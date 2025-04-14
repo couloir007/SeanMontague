@@ -1,0 +1,103 @@
+/**
+ * @file
+ * Styles for menu placed in sidebar region.
+ */
+
+.menu-sidebar {
+  color: var(--midnight-joshua-tree);
+  font-family: var(--font-heading), sans-serif;
+  list-style-type: none;
+  margin-block: 0;
+  padding-inline-start: 0;
+}
+
+.menu-sidebar .menu__item {
+    margin-block: 0;
+  }
+
+.menu-sidebar .menu__item--has-children {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+.menu-sidebar .menu__link {
+    display: flex;
+    flex-basis: calc(100% - 32px);
+    font-size: var(--font-size-2);
+    text-decoration: none;
+  }
+
+.menu-sidebar .menu__link:hover {
+      border-block-end: 0;
+      color: var(--southbay-waves);
+    }
+
+.menu-sidebar .menu__item--level-1 {
+    padding-block-end: var(--size-3);
+  }
+
+.menu-sidebar .menu__item--level-1 .menu__link {
+      font-weight: var(--font-weight-600);
+      line-height: var(--leading-10);
+    }
+
+.menu-sidebar .menu__item--level-2 .menu__link{
+      display: list-item;
+      font-weight: var(--font-weight-400);
+      line-height: var(--leading-normal);
+      list-style-type: square;
+    }
+
+.menu-sidebar .menu__item--level-3 .menu__link{
+      list-style-type: disc;
+      margin-bottom: 3px;
+    }
+
+/* For Storybook purposes, set a max width to represent a typical width of this
+  menu when used in Drupal. */
+
+.sb-demo .menu-sidebar {
+    max-inline-size: var(--size-96);
+  }
+
+/* Sidebar menu level 2 */
+
+.menu-sidebar--level-2 {
+  flex-basis: 100%;
+  padding-inline-start: var(--size-8);
+}
+
+.menu-sidebar--level-2 .menu__item--has-children {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+.menu-sidebar--level-2 .menu__link {
+    font-size: var(--font-size-1);
+    font-weight: var(--font-weight-400);
+  }
+
+/* Sidebar menu level 3 */
+
+.menu-sidebar--level-3 {
+  flex-basis: 100%;
+  padding-inline-start: var(--size-6);
+}
+
+.menu-sidebar--level-3 .menu__link {
+    font-size: var(--font-size-1);
+  }
+
+/* Sidebar menu level 4 */
+
+.menu-sidebar--level-4 {
+  flex-basis: 100%;
+  padding-inline-start: var(--size-6);
+}
+
+.menu-sidebar--level-4 .menu__link {
+    font-size: var(--font-size-1);
+  }

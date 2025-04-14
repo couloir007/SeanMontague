@@ -1,0 +1,7 @@
+.search-filter {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  margin-bottom: 35px;
+  width: 100%;
+}

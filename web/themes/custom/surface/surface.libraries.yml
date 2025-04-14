@@ -1,0 +1,38 @@
+global:
+  version: VERSION
+  css:
+    base:
+      dist/css/global.css: {}
+      dist/css/utilities.css: {}
+    component:
+      dist/css/button.css: {}
+
+breadcrumb:
+  css:
+    component:
+      dist/css/breadcrumb.css: {}
+
+card:
+  css:
+    component:
+      dist/css/card.css: {}
+
+# Overrides Drupal messages to solve issue in 10.3.
+# https://www.drupal.org/project/uswds_base/issues/3465493
+drupal.message:
+  version: VERSION
+  js:
+    dist/js/messages.js: {}
+  dependencies:
+    - surface/messages
+
+featured-card:
+  css:
+    component:
+      dist/css/featured-card.css: {}
+
+leaflet:
+  css:
+    component:
+      dist/css/leaflet.css: {}
+

@@ -1,0 +1,24 @@
+/**
+ * @file
+ * Map component styling.
+ */
+
+.map__title {
+  color: var(--gray-900);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-8);
+  line-height: var(--leading-normal);
+  margin-block-end: var(--size-6);
+}
+
+/* Text color changes if Venice Canal background is present. */
+
+.bg-venice-canal .map__title {
+    color: var(--white);
+  }
+
+/* Text color changes if Santa Barbara Sand background is present. */
+
+.bg-santa-barbara-sand .map__title {
+    color: var(--midnight-observatory);
+  }

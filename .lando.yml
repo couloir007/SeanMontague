@@ -1,0 +1,38 @@
+name: trailmapper psql
+recipe: drupal10
+config:
+  webroot: web
+  php: '8.3'
+  composer_version: '2'
+  database: postgres:15
+
+proxy:
+  appserver:
+    - trailmapper-psql.lndo.site
+
+services:
+  appserver:
+    type: php:8.3
+    webroot: web
+    via: apache
+    overrides:
+      extra_hosts:
+        - 'host.docker.internal:172.17.0.1'
+      environment:
+        DRUSH_OPTIONS_URI: "https://trailmapper-psql.lndo.site"
+
+  database:
+    type: postgres:15
+    creds:
+      database: drupal
+      user: drupal
+      password: drupal
+    config:
+      extensions:
+        - postgis
+
+tooling:
+  composer:
+    service: appserver
+  drush:
+    service: appserver

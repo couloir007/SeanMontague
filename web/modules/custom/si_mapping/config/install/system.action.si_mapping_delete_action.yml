@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - si_mapping
+id: si_mapping_delete_action
+label: 'Delete si mappings'
+type: si_mapping
+plugin: entity:delete_action:si_mapping
+configuration: {  }

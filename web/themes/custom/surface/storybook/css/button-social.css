@@ -1,0 +1,43 @@
+/**
+ * @file
+ * Button-Social styles.
+ */
+
+/* Give button */
+
+.button.button--social {
+    background-color: transparent;
+    background-repeat: no-repeat;
+    border: none;
+    padding-inline: 16px;
+    width: 34px;
+  }
+
+.button.button--social:visited {
+      background-color: inherit;
+      color: inherit;
+    }
+
+.button.button--social:hover {
+      background-color: inherit;
+      color: var(--gray-200);
+    }
+
+.button.button--social.button--flickr {
+      background-image: linear-gradient(transparent, transparent), url('../../images/Flickr_white.svg');
+    }
+
+.button.button--social.button--facebook {
+      display: flex;
+      margin-inline-end: var(--size-4);
+      padding-inline: 0;
+      width: 32px;
+    }
+
+.button.button--social svg {
+      color: var(--white);
+      display: block;
+      height: 100%;
+      margin-inline-start: 0;
+      width: 100%;
+    }

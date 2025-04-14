@@ -1,0 +1,28 @@
+uuid: d9ba5a54-b5c8-48f1-ba19-e2677fdf3977
+langcode: en
+status: false
+dependencies:
+  config:
+    - core.entity_view_mode.media.token
+    - field.field.media.image.field_media_image
+    - media.type.image
+  module:
+    - svg_image
+id: media.image.token
+targetEntityType: media
+bundle: image
+mode: token
+content:
+  field_media_image:
+    type: image_url
+    label: visually_hidden
+    settings:
+      image_style: '4_3'
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  created: true
+  name: true
+  thumbnail: true
+  uid: true

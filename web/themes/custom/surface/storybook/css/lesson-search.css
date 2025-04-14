@@ -1,0 +1,34 @@
+/**
+ * @file
+ * Search results specific styles.
+ */
+
+.lesson-search {
+  margin-bottom: 60px;
+  width: 100%;
+}
+
+.lesson-search h3 {
+    line-height: 38px;
+  }
+
+.lesson-search h3 a {
+      color: black;
+    }
+
+.lesson-search h6 {
+    font-weight: 400;
+    line-height: 24px;
+  }
+
+.lesson-search__grades label {
+      margin-right: 5px;
+    }
+
+.lesson-search__grades strong::after {
+      content: ', ';
+    }
+
+.lesson-search__grades strong:last-child::after {
+      content: '';
+    }

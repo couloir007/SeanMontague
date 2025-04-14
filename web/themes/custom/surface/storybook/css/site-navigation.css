@@ -1,0 +1,32 @@
+/**
+ * @file
+ * Site navigation.
+ */
+
+.site-navigation {
+  display: none;
+}
+
+.site-navigation.is-active {
+    display: block;
+  }
+
+@media (width >= 1280px) {
+
+.site-navigation {
+    display: block
+}
+  }
+
+/* Secondary menu mobile */
+
+.site-navigation .menu--secondary {
+    display: block;
+  }
+
+@media (width >= 1280px) {
+
+.site-navigation .menu--secondary {
+      display: none
+  }
+    }

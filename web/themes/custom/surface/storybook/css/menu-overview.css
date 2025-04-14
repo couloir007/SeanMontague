@@ -1,0 +1,71 @@
+/**
+ * @file
+ * Overview menu styling.
+ */
+
+.page--overview .mobile-button {
+    color: var(--white);
+  }
+
+.page--overview .mobile-button path {
+      stroke: var(--white);
+    }
+
+@media (width >= 900px) {
+    .menu-overview .toggle {
+      color: var(--white);
+      display: none;
+    }
+  }
+
+.menu-overview.fixed {
+    margin-inline: auto;
+    max-inline-size: var(--size-container);
+    position: fixed;
+    z-index: 10;
+  }
+
+.menu-overview .sections-navigation {
+    display: none;
+  }
+
+.menu-overview .sections-navigation.is-active {
+      display: block;
+    }
+
+@media (width >= 900px) {
+
+.menu-overview .sections-navigation {
+      display: block
+  }
+    }
+
+.menu--overview {
+  inline-size: 100%;
+  list-style: none;
+  margin-block: 0;
+  margin-inline-end: 0;
+  margin-inline-start: calc(var(--size-4) * -1);
+  padding-block-start: var(--size-3);
+  text-align: center;
+}
+
+.menu--overview .menu__item {
+    display: inline-block;
+    margin-block: 0;
+  }
+
+.menu--overview .menu__link {
+    color: var(--white);
+    display: block;
+    font-size: var(--font-size-1);
+    font-weight: var(--font-weight-700);
+    margin-block: 0;
+    padding-block-end: var(--size-3);
+    padding-inline-end: var(--size-6);
+    text-transform: uppercase;
+  }
+
+.overview_menu.fixed {
+    width: 100%;
+  }

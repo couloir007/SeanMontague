@@ -1,0 +1,66 @@
+/**
+ * @file
+ * Facet block styles.
+ */
+
+.facet-block {
+  margin-block-end: var(--size-3);
+}
+
+.facet-block ul {
+    padding-inline-start: 0;
+  }
+
+.facet-block ul li {
+      padding-inline-start: 0;
+    }
+
+.facet-block h3::before {
+    background-image: linear-gradient(transparent, transparent), url('../../images/bg/angle-right-primary.svg');
+    background-repeat: no-repeat;
+    background-size: 12px;
+    content: '';
+    display: block;
+    height: 24px;
+    overflow: hidden;
+    position: absolute;
+    right: 20px;
+    top: 16px;
+    transform: rotate(90deg);
+    width: 24px;
+  }
+
+@media (width >= 640px) {
+
+.facet-block h3::before {
+      display: none
+  }
+    }
+
+.facets-widget-checkbox {
+  display: none;
+}
+
+@media (width >= 640px) {
+
+.facets-widget-checkbox {
+    display: block
+}
+  }
+
+.facet-block__title {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-700);
+  margin-block-end: var(--size-3);
+  margin-block-start: var(--size-8);
+}
+
+.facets-soft-limit-link {
+  display: block;
+  font-size: var(--font-size-0);
+  margin-block-start: var(--size-2);
+}
+
+.facet-item {
+  display: flex;
+}

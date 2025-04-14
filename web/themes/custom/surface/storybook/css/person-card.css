@@ -1,0 +1,55 @@
+/**
+ * @file
+ * Person card styles.
+ */
+
+.person-card {
+  background-color: var(--white);
+  border-radius: var(--radius-2);
+  box-shadow: var(--shadow-2);
+  inline-size: 100%;
+  max-inline-size: var(--size-50);
+}
+
+@media (width >= 640px) {
+
+.person-card {
+    margin-inline: initial /* resets margin on larger devices. */
+}
+  }
+
+.person-card:hover {
+    box-shadow: var(--shadow-3);
+  }
+
+.person-card:hover .person-card__name {
+      color: var(--ucla-blue);
+    }
+
+.person-card__image {
+  max-inline-size: var(--size-50);
+  min-inline-size: var(--size-50);
+}
+
+.person-card__image img {
+    inline-size: 100%;
+  }
+
+.person-card__meta {
+  padding-block: var(--size-4);
+  padding-inline: var(--size-4);
+}
+
+.person-card__name {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-3);
+  line-height: var(--leading-normal);
+}
+
+.person-card__title {
+  color: var(--gray-500);
+  display: inline-block;
+  font-size: var(--font-size-0);
+  line-height: var(--leading-snug);
+  margin-block-start: var(--size-3);
+}

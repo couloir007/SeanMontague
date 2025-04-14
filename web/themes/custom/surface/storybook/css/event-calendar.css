@@ -1,0 +1,93 @@
+/**
+ * @file
+ * Event calendar component.
+ */
+
+/* Updates text color for content outside of the actual calendar
+  based on the background color applied. */
+
+.bg-santa-barbara-sand .event-calendar {
+    color: var(--midnight-observatory);
+  }
+
+.bg-venice-canal .event-calendar {
+    color: var(--white);
+  }
+
+.event-calendar__header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+@media (width >= 768px) {
+
+.event-calendar__header {
+    align-items: center;
+    flex-direction: row
+}
+  }
+
+.event-calendar__heading {
+  color: var(--midnight-joshua-tree);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-8);
+  font-weight: var(--font-weight-600);
+}
+
+/* Calendar heading text color changes based on background
+  color applied. */
+
+.bg-santa-barbara-sand .event-calendar__heading {
+    color: var(--midnight-observatory);
+  }
+
+.bg-venice-canal .event-calendar__heading {
+    color: var(--white);
+  }
+
+.event-calendar__items {
+  inline-size: 100%;
+  padding-block-start: var(--size-8);
+}
+
+.event-calendar__more-link-wrapper {
+  align-items: center;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.event-calendar__more-link-wrapper svg {
+    block-size: 1rem;
+    display: inline-block;
+    inline-size: 1rem;
+    margin-inline-start: var(--size-05);
+  }
+
+.event-calendar__more-link-wrapper svg path {
+      color: var(--midnight-joshua-tree);
+    }
+
+/* More link svg image color changes based on background
+      color being applied. */
+
+.bg-santa-barbara-sand .event-calendar__more-link-wrapper svg path {
+        color: var(--midnight-observatory);
+      }
+
+.bg-venice-canal .event-calendar__more-link-wrapper svg path {
+        color: var(--white);
+      }
+
+.event-calendar__link {
+  color: var(--midnight-joshua-tree);
+  font-size: var(--font-size-3);
+}
+
+.bg-santa-barbara-sand .event-calendar__link {
+    color: var(--midnight-observatory);
+  }
+
+.bg-venice-canal .event-calendar__link {
+    color: var(--white);
+  }

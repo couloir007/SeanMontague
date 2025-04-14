@@ -1,0 +1,26 @@
+entity.si_mapping.view:
+  title: 'View'
+  route_name: entity.si_mapping.canonical
+  base_route: entity.si_mapping.canonical
+entity.si_mapping.edit_form:
+  title: 'Edit'
+  route_name: entity.si_mapping.edit_form
+  base_route: entity.si_mapping.canonical
+entity.si_mapping.delete_form:
+  title: 'Delete'
+  route_name: entity.si_mapping.delete_form
+  base_route: entity.si_mapping.canonical
+  weight: 10
+entity.si_mapping.collection:
+  title: 'Si mappings'
+  route_name: entity.si_mapping.collection
+  base_route: system.admin_content
+  weight: 10
+entity.si_mapping_type.edit_form:
+  title: 'Edit'
+  route_name: entity.si_mapping_type.edit_form
+  base_route: entity.si_mapping_type.edit_form
+entity.si_mapping_type.collection:
+  title: 'List'
+  route_name: entity.si_mapping_type.collection
+  base_route: entity.si_mapping_type.collection

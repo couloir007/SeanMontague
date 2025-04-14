@@ -1,0 +1,17 @@
+uuid: fa6c8ef1-9d6c-41c5-b21c-50be92fbf377
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+third_party_settings:
+  menu_ui:
+    available_menus: {  }
+    parent: ''
+name: 'Home Page'
+type: home_page
+description: null
+help: null
+new_revision: false
+preview_mode: 0
+display_submitted: false

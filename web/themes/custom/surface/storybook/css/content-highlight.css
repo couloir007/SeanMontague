@@ -1,0 +1,181 @@
+/**
+ * @file
+ * Content highlight component which is used by Article and Event
+ * content types.
+ */
+
+/* Data attributes to change component's background based on theme. */
+
+:where([data-theme='surface']) {
+  --content-highlight-bg: var(--op-blue);
+}
+
+:where([data-theme='dgsom']) {
+  --content-highlight-bg: var(--midnight-joshua-tree);
+}
+
+:where([data-theme='labs']) {
+  --content-highlight-bg: var(--malibu-dolphin);
+  --button-bg: var(--op-blue);
+  --button-color: var(--white);
+  --button-bg-hover: var(--silver-lake-reservoir);
+}
+
+:where([data-theme='labs-dynamic']) {
+  --content-highlight-bg: var(--malibu-dolphin);
+  --button-bg: var(--op-blue);
+  --button-color: var(--white);
+  --button-bg-hover: var(--silver-lake-reservoir);
+}
+
+/* Changes date badge's background color only when it appears inside the Card. */
+
+.content-highlight .date-badge {
+    background-color: var(--midnight-joshua-tree, var(--op-blue));
+  }
+
+.content-highlight__container {
+  background-color: var(--white);
+  padding: var(--size-10);
+}
+
+/* If component is added in a one column layout, add blue background. */
+
+.layout--onecol .content-highlight__container {
+    background-color: var(--content-highlight-bg, var(--op-blue));
+  }
+
+/* If background colors are applied by users, remove the component's background
+  color to show the user-applied background color. */
+
+.bg-venice-canal .content-highlight__container,
+  .bg-santa-barbara-sand .content-highlight__container {
+    background-color: transparent;
+  }
+
+.content-highlight__featured {
+  margin-block-start: var(--size-8);
+}
+
+.content-highlight__header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+@media (width >= 768px) {
+
+.content-highlight__header {
+    align-items: center;
+    flex-direction: row
+}
+  }
+
+.content-highlight__title {
+  color: var(--gray-900);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-8);
+  font-weight: var(--font-weight-600);
+}
+
+.layout--onecol .content-highlight__title {
+    color: var(--white);
+  }
+
+.bg-santa-barbara-sand .content-highlight__title {
+    color: var(--midnight-joshua-tree);
+  }
+
+.content-highlight__link {
+  color: var(--op-blue);
+  font-size: var(--font-size-3);
+
+  /* If a highlight title is not provided, we still want the link to display
+  on the right side.  Flexbox's margin auto lets us do this. */
+  margin-inline-start: auto;
+}
+
+.layout--onecol .content-highlight__link {
+    color: var(--white);
+  }
+
+.bg-santa-barbara-sand .content-highlight__link {
+    color: var(--midnight-joshua-tree);
+  }
+
+/* Create grid for component cards. */
+
+.content-highlight__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-8);
+  justify-content: center;
+  padding-block: var(--size-8);
+}
+
+@media (width >= 640px) {
+
+.content-highlight__items {
+    justify-content: flex-start
+}
+  }
+
+/* Changes text size of '+ more dates' inside the cards. */
+
+.content-highlight__items .event-card__more-dates {
+    font-size: var(--font-size-sm);
+  }
+
+.content-highlight__items .content-card {
+    flex: 1 1 var(--size-50);
+    max-inline-size: var(--size-80);
+  }
+
+/* Hides the 4th card when the content highlight is added to a two column
+  layout with a split of 70/30 or 30/70. */
+
+.layout--twocol-30-70 .content-highlight__items > article:nth-child(4), .layout--twocol-70-30 .content-highlight__items > article:nth-child(4) {
+      display: none;
+    }
+
+.card--event .card__date--wrapper {
+    align-items: initial;
+    flex-direction: column;
+  }
+
+.card--event .readtime {
+    margin-block-start: var(--size-3);
+  }
+
+/* We hide the wave's container on small devices, then show them in larger devices.
+However, if background color has been added to the content highlight, then
+we hide the waves on all devices. */
+
+.content-highlight__waves {
+  display: none;
+}
+
+@media (width >= 768px) {
+    .layout--onecol .content-highlight__waves {
+      display: block;
+    }
+
+    .bg-santa-barbara-sand .content-highlight__waves,
+    .bg-venice-canal .content-highlight__waves {
+      display: none;
+    }
+  }
+
+.content-highlight__waves--top,
+.content-highlight__waves--bottom {
+  /* In some instances, a while line is visible where the waves end and the
+    background color starts. The negative margin below removes this white line. */
+  margin-block-end: -1px;
+}
+
+/* Styles for waves svg images to expand full width. */
+
+.layout--onecol .content-highlight__wave {
+    display: block;
+    inline-size: 100%;
+  }

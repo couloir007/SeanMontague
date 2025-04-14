@@ -1,0 +1,51 @@
+<?php
+
+use Drupal\views\ViewExecutable;
+
+/**
+ * Implements hook_theme().
+ */
+function leaflet_full_page_theme($existing, $type, $theme, $path) {
+  $module_path = \Drupal::service('extension.list.module')->getPath('leaflet_full_page');
+  return [
+    'views_view__leaflet_full_page__leaflet_full_page' => [
+      'template' => 'views-view--leaflet-full-page--leaflet-full-page', // Filename without .html.twig
+      'path' => $module_path . '/templates',
+    ],
+    'views_view_unformatted__leaflet_full_page__leaflet_full_page' => [
+      'template' => 'views-view-unformatted--leaflet-full-page--leaflet-full-page', // Filename without .html.twig
+      'path' => $module_path . '/templates',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_views_view().
+ */
+//function leaflet_full_page_preprocess_views_view(array &$variables) {
+//  if ($variables['view']->id() === 'leaflet_full_page') {
+//
+//    // Attach the custom library.
+//    $variables['#attached']['library'][] = 'leaflet_full_page/custom_leaflet';
+//  }
+//}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function leaflet_full_page_theme_suggestions_views_view_alter(array &$suggestions, array $variables) {
+  $view = $variables['view'];
+  $suggestions[] = 'views_view__leaflet_full_page__' . $view->id();
+  $suggestions[] = 'views_view__leaflet_full_page__' . $view->current_display;
+  $suggestions[] = 'views_view__leaflet_full_page__' . $view->id() . '__' . $view->current_display;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function leaflet_full_page_theme_suggestions_views_view_unformatted_alter(array &$suggestions, array $variables) {
+  $view = $variables['view'];
+  $suggestions[] = 'views_view_unformatted__leaflet_full_page__' . $view->id();
+  $suggestions[] = 'views_view_unformatted__leaflet_full_page__' . $view->current_display;
+  $suggestions[] = 'views_view_unformatted__leaflet_full_page__' . $view->id() . '__' . $view->current_display;
+}

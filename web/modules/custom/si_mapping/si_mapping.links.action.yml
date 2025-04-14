@@ -1,0 +1,11 @@
+si_mapping.type_add:
+  title: 'Add si mapping type'
+  route_name: entity.si_mapping_type.add_form
+  appears_on:
+    - entity.si_mapping_type.collection
+
+si_mapping.add_page:
+  title: 'Add si mapping'
+  route_name: entity.si_mapping.add_page
+  appears_on:
+    - entity.si_mapping.collection

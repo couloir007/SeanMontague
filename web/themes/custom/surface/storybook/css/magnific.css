@@ -1,0 +1,20 @@
+.magnific {
+  display: block;
+}
+
+  .magnific .slideshow--full-thumb img {
+      width: 100%;
+    }
+
+  .magnific .slideshow--small-thumbs-container {
+    padding-block-start: var(--size-8);
+    text-align: center;
+  }
+
+  .magnific .slideshow--small-thumbs-container a {
+      display: inline-block;
+    }
+
+  .magnific .slide__container {
+    display: none;
+  }

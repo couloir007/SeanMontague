@@ -1,0 +1,422 @@
+/*
+ * @file
+ * Provides default layout styles for all layout sections and main section.
+ */
+
+/**
+ * The `region--max-width` selector is used to define the maximum width of
+ * the entire site. This only includes components in the content region,
+ * and excludes the site header and site footer elements to allow them to
+ * expand indefinitely.
+ */
+
+.region--max-width {
+  margin: 0 auto;
+  max-inline-size: var(--size-max-site-width);
+}
+
+.region--tablet-width {
+  margin: 0 auto;
+}
+
+/* Main content Layout. */
+
+.main {
+  inline-size: 100%;
+  margin-block-end: var(--size-8);
+  position: relative;
+}
+
+.layout {
+  display: grid;
+  gap: var(--size-8);
+  grid-auto-flow: row;
+}
+
+.layout__region {
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+/* One Column */
+
+.layout--onecol {
+  grid-template-columns: 1fr;
+}
+
+.layout--onecol .layout--onecol {
+    margin-inline: var(--size-4);
+  }
+
+@media (width >= 768px) {
+
+.layout--onecol .layout--onecol {
+      margin-inline: auto;
+      max-inline-size: calc(var(--size-tablet) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1024px) {
+
+.layout--onecol .layout--onecol {
+      max-inline-size: calc(var(--size-laptop) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1280px) {
+
+.layout--onecol .layout--onecol {
+      max-inline-size: calc(var(--size-container) - var(--size-8) * 2)
+  }
+    }
+
+/* Two Column */
+
+@media (width >= 768px) {
+
+.layout--twocol {
+    grid-template-columns: repeat(2, minmax(0, 1fr))
+}
+  }
+
+.layout--onecol .layout--twocol {
+    margin-inline: var(--size-4);
+  }
+
+@media (width >= 768px) {
+
+.layout--onecol .layout--twocol {
+      margin-inline: auto;
+      max-inline-size: calc(var(--size-tablet) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1024px) {
+
+.layout--onecol .layout--twocol {
+      max-inline-size: calc(var(--size-laptop) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1280px) {
+
+.layout--onecol .layout--twocol {
+      max-inline-size: calc(var(--size-container) - var(--size-8) * 2)
+  }
+    }
+
+@media (width >= 768px) {
+
+.layout--twocol-30-70 {
+    grid-template-columns: 3fr 7fr
+}
+  }
+
+.layout--onecol .layout--twocol-30-70 {
+    margin-inline: var(--size-4);
+  }
+
+@media (width >= 768px) {
+
+.layout--onecol .layout--twocol-30-70 {
+      margin-inline: auto;
+      max-inline-size: calc(var(--size-tablet) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1024px) {
+
+.layout--onecol .layout--twocol-30-70 {
+      max-inline-size: calc(var(--size-laptop) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1280px) {
+
+.layout--onecol .layout--twocol-30-70 {
+      max-inline-size: calc(var(--size-container) - var(--size-8) * 2)
+  }
+    }
+
+@media (width >= 768px) {
+
+.layout--twocol-70-30 {
+    grid-template-columns: 7fr 3fr
+}
+  }
+
+.layout--onecol .layout--twocol-70-30 {
+    margin-inline: var(--size-4);
+  }
+
+@media (width >= 768px) {
+
+.layout--onecol .layout--twocol-70-30 {
+      margin-inline: auto;
+      max-inline-size: calc(var(--size-tablet) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1024px) {
+
+.layout--onecol .layout--twocol-70-30 {
+      max-inline-size: calc(var(--size-laptop) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1280px) {
+
+.layout--onecol .layout--twocol-70-30 {
+      max-inline-size: calc(var(--size-container) - var(--size-8) * 2)
+  }
+    }
+
+/* Three Column */
+
+@media (width >= 768px) {
+
+.layout--threecol {
+    grid-template-columns: repeat(3, minmax(0, 1fr))
+}
+  }
+
+.layout--onecol .layout--threecol {
+    margin-inline: var(--size-4);
+  }
+
+@media (width >= 768px) {
+
+.layout--onecol .layout--threecol {
+      margin-inline: auto;
+      max-inline-size: calc(var(--size-tablet) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1024px) {
+
+.layout--onecol .layout--threecol {
+      max-inline-size: calc(var(--size-laptop) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1280px) {
+
+.layout--onecol .layout--threecol {
+      max-inline-size: calc(var(--size-container) - var(--size-8) * 2)
+  }
+    }
+
+@media (width >= 768px) {
+
+.layout--threecol-25-25-50 {
+    grid-template-columns: 2.5fr 2.5fr 5fr
+}
+  }
+
+.layout--onecol .layout--threecol-25-25-50 {
+    margin-inline: var(--size-4);
+  }
+
+@media (width >= 768px) {
+
+.layout--onecol .layout--threecol-25-25-50 {
+      margin-inline: auto;
+      max-inline-size: calc(var(--size-tablet) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1024px) {
+
+.layout--onecol .layout--threecol-25-25-50 {
+      max-inline-size: calc(var(--size-laptop) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1280px) {
+
+.layout--onecol .layout--threecol-25-25-50 {
+      max-inline-size: calc(var(--size-container) - var(--size-8) * 2)
+  }
+    }
+
+@media (width >= 768px) {
+
+.layout--threecol-25-50-25 {
+    grid-template-columns: 2.5fr 5fr 2.5fr
+}
+  }
+
+.layout--onecol .layout--threecol-25-50-25 {
+    margin-inline: var(--size-4);
+  }
+
+@media (width >= 768px) {
+
+.layout--onecol .layout--threecol-25-50-25 {
+      margin-inline: auto;
+      max-inline-size: calc(var(--size-tablet) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1024px) {
+
+.layout--onecol .layout--threecol-25-50-25 {
+      max-inline-size: calc(var(--size-laptop) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1280px) {
+
+.layout--onecol .layout--threecol-25-50-25 {
+      max-inline-size: calc(var(--size-container) - var(--size-8) * 2)
+  }
+    }
+
+@media (width >= 768px) {
+
+.layout--threecol-50-25-25 {
+    grid-template-columns: 5fr 2.5fr 2.5fr
+}
+  }
+
+.layout--onecol .layout--threecol-50-25-25 {
+    margin-inline: var(--size-4);
+  }
+
+@media (width >= 768px) {
+
+.layout--onecol .layout--threecol-50-25-25 {
+      margin-inline: auto;
+      max-inline-size: calc(var(--size-tablet) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1024px) {
+
+.layout--onecol .layout--threecol-50-25-25 {
+      max-inline-size: calc(var(--size-laptop) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1280px) {
+
+.layout--onecol .layout--threecol-50-25-25 {
+      max-inline-size: calc(var(--size-container) - var(--size-8) * 2)
+  }
+    }
+
+/* Four Column */
+
+@media (width >= 640px) {
+
+.layout--fourcol {
+    grid-template-columns: repeat(2, minmax(0, 1fr))
+}
+  }
+
+@media (width >= 768px) {
+
+.layout--fourcol {
+    grid-template-columns: repeat(4, minmax(0, 1fr))
+}
+  }
+
+.layout--onecol .layout--fourcol {
+    margin-inline: var(--size-4);
+  }
+
+@media (width >= 768px) {
+
+.layout--onecol .layout--fourcol {
+      margin-inline: auto;
+      max-inline-size: calc(var(--size-tablet) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1024px) {
+
+.layout--onecol .layout--fourcol {
+      max-inline-size: calc(var(--size-laptop) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1280px) {
+
+.layout--onecol .layout--fourcol {
+      max-inline-size: calc(var(--size-container) - var(--size-8) * 2)
+  }
+    }
+
+/* Six Column */
+
+@media (width >= 768px) {
+
+.layout--sixcol {
+    grid-template-columns: repeat(3, minmax(0, 1fr))
+}
+  }
+
+@media (width >= 1024px) {
+
+.layout--sixcol {
+    grid-template-columns: repeat(6, minmax(0, 1fr))
+}
+  }
+
+.layout--onecol .layout--sixcol {
+    margin-inline: var(--size-4);
+  }
+
+@media (width >= 768px) {
+
+.layout--onecol .layout--sixcol {
+      margin-inline: auto;
+      max-inline-size: calc(var(--size-tablet) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1024px) {
+
+.layout--onecol .layout--sixcol {
+      max-inline-size: calc(var(--size-laptop) - var(--size-4) * 2)
+  }
+    }
+
+@media (width >= 1280px) {
+
+.layout--onecol .layout--sixcol {
+      max-inline-size: calc(var(--size-container) - var(--size-8) * 2)
+  }
+    }
+
+/* Columns */
+
+.display-as-columns .layout__region {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    margin-inline: auto;
+    max-inline-size: var(--size-max-content-width); /* 1376px */
+    padding-inline: var(--size-4);
+  }
+
+@media (width >= 1280px) {
+
+.display-as-columns .layout__region {
+      padding-inline: var(--size-8)
+  }
+    }
+
+@media (width >= 1440px) {
+
+.display-as-columns .layout__region { /* 1440px */
+      padding-inline: 0
+  }
+    }
+
+/* Experimental */
+
+.full-width-bg {
+  box-shadow: 0 0 0 100vmax #000;
+  clip-path: inset(0 -100vmax);
+}

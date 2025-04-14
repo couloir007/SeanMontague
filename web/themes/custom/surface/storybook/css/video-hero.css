@@ -1,0 +1,50 @@
+/**
+ * @file
+ * Video hero styles.
+ */
+
+.video-hero {
+  margin-inline: auto;
+  max-inline-size: var(--size-max-site-width);
+  position: relative;
+}
+
+.video-hero__button {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  background: transparent;
+  block-size: 50px;
+  border: 0;
+  box-shadow: none;
+  color: var(--white);
+  display: block;
+  inline-size: 50px;
+  inset-block-end: 10px;
+  inset-inline-end: 10px;
+  outline: none;
+  padding: 0;
+  position: absolute;
+}
+
+/* Removes the focus outline and other button styles for clicking devices. */
+
+.video-hero__button:hover,
+  .video-hero__button:focus {
+    background-color: transparent;
+    border: 0;
+    box-shadow: none;
+    outline: none;
+  }
+
+/* Restores focus outline for keyboard devices. */
+
+.video-hero__button:focus-visible {
+    box-shadow: 0 0 var(--white), 0 0 0 2px var(--gray-400), 0 0 var(--white);
+  }
+
+.video-hero__button svg {
+    block-size: 30px;
+    inline-size: 30px;
+    margin-inline-start: 0;
+  }

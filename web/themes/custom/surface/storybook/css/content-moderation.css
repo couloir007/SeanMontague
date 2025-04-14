@@ -1,0 +1,16 @@
+/**
+ * @file
+ * Content moderation overrides.
+*/
+
+.entity-moderation-form {
+  background: none;
+}
+
+.entity-moderation-form .form-item--current {
+    font-weight: var(--font-weight-700);
+  }
+
+.entity-moderation-form .form-item--current .form-item__label {
+      margin-block-end: var(--size-4);
+    }

@@ -1,0 +1,11 @@
+{# Inherits all of the content from the 404 page with the ability to override
+key pieces of content. #}
+{% extends '@surface/page--surface-404-custom.html.twig' %}
+
+{# Overrides the `about` url to match this page's url. #}
+{% block about %}{{ '/access-restricted'|trim }}{% endblock %}
+
+{# Overrides the page's title to match this page's title. #}
+{% block page_title %}
+  <h1><span>Unauthorized Access</span></h1>
+{% endblock %}

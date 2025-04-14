@@ -1,0 +1,67 @@
+/**
+ * @file
+ * Mercury editor node form overrides.
+ */
+
+.me-node-form {
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: var(--size-2) !important;
+}
+
+.me-node-form .form-item {
+    margin-block: var(--size-6) !important;
+  }
+
+.me-node-form .form-item__description ul {
+      list-style: none !important;
+      margin-inline: 0 !important;
+    }
+
+.me-node-form .form-item__description ul li {
+        list-style: none !important;
+        margin-inline: 0 !important;
+      }
+
+.me-node-form .claro-details__summary {
+    padding-inline: 0 !important;
+  }
+
+.me-node-form .claro-details__summary--accordion-item {
+    padding-block-end: var(--size-5) !important;
+  }
+
+.me-node-form .messages {
+    background-color: var(--santa-barbara-sand);
+    font-size: var(--font-size-0);
+    font-weight: var(--font-weight-500);
+    inline-size: 100%;
+  }
+
+.me-node-form .messages.messages--status {
+      background-color: var(--green-100);
+      border: 1px solid var(--green-300);
+      color: var(--green-900);
+    }
+
+.me-node-form .messages .button--dismiss:hover:not(:focus) {
+        border-color: transparent !important;
+      }
+
+.me-node-form .messages .button--dismiss:hover:not(:focus) .icon-close {
+          background-color: var(--gray-600) !important;
+        }
+
+.me-node-form .messages .button--dismiss .icon-close {
+        background-color: var(--black) !important;
+      }
+
+.me-node-form .messages .messages__content {
+      margin: 0 !important;
+      padding-block: var(--size-6);
+      padding-inline: var(--size-4);
+    }
+
+.me-node-form .gin-tooltip {
+    display: none;
+  }

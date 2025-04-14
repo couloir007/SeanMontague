@@ -1,0 +1,26 @@
+/**
+ * @file
+ * Branding styles.
+ */
+
+.site-branding--footer {
+  display: inline-block;
+  margin-block-end: var(--size-6);
+}
+
+.site-branding--footer img {
+    inline-size: 100%;
+  }
+
+.site-branding--horizontal-op {
+  display: inline-block;
+  max-inline-size: 183px;
+}
+
+.site-branding--horizontal-op.primary-hidden {
+    max-inline-size: 110px;
+  }
+
+.site-branding--horizontal-op img {
+    inline-size: 100%;
+  }

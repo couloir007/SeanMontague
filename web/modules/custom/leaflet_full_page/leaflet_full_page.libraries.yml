@@ -1,0 +1,11 @@
+custom_leaflet:
+  version: 1.0
+  css:
+    component:
+      css/custom_leaflet.css: {}
+  js:
+    js/custom_leaflet.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/once

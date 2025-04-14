@@ -1,0 +1,13 @@
+uuid: 7e642e69-4da1-44a6-be57-10f4d4d08f8e
+langcode: en
+status: true
+dependencies:
+  module:
+    - si_mapping
+_core:
+  default_config_hash: kNv_DuFNFPlixNO1lxJaknSh4Cacb7pX-EI4wPmZnGM
+id: si_mapping_save_action
+label: 'Save si mappings'
+type: si_mapping
+plugin: 'entity:save_action:si_mapping'
+configuration: {  }

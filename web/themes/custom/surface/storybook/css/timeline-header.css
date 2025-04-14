@@ -1,0 +1,54 @@
+.timeline-header.page-section.tight {
+    margin-block-end: 0;
+  }
+  .timeline-header .hero__overview_overlay {
+    opacity: 30%;
+  }
+  .timeline-header .hero__scientific_name {
+    font-size: var(--font-size-7);
+  }
+  .timeline-header .hero__title {
+    margin-block-end: var(--size-6);
+  }
+  .timeline-header .overview-menu__sections {
+    background-color: var(--white);
+    color: var(--op-blue);
+    display: flex;
+  }
+  .timeline-header .overview-menu__sections a {
+      color: var(--op-blue);
+    }
+  .timeline-header .overview-menu__sections .menu--overview {
+      border-bottom: 7px solid #234FA3;
+      margin-inline-start: 0;
+      width: 85%;
+    }
+  .timeline-header .overview-menu__sections .toggle {
+      border-bottom: 7px solid #4bc7ec;
+      margin-block-start: 10px;
+      padding-inline-start: 10px;
+      width: 15%;
+    }
+  .timeline-header .overview-menu__sections .menu-timeline-title {
+      border-bottom: 7px solid #4bc7ec;
+      display: block;
+      padding-inline-start: 0;
+      width: 85%;
+    }
+  @media (width >= 900px) {
+  .timeline-header .overview-menu__sections .menu-timeline-title {
+        width: 25%
+    }
+      }
+  .timeline-header .overview-menu__sections .timeline-title {
+      font-size: var(--size-5);
+      font-weight: 700;
+      line-height: var(--size-6);
+      text-align: center;
+      text-transform: uppercase;
+      transform: scale(1, 1.25);
+      transition-duration: 0.2s
+    }
+  .timeline-header .menu-overview.fixed {
+      width: 100%;
+    }

@@ -1,0 +1,18 @@
+/**
+ * @file
+ * Form overrides.
+ */
+
+.form-actions .field-actions {
+    align-items: center;
+  }
+
+.form-text {
+  inline-size: 100%;
+}
+
+/* Node confirm form */
+
+.node-confirm-form {
+  padding-block: var(--size-5);
+}

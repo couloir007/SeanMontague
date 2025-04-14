@@ -1,0 +1,57 @@
+/**
+ * @file
+ * Tabs styles.
+ */
+
+.tabs__list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  inline-size: 100%;
+  margin-block-end: var(--size-5);
+}
+
+.tabs__item {
+  display: flex;
+}
+
+.tabs__link {
+  align-items: center;
+  block-size: var(--size-14);
+  border-block-end: 1px solid var(--gray-300);
+  color: var(--gray-900);
+  display: flex;
+  flex-grow: 1;
+  font-size: var(--font-size-2);
+  letter-spacing: 1px;
+  padding-block: 0;
+  padding-inline: var(--size-6);
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.tabs__link:focus {
+    outline: 3px solid var(--ucla-blue);
+    outline-offset: -3px;
+  }
+
+.tabs__link:hover {
+    background-color: var(--gray-100);
+  }
+
+.tabs__link.active,
+  .tabs__link.is-active {
+    color: var(--gray-900);
+    font-weight: var(--font-weight-600);
+    position: relative;
+  }
+
+.tabs__link.active::after, .tabs__link.is-active::after {
+      block-size: auto;
+      border-block-start: 6px solid var(--ucla-blue);
+      content: "";
+      inline-size: 100%;
+      inset-block-end: -1px;
+      inset-inline-start: 0;
+      position: absolute;
+    }

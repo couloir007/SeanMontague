@@ -1,0 +1,12 @@
+name: 'Leaflet Full Page'
+type: module
+description: 'Attaches JavaScript to Leaflet field formatters when used in Views.'
+package: 'Custom'
+core_version_requirement: ^10
+dependencies:
+  - drupal:leaflet
+  - drupal:views
+  - geofield:geofield
+  - drupal:field
+libraries:
+  - leaflet_full_page/custom_leaflet

@@ -1,0 +1,73 @@
+/**
+ * @file
+ * Hero styles.
+ * Custom properties:
+ *  --title-text-background: Background color surrounding the titlte text.
+ * --ttile-text-color: Text color used combined with background color.
+ * --button-bg: Background color to override default button styles.
+ * --button-text-color: Text color for button label.
+ * --button-bg-hover: Background color for button's hover state.
+ *  --hero-bg: Hero's background color.
+ *  --hero-padding: Padding applied around hero component (Labs sites)
+ *  --hero-slant-bg: Color of slant image used on angled image display.
+ */
+
+:where([data-theme='surface']) {
+  --title-text-color: var(--white);
+}
+
+.hero {
+  max-inline-size: 1400px;
+  position: relative;
+}
+
+/* Using gap as a way to achieve spacing on stacked and horizontal layout
+  of the text wrapper. */
+
+.hero .hero__container {
+    position: relative;
+  }
+
+.hero__text {
+  position: absolute;
+  text-align: center;
+  top: 35%;
+  width: 100%;
+}
+
+.hero__title {
+  background-color: var(--title-text-background);
+  color: var(--title-text-color);
+  font-family: var(--font-heading);
+  font-size: var(--size-fluid-overview);
+  font-weight: var(--font-weight-600);
+  line-height: var(--size-fluid-overview);
+  max-inline-size: var(--size-content-3);
+  padding-inline: var(--size-4);
+  text-transform: uppercase;
+}
+
+.hero__overview_overlay {
+  background-color: var(--black);
+  height: 100%;
+  left: 0;
+  opacity: 20%;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+.hero__scientific_name {
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: var(--font-size-2);
+  line-height: var(--leading-relaxed);
+  max-inline-size: var(--size-content-3);
+}
+
+@media (width >= 1280px) {
+
+.hero__scientific_name {
+    font-size: var(--font-size-4)
+}
+  }

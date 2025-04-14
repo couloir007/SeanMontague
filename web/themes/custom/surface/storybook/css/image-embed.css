@@ -1,0 +1,8 @@
+/**
+ * @file
+ * Image embed component styling.
+ */
+
+.image-embed {
+  margin-block-end: var(--size-5);
+}

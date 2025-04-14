@@ -1,0 +1,112 @@
+.slideshow {
+  max-inline-size: var(--size-max-content-width);
+}
+
+  /* Overrides default navigational arrows color to white. */
+  .slideshow .splide__arrow svg {
+    fill: var(--white);
+  }
+  /* Overrides black border on thumbs. */
+  .slideshow .splide__track--nav > .splide__list > .splide__slide.is-active {
+      border-color: transparent !important;
+    }
+  /* Applies same overlay treatment as the caption, to the arrows. */
+  .slideshow .splide__arrow {
+    background-color: rgba(0, 0, 0, 60%);
+  }
+
+.slideshow__title {
+  color: var(--gray-900);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-8);
+  line-height: var(--leading-normal);
+  margin-block-end: var(--size-6);
+}
+
+/* Change the title text color based on background color being selected. */
+
+.bg-santa-barbara-sand .slideshow__title {
+    color: var(--gray-900), var(--midnight-observatory);
+  }
+
+.bg-venice-canal .slideshow__title {
+    color: var(--white);
+  }
+
+.slideshow__img {
+  position: relative;
+}
+
+.slideshow__img figcaption {
+    background: linear-gradient(180deg, rgba(154, 154, 154, 1%), rgba(0, 0, 0, 80%));
+    color: var(--white);
+    font-size: var(--font-size-0);
+    inset-block-end: 0;
+    inset-inline-end: 0;
+    inset-inline-start: 0;
+    padding: var(--size-2);
+    padding-block-start: var(--size-4);
+    position: absolute;
+  }
+
+@media (width >= 1024px) {
+
+.slideshow__img figcaption {
+      font-size: medium;
+      font-size: initial;
+      padding: var(--size-4);
+      padding-block-start: var(--size-6)
+  }
+    }
+
+.slideshow__thumb figure {
+    margin-block-start: var(--size-1);
+    position: relative;
+  }
+
+/* Setting the overlay over the image but setting its opacity to 0% to
+    make it invisible by default. */
+
+.slideshow__thumb figure::before {
+      background-color: var(--burbank-blue);
+      block-size: 100%;
+      content: '';
+      display: block;
+      inline-size: 100%;
+      inset-block-start: 0;
+      inset-inline-start: 0;
+      opacity: 0%;
+      position: absolute;
+      transition: opacity 0.4s, border-color 0.4s;
+      z-index: var(--layer-1);
+    }
+
+/* When someone hovers over any image, the overlay opacity is changed to 55%
+    thus becoming visible on hover only. */
+
+.slideshow__thumb figure:hover,
+    .slideshow__thumb figure:focus {
+      border: 0 !important;
+    }
+
+.slideshow__thumb figure:hover::before, .slideshow__thumb figure:focus::before {
+        opacity: 55%;
+      }
+
+/* Increasing the exapand icon opacity to make it visible on hover. */
+
+.slideshow__thumb figure:hover svg, .slideshow__thumb figure:focus svg {
+        opacity: 80%;
+      }
+
+/* Applies the semi-transparent burbank-blue overlay over the active thumb. */
+
+.slideshow__thumb.is-active figure::before {
+        opacity: 55%;
+      }
+
+/* Increasing the exapand icon opacity to make it visible on hover. */
+
+.slideshow__thumb.is-active figure svg {
+        opacity: 80%;
+      }

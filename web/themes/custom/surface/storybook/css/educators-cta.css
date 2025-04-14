@@ -1,0 +1,45 @@
+/**
+ * @file
+ * Educators CTA styles.
+ */
+
+.educator--cta {
+  background-color: var(--op-blue);
+  max-inline-size: 100%;
+  padding-block: 100px;
+}
+
+.educator--cta__description {
+    font-size: var(--font-size-3);
+    padding-block-end: var(--size-8);
+  }
+
+.educator--cta .container {
+    color: var(--white);
+    padding-inline: var(--size-4);
+  }
+
+@media (width >= 1024px) {
+
+.educator--cta .container {
+      padding-inline: 0
+  }
+    }
+
+.educator--cta.educator--cta--topic {
+    background-color: var(--white);
+    padding-block: 0;
+  }
+
+.educator--cta.educator--cta--topic .container {
+      background-color: var(--gray-op);
+      color: var(--black);
+      padding-block: var(--size-20);
+      padding-inline: var(--size-20);
+    }
+
+.educator--cta__title {
+  font-size: var(--font-size-11);
+  line-height: var(--font-size-11);
+  margin-block-end: var(--size-10);
+}

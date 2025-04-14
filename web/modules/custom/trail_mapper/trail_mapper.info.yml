@@ -1,0 +1,5 @@
+name: Trail Mapper
+type: module
+description: 'Generates GeoJSON from external PostgreSQL data.'
+core_version_requirement: ^10 || ^11
+package: Custom

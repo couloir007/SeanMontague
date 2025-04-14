@@ -1,0 +1,22 @@
+/**
+ * @file
+ * Overview Section.
+ */
+
+.overview--overview-section {
+  border-top: 2px solid #a1a1a1;
+  margin-block-start: var(--size-12);
+  padding-block-start: var(--size-12);
+}
+
+.overview--overview-section h2 {
+    margin-block-end: var(--size-10);
+    margin-block-start: 0;
+  }
+
+.overview--overview-section .scroll_anchor {
+    display: block;
+    position: relative;
+    top: -215px;
+    visibility: hidden;
+  }

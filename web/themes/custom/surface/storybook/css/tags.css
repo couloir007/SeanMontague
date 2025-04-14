@@ -1,0 +1,60 @@
+/**
+ * @file
+ * Tags.
+ */
+
+
+.tags {
+  font-family: var(--font-heading);
+  font-size: var(--size-6);
+  font-weight: var(--font-weight-600);
+  padding-block-end: var(--size-6);
+  padding-block-start: var(--size-6);
+  text-transform: uppercase;
+}
+
+
+.tags span {
+    margin-inline-end: var(--size-2);
+  }
+
+
+.tags span.Source {
+    margin-inline-end: var(--size-12);
+  }
+
+
+.tags span.Subjects {
+    margin-inline-end: var(--size-10);
+  }
+
+
+.tags span.Grades {
+    margin-inline-end: var(--size-13);
+  }
+
+
+.tags strong {
+    font-weight: var(--font-weight-600);
+    margin-inline-end: var(--size-10);
+  }
+
+
+.tags strong:last-child {
+    margin-inline-end: 0;
+  }
+
+
+.tags.tag-comma strong {
+      margin-inline-end: 0;
+    }
+
+
+.tags.tag-comma strong::after {
+      content: ', ';
+    }
+
+
+.tags.tag-comma strong:last-child::after {
+      content: '';
+    }

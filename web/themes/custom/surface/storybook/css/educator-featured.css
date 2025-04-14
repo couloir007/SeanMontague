@@ -1,0 +1,72 @@
+.page-educators-corner h2 {
+    font-size: var(--size-13);
+    font-weight: var(--font-weight-300);
+    text-transform: uppercase;
+  }
+  .page-educators-corner .search-lesson-plans {
+    width: 100%;
+  }
+  @media (width >= 768px) {
+  .page-educators-corner .search-lesson-plans {
+      display: flex;
+      justify-content: space-between
+  }
+    }
+  .page-educators-corner .search-lesson-plans h3 {
+      margin-block-start: 0;
+    }
+  .page-educators-corner .search-lesson-plans .search-filter {
+      width: 100%;
+    }
+  @media (width >= 768px) {
+  .page-educators-corner .search-lesson-plans .search-filter {
+        margin-inline-end: 15px;
+        width: 265px
+    }
+      }
+  @media (width >= 768px) {
+  .page-educators-corner .search-lesson-plans .search-results {
+        flex: 1
+    }
+      }
+
+.educator__featured {
+  padding-block-start: var(--size-10);
+}
+
+.educator__featured h2 {
+    margin-block-start: 0;
+  }
+
+.educator__featured .educator__links{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+@media (width >= 1024px) {
+
+.educator__featured .educator__links{
+      flex-wrap: nowrap
+  }
+    }
+
+.educator__featured .l-constrain--content {
+    background-color: #f7f7f7;
+    color: #373a3e;
+    padding: 50px;
+  }
+
+.educator__featured .l-constrain--content .lesson-featured {
+      max-width: 100%;
+      text-align: center;
+      width: 100%;
+    }
+
+@media (width >= 1024px) {
+
+.educator__featured .l-constrain--content .lesson-featured {
+        text-align: left;
+        width: 31%
+    }
+      }

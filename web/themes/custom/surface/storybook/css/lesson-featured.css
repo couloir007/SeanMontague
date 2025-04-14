@@ -1,0 +1,28 @@
+/*
+ * @file
+ * Provides default layout styles for all lesson featured items.
+ */
+
+.lesson-featured {
+  max-width: 245px;
+}
+
+.lesson-featured h3 {
+    margin-block-start: 0;
+  }
+
+.lesson-featured h3 a {
+      font-weight: var(--font-weight-600);
+    }
+
+.lesson-featured .lesson-featured__links {
+    padding-top: 30px;
+  }
+
+.lesson-featured .button__dark-blue {
+    padding: 3.4vw 7.8vw;
+  }
+
+.lesson-featured:first-child h2 {
+  margin-top: 0;
+}

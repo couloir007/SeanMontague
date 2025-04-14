@@ -1,0 +1,81 @@
+/**
+ * @file
+ * Overview styles.
+ *
+ */
+
+/** Overview content layout.
+ * These styles are shared by Events, Person and Articles full nodes.
+ * The styles are simply for the two column content are.
+ */
+
+.page--overview .author {
+    font-weight: var(--font-weight-600);
+  }
+
+.page--overview .tags,
+  .page--overview .date {
+    margin-inline: auto;
+    max-inline-size: var(--size-mobile-large);
+    padding-block-start: 0;
+  }
+
+.page--overview .table_of_contents {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-6);
+    font-weight: var(--font-weight-700);
+    letter-spacing: -0.2px;
+    line-height: var(--font-size-6);
+    margin-block-end: var(--size-5);
+    margin-block-start: 0;
+    text-rendering: optimizeLegibility;
+    transform: scale(1, 1.1);
+  }
+
+.page--overview li {
+    padding-inline-start: 0;
+  }
+
+.page--overview h2,
+  .page--overview h3,
+  .page--overview h4 {
+    letter-spacing: -0.19px;
+    text-transform: capitalize;
+    transform: scale(1, 1.2);
+  }
+
+.page--overview h2 {
+    color: var(--op-blue);
+    font-size: var(--font-size-10);
+    font-weight: var(--font-weight-600);
+    line-height: var(--font-size-10);
+  }
+
+@media (width >= 768px) {
+    .page--overview .intro-aside-wrapper {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+  }
+
+.page--overview .side-overview {
+    display: none;
+  }
+
+@media (width >= 768px) {
+    .page--overview .side-overview {
+      display: block;
+      width: 255px;
+    }
+
+    .page--overview .intro-text.desktop {
+      padding-inline-start: 0;
+      width: calc(100% - 255px);
+    }
+
+      .page--overview .intro-text.desktop p {
+        margin-inline: auto;
+        max-inline-size: 90%;
+      }
+  }

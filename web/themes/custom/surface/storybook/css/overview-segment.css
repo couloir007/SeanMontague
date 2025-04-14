@@ -1,0 +1,12 @@
+/**
+ * @file
+ * Overview Segment.
+ */
+
+.overview--overview-segment h3 {
+    font-size: var(--font-size-9);
+    font-weight: var(--font-weight-300);
+    line-height: var(--font-size-9);
+    margin-block-end: var(--size-7);
+    margin-block-start: 0;
+  }

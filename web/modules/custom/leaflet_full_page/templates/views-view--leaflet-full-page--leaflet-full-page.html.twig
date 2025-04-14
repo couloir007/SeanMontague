@@ -1,0 +1,41 @@
+{{ attach_library('leaflet_full_page/custom_leaflet') }}
+
+{%
+  set classes = [
+  'view',
+  'view--' ~ id|clean_class,
+  'view--display-' ~ display_id,
+  dom_id ? 'js-view-dom-id-' ~ dom_id,
+]
+%}
+
+<div {{ attributes.addClass(classes) }}>
+  <div class="leaflet">
+    <div class="leaflet__list-container">
+      <div class="leaflet__top">
+        <h1>{{ title }}</h1>
+        <h3></h3>
+      </div>
+      <ul class="leaflet__list" tabindex="0"></ul>
+      <div class="leaflet__content" maps-nid="">
+        <div class="leaflet__content-header">
+          <h3 class="leaflet__content-title"></h3>
+          <a class="arrow arrow-left" tabindex="0" href="/left"></a>
+          <a class="arrow arrow-right" tabindex="0" href="right"></a>
+          <a class="x-button" tabindex="0" href="close"></a>
+        </div>
+        <div class="leaflet__content-scrollable" tabindex="0">
+          <figure class="leaflet__content-main-figure">
+            <img class="leaflet__content-main-image" src="">
+            <figcaption class="leaflet__content-main-image-caption"></figcaption>
+          </figure>
+          <div class="leaflet__content-textarea"></div>
+        </div>
+      </div>
+    </div>
+
+    {% if rows %}
+      {{ rows }}
+    {% endif %}
+  </div>
+</div>

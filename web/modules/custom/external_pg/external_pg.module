@@ -1,0 +1,6 @@
+<?php
+
+/**
+ * @file
+ * Contains code for the External PostgreSQL Connection module.
+ */

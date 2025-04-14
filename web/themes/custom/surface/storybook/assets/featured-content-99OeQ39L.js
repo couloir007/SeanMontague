@@ -1,0 +1,7 @@
+import{ae as t,af as a,ag as o}from"./index-B15VT6w7.js";import{useMDXComponents as r}from"./index-CcnH5Kt0.js";import{F as p,a as s,b as m}from"./featured-content.stories-mtdLEjeL.js";import"./iframe-CGGnHX8c.js";import"../sb-preview/runtime.js";import"./index-RYns6xqu.js";import"./index-DAfSkmQi.js";import"./index-D-8MO0q_.js";import"./index-ar2LJKLv.js";import"./index-DrFu-skq.js";import"./index-C-ZRuDWU.js";import"./twig-CEFeP58X.js";import"./twig-D5Zl0i6Y.js";import"./title-ukWx3bcD.js";import"./card-BxeYgWss.js";import"./eyebrow-DtcqqXFq.js";import"./button-track-BskoRuOl.js";import"./date-badge-CPVOQVkw.js";function i(n){const e={h1:"h1",p:"p",...r(),...n.components};return t.jsxs(t.Fragment,{children:[t.jsx(a,{of:p}),`
+`,t.jsx(e.h1,{id:"featured-content",children:"Featured Content"}),`
+`,t.jsx(e.p,{children:"The Featured Content component is a banner-like component which is typically used on page content types.  This component contains the title of the page, breadcrumb, subtitle and an optional banner image."}),`
+`,t.jsx(o,{of:s}),`
+`,t.jsx(e.h1,{id:"featured-content-topic",children:"Featured Content Topic"}),`
+`,t.jsx(e.p,{children:"The Featured Content component is a banner-like component which is typically used on page content types.  This component contains the title of the page, breadcrumb, subtitle and an optional banner image."}),`
+`,t.jsx(o,{of:m})]})}function k(n={}){const{wrapper:e}={...r(),...n.components};return e?t.jsx(e,{...n,children:t.jsx(i,{...n})}):i(n)}export{k as default};

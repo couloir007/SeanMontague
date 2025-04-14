@@ -1,0 +1,28 @@
+uuid: b92b6f53-28ae-499c-89bd-2071b96e0a21
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.image_url
+    - field.field.media.image.field_media_image
+    - media.type.image
+  module:
+    - svg_image
+id: media.image.image_url
+targetEntityType: media
+bundle: image
+mode: image_url
+content:
+  field_media_image:
+    type: image_url
+    label: visually_hidden
+    settings:
+      image_style: '4_3'
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  created: true
+  name: true
+  thumbnail: true
+  uid: true

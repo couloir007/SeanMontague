@@ -1,0 +1,57 @@
+<?php
+
+/**
+ * @file
+ * Contains code for the External PostgreSQL Connection module.
+ */
+
+/**
+ * Implements theme_preprocess to add variables.
+ */
+//function trail_mapper_preprocess(&$variables) {
+//  $table = 'kt_trails';
+//  $scr = 6589;
+//  $query = "
+//            WITH tmp1 as (
+//                SELECT 'Feature' as " . '"type"' . ",
+//                ST_AsGeoJSON(ST_Transform(ST_SetSRID(t.geom," . $scr . "), 4326), 6)::json as " . '"geometry"' . ",
+//                (
+//                    SELECT json_strip_nulls(row_to_json(t))
+//                    FROM (select objectid As id, name, touches,  ST_Length(ST_Transform(geom," . $scr . ")) as length) t
+//                ) as " . '"properties"' . "
+//                FROM public." . $table . " t
+//            ),
+//            tmp2 as (
+//                SELECT 'FeatureCollection' as " . '"type"' . ",
+//                array_to_json(array_agg(t)) as " . '"features"' . "
+//                FROM tmp1 t
+//            ) SELECT row_to_json(t)
+//            FROM tmp2 t;
+//            ";
+//
+//
+//  $external_pg_service = \Drupal::service('external_pg.service');
+//  $data = $external_pg_service->fetchData($query);
+//
+//
+//  // Process $data as needed.
+//  // Get the module path for trail_mapper.
+//  $module_handler = \Drupal::service('extension.list.module');
+//  $module_path = $module_handler->getPath('trail_mapper');
+//
+//  // Build the absolute path to the includes directory.
+//  $output = DRUPAL_ROOT . '/' . $module_path . '/includes/KingdomTrails.geojson';
+//
+//  foreach ($data as $row) {
+////    ray($row->row_to_json);
+//    // Open the file for writing.
+//    if ($fp = fopen($output, 'w')) {
+//      fwrite($fp, $row->row_to_json);
+//      fclose($fp);
+//      \Drupal::messenger()->addStatus(t('GeoJSON file has been saved successfully.'));
+//    }
+//    else {
+//      \Drupal::messenger()->addError(t('Unable to open the file for writing.'));
+//    }
+//  }
+//}

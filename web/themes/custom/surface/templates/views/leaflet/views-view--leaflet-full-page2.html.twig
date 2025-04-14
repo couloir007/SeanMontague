@@ -1,0 +1,14 @@
+{%
+  set classes = [
+  'view',
+  'view--' ~ id|clean_class,
+  'view--display-' ~ display_id,
+  dom_id ? 'js-view-dom-id-' ~ dom_id,
+]
+%}
+
+{% include '@elements/leaflet/leaflet.twig' with {
+  'attributes': attributes,
+  'rows': rows,
+  'title': header
+} %}

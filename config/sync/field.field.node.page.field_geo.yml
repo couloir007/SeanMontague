@@ -1,0 +1,21 @@
+uuid: 42d31d17-e9f8-480c-97ae-998826f8696c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_geo
+    - node.type.page
+  module:
+    - geofield
+id: node.page.field_geo
+field_name: field_geo
+entity_type: node
+bundle: page
+label: Geo
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: geofield

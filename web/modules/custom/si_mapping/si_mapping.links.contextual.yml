@@ -1,0 +1,10 @@
+entity.si_mapping.edit_form:
+  route_name: entity.si_mapping.edit_form
+  group: si_mapping
+  title: 'Edit'
+
+entity.si_mapping.delete_form:
+  route_name: entity.si_mapping.delete_form
+  group: si_mapping
+  title: 'Delete'
+  weight: 10

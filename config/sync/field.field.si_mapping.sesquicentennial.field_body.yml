@@ -1,0 +1,24 @@
+uuid: 7e3322cc-831e-4ab0-ae60-eab24c70b8f0
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.si_mapping.field_body
+    - filter.format.full_html
+    - si_mapping.si_mapping_type.sesquicentennial
+  module:
+    - text
+id: si_mapping.sesquicentennial.field_body
+field_name: field_body
+entity_type: si_mapping
+bundle: sesquicentennial
+label: Body
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - full_html
+field_type: text_long

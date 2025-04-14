@@ -1,0 +1,35 @@
+name: Surface
+type: theme
+description: 'A clean, accessible, and flexible Drupal front-end theme.'
+alt text: 'Screenshot of Surface, Drupal front-end theme.'
+package: Core
+core_version_requirement: ^8.9 || ^9 || ^10 || ^11
+base theme: false
+
+libraries:
+  - surface/global
+
+regions:
+  header: Header
+  highlighted: Highlighted
+  breadcrumb: Breadcrumb
+  content_above: Content Above
+  content: Content
+  content_below: Content Below
+  footer: Footer
+  theme: Theme
+
+ckeditor5-stylesheets:
+  - dist/css/global.css
+  - dist/css/button.css
+
+components:
+  namespaces:
+    surface: templates/custom
+    images: dist/images
+    base: source/patterns/base
+    elements: source/patterns/elements
+    layouts: source/patterns/layouts
+    components: source/patterns/components
+    collections: source/patterns/collections
+    theme: source/patterns/theme

@@ -1,0 +1,14 @@
+/**
+ * @file
+ * Flockler embed styles.
+ */
+
+/* If Venice Canal background color is present, change text color to white. */
+
+.bg-venice-canal .flockler-embed {
+    color: var(--white);
+  }
+
+.bg-venice-canal .flockler-embed .flockler-embed__title {
+      color: var(--white);
+    }

@@ -1,0 +1,68 @@
+/**
+ * @file
+ * Select input elements.
+ */
+
+.form-select {
+  block-size: var(--size-12);
+  max-inline-size: 100%;
+  padding-block: 0;
+}
+
+select {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  background-color: var(--white);
+  background-image: url("/images/chevron-down.svg");
+  background-position: right var(--size-2) center;
+  background-repeat: no-repeat;
+  background-size: var(--size-6) var(--size-6);
+  border-radius: var(--radius-2);
+  border-width: 1px;
+  color: var(--gray-900);
+  cursor: pointer;
+  display: inline-flex;
+  flex-shrink: 0;
+  padding-inline-end: var(--size-10);
+  padding-inline-start: var(--size-4);
+  touch-action: manipulation;
+  transition-duration: 0.2s;
+  transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+select:focus {
+    outline: 2px solid var(--gray-300);
+    outline-offset: 2px;
+  }
+
+select[disabled] {
+    background-color: var(--gray-100);
+    color: var(--gray-500);
+  }
+
+select.error {
+    border: solid 2px var(--red-900);
+  }
+
+select.error:focus {
+      outline-color: var(--red-900);
+    }
+
+select[multiple] {
+    background-image: none;
+    block-size: auto;
+    line-height: 1;
+    padding: var(--size-2);
+  }
+
+select[multiple] option {
+      padding: var(--size-2);
+    }
+
+select.form-element--small {
+    block-size: var(--size-10);
+  }

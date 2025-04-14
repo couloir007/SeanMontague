@@ -1,0 +1,13 @@
+/**
+ * @file
+ * Title styles.
+ * See also Prose styling for all text elements.
+ */
+
+.content-card__title a {
+    color: var(--midnight-observatory);
+  }
+
+a .content-card__title {
+    color: var(--midnight-observatory);
+  }

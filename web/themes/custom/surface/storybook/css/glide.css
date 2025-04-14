@@ -1,0 +1,114 @@
+/* stylelint-disable -- This is a third party library. */
+/**
+ * @file
+ * Glide styles.
+ */
+.glide {
+  inline-size: 100%;
+  margin-inline: auto;
+  max-inline-size: var(--size-container);
+}
+.glide__arrow {
+  display: none;
+}
+@media (width >= 768px) {
+  .glide__arrow {
+    --size: 50px;
+    --top: 25%;
+    align-content: center;
+    background-color: var(--op-blue);
+    block-size: var(--size);
+    color: var(--white);
+    cursor: pointer;
+    display: grid;
+    inline-size: var(--size);
+    inset-block-start: var(--top);
+    justify-content: center;
+    place-content: center;
+    position: absolute;
+    transform: translateY(calc(var(--top) * -1));
+    z-index: 1;
+  }
+
+  .glide__arrow svg {
+    block-size: 2em;
+    inline-size: 2em;
+  }
+}
+@media (width >= 1024px) {
+  .glide__arrow {
+    --size: 70px;
+    --top: 25%
+  }
+
+  .glide__arrow:visited {
+    background-color: var(--op-blue);
+  }
+
+  .glide__arrow:hover {
+    background-color: var(--silver-lake-reservoir);
+  }
+}
+@media (width >= 1280px) {
+  .glide__arrow {
+    --top: 34%
+  }
+}
+.glide__arrow--left {
+  inset-inline-start: 0;
+}
+.glide__arrow--right {
+  inset-inline-end: 0;
+}
+.glide__bullets {
+  block-size: 16px;
+  display: inline-flex;
+  inline-size: 100%;
+  inset-block-end: 0;
+  inset-block-start: 25%;
+  justify-content: center;
+  margin-inline: auto;
+  position: absolute;
+  transform: translateY(-25%);
+  z-index: 2;
+}
+@media (width >= 768px) {
+.glide__bullets {
+    inset-block-start: 20%;
+    transform: translateY(-20%)
+}
+  }
+@media (width >= 1024px) {
+.glide__bullets {
+    inset-block-start: 35%;
+    transform: translateY(-35%)
+}
+  }
+@media (width >= 1280px) {
+.glide__bullets {
+    inset-block-start: 50%;
+    transform: translateY(-50%)
+}
+  }
+.glide__bullet {
+  background-color: var(--silver-screen);
+  block-size: 16px;
+  border-radius: var(--radius-round);
+  display: inline-block;
+  inline-size: 16px;
+  margin-inline: 4px;
+  transition: width 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+.glide__bullet:hover {
+  background-color: var(--op-blue);
+}
+.glide__bullet--active {
+  background-color: var(--ucla-yellow);
+  inline-size: 32px;
+}
+.glide--swipeable {
+  cursor: grab;
+}
+.glide--dragging {
+  cursor: grabbing;
+}

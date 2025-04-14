@@ -1,0 +1,12 @@
+/**
+ * @file
+ * Note type styles.
+ */
+
+.type {
+  color: var(--op-blue);
+  font-size: var(--font-size-2);
+  font-weight: var(--font-weight-700);
+  margin-block-end: var(--size-5);
+  text-transform: uppercase;
+}

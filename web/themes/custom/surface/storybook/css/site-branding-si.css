@@ -1,0 +1,50 @@
+/**
+ * @file
+ * Branding styles.
+ */
+
+.site-branding-si {
+  background-color: var(--op-blue);
+  display: inline-block;
+}
+
+.site-branding-si img {
+    inline-size: 70%;
+    max-inline-size: 100%;
+    min-inline-size: 200px;
+  }
+
+@media (width >= 768px) {
+
+.site-branding-si img {
+      inline-size: 100%;
+      max-inline-size: 350px
+  }
+    }
+
+.site-branding-si .title {
+    font-size: var(--font-size-2);
+    font-weight: var(--font-weight-600);
+  }
+
+.site-branding--menu {
+  background-color: var(--white);
+}
+
+.site-branding--footer {
+  background-color: #f1f0f0;
+  max-inline-size: 300px;
+}
+
+.site-branding--footer.site-branding--op {
+    max-inline-size: 150px;
+  }
+
+.site-branding--footer.site-branding--op img {
+      inline-size: 100%;
+      min-inline-size: 110px;
+    }
+
+.site-branding--horizontal {
+  max-inline-size: 250px;
+}

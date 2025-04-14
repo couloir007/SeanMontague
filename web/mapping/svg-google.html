@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Data Layer: Dynamic Styling</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+
+
+
+
+    <!-- The callback parameter is required, so we use console.debug as a noop -->
+
+    <script
+            src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
+            crossorigin="anonymous"></script>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+
+      let map;
+      let trailList = [];
+      let urlString;
+      let urlVar;
+      let win;
+      let baseUrl;
+
+      function myFunction(item, idx)
+      {
+        urlVar = '&id' + idx + '=' + item;
+        urlString = urlString + urlVar;
+      }
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 5,
+          // center: {lng:-105.166804,lat:39.682507}
+          center: {lng:-90.929,lat:44.59}
+        });
+
+        // Load GeoJSON.
+        // map.data.loadGeoJson('GreenMt.geojson');
+        // map.data.loadGeoJson('GreenMt.geojson');
+        map.data.loadGeoJson('KingdomTrails.geojson');
+        map.data.loadGeoJson('kokopelli.geojson');
+        map.data.loadGeoJson('FrontRange.geojson');
+
+
+        // Color each letter gray. Change the color when the isColorful property
+        // is set to true.
+        map.data.setStyle(function(feature) {
+          let color = 'red';
+          if (feature.getProperty('isColorful')) {
+            color = 'blue';
+          }
+          return /** @type {!google.maps.Data.StyleOptions} */({
+            fillColor: color,
+            strokeColor: color,
+            strokeWeight: 2
+          });
+        });
+
+
+
+        // When the user clicks, set 'isColorful', changing the color of the letters.
+        map.data.addListener('click', function(event) {
+          event.feature.setProperty('isColorful', true);
+          trailList.push(event.feature.getProperty('id'));
+        });
+
+        // When the user hovers, tempt them to click by outlining the letters.
+        // Call revertStyle() to remove all overrides. This will use the style rules
+        // defined in the function passed to setStyle()
+        map.data.addListener('mouseover', function(event) {
+          map.data.revertStyle();
+          map.data.overrideStyle(event.feature, {strokeWeight: 8});
+        });
+
+        map.data.addListener('mouseout', function(event) {
+          map.data.revertStyle();
+        });
+
+        map.setMapTypeId('terrain');
+        // map.setMapTypeId('satellite');
+        map.setOptions({draggableCursor:'cell'});
+        // map.setOptions({draggableCursor:'pointer'});
+        // map.setOptions({draggableCursor:'url("https://maps.gstatic.com/mapfiles/openhand_8_8.cur"), default'});
+
+      }
+    </script>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDGCir12xKAayOFH4cjDNsZknmzNMbsoCo&callback=initMap">
+    </script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+services:
+  trail_mapper.geojson_generator:
+    class: Drupal\trail_mapper\GeoJsonGenerator
+    arguments:
+      - '@external_pg.service'
+      - '@extension.list.module'
+      - '@messenger'

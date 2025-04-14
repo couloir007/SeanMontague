@@ -1,0 +1,5 @@
+name: External PostgreSQL Connection
+type: module
+description: 'Manages a connection to an external PostgreSQL database.'
+core_version_requirement: ^10 || ^11
+package: Custom
