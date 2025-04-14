@@ -4,6 +4,7 @@ module:
   actions_permissions: 0
   admin_toolbar: 0
   admin_toolbar_tools: 0
+  backup_migrate: 0
   block: 0
   breakpoint: 0
   captcha: 0
