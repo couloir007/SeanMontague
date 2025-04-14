@@ -174,7 +174,7 @@ let geoJsonLayer;
         const filters = {};
 
         // Load the JSON data from the provided endpoint.
-        $.getJSON('https://trailmapper-psql.lndo.site/mapitems', function(data) {
+        $.getJSON('/mapitems', function(data) {
           console.log('Loaded map items:', data);
           // Process each data item as needed.
           $.each(data, function(index, item) {
