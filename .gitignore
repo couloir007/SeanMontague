@@ -8,8 +8,7 @@
 /web/sites/*/services*.yml
 /web/sites/*/dev.local.php
 /web/sites/*/local.services.yml
-!/web/sites/*/services.pantheon.*.yml
-!/web/sites/*/services.yml
+/web/sites/*/services.yml
 /web/sites/*/settings.php
 
 # Ignore paths that contain user-generated content.
