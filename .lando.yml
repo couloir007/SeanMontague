@@ -2,7 +2,7 @@ name: trailmapper psql
 recipe: drupal10
 config:
   webroot: web
-  php: '8.3'
+  php: '8.1'
   composer_version: '2'
   database: postgres:15
 
@@ -12,7 +12,7 @@ proxy:
 
 services:
   appserver:
-    type: php:8.3
+    type: php:8.1
     webroot: web
     via: apache
     overrides:

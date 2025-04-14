@@ -1,15 +1,14 @@
 <?php
 
-include('gzip_encode.php');
 require_once("pg_connect.php");
 require_once("GetProfile.php");
 
-$host = '192.168.86.112';
 $port = '5432';
-$db = 'TrailMapper';
+$host = 'us17.acugis-dns.com';
+$db = 'roundybr_trailmapper';
+$username = 'roundybr';
+$password = 'Fi8w0t8I4x';
 
-$username = 'postgres';
-$password = 'postgres';
 $conn = connectDBLook($host, $username, $db, $password, $port);
 
 $points = $_GET;

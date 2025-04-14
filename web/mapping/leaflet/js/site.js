@@ -29,7 +29,7 @@ $('#getProfile').click(function (e) {
     // trailList is populated leafletembed.js click
     trailList.forEach(iterateSegments2);
 
-    $.get( "../../php_files/loadProfile.php", theObject )
+    $.get( "/mapping/php_files/loadProfile.php", theObject )
         .done(function( data ) {
             $('.profile-inner').html(data);
             $("#close").appendTo('.profile-inner');
@@ -67,7 +67,7 @@ $('#exportGPX').click(function (e) {
 
     console.log(urlString2);
 
-    window.location.href = '../../php_files/exportGPX.php?' + urlString2;
+    window.location.href = '/mapping/php_files/exportGPX.php?' + urlString2;
 
 //    $.get( "../../php_files/exportGPX.php", theObject )
 //        .done(function( data ) {
