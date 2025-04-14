@@ -174,7 +174,7 @@ let geoJsonLayer;
         const filters = {};
 
         // Load the JSON data from the provided endpoint.
-        $.getJSON('/mapitems', function(data) {
+        $.getJSON('https://roundybrookfarm.com/mapitems', function(data) {
           console.log('Loaded map items:', data);
           // Process each data item as needed.
           $.each(data, function(index, item) {
