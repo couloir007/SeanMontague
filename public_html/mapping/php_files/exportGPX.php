@@ -3,7 +3,6 @@
 require_once("pg_connect.php");
 require_once("GetProfile.php");
 
-$port = '5432';
 $host = 'us17.acugis-dns.com';
 $db = 'roundybr_trailmapper';
 $username = 'roundybr';

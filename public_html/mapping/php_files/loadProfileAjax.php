@@ -2,11 +2,10 @@
 require_once("pg_connect.php");
 require_once("GetProfile.php");
 
-$host = '172.22.0.1';
-//$db = 'kokopelli';
-//$db = 'themountainscene_com';
-$db = 'PostGIS';
-$db = 'TrailMapper';
+$host = 'us17.acugis-dns.com';
+$db = 'roundybr_trailmapper';
+$username = 'roundybr';
+$password = 'Fi8w0t8I4x';
 
 $username = 'trailmaster';
 $password = '!MbiaSC5010!';

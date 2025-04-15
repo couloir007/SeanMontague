@@ -81,7 +81,7 @@ function initmap(basemap) {
 
     // basemap.addTo(map);
 
-    geoJsonLayer = new L.GeoJSON.AJAX("/mapping/GeoJSON/KingdomTrails.geojson", {
+    geoJsonLayer = new L.GeoJSON.AJAX("../../GeoJSON/KingdomTrails.geojson", {
         color: 'midnightblue',
         weight: 1.5,
 

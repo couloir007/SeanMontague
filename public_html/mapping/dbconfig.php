@@ -1,12 +1,8 @@
 <?php
-// ifconfig |grep inet
-// inet 192.168.1.130  netmask 255.255.255.0  broadcast 192.168.1.255
-$host = '192.168.1.26 ';
-//$db = 'kokopelli';
-//$db = 'themountainscene_com';
-$db = 'PostGIS';
-$db = 'TrailMapper';
-$username = 'postgres';
-$password = '';
+
+$host = 'us17.acugis-dns.com';
+$db = 'roundybr_trailmapper';
+$username = 'roundybr';
+$password = 'Fi8w0t8I4x';
 
 //!MbiaSC5010!
