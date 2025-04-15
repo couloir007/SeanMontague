@@ -11,29 +11,28 @@
 /TrailMapper
 /access-logs
 /www
-
-	.bash_history
-	.bash_logout
-	.bash_profile
-	.bashrc
-	.cache/
-	.caldav/
-	.cloud-locale-test.skip
-	.config/
-	.cpanel/
-	.gemrc
-	.gitconfig
-	.lastlogin
-	.local/
-	.myimunify_id
-	.pearrc
-	.softaculous/
-	.spamassassin/
-	.spamassassinboxenable
-	.spamassassinenable
-	.ssh/
-	.trash/
-	.wp-toolkit-identifier
+.bash_history
+.bash_logout
+.bash_profile
+.bashrc
+.cache/
+.caldav/
+.cloud-locale-test.skip
+.config/
+.cpanel/
+.gemrc
+.gitconfig
+.lastlogin
+.local/
+.myimunify_id
+.pearrc
+.softaculous/
+.spamassassin/
+.spamassassinboxenable
+.spamassassinenable
+.ssh/
+.trash/
+.wp-toolkit-identifier
 
 
 # This file contains .gitignore rules that are often used with Drupal projects.
