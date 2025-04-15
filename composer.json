@@ -16,6 +16,7 @@
     ],
     "require": {
         "composer/installers": "^2.0",
+        "defuse/php-encryption": "^2.4",
         "drupal/admin_toolbar": "^3.5",
         "drupal/backup_migrate": "^5.1",
         "drupal/ckeditor5_fullscreen": "^1.0@beta",
