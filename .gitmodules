@@ -1,0 +1,3 @@
+[submodule "public_html/mapping"]
+	path = public_html/mapping
+	url = git@github.com:couloir007/mapping.git
