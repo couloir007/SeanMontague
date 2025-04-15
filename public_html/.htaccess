@@ -123,8 +123,8 @@ AddEncoding gzip svgz
   RewriteRule ^core/install\.php core/install.php?rewrite=ok [QSA,L]
 
   # Exclude the /mapping directory from being rewritten by Drupal.
-#  RewriteCond %{REQUEST_URI} ^/mapping/ [NC]
-#  RewriteRule ^ - [L]
+  RewriteCond %{REQUEST_URI} ^/mapping/ [NC]
+  RewriteRule ^ - [L]
 
   # Pass all requests not referring directly to files in the filesystem to
   # index.php.
