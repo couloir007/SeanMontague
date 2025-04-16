@@ -1,2 +1,3 @@
 ../vendor/drush/drush/drush sql-drop
 ../vendor/drush/drush/drush sql-cli < ../private/backup
+PHP OPcode caching
