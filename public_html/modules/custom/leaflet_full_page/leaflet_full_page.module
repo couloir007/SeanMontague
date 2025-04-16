@@ -81,3 +81,21 @@ function leaflet_full_page_form_alter(&$form, FormStateInterface $form_state, $f
     }
   }
 }
+
+function leaflet_full_page_views_pre_render(ViewExecutable $view): void {
+  ray($view->id());
+  if (isset($view->filter['bundle'])) {
+    $table = $view->filter['bundle']->table;
+    if (strpos($table, 'leaflet_full_page') !== FALSE) {
+      if (strpos($view->current_display, 'rest_export') !== FALSE) {
+        ray($view->id());
+        // Only attach for the view/display you care about.
+//        if ($view->id() === 'leaflet_map_media' && $view->current_display === 'ocean_map') {
+//          // This will make drupalSettings.si_mapping.which available in your JS.
+//          $view->element['#attached']['drupalSettings']['si_mapping']['which'] = $view->id();
+//        }
+
+      }
+    }
+  }
+}
