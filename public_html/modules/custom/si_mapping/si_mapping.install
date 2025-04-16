@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * @file
+ * Various install/uninstall hooks for the Metatag Views module.
+ */
+
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
+/**
+ * Implements hook_install().
+ */
+function si_mapping_install() {
+  // Enable si_mapping_display_extender plugin.
+  $config = \Drupal::service('config.factory')->getEditable('views.settings');
+  $display_extenders = $config->get('display_extenders') ?: [];
+  $display_extenders[] = 'si_mapping_display_extender';
+  $config->set('display_extenders', $display_extenders);
+  $config->save();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function si_mapping_uninstall() {
+  // Disable si_mapping_display_extender plugin.
+  $config = \Drupal::service('config.factory')->getEditable('views.settings');
+  $display_extenders = $config->get('display_extenders') ?: [];
+
+  $key = array_search('si_mapping_display_extender', $display_extenders);
+  if ($key !== FALSE) {
+    unset($display_extenders[$key]);
+    $config->set('display_extenders', $display_extenders);
+    $config->save();
+  }
+}
+
+/**
+ * Enable si_mapping_display_extender plugin on existing installations.
+ */
+function si_mapping_update_8101() {
+  $config = \Drupal::service('config.factory')->getEditable('views.settings');
+  $display_extenders = $config->get('display_extenders') ?: [];
+
+  if (!in_array('si_mapping_display_extender', $display_extenders, TRUE)) {
+    $display_extenders[] = 'si_mapping_display_extender';
+    $config->set('display_extenders', $display_extenders);
+    $config->save();
+
+    return new TranslatableMarkup('The SI Mapping Display Extender has been enabled.');
+  }
+
+  return new TranslatableMarkup('The SI Mapping Display Extender was already enabled.');
+}
