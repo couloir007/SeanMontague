@@ -1,6 +1,7 @@
 <?php
 
 use Drupal\views\ViewExecutable;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Implements hook_theme().
@@ -20,25 +21,14 @@ function leaflet_full_page_theme($existing, $type, $theme, $path) {
 }
 
 /**
- * Implements hook_preprocess_views_view().
- */
-//function leaflet_full_page_preprocess_views_view(array &$variables) {
-//  if ($variables['view']->id() === 'leaflet_full_page') {
-//
-//    // Attach the custom library.
-//    $variables['#attached']['library'][] = 'leaflet_full_page/custom_leaflet';
-//  }
-//}
-
-/**
  * Implements hook_theme_suggestions_HOOK_alter().
  */
 function leaflet_full_page_theme_suggestions_views_view_alter(array &$suggestions, array $variables) {
   $view = $variables['view'];
-  $si_mapping_extenders = $view->display_handler->getOption('display_extenders')['si_mapping_display_extender'] ?? [];
+  $leaflet_full_page_extenders = $view->display_handler->getOption('display_extenders')['leaflet_full_page_display_extender'] ?? [];
 
-  if (isset($si_mapping_extenders['template'])) {
-    $suggestions[] = 'views_view__leaflet_full_page__' . $si_mapping_extenders['template'];
+  if (isset($leaflet_full_page_extenders['template'])) {
+    $suggestions[] = 'views_view__leaflet_full_page__' . $leaflet_full_page_extenders['template'];
   } else {
 
   }
@@ -53,3 +43,41 @@ function leaflet_full_page_theme_suggestions_views_view_alter(array &$suggestion
 //  $suggestions[] = 'views_view_unformatted__leaflet_full_page__' . $view->current_display;
 //  $suggestions[] = 'views_view_unformatted__leaflet_full_page__' . $view->id() . '__' . $view->current_display;
 //}
+
+
+
+function _leaflet_full_page_is_si_mapping_view($view, &$options = []): bool {
+  if(
+    !!($extenders = $view->getDisplay()->getExtenders())
+    && (array_key_exists('leaflet_full_page_view', $extenders))
+    && !empty($extenders['leaflet_full_page_view']->options['template'])
+  ) {
+    $options = $extenders['leaflet_full_page_view']->options;
+    return TRUE;
+  }
+
+  return False;
+}
+
+/**
+ * Implements hook_form_alter().
+ *
+ * This catches all forms; then we check for the Views display edit form.
+ */
+function leaflet_full_page_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (strpos($form_id, 'views_exposed_form') !== FALSE) {
+    $view = $form_state->get('view');
+
+    if (isset($view->filter['bundle'])) {
+      $table = $view->filter['bundle']->table;
+      if (strpos($table, 'leaflet_full_page') !== FALSE) {
+        if(_leaflet_full_page_is_si_mapping_view($view, $options)
+          && !empty($options['template'])) {
+          $form['leaflet_full_page'] = [
+            'template' => $options['template'],
+          ];
+        }
+      }
+    }
+  }
+}

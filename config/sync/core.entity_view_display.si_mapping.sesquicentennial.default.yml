@@ -1,4 +1,4 @@
-uuid: c2028493-5455-4d83-b540-58fd90ef3a3c
+uuid: 6d7c4e1e-9e64-4533-96e1-61fa7ca8dc1c
 langcode: en
 status: true
 dependencies:
@@ -127,10 +127,17 @@ content:
       map_lazy_load:
         lazy_load: false
     third_party_settings: {  }
+    weight: 3
+    region: content
+  label:
+    type: string
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
     weight: 0
     region: content
 hidden:
   created: true
-  label: true
   status: true
   uid: true

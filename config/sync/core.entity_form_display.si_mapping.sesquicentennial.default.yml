@@ -1,4 +1,4 @@
-uuid: c8cb4a3e-0453-47f1-b3f8-dcb7e44c487c
+uuid: c1d87d8a-78e1-4960-be76-428fc8861cee
 langcode: en
 status: true
 dependencies:
@@ -16,12 +16,6 @@ targetEntityType: si_mapping
 bundle: sesquicentennial
 mode: default
 content:
-  created:
-    type: datetime_timestamp
-    weight: 6
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   field_body:
     type: text_textarea
     weight: 2
@@ -117,14 +111,6 @@ content:
     settings:
       display_label: false
     third_party_settings: {  }
-  uid:
-    type: entity_reference_autocomplete
-    weight: 5
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-hidden: {  }
+hidden:
+  created: true
+  uid: true

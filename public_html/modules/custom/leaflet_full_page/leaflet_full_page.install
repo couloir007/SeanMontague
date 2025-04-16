@@ -1,0 +1,42 @@
+<?php
+
+/**
+ * @file
+ * Various install/uninstall hooks for the Metatag Views module.
+ */
+
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
+/**
+ * Implements hook_install().
+ */
+/**
+ * Implements hook_theme().
+ */
+function leaflet_full_page_install() {
+  /**
+   * Enable leaflet_full_page_display_extender plugin.
+   */
+  $config = \Drupal::service('config.factory')->getEditable('views.settings');
+  $display_extenders = $config->get('display_extenders') ?: [];
+  $display_extenders[] = 'leaflet_full_page_display_extender';
+  $config->set('display_extenders', $display_extenders);
+  $config->save();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function leaflet_full_page_uninstall() {
+  // Disable si_mapping_display_extender plugin.
+  $config = \Drupal::service('config.factory')->getEditable('views.settings');
+  $display_extenders = $config->get('display_extenders') ?: [];
+
+  $key = array_search('leaflet_full_page_display_extender', $display_extenders);
+  if ($key !== FALSE) {
+    unset($display_extenders[$key]);
+    $config->set('display_extenders', $display_extenders);
+    $config->save();
+  }
+}
+

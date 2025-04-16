@@ -85,7 +85,6 @@ function si_mapping_user_predelete(UserInterface $account): void {
 }
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\views\ViewExecutable;
 
 function _si_mapping_is_si_mapping_view($view, &$options = []): bool {
   if(
@@ -124,16 +123,3 @@ function si_mapping_form_alter(&$form, FormStateInterface $form_state, $form_id)
   }
 }
 
-/**
- * Custom submit handler to save the custom template choice.
- */
-//function si_mapping_views_pre_render(ViewExecutable $view): void {
-//  if (isset($view->filter['bundle'])) {
-//    $table = $view->filter['bundle']->table;
-//    if (strpos($table, 'si_mapping') !== FALSE) {
-//      if (strpos($view->current_display, 'rest_export') === FALSE) {
-//        ray($view->current_display);
-//      }
-//    }
-//  }
-//}
