@@ -388,7 +388,7 @@ display:
       group_by: false
       display_extenders:
         leaflet_full_page_display_extender:
-          template: none
+          template: legend
       path: leaflet_full_page
     cache_metadata:
       max-age: -1
