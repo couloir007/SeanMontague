@@ -172,9 +172,10 @@ let geoJsonLayer;
     attach (context) {
       $(once('setMapItems', '.leaflet__list-container', context)).each(function () {
         const filters = {};
+        const currentDisplay = drupalSettings.leaflet_full_page?.currentDisplay || 'default_view_name';
 
         // Load the JSON data from the provided endpoint.
-        $.getJSON('/' + {$which} + '_mapitems', function(data) {
+        $.getJSON('/' + currentDisplay + '_mapitems', function(data) {
           console.log('Loaded map items:', data);
           // Process each data item as needed.
           $.each(data, function(index, item) {
@@ -186,9 +187,9 @@ let geoJsonLayer;
                   <div class="thumb" style="background-image: url(${item.field_media_image});">
                   </div>
                   <div class="info">
-                    <h2>${item.label}</h2>
-                    <div class="teaser">${item.label}</div>
-                    <div class="pub-date">2025</div>
+                    <h1 style="font-size: 16px; font-weight: bold">${item.label}</h1>
+                    <div class="teaser">${item.field_subtitle}</div>
+                    <date class="pub-date">${item.field_publication_date}</date>
                   </div>
                 </li>
               `);

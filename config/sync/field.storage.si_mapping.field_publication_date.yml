@@ -1,0 +1,20 @@
+uuid: 7129d20e-7186-432e-9c6f-77867a4ec5b9
+langcode: en
+status: true
+dependencies:
+  module:
+    - datetime
+    - si_mapping
+id: si_mapping.field_publication_date
+field_name: field_publication_date
+entity_type: si_mapping
+type: datetime
+settings:
+  datetime_type: date
+module: datetime
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

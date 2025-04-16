@@ -6,8 +6,11 @@ dependencies:
     - field.field.si_mapping.sesquicentennial.field_body
     - field.field.si_mapping.sesquicentennial.field_image
     - field.field.si_mapping.sesquicentennial.field_location
+    - field.field.si_mapping.sesquicentennial.field_publication_date
+    - field.field.si_mapping.sesquicentennial.field_subtitle
     - si_mapping.si_mapping_type.sesquicentennial
   module:
+    - datetime
     - leaflet
     - media_library
     - text
@@ -18,7 +21,7 @@ mode: default
 content:
   field_body:
     type: text_textarea
-    weight: 2
+    weight: 3
     region: content
     settings:
       rows: 5
@@ -26,14 +29,14 @@ content:
     third_party_settings: {  }
   field_image:
     type: media_library_widget
-    weight: 1
+    weight: 2
     region: content
     settings:
       media_types: {  }
     third_party_settings: {  }
   field_location:
     type: leaflet_widget_default
-    weight: 3
+    weight: 5
     region: content
     settings:
       map:
@@ -96,6 +99,20 @@ content:
       feature_properties:
         values: ''
     third_party_settings: {  }
+  field_publication_date:
+    type: datetime_default
+    weight: 4
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_subtitle:
+    type: string_textfield
+    weight: 1
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   label:
     type: string_textfield
     weight: 0
@@ -106,7 +123,7 @@ content:
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 4
+    weight: 6
     region: content
     settings:
       display_label: false
