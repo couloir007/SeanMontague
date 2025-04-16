@@ -387,8 +387,6 @@ display:
       relationships: {  }
       group_by: false
       display_extenders:
-        si_mapping_display_extender:
-          template: none
         leaflet_full_page_display_extender:
           template: none
       path: leaflet_full_page
@@ -643,7 +641,7 @@ display:
           element_label_colon: false
           element_wrapper_type: ''
           element_wrapper_class: ''
-          element_default_classes: false
+          element_default_classes: true
           empty: ''
           hide_empty: false
           empty_zero: false
@@ -695,11 +693,7 @@ display:
           plugin_id: standard
           required: false
       display_description: ''
-      display_extenders:
-        si_mapping_display_extender:
-          template: none
-        leaflet_full_page_display_extender:
-          template: legend
+      display_extenders: {  }
       path: mapitems
     cache_metadata:
       max-age: -1
