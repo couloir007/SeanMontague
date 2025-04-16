@@ -695,7 +695,11 @@ display:
           plugin_id: standard
           required: false
       display_description: ''
-      display_extenders: {  }
+      display_extenders:
+        si_mapping_display_extender:
+          template: none
+        leaflet_full_page_display_extender:
+          template: legend
       path: mapitems
     cache_metadata:
       max-age: -1
