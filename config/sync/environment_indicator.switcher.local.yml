@@ -1,0 +1,11 @@
+uuid: 5a9094a8-af9a-4b14-886f-f727ef00d97d
+langcode: en
+status: true
+dependencies: {  }
+machine: local
+description: null
+name: Local
+weight: -10
+url: 'https://trailmapper-psql.lndo.site'
+fg_color: '#ffffff'
+bg_color: '#114d00'
