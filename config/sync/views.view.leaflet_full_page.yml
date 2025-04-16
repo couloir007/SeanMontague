@@ -696,7 +696,7 @@ display:
       display_extenders:
         leaflet_full_page_display_extender:
           template: legend
-      path: mapitems
+      path: page_1_mapitems
     cache_metadata:
       max-age: -1
       contexts:
