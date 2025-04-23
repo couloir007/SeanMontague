@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - si_mapping
+id: si_mapping_si_mapping_item_save_action
+label: 'Save si mapping items'
+type: si_mapping_si_mapping_item
+plugin: entity:save_action:si_mapping_si_mapping_item
+configuration: {  }

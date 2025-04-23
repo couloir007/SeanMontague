@@ -9,3 +9,15 @@ si_mapping.add_page:
   route_name: entity.si_mapping.add_page
   appears_on:
     - entity.si_mapping.collection
+
+si_mapping_si_mapping_item.type_add:
+  title: 'Add si mapping item type'
+  route_name: entity.si_mapping_si_mapping_item_type.add_form
+  appears_on:
+    - entity.si_mapping_si_mapping_item_type.collection
+
+si_mapping_si_mapping_item.add_page:
+  title: 'Add si mapping item'
+  route_name: entity.si_mapping_si_mapping_item.add_page
+  appears_on:
+    - entity.si_mapping_si_mapping_item.collection

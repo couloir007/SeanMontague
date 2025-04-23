@@ -134,7 +134,7 @@ content:
     region: content
   field_publication_date:
     type: datetime_custom
-    label: above
+    label: visually_hidden
     settings:
       timezone_override: ''
       date_format: 'F j, Y'

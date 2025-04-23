@@ -10,3 +10,16 @@ si_mapping.si_mapping_type.*:
       label: 'Label'
     uuid:
       type: string
+
+si_mapping.si_mapping_si_mapping_item_type.*:
+  type: config_entity
+  label: 'SI Mapping Item type config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    uuid:
+      type: string

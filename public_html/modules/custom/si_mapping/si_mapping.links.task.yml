@@ -24,3 +24,30 @@ entity.si_mapping_type.collection:
   title: 'List'
   route_name: entity.si_mapping_type.collection
   base_route: entity.si_mapping_type.collection
+
+entity.si_mapping_si_mapping_item.view:
+  title: 'View'
+  route_name: entity.si_mapping_si_mapping_item.canonical
+  base_route: entity.si_mapping_si_mapping_item.canonical
+entity.si_mapping_si_mapping_item.edit_form:
+  title: 'Edit'
+  route_name: entity.si_mapping_si_mapping_item.edit_form
+  base_route: entity.si_mapping_si_mapping_item.canonical
+entity.si_mapping_si_mapping_item.delete_form:
+  title: 'Delete'
+  route_name: entity.si_mapping_si_mapping_item.delete_form
+  base_route: entity.si_mapping_si_mapping_item.canonical
+  weight: 10
+entity.si_mapping_si_mapping_item.collection:
+  title: 'SI Mapping Items'
+  route_name: entity.si_mapping_si_mapping_item.collection
+  base_route: system.admin_content
+  weight: 10
+entity.si_mapping_si_mapping_item_type.edit_form:
+  title: 'Edit'
+  route_name: entity.si_mapping_si_mapping_item_type.edit_form
+  base_route: entity.si_mapping_si_mapping_item_type.edit_form
+entity.si_mapping_si_mapping_item_type.collection:
+  title: 'List'
+  route_name: entity.si_mapping_si_mapping_item_type.collection
+  base_route: entity.si_mapping_si_mapping_item_type.collection

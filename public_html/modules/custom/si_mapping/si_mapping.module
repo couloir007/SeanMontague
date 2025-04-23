@@ -16,6 +16,7 @@ use Drupal\user\UserInterface;
 function si_mapping_theme(): array {
   return [
     'si_mapping' => ['render element' => 'elements'],
+    'si_mapping_si_mapping_item' => ['render element' => 'elements'],
   ];
 }
 
@@ -30,7 +31,25 @@ function si_mapping_theme(): array {
  *     fields attached to the entity.
  *   - attributes: HTML attributes for the containing element.
  */
-function template_preprocess_si_mapping(array &$variables): void {
+function si_mapping_preprocess_si_mapping(array &$variables): void {
+  $variables['view_mode'] = $variables['elements']['#view_mode'];
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Prepares variables for si mapping item templates.
+ *
+ * Default template: si-mapping-si-mapping-item.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing the si mapping item information and any
+ *     fields attached to the entity.
+ *   - attributes: HTML attributes for the containing element.
+ */
+function si_mapping_preprocess_si_mapping_si_mapping_item(array &$variables): void {
   $variables['view_mode'] = $variables['elements']['#view_mode'];
   foreach (Element::children($variables['elements']) as $key) {
     $variables['content'][$key] = $variables['elements'][$key];
@@ -40,46 +59,51 @@ function template_preprocess_si_mapping(array &$variables): void {
 /**
  * Implements hook_user_cancel().
  */
-function si_mapping_user_cancel($edit, UserInterface $account, $method): void {
+function si_mapping_user_cancel(array $edit, \Drupal\user\UserInterface $account, $method): void {
+  // Which entity types we need to touch.
+  $types = ['si_mapping', 'si_mapping_item'];
+
   switch ($method) {
     case 'user_cancel_block_unpublish':
-      // Unpublish si mappings.
-      $storage = \Drupal::entityTypeManager()->getStorage('si_mapping');
-      $si_mapping_ids = $storage->getQuery()
-        ->condition('uid', $account->id())
-        ->condition('status', 1)
-        ->accessCheck(FALSE)
-        ->execute();
-      foreach ($storage->loadMultiple($si_mapping_ids) as $si_mapping) {
-        $si_mapping->set('status', FALSE)->save();
+      foreach ($types as $type) {
+        $storage = \Drupal::entityTypeManager()->getStorage($type);
+        $ids = $storage->getQuery()
+          ->condition('uid', $account->id())
+          ->condition('status', 1)
+          ->accessCheck(FALSE)
+          ->execute();
+        foreach ($storage->loadMultiple($ids) as $entity) {
+          $entity->set('status', FALSE)->save();
+        }
       }
       break;
 
     case 'user_cancel_reassign':
-      // Anonymize si mappings.
-      $storage = \Drupal::entityTypeManager()->getStorage('si_mapping');
-      $si_mapping_ids = $storage->getQuery()
-        ->condition('uid', $account->id())
-        ->accessCheck(FALSE)
-        ->execute();
-      foreach ($storage->loadMultiple($si_mapping_ids) as $si_mapping) {
-        $si_mapping->setOwnerId(0)->save();
+      foreach ($types as $type) {
+        $storage = \Drupal::entityTypeManager()->getStorage($type);
+        $ids = $storage->getQuery()
+          ->condition('uid', $account->id())
+          ->accessCheck(FALSE)
+          ->execute();
+        foreach ($storage->loadMultiple($ids) as $entity) {
+          $entity->setOwnerId(0)->save();
+        }
       }
       break;
   }
 }
 
 /**
- * Implements hook_ENTITY_TYPE_predelete() for user entities.
+ * Implements hook_user_predelete().
  */
-function si_mapping_user_predelete(UserInterface $account): void {
-  // Delete si mappings that belong to this account.
-  $storage = \Drupal::entityTypeManager()->getStorage('si_mapping');
-  $si_mapping_ids = $storage->getQuery()
-    ->condition('uid', $account->id())
-    ->accessCheck(FALSE)
-    ->execute();
-  $storage->delete(
-    $storage->loadMultiple($si_mapping_ids)
-  );
+function si_mapping_user_predelete(\Drupal\user\UserInterface $account): void {
+  $types = ['si_mapping', 'si_mapping_item'];
+  foreach ($types as $type) {
+    $storage = \Drupal::entityTypeManager()->getStorage($type);
+    $ids = $storage->getQuery()
+      ->condition('uid', $account->id())
+      ->accessCheck(FALSE)
+      ->execute();
+    $storage->delete($storage->loadMultiple($ids));
+  }
 }

@@ -27,6 +27,7 @@ settings:
       - horizontalLine
       - alignment
       - sourceEditing
+      - drupalMedia
   plugins:
     ckeditor5_alignment:
       enabled_alignments:

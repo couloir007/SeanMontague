@@ -9,3 +9,15 @@ entity.si_mapping.collection:
   description: 'List of si mappings.'
   route_name: entity.si_mapping.collection
   parent: system.admin_content
+
+entity.si_mapping_si_mapping_item_type.collection:
+  title: 'SI Mapping Item types'
+  description: 'Manage and CRUD actions on SI Mapping Item type.'
+  parent: system.admin_structure
+  route_name: entity.si_mapping_si_mapping_item_type.collection
+
+entity.si_mapping_si_mapping_item.collection:
+  title: 'SI Mapping Items'
+  description: 'List of si mapping items.'
+  route_name: entity.si_mapping_si_mapping_item.collection
+  parent: system.admin_content

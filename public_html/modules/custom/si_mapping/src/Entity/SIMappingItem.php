@@ -9,30 +9,29 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\si_mapping\SiMappingInterface;
+use Drupal\si_mapping\SIMappingItemInterface;
 use Drupal\user\EntityOwnerTrait;
 
 /**
- * Defines the si mapping entity class.
+ * Defines the si mapping item entity class.
  *
  * @ContentEntityType(
- *   id = "si_mapping",
- *   label = @Translation("Si mapping"),
- *   label_collection = @Translation("Si mappings"),
- *   label_singular = @Translation("si mapping"),
- *   label_plural = @Translation("si mappings"),
+ *   id = "si_mapping_si_mapping_item",
+ *   label = @Translation("SI Mapping Item"),
+ *   label_collection = @Translation("SI Mapping Items"),
+ *   label_singular = @Translation("si mapping item"),
+ *   label_plural = @Translation("si mapping items"),
  *   label_count = @PluralTranslation(
- *     singular = "@count si mapping",
- *     plural = "@count si mappings",
+ *     singular = "@count si mapping items",
+ *     plural = "@count si mapping items",
  *   ),
- *   bundle_label = @Translation("Si mapping type"),
+ *   bundle_label = @Translation("SI Mapping Item type"),
  *   handlers = {
- *     "access" = "Drupal\si_mapping\Access\MapItemAccessControlHandler",
- *     "list_builder" = "Drupal\si_mapping\SiMappingListBuilder",
+ *     "list_builder" = "Drupal\si_mapping\SIMappingItemListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
- *       "add" = "Drupal\si_mapping\Form\SiMappingForm",
- *       "edit" = "Drupal\si_mapping\Form\SiMappingForm",
+ *       "add" = "Drupal\si_mapping\Form\SIMappingItemForm",
+ *       "edit" = "Drupal\si_mapping\Form\SIMappingItemForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm",
  *       "delete-multiple-confirm" = "Drupal\Core\Entity\Form\DeleteMultipleForm",
  *     },
@@ -40,10 +39,10 @@ use Drupal\user\EntityOwnerTrait;
  *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *     },
  *   },
- *   base_table = "si_mapping",
- *   data_table = "si_mapping_field_data",
+ *   base_table = "si_mapping_si_mapping_item",
+ *   data_table = "si_mapping_si_mapping_item_field_data",
  *   translatable = TRUE,
- *   admin_permission = "administer si_mapping types",
+ *   admin_permission = "administer si_mapping_si_mapping_item types",
  *   entity_keys = {
  *     "id" = "id",
  *     "langcode" = "langcode",
@@ -53,19 +52,19 @@ use Drupal\user\EntityOwnerTrait;
  *     "owner" = "uid",
  *   },
  *   links = {
- *     "collection" = "/admin/content/si-mapping",
- *     "add-form" = "/si-mapping/add/{si_mapping_type}",
- *     "add-page" = "/si-mapping/add",
- *     "canonical" = "/si-mapping/{si_mapping}",
- *     "edit-form" = "/si-mapping/{si_mapping}/edit",
- *     "delete-form" = "/si-mapping/{si_mapping}/delete",
- *     "delete-multiple-form" = "/admin/content/si-mapping/delete-multiple",
+ *     "collection" = "/admin/content/si-mapping-item",
+ *     "add-form" = "/si-mapping-item/add/{si_mapping_si_mapping_item_type}",
+ *     "add-page" = "/si-mapping-item/add",
+ *     "canonical" = "/si-mapping-item/{si_mapping_si_mapping_item}",
+ *     "edit-form" = "/si-mapping-item/{si_mapping_si_mapping_item}/edit",
+ *     "delete-form" = "/si-mapping-item/{si_mapping_si_mapping_item}/delete",
+ *     "delete-multiple-form" = "/admin/content/si-mapping-item/delete-multiple",
  *   },
- *   bundle_entity_type = "si_mapping_type",
- *   field_ui_base_route = "entity.si_mapping_type.edit_form",
+ *   bundle_entity_type = "si_mapping_si_mapping_item_type",
+ *   field_ui_base_route = "entity.si_mapping_si_mapping_item_type.edit_form",
  * )
  */
-final class SiMapping extends ContentEntityBase implements SiMappingInterface {
+final class SIMappingItem extends ContentEntityBase implements SIMappingItemInterface {
 
   use EntityChangedTrait;
   use EntityOwnerTrait;
@@ -127,6 +126,21 @@ final class SiMapping extends ContentEntityBase implements SiMappingInterface {
       ])
       ->setDisplayConfigurable('view', TRUE);
 
+    $fields['description'] = BaseFieldDefinition::create('text_long')
+      ->setTranslatable(TRUE)
+      ->setLabel(t('Description'))
+      ->setDisplayOptions('form', [
+        'type' => 'text_textarea',
+        'weight' => 10,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayOptions('view', [
+        'type' => 'text_default',
+        'label' => 'above',
+        'weight' => 10,
+      ])
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setTranslatable(TRUE)
       ->setLabel(t('Author'))
@@ -152,7 +166,7 @@ final class SiMapping extends ContentEntityBase implements SiMappingInterface {
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Authored on'))
       ->setTranslatable(TRUE)
-      ->setDescription(t('The time that the si mapping was created.'))
+      ->setDescription(t('The time that the si mapping item was created.'))
       ->setDisplayOptions('view', [
         'label' => 'above',
         'type' => 'timestamp',
@@ -168,7 +182,7 @@ final class SiMapping extends ContentEntityBase implements SiMappingInterface {
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
       ->setTranslatable(TRUE)
-      ->setDescription(t('The time that the si mapping was last edited.'));
+      ->setDescription(t('The time that the si mapping item was last edited.'));
 
     return $fields;
   }
