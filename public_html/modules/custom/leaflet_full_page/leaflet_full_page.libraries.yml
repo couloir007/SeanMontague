@@ -4,8 +4,8 @@ custom_leaflet:
     component:
       css/custom_leaflet.css: {}
   js:
-    js/custom_leaflet.js: {}
-#    js/LeafletMapInteraction.js: { }
+#    js/custom_leaflet.js: {}
+    js/LeafletMapInteraction.js: { }
   dependencies:
     - core/drupal
     - core/jquery

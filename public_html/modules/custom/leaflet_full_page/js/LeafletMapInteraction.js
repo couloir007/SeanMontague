@@ -14,12 +14,37 @@
     Object.keys(drupalSettings.leaflet).forEach(function (mapId) {
       const cfg = drupalSettings.leaflet[mapId];
       const lMap = cfg && cfg.lMap;
+      const features = drupalSettings.leaflet[mapId]['features'];
+      const theMap = drupalSettings.leaflet[mapId]['map'];
+
+      console.log(theMap);
 
       // Guard clause: Leaflet map instance must be initialized.
       if (!lMap) {
         console.error(`Leaflet map ${mapId} not initialized after window.load.`);
         return;
       }
+
+      features.forEach(feature => {
+        // console.log(feature);
+        if (feature.type === 'point') {
+          // Create marker for feature
+          const marker = L.marker([feature.lat, feature.lon]);
+
+          // Store entity_id on marker directly as custom property
+          marker.entity_id = feature.entity_id;
+
+          // Add click listener
+          marker.on('click', () => {
+            // console.log('Clicked entity_id:', marker.entity_id);
+            getContent(marker.entity_id, 'map');
+            // Your logic here, e.g., getContent(marker.entity_id);
+          });
+
+          // Add marker to the map
+          marker.addTo(lMap);
+        }
+      });
 
       /**
        * Load GeoJSON file (e.g. boundaries or trails) asynchronously,
@@ -29,16 +54,28 @@
         .then(res => res.json())
         .then(geojsonData => {
           const geoJsonLayer = L.geoJSON(geojsonData, {
-            style: () => ({
-              color: 'green',
-              weight: 2,
-              fillOpacity: 0.2,
-            }),
+            style: () => {
+              return ({
+                color: 'green',
+                weight: 2,
+                fillOpacity: 0.2,
+              });
+            },
             onEachFeature: (feature, layer) => {
               if (feature.properties && feature.properties.name) {
                 layer.bindPopup(feature.properties.name);
+
+                layer.on('click', function() {
+                  console.log('Feature clicked:', feature.properties.name);
+
+                  // Open popup when feature is clicked
+                  // layer.openPopup();
+
+                  // Pan map to center on the clicked feature
+                  lMap.panTo(layer.getBounds().getCenter());
+                });
               }
-            }
+            },
           });
           geoJsonLayer.addTo(lMap);
         })
@@ -110,6 +147,7 @@
             listContainer.appendChild(li);
           });
 
+
           /**
            * Event delegation:
            * Attach a single click listener to the list container to handle clicks
@@ -120,6 +158,8 @@
             if (!li) return; // Ignore clicks outside list items.
 
             const contentID = li.id;
+
+            console.log('Clicked item:', contentID);
 
             // Placeholder: load/display content related to this item.
             getContent(contentID);
@@ -138,24 +178,152 @@
        * Intended to fetch and display detailed content for a given item.
        * User should implement AJAX or DOM manipulation here.
        * @param {string} contentID - The ID of the content to fetch.
+       * @param which - The source of click (e.g., 'map' or 'list').
        */
-      function getContent(contentID) {
-        console.log('Fetching content for:', contentID);
-        // Implement fetching and displaying content details here.
+      function getContent(contentID, which) {
         const currentDisplay = drupalSettings.leaflet_full_page?.currentDisplay || 'default_view_name';
-        fetch(`/${currentDisplay}_mapitems`)
-          .then(res => res.json())
+        console.log('Fetching content for:', contentID);
+
+        fetch(`/${currentDisplay}_mapitems?contentID=${encodeURIComponent(contentID)}&which=${encodeURIComponent(which)}`)  // Add query parameter here
+          .then(res => {
+            // Get contentID from the request URL
+            const url = new URL(res.url);
+            const contentID = url.searchParams.get('contentID');
+            const which = url.searchParams.get('which');
+            console.log('contentID from URL:', contentID);
+            return res.json().then(data => {
+              // Return both the data and the contentID
+              return {
+                data: data,
+                contentID: contentID,
+                which: which,
+              };
+            });
+          })
           .then(data => {
-            const item = data.find(obj => obj.id === contentID);
+            let theData = data.data;
+            let contentID = data.contentID;  // Use contentID from the response
+            let which = data.which;  // Use which from the response
+
+            const item = theData.find(obj => Number(obj.id) === Number(contentID));
+
             if (item) {
-              // do something with `item`
-              ray(item);
-              $('.leaflet__content-title').html(item.label);
-              $('.leaflet__content-textarea').html(item.body);
+              const itemsList = [];
+              let itemTitle = '';
+              if (which === 'map') {
+                // do something with `item`
+                itemsList.push(contentID);
+                itemTitle = item.label;
+
+                if (itemsList.length < 2) {
+                  [contentID] = itemsList;
+                } else {
+                  contentID = null;
+
+                  document.querySelectorAll('li.map-item-list').forEach(el => el.style.display = 'none');
+
+                  itemsList.forEach(item => {
+                    document.querySelector('.leaflet__list-container').classList.remove('open');
+                    document.querySelector('.leaflet__list-container').classList.remove('container-up');
+                    document.querySelector('.leaflet__content').style.display = 'none';
+                    document.getElementById(item).style.display = 'block';
+                    document.querySelector('.leaflet__top h1').style.display = 'none';
+                    document.querySelector('.leaflet__top h3').innerHTML = itemTitle;
+                    document.querySelector('.leaflet__top h3').style.display = 'block';
+                  });
+                }
+              }
+
+              if (contentID != null) {
+                document.querySelector('.leaflet__content-title').textContent = item.label;
+                document.querySelector('.leaflet__content-textarea').innerHTML = item.field_body;
+                // document.querySelector('.leaflet__content-textarea').append(mapItems[contentID].content);
+
+                document.querySelectorAll('.leaflet__content-textarea a').forEach(link => {
+                  link.setAttribute('target', '_blank');
+                });
+
+                const theWidth = getTheWidth();
+
+                if (theWidth === '100%') {
+                  document.querySelector('.leaflet__list-container').classList.add('container-up');
+                  if (item.image_url_mobile) {
+                    document.querySelector('.leaflet__content-main-image').src = item.image_url_mobile;
+                  }
+                } else {
+                  document.querySelector('.leaflet__list-container').classList.remove('container-up');
+                  if (item.image_url_big) {
+                    document.querySelector('.leaflet__content-main-image').src = item.image_url_big;
+                  }
+                }
+
+                if (item.credit) {
+                  const figcaption = document.querySelector('.leaflet__content-main-figure figcaption');
+                  figcaption.innerHTML = `<strong>Credit: </strong>${item.credit}`;
+                  figcaption.style.display = 'block';
+                }
+
+                document.querySelector('.leaflet__content').setAttribute('maps-nid', contentID);
+                document.querySelector('.leaflet__content').style.display = 'block';
+
+                requestAnimationFrame(() => document.querySelector('.leaflet__list-container').classList.add('open'));
+
+                document.querySelector('.leaflet__content-scrollable').style.cssText = 'overflow-y: scroll; overflow-x: hidden;';
+                document.querySelector('.leaflet__content-scrollable').scrollTo({ top: 0, behavior: 'smooth' });
+
+
+                const scrollableElement = document.querySelector('.leaflet__content-scrollable');
+                scrollableElement.style.cssText = 'overflow-y: scroll; overflow-x: hidden; max-height: 100%;';
+                scrollableElement.scrollTo({ top: 0, behavior: 'smooth' });
+
+                const headerHeight = document.querySelector('.leaflet__content-header').offsetHeight + 7 + 30;
+                document.querySelector('.leaflet__content-scrollable').style.height = `${document.querySelector('.leaflet__content').offsetHeight - headerHeight - 20}px`;
+
+
+                setTimeout(() => {
+                  if (document.querySelector('.leaflet__list-container').classList.contains('container-up')) {
+                    const headerHeight = document.querySelector('.leaflet__content-header').offsetHeight + 7 + 30;
+                    document.querySelector('.leaflet__content-scrollable').style.height =
+                      `${document.querySelector('.leaflet__content').offsetHeight - headerHeight - 20}px`;
+                  }
+                }, 400);
+              }
             }
           })
           .catch(err => console.error(err));
       }
+
+      function getTheWidth() {
+        const leafletEl = document.querySelector('.leaflet');
+        const containerEl = document.querySelector('.leaflet__list-container');
+
+        leafletEl.style.display = 'none';
+        const theGetWidth = getComputedStyle(containerEl).width;
+        leafletEl.style.display = '';
+
+        return theGetWidth;
+      }
+
+      document.querySelectorAll('.leaflet__content a.x-button').forEach(button => {
+        button.addEventListener('click', function (e) {
+          e.preventDefault();
+
+          console.log(theMap.settings.center);
+          lMap.setView(theMap.settings.center, theMap.settings.zoom);
+          lMap.invalidateSize();
+
+          document.querySelector('.leaflet__list-container').classList.remove('open');
+          document.querySelector('.leaflet__list-container').classList.remove('container-up');
+          document.querySelector('.leaflet__content').style.display = 'none';
+          document.querySelectorAll('li.map-item-list').forEach(item => item.style.display = 'block');
+          document.querySelector('.leaflet__top h1').style.display = 'block';
+          document.querySelector('.leaflet__top h3').style.display = 'none';
+
+          // filterItems();
+
+          return null;
+        });
+      });
 
       /**
        * Placeholder function:
@@ -166,6 +334,18 @@
       function getNewLatLng(contentID) {
         console.log('Panning map to:', contentID);
         // Implement locating item coordinates and updating map view here.
+        const feature = features.find(item => item.entity_id === contentID);
+
+
+        const newLatLng = {};
+
+        newLatLng.lng = parseFloat(feature.lon) + 1;
+        newLatLng.lat = feature.lat;
+        console.log(newLatLng);
+        console.log(feature);
+
+        lMap.setView(newLatLng, 9);
+        lMap.invalidateSize();
       }
 
       /**
@@ -179,6 +359,10 @@
         const windowHeight = window.innerHeight;
         const offsetTop = mapElement.getBoundingClientRect().top;
         const newHeight = windowHeight - offsetTop;
+
+
+        const headerHeight = document.querySelector('.leaflet__content-header').offsetHeight + 7 + 30;
+        document.querySelector('.leaflet__content-scrollable').style.height = `${document.querySelector('.leaflet__content').offsetHeight - headerHeight - 20}px`;
 
         mapElement.style.height = `${newHeight}px`;
         lMap.invalidateSize(); // Notify Leaflet to recalc map size.

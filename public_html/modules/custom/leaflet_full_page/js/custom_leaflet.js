@@ -119,15 +119,16 @@ let geoJsonLayer;
           } else {
             contentID = null;
 
-            $('li.map-item-list').hide();
+            document.querySelectorAll('li.map-item-list').forEach(el => el.style.display = 'none');
 
-            $.each(itemsList, function (key, item) {
-              $('.leaflet__list-container').removeClass('open');
-              $('.leaflet__list-container').removeClass('container-up');
-              $('.leaflet__content').hide();
-              $(`#${item}`).show();
-              $('.leaflet__top h1').hide();
-              $('.leaflet__top h3').html(itemTitle).show();
+            itemsList.forEach(item => {
+              document.querySelector('.leaflet__list-container').classList.remove('open');
+              document.querySelector('.leaflet__list-container').classList.remove('container-up');
+              document.querySelector('.leaflet__content').style.display = 'none';
+              document.getElementById(item).style.display = 'block';
+              document.querySelector('.leaflet__top h1').style.display = 'none';
+              document.querySelector('.leaflet__top h3').innerHTML = itemTitle;
+              document.querySelector('.leaflet__top h3').style.display = 'block';
             });
           }
 
@@ -163,11 +164,8 @@ let geoJsonLayer;
             }
 
             document.querySelector('.leaflet__content').setAttribute('maps-nid', contentID);
-
             document.querySelector('.leaflet__content').style.display = 'block';
-
             document.querySelector('.leaflet__list-container').classList.add('open');
-
             document.querySelector('.leaflet__content-scrollable').scrollTo({ top: 0, behavior: 'smooth' });
 
             setTimeout(() => {
@@ -176,7 +174,7 @@ let geoJsonLayer;
                 document.querySelector('.leaflet__content-scrollable').style.height =
                   `${document.querySelector('.leaflet__content').offsetHeight - headerHeight - 20}px`;
               }
-            }, 900);
+            }, 300);
           }
         }
       })
@@ -186,11 +184,11 @@ let geoJsonLayer;
   $(document).bind('leaflet.feature', function (event, lFeature, feature) {
     $(lFeature).click(function (e) {
       const newLatLng = {};
-      // newLatLng.lng = e.originalEvent.latlng.lng + 7;
-      // newLatLng.lat = e.originalEvent.latlng.lat;
-      //
-      // theMap.lMap.setView(newLatLng, 9);
-      // theMap.lMap.invalidateSize();
+      newLatLng.lng = e.originalEvent.latlng.lng + 7;
+      newLatLng.lat = e.originalEvent.latlng.lat;
+
+      theMap.lMap.setView(newLatLng, 9);
+      theMap.lMap.invalidateSize();
 
       const contentID = feature.entity_id;
 
@@ -248,22 +246,24 @@ let geoJsonLayer;
           return null;
         });
 
-        $('.leaflet__content a.x-button', context).on('click', function (e) {
-          e.preventDefault();
+        document.querySelectorAll('.leaflet__content a.x-button').forEach(button => {
+          button.addEventListener('click', function (e) {
+            e.preventDefault();
 
-          theMap.lMap.setView(theMap.map.settings.center, theMap.map.settings.zoom);
-          theMap.lMap.invalidateSize();
+            theMap.lMap.setView(theMap.map.settings.center, theMap.map.settings.zoom);
+            theMap.lMap.invalidateSize();
 
-          $('.leaflet__list-container').removeClass('open');
-          $('.leaflet__list-container').removeClass('container-up');
-          $('.leaflet__content').hide();
-          $('li.map-item-list').show();
-          $('.leaflet__top h1').show();
-          $('.leaflet__top h3').hide();
+            document.querySelector('.leaflet__list-container').classList.remove('open');
+            document.querySelector('.leaflet__list-container').classList.remove('container-up');
+            document.querySelector('.leaflet__content').style.display = 'none';
+            document.querySelectorAll('li.map-item-list').forEach(item => item.style.display = 'block');
+            document.querySelector('.leaflet__top h1').style.display = 'block';
+            document.querySelector('.leaflet__top h3').style.display = 'none';
 
-          filterItems();
+            filterItems();
 
-          return null;
+            return null;
+          });
         });
 
         $('.leaflet__content a.arrow-left', context).on('click', function (e) {
