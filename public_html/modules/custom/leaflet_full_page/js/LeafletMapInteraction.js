@@ -1,4 +1,132 @@
 (function (Drupal, drupalSettings) {
+  'use strict';
+
+  // Utility to decode HTML entities
+  function decodeHtmlEntities(text) {
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = text;
+    return textarea.value;
+  }
+
+  function setupMarkers(features, lMap) {
+    features.forEach(feature => {
+      if (feature.type === 'point') {
+        const marker = L.marker([feature.lat, feature.lon]);
+        marker.entity_id = feature.entity_id;
+
+        marker.on('click', () => {
+          getContent(marker.entity_id, 'map');
+          getNewLatLng(marker.entity_id);
+        });
+
+        marker.addTo(lMap);
+      }
+    });
+  }
+
+  function addGeoJsonLayer(lMap) {
+    fetch('/sites/default/files/KingdomTrails.geojson')
+      .then(res => res.json())
+      .then(data => {
+        const layer = L.geoJSON(data, {
+          style: () => ({
+            color: 'green',
+            weight: 2,
+            fillOpacity: 0.2,
+          }),
+          onEachFeature: (feature, layer) => {
+            if (feature.properties?.name) {
+              layer.bindPopup(feature.properties.name);
+              layer.on('click', () => {
+                lMap.panTo(layer.getBounds().getCenter());
+              });
+            }
+          },
+        });
+        layer.addTo(lMap);
+      })
+      .catch(console.error);
+  }
+
+  function populateList(items) {
+    const listContainer = document.querySelector('.leaflet__list');
+    if (!listContainer) {
+      return;
+    }
+
+    listContainer.innerHTML = '';
+    items.forEach(item => {
+      const li = document.createElement('li');
+      li.tabIndex = -1;
+      li.id = item.id;
+      li.className = 'map-item-list';
+
+      const thumb = document.createElement('div');
+      thumb.className = 'thumb';
+      thumb.style.backgroundImage = `url(${item.field_media_image})`;
+
+      const info = document.createElement('div');
+      info.className = 'info';
+
+      const h1 = document.createElement('h1');
+      h1.style.fontSize = '16px';
+      h1.style.fontWeight = 'bold';
+      h1.textContent = decodeHtmlEntities(item.label || '');
+
+      const teaser = document.createElement('div');
+      teaser.className = 'teaser';
+      teaser.textContent = decodeHtmlEntities(item.field_subtitle || '');
+
+      const pubDate = document.createElement('date');
+      pubDate.className = 'pub-date';
+      pubDate.textContent = item.field_publication_date || '';
+
+      info.append(h1, teaser, pubDate);
+      li.append(thumb, info);
+      listContainer.appendChild(li);
+    });
+  }
+
+  function attachListClickHandler() {
+    const listContainer = document.querySelector('.leaflet__list');
+    if (!listContainer) {
+      return;
+    }
+
+    listContainer.addEventListener('click', e => {
+      const li = e.target.closest('li.map-item-list');
+      if (!li) {
+        return;
+      }
+
+      const contentID = li.id;
+      getContent(contentID);
+      getNewLatLng(contentID);
+    });
+  }
+
+  function setupCloseButton(theMap, lMap) {
+    document.querySelectorAll('.leaflet__content a.x-button').forEach(button => {
+      button.addEventListener('click', e => {
+        e.preventDefault();
+        lMap.setView(theMap.settings.center, theMap.settings.zoom);
+        lMap.invalidateSize();
+
+        const listContainer = document.querySelector('.leaflet__list-container');
+        listContainer?.classList.remove('open', 'container-up');
+
+        const leafletContent = document.querySelector('.leaflet__content');
+        if (leafletContent) {
+          leafletContent.style.display = 'none';
+        }
+
+        document.querySelectorAll('li.map-item-list').forEach(item => item.style.display = 'block');
+        document.querySelector('.leaflet__top h1').style.display = 'block';
+        document.querySelector('.leaflet__top h3').style.display = 'none';
+      });
+    });
+  }
+
   /**
    * Entry point: Waits for all page resources (DOM, images, scripts) to be fully loaded.
    * Ensures Leaflet maps are available in Drupal settings before proceeding.
@@ -16,8 +144,12 @@
       const lMap = cfg && cfg.lMap;
       const features = drupalSettings.leaflet[mapId]['features'];
       const theMap = drupalSettings.leaflet[mapId]['map'];
+      let mapWidthPx = document.querySelector('.leaflet').offsetWidth - 350;
+      const US_CENTER_LON = -95.867;
 
-      console.log(theMap);
+      if (mapWidthPx < 1320) {
+        adjustMapView(mapWidthPx, theMap, lMap);
+      }
 
       // Guard clause: Leaflet map instance must be initialized.
       if (!lMap) {
@@ -39,6 +171,7 @@
             // console.log('Clicked entity_id:', marker.entity_id);
             getContent(marker.entity_id, 'map');
             // Your logic here, e.g., getContent(marker.entity_id);
+            getNewLatLng(marker.entity_id);
           });
 
           // Add marker to the map
@@ -65,7 +198,7 @@
               if (feature.properties && feature.properties.name) {
                 layer.bindPopup(feature.properties.name);
 
-                layer.on('click', function() {
+                layer.on('click', function () {
                   console.log('Feature clicked:', feature.properties.name);
 
                   // Open popup when feature is clicked
@@ -90,7 +223,9 @@
       const currentDisplay = drupalSettings.leaflet_full_page?.currentDisplay || 'default_view_name';
       fetch(`/${currentDisplay}_mapitems`)
         .then(res => {
-          if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
           return res.json();
         })
         .then(items => {
@@ -147,7 +282,6 @@
             listContainer.appendChild(li);
           });
 
-
           /**
            * Event delegation:
            * Attach a single click listener to the list container to handle clicks
@@ -155,11 +289,11 @@
            */
           listContainer.addEventListener('click', (e) => {
             const li = e.target.closest('li.map-item-list');
-            if (!li) return; // Ignore clicks outside list items.
+            if (!li) {
+              return;
+            } // Ignore clicks outside list items.
 
             const contentID = li.id;
-
-            console.log('Clicked item:', contentID);
 
             // Placeholder: load/display content related to this item.
             getContent(contentID);
@@ -173,6 +307,27 @@
           console.error('Failed to load map items:', err);
         });
 
+      /* CloseButton */
+      document.querySelectorAll('.leaflet__content a.x-button').forEach(button => {
+        button.addEventListener('click', function (e) {
+          e.preventDefault();
+
+          mapWidthPx = document.querySelector('.leaflet').offsetWidth - 350;
+          adjustMapView(mapWidthPx, theMap, lMap);
+
+          document.querySelector('.leaflet__list-container').classList.remove('open');
+          document.querySelector('.leaflet__list-container').classList.remove('container-up');
+          document.querySelector('.leaflet__content').style.display = 'none';
+          document.querySelectorAll('li.map-item-list').forEach(item => item.style.display = 'block');
+          document.querySelector('.leaflet__top h1').style.display = 'block';
+          document.querySelector('.leaflet__top h3').style.display = 'none';
+
+          // filterItems();
+
+          return null;
+        });
+      });
+
       /**
        * Placeholder function:
        * Intended to fetch and display detailed content for a given item.
@@ -182,7 +337,7 @@
        */
       function getContent(contentID, which) {
         const currentDisplay = drupalSettings.leaflet_full_page?.currentDisplay || 'default_view_name';
-        console.log('Fetching content for:', contentID);
+        // console.log('Fetching content for:', contentID);
 
         fetch(`/${currentDisplay}_mapitems?contentID=${encodeURIComponent(contentID)}&which=${encodeURIComponent(which)}`)  // Add query parameter here
           .then(res => {
@@ -190,7 +345,9 @@
             const url = new URL(res.url);
             const contentID = url.searchParams.get('contentID');
             const which = url.searchParams.get('which');
-            console.log('contentID from URL:', contentID);
+
+            // console.log('contentID from URL:', contentID);
+
             return res.json().then(data => {
               // Return both the data and the contentID
               return {
@@ -271,14 +428,12 @@
                 document.querySelector('.leaflet__content-scrollable').style.cssText = 'overflow-y: scroll; overflow-x: hidden;';
                 document.querySelector('.leaflet__content-scrollable').scrollTo({ top: 0, behavior: 'smooth' });
 
-
                 const scrollableElement = document.querySelector('.leaflet__content-scrollable');
                 scrollableElement.style.cssText = 'overflow-y: scroll; overflow-x: hidden; max-height: 100%;';
                 scrollableElement.scrollTo({ top: 0, behavior: 'smooth' });
 
                 const headerHeight = document.querySelector('.leaflet__content-header').offsetHeight + 7 + 30;
                 document.querySelector('.leaflet__content-scrollable').style.height = `${document.querySelector('.leaflet__content').offsetHeight - headerHeight - 20}px`;
-
 
                 setTimeout(() => {
                   if (document.querySelector('.leaflet__list-container').classList.contains('container-up')) {
@@ -293,6 +448,72 @@
           .catch(err => console.error(err));
       }
 
+      function adjustMapView(mapWidthPx, theMap, lMap) {
+        const zoom = zoomFromWidth(mapWidthPx);
+        theMap.settings.center.lon = lonWestOfCenter(zoom);
+        lMap.setView(theMap.settings.center, zoom);
+        lMap.invalidateSize();
+
+        console.log(theMap.settings.center);
+        console.log('Zoom: ' + zoom);
+        console.log('Zoom4: ' + lonWestOfCenter(zoom));
+      }
+
+      /**
+       * Given a zoom level, returns the longitude
+       * you get by moving 50 px west of the U.S. center.
+       *
+       * @param {number} zoom  – the Leaflet/OSM zoom (e.g. 0,1,2…)
+       * @param {number} px    – pixel offset (default 50)
+       * @returns {number}     – target longitude
+       */
+      function lonWestOfCenter(zoom, px = -175) {
+        // Web-Mercator uses 256×2^zoom px world width → 360° across.
+        const degPerPixel = 360 / (256 * Math.pow(2, zoom));
+        return US_CENTER_LON - (degPerPixel * px);
+      }
+
+      /**
+       * Placeholder function:
+       * Intended to pan and zoom the Leaflet map to the location associated
+       * with the given content ID.
+       * @param {string} contentID - The ID to locate on the map.
+       */
+      function getNewLatLng(contentID) {
+        // console.log('Panning map to:', contentID);
+        // Implement locating item coordinates and updating map view here.
+        const feature = features.find(item => item.entity_id === contentID);
+
+        const newLatLng = {};
+
+        newLatLng.lng = parseFloat(feature.lon) + 1;
+        newLatLng.lat = feature.lat;
+        // console.log(newLatLng);
+        // console.log(feature);
+
+        lMap.setView(newLatLng, 9);
+        lMap.invalidateSize();
+      }
+
+      function zoomFromWidth(widthPx) {
+        // Thresholds: [minWidth, zoom]
+        const thresholds = [
+          [1319, 5],
+          [659.5, 4],
+          [329.7, 3],
+          [164.9, 2],
+          [82.4, 1],
+          [41.2, 0],
+          [0, 0],  // catch anything below 41.2px as zoom 0
+        ];
+
+        for (const [minW, zoom] of thresholds) {
+          if (widthPx >= minW) {
+            return zoom;
+          }
+        }
+      }
+
       function getTheWidth() {
         const leafletEl = document.querySelector('.leaflet');
         const containerEl = document.querySelector('.leaflet__list-container');
@@ -304,62 +525,19 @@
         return theGetWidth;
       }
 
-      document.querySelectorAll('.leaflet__content a.x-button').forEach(button => {
-        button.addEventListener('click', function (e) {
-          e.preventDefault();
-
-          console.log(theMap.settings.center);
-          lMap.setView(theMap.settings.center, theMap.settings.zoom);
-          lMap.invalidateSize();
-
-          document.querySelector('.leaflet__list-container').classList.remove('open');
-          document.querySelector('.leaflet__list-container').classList.remove('container-up');
-          document.querySelector('.leaflet__content').style.display = 'none';
-          document.querySelectorAll('li.map-item-list').forEach(item => item.style.display = 'block');
-          document.querySelector('.leaflet__top h1').style.display = 'block';
-          document.querySelector('.leaflet__top h3').style.display = 'none';
-
-          // filterItems();
-
-          return null;
-        });
-      });
-
-      /**
-       * Placeholder function:
-       * Intended to pan and zoom the Leaflet map to the location associated
-       * with the given content ID.
-       * @param {string} contentID - The ID to locate on the map.
-       */
-      function getNewLatLng(contentID) {
-        console.log('Panning map to:', contentID);
-        // Implement locating item coordinates and updating map view here.
-        const feature = features.find(item => item.entity_id === contentID);
-
-
-        const newLatLng = {};
-
-        newLatLng.lng = parseFloat(feature.lon) + 1;
-        newLatLng.lat = feature.lat;
-        console.log(newLatLng);
-        console.log(feature);
-
-        lMap.setView(newLatLng, 9);
-        lMap.invalidateSize();
-      }
-
       /**
        * Dynamically adjusts the Leaflet map container height to fill available viewport space.
        * Ensures map resizes correctly on window resize.
        */
       function adjustMapHeight() {
         const mapElement = document.getElementById(mapId);
-        if (!mapElement) return; // Guard: element must exist.
+        if (!mapElement) {
+          return;
+        } // Guard: element must exist.
 
         const windowHeight = window.innerHeight;
         const offsetTop = mapElement.getBoundingClientRect().top;
         const newHeight = windowHeight - offsetTop;
-
 
         const headerHeight = document.querySelector('.leaflet__content-header').offsetHeight + 7 + 30;
         document.querySelector('.leaflet__content-scrollable').style.height = `${document.querySelector('.leaflet__content').offsetHeight - headerHeight - 20}px`;
