@@ -1,0 +1,24 @@
+uuid: d960d48f-5b60-4cb5-9ea8-be286a2d660b
+langcode: en
+status: true
+dependencies:
+  config:
+    - custom_entity.custom_entity_type.custom_entity
+    - field.storage.custom_entity.field_body
+    - filter.format.full_html
+  module:
+    - text
+id: custom_entity.custom_entity.field_body
+field_name: field_body
+entity_type: custom_entity
+bundle: custom_entity
+label: Body
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - full_html
+field_type: text_long

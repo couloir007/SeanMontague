@@ -13,9 +13,12 @@ module:
   components: 0
   config: 0
   contextual: 0
+  custom_entity: 0
   datetime: 0
   datetime_range: 0
   dblog: 0
+  devel: 0
+  devel_entity_updates: 0
   dynamic_page_cache: 0
   editor: 0
   embed: 0

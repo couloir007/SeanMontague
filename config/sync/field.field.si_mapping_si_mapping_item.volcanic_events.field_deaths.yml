@@ -1,0 +1,23 @@
+uuid: 006767b6-78bd-4c39-b13a-0506bd4f37b7
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.si_mapping_si_mapping_item.field_deaths
+    - si_mapping.si_mapping_si_mapping_item_type.volcanic_events
+id: si_mapping_si_mapping_item.volcanic_events.field_deaths
+field_name: field_deaths
+entity_type: si_mapping_si_mapping_item
+bundle: volcanic_events
+label: Deaths
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

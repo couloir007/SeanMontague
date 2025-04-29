@@ -1,0 +1,6 @@
+uuid: 846124a6-c6c0-432f-aedd-395314cd2b9b
+langcode: en
+status: true
+dependencies: {  }
+id: custom_entity
+label: 'Custom Entity'
