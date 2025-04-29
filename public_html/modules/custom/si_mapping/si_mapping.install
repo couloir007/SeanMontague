@@ -1,0 +1,173 @@
+<?php
+
+use Drupal\Core\Database\SchemaObjectExistsException;
+
+function si_mapping_schema() {
+  $schema['si_mapping_si_mapping_item_revision'] = [
+    'description' => 'Stores revisions of si mapping items.',
+    'fields' => [
+      'revision_id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'id' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'langcode' => [
+        'type' => 'varchar',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'revision_uid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'User ID of the revision author.',
+      ],
+      'revision_timestamp' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Timestamp of the revision.',
+      ],
+      'revision_log_message' => [
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'description' => 'Revision log message.',
+      ],
+      // Other base fields as needed.
+    ],
+    'primary key' => ['revision_id'],
+    'indexes' => [
+      'id' => ['id'],
+    ],
+  ];
+
+  $schema['si_mapping_si_mapping_item_field_revision'] = [
+    'description' => 'Stores field data for revisions of si mapping items.',
+    'fields' => [
+      // Define your field schema similarly to base field data table + revision_id.
+      // ...
+    ],
+    'primary key' => ['revision_id'],
+    'indexes' => [
+      // Indexes for relevant columns
+    ],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Creates the revision tables for the si_mapping_si_mapping_item entity.
+ */
+function si_mapping_update_9001() {
+  $database = \Drupal::database();
+
+  // Define schema for the revision table.
+  $revision_table_schema = [
+    'description' => 'Stores revisions for si mapping items.',
+    'fields' => [
+      'revision_id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'description' => 'Primary key: revision ID.',
+      ],
+      'id' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'description' => 'The item ID this revision belongs to.',
+      ],
+      'langcode' => [
+        'type' => 'varchar',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Language code of the revision.',
+      ],
+      'revision_uid' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'description' => 'User ID who created the revision.',
+      ],
+      'revision_timestamp' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'description' => 'Timestamp when the revision was created.',
+      ],
+      'revision_log_message' => [
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+        'description' => 'Optional log message for the revision.',
+      ],
+      // Add other fields here as necessary, mirroring base table fields.
+    ],
+    'primary key' => ['revision_id'],
+    'indexes' => [
+      'id' => ['id'],
+      'revision_uid' => ['revision_uid'],
+    ],
+  ];
+
+  // Define schema for the field revision table.
+  $field_revision_table_schema = [
+    'description' => 'Stores field data for revisions of si mapping items.',
+    'fields' => [
+      'revision_id' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'description' => 'The revision ID.',
+      ],
+      'id' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'description' => 'The item ID this revision belongs to.',
+      ],
+      // Define your entity’s fields here for revisioned field data.
+      // For example:
+      'label' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'description' => 'Label field data for revision.',
+      ],
+      // Add other revisioned fields here...
+    ],
+    'primary key' => ['revision_id'],
+    'indexes' => [
+      'id' => ['id'],
+    ],
+  ];
+
+  // Create the revision table if it does not exist.
+  if (!$database->schema()->tableExists('si_mapping_si_mapping_item_revision')) {
+    try {
+      $database->schema()->createTable('si_mapping_si_mapping_item_revision', $revision_table_schema);
+    }
+    catch (SchemaObjectExistsException $e) {
+      // Table already exists, no action needed.
+    }
+  }
+
+  // Create the field revision table if it does not exist.
+  if (!$database->schema()->tableExists('si_mapping_si_mapping_item_field_revision')) {
+    try {
+      $database->schema()->createTable('si_mapping_si_mapping_item_field_revision', $field_revision_table_schema);
+    }
+    catch (SchemaObjectExistsException $e) {
+      // Table already exists, no action needed.
+    }
+  }
+}

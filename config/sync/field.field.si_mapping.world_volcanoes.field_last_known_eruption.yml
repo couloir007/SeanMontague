@@ -1,0 +1,29 @@
+uuid: a291107d-2001-4046-8419-9ae022a11f79
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.si_mapping.field_last_known_eruption
+    - si_mapping.si_mapping_type.world_volcanoes
+    - taxonomy.vocabulary.last_known_eruption
+id: si_mapping.world_volcanoes.field_last_known_eruption
+field_name: field_last_known_eruption
+entity_type: si_mapping
+bundle: world_volcanoes
+label: 'Last Known Eruption'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      last_known_eruption: last_known_eruption
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

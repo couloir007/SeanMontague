@@ -1,0 +1,21 @@
+uuid: efa2236f-a6f1-43ee-b3a0-53617691e5d1
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.si_mapping.field_location
+    - si_mapping.si_mapping_type.world_volcanoes
+  module:
+    - geofield
+id: si_mapping.world_volcanoes.field_location
+field_name: field_location
+entity_type: si_mapping
+bundle: world_volcanoes
+label: Location
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: geofield

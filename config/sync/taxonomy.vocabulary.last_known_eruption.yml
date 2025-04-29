@@ -1,0 +1,9 @@
+uuid: 1bb6bf54-59a0-415c-99f8-bed90524b652
+langcode: en
+status: true
+dependencies: {  }
+name: 'Last Known Eruption'
+vid: last_known_eruption
+description: null
+weight: 0
+new_revision: false

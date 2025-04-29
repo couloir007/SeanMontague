@@ -1,0 +1,20 @@
+uuid: 3d8f8db1-0668-43b9-a303-946a0e6287e4
+langcode: en
+status: true
+dependencies:
+  module:
+    - si_mapping
+    - taxonomy
+id: si_mapping.field_country
+field_name: field_country
+entity_type: si_mapping
+type: entity_reference
+settings:
+  target_type: taxonomy_term
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

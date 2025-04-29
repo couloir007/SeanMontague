@@ -28,6 +28,8 @@ module:
   environment_indicator: 0
   environment_indicator_ui: 0
   external_pg: 0
+  feeds: 0
+  feeds_log: 0
   field: 0
   field_ui: 0
   file: 0
@@ -36,6 +38,7 @@ module:
   geofield_map: 0
   geofield_map_extras: 0
   gin_toolbar: 0
+  global_volcanism: 0
   honeypot: 0
   image: 0
   inline_entity_form: 0

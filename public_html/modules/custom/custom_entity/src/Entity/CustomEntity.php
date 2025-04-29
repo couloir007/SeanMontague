@@ -2,90 +2,85 @@
 
 declare(strict_types=1);
 
-namespace Drupal\si_mapping\Entity;
+namespace Drupal\custom_entity\Entity;
 
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\RevisionableContentEntityBase;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\si_mapping\SIMappingItemInterface;
+use Drupal\custom_entity\CustomEntityInterface;
 use Drupal\user\EntityOwnerTrait;
 
 /**
- * Defines the si mapping item entity class.
+ * Defines the custom entity entity class.
  *
  * @ContentEntityType(
- *   id = "si_mapping_si_mapping_item",
- *   label = @Translation("SI Mapping Item"),
- *   label_collection = @Translation("SI Mapping Items"),
- *   label_singular = @Translation("si mapping item"),
- *   label_plural = @Translation("si mapping items"),
+ *   id = "custom_entity",
+ *   label = @Translation("Custom entity"),
+ *   label_collection = @Translation("Custom entities"),
+ *   label_singular = @Translation("custom entity"),
+ *   label_plural = @Translation("custom entities"),
  *   label_count = @PluralTranslation(
- *     singular = "@count si mapping items",
- *     plural = "@count si mapping items",
+ *     singular = "@count custom entities",
+ *     plural = "@count custom entities",
  *   ),
- *   bundle_label = @Translation("SI Mapping Item type"),
+ *   bundle_label = @Translation("Custom entity type"),
  *   handlers = {
- *     "entity_reference" = {
- *       "selection" = "default",
- *     },
- *     "list_builder" = "Drupal\si_mapping\SIMappingItemListBuilder",
+ *     "list_builder" = "Drupal\custom_entity\CustomEntityListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
- *       "add" = "Drupal\si_mapping\Form\SIMappingItemForm",
- *       "edit" = "Drupal\si_mapping\Form\SIMappingItemForm",
+ *       "add" = "Drupal\custom_entity\Form\CustomEntityForm",
+ *       "edit" = "Drupal\custom_entity\Form\CustomEntityForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm",
  *       "delete-multiple-confirm" = "Drupal\Core\Entity\Form\DeleteMultipleForm",
- *       "revision" = "Drupal\si_mapping\Form\SIMappingItemRevisionForm",
- *       "revision_revert" = "Drupal\si_mapping\Form\SIMappingItemRevisionRevertForm",
- *       "revision_delete" = "Drupal\si_mapping\Form\SIMappingItemRevisionDeleteForm",
+ *       "revision-delete" = \Drupal\Core\Entity\Form\RevisionDeleteForm::class,
+ *       "revision-revert" = \Drupal\Core\Entity\Form\RevisionRevertForm::class,
  *     },
  *     "route_provider" = {
  *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *       "revision" = \Drupal\Core\Entity\Routing\RevisionHtmlRouteProvider::class,
  *     },
  *   },
- *   base_table = "si_mapping_si_mapping_item",
- *   data_table = "si_mapping_si_mapping_item_field_data",
- *   revision_table = "si_mapping_si_mapping_item_revision",
- *   revision_data_table = "si_mapping_si_mapping_item_field_revision",
- *   revision_metadata_keys = {
- *     "revision_user" = "revision_uid",
- *     "revision_created" = "revision_timestamp",
- *     "revision_log" = "revision_log_message",
- *   },
+ *   base_table = "custom_entity",
+ *   data_table = "custom_entity_field_data",
+ *   revision_table = "custom_entity_revision",
+ *   revision_data_table = "custom_entity_field_revision",
+ *   show_revision_ui = TRUE,
  *   translatable = TRUE,
- *   admin_permission = "administer si_mapping_si_mapping_item types",
+ *   admin_permission = "administer custom_entity types",
  *   entity_keys = {
  *     "id" = "id",
+ *     "revision" = "revision_id",
  *     "langcode" = "langcode",
  *     "bundle" = "bundle",
  *     "label" = "label",
  *     "uuid" = "uuid",
  *     "owner" = "uid",
- *     "revision" = "revision_id",
+ *   },
+ *   revision_metadata_keys = {
  *     "revision_user" = "revision_uid",
  *     "revision_created" = "revision_timestamp",
+ *     "revision_log_message" = "revision_log",
  *   },
  *   links = {
- *     "collection" = "/admin/content/si-mapping-item",
- *     "add-form" = "/si-mapping-item/add/{si_mapping_si_mapping_item_type}",
- *     "add-page" = "/si-mapping-item/add",
- *     "canonical" = "/si-mapping-item/{si_mapping_si_mapping_item}",
- *     "edit-form" = "/si-mapping-item/{si_mapping_si_mapping_item}/edit",
- *     "delete-form" = "/si-mapping-item/{si_mapping_si_mapping_item}/delete",
- *     "delete-multiple-form" = "/admin/content/si-mapping-item/delete-multiple",
- *     "version-history" = "/si-mapping-item/{si_mapping_si_mapping_item}/revisions",
- *     "revision" = "/si-mapping-item/{si_mapping_si_mapping_item}/revisions/{si_mapping_si_mapping_item_revision}/view",
- *     "revision_revert" = "/si-mapping-item/{si_mapping_si_mapping_item}/revisions/{si_mapping_si_mapping_item_revision}/revert",
- *     "revision_delete" = "/si-mapping-item/{si_mapping_si_mapping_item}/revisions/{si_mapping_si_mapping_item_revision}/delete",
+ *     "collection" = "/admin/content/custom-entity",
+ *     "add-form" = "/custom-entity/add/{custom_entity_type}",
+ *     "add-page" = "/custom-entity/add",
+ *     "canonical" = "/custom-entity/{custom_entity}",
+ *     "edit-form" = "/custom-entity/{custom_entity}/edit",
+ *     "delete-form" = "/custom-entity/{custom_entity}/delete",
+ *     "delete-multiple-form" = "/admin/content/custom-entity/delete-multiple",
+ *     "revision" = "/custom-entity/{custom_entity}/revision/{custom_entity_revision}/view",
+ *     "revision-delete-form" = "/custom-entity/{custom_entity}/revision/{custom_entity_revision}/delete",
+ *     "revision-revert-form" = "/custom-entity/{custom_entity}/revision/{custom_entity_revision}/revert",
+ *     "version-history" = "/custom-entity/{custom_entity}/revisions",
  *   },
- *   bundle_entity_type = "si_mapping_si_mapping_item_type",
- *   field_ui_base_route = "entity.si_mapping_si_mapping_item_type.edit_form",
- *   show_revision_ui = TRUE,
+ *   bundle_entity_type = "custom_entity_type",
+ *   field_ui_base_route = "entity.custom_entity_type.edit_form",
  * )
  */
-final class SIMappingItem extends ContentEntityBase implements SIMappingItemInterface {
+final class CustomEntity extends RevisionableContentEntityBase implements CustomEntityInterface {
 
   use EntityChangedTrait;
   use EntityOwnerTrait;
@@ -109,6 +104,7 @@ final class SIMappingItem extends ContentEntityBase implements SIMappingItemInte
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['label'] = BaseFieldDefinition::create('string')
+      ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
       ->setLabel(t('Label'))
       ->setRequired(TRUE)
@@ -126,6 +122,7 @@ final class SIMappingItem extends ContentEntityBase implements SIMappingItemInte
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
+      ->setRevisionable(TRUE)
       ->setLabel(t('Status'))
       ->setDefaultValue(TRUE)
       ->setSetting('on_label', 'Enabled')
@@ -148,6 +145,7 @@ final class SIMappingItem extends ContentEntityBase implements SIMappingItemInte
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['description'] = BaseFieldDefinition::create('text_long')
+      ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
       ->setLabel(t('Description'))
       ->setDisplayOptions('form', [
@@ -163,6 +161,7 @@ final class SIMappingItem extends ContentEntityBase implements SIMappingItemInte
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
+      ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
       ->setLabel(t('Author'))
       ->setSetting('target_type', 'user')
@@ -187,7 +186,7 @@ final class SIMappingItem extends ContentEntityBase implements SIMappingItemInte
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Authored on'))
       ->setTranslatable(TRUE)
-      ->setDescription(t('The time that the si mapping item was created.'))
+      ->setDescription(t('The time that the custom entity was created.'))
       ->setDisplayOptions('view', [
         'label' => 'above',
         'type' => 'timestamp',
@@ -203,33 +202,7 @@ final class SIMappingItem extends ContentEntityBase implements SIMappingItemInte
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
       ->setTranslatable(TRUE)
-      ->setDescription(t('The time that the si mapping item was last edited.'));
-
-    // Revision fields.
-    $fields['revision_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Revision ID'))
-      ->setDescription(t('The revision ID of the si mapping item.'))
-      ->setReadOnly(TRUE);
-
-    $fields['revision_uid'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Revision user'))
-      ->setDescription(t('The user who last modified the revision.'))
-      ->setSetting('target_type', 'user')
-      ->setReadOnly(TRUE);
-
-    $fields['revision_timestamp'] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Revision timestamp'))
-      ->setDescription(t('The time at which the revision was created.'))
-      ->setReadOnly(TRUE);
-
-    $fields['revision_log_message'] = BaseFieldDefinition::create('string_long')
-      ->setLabel(t('Revision log message'))
-      ->setDescription(t('Log message for the revision.'))
-      ->setDisplayOptions('form', [
-        'type' => 'string_textarea',
-        'weight' => 20,
-      ])
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDescription(t('The time that the custom entity was last edited.'));
 
     return $fields;
   }

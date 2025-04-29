@@ -1,0 +1,7 @@
+global_volcanism.import_form:
+  path: '/admin/config/global-volcanism/import'
+  defaults:
+    _form: '\Drupal\global_volcanism\Form\VolcanoImportForm'
+    _title: 'Import Volcano Data'
+  requirements:
+    _permission: 'administer site configuration'

@@ -8,6 +8,9 @@
     return textarea.value;
   }
 
+  // esri-natgeo_world_map
+  // esri-world_topo_map
+
   function setupMarkers(features, lMap) {
     features.forEach(feature => {
       if (feature.type === 'point') {
@@ -147,6 +150,13 @@
       let mapWidthPx = document.querySelector('.leaflet').offsetWidth - 350;
       const US_CENTER_LON = -95.867;
 
+      // Create both tile layers
+      const natgeoLayer = new L.TileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer');
+      const topoLayer = new L.TileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer');
+      // const oceanLayer = new L.TileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Ocean_World_Ocean_Base/MapServer');
+
+      // esri-ocean_world_ocean_base
+
       if (mapWidthPx < 1320) {
         adjustMapView(mapWidthPx, theMap, lMap);
       }
@@ -156,6 +166,27 @@
         console.error(`Leaflet map ${mapId} not initialized after window.load.`);
         return;
       }
+
+      // Listen for zoom changes
+      lMap.on('zoomend', () => {
+        const zoom = lMap.getZoom();
+        if (zoom >= 7) {
+          if (lMap.hasLayer(natgeoLayer)) {
+            lMap.removeLayer(natgeoLayer);
+          }
+          if (!lMap.hasLayer(topoLayer)) {
+            topoLayer.addTo(lMap);
+          }
+        } else {
+          if (lMap.hasLayer(topoLayer)) {
+            lMap.removeLayer(topoLayer);
+          }
+          if (!lMap.hasLayer(natgeoLayer)) {
+            natgeoLayer.addTo(lMap);
+          }
+        }
+      });
+
 
       features.forEach(feature => {
         // console.log(feature);

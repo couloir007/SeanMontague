@@ -1,0 +1,10 @@
+global_volcanism.import_form:
+  title: 'Import Volcano Data'
+  description: 'Upload tab-delimited volcano data files.'
+  parent: system.admin_config_system
+  route_name: global_volcanism.import_form
+  weight: 100
+  menu_name: admin
+  # Permissions needed for the link to be visible.
+  requirements:
+    _permission: 'administer site configuration'

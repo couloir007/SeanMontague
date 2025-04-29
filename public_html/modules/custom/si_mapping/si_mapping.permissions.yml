@@ -7,3 +7,18 @@ administer si_mapping_si_mapping_item types:
   title: 'Administer si mapping item types'
   description: 'Maintain the types of si mapping item entity.'
   restrict access: true
+
+view si_mapping item revisions:
+  title: 'View si mapping item revisions'
+  description: 'Allows users to view revision history of si mapping items.'
+  restrict access: TRUE
+
+revert si_mapping item revisions:
+  title: 'Revert si mapping item revisions'
+  description: 'Allows users to revert si mapping items to a previous revision.'
+  restrict access: TRUE
+
+delete si_mapping item revisions:
+  title: 'Delete si mapping item revisions'
+  description: 'Allows users to delete si mapping item revisions.'
+  restrict access: TRUE

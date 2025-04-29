@@ -1,0 +1,29 @@
+uuid: 774b2088-b1ad-4bce-aaaf-328830e2bac2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.si_mapping.field_status
+    - si_mapping.si_mapping_type.world_volcanoes
+    - taxonomy.vocabulary.volcano_status
+id: si_mapping.world_volcanoes.field_status
+field_name: field_status
+entity_type: si_mapping
+bundle: world_volcanoes
+label: Status
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      volcano_status: volcano_status
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

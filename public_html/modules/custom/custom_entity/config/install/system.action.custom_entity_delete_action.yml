@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - custom_entity
+id: custom_entity_delete_action
+label: 'Delete custom entities'
+type: custom_entity
+plugin: entity:delete_action:custom_entity
+configuration: {  }

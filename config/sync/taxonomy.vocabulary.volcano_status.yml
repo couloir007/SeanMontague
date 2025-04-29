@@ -1,0 +1,9 @@
+uuid: ceadd25c-ba8e-4c20-b55d-87e13a107e52
+langcode: en
+status: true
+dependencies: {  }
+name: 'Volcano Status'
+vid: volcano_status
+description: null
+weight: 0
+new_revision: false

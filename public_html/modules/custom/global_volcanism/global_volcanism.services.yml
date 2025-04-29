@@ -1,0 +1,7 @@
+services:
+  global_volcanism.NoaaApiClient:
+    class: Drupal\global_volcanism\Services\NoaaApiClient
+
+  global_volcanism.VolcanoesService:
+    class: Drupal\global_volcanism\Services\VolcanoesService
+    arguments: ['@http_client', '@logger.channel.default']

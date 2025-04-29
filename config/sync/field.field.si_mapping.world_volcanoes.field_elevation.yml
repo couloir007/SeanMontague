@@ -1,0 +1,23 @@
+uuid: b9bac68f-b5a1-4894-8065-d60aff69fdd7
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.si_mapping.field_elevation
+    - si_mapping.si_mapping_type.world_volcanoes
+id: si_mapping.world_volcanoes.field_elevation
+field_name: field_elevation
+entity_type: si_mapping
+bundle: world_volcanoes
+label: Elevation
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer
