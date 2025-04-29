@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.field.si_mapping.world_volcanoes.field_country
     - field.field.si_mapping.world_volcanoes.field_elevation
+    - field.field.si_mapping.world_volcanoes.field_eruption_events
     - field.field.si_mapping.world_volcanoes.field_last_known_eruption
     - field.field.si_mapping.world_volcanoes.field_locality
     - field.field.si_mapping.world_volcanoes.field_location
@@ -21,7 +22,7 @@ mode: default
 content:
   created:
     type: datetime_timestamp
-    weight: 9
+    weight: 10
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -40,6 +41,16 @@ content:
     weight: 3
     region: content
     settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_eruption_events:
+    type: entity_reference_autocomplete
+    weight: 9
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
       placeholder: ''
     third_party_settings: {  }
   field_last_known_eruption:
@@ -164,10 +175,10 @@ content:
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 10
+    weight: 11
     region: content
     settings:
-      display_label: false
+      display_label: true
     third_party_settings: {  }
 hidden:
   uid: true

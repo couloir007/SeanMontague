@@ -29,9 +29,6 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "route_provider" = {
  *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *     },
- *     "entity_reference" = {
- *       "selection" = "Drupal\your_module\Plugin\EntityReferenceSelection\YourCustomSelection",
- *     },
  *   },
  *   admin_permission = "administer si_mapping_si_mapping_item types",
  *   bundle_of = "si_mapping_si_mapping_item",

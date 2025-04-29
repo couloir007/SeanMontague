@@ -10,7 +10,7 @@ id: si_mapping.world_volcanoes.field_status
 field_name: field_status
 entity_type: si_mapping
 bundle: world_volcanoes
-label: Status
+label: 'Volcano Status'
 description: ''
 required: false
 translatable: false

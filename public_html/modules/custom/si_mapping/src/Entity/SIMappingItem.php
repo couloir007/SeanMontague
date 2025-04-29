@@ -27,9 +27,6 @@ use Drupal\user\EntityOwnerTrait;
  *   ),
  *   bundle_label = @Translation("SI Mapping Item type"),
  *   handlers = {
- *     "entity_reference" = {
- *       "selection" = "default",
- *     },
  *     "list_builder" = "Drupal\si_mapping\SIMappingItemListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
@@ -37,9 +34,6 @@ use Drupal\user\EntityOwnerTrait;
  *       "edit" = "Drupal\si_mapping\Form\SIMappingItemForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm",
  *       "delete-multiple-confirm" = "Drupal\Core\Entity\Form\DeleteMultipleForm",
- *       "revision" = "Drupal\si_mapping\Form\SIMappingItemRevisionForm",
- *       "revision_revert" = "Drupal\si_mapping\Form\SIMappingItemRevisionRevertForm",
- *       "revision_delete" = "Drupal\si_mapping\Form\SIMappingItemRevisionDeleteForm",
  *     },
  *     "route_provider" = {
  *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
@@ -47,13 +41,6 @@ use Drupal\user\EntityOwnerTrait;
  *   },
  *   base_table = "si_mapping_si_mapping_item",
  *   data_table = "si_mapping_si_mapping_item_field_data",
- *   revision_table = "si_mapping_si_mapping_item_revision",
- *   revision_data_table = "si_mapping_si_mapping_item_field_revision",
- *   revision_metadata_keys = {
- *     "revision_user" = "revision_uid",
- *     "revision_created" = "revision_timestamp",
- *     "revision_log" = "revision_log_message",
- *   },
  *   translatable = TRUE,
  *   admin_permission = "administer si_mapping_si_mapping_item types",
  *   entity_keys = {
@@ -63,9 +50,6 @@ use Drupal\user\EntityOwnerTrait;
  *     "label" = "label",
  *     "uuid" = "uuid",
  *     "owner" = "uid",
- *     "revision" = "revision_id",
- *     "revision_user" = "revision_uid",
- *     "revision_created" = "revision_timestamp",
  *   },
  *   links = {
  *     "collection" = "/admin/content/si-mapping-item",
@@ -75,14 +59,10 @@ use Drupal\user\EntityOwnerTrait;
  *     "edit-form" = "/si-mapping-item/{si_mapping_si_mapping_item}/edit",
  *     "delete-form" = "/si-mapping-item/{si_mapping_si_mapping_item}/delete",
  *     "delete-multiple-form" = "/admin/content/si-mapping-item/delete-multiple",
- *     "version-history" = "/si-mapping-item/{si_mapping_si_mapping_item}/revisions",
- *     "revision" = "/si-mapping-item/{si_mapping_si_mapping_item}/revisions/{si_mapping_si_mapping_item_revision}/view",
- *     "revision_revert" = "/si-mapping-item/{si_mapping_si_mapping_item}/revisions/{si_mapping_si_mapping_item_revision}/revert",
- *     "revision_delete" = "/si-mapping-item/{si_mapping_si_mapping_item}/revisions/{si_mapping_si_mapping_item_revision}/delete",
  *   },
  *   bundle_entity_type = "si_mapping_si_mapping_item_type",
  *   field_ui_base_route = "entity.si_mapping_si_mapping_item_type.edit_form",
- *   show_revision_ui = TRUE,
+ *   common_reference_target  = TRUE,
  * )
  */
 final class SIMappingItem extends ContentEntityBase implements SIMappingItemInterface {
@@ -204,32 +184,6 @@ final class SIMappingItem extends ContentEntityBase implements SIMappingItemInte
       ->setLabel(t('Changed'))
       ->setTranslatable(TRUE)
       ->setDescription(t('The time that the si mapping item was last edited.'));
-
-    // Revision fields.
-    $fields['revision_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Revision ID'))
-      ->setDescription(t('The revision ID of the si mapping item.'))
-      ->setReadOnly(TRUE);
-
-    $fields['revision_uid'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Revision user'))
-      ->setDescription(t('The user who last modified the revision.'))
-      ->setSetting('target_type', 'user')
-      ->setReadOnly(TRUE);
-
-    $fields['revision_timestamp'] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Revision timestamp'))
-      ->setDescription(t('The time at which the revision was created.'))
-      ->setReadOnly(TRUE);
-
-    $fields['revision_log_message'] = BaseFieldDefinition::create('string_long')
-      ->setLabel(t('Revision log message'))
-      ->setDescription(t('Log message for the revision.'))
-      ->setDisplayOptions('form', [
-        'type' => 'string_textarea',
-        'weight' => 20,
-      ])
-      ->setDisplayConfigurable('form', TRUE);
 
     return $fields;
   }

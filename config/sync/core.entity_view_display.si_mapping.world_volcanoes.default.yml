@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.field.si_mapping.world_volcanoes.field_country
     - field.field.si_mapping.world_volcanoes.field_elevation
+    - field.field.si_mapping.world_volcanoes.field_eruption_events
     - field.field.si_mapping.world_volcanoes.field_last_known_eruption
     - field.field.si_mapping.world_volcanoes.field_locality
     - field.field.si_mapping.world_volcanoes.field_location
@@ -14,38 +15,18 @@ dependencies:
     - si_mapping.si_mapping_type.world_volcanoes
   module:
     - leaflet
-    - user
 id: si_mapping.world_volcanoes.default
 targetEntityType: si_mapping
 bundle: world_volcanoes
 mode: default
 content:
-  created:
-    type: timestamp
-    label: above
-    settings:
-      date_format: medium
-      custom_date_format: ''
-      timezone: ''
-      tooltip:
-        date_format: long
-        custom_date_format: ''
-      time_diff:
-        enabled: false
-        future_format: '@interval hence'
-        past_format: '@interval ago'
-        granularity: 2
-        refresh: 60
-    third_party_settings: {  }
-    weight: 20
-    region: content
   field_country:
     type: entity_reference_label
     label: above
     settings:
       link: true
     third_party_settings: {  }
-    weight: 23
+    weight: 4
     region: content
   field_elevation:
     type: number_integer
@@ -54,7 +35,15 @@ content:
       thousand_separator: ''
       prefix_suffix: true
     third_party_settings: {  }
-    weight: 22
+    weight: 3
+    region: content
+  field_eruption_events:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 8
     region: content
   field_last_known_eruption:
     type: entity_reference_label
@@ -62,7 +51,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 27
+    weight: 7
     region: content
   field_locality:
     type: entity_reference_label
@@ -70,7 +59,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 24
+    weight: 5
     region: content
   field_location:
     type: leaflet_formatter_default
@@ -168,7 +157,7 @@ content:
       map_lazy_load:
         lazy_load: false
     third_party_settings: {  }
-    weight: 5
+    weight: 9
     region: content
   field_status:
     type: entity_reference_label
@@ -176,7 +165,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 25
+    weight: 2
     region: content
   field_type:
     type: entity_reference_label
@@ -184,7 +173,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 26
+    weight: 6
     region: content
   field_valcano_id:
     type: number_integer
@@ -193,7 +182,7 @@ content:
       thousand_separator: ''
       prefix_suffix: true
     third_party_settings: {  }
-    weight: 21
+    weight: 1
     region: content
   label:
     type: string
@@ -201,23 +190,9 @@ content:
     settings:
       link_to_entity: false
     third_party_settings: {  }
-    weight: -5
-    region: content
-  status:
-    type: boolean
-    label: above
-    settings:
-      format: enabled-disabled
-      format_custom_false: ''
-      format_custom_true: ''
-    third_party_settings: {  }
     weight: 0
     region: content
-  uid:
-    type: author
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    weight: 15
-    region: content
-hidden: {  }
+hidden:
+  created: true
+  status: true
+  uid: true
