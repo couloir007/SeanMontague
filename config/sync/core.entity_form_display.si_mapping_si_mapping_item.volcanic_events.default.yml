@@ -4,10 +4,12 @@ status: true
 dependencies:
   config:
     - field.field.si_mapping_si_mapping_item.volcanic_events.field_deaths
+    - field.field.si_mapping_si_mapping_item.volcanic_events.field_eruption_date
     - field.field.si_mapping_si_mapping_item.volcanic_events.field_event_id
     - field.field.si_mapping_si_mapping_item.volcanic_events.field_volcano_number
     - si_mapping.si_mapping_si_mapping_item_type.volcanic_events
   module:
+    - datetime
     - text
 id: si_mapping_si_mapping_item.volcanic_events.default
 targetEntityType: si_mapping_si_mapping_item
@@ -34,6 +36,12 @@ content:
     region: content
     settings:
       placeholder: ''
+    third_party_settings: {  }
+  field_eruption_date:
+    type: datetime_default
+    weight: 24
+    region: content
+    settings: {  }
     third_party_settings: {  }
   field_event_id:
     type: number

@@ -1,0 +1,20 @@
+uuid: 1eb36b59-ec3e-4456-9e24-711a0b10b0a0
+langcode: en
+status: true
+dependencies:
+  module:
+    - datetime
+    - si_mapping
+id: si_mapping_si_mapping_item.field_eruption_date
+field_name: field_eruption_date
+entity_type: si_mapping_si_mapping_item
+type: datetime
+settings:
+  datetime_type: datetime
+module: datetime
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

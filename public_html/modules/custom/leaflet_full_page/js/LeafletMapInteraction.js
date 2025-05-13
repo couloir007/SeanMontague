@@ -230,7 +230,7 @@
                 layer.bindPopup(feature.properties.name);
 
                 layer.on('click', function () {
-                  console.log('Feature clicked:', feature.properties.name);
+                  // console.log('Feature clicked:', feature.properties.name);
 
                   // Open popup when feature is clicked
                   // layer.openPopup();
@@ -252,6 +252,9 @@
        * data entries to populate the interactive list.
        */
       const currentDisplay = drupalSettings.leaflet_full_page?.currentDisplay || 'default_view_name';
+
+      // console.log(currentDisplay);
+
       fetch(`/${currentDisplay}_mapitems`)
         .then(res => {
           if (!res.ok) {
@@ -349,7 +352,7 @@
           document.querySelector('.leaflet__list-container').classList.remove('open');
           document.querySelector('.leaflet__list-container').classList.remove('container-up');
           document.querySelector('.leaflet__content').style.display = 'none';
-          document.querySelectorAll('li.map-item-list').forEach(item => item.style.display = 'block');
+          document.querySelectorAll('li.map-item-list').forEach(item => item.style.display = 'flex');
           document.querySelector('.leaflet__top h1').style.display = 'block';
           document.querySelector('.leaflet__top h3').style.display = 'none';
 
@@ -485,9 +488,9 @@
         lMap.setView(theMap.settings.center, zoom);
         lMap.invalidateSize();
 
-        console.log(theMap.settings.center);
-        console.log('Zoom: ' + zoom);
-        console.log('Zoom4: ' + lonWestOfCenter(zoom));
+        // console.log(theMap.settings.center);
+        // console.log('Zoom: ' + zoom);
+        // console.log('Zoom4: ' + lonWestOfCenter(zoom));
       }
 
       /**
