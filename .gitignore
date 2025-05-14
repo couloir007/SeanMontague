@@ -138,15 +138,15 @@
 
 Ray-2*.*
 
-web/themes/custom/a_clean_ocean/node_modules
+public_html/themes/custom/a_clean_ocean/node_modules
 
-web/themes/custom/surface/dist/css/OpenSans-Italic-VariableFont_wdth_wght.css
-web/themes/custom/surface/dist/css/OpenSans-VariableFont_wdth_wght.css
-web/themes/custom/surface/dist/css/Oswald-VariableFont_wght.css
+public_html/themes/custom/surface/dist/css/OpenSans-Italic-VariableFont_wdth_wght.css
+public_html/themes/custom/surface/dist/css/OpenSans-VariableFont_wdth_wght.css
+public_html/themes/custom/surface/dist/css/Oswald-VariableFont_wght.css
 
-web/themes/custom/surface/storybook/css/OpenSans-Italic-VariableFont_wdth_wght.css
-web/themes/custom/surface/storybook/css/OpenSans-VariableFont_wdth_wght.css
-web/themes/custom/surface/storybook/css/Oswald-VariableFont_wght.css
+public_html/themes/custom/surface/storybook/css/OpenSans-Italic-VariableFont_wdth_wght.css
+public_html/themes/custom/surface/storybook/css/OpenSans-VariableFont_wdth_wght.css
+public_html/themes/custom/surface/storybook/css/Oswald-VariableFont_wght.css
 
 
 # Logs and databases #
