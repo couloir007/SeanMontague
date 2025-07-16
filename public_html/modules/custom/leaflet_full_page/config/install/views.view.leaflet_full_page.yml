@@ -572,7 +572,7 @@ display:
               lat: 40.0
               lon: -89.0
             zoomControlPosition: topleft
-            zoom: 6
+            zoom: 5
             minZoom: 1
             maxZoom: 18
             zoomFiner: 0
