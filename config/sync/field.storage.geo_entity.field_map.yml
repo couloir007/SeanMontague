@@ -1,0 +1,22 @@
+uuid: 96618c7e-f90f-4844-9932-7ddec4be1b7a
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+    - taxonomy
+_core:
+  default_config_hash: rOxaVIPYMTTLzxvsy5o_RyRbhHv0tRMuajUHp9_MAnM
+id: geo_entity.field_map
+field_name: field_map
+entity_type: geo_entity
+type: entity_reference
+settings:
+  target_type: taxonomy_term
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

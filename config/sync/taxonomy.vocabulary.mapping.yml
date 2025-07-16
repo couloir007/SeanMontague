@@ -1,0 +1,11 @@
+uuid: 0d6947e6-9d53-4cf2-a65c-b184c01b39e1
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: naN_e8TbjWZiP8NmSImI0OZNZhKr1TfcPDrRM95EmbM
+name: Mapping
+vid: mapping
+description: null
+weight: 0
+new_revision: false

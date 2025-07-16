@@ -1,0 +1,12 @@
+geo_content_builder.geo_content_builder_type.*:
+  type: config_entity
+  label: 'SI Map type config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    uuid:
+      type: string

@@ -4,7 +4,6 @@ status: true
 dependencies:
   config:
     - custom_entity.custom_entity_type.custom_entity
-    - field.field.custom_entity.custom_entity.field_body
   module:
     - text
     - user
@@ -38,13 +37,6 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 10
-    region: content
-  field_body:
-    type: text_default
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    weight: 21
     region: content
   label:
     type: string

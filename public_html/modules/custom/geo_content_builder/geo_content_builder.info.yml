@@ -1,0 +1,11 @@
+name: Geo Content Builder
+type: module
+description: Creates custom entities for plotting geographic content on Leaflet maps
+core_version_requirement: ^10 || ^11
+package: Custom
+dependencies:
+  - drupal:field
+  - drupal:options
+  - drupal:datetime
+  - drupal:text
+  - drupal:user

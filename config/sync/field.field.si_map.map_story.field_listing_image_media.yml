@@ -1,0 +1,29 @@
+uuid: 181fa542-8c01-4437-bd4e-10ec23284a0d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.si_map.field_listing_image_media
+    - media.type.image
+    - si_map.si_map_type.map_story
+id: si_map.map_story.field_listing_image_media
+field_name: field_listing_image_media
+entity_type: si_map
+bundle: map_story
+label: 'Listing Image Media'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      image: image
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

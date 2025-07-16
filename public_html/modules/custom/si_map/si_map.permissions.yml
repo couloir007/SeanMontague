@@ -1,0 +1,4 @@
+administer si_map types:
+  title: 'Administer si map types'
+  description: 'Maintain the types of si map entity.'
+  restrict access: true

@@ -1,0 +1,6 @@
+name: Wildweft
+type: theme
+core_version_requirement: ^10 || ^11
+base theme: classy
+libraries:
+  - wildweft/global

@@ -1,0 +1,12 @@
+_core:
+  default_config_hash: zv5RgJ6cHRWG5dd18qKbw8xG7UK0vn7wQxJNnsEUmso
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.mapping
+name: 'Map Story'
+vid: mapping
+description: null
+weight: 0
+parent: {  }

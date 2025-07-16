@@ -1,134 +1,22 @@
+/* jshint esversion: 11 */
+/* eslint-disable no-param-reassign */
+/* eslint-disable func-names */
+/* jshint camelcase:false */
+/* global L, Drupal, drupalSettings */
+// eslint-disable-next-line no-redeclare
+
+
 (function (Drupal, drupalSettings) {
   'use strict';
-
-  // Utility to decode HTML entities
-  function decodeHtmlEntities(text) {
-    const textarea = document.createElement('textarea');
-    textarea.innerHTML = text;
-    return textarea.value;
-  }
 
   // esri-natgeo_world_map
   // esri-world_topo_map
 
-  function setupMarkers(features, lMap) {
-    features.forEach(feature => {
-      if (feature.type === 'point') {
-        const marker = L.marker([feature.lat, feature.lon]);
-        marker.entity_id = feature.entity_id;
-
-        marker.on('click', () => {
-          getContent(marker.entity_id, 'map');
-          getNewLatLng(marker.entity_id);
-        });
-
-        marker.addTo(lMap);
-      }
-    });
-  }
-
-  function addGeoJsonLayer(lMap) {
-    fetch('/sites/default/files/KingdomTrails.geojson')
-      .then(res => res.json())
-      .then(data => {
-        const layer = L.geoJSON(data, {
-          style: () => ({
-            color: 'green',
-            weight: 2,
-            fillOpacity: 0.2,
-          }),
-          onEachFeature: (feature, layer) => {
-            if (feature.properties?.name) {
-              layer.bindPopup(feature.properties.name);
-              layer.on('click', () => {
-                lMap.panTo(layer.getBounds().getCenter());
-              });
-            }
-          },
-        });
-        layer.addTo(lMap);
-      })
-      .catch(console.error);
-  }
-
-  function populateList(items) {
-    const listContainer = document.querySelector('.leaflet__list');
-    if (!listContainer) {
-      return;
-    }
-
-    listContainer.innerHTML = '';
-    items.forEach(item => {
-      const li = document.createElement('li');
-      li.tabIndex = -1;
-      li.id = item.id;
-      li.className = 'map-item-list';
-
-      const thumb = document.createElement('div');
-      thumb.className = 'thumb';
-      thumb.style.backgroundImage = `url(${item.field_media_image})`;
-
-      const info = document.createElement('div');
-      info.className = 'info';
-
-      const h1 = document.createElement('h1');
-      h1.style.fontSize = '16px';
-      h1.style.fontWeight = 'bold';
-      h1.textContent = decodeHtmlEntities(item.label || '');
-
-      const teaser = document.createElement('div');
-      teaser.className = 'teaser';
-      teaser.textContent = decodeHtmlEntities(item.field_subtitle || '');
-
-      const pubDate = document.createElement('date');
-      pubDate.className = 'pub-date';
-      pubDate.textContent = item.field_publication_date || '';
-
-      info.append(h1, teaser, pubDate);
-      li.append(thumb, info);
-      listContainer.appendChild(li);
-    });
-  }
-
-  function attachListClickHandler() {
-    const listContainer = document.querySelector('.leaflet__list');
-    if (!listContainer) {
-      return;
-    }
-
-    listContainer.addEventListener('click', e => {
-      const li = e.target.closest('li.map-item-list');
-      if (!li) {
-        return;
-      }
-
-      const contentID = li.id;
-      getContent(contentID);
-      getNewLatLng(contentID);
-    });
-  }
-
-  function setupCloseButton(theMap, lMap) {
-    document.querySelectorAll('.leaflet__content a.x-button').forEach(button => {
-      button.addEventListener('click', e => {
-        e.preventDefault();
-        lMap.setView(theMap.settings.center, theMap.settings.zoom);
-        lMap.invalidateSize();
-
-        const listContainer = document.querySelector('.leaflet__list-container');
-        listContainer?.classList.remove('open', 'container-up');
-
-        const leafletContent = document.querySelector('.leaflet__content');
-        if (leafletContent) {
-          leafletContent.style.display = 'none';
-        }
-
-        document.querySelectorAll('li.map-item-list').forEach(item => item.style.display = 'block');
-        document.querySelector('.leaflet__top h1').style.display = 'block';
-        document.querySelector('.leaflet__top h3').style.display = 'none';
-      });
-    });
-  }
+  /**
+   * @typedef {Object} DrupalSettings
+   * @property {Object} leaflet_full_page
+   * @property {string} leaflet_full_page.currentDisplay
+   */
 
   /**
    * Entry point: Waits for all page resources (DOM, images, scripts) to be fully loaded.
@@ -187,73 +75,33 @@
         }
       });
 
-
-      features.forEach(feature => {
-        // console.log(feature);
-        if (feature.type === 'point') {
-          // Create marker for feature
-          const marker = L.marker([feature.lat, feature.lon]);
-
-          // Store entity_id on marker directly as custom property
-          marker.entity_id = feature.entity_id;
-
-          // Add click listener
-          marker.on('click', () => {
-            // console.log('Clicked entity_id:', marker.entity_id);
-            getContent(marker.entity_id, 'map');
-            // Your logic here, e.g., getContent(marker.entity_id);
-            getNewLatLng(marker.entity_id);
-          });
-
-          // Add marker to the map
-          marker.addTo(lMap);
-        }
-      });
+      /**
+       * Initializes and adds marker elements to the Leaflet map.
+       *
+       * @param {Array|Object} features - The geographic feature data (e.g., points) to be represented as markers on the map.
+       * @param lMap - The Leaflet map instance where the markers will be added.
+       *
+       * This function typically iterates over the provided features and creates corresponding
+       * markers with associated popups or event handlers, then adds them to the given Leaflet map.
+       *
+       * Note: The actual implementation of setupMarkers is not shown here, but this call
+       * indicates that the map's features are being visualized as interactive markers on the map.
+       * line 322
+       */
+      setupMarkers(features, lMap);
 
       /**
        * Load GeoJSON file (e.g. boundaries or trails) asynchronously,
        * then add it as a styled layer to the Leaflet map.
+       * line 37
        */
-      fetch('/sites/default/files/KingdomTrails.geojson')
-        .then(res => res.json())
-        .then(geojsonData => {
-          const geoJsonLayer = L.geoJSON(geojsonData, {
-            style: () => {
-              return ({
-                color: 'green',
-                weight: 2,
-                fillOpacity: 0.2,
-              });
-            },
-            onEachFeature: (feature, layer) => {
-              if (feature.properties && feature.properties.name) {
-                layer.bindPopup(feature.properties.name);
-
-                layer.on('click', function () {
-                  // console.log('Feature clicked:', feature.properties.name);
-
-                  // Open popup when feature is clicked
-                  // layer.openPopup();
-
-                  // Pan map to center on the clicked feature
-                  lMap.panTo(layer.getBounds().getCenter());
-                });
-              }
-            },
-          });
-          geoJsonLayer.addTo(lMap);
-        })
-        .catch(err => {
-          console.error('Error loading GeoJSON:', err);
-        });
+      // addGeoJsonLayer(lMap);
 
       /**
        * Fetches the map items JSON endpoint which provides
        * data entries to populate the interactive list.
        */
       const currentDisplay = drupalSettings.leaflet_full_page?.currentDisplay || 'default_view_name';
-
-      // console.log(currentDisplay);
 
       fetch(`/${currentDisplay}_mapitems`)
         .then(res => {
@@ -263,6 +111,7 @@
           return res.json();
         })
         .then(items => {
+
           const listContainer = document.querySelector('.leaflet__list');
           if (!listContainer) {
             console.warn('.leaflet__list container not found');
@@ -273,47 +122,7 @@
 
           // Create and append each item in the fetched list data.
           items.forEach(item => {
-            const li = document.createElement('li');
-            li.tabIndex = -1;                      // Accessibility: allow focus.
-            li.id = item.id;                      // Set ID for reference.
-            li.classList.add('map-item-list');   // Styling hook.
-
-            // Thumbnail with background image from the item.
-            const thumb = document.createElement('div');
-            thumb.classList.add('thumb');
-            thumb.style.backgroundImage = `url(${item.field_media_image})`;
-
-            // Container for textual info.
-            const info = document.createElement('div');
-            info.classList.add('info');
-
-            // Title styled with bold font.
-            const h1 = document.createElement('h1');
-            h1.style.fontSize = '16px';
-            h1.style.fontWeight = 'bold';
-            h1.textContent = decodeHtmlEntities(item.label || '');
-
-            // Subtitle or teaser text.
-            const teaser = document.createElement('div');
-            teaser.classList.add('teaser');
-            teaser.textContent = decodeHtmlEntities(item.field_subtitle || '');
-
-            // Publication date shown semantically.
-            const pubDate = document.createElement('date');
-            pubDate.classList.add('pub-date');
-            pubDate.textContent = item.field_publication_date || '';
-
-            // Assemble info container.
-            info.appendChild(h1);
-            info.appendChild(teaser);
-            info.appendChild(pubDate);
-
-            // Assemble complete list item.
-            li.appendChild(thumb);
-            li.appendChild(info);
-
-            // Add the list item to the container.
-            listContainer.appendChild(li);
+            populateList(listContainer, item);
           });
 
           /**
@@ -328,12 +137,13 @@
             } // Ignore clicks outside list items.
 
             const contentID = li.id;
+            const locationID = li.getAttribute('data-location-id');
 
             // Placeholder: load/display content related to this item.
             getContent(contentID);
 
             // Placeholder: pan or zoom map to this item location.
-            getNewLatLng(contentID);
+            getNewLatLng(locationID);
           });
 
         })
@@ -342,42 +152,153 @@
         });
 
       /* CloseButton */
-      document.querySelectorAll('.leaflet__content a.x-button').forEach(button => {
-        button.addEventListener('click', function (e) {
-          e.preventDefault();
+      setupCloseButton();
 
-          mapWidthPx = document.querySelector('.leaflet').offsetWidth - 350;
-          adjustMapView(mapWidthPx, theMap, lMap);
+      function setupCloseButton() {
+        document.querySelectorAll('.leaflet__content a.x-button').forEach(button => {
+          button.addEventListener('click', function (e) {
+            e.preventDefault();
 
-          document.querySelector('.leaflet__list-container').classList.remove('open');
-          document.querySelector('.leaflet__list-container').classList.remove('container-up');
-          document.querySelector('.leaflet__content').style.display = 'none';
-          document.querySelectorAll('li.map-item-list').forEach(item => item.style.display = 'flex');
-          document.querySelector('.leaflet__top h1').style.display = 'block';
-          document.querySelector('.leaflet__top h3').style.display = 'none';
+            mapWidthPx = document.querySelector('.leaflet').offsetWidth - 350;
+            adjustMapView(mapWidthPx, theMap, lMap);
 
-          // filterItems();
+            document.querySelector('.leaflet__top').style.display = 'block';
+            document.querySelector('.leaflet__list').style.display = 'block';
 
-          return null;
+            document.querySelector('.leaflet__list-container').classList.remove('open');
+            document.querySelector('.leaflet__list-container').classList.remove('container-up');
+            document.querySelector('.leaflet__content').style.display = 'none';
+            document.querySelectorAll('li.map-item-list').forEach(item => item.style.display = 'flex');
+            document.querySelector('.leaflet__top h1').style.display = 'block';
+            document.querySelector('.leaflet__top h3').style.display = 'none';
+
+            // filterItems();
+
+            return null;
+          });
         });
-      });
+      }
+
+      function setupMarkers(features, lMap) {
+        features.forEach(feature => {
+          if (feature.type === 'point') {
+            // Create marker for feature
+            const marker = L.marker([feature.lat, feature.lon]);
+
+            // Store entity_id on marker directly as custom property
+            marker.entity_id = feature.entity_id;
+
+            // Add click listener
+            marker.on('click', () => {
+              getContent(marker.entity_id, 'map');
+              // Your logic here, e.g., getContent(marker.entity_id);
+              getNewLatLng(marker.entity_id);
+            });
+
+            // Add marker to the map
+            marker.addTo(lMap);
+          }
+        });
+      }
+
+      function populateList(listContainer, item) {
+        const li = document.createElement('li');
+        li.tabIndex = -1;                    // Accessibility: allow focus.
+        li.id = item.contentID;              // Set ID for reference.
+        li.classList.add('map-item-list');   // Styling hook.
+        li.setAttribute('data-location-id', item.locationID);
+
+        // Thumbnail with background image from the item.
+        const thumb = document.createElement('div');
+        thumb.classList.add('thumb');
+        thumb.insertAdjacentHTML('afterbegin', decodeHtmlEntities(item.field_listing_image_media_1 || ''));
+        // thumb.style.backgroundImage = `url(${item.field_media_image})`;
+
+        // Container for textual info.
+        const info = document.createElement('div');
+        info.classList.add('info');
+
+        // Title styled with bold font.
+        const h1 = document.createElement('h1');
+        h1.style.fontSize = '16px';
+        h1.style.fontWeight = 'bold';
+        h1.textContent = decodeHtmlEntities(item.title || '');
+
+        // Subtitle or teaser text.
+        const teaser = document.createElement('div');
+        teaser.classList.add('teaser');
+        teaser.textContent = decodeHtmlEntities(item.field_sub_title || '');
+
+        // Publication date shown semantically.
+        const pubDate = document.createElement('time');
+        pubDate.classList.add('pub-date');
+        pubDate.textContent = item.field_item_date || '';
+
+        // Add datetime attribute if date exists
+        if (item.field_item_date) {
+          // Parse the "F j, Y" format (e.g., "July 16, 2025")
+          const parsedDate = new Date(item.field_item_date);
+
+          // Check if the date is valid
+          if (!isNaN(parsedDate.getTime())) {
+            // Format as ISO datetime for the datetime attribute
+            pubDate.setAttribute('datetime', parsedDate.toISOString());
+          }
+        }
+
+        // Assemble info container.
+        info.appendChild(h1);
+        info.appendChild(teaser);
+        info.appendChild(pubDate);
+
+        // Assemble complete list item.
+        li.appendChild(thumb);
+        li.appendChild(info);
+
+        // Add the list item to the container.
+        listContainer.appendChild(li);
+      }
+
+      // Function to parse WKT POINT and extract lat/lon
+      function parseWKTPoint(wktString) {
+        // Remove "POINT (" and ")" from the string
+        const coordsString = wktString.replace(/POINT\s*\(\s*/, '').replace(/\s*\)$/, '');
+
+        // Split by space to get longitude and latitude
+        const coords = coordsString.split(/\s+/);
+
+        if (coords.length >= 2) {
+          return {
+            lon: parseFloat(coords[0]), // First value is longitude
+            lat: parseFloat(coords[1])  // Second value is latitude
+          };
+        }
+
+        return null;
+      }
 
       /**
        * Placeholder function:
        * Intended to fetch and display detailed content for a given item.
        * User should implement AJAX or DOM manipulation here.
-       * @param {string} contentID - The ID of the content to fetch.
+       * @param {int} theID - The ID of the content to fetch.
        * @param which - The source of click (e.g., 'map' or 'list').
        */
-      function getContent(contentID, which) {
+      function getContent(theID, which) {
         const currentDisplay = drupalSettings.leaflet_full_page?.currentDisplay || 'default_view_name';
-        // console.log('Fetching content for:', contentID);
+        let contentFilter;
+        if (which === 'map') {
+          contentFilter = 'locationID';
+        } else {
+          contentFilter = 'contentID';
+        }
 
-        fetch(`/${currentDisplay}_mapitems?contentID=${encodeURIComponent(contentID)}&which=${encodeURIComponent(which)}`)  // Add query parameter here
+        fetch(`/${currentDisplay}_mapitems?${contentFilter}=${encodeURIComponent(theID)}&which=${encodeURIComponent(which)}`)
           .then(res => {
             // Get contentID from the request URL
             const url = new URL(res.url);
             const contentID = url.searchParams.get('contentID');
+            const locationID = url.searchParams.get('locationID');
             const which = url.searchParams.get('which');
 
             // console.log('contentID from URL:', contentID);
@@ -387,6 +308,7 @@
               return {
                 data: data,
                 contentID: contentID,
+                locationID: locationID,
                 which: which,
               };
             });
@@ -394,41 +316,50 @@
           .then(data => {
             let theData = data.data;
             let contentID = data.contentID;  // Use contentID from the response
+            let locationID = data.locationID;  // Use locationID from the response
             let which = data.which;  // Use which from the response
 
-            const item = theData.find(obj => Number(obj.id) === Number(contentID));
+            let item;
+
+            if (which === 'map') {
+              let items = theData.filter(item => item.locationID === locationID);
+
+              // use filteredItems as needed
+              if (items.length > 1) {
+                document.querySelectorAll('li.map-item-list').forEach(el => el.style.display = 'none');
+
+                items.forEach(item => {
+                  document.querySelector('.leaflet__list-container').classList.remove('open');
+                  document.querySelector('.leaflet__list-container').classList.remove('container-up');
+                  document.querySelector('.leaflet__content').style.display = 'none';
+                  document.getElementById(item.contentID).style.display = 'flex';
+                  document.querySelector('.leaflet__top h1').style.display = 'none';
+                  document.querySelector('.leaflet__top h3').innerHTML = item.title;
+                  document.querySelector('.leaflet__top h3').style.display = 'block';
+                });
+              } else {
+                // console.log('item:', item);
+                item = items[0];
+                items = null;
+                contentID = item.contentID;
+              }
+            } else {
+              // console.log('theData:', theData);
+              // console.log('contentID:', contentID);
+              item = theData.find(obj => Number(obj.contentID) === Number(contentID));
+            }
 
             if (item) {
-              const itemsList = [];
-              let itemTitle = '';
-              if (which === 'map') {
-                // do something with `item`
-                itemsList.push(contentID);
-                itemTitle = item.label;
-
-                if (itemsList.length < 2) {
-                  [contentID] = itemsList;
-                } else {
-                  contentID = null;
-
-                  document.querySelectorAll('li.map-item-list').forEach(el => el.style.display = 'none');
-
-                  itemsList.forEach(item => {
-                    document.querySelector('.leaflet__list-container').classList.remove('open');
-                    document.querySelector('.leaflet__list-container').classList.remove('container-up');
-                    document.querySelector('.leaflet__content').style.display = 'none';
-                    document.getElementById(item).style.display = 'block';
-                    document.querySelector('.leaflet__top h1').style.display = 'none';
-                    document.querySelector('.leaflet__top h3').innerHTML = itemTitle;
-                    document.querySelector('.leaflet__top h3').style.display = 'block';
-                  });
-                }
-              }
-
               if (contentID != null) {
-                document.querySelector('.leaflet__content-title').textContent = item.label;
-                document.querySelector('.leaflet__content-textarea').innerHTML = item.field_body;
-                // document.querySelector('.leaflet__content-textarea').append(mapItems[contentID].content);
+                const scrollableContainer = document.querySelector('.leaflet__content-scrollable');
+                scrollableContainer.innerHTML = ''; // Clear previous content
+                document.querySelector('.leaflet__top').style.display = 'none';
+                document.querySelector('.leaflet__list').style.display = 'none';
+
+                document.querySelector('.leaflet__content-title').textContent = item.title;
+                scrollableContainer.insertAdjacentHTML('afterbegin', decodeHtmlEntities(item.field_listing_image_media || ''));
+                scrollableContainer.insertAdjacentHTML('beforeend', decodeHtmlEntities(item.field_body || ''));
+                scrollableContainer.insertAdjacentHTML('beforeend', decodeHtmlEntities(item.field_content || ''));
 
                 document.querySelectorAll('.leaflet__content-textarea a').forEach(link => {
                   link.setAttribute('target', '_blank');
@@ -466,8 +397,8 @@
                 scrollableElement.style.cssText = 'overflow-y: scroll; overflow-x: hidden; max-height: 100%;';
                 scrollableElement.scrollTo({ top: 0, behavior: 'smooth' });
 
-                const headerHeight = document.querySelector('.leaflet__content-header').offsetHeight + 7 + 30;
-                document.querySelector('.leaflet__content-scrollable').style.height = `${document.querySelector('.leaflet__content').offsetHeight - headerHeight - 20}px`;
+                // const headerHeight = document.querySelector('.leaflet__content-header').offsetHeight + 7 + 30;
+                // document.querySelector('.leaflet__content-scrollable').style.height = `${document.querySelector('.leaflet__content').offsetHeight - headerHeight - 20}px`;
 
                 setTimeout(() => {
                   if (document.querySelector('.leaflet__list-container').classList.contains('container-up')) {
@@ -484,8 +415,9 @@
 
       function adjustMapView(mapWidthPx, theMap, lMap) {
         const zoom = zoomFromWidth(mapWidthPx);
-        theMap.settings.center.lon = lonWestOfCenter(zoom);
-        lMap.setView(theMap.settings.center, zoom);
+        // theMap.settings.center.lon = lonWestOfCenter(theMap.settings.zoom);
+        // console.log(theMap.settings);
+        lMap.setView(theMap.settings.center, theMap.settings.zoom);
         lMap.invalidateSize();
 
         // console.log(theMap.settings.center);
@@ -516,16 +448,19 @@
       function getNewLatLng(contentID) {
         // console.log('Panning map to:', contentID);
         // Implement locating item coordinates and updating map view here.
+        // console.log('Panning map to:', contentID);
         const feature = features.find(item => item.entity_id === contentID);
+        const propertiesObj = JSON.parse(feature.properties);
+        const zoomLevel = propertiesObj.zoomTo ? parseInt(propertiesObj.zoomTo, 10) : 3;
+        const offSet = propertiesObj.offSet ? parseFloat(propertiesObj.offSet, 10) : 1;
 
         const newLatLng = {};
 
-        newLatLng.lng = parseFloat(feature.lon) + 1;
-        newLatLng.lat = feature.lat;
-        // console.log(newLatLng);
-        // console.log(feature);
 
-        lMap.setView(newLatLng, 9);
+        newLatLng.lng = parseFloat(feature.lon) + offSet;
+        newLatLng.lat = feature.lat;
+
+        lMap.setView(newLatLng, zoomLevel);
         lMap.invalidateSize();
       }
 
@@ -573,8 +508,8 @@
         const offsetTop = mapElement.getBoundingClientRect().top;
         const newHeight = windowHeight - offsetTop;
 
-        const headerHeight = document.querySelector('.leaflet__content-header').offsetHeight + 7 + 30;
-        document.querySelector('.leaflet__content-scrollable').style.height = `${document.querySelector('.leaflet__content').offsetHeight - headerHeight - 20}px`;
+        // const headerHeight = document.querySelector('.leaflet__content-header').offsetHeight + 7 + 30;
+        // document.querySelector('.leaflet__content-scrollable').style.height = `${document.querySelector('.leaflet__content').offsetHeight}px`;
 
         mapElement.style.height = `${newHeight}px`;
         lMap.invalidateSize(); // Notify Leaflet to recalc map size.
@@ -584,6 +519,30 @@
         const txt = document.createElement('textarea');
         txt.innerHTML = text;
         return txt.value;
+      }
+
+      function addGeoJsonLayer(lMap) {
+        fetch('/modules/custom/leaflet_full_page/includes/gz_2010_us_040_00_500k.geojson')
+          .then(res => res.json())
+          .then(data => {
+            const layer = L.geoJSON(data, {
+              style: () => ({
+                color: 'green',
+                weight: 2,
+                fillOpacity: 0.2,
+              }),
+              onEachFeature: (feature, layer) => {
+                if (feature.properties?.name) {
+                  layer.bindPopup(feature.properties.name);
+                  layer.on('click', () => {
+                    lMap.panTo(layer.getBounds().getCenter());
+                  });
+                }
+              },
+            });
+            layer.addTo(lMap);
+          })
+          .catch(console.error);
       }
 
       // Initial map height adjustment.

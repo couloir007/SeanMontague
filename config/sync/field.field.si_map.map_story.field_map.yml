@@ -1,0 +1,27 @@
+uuid: 9646fa4b-4914-4534-8334-8f87578c959e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.si_map.field_map
+    - si_map.si_map_type.map_story
+id: si_map.map_story.field_map
+field_name: field_map
+entity_type: si_map
+bundle: map_story
+label: Map
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles: {  }
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

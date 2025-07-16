@@ -1,0 +1,23 @@
+uuid: 69734ae3-d5b8-4714-9a3e-a4055e8a73c8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.field_item_date
+    - geo_entity.geo_entity_type.map_story
+  module:
+    - datetime
+_core:
+  default_config_hash: 0KwULK4PD3tJRclqZn3jEvQNaVl451DLQC4gsGEtFJs
+id: geo_entity.map_story.field_item_date
+field_name: field_item_date
+entity_type: geo_entity
+bundle: map_story
+label: 'Item Date'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

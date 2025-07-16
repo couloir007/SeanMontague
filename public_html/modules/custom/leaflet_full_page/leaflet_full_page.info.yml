@@ -8,6 +8,6 @@ dependencies:
   - drupal:views
   - geofield:geofield
   - drupal:field
-  - drupal:si_mapping
+  - drupal:geo_entity
 libraries:
   - leaflet_full_page/custom_leaflet

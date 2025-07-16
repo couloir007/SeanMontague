@@ -1,10 +1,56 @@
 <?php
 
-use Drupal\views\ViewExecutable;
-use Drupal\Core\Form\FormStateInterface;
+use /**
+ * Class ViewExecutable
+ *
+ * The ViewExecutable class represents the runtime execution of a view in
+ * Drupal. This class is responsible for managing the build process of
+ * displaying a view, including applying filters, sorting, and rendering
+ * results. It handles all aspects of transforming the raw data into the
+ * rendered output based on the view's configuration.
+ *
+ * Responsibilities include:
+ * - Executing query building and retrieving data for the view.
+ * - Managing view relationships, filters, sorts, and fields.
+ * - Providing methods for rendering the final output.
+ *
+ * This class is an integral part of the Views module, enabling flexible
+ * and dynamic content display on a site.
+ *
+ * Extending, overriding, or modifying the behavior of a ViewExecutable
+ * should be done by implementing appropriate hooks or plugins, wherever
+ * possible, to maintain update compatibility.
+ */
+  Drupal\views\ViewExecutable;
+use /**
+ * Provides an interface for handling form state.
+ *
+ * This interface defines the methods used to manage and interact with the
+ * state of a form during the processing lifecycle in a Symfony application.
+ * It includes methods for retrieving and setting input values, triggering
+ * errors, and managing other aspects of form behavior.
+ */
+  Drupal\Core\Form\FormStateInterface;
 
 /**
- * Implements hook_theme().
+ * Defines theme hook implementations for the Leaflet Full Page module.
+ *
+ * This function provides theme definitions, including templates and their
+ * corresponding file paths, for rendering specific views in the Leaflet Full
+ * Page module.
+ *
+ * @param array $existing
+ *   An array of existing theme definitions.
+ * @param string $type
+ *   The type of hook being invoked.
+ * @param string $theme
+ *   The name of the theme for which suggestions are being retrieved.
+ * @param string $path
+ *   The path to the theme engine.
+ *
+ * @return array
+ *   An array of theme definitions specific to the Leaflet Full Page module.
+ *   Each theme definition contains the template name and its file path.
  */
 function leaflet_full_page_theme($existing, $type, $theme, $path) {
   $module_path = \Drupal::service('extension.list.module')->getPath('leaflet_full_page');
@@ -21,7 +67,7 @@ function leaflet_full_page_theme($existing, $type, $theme, $path) {
 }
 
 /**
- * Implements hook_theme_suggestions_HOOK_alter().
+ *
  */
 function leaflet_full_page_theme_suggestions_views_view_alter(array &$suggestions, array $variables) {
   $view = $variables['view'];
@@ -34,8 +80,17 @@ function leaflet_full_page_theme_suggestions_views_view_alter(array &$suggestion
   }
 }
 
-
-
+/**
+ * Checks if the provided view is a "leaflet full page" mapping view.
+ *
+ * Determines if the given view has a "leaflet_full_page_view" extender
+ * with a valid template configuration.
+ *
+ * @param mixed $view The view object to analyze.
+ * @param array $options An array to store extender options if the conditions are met.
+ *
+ * @return bool Returns TRUE if the view is a "leaflet full page" mapping view, FALSE otherwise.
+ */
 function _leaflet_full_page_is_si_mapping_view($view, &$options = []): bool {
   if(
     !!($extenders = $view->getDisplay()->getExtenders())
@@ -50,9 +105,20 @@ function _leaflet_full_page_is_si_mapping_view($view, &$options = []): bool {
 }
 
 /**
- * Implements hook_form_alter().
+ * Alters the form structure for specific Views exposed forms in the context of
+ * leaflet full page integration.
  *
- * This catches all forms; then we check for the Views display edit form.
+ * This function checks if the form ID corresponds to a Views exposed form and
+ * further verifies if the associated view is related to leaflet full page
+ * functionality. If the conditions are met, it adds a `leaflet_full_page`
+ * configuration to the form based on the provided template options.
+ *
+ * @param array $form
+ *   The form structure to be altered.
+ * @param FormStateInterface $form_state
+ *   The current state of the form.
+ * @param string $form_id
+ *   The unique identifier of the form being altered.
  */
 function leaflet_full_page_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   if (strpos($form_id, 'views_exposed_form') !== FALSE) {
@@ -72,6 +138,16 @@ function leaflet_full_page_form_alter(&$form, FormStateInterface $form_state, $f
   }
 }
 
+/**
+ * Modifies the pre-render phase of a view to handle "leaflet full page" specific settings.
+ *
+ * Checks if the view's ID contains "leaflet_full_page" and, if so, applies custom Drupal settings
+ * for the current display, provided it does not contain "items."
+ *
+ * @param ViewExecutable $view The view instance being pre-rendered.
+ *
+ * @return void
+ */
 function leaflet_full_page_views_pre_render(ViewExecutable $view): void {
   if (strpos($view->id(), 'leaflet_full_page') !== FALSE) {
     if (strpos($view->current_display, 'items') === FALSE) {

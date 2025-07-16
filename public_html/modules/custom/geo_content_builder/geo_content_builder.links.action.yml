@@ -1,0 +1,11 @@
+geo_content_builder.type_add:
+  title: 'Add Geo Content Entity'
+  route_name: entity.geo_content_builder_type.add_form
+  appears_on:
+    - entity.geo_content_builder_type.collection
+
+geo_content_builder.add_page:
+  title: 'Add Geo Content Entity'
+  route_name: entity.geo_content_builder.add_page
+  appears_on:
+    - entity.geo_content_builder.collection

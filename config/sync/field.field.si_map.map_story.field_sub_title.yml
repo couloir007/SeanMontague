@@ -1,0 +1,19 @@
+uuid: 290bf32a-e8c6-4dbf-92f7-be5cd70957c2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.si_map.field_sub_title
+    - si_map.si_map_type.map_story
+id: si_map.map_story.field_sub_title
+field_name: field_sub_title
+entity_type: si_map
+bundle: map_story
+label: Sub-Title
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

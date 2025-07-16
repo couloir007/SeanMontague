@@ -1,0 +1,20 @@
+uuid: 19dad027-aa94-45e6-bf44-75e9c4101cfe
+langcode: en
+status: true
+dependencies:
+  module:
+    - media
+    - si_map
+id: si_map.field_listing_image_media
+field_name: field_listing_image_media
+entity_type: si_map
+type: entity_reference
+settings:
+  target_type: media
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

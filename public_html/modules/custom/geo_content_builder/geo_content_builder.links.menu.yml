@@ -1,0 +1,11 @@
+entity.geo_content_builder_type.collection:
+  title: 'SI Map types'
+  description: 'Manage and CRUD actions on SI Map type.'
+  parent: system.admin_structure
+  route_name: entity.geo_content_builder_type.collection
+
+entity.geo_content_builder.collection:
+  title: 'SI Maps'
+  description: 'List of si maps.'
+  route_name: entity.geo_content_builder.collection
+  parent: system.admin_content

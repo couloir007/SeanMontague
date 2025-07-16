@@ -17,7 +17,7 @@
   display: flex;
   flex-direction: column;
   height: 50%;
-  padding: 10px;
+  padding: 20px;
   position: absolute;
   top: initial;
   transition: height 750ms;
@@ -44,7 +44,7 @@
     background: rgba(252, 239, 208, 80%);
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
-    height: calc(100% - 50px);
+    height: calc(100% - 40px);
     max-width: 350px;
     overflow: hidden;
     right: 20px;
@@ -55,6 +55,7 @@
     &.open {
       background: rgba(252, 239, 208, 100%);
       max-width: 1000px;
+      padding: 25px;
       width: 70%;
     }
   }
@@ -106,7 +107,7 @@
   li {
     cursor: pointer;
     display: flex;
-    padding: 7px;
+    padding: 7px 0;
 
     h2 {
       font-size: 16px;
@@ -134,10 +135,9 @@
   background-color: #fcefd0;
   display: none;
   flex-direction: column;
-  height: calc(100% - 20px);
-  padding: 10px;
-  position: absolute;
-  width: calc(100% - 20px);
+  height: 100%;
+  position: relative;
+  width: 100%;
   z-index: 1;
 
   h3 {
@@ -186,7 +186,6 @@
   border-width: 2px;
   display: flex;
   flex-shrink: 0;
-  margin-left: 5px;
   padding-bottom: 5px;
 }
 
@@ -216,11 +215,9 @@
 
 .leaflet__content-scrollable {
   display: block;
-  margin-bottom: 15px;
+  height: calc(100% - 40px);
   overflow-x: hidden;
   overflow-y: auto;
-  padding-left: 10px;
-  padding-right: 20px;
   padding-top: 20px;
 
   p {

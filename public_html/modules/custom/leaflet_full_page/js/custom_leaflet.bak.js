@@ -6,8 +6,37 @@
 
 'use strict';
 
+/**
+ * A map object used as a key-value store.
+ * The variable is a plain JavaScript object, commonly utilized for storing and retrieving data.
+ * Keys are typically strings, with associated values potentially of any data type.
+ */
 const theMap = {};
+/**
+ * An object used for mapping resize-related data. This variable acts as a container
+ * to store and manage associations or configurations required for resize operations.
+ *
+ * The structure and purpose of this mapping depend on the specific use case. It may
+ * include properties or key-value pairs representing elements, dimensions, or
+ * configurations linked to resizing functionality.
+ */
 const resizeMap = {};
+/**
+ * Represents a GeoJSON layer for mapping and visualizing geographical data.
+ * This variable is used to handle and display GeoJSON features on a map.
+ *
+ * The GeoJSON layer supports dynamic rendering and can be utilized to
+ * overlay shapes, points, and other geometries in GeoJSON format.
+ *
+ * Features of the GeoJSON may include styling, events, and interaction
+ * capabilities to customize the map behavior as per the application's needs.
+ *
+ * The data model for GeoJSON should adhere to the GeoJSON format specifications,
+ * encapsulating geometry objects and their associated properties.
+ *
+ * Common use cases may involve rendering regions, points of interest,
+ * or other geographical features derived from GeoJSON datasets.
+ */
 let geoJsonLayer;
 
 (function ($, Drupal, drupalSettings, once) {

@@ -1,0 +1,4 @@
+administer geo_content_builder types:
+  title: 'Administer si map types'
+  description: 'Maintain the types of si map entity.'
+  restrict access: true

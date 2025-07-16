@@ -1,0 +1,20 @@
+uuid: 4ead7b38-b3a8-419f-bd86-2009db9f8120
+langcode: en
+status: true
+dependencies:
+  module:
+    - si_map
+    - taxonomy
+id: si_map.field_map
+field_name: field_map
+entity_type: si_map
+type: entity_reference
+settings:
+  target_type: taxonomy_term
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

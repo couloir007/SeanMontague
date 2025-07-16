@@ -1,0 +1,21 @@
+uuid: b5451b24-f8b9-48d9-9f9c-e96ca8938b3a
+langcode: en
+status: true
+dependencies:
+  module:
+    - si_map
+id: si_map.field_sub_title
+field_name: field_sub_title
+entity_type: si_map
+type: string
+settings:
+  max_length: 255
+  case_sensitive: false
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

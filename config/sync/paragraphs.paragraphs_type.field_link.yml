@@ -1,0 +1,10 @@
+uuid: 2e6be504-3c31-4e45-a4c2-f730b2352c66
+langcode: en
+status: true
+dependencies: {  }
+id: field_link
+label: 'Field Link'
+icon_uuid: null
+icon_default: null
+description: ''
+behavior_plugins: {  }

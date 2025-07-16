@@ -1,0 +1,85 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Provides a si map entity type.
+ */
+
+use Drupal\Core\Render\Element;
+use Drupal\user\UserInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function geo_content_builder_theme(): array {
+  return [
+    'geo_content_builder' => ['render element' => 'elements'],
+  ];
+}
+
+/**
+ * Prepares variables for si map templates.
+ *
+ * Default template: si-map.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing the si map information and any
+ *     fields attached to the entity.
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_geo_content_builder(array &$variables): void {
+  $variables['view_mode'] = $variables['elements']['#view_mode'];
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Implements hook_user_cancel().
+ */
+function geo_content_builder_user_cancel($edit, UserInterface $account, $method): void {
+  switch ($method) {
+    case 'user_cancel_block_unpublish':
+      // Unpublish si maps.
+      $storage = \Drupal::entityTypeManager()->getStorage('geo_content_builder');
+      $geo_content_builder_ids = $storage->getQuery()
+        ->condition('uid', $account->id())
+        ->condition('status', 1)
+        ->accessCheck(FALSE)
+        ->execute();
+      foreach ($storage->loadMultiple($geo_content_builder_ids) as $geo_content_builder) {
+        $geo_content_builder->set('status', FALSE)->save();
+      }
+      break;
+
+    case 'user_cancel_reassign':
+      // Anonymize si maps.
+      $storage = \Drupal::entityTypeManager()->getStorage('geo_content_builder');
+      $geo_content_builder_ids = $storage->getQuery()
+        ->condition('uid', $account->id())
+        ->accessCheck(FALSE)
+        ->execute();
+      foreach ($storage->loadMultiple($geo_content_builder_ids) as $geo_content_builder) {
+        $geo_content_builder->setOwnerId(0)->save();
+      }
+      break;
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_predelete() for user entities.
+ */
+function geo_content_builder_user_predelete(UserInterface $account): void {
+  // Delete si maps that belong to this account.
+  $storage = \Drupal::entityTypeManager()->getStorage('geo_content_builder');
+  $geo_content_builder_ids = $storage->getQuery()
+    ->condition('uid', $account->id())
+    ->accessCheck(FALSE)
+    ->execute();
+  $storage->delete(
+    $storage->loadMultiple($geo_content_builder_ids)
+  );
+}

@@ -1,0 +1,19 @@
+uuid: 15b73568-1507-4d8e-b81a-da95783aef31
+langcode: en
+status: true
+dependencies:
+  module:
+    - si_map
+    - text
+id: si_map.field_body
+field_name: field_body
+entity_type: si_map
+type: text_long
+settings: {  }
+module: text
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

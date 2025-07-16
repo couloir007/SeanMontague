@@ -4,7 +4,6 @@ status: true
 dependencies:
   config:
     - custom_entity.custom_entity_type.custom_entity
-    - field.field.custom_entity.custom_entity.field_body
   module:
     - text
 id: custom_entity.custom_entity.default
@@ -21,14 +20,6 @@ content:
   description:
     type: text_textarea
     weight: 10
-    region: content
-    settings:
-      rows: 5
-      placeholder: ''
-    third_party_settings: {  }
-  field_body:
-    type: text_textarea
-    weight: 26
     region: content
     settings:
       rows: 5
