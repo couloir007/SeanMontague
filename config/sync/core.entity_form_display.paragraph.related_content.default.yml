@@ -1,0 +1,34 @@
+uuid: 3c7c5354-2a71-4a37-aa4e-4f84453edfe4
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.related_content.field_linked_content
+    - field.field.paragraph.related_content.field_short_plain_text
+    - paragraphs.paragraphs_type.related_content
+id: paragraph.related_content.default
+targetEntityType: paragraph
+bundle: related_content
+mode: default
+content:
+  field_linked_content:
+    type: entity_reference_autocomplete
+    weight: 1
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_short_plain_text:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

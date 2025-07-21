@@ -1,13 +1,14 @@
-name: 'Leaflet Full Page'
+name: Leaflet Full Page
 type: module
-description: 'Attaches JavaScript to Leaflet field formatters when used in Views.'
-package: 'Custom'
-core_version_requirement: ^10
+description: 'Provides full-page leaflet mapping functionality with custom paragraph types'
+core_version_requirement: ^10 || ^11
+package: Custom
 dependencies:
-  - drupal:leaflet
-  - drupal:views
-  - geofield:geofield
   - drupal:field
-  - drupal:geo_entity
-libraries:
-  - leaflet_full_page/custom_leaflet
+  - drupal:views
+  - drupal:geofield
+  - drupal:taxonomy
+  - drupal:datetime
+  - drupal:text
+  - drupal:paragraphs
+  - geo_entity:geo_entity

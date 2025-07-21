@@ -1,0 +1,19 @@
+uuid: 45416c17-3ecd-41f4-9bfa-37ba4b8d1f60
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_short_plain_text
+    - paragraphs.paragraphs_type.related_content
+id: paragraph.related_content.field_short_plain_text
+field_name: field_short_plain_text
+entity_type: paragraph
+bundle: related_content
+label: Title
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

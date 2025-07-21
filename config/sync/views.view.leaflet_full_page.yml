@@ -1,4 +1,4 @@
-uuid: 6c86f5a8-58bf-42d1-ad88-48266b5c6936
+uuid: 92d2a3a5-59f4-4237-a7fc-650a84ad84c2
 langcode: en
 status: true
 dependencies:
@@ -12,7 +12,7 @@ dependencies:
     - geo_entity.geo_entity_type.map_story
     - taxonomy.vocabulary.mapping
   content:
-    - 'taxonomy_term:mapping:bb048f88-75c1-43d7-8015-be39a5027183'
+    - 'taxonomy_term:mapping:5cd912c9-387a-4c57-8174-9f65bb5584ee'
   module:
     - datetime
     - geo_entity
@@ -23,7 +23,7 @@ dependencies:
     - taxonomy
     - text
 _core:
-  default_config_hash: B7vRYnHvoG42tKEtbi1fw2WjW0ytB2eRAsYNlMTTU88
+  default_config_hash: onpG_Hc73_K4oiWCmuV-GsaVZy9x9YYauNHiD5E4NNE
 id: leaflet_full_page
 label: 'Leaflet Full Page'
 module: views
@@ -499,7 +499,7 @@ display:
           plugin_id: taxonomy_index_tid
           operator: or
           value:
-            304: 304
+            305: 305
           group: 1
           exposed: false
           expose:
@@ -573,7 +573,7 @@ display:
               lat: 40.0
               lon: -89.0
             zoomControlPosition: topleft
-            zoom: 6
+            zoom: 5
             minZoom: 1
             maxZoom: 18
             zoomFiner: 0
@@ -1422,9 +1422,9 @@ display:
           empty_zero: false
           hide_alter_empty: true
           click_sort_column: target_id
-          type: entity_reference_label
+          type: entity_reference_entity_view
           settings:
-            link: true
+            view_mode: default
           group_column: target_id
           group_columns: {  }
           group_rows: true

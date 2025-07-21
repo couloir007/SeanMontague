@@ -1,0 +1,31 @@
+uuid: b798ca0d-0f9a-4227-bafe-b2cc4f0d44be
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.related_content.field_linked_content
+    - field.field.paragraph.related_content.field_short_plain_text
+    - paragraphs.paragraphs_type.related_content
+id: paragraph.related_content.default
+targetEntityType: paragraph
+bundle: related_content
+mode: default
+content:
+  field_linked_content:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: full
+      link: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_short_plain_text:
+    type: string
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden: {  }

@@ -11,7 +11,7 @@ dependencies:
     - geo_entity.geo_entity_type.map_story
     - taxonomy.vocabulary.mapping
   content:
-    - 'taxonomy_term:mapping:bb048f88-75c1-43d7-8015-be39a5027183'
+    - 'taxonomy_term:mapping:5cd912c9-387a-4c57-8174-9f65bb5584ee'
   module:
     - datetime
     - geo_entity
@@ -22,7 +22,7 @@ dependencies:
     - taxonomy
     - text
 _core:
-  default_config_hash: B7vRYnHvoG42tKEtbi1fw2WjW0ytB2eRAsYNlMTTU88
+  default_config_hash: onpG_Hc73_K4oiWCmuV-GsaVZy9x9YYauNHiD5E4NNE
 id: leaflet_full_page
 label: 'Leaflet Full Page'
 module: views
@@ -498,7 +498,7 @@ display:
           plugin_id: taxonomy_index_tid
           operator: or
           value:
-            304: 304
+            305: 305
           group: 1
           exposed: false
           expose:
@@ -1421,9 +1421,9 @@ display:
           empty_zero: false
           hide_alter_empty: true
           click_sort_column: target_id
-          type: entity_reference_label
+          type: entity_reference_entity_view
           settings:
-            link: true
+            view_mode: default
           group_column: target_id
           group_columns: {  }
           group_rows: true
