@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f9b0fa72a8c7645dc68a309ce87fb467",
+    "content-hash": "c75aad288c9755040b5ba5b2e13523e1",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -6563,113 +6563,6 @@
             }
         },
         {
-            "name": "drupal/webform",
-            "version": "6.3.0-beta3",
-            "source": {
-                "type": "git",
-                "url": "https://git.drupalcode.org/project/webform.git",
-                "reference": "6.3.0-beta3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/webform-6.3.0-beta3.zip",
-                "reference": "6.3.0-beta3",
-                "shasum": "60af12e66a7898c81a34400979973b046867582e"
-            },
-            "require": {
-                "drupal/core": "^10.3 || ^11.0"
-            },
-            "require-dev": {
-                "drupal/address": "^2.0",
-                "drupal/captcha": "^2.0",
-                "drupal/chosen": "^4.0",
-                "drupal/clientside_validation": "^4.1",
-                "drupal/clientside_validation_jquery": "*",
-                "drupal/devel": "^5.3",
-                "drupal/entity": "^1.5",
-                "drupal/entity_print": "^2.15",
-                "drupal/hal": "^2.0",
-                "drupal/jquery_ui": "^1.7",
-                "drupal/jquery_ui_button": "^2.1",
-                "drupal/jquery_ui_checkboxradio": "^2.1",
-                "drupal/jquery_ui_datepicker": "^2.1",
-                "drupal/mailsystem": "^4.5",
-                "drupal/metatag": "^2.0",
-                "drupal/paragraphs": "^1.18",
-                "drupal/select2": "1.x-dev",
-                "drupal/smtp": "^1.4",
-                "drupal/styleguide": "^2.1",
-                "drupal/telephone_validation": "2.x-dev",
-                "drupal/token": "^1.15",
-                "drupal/webform_access": "*",
-                "drupal/webform_attachment": "*",
-                "drupal/webform_clientside_validation": "*",
-                "drupal/webform_devel": "*",
-                "drupal/webform_entity_print": "*",
-                "drupal/webform_node": "*",
-                "drupal/webform_options_limit": "*",
-                "drupal/webform_scheduled_email": "*",
-                "drupal/webform_share": "*",
-                "drupal/webform_ui": "*"
-            },
-            "suggest": {
-                "drupal/jquery_ui_buttons": "Provides jQuery UI Checkboxradio library. Required by the Webform jQueryUI Buttons module. The Webform jQueryUI Buttons module is deprecated because jQueryUI is no longer maintained.",
-                "drupal/jquery_ui_datepicker": "Provides jQuery UI Datepicker library. Required to support datepickers. The Webform jQueryUI Datepicker module is deprecated because jQueryUI is no longer maintained."
-            },
-            "type": "drupal-module",
-            "extra": {
-                "drupal": {
-                    "version": "6.3.0-beta3",
-                    "datestamp": "1753217750",
-                    "security-coverage": {
-                        "status": "not-covered",
-                        "message": "Beta releases are not covered by Drupal security advisories."
-                    }
-                },
-                "drush": {
-                    "services": {
-                        "drush.services.yml": ">=11"
-                    }
-                }
-            },
-            "notification-url": "https://packages.drupal.org/8/downloads",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Jacob Rockowitz (jrockowitz)",
-                    "homepage": "https://www.drupal.org/u/jrockowitz",
-                    "role": "Maintainer"
-                },
-                {
-                    "name": "Contributors",
-                    "homepage": "https://www.drupal.org/node/7404/committers",
-                    "role": "Contributor"
-                },
-                {
-                    "name": "liam morland",
-                    "homepage": "https://www.drupal.org/user/493050"
-                },
-                {
-                    "name": "mandclu",
-                    "homepage": "https://www.drupal.org/user/52136"
-                },
-                {
-                    "name": "quicksketch",
-                    "homepage": "https://www.drupal.org/user/35821"
-                }
-            ],
-            "description": "Enables the creation of webforms and questionnaires.",
-            "homepage": "https://drupal.org/project/webform",
-            "support": {
-                "source": "https://git.drupalcode.org/project/webform",
-                "issues": "https://www.drupal.org/project/issues/webform?version=8.x",
-                "docs": "https://www.drupal.org/docs/8/modules/webform",
-                "forum": "https://drupal.stackexchange.com/questions/tagged/webform"
-            }
-        },
-        {
             "name": "drush/drush",
             "version": "12.5.3",
             "source": {
@@ -8039,31 +7932,32 @@
         },
         {
             "name": "maennchen/zipstream-php",
-            "version": "3.1.1",
+            "version": "3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/maennchen/ZipStream-PHP.git",
-                "reference": "6187e9cc4493da94b9b63eb2315821552015fca9"
+                "reference": "9712d8fa4cdf9240380b01eb4be55ad8dcf71416"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maennchen/ZipStream-PHP/zipball/6187e9cc4493da94b9b63eb2315821552015fca9",
-                "reference": "6187e9cc4493da94b9b63eb2315821552015fca9",
+                "url": "https://api.github.com/repos/maennchen/ZipStream-PHP/zipball/9712d8fa4cdf9240380b01eb4be55ad8dcf71416",
+                "reference": "9712d8fa4cdf9240380b01eb4be55ad8dcf71416",
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*",
                 "ext-zlib": "*",
-                "php-64bit": "^8.1"
+                "php-64bit": "^8.3"
             },
             "require-dev": {
+                "brianium/paratest": "^7.7",
                 "ext-zip": "*",
                 "friendsofphp/php-cs-fixer": "^3.16",
                 "guzzlehttp/guzzle": "^7.5",
                 "mikey179/vfsstream": "^1.6",
                 "php-coveralls/php-coveralls": "^2.5",
-                "phpunit/phpunit": "^10.0",
-                "vimeo/psalm": "^5.0"
+                "phpunit/phpunit": "^12.0",
+                "vimeo/psalm": "^6.0"
             },
             "suggest": {
                 "guzzlehttp/psr7": "^2.4",
@@ -8104,7 +7998,7 @@
             ],
             "support": {
                 "issues": "https://github.com/maennchen/ZipStream-PHP/issues",
-                "source": "https://github.com/maennchen/ZipStream-PHP/tree/3.1.1"
+                "source": "https://github.com/maennchen/ZipStream-PHP/tree/3.2.0"
             },
             "funding": [
                 {
@@ -8112,7 +8006,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-10-10T12:33:01+00:00"
+            "time": "2025-07-17T11:15:13+00:00"
         },
         {
             "name": "masterminds/html5",
@@ -12345,20 +12239,20 @@
         },
         {
             "name": "symfony/stopwatch",
-            "version": "v6.4.19",
+            "version": "v7.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/stopwatch.git",
-                "reference": "dfe1481c12c06266d0c3d58c0cb4b09bd497ab9c"
+                "reference": "5a49289e2b308214c8b9c2fda4ea454d8b8ad7cd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/stopwatch/zipball/dfe1481c12c06266d0c3d58c0cb4b09bd497ab9c",
-                "reference": "dfe1481c12c06266d0c3d58c0cb4b09bd497ab9c",
+                "url": "https://api.github.com/repos/symfony/stopwatch/zipball/5a49289e2b308214c8b9c2fda4ea454d8b8ad7cd",
+                "reference": "5a49289e2b308214c8b9c2fda4ea454d8b8ad7cd",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.1",
+                "php": ">=8.2",
                 "symfony/service-contracts": "^2.5|^3"
             },
             "type": "library",
@@ -12387,7 +12281,7 @@
             "description": "Provides a way to profile code",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/stopwatch/tree/v6.4.19"
+                "source": "https://github.com/symfony/stopwatch/tree/v7.3.0"
             },
             "funding": [
                 {
@@ -12403,7 +12297,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-02-21T10:06:30+00:00"
+            "time": "2025-02-24T10:49:57+00:00"
         },
         {
             "name": "symfony/string",
@@ -13096,8 +12990,7 @@
         "drupal/components": 10,
         "drupal/flags": 10,
         "drupal/inline_entity_form": 5,
-        "drupal/schemadotorg": 15,
-        "drupal/webform": 10
+        "drupal/schemadotorg": 15
     },
     "prefer-stable": true,
     "prefer-lowest": false,
