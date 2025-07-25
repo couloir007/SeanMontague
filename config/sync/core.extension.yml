@@ -97,6 +97,7 @@ module:
   views_bulk_operations: 0
   views_geojson: 0
   views_ui: 0
+  webform: 0
   pathauto: 1
   views: 10
   paragraphs: 11
