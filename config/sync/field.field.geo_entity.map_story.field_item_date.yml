@@ -1,4 +1,4 @@
-uuid: 69734ae3-d5b8-4714-9a3e-a4055e8a73c8
+uuid: 733f94cd-0cee-4526-9ed8-2d08c6f5a76a
 langcode: en
 status: true
 dependencies:
@@ -8,7 +8,7 @@ dependencies:
   module:
     - datetime
 _core:
-  default_config_hash: 0KwULK4PD3tJRclqZn3jEvQNaVl451DLQC4gsGEtFJs
+  default_config_hash: 0QZIgk9zlsnY26Rfc-63pIXwtkhI9vT5RFJ4HVJN30M
 id: geo_entity.map_story.field_item_date
 field_name: field_item_date
 entity_type: geo_entity

@@ -1,4 +1,4 @@
-uuid: a5e7b243-f2a2-43e2-904a-7108fdc64559
+uuid: 6de0689f-09dd-4fea-afc8-ec8262af0324
 langcode: en
 status: true
 dependencies:
@@ -13,12 +13,10 @@ dependencies:
     - geo_entity.geo_entity_type.map_story
   module:
     - datetime
-    - entity_browser_entity_form
-    - inline_entity_form
     - leaflet
     - text
 _core:
-  default_config_hash: 2BCwGvd2CgGRJfYBqShfroZtArcUb7gSTVsiVr0VXpw
+  default_config_hash: 2LktkZtBRb3smRfC74_NFM-Tf6CLkfip_qFAx7VYTdk
 id: geo_entity.map_story.default
 targetEntityType: geo_entity
 bundle: map_story
@@ -33,25 +31,15 @@ content:
       placeholder: ''
     third_party_settings: {  }
   field_content:
-    type: inline_entity_form_complex
+    type: entity_reference_autocomplete
     weight: 6
     region: content
     settings:
-      form_mode: default
-      override_labels: false
-      label_singular: ''
-      label_plural: ''
-      allow_new: true
-      allow_existing: false
       match_operator: CONTAINS
-      allow_duplicate: false
-      collapsible: false
-      collapsed: false
-      revision: false
-      removed_reference: optional
-    third_party_settings:
-      entity_browser_entity_form:
-        entity_browser_id: _none
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   field_item_date:
     type: datetime_default
     weight: 4

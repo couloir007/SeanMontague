@@ -1,4 +1,4 @@
-uuid: 8de99cbd-d3a8-4cff-b754-104788432e7f
+uuid: 769cd62f-62d9-4a2b-b8e4-0ca4e7bfe823
 langcode: en
 status: true
 dependencies:
@@ -6,7 +6,7 @@ dependencies:
     - field.storage.geo_entity.field_sub_title
     - geo_entity.geo_entity_type.map_story
 _core:
-  default_config_hash: HELxNZaZD6CqsG3DJStpOIM-GajZQkX9KY-My5Pn_pQ
+  default_config_hash: NYi6b8GdSlYBziF_sUGt9COcqXxOjv6hysNBgDXUQqI
 id: geo_entity.map_story.field_sub_title
 field_name: field_sub_title
 entity_type: geo_entity

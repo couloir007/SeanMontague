@@ -1,4 +1,4 @@
-uuid: bebbf303-64e3-4789-8235-dcbe6ad77eac
+uuid: 2b1d234c-d280-4813-844b-126b33ac4459
 langcode: en
 status: true
 dependencies:
@@ -7,7 +7,7 @@ dependencies:
     - geo_entity.geo_entity_type.map_story
     - media.type.image
 _core:
-  default_config_hash: ZsdSiqMkVZ88fDKvciD0J7o3eBBHJgC50FxjuMDxoG4
+  default_config_hash: pnBztiWVfdsHmDnSOfQAcF5ah9ZW4ZB1ng6mqniHcug
 id: geo_entity.map_story.field_listing_image_media
 field_name: field_listing_image_media
 entity_type: geo_entity

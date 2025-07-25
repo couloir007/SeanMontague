@@ -1,4 +1,4 @@
-uuid: 96618c7e-f90f-4844-9932-7ddec4be1b7a
+uuid: 453f8ea7-72fa-49a4-b71e-4b85dda4a6ec
 langcode: en
 status: true
 dependencies:
@@ -6,7 +6,7 @@ dependencies:
     - geo_entity
     - taxonomy
 _core:
-  default_config_hash: rOxaVIPYMTTLzxvsy5o_RyRbhHv0tRMuajUHp9_MAnM
+  default_config_hash: iLZmTT9p68meYI7mSMITroXE33rZGBM0q6BFsLx2KCQ
 id: geo_entity.field_map
 field_name: field_map
 entity_type: geo_entity

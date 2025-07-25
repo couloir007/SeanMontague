@@ -1,15 +1,12 @@
-uuid: ba8211e2-78ed-47dd-b407-5d98a962583f
+uuid: a9d77e3c-22ba-4e30-b7f7-70d166322694
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.geo_entity.field_content
     - geo_entity.geo_entity_type.map_story
-    - paragraphs.paragraphs_type.field_link
-    - paragraphs.paragraphs_type.full_text
-    - paragraphs.paragraphs_type.related_content
 _core:
-  default_config_hash: rTK7ytds1Gy91N4NvTcyqIIYX65q3joFW7UnTguURZI
+  default_config_hash: 5kmrVg51do7-qoqhbMw5M9uzJDGrYKnL4UilQqpScEU
 id: geo_entity.map_story.field_content
 field_name: field_content
 entity_type: geo_entity

@@ -1,4 +1,4 @@
-uuid: 4802272a-ccfe-416d-84f8-8f2ba9375fe9
+uuid: b7415998-c479-44ee-963e-87c0fd52f220
 langcode: en
 status: true
 dependencies:
@@ -6,7 +6,7 @@ dependencies:
     - geo_entity
     - media
 _core:
-  default_config_hash: G0SW9-j-MHYttD9mpjvA1W2sbCOcjSS_x0l7pXnVAtg
+  default_config_hash: trhOthOuf2NZeJgTqx5dMowC25LA1rEGYPghBY_N1gc
 id: geo_entity.field_listing_image_media
 field_name: field_listing_image_media
 entity_type: geo_entity

@@ -81,7 +81,6 @@ module:
   rest: 0
   search: 0
   serialization: 0
-  si_map: 0
   svg_image: 0
   svg_image_responsive: 0
   system: 0

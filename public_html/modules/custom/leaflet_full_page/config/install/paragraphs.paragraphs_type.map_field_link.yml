@@ -1,9 +1,9 @@
-uuid: c3cb0a91-25c9-4c5e-bda0-1c2d82929763
+uuid: ee38e1fc-ed33-415c-9ba4-49582dacda4a
 langcode: en
 status: true
 dependencies: {  }
-id: related_content
-label: 'Related Content'
+id: map_field_link
+label: 'Map Field Link'
 icon_uuid: null
 icon_default: null
 description: ''

@@ -1,4 +1,4 @@
-uuid: 2d464470-d001-4a18-ab81-3591ef052b3a
+uuid: 4242daa6-83dd-425e-ac20-d26ce5ae75f7
 langcode: en
 status: true
 dependencies:
@@ -9,7 +9,7 @@ dependencies:
   module:
     - text
 _core:
-  default_config_hash: oGVhuconq2NJQgn86m7V3PM5BCFPKlnVo9mq011dmCg
+  default_config_hash: s1JxAva-malumcVCs_t6W7PlKrbSUh5GcyPdd9gN5n8
 id: geo_entity.map_story.field_body
 field_name: field_body
 entity_type: geo_entity

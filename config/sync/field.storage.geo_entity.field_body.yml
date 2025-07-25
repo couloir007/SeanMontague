@@ -1,4 +1,4 @@
-uuid: 3cbbfff6-d073-4ed4-86e3-320048db5b85
+uuid: 5251309b-581b-48cd-be22-07020c5b4b0a
 langcode: en
 status: true
 dependencies:
@@ -6,7 +6,7 @@ dependencies:
     - geo_entity
     - text
 _core:
-  default_config_hash: M6d6P8nGqo8Cj2OxBp3UXbbBeJqSQ4hdf4UnPGoYsco
+  default_config_hash: XMDl1LExmG4FUsBwzRdE1UePvCdcynK9nFU5_QPM1dE
 id: geo_entity.field_body
 field_name: field_body
 entity_type: geo_entity

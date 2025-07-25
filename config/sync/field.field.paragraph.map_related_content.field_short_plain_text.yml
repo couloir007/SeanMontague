@@ -1,15 +1,17 @@
-uuid: 45416c17-3ecd-41f4-9bfa-37ba4b8d1f60
+uuid: f961af3d-8b0f-4054-970b-5360d1716312
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.paragraph.field_short_plain_text
-    - paragraphs.paragraphs_type.related_content
-id: paragraph.related_content.field_short_plain_text
+    - paragraphs.paragraphs_type.map_related_content
+_core:
+  default_config_hash: WqTM2HfuaC7MBXgXgZJAMPsuVEjGg1KrrjarMr-tj0A
+id: paragraph.map_related_content.field_short_plain_text
 field_name: field_short_plain_text
 entity_type: paragraph
-bundle: related_content
-label: Title
+bundle: map_related_content
+label: 'Short Plain Text'
 description: ''
 required: false
 translatable: false

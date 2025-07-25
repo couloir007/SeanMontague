@@ -1,13 +1,12 @@
-uuid: ba8211e2-78ed-47dd-b407-5d98a962583f
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.geo_entity.field_content
     - geo_entity.geo_entity_type.map_story
-    - paragraphs.paragraphs_type.field_link
-    - paragraphs.paragraphs_type.full_text
-    - paragraphs.paragraphs_type.related_content
+    - paragraphs.paragraphs_type.map_field_link
+    - paragraphs.paragraphs_type.map_full_text
+    - paragraphs.paragraphs_type.map_related_content
 id: geo_entity.map_story.field_content
 field_name: field_content
 entity_type: geo_entity

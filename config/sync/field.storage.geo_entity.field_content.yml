@@ -1,4 +1,4 @@
-uuid: 8dd2de5b-21cc-473a-b18a-65c4d689121a
+uuid: 46940a6b-322c-431d-bd20-6d65fc403959
 langcode: en
 status: true
 dependencies:
@@ -6,7 +6,7 @@ dependencies:
     - geo_entity
     - paragraphs
 _core:
-  default_config_hash: fvCdVrA8Pl4fWX3wBkijRRjyINFZsnBI5XD8kghel_Y
+  default_config_hash: Yhjl_w2UvaPTjriNnlDADRHY518FvkcI61aVPAymgq8
 id: geo_entity.field_content
 field_name: field_content
 entity_type: geo_entity

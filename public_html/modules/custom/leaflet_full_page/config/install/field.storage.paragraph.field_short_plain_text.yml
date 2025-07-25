@@ -1,12 +1,12 @@
-uuid: b5451b24-f8b9-48d9-9f9c-e96ca8938b3a
+uuid: a58bb116-8e38-4694-825b-5642831c101b
 langcode: en
 status: true
 dependencies:
   module:
-    - si_map
-id: si_map.field_sub_title
-field_name: field_sub_title
-entity_type: si_map
+    - paragraphs
+id: paragraph.field_short_plain_text
+field_name: field_short_plain_text
+entity_type: paragraph
 type: string
 settings:
   max_length: 255

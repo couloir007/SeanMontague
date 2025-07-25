@@ -1,16 +1,18 @@
-uuid: a45e16f3-a17a-4f79-a3cf-4c295f7168eb
+uuid: 24cec32c-caf3-49cc-9869-10fb291ecdfa
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.paragraph.field_link_url
-    - paragraphs.paragraphs_type.field_link
+    - paragraphs.paragraphs_type.map_field_link
   module:
     - link
-id: paragraph.field_link.field_link_url
+_core:
+  default_config_hash: zXRxCdl_ilGNu9SbfIY_2N-sIqvxYySFSNxgbTGbdA8
+id: paragraph.map_field_link.field_link_url
 field_name: field_link_url
 entity_type: paragraph
-bundle: field_link
+bundle: map_field_link
 label: 'Link URL'
 description: ''
 required: false

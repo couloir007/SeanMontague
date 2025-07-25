@@ -154,6 +154,8 @@
       /* CloseButton */
       setupCloseButton();
 
+      addGeoJsonLayer();
+
       function setupCloseButton() {
         document.querySelectorAll('.leaflet__content a.x-button').forEach(button => {
           button.addEventListener('click', function (e) {

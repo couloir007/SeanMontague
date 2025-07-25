@@ -1,4 +1,4 @@
-uuid: e0f655d4-e4e5-46b8-9d24-a0c46d119734
+uuid: d01f67ba-b272-4b23-8747-9c169a3cd1c6
 langcode: en
 status: true
 dependencies:
@@ -16,7 +16,7 @@ dependencies:
     - leaflet
     - text
 _core:
-  default_config_hash: lzVM9XLofaJ8RPa2LWySbXti7ywUgIKExiPupmN8ac4
+  default_config_hash: GsF-P3AnEjSyf16gJRHcGgm_ijkmmMa0An4XGvBe51c
 id: geo_entity.map_story.default
 targetEntityType: geo_entity
 bundle: map_story

@@ -1,4 +1,4 @@
-uuid: 69646230-bf1c-4a04-ac02-7c533575d35b
+uuid: 55db7e18-4f79-4ea6-a12a-fe1e47c7a918
 langcode: en
 status: true
 dependencies:
@@ -8,7 +8,7 @@ dependencies:
   module:
     - geofield
 _core:
-  default_config_hash: SKh_WoOju73q07S3DCPTj4mKE6mH53K1mOOUKg4C_uM
+  default_config_hash: 3tdvijSk3dT0W1phqXRSQMQzFyABrZyMOE-tojUmFus
 id: geo_entity.map_story.location
 field_name: location
 entity_type: geo_entity
