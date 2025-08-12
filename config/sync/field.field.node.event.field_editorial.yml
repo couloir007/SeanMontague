@@ -1,0 +1,31 @@
+uuid: cfd1c12c-708d-460c-8a5c-453c97e5d5ec
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_editorial
+    - node.type.event
+    - paragraphs.paragraphs_type.editorial
+  module:
+    - entity_reference_revisions
+id: node.event.field_editorial
+field_name: field_editorial
+entity_type: node
+bundle: event
+label: 'Editorial information'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      editorial: editorial
+    negate: 0
+    target_bundles_drag_drop:
+      editorial:
+        weight: 0
+        enabled: true
+field_type: entity_reference_revisions

@@ -1,9 +1,8 @@
-uuid: bed3bedf-92af-4287-a562-60995bbf9991
+uuid: ba9c3003-f5dd-4bad-940b-4982bc072872
 langcode: en
 status: true
 dependencies:
   module:
-    - geo_entity
     - media
     - system
 _core:
@@ -14,5 +13,4 @@ weight: 0
 is_admin: false
 permissions:
   - 'access content'
-  - 'view geo'
   - 'view media'

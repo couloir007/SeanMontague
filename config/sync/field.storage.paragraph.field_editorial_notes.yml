@@ -1,0 +1,21 @@
+uuid: 201e46e4-2ad7-4ebc-8c8e-54a947dff7e5
+langcode: en
+status: true
+dependencies:
+  module:
+    - paragraphs
+    - text
+_core:
+  default_config_hash: lOxOi6LEGQDD9opfpjzR5drR493ZN76EhRYh7-L9LmM
+id: paragraph.field_editorial_notes
+field_name: field_editorial_notes
+entity_type: paragraph
+type: text_long
+settings: {  }
+module: text
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

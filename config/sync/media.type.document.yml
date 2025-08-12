@@ -1,0 +1,14 @@
+uuid: 316173d9-c6c7-482e-b284-7ad333944ed6
+langcode: en
+status: true
+dependencies: {  }
+id: document
+label: 'Data Download'
+description: 'All or part of a <a href="https://schema.org/Dataset">Dataset</a> in downloadable form.'
+source: file
+queue_thumbnail_downloads: false
+new_revision: false
+source_configuration:
+  source_field: field_media_file
+field_map:
+  name: name

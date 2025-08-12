@@ -27,11 +27,11 @@ use Drupal\user\EntityOwnerTrait;
  *   ),
  *   bundle_label = @Translation("SI Map type"),
  *   handlers = {
- *     "list_builder" = "Drupal\geo_content_builder\SIMapListBuilder",
+ *     "list_builder" = "Drupal\geo_content_builder\GeoContentListBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
- *       "add" = "Drupal\geo_content_builder\Form\SIMapForm",
- *       "edit" = "Drupal\geo_content_builder\Form\SIMapForm",
+ *       "add" = "Drupal\Core\Entity\ContentEntityForm",
+ *       "edit" = "Drupal\Core\Entity\ContentEntityForm",
  *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm",
  *       "delete-multiple-confirm" = "Drupal\Core\Entity\Form\DeleteMultipleForm",
  *     },

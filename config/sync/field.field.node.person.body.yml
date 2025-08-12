@@ -1,0 +1,26 @@
+uuid: 99bfe97d-e653-4998-8994-41f6b1a4b8b5
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.body
+    - filter.format.full_html
+    - node.type.person
+  module:
+    - text
+id: node.person.body
+field_name: body
+entity_type: node
+bundle: person
+label: Description
+description: 'A description of the item.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: false
+  required_summary: false
+  allowed_formats:
+    - full_html
+field_type: text_with_summary

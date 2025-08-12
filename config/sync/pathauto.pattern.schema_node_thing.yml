@@ -1,0 +1,22 @@
+uuid: f7319570-1143-4960-95bc-f0494d259551
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: schema_node_thing
+label: 'Schema.org: Content - Thing'
+type: 'canonical_entities:node'
+pattern: '[node:schemadotorg:base-path]/[node:schemadotorg:alternate-name]'
+selection_criteria:
+  ef677662-87a0-4f8d-9dee-7010a75d123e:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: ef677662-87a0-4f8d-9dee-7010a75d123e
+    context_mapping:
+      node: node
+    bundles:
+      job_posting: job_posting
+selection_logic: and
+weight: -10
+relationships: {  }

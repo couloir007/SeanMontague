@@ -1,0 +1,28 @@
+uuid: c7a840d6-dcd1-4888-9f25-f38afb74cd85
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_image
+    - node.type.place
+id: node.place.schema_image
+field_name: schema_image
+entity_type: node
+bundle: place
+label: Image
+description: 'An image of the item.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'schemadotorg:media'
+  handler_settings:
+    target_type: media
+    schema_types:
+      ImageObject: ImageObject
+    excluded_schema_types: {  }
+    ignore_additional_mappings: false
+    target_bundles:
+      image: image
+field_type: entity_reference

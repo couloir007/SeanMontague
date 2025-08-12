@@ -1,0 +1,88 @@
+uuid: 0f166f29-e29b-4896-934a-99e4c572128e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.web_site.body
+    - field.field.node.web_site.field_editorial
+    - field.field.node.web_site.schema_image
+    - field.field.node.web_site.schema_related_link
+    - field.field.node.web_site.schema_significant_link
+    - node.type.web_site
+  module:
+    - entity_reference_revisions
+    - field_group
+    - link
+    - text
+    - user
+third_party_settings:
+  field_group:
+    group_editorial:
+      children:
+        - field_editorial
+      label: 'Editorial information'
+      parent_name: ''
+      region: content
+      weight: 220
+      format_type: details
+      format_settings: {  }
+id: node.web_site.default
+targetEntityType: node
+bundle: web_site
+mode: default
+content:
+  body:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 18
+    region: content
+  field_editorial:
+    type: entity_reference_revisions_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 201
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 200
+    region: content
+  schema_image:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 10
+    region: content
+  schema_related_link:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 95
+    region: content
+  schema_significant_link:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 94
+    region: content
+hidden: {  }

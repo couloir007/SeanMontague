@@ -1,10 +1,10 @@
-uuid: 10f18197-9155-4a7b-96ac-8864cd5ca822
+uuid: a82a3eb5-3f20-4f1b-a726-e859b23bb8f5
 langcode: en
 status: true
 dependencies: {  }
 id: image
-label: Image
-description: ''
+label: 'Image Object'
+description: 'An image file.'
 source: image
 queue_thumbnail_downloads: false
 new_revision: false

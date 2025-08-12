@@ -1,18 +1,11 @@
-uuid: 682f9b74-39c2-421f-8927-5a9c0ef17a74
+uuid: 7d858767-2567-4254-b0bb-6805be2a3772
 langcode: en
 status: true
-dependencies:
-  module:
-    - menu_ui
-third_party_settings:
-  menu_ui:
-    available_menus:
-      - main
-    parent: 'main:'
+dependencies: {  }
 name: Article
 type: article
-description: null
+description: 'An article, such as a news article or piece of investigative report.'
 help: null
-new_revision: false
+new_revision: true
 preview_mode: 1
-display_submitted: false
+display_submitted: true

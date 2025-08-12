@@ -1,0 +1,9 @@
+entity.geo_content_builder.collection:
+  path: '/admin/content/si-map'
+  defaults:
+    _entity_list: 'geo_content_builder'
+    _title: 'SI Maps'
+  requirements:
+    _permission: 'access content'
+  options:
+    _admin_route: TRUE

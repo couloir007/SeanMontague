@@ -1,0 +1,33 @@
+uuid: de2ba2ac-a022-486d-b28a-6e7c7be68a4b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.web_site.body
+    - field.field.node.web_site.schema_image
+    - field.field.node.web_site.schema_related_link
+    - field.field.node.web_site.schema_significant_link
+    - node.type.web_site
+  module:
+    - node
+id: node.web_site
+target_entity_type_id: node
+target_bundle: web_site
+schema_type: WebSite
+schema_properties:
+  created: dateCreated
+  changed: dateModified
+  langcode: inLanguage
+  title: name
+  body: text
+additional_mappings:
+  WebPage:
+    schema_type: WebPage
+    schema_properties:
+      created: dateCreated
+      changed: dateModified
+      langcode: inLanguage
+      title: name
+      schema_image: primaryImageOfPage
+      schema_related_link: relatedLink
+      schema_significant_link: significantLink

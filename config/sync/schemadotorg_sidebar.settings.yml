@@ -1,0 +1,7 @@
+_core:
+  default_config_hash: F3Ki6IHRktNWFi3fMehng_Se5Pbl0LKjGLDVwTcoERE
+paragraph_types:
+  editorial:
+    schema_types:
+      - Thing
+    view_format_type: details

@@ -1,0 +1,16 @@
+uuid: 760f403b-e148-4c20-9690-a778422270a1
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: dDFuejK8ylAwgzvX_dSWHCyx6flktO_seAVsETG3vn0
+id: image_styles_edit
+label: 'Image Styles Edit'
+type: paths
+dialog_group: administrative
+dialog_type: modal
+dialog_width: '550'
+dialog_title_override: ''
+selection_criteria:
+  paths:
+    - '/admin/config/media/image-styles/manage/*/effects/*'

@@ -1,0 +1,13 @@
+uuid: 96674113-bc5d-4323-98b6-bfaa0af91f9c
+langcode: en
+status: true
+dependencies: {  }
+id: schema_sub_organization
+label: 'Schema.org: Sub organization ↔ Parent organization'
+enabled: true
+first_field: schema_sub_organization
+second_field: schema_parent_organization
+add_direction: append
+bundles:
+  node:
+    - '*'

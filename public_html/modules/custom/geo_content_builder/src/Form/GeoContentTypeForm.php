@@ -7,6 +7,7 @@ namespace Drupal\geo_content_builder\Form;
 use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\geo_content_builder\Entity\GeoContentType;
 
 /**
  * Form handler for si map type forms.

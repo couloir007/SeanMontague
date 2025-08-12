@@ -1,3 +1,5 @@
-name: ''
-fg_color: '#ffffff'
-bg_color: '#006110'
+_core:
+  default_config_hash: NHfIRkSKOwsyxrm4wDt7erXse_pO4hAY38uuEitBeMk
+name: Demo
+fg_color: '#d80029'
+bg_color: '#d80029'

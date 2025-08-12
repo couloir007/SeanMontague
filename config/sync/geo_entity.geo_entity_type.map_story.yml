@@ -1,9 +1,0 @@
-uuid: 24fb4726-f496-4829-ba1b-75190ebc85d0
-langcode: en
-status: true
-dependencies: {  }
-_core:
-  default_config_hash: eYZY_ILp-X0lusbD6FxQVR8gBLkiM0-MteaKQ2oTPpo
-id: map_story
-label: 'Map Story'
-label_token: ''

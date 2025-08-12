@@ -1,6 +1,7 @@
 _core:
-  default_config_hash: qGL_KP2Zot4eAZeXlSi0qo1IxYTBvbGSrTfBpJ8I4SE
+  default_config_hash: dtNPOgg8ju5y_s49ZBj8gEqyoRWTuk_AWfcNicS84nA
 tabs: true
 path: false
+descriptions_show: false
 enabled_filters:
   permissions: true

@@ -1,0 +1,48 @@
+uuid: 4d1e322b-175a-47c7-9dba-294dd0d2cc9c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_subject_of
+    - node.type.article
+    - node.type.event
+    - node.type.job_posting
+    - node.type.organization
+    - node.type.page
+    - node.type.person
+    - node.type.place
+    - node.type.web_site
+  module:
+    - epp
+third_party_settings:
+  epp:
+    value: 'target_id: [current-page:query:subject_of]'
+id: node.job_posting.schema_subject_of
+field_name: schema_subject_of
+entity_type: node
+bundle: job_posting
+label: 'Subject of'
+description: 'A CreativeWork or Event about this Thing.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'schemadotorg:node'
+  handler_settings:
+    target_type: node
+    schema_types:
+      CreativeWork: CreativeWork
+      Event: Event
+    excluded_schema_types: {  }
+    ignore_additional_mappings: false
+    target_bundles:
+      article: article
+      event: event
+      job_posting: job_posting
+      organization: organization
+      page: page
+      person: person
+      place: place
+      web_site: web_site
+field_type: entity_reference

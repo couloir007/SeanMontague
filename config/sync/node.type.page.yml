@@ -1,18 +1,11 @@
-uuid: c133a62a-901f-45d8-8572-9dbb4824c566
+uuid: ff19cc57-1710-4f65-891d-06a4c7db5d8f
 langcode: en
 status: true
-dependencies:
-  module:
-    - menu_ui
-third_party_settings:
-  menu_ui:
-    available_menus:
-      - main
-    parent: 'main:'
+dependencies: {  }
 name: Page
 type: page
-description: null
+description: 'A web page.'
 help: null
-new_revision: false
-preview_mode: 0
-display_submitted: false
+new_revision: true
+preview_mode: 1
+display_submitted: true

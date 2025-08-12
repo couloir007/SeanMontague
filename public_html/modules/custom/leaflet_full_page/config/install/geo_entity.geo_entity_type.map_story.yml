@@ -1,6 +1,0 @@
-langcode: en
-status: true
-dependencies: {}
-id: map_story
-label: 'Map Story'
-label_token: ''

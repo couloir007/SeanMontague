@@ -1,0 +1,11 @@
+uuid: fc936ef5-a510-4b00-8123-87e388121c31
+langcode: en
+status: true
+dependencies: {  }
+name: 'Web Site'
+type: web_site
+description: 'A WebSite is a set of related web pages and other items typically served from a single web domain and accessible via URLs.'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: true

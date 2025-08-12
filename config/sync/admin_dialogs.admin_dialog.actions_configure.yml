@@ -1,0 +1,16 @@
+uuid: d867756d-d91f-4aa2-97a3-8f7c7b11d74f
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: 7GsA-dHgdoGybRIuG60vD-DIet2xHcIsxAzWCugBZoY
+id: actions_configure
+label: 'Actions Configure'
+type: paths
+dialog_group: administrative
+dialog_type: modal
+dialog_width: '550'
+dialog_title_override: ''
+selection_criteria:
+  paths:
+    - '/admin/config/system/actions/configure/*'

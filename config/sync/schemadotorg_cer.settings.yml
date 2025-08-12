@@ -1,0 +1,24 @@
+_core:
+  default_config_hash: 6fw-yx1VMrbUAu2gb9DHP1prG0TFjecvVwYgNx6FtkE
+default_schema_properties:
+  subOrganization: parentOrganization
+  parentOrganization: subOrganization
+  subEvent: superEvent
+  superEvent: subEvent
+  memberOf: member
+  member: memberOf
+  subjectOf: about
+  about: subjectOf
+  containedInPlace: containsPlace
+  containsPlace: containedInPlace
+  worksFor: employee
+  employee: worksFor
+  department: parentOrganization
+  offeredBy: makesOffer
+  makesOffer: offeredBy
+  performerIn: performer
+  performer: performerIn
+  healthCondition: study
+  relatedDrug: relatedDrug
+  isPartOf: hasPart
+  hasPart: isPartOf

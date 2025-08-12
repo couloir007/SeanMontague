@@ -1,0 +1,36 @@
+uuid: 89a8c5bd-9403-4eb9-acc6-f9d03000576e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.article.body
+    - field.field.node.article.schema_article_type
+    - field.field.node.article.schema_image
+    - field.field.node.article.schema_related_link
+    - field.field.node.article.schema_significant_link
+    - node.type.article
+  module:
+    - node
+id: node.article
+target_entity_type_id: node
+target_bundle: article
+schema_type: Article
+schema_properties:
+  schema_article_type: additionalType
+  body: articleBody
+  created: dateCreated
+  changed: dateModified
+  title: headline
+  schema_image: image
+  langcode: inLanguage
+additional_mappings:
+  WebPage:
+    schema_type: WebPage
+    schema_properties:
+      created: dateCreated
+      changed: dateModified
+      langcode: inLanguage
+      title: name
+      schema_image: primaryImageOfPage
+      schema_related_link: relatedLink
+      schema_significant_link: significantLink

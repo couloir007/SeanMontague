@@ -1,0 +1,21 @@
+uuid: a713b4bc-897f-4ced-8f18-47739c561afb
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_organization_type
+    - node.type.organization
+  module:
+    - options
+id: node.organization.schema_organization_type
+field_name: schema_organization_type
+entity_type: node
+bundle: organization
+label: Type
+description: 'An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

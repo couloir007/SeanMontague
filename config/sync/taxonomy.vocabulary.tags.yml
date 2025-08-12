@@ -1,0 +1,9 @@
+uuid: b13eab33-4468-409c-af42-2139c30d82fa
+langcode: en
+status: true
+dependencies: {  }
+name: 'Defined Term'
+vid: tags
+description: 'A word, name, acronym, phrase, etc. with a formal definition.'
+weight: 0
+new_revision: false

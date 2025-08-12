@@ -1,0 +1,20 @@
+uuid: 5125bf61-ea46-45a4-922a-f8266071fbf4
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.media.audio.field_media_audio_file
+    - media.type.audio
+  module:
+    - media
+id: media.audio
+target_entity_type_id: media
+target_bundle: audio
+schema_type: AudioObject
+schema_properties:
+  field_media_audio_file: contentUrl
+  created: dateCreated
+  changed: dateModified
+  langcode: inLanguage
+  name: name
+additional_mappings: {  }

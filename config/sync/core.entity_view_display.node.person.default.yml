@@ -1,0 +1,190 @@
+uuid: 41ec05af-0c4c-4630-871c-20bea74f35f2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.person.body
+    - field.field.node.person.field_editorial
+    - field.field.node.person.schema_additional_name
+    - field.field.node.person.schema_contact_point
+    - field.field.node.person.schema_email
+    - field.field.node.person.schema_family_name
+    - field.field.node.person.schema_given_name
+    - field.field.node.person.schema_image
+    - field.field.node.person.schema_knows_language
+    - field.field.node.person.schema_member_of
+    - field.field.node.person.schema_related_link
+    - field.field.node.person.schema_same_as
+    - field.field.node.person.schema_significant_link
+    - field.field.node.person.schema_subject_of
+    - field.field.node.person.schema_telephone
+    - field.field.node.person.schema_works_for
+    - node.type.person
+  module:
+    - custom_field
+    - entity_reference_revisions
+    - field_group
+    - link
+    - text
+    - user
+third_party_settings:
+  field_group:
+    group_editorial:
+      children:
+        - field_editorial
+      label: 'Editorial information'
+      parent_name: ''
+      region: content
+      weight: 220
+      format_type: details
+      format_settings: {  }
+id: node.person.default
+targetEntityType: node
+bundle: person
+mode: default
+content:
+  body:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 17
+    region: content
+  field_editorial:
+    type: entity_reference_revisions_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 201
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -100
+    region: content
+  schema_additional_name:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 110
+    region: content
+  schema_contact_point:
+    type: custom_formatter
+    label: above
+    settings:
+      fields: {  }
+    third_party_settings: {  }
+    weight: 155
+    region: content
+  schema_email:
+    type: email_mailto
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 25
+    region: content
+  schema_family_name:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 110
+    region: content
+  schema_given_name:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 110
+    region: content
+  schema_image:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 8
+    region: content
+  schema_knows_language:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 115
+    region: content
+  schema_member_of:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 115
+    region: content
+  schema_related_link:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 95
+    region: content
+  schema_same_as:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 146
+    region: content
+  schema_significant_link:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 94
+    region: content
+  schema_subject_of:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 165
+    region: content
+  schema_telephone:
+    type: basic_string
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 24
+    region: content
+  schema_works_for:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 115
+    region: content
+hidden: {  }

@@ -1,13 +1,13 @@
-uuid: 684767ab-3ec6-4e0e-92bd-be7e9ece441d
+uuid: b4993cea-3886-4057-911b-6da576f300e6
 langcode: en
 status: true
 dependencies:
   config:
     - field.field.media.image.field_media_image
-    - image.style.4_3
+    - image.style.large
     - media.type.image
   module:
-    - svg_image
+    - image
 id: media.image.default
 targetEntityType: media
 bundle: image
@@ -18,13 +18,9 @@ content:
     label: visually_hidden
     settings:
       image_link: ''
-      image_style: '4_3'
+      image_style: large
       image_loading:
         attribute: lazy
-      svg_attributes:
-        width: null
-        height: null
-      svg_render_as_image: true
     third_party_settings: {  }
     weight: 0
     region: content

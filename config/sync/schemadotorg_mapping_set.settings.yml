@@ -1,0 +1,78 @@
+_core:
+  default_config_hash: A4ZC3KY5guRjMaFQ5IXgWq5hGDi4A5JGknEewrjNgrc
+sets:
+  required:
+    label: Required
+    types:
+      - 'media:AudioObject'
+      - 'media:DataDownload'
+      - 'media:ImageObject'
+      - 'media:VideoObject'
+      - 'taxonomy_term:DefinedTerm'
+      - 'node:Person'
+  common:
+    label: Common
+    types:
+      - 'node:Place'
+      - 'node:Organization'
+      - 'node:Person'
+      - 'node:Event'
+      - 'node:Article'
+      - 'node:WebPage'
+  web_site:
+    label: 'Web site'
+    types:
+      - 'node:WebPage'
+      - 'node:WebSite'
+  media:
+    label: Media
+    types:
+      - 'node:MediaGallery'
+      - 'node:ImageGallery'
+      - 'node:VideoGallery'
+  howto:
+    label: 'How to'
+    types:
+      - 'paragraph:HowToSupply'
+      - 'paragraph:HowToTool'
+      - 'paragraph:HowToDirection'
+      - 'paragraph:HowToTip'
+      - 'paragraph:HowToStep'
+      - 'paragraph:HowToSection'
+      - 'node:HowTo'
+  food_establishment:
+    label: 'Food establishment'
+    types:
+      - 'paragraph:MenuItem'
+      - 'paragraph:MenuSection'
+      - 'node:Menu'
+      - 'node:Recipe'
+      - 'node:FoodEstablishment'
+  course:
+    label: Course
+    types:
+      - 'paragraph:Schedule'
+      - 'node:CourseInstance'
+      - 'node:Course'
+  education_organization:
+    label: 'Education organization'
+    types:
+      - 'node:CourseInstance'
+      - 'node:Course'
+      - 'node:EducationalOrganization'
+  local_business:
+    label: 'Local business'
+    types:
+      - 'paragraph:ServiceChannel'
+      - 'node:Service'
+      - 'node:JobPosting'
+      - 'node:LocalBusiness'
+  hotel:
+    label: Hotel
+    types:
+      - 'paragraph:BedDetails'
+      - 'paragraph:ContactPoint'
+      - 'node:Person'
+      - 'node:Organization'
+      - 'node:HotelRoom'
+      - 'node:Hotel'

@@ -1,0 +1,17 @@
+uuid: f4ced0ad-63de-42de-8d03-7bc91d08f4d2
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: 0bzEHbrgNRmHw-eAe-wvnHAI7z-u3J6Iq9V1Xv6wZms
+name: dashboard_overview
+label: 'Dashboard: Overview'
+triggers:
+  login: login
+roles: {  }
+pages_type: 0
+pages: ''
+language: ''
+enabled: true
+destination_path: 'internal:/admin/dashboard'
+weight: 0

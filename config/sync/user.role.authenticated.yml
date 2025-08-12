@@ -1,13 +1,8 @@
-uuid: 5c96060d-13fc-4cdb-9a95-74599b3efcf5
+uuid: 68b03ac0-fc31-49a9-98e6-8bdce70a1ef7
 langcode: en
 status: true
 dependencies:
-  config:
-    - filter.format.full_html
-    - filter.format.webform_default
   module:
-    - filter
-    - geo_entity
     - media
     - system
 _core:
@@ -18,7 +13,4 @@ weight: 1
 is_admin: false
 permissions:
   - 'access content'
-  - 'use text format full_html'
-  - 'use text format webform_default'
-  - 'view geo'
   - 'view media'

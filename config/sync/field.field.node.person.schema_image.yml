@@ -1,0 +1,28 @@
+uuid: ca5645bb-27f9-46ae-8df6-64d4fcc7946c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_image
+    - node.type.person
+id: node.person.schema_image
+field_name: schema_image
+entity_type: node
+bundle: person
+label: Image
+description: 'An image of the item.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'schemadotorg:media'
+  handler_settings:
+    target_type: media
+    schema_types:
+      ImageObject: ImageObject
+    excluded_schema_types: {  }
+    ignore_additional_mappings: false
+    target_bundles:
+      image: image
+field_type: entity_reference

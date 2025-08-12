@@ -1,0 +1,21 @@
+uuid: 7ea97808-871f-4b1a-845e-a184d84799e1
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_article_type
+    - node.type.article
+  module:
+    - options
+id: node.article.schema_article_type
+field_name: schema_article_type
+entity_type: node
+bundle: article
+label: Type
+description: 'An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

@@ -1,0 +1,36 @@
+_core:
+  default_config_hash: gIbo64Eyag5-zaZIXoO1DIJ5fcoeLO-FY88bGd5PG3c
+patterns:
+  node--Thing: '[node:schemadotorg:base-path]/[node:schemadotorg:alternate-name]'
+base_paths:
+  Recipe: recipes
+  Restaurants: restaurants
+  Physician: doctors
+  DietarySupplement: supplements
+  Drug: drugs
+  Room: rooms
+  Hotel: hotels
+  PodcastEpisode: podcasts
+  PodcastSeries: podcasts
+  HealthTopicContent: topics
+  ResearchOrganization: research
+  EducationalOrganization: education
+  LocalBusiness: businesses
+  MedicalOrganization: medical/organization
+  MedicalBusiness: medical/business
+  MedicalCondition: medical/conditions
+  MedicalCause: medical/causes
+  MedicalGuideline: medical/guidelines
+  MedicalStudy: medical/studies
+  MedicalTest: medical/tests
+  MedicalEntity: medical
+  WebPage: pages
+  Article: articles
+  BlogPosting: blog
+  Blog: blogs
+  Organization: organizations
+  MediaObject: media
+  Event: events
+  Patient: patients
+  Person: profiles
+  Place: locations
