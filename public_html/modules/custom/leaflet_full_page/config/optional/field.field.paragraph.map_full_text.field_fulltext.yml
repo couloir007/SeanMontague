@@ -1,0 +1,26 @@
+uuid: b34a91ea-4524-400d-814a-141215e7ab13
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_fulltext
+    - filter.format.full_html
+    - filter.format.plain_text
+    - paragraphs.paragraphs_type.map_full_text
+  module:
+    - text
+id: paragraph.map_full_text.field_fulltext
+field_name: field_fulltext
+entity_type: paragraph
+bundle: map_full_text
+label: FullText
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - full_html
+    - plain_text
+field_type: text_long

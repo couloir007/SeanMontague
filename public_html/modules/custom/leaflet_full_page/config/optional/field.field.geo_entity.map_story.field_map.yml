@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.field_map
+    - geo_entity.geo_entity_type.map_story
+    - taxonomy.vocabulary.mapping
+id: geo_entity.map_story.field_map
+field_name: field_map
+entity_type: geo_entity
+bundle: map_story
+label: Map
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      mapping: mapping
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.field_body
+    - filter.format.full_html
+    - geo_entity.geo_entity_type.map_story
+  module:
+    - text
+id: geo_entity.map_story.field_body
+field_name: field_body
+entity_type: geo_entity
+bundle: map_story
+label: Body
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - full_html
+field_type: text_long

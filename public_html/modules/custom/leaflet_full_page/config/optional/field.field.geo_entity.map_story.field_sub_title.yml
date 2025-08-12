@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.field_sub_title
+    - geo_entity.geo_entity_type.map_story
+id: geo_entity.map_story.field_sub_title
+field_name: field_sub_title
+entity_type: geo_entity
+bundle: map_story
+label: Sub-Title
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string
