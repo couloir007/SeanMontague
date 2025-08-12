@@ -1,4 +1,4 @@
-uuid: d7cedda5-3623-4ac4-a566-af5256523705
+uuid: 56237921-51b1-4d5a-91c6-7ca690224410
 langcode: en
 status: true
 dependencies:
@@ -24,13 +24,13 @@ configuration:
       - xml
     supported_auth:
       - cookie
-  DELETE:
+  PATCH:
     supported_formats:
       - json
       - xml
     supported_auth:
       - cookie
-  PATCH:
+  DELETE:
     supported_formats:
       - json
       - xml

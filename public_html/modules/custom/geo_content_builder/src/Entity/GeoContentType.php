@@ -7,25 +7,25 @@ namespace Drupal\geo_content_builder\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 
 /**
- * Defines the SI Map type configuration entity.
+ * Defines the Geo Content type configuration entity.
  *
  * @ConfigEntityType(
  *   id = "geo_content_builder_type",
- *   label = @Translation("SI Map type"),
- *   label_collection = @Translation("SI Map types"),
- *   label_singular = @Translation("si map type"),
- *   label_plural = @Translation("si maps types"),
+ *   label = @Translation("Geo Content type"),
+ *   label_collection = @Translation("Geo Content types"),
+ *   label_singular = @Translation("geo content type"),
+ *   label_plural = @Translation("geo content types"),
  *   label_count = @PluralTranslation(
- *     singular = "@count si maps type",
- *     plural = "@count si maps types",
+ *     singular = "@count geo content type",
+ *     plural = "@count geo content types",
  *   ),
  *   handlers = {
  *     "form" = {
- *       "add" = "Drupal\geo_content_builder\Form\SIMapTypeForm",
- *       "edit" = "Drupal\geo_content_builder\Form\SIMapTypeForm",
+ *       "add" = "Drupal\geo_content_builder\Form\GeoContentTypeForm",
+ *       "edit" = "Drupal\geo_content_builder\Form\GeoContentTypeForm",
  *       "delete" = "Drupal\Core\Entity\EntityDeleteForm",
  *     },
- *     "list_builder" = "Drupal\geo_content_builder\SIMapTypeListBuilder",
+ *     "list_builder" = "Drupal\geo_content_builder\GeoContentTypeListBuilder",
  *     "route_provider" = {
  *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *     },
@@ -51,7 +51,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   },
  * )
  */
-final class SIMapType extends ConfigEntityBundleBase {
+final class GeoContentType extends ConfigEntityBundleBase {
 
   /**
    * The machine name of this si map type.

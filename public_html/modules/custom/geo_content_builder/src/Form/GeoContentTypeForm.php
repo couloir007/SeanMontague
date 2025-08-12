@@ -7,12 +7,11 @@ namespace Drupal\geo_content_builder\Form;
 use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\geo_content_builder\Entity\SIMapType;
 
 /**
  * Form handler for si map type forms.
  */
-final class SIMapTypeForm extends BundleEntityFormBase {
+final class GeoContentTypeForm extends BundleEntityFormBase {
 
   /**
    * {@inheritdoc}
@@ -37,7 +36,7 @@ final class SIMapTypeForm extends BundleEntityFormBase {
       '#default_value' => $this->entity->id(),
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
       '#machine_name' => [
-        'exists' => [SIMapType::class, 'load'],
+        'exists' => [GeoContentType::class, 'load'],
         'source' => ['label'],
       ],
       '#description' => $this->t('A unique machine-readable name for this si map type. It must only contain lowercase letters, numbers, and underscores.'),

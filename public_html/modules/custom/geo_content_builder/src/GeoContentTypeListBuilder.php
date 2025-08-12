@@ -11,9 +11,9 @@ use Drupal\Core\Url;
 /**
  * Defines a class to build a listing of si map type entities.
  *
- * @see \Drupal\geo_content_builder\Entity\SIMapType
+ * @see \Drupal\geo_content_builder\Entity\GeoContentType
  */
-final class SIMapTypeListBuilder extends ConfigEntityListBuilder {
+final class GeoContentTypeListBuilder extends ConfigEntityListBuilder {
 
   /**
    * {@inheritdoc}

@@ -1,10 +1,11 @@
-uuid: 60080a74-96f7-428f-9cc8-d262b0d33e66
+uuid: 4c357402-3f48-4040-b7ed-9449f4ad9012
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.geo_entity.field_map
     - geo_entity.geo_entity_type.map_story
+    - taxonomy.vocabulary.mapping
 _core:
   default_config_hash: x3UsAlX9ygzQtfbc0xFSBhX20viAO2WRaQU8nwZS0VY
 id: geo_entity.map_story.field_map
@@ -20,7 +21,8 @@ default_value_callback: ''
 settings:
   handler: 'default:taxonomy_term'
   handler_settings:
-    target_bundles: {  }
+    target_bundles:
+      mapping: mapping
     sort:
       field: name
       direction: asc

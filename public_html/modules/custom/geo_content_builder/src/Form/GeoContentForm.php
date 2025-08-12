@@ -1,16 +1,59 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Drupal\geo_content_builder\Form;
 
-use Drupal\Core\Entity\ContentEntityForm;
+use Drupal\Core\Entity\BundleEntityFormBase;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\geo_content_builder\Entity\GeoContentType;
 
 /**
- * Form controller for the si map entity edit forms.
+ * Form handler for geo content type forms.
  */
-final class SIMapForm extends ContentEntityForm {
+final class GeoContentTypeForm extends BundleEntityFormBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function form(array $form, FormStateInterface $form_state): array {
+    $form = parent::form($form, $form_state);
+
+    if ($this->operation === 'edit') {
+      $form['#title'] = $this->t('Edit %label geo content type', ['%label' => $this->entity->label()]);
+    }
+
+    $form['label'] = [
+      '#title' => $this->t('Label'),
+      '#type' => 'textfield',
+      '#default_value' => $this->entity->label(),
+      '#description' => $this->t('The human-readable name of this geo content type.'),
+      '#required' => TRUE,
+    ];
+
+    $form['id'] = [
+      '#type' => 'machine_name',
+      '#default_value' => $this->entity->id(),
+      '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
+      '#machine_name' => [
+        'exists' => [GeoContentType::class, 'load'],
+        'source' => ['label'],
+      ],
+      '#description' => $this->t('A unique machine-readable name for this geo content type. It must only contain lowercase letters, numbers, and underscores.'),
+    ];
+
+    return $this->protectBundleIdElement($form);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function actions(array $form, FormStateInterface $form_state): array {
+    $actions = parent::actions($form, $form_state);
+    $actions['submit']['#value'] = $this->t('Save geo content type');
+    $actions['delete']['#value'] = $this->t('Delete geo content type');
+    return $actions;
+  }
 
   /**
    * {@inheritdoc}
@@ -18,28 +61,14 @@ final class SIMapForm extends ContentEntityForm {
   public function save(array $form, FormStateInterface $form_state): int {
     $result = parent::save($form, $form_state);
 
-    $message_args = ['%label' => $this->entity->toLink()->toString()];
-    $logger_args = [
-      '%label' => $this->entity->label(),
-      'link' => $this->entity->toLink($this->t('View'))->toString(),
-    ];
-
-    switch ($result) {
-      case SAVED_NEW:
-        $this->messenger()->addStatus($this->t('New si map %label has been created.', $message_args));
-        $this->logger('geo_content_builder')->notice('New si map %label has been created.', $logger_args);
-        break;
-
-      case SAVED_UPDATED:
-        $this->messenger()->addStatus($this->t('The si map %label has been updated.', $message_args));
-        $this->logger('geo_content_builder')->notice('The si map %label has been updated.', $logger_args);
-        break;
-
-      default:
-        throw new \LogicException('Could not save the entity.');
-    }
-
-    $form_state->setRedirectUrl($this->entity->toUrl());
+    $message_args = ['%label' => $this->entity->label()];
+    $this->messenger()->addStatus(
+      match($result) {
+        SAVED_NEW => $this->t('The geo content type %label has been added.', $message_args),
+        SAVED_UPDATED => $this->t('The geo content type %label has been updated.', $message_args),
+      }
+    );
+    $form_state->setRedirectUrl($this->entity->toUrl('collection'));
 
     return $result;
   }

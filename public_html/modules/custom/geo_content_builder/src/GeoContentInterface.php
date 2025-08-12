@@ -11,6 +11,6 @@ use Drupal\user\EntityOwnerInterface;
 /**
  * Provides an interface defining a si map entity type.
  */
-interface SIMapInterface extends ContentEntityInterface, EntityOwnerInterface, EntityChangedInterface {
+interface GeoContentInterface extends ContentEntityInterface, EntityOwnerInterface, EntityChangedInterface {
 
 }

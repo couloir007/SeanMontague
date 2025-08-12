@@ -1,9 +1,0 @@
-administer si_mapping types:
-  title: 'Administer si mapping types'
-  description: 'Maintain the types of si mapping entity.'
-  restrict access: true
-
-administer si_mapping_si_mapping_item types:
-  title: 'Administer si mapping item types'
-  description: 'Maintain the types of si mapping item entity.'
-  restrict access: true

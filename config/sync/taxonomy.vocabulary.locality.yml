@@ -1,9 +1,0 @@
-uuid: 0d3f812f-6be2-4be3-a88a-5f5f42a12bf6
-langcode: en
-status: true
-dependencies: {  }
-name: Locality
-vid: locality
-description: null
-weight: 0
-new_revision: false

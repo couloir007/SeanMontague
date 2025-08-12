@@ -1,9 +1,0 @@
-uuid: 285ad8de-fee7-42fd-a3d4-e9463f4f9886
-langcode: en
-status: true
-dependencies: {  }
-name: 'Volcano Type'
-vid: volcano_type
-description: null
-weight: 0
-new_revision: false

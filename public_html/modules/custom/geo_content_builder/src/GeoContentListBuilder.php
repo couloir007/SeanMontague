@@ -10,7 +10,7 @@ use Drupal\Core\Entity\EntityListBuilder;
 /**
  * Provides a list controller for the si map entity type.
  */
-final class SIMapListBuilder extends EntityListBuilder {
+final class GeoContentListBuilder extends EntityListBuilder {
 
   /**
    * {@inheritdoc}

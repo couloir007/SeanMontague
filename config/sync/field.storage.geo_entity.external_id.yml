@@ -1,4 +1,4 @@
-uuid: 8a39f6ef-fe23-421e-842d-0737a53cf658
+uuid: c61aa720-f395-4e39-bd3d-75c82792fa50
 langcode: en
 status: true
 dependencies:
@@ -12,8 +12,8 @@ entity_type: geo_entity
 type: string
 settings:
   max_length: 255
-  case_sensitive: false
   is_ascii: false
+  case_sensitive: false
 module: core
 locked: false
 cardinality: 1

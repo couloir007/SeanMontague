@@ -9,7 +9,7 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\geo_content_builder\SIMapInterface;
+use Drupal\geo_content_builder\GeoContentInterface;
 use Drupal\user\EntityOwnerTrait;
 
 /**
@@ -66,7 +66,7 @@ use Drupal\user\EntityOwnerTrait;
  *   common_reference_target  = TRUE,
  * )
  */
-final class SIMap extends ContentEntityBase implements SIMapInterface {
+final class GeoContent extends ContentEntityBase implements GeoContentInterface {
 
   use EntityChangedTrait;
   use EntityOwnerTrait;
