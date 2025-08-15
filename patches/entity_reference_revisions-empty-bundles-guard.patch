@@ -1,0 +1,33 @@
+Subject: [PATCH] entity_reference_revisions: Guard against empty bundles in
+ generateSampleValue() to avoid PHP 8+ ValueError from array_rand()
+
+Problem
+-------
+In some configurations (e.g., during Devel Generate or Schema.org starterkit
+content generation), there may be no referenceable bundles for an
+entity_reference_revisions field. The method
+EntityReferenceRevisionsItem::generateSampleValue() called array_rand($bundles)
+without ensuring $bundles was non-empty, causing a PHP 8+ ValueError:
+  ValueError: array_rand(): Argument #1 ($array) cannot be empty
+
+Fix
+---
+Add a minimal guard that returns NULL when $bundles is empty before calling
+array_rand(). This makes sample value generation skip gracefully.
+
+--- a/public_html/modules/contrib/entity_reference_revisions/src/Plugin/Field/FieldType/EntityReferenceRevisionsItem.php
++++ b/public_html/modules/contrib/entity_reference_revisions/src/Plugin/Field/FieldType/EntityReferenceRevisionsItem.php
+@@ -485,6 +485,13 @@
+     else {
+       $bundles = $bundle_manager->getBundleInfo($target_type_id);
+     }
++
++    // In some configurations, there may be no referenceable bundles. Avoid
++    // calling array_rand() on an empty array (PHP 8+ ValueError).
++    if (empty($bundles)) {
++      return NULL;
++    }
++
+     $bundle = array_rand($bundles);
+
+     $label = NULL;
