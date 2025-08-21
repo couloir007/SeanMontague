@@ -1,10 +1,10 @@
-uuid: 6b8689d7-1521-4287-9a4b-4440749a47b6
+uuid: 5dbda4ac-54a2-498b-b3b6-1a2c28b23969
 langcode: en
 status: true
 dependencies: {  }
 id: audio
 label: 'Audio Object'
-description: 'An audio file.'
+description: ''
 source: audio_file
 queue_thumbnail_downloads: false
 new_revision: false

@@ -1,3 +1,14 @@
 _core:
   default_config_hash: c-knKQdQwnCtY9cwzSHofxLIkpZdYUGi13uCGVEFCHc
+categories:
+  people: People
+  page: Page
+  content: Content
+  organization: Organization
+  education: Education
+  place: Place
+  food: Food
+  media: Media
+  medical_organization: 'Medical organization'
+  medical_information: 'Medical information'
 fallback_label: Uncategorized

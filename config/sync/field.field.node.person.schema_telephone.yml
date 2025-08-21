@@ -1,4 +1,4 @@
-uuid: 1f1dfcef-98b0-4582-af11-a75dff9c139c
+uuid: b13846a8-a3ee-465f-b287-eaf08d0c8ea8
 langcode: en
 status: true
 dependencies:
@@ -12,9 +12,9 @@ field_name: schema_telephone
 entity_type: node
 bundle: person
 label: Telephone
-description: 'The telephone number.'
+description: ''
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings: {  }

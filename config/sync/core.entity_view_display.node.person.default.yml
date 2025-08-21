@@ -1,12 +1,12 @@
-uuid: 41ec05af-0c4c-4630-871c-20bea74f35f2
+uuid: e92fd267-01af-416f-953e-5cc524ec3a52
 langcode: en
 status: true
 dependencies:
   config:
     - field.field.node.person.body
     - field.field.node.person.field_editorial
+    - field.field.node.person.field_metatag
     - field.field.node.person.schema_additional_name
-    - field.field.node.person.schema_contact_point
     - field.field.node.person.schema_email
     - field.field.node.person.schema_family_name
     - field.field.node.person.schema_given_name
@@ -21,7 +21,6 @@ dependencies:
     - field.field.node.person.schema_works_for
     - node.type.person
   module:
-    - custom_field
     - entity_reference_revisions
     - field_group
     - link
@@ -29,6 +28,61 @@ dependencies:
     - user
 third_party_settings:
   field_group:
+    group_general:
+      children:
+        - schema_additional_name
+        - schema_family_name
+        - schema_given_name
+        - schema_image
+        - schema_knows_language
+        - body
+        - title
+      label: General
+      parent_name: ''
+      region: content
+      weight: -20
+      format_type: fieldset
+      format_settings: {  }
+    group_contact:
+      children:
+        - schema_email
+        - schema_telephone
+      label: Contact
+      parent_name: ''
+      region: content
+      weight: -18
+      format_type: fieldset
+      format_settings: {  }
+    group_organization:
+      children:
+        - schema_member_of
+        - schema_works_for
+      label: Organization
+      parent_name: ''
+      region: content
+      weight: -13
+      format_type: fieldset
+      format_settings: {  }
+    group_links:
+      children:
+        - schema_same_as
+        - schema_related_link
+        - schema_significant_link
+      label: Links
+      parent_name: ''
+      region: content
+      weight: 20
+      format_type: fieldset
+      format_settings: {  }
+    group_references:
+      children:
+        - schema_subject_of
+      label: References
+      parent_name: ''
+      region: content
+      weight: 22
+      format_type: fieldset
+      format_settings: {  }
     group_editorial:
       children:
         - field_editorial
@@ -48,7 +102,7 @@ content:
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 17
+    weight: 18
     region: content
   field_editorial:
     type: entity_reference_revisions_entity_view
@@ -57,7 +111,7 @@ content:
       view_mode: default
       link: ''
     third_party_settings: {  }
-    weight: 201
+    weight: 24
     region: content
   links:
     settings: {  }
@@ -70,22 +124,14 @@ content:
     settings:
       link_to_entity: false
     third_party_settings: {  }
-    weight: 110
-    region: content
-  schema_contact_point:
-    type: custom_formatter
-    label: above
-    settings:
-      fields: {  }
-    third_party_settings: {  }
-    weight: 155
+    weight: 10
     region: content
   schema_email:
     type: email_mailto
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 25
+    weight: 6
     region: content
   schema_family_name:
     type: string
@@ -93,7 +139,7 @@ content:
     settings:
       link_to_entity: false
     third_party_settings: {  }
-    weight: 110
+    weight: 11
     region: content
   schema_given_name:
     type: string
@@ -101,7 +147,7 @@ content:
     settings:
       link_to_entity: false
     third_party_settings: {  }
-    weight: 110
+    weight: 9
     region: content
   schema_image:
     type: entity_reference_entity_view
@@ -110,7 +156,7 @@ content:
       view_mode: default
       link: false
     third_party_settings: {  }
-    weight: 8
+    weight: 23
     region: content
   schema_knows_language:
     type: string
@@ -118,15 +164,15 @@ content:
     settings:
       link_to_entity: false
     third_party_settings: {  }
-    weight: 115
+    weight: 16
     region: content
   schema_member_of:
-    type: string
+    type: entity_reference_label
     label: above
     settings:
-      link_to_entity: false
+      link: true
     third_party_settings: {  }
-    weight: 115
+    weight: 2
     region: content
   schema_related_link:
     type: link
@@ -138,7 +184,7 @@ content:
       rel: ''
       target: ''
     third_party_settings: {  }
-    weight: 95
+    weight: 0
     region: content
   schema_same_as:
     type: link
@@ -150,7 +196,7 @@ content:
       rel: ''
       target: ''
     third_party_settings: {  }
-    weight: 146
+    weight: 3
     region: content
   schema_significant_link:
     type: link
@@ -162,7 +208,7 @@ content:
       rel: ''
       target: ''
     third_party_settings: {  }
-    weight: 94
+    weight: 1
     region: content
   schema_subject_of:
     type: entity_reference_label
@@ -170,21 +216,23 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 165
+    weight: 1
     region: content
   schema_telephone:
     type: basic_string
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 24
+    weight: 4
     region: content
   schema_works_for:
-    type: string
+    type: entity_reference_label
     label: above
     settings:
-      link_to_entity: false
+      link: true
     third_party_settings: {  }
-    weight: 115
+    weight: 7
     region: content
-hidden: {  }
+hidden:
+  field_metatag: true
+  langcode: true

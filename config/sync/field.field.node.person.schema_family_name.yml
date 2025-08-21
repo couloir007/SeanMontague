@@ -1,4 +1,4 @@
-uuid: f11ca461-9c5b-4853-83be-c49cf83091c4
+uuid: bb14fbad-572d-45ae-a10f-711c5f1ea2d2
 langcode: en
 status: true
 dependencies:
@@ -10,7 +10,7 @@ field_name: schema_family_name
 entity_type: node
 bundle: person
 label: 'Last name'
-description: 'Family name.'
+description: ''
 required: true
 translatable: true
 default_value: {  }

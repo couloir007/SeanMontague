@@ -1,4 +1,4 @@
-uuid: 4655d6ff-86e7-41a6-af15-823da623cf2d
+uuid: 9c1bd388-c10e-4be0-b4e7-f9a44ac64c72
 langcode: en
 status: true
 dependencies:
@@ -10,9 +10,9 @@ field_name: schema_longitude
 entity_type: node
 bundle: place
 label: Longitude
-description: 'The longitude of a location.'
+description: ''
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:

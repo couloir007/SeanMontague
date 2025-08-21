@@ -1,4 +1,4 @@
-uuid: f7319570-1143-4960-95bc-f0494d259551
+uuid: 4f66ca51-372f-4144-9fad-3f16d343268f
 langcode: en
 status: true
 dependencies:
@@ -9,14 +9,20 @@ label: 'Schema.org: Content - Thing'
 type: 'canonical_entities:node'
 pattern: '[node:schemadotorg:base-path]/[node:schemadotorg:alternate-name]'
 selection_criteria:
-  ef677662-87a0-4f8d-9dee-7010a75d123e:
+  4221e271-4016-47bd-9347-843b615fd98a:
     id: 'entity_bundle:node'
     negate: false
-    uuid: ef677662-87a0-4f8d-9dee-7010a75d123e
+    uuid: 4221e271-4016-47bd-9347-843b615fd98a
     context_mapping:
       node: node
     bundles:
-      job_posting: job_posting
+      article: article
+      event: event
+      organization: organization
+      page: page
+      person: person
+      place: place
+      web_site: web_site
 selection_logic: and
 weight: -10
 relationships: {  }

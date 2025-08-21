@@ -1,4 +1,4 @@
-uuid: c23b2238-bf4c-4c7d-a889-98204f8b8e59
+uuid: ba2e7eb7-e79d-4de2-a5c0-733ac6507fe7
 langcode: en
 status: true
 dependencies:
@@ -13,7 +13,7 @@ field_name: body
 entity_type: node
 bundle: page
 label: Text
-description: 'The textual content of this CreativeWork.'
+description: ''
 required: false
 translatable: true
 default_value: {  }

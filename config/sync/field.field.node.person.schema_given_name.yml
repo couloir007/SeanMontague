@@ -1,4 +1,4 @@
-uuid: bd6e3f0e-89b5-4b7f-87de-e9ffa64e4822
+uuid: aa23b7cf-a94b-4682-86a0-54d70759b260
 langcode: en
 status: true
 dependencies:
@@ -10,7 +10,7 @@ field_name: schema_given_name
 entity_type: node
 bundle: person
 label: 'First name'
-description: 'Given name.'
+description: ''
 required: true
 translatable: true
 default_value: {  }

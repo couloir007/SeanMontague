@@ -1,4 +1,4 @@
-uuid: 2053beaf-cd92-4116-a96c-f8d1aeeeb099
+uuid: c42a33e5-de0f-43be-932a-b90eb7f0ec29
 langcode: en
 status: true
 dependencies:
@@ -15,7 +15,7 @@ bundle: place
 label: 'Editorial information'
 description: ''
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:

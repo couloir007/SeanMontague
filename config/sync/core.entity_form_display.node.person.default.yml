@@ -1,12 +1,12 @@
-uuid: f4b4da9c-1a14-4c12-a7da-d8f86c4bbab0
+uuid: f3514a63-fc52-437b-a5fa-b116d77bcd72
 langcode: en
 status: true
 dependencies:
   config:
     - field.field.node.person.body
     - field.field.node.person.field_editorial
+    - field.field.node.person.field_metatag
     - field.field.node.person.schema_additional_name
-    - field.field.node.person.schema_contact_point
     - field.field.node.person.schema_email
     - field.field.node.person.schema_family_name
     - field.field.node.person.schema_given_name
@@ -22,15 +22,80 @@ dependencies:
     - node.type.person
   module:
     - allowed_formats
-    - custom_field
     - field_group
     - inline_entity_form
     - link
+    - metatag
     - path
     - telephone
     - text
 third_party_settings:
   field_group:
+    group_general:
+      children:
+        - schema_additional_name
+        - schema_family_name
+        - schema_given_name
+        - schema_image
+        - schema_knows_language
+        - body
+        - title
+      label: General
+      region: content
+      parent_name: ''
+      weight: -20
+      format_type: details
+      format_settings:
+        open: true
+        description: ''
+    group_contact:
+      children:
+        - schema_email
+        - schema_telephone
+      label: Contact
+      region: content
+      parent_name: ''
+      weight: -18
+      format_type: details
+      format_settings:
+        open: true
+        description: ''
+    group_organization:
+      children:
+        - schema_member_of
+        - schema_works_for
+      label: Organization
+      region: content
+      parent_name: ''
+      weight: -13
+      format_type: details
+      format_settings:
+        open: true
+        description: ''
+    group_links:
+      children:
+        - schema_same_as
+        - schema_related_link
+        - schema_significant_link
+      label: Links
+      region: content
+      parent_name: ''
+      weight: 20
+      format_type: details
+      format_settings:
+        open: true
+        description: ''
+    group_references:
+      children:
+        - schema_subject_of
+      label: References
+      region: content
+      parent_name: ''
+      weight: 22
+      format_type: details
+      format_settings:
+        open: true
+        description: ''
     group_editorial:
       children:
         - field_editorial
@@ -48,7 +113,7 @@ mode: default
 content:
   body:
     type: text_textarea_with_summary
-    weight: 17
+    weight: 18
     region: content
     settings:
       rows: 9
@@ -78,6 +143,21 @@ content:
       collapsed: false
       revision: false
     third_party_settings: {  }
+  field_metatag:
+    type: metatag_firehose
+    weight: 99
+    region: content
+    settings:
+      sidebar: true
+      use_details: true
+    third_party_settings: {  }
+  langcode:
+    type: language_select
+    weight: 200
+    region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
   path:
     type: path
     weight: 220
@@ -93,24 +173,15 @@ content:
     third_party_settings: {  }
   schema_additional_name:
     type: string_textfield
-    weight: 110
+    weight: 10
     region: content
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-  schema_contact_point:
-    type: custom_stacked
-    weight: 155
-    region: content
-    settings:
-      label: true
-      wrapper: fieldset
-      open: true
-    third_party_settings: {  }
   schema_email:
     type: email_default
-    weight: 25
+    weight: 6
     region: content
     settings:
       placeholder: ''
@@ -118,7 +189,7 @@ content:
     third_party_settings: {  }
   schema_family_name:
     type: string_textfield
-    weight: 110
+    weight: 11
     region: content
     settings:
       size: 60
@@ -126,7 +197,7 @@ content:
     third_party_settings: {  }
   schema_given_name:
     type: string_textfield
-    weight: 110
+    weight: 9
     region: content
     settings:
       size: 60
@@ -134,7 +205,7 @@ content:
     third_party_settings: {  }
   schema_image:
     type: entity_reference_autocomplete
-    weight: 8
+    weight: 23
     region: content
     settings:
       match_operator: CONTAINS
@@ -144,23 +215,25 @@ content:
     third_party_settings: {  }
   schema_knows_language:
     type: string_textfield
-    weight: 115
+    weight: 16
     region: content
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
   schema_member_of:
-    type: string_textfield
-    weight: 115
+    type: entity_reference_autocomplete
+    weight: 2
     region: content
     settings:
+      match_operator: CONTAINS
+      match_limit: 10
       size: 60
       placeholder: ''
     third_party_settings: {  }
   schema_related_link:
     type: link_default
-    weight: 95
+    weight: 0
     region: content
     settings:
       placeholder_url: ''
@@ -168,7 +241,7 @@ content:
     third_party_settings: {  }
   schema_same_as:
     type: link_default
-    weight: 146
+    weight: 3
     region: content
     settings:
       placeholder_url: ''
@@ -176,7 +249,7 @@ content:
     third_party_settings: {  }
   schema_significant_link:
     type: link_default
-    weight: 94
+    weight: 1
     region: content
     settings:
       placeholder_url: ''
@@ -184,7 +257,7 @@ content:
     third_party_settings: {  }
   schema_subject_of:
     type: entity_reference_autocomplete
-    weight: 165
+    weight: 1
     region: content
     settings:
       match_operator: CONTAINS
@@ -194,16 +267,18 @@ content:
     third_party_settings: {  }
   schema_telephone:
     type: telephone_default
-    weight: 24
+    weight: 4
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   schema_works_for:
-    type: string_textfield
-    weight: 115
+    type: entity_reference_autocomplete
+    weight: 7
     region: content
     settings:
+      match_operator: CONTAINS
+      match_limit: 10
       size: 60
       placeholder: ''
     third_party_settings: {  }
@@ -223,7 +298,7 @@ content:
     third_party_settings: {  }
   title:
     type: string_textfield
-    weight: -5
+    weight: 1
     region: content
     settings:
       size: 60

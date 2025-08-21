@@ -1,4 +1,4 @@
-uuid: 9bb73751-17d4-43db-ae15-37d46fa48791
+uuid: b21dfe9a-089a-41f4-85b4-dc7d6347cbc6
 langcode: en
 status: true
 dependencies:
@@ -10,9 +10,9 @@ field_name: schema_email
 entity_type: node
 bundle: person
 label: Email
-description: 'Email address.'
+description: ''
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings: {  }

@@ -1,4 +1,4 @@
-uuid: 526bd05a-221d-446a-975e-d873f89d5d42
+uuid: d09cb974-7035-4382-bac1-3feaa171e10a
 langcode: en
 status: true
 dependencies:
@@ -15,9 +15,9 @@ field_name: schema_sub_organization
 entity_type: node
 bundle: organization
 label: 'Sub organization'
-description: 'A relationship between two organizations where the first includes the second, e.g., as a subsidiary.'
+description: ''
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:

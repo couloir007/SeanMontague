@@ -54,6 +54,22 @@ sets:
       - 'paragraph:Schedule'
       - 'node:CourseInstance'
       - 'node:Course'
+  movie:
+    label: Movie
+    types:
+      - 'node:Movie'
+  podcast:
+    label: Podcast
+    types:
+      - 'node:PodcastEpisode'
+      - 'node:PodcastSeason'
+      - 'node:PodcastSeries'
+  tv:
+    label: TV
+    types:
+      - 'node:TVEpisode'
+      - 'node:TVSeason'
+      - 'node:TVSeries'
   education_organization:
     label: 'Education organization'
     types:
@@ -76,3 +92,33 @@ sets:
       - 'node:Organization'
       - 'node:HotelRoom'
       - 'node:Hotel'
+  medical_doctor:
+    label: 'Medical doctor'
+    types:
+      - 'node:Physician'
+  medical_research:
+    label: 'Medical research'
+    types:
+      - 'node:ResearchOrganization'
+      - 'node:ResearchProject'
+  medical_organization:
+    label: 'Medical organization'
+    types:
+      - 'node:MedicalTest'
+      - 'node:Hospital'
+      - 'node:MedicalBusiness'
+      - 'node:MedicalClinic'
+      - 'node:DiagnosticLab'
+  medical_content:
+    label: 'Medical content'
+    types:
+      - 'node:MedicalWebPage'
+      - 'node:HealthTopicContent'
+  medical_information:
+    label: 'Medical information'
+    types:
+      - 'node:Drug'
+      - 'node:DietarySupplement'
+      - 'node:MedicalStudy'
+      - 'node:MedicalTrial'
+      - 'node:MedicalCondition'

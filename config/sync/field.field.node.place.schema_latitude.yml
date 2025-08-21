@@ -1,4 +1,4 @@
-uuid: a1668c11-0fe0-4702-a18e-c13ec7b575d8
+uuid: 441affb2-fac0-4b9d-a6e4-98ad851242ab
 langcode: en
 status: true
 dependencies:
@@ -10,9 +10,9 @@ field_name: schema_latitude
 entity_type: node
 bundle: place
 label: Latitude
-description: 'The latitude of a location.'
+description: ''
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:

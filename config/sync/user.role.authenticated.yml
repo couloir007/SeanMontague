@@ -1,8 +1,12 @@
-uuid: 68b03ac0-fc31-49a9-98e6-8bdce70a1ef7
+uuid: 97271157-6724-4bce-bbc5-010e00ba885c
 langcode: en
 status: true
 dependencies:
+  config:
+    - filter.format.basic_html
+    - filter.format.full_html
   module:
+    - filter
     - media
     - system
 _core:
@@ -13,4 +17,6 @@ weight: 1
 is_admin: false
 permissions:
   - 'access content'
+  - 'use text format basic_html'
+  - 'use text format full_html'
   - 'view media'

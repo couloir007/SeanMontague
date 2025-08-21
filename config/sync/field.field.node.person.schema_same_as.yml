@@ -1,4 +1,4 @@
-uuid: ea510fbb-da9c-4952-b8ac-2913f38c7f6b
+uuid: be8db3e5-be83-4747-9bab-fb93c18db760
 langcode: en
 status: true
 dependencies:
@@ -12,7 +12,7 @@ field_name: schema_same_as
 entity_type: node
 bundle: person
 label: 'Same as'
-description: "URL of a reference Web page that unambiguously indicates the item's identity."
+description: ''
 required: false
 translatable: true
 default_value: {  }

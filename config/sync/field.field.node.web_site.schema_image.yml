@@ -1,18 +1,24 @@
-uuid: 0af8b96c-f1f4-41bf-8f18-89740de7866c
+uuid: 584fd59a-2337-49d4-be12-1ab47d4c1675
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.node.schema_image
+    - media.type.image
     - node.type.web_site
+  module:
+    - epp
+third_party_settings:
+  epp:
+    value: 'target_id: [current-page:query:primary_image_of_page]'
 id: node.web_site.schema_image
 field_name: schema_image
 entity_type: node
 bundle: web_site
 label: Image
-description: 'Indicates the main image on the page.'
+description: ''
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:

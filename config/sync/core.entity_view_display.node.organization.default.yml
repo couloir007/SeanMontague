@@ -1,13 +1,12 @@
-uuid: a699a1f4-d4d3-421f-9a92-099196827c18
+uuid: b5d9b71d-2911-4281-ac06-ce91e495f59b
 langcode: en
 status: true
 dependencies:
   config:
     - field.field.node.organization.body
     - field.field.node.organization.field_editorial
-    - field.field.node.organization.schema_contact_point
+    - field.field.node.organization.field_metatag
     - field.field.node.organization.schema_image
-    - field.field.node.organization.schema_member
     - field.field.node.organization.schema_organization_type
     - field.field.node.organization.schema_parent_organization
     - field.field.node.organization.schema_related_link
@@ -16,8 +15,6 @@ dependencies:
     - field.field.node.organization.schema_subject_of
     - node.type.organization
   module:
-    - custom_field
-    - entity_reference_override
     - entity_reference_revisions
     - field_group
     - link
@@ -26,6 +23,37 @@ dependencies:
     - user
 third_party_settings:
   field_group:
+    group_general:
+      children:
+        - schema_organization_type
+        - schema_image
+        - body
+        - title
+      label: General
+      parent_name: ''
+      region: content
+      weight: -20
+      format_type: fieldset
+      format_settings: {  }
+    group_organization:
+      children:
+        - schema_parent_organization
+        - schema_sub_organization
+      label: Organization
+      parent_name: ''
+      region: content
+      weight: -13
+      format_type: fieldset
+      format_settings: {  }
+    group_references:
+      children:
+        - schema_subject_of
+      label: References
+      parent_name: ''
+      region: content
+      weight: 22
+      format_type: fieldset
+      format_settings: {  }
     group_editorial:
       children:
         - field_editorial
@@ -34,6 +62,16 @@ third_party_settings:
       region: content
       weight: 220
       format_type: details
+      format_settings: {  }
+    group_links:
+      children:
+        - schema_related_link
+        - schema_significant_link
+      label: Links
+      parent_name: ''
+      region: content
+      weight: 20
+      format_type: fieldset
       format_settings: {  }
 id: node.organization.default
 targetEntityType: node
@@ -45,7 +83,7 @@ content:
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 17
+    weight: 18
     region: content
   field_editorial:
     type: entity_reference_revisions_entity_view
@@ -54,20 +92,12 @@ content:
       view_mode: default
       link: ''
     third_party_settings: {  }
-    weight: 201
+    weight: 24
     region: content
   links:
     settings: {  }
     third_party_settings: {  }
     weight: -100
-    region: content
-  schema_contact_point:
-    type: custom_formatter
-    label: above
-    settings:
-      fields: {  }
-    third_party_settings: {  }
-    weight: 155
     region: content
   schema_image:
     type: entity_reference_entity_view
@@ -76,23 +106,14 @@ content:
       view_mode: default
       link: false
     third_party_settings: {  }
-    weight: 8
-    region: content
-  schema_member:
-    type: entity_reference_override_label
-    label: above
-    settings:
-      link: true
-      override_action: suffix
-    third_party_settings: {  }
-    weight: 73
+    weight: 23
     region: content
   schema_organization_type:
     type: list_default
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 1
+    weight: 0
     region: content
   schema_parent_organization:
     type: entity_reference_label
@@ -100,7 +121,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 165
+    weight: 0
     region: content
   schema_related_link:
     type: link
@@ -112,7 +133,7 @@ content:
       rel: ''
       target: ''
     third_party_settings: {  }
-    weight: 95
+    weight: 0
     region: content
   schema_significant_link:
     type: link
@@ -124,7 +145,7 @@ content:
       rel: ''
       target: ''
     third_party_settings: {  }
-    weight: 94
+    weight: 1
     region: content
   schema_sub_organization:
     type: entity_reference_label
@@ -132,7 +153,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 165
+    weight: 1
     region: content
   schema_subject_of:
     type: entity_reference_label
@@ -140,6 +161,8 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 165
+    weight: 1
     region: content
-hidden: {  }
+hidden:
+  field_metatag: true
+  langcode: true

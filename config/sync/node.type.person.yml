@@ -1,11 +1,16 @@
-uuid: 45c00aca-46b3-4e37-ad11-33ab266a456d
+uuid: db740cff-1efe-4142-ba4c-214903940f33
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  module:
+    - type_tray
+third_party_settings:
+  type_tray:
+    existing_nodes_link_text: 'View existing <em class="placeholder">Person</em> content'
 name: Person
 type: person
-description: 'A person (alive, dead, undead, or fictional).'
+description: null
 help: null
 new_revision: true
 preview_mode: 1
-display_submitted: true
+display_submitted: false

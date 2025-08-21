@@ -1,4 +1,4 @@
-uuid: 97490afc-51de-4ae2-b744-7e7c897fb578
+uuid: 419666fe-ee14-4581-b3ac-71dff6096a78
 langcode: en
 status: true
 dependencies:
@@ -12,9 +12,9 @@ field_name: schema_event_type
 entity_type: node
 bundle: event
 label: Type
-description: 'An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax.'
+description: ''
 required: true
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings: {  }

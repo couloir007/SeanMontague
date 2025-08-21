@@ -1,18 +1,23 @@
-uuid: 9ec4afc1-36be-4857-ac0c-9e6159a93af0
+uuid: 7627b314-4ec6-4c48-9014-6595c185fe3a
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.node.schema_image
     - node.type.organization
+  module:
+    - epp
+third_party_settings:
+  epp:
+    value: 'target_id: [current-page:query:image]'
 id: node.organization.schema_image
 field_name: schema_image
 entity_type: node
 bundle: organization
 label: Image
-description: 'An image of the item.'
+description: ''
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:

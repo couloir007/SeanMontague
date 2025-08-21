@@ -1,0 +1,7 @@
+status: 1
+pattern: '[node:schema_given_name:value] [node:schema_family_name:value]'
+escape: false
+preserve_titles: false
+dependencies:
+  config:
+    - node.type.person

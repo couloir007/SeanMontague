@@ -1,19 +1,33 @@
-uuid: b0c9cc86-2201-4455-a393-01bb2b00f352
+uuid: dd265d24-f7af-445c-9e1f-96f17f5d8645
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.node.schema_address
     - node.type.place
+  module:
+    - address
 id: node.place.schema_address
 field_name: schema_address
 entity_type: node
 bundle: place
 label: Address
-description: 'Physical address of the item.'
+description: ''
 required: false
 translatable: true
 default_value: {  }
 default_value_callback: ''
-settings: {  }
-field_type: string_long
+settings:
+  available_countries: {  }
+  langcode_override: null
+  field_overrides:
+    givenName:
+      override: optional
+    additionalName:
+      override: optional
+    familyName:
+      override: optional
+    organization:
+      override: optional
+  fields: {  }
+field_type: address

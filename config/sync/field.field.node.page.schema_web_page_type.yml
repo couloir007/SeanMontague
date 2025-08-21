@@ -1,4 +1,4 @@
-uuid: ea476929-7160-402d-aca3-28ef25a41eb6
+uuid: fcc9ba19-2958-4fb9-acdc-3486bea0b474
 langcode: en
 status: true
 dependencies:
@@ -12,9 +12,9 @@ field_name: schema_web_page_type
 entity_type: node
 bundle: page
 label: Type
-description: 'An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax.'
+description: ''
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings: {  }

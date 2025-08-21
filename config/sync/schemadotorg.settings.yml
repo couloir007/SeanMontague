@@ -293,11 +293,9 @@ schema_types:
       - text
     Event:
       - description
-      - duration
-      - endDate
+      - eventSchedule
       - inLanguage
       - name
-      - startDate
     CourseInstance:
       - courseMode
       - courseSchedule
@@ -710,6 +708,7 @@ schema_types:
       - list_string
       - 'field_ui:entity_reference:taxonomy_term'
     PostalAddress:
+      - address
       - string_long
     AudioObject:
       - 'field_ui:entity_reference:media'
@@ -1189,8 +1188,8 @@ schema_properties:
     cookTime:
       granularity: 'h:i'
     courseMode:
-      label: 'Course modes'
       type: string
+      label: 'Course modes'
       unlimited: true
     coursePrerequisites:
       type: string
@@ -1243,7 +1242,7 @@ schema_properties:
     estimatedFlightDuration:
       granularity: 'h:i'
     eventSchedule:
-      type: daterange
+      type: smartdate
       unlimited: true
     exceptDate:
       label: 'Except dates'
@@ -1455,8 +1454,8 @@ schema_properties:
     prepTime:
       granularity: 'h:i'
     primaryImageOfPage:
-      label: Image
       name: image
+      label: Image
     primaryPrevention:
       label: 'Primary preventions'
       unlimited: true
@@ -1494,8 +1493,8 @@ schema_properties:
       label: Ingredients
       unlimited: true
     recipeInstructions:
-      label: Instructions
       type: string_long
+      label: Instructions
       unlimited: true
     recipeYield:
       label: Yield

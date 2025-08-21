@@ -1,4 +1,4 @@
-uuid: 34e61c99-4f16-4ec5-b272-5e9065bc7dce
+uuid: b1dd8a16-0c65-4f74-8903-eeae0a65129c
 langcode: en
 status: true
 dependencies:
@@ -10,6 +10,7 @@ dependencies:
     - field.field.node.place.schema_longitude
     - field.field.node.place.schema_related_link
     - field.field.node.place.schema_significant_link
+    - field.field.node.place.schema_subject_of
     - field.field.node.place.schema_telephone
     - node.type.place
   module:
@@ -25,6 +26,7 @@ schema_properties:
   schema_latitude: latitude
   schema_longitude: longitude
   title: name
+  schema_subject_of: subjectOf
   schema_telephone: telephone
 additional_mappings:
   WebPage:

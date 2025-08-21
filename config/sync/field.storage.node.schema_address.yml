@@ -1,16 +1,16 @@
-uuid: b130a41d-a326-43aa-98e0-0bc2e2cb774c
+uuid: 3951c64f-aeac-4d74-bbf3-4bf0a0f97918
 langcode: en
 status: true
 dependencies:
   module:
+    - address
     - node
 id: node.schema_address
 field_name: schema_address
 entity_type: node
-type: string_long
-settings:
-  case_sensitive: false
-module: core
+type: address
+settings: {  }
+module: address
 locked: false
 cardinality: 1
 translatable: true

@@ -1,4 +1,4 @@
-uuid: 721f8a64-fd08-4977-8d33-42a57de2ded6
+uuid: 5bf381f4-23a4-4b41-9bf7-adb580386dd8
 langcode: en
 status: true
 dependencies:
@@ -12,9 +12,9 @@ field_name: schema_telephone
 entity_type: node
 bundle: place
 label: Telephone
-description: 'The telephone number.'
+description: ''
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings: {  }

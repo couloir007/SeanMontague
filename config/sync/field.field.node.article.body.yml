@@ -1,4 +1,4 @@
-uuid: 7f7de218-373f-436b-bebe-05182180c5af
+uuid: ed61532f-7ffe-4379-96b6-b078d35fdffc
 langcode: en
 status: true
 dependencies:
@@ -13,7 +13,7 @@ field_name: body
 entity_type: node
 bundle: article
 label: 'Article body'
-description: 'The actual body of the article.'
+description: ''
 required: false
 translatable: true
 default_value: {  }

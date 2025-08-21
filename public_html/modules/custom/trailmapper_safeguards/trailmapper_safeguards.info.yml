@@ -1,0 +1,7 @@
+name: Trailmapper Safeguards
+type: module
+description: "Project-level safeguards against common data errors (e.g., invalid menu_name on MenuLinkContent)."
+package: Custom
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:menu_link_content

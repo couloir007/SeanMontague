@@ -1,9 +1,9 @@
-uuid: b13eab33-4468-409c-af42-2139c30d82fa
+uuid: cab13662-e15e-4731-9f0c-0bee964a491c
 langcode: en
 status: true
 dependencies: {  }
 name: 'Defined Term'
 vid: tags
-description: 'A word, name, acronym, phrase, etc. with a formal definition.'
+description: null
 weight: 0
 new_revision: false

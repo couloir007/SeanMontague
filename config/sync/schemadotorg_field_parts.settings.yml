@@ -1,0 +1,8 @@
+_core:
+  default_config_hash: MNG97l4AVrxI_JRIdfhB4pUorEf_slcDye2SQh2WskE
+prefix_properties:
+  - WebContent--name
+suffix_properties:
+  - WebContent--name
+prefix_delimiter: ': '
+suffix_delimiter: ' - '

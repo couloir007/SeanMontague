@@ -1,0 +1,355 @@
+<?php
+
+declare(strict_types=1);
+
+use Drupal\menu_link_content\MenuLinkContentInterface;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\node\NodeInterface;
+
+/**
+ * @file
+ * Safeguards for project-specific data integrity issues.
+ */
+
+/**
+ * Implements hook_module_implements_alter().
+ * Ensure our presave runs last to apply final safeguards.
+ */
+function trailmapper_safeguards_module_implements_alter(array &$implementations, string $hook): void {
+  if (in_array($hook, ['menu_link_content_presave', 'node_presave', 'entity_presave'], TRUE)) {
+    if (isset($implementations['trailmapper_safeguards'])) {
+      $our_impl = $implementations['trailmapper_safeguards'];
+      unset($implementations['trailmapper_safeguards']);
+      // Re-append to the end so it runs last for this hook.
+      $implementations['trailmapper_safeguards'] = $our_impl;
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave() for menu_link_content.
+ */
+function trailmapper_safeguards_menu_link_content_presave(MenuLinkContentInterface $menu_link_content): void {
+  // 1) Ensure menu_name is valid and within DB length constraints (varchar(32)).
+  $menu_name = (string) $menu_link_content->get('menu_name')->value;
+
+  // Load available menu IDs.
+  $menu_storage = \Drupal::entityTypeManager()->getStorage('menu');
+  /** @var array<string, \Drupal\system\Entity\Menu> $menus */
+  $menus = $menu_storage->loadMultiple();
+  $available_ids = array_keys($menus);
+
+  $pick_fallback = function () use ($available_ids): ?string {
+    // Prefer 'main' if present, else first available.
+    if (in_array('main', $available_ids, TRUE)) {
+      return 'main';
+    }
+    return $available_ids[0] ?? null;
+  };
+
+  $changed = FALSE;
+
+  // If no menu_name set, set a fallback.
+  if ($menu_name === '') {
+    $fallback = $pick_fallback();
+    if ($fallback !== null) {
+      $menu_link_content->set('menu_name', $fallback);
+      $changed = TRUE;
+    }
+  }
+  else {
+    // Trim to 32 characters to meet storage schema.
+    if (strlen($menu_name) > 32) {
+      $menu_name = substr($menu_name, 0, 32);
+      $changed = TRUE;
+    }
+    // If resulting id is not an existing menu, pick a fallback.
+    if (!in_array($menu_name, $available_ids, TRUE)) {
+      $fallback = $pick_fallback();
+      if ($fallback !== null) {
+        $menu_name = $fallback;
+        $changed = TRUE;
+      }
+    }
+    if ($changed) {
+      $menu_link_content->set('menu_name', $menu_name);
+    }
+  }
+
+  // 2) Ensure 'enabled' is set (not null) to satisfy the NOT NULL constraint.
+  if ($menu_link_content->hasField('enabled')) {
+    $enabled = $menu_link_content->get('enabled')->value;
+    if ($enabled === NULL || $enabled === '') {
+      $menu_link_content->set('enabled', 1);
+    }
+  }
+
+  // 3) Ensure 'title' is non-empty; derive from linked entity when possible.
+  if ($menu_link_content->hasField('title')) {
+    $title = (string) ($menu_link_content->get('title')->value ?? '');
+    if (trim($title) === '') {
+      $derived = NULL;
+      // Try to derive a useful title from the link target if available.
+      if ($menu_link_content->hasField('link') && !$menu_link_content->get('link')->isEmpty()) {
+        $link_item = $menu_link_content->get('link')->first();
+        $value = $link_item ? $link_item->getValue() : [];
+        $uri = isset($value['uri']) ? (string) $value['uri'] : '';
+        if (str_starts_with($uri, 'entity:node/')) {
+          $nid = (int) substr($uri, strlen('entity:node/'));
+          if ($nid > 0) {
+            $node = \Drupal::entityTypeManager()->getStorage('node')->load($nid);
+            if ($node) {
+              $derived = $node->label();
+            }
+          }
+        }
+      }
+      $menu_link_content->set('title', $derived ?: 'Menu link');
+    }
+  }
+
+  // 4) Default weight to 0 if missing (prevents NULL in DB column).
+  if ($menu_link_content->hasField('weight')) {
+    $weight = $menu_link_content->get('weight')->value;
+    if ($weight === NULL || $weight === '') {
+      $menu_link_content->set('weight', 0);
+    }
+  }
+
+  // 5) Ensure language fields are populated to avoid NOT NULL violations.
+  // Set langcode if missing to the current content language, or fall back to the default site language.
+  if ($menu_link_content->hasField('langcode')) {
+    $langcode_value = $menu_link_content->get('langcode')->value ?? '';
+    if ($langcode_value === '' || $langcode_value === NULL) {
+      $langcode = \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
+      if (!$langcode) {
+        $langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
+      }
+      if ($langcode) {
+        $menu_link_content->set('langcode', $langcode);
+      }
+    }
+  }
+
+  // default_langcode is a required boolean on shared tables; ensure it is set.
+  if ($menu_link_content->hasField('default_langcode')) {
+    $default_langcode = $menu_link_content->get('default_langcode')->value;
+    if ($default_langcode === NULL || $default_langcode === '') {
+      $menu_link_content->set('default_langcode', 1);
+    }
+  }
+}
+
+/**
+ * Implements hook_node_presave().
+ * Ensure core fields have safe defaults to avoid NOT NULL violations.
+ */
+function trailmapper_safeguards_node_presave(NodeInterface $node): void {
+  // Enforce published state via API and ensure required base fields are non-null across translations.
+  if (method_exists($node, 'setPublished')) {
+    $node->setPublished(TRUE);
+  }
+
+  $now = time();
+  $untranslated = $node->getUntranslated();
+
+  // Ensure base/default translation has status set.
+  if ($untranslated->hasField('status')) {
+    $base_status = $untranslated->get('status')->value;
+    if ($base_status === NULL || $base_status === '') {
+      $untranslated->set('status', 1);
+    }
+  }
+
+  // Ensure title is present on base/default translation.
+  if ($untranslated->hasField('title')) {
+    $base_title = (string) ($untranslated->get('title')->value ?? '');
+    if (trim($base_title) === '') {
+      $fallback = 'Untitled ' . $node->bundle();
+      $untranslated->set('title', $fallback);
+    }
+  }
+
+  // Ensure created/changed timestamps are set.
+  if ($node->hasField('created')) {
+    $created = $node->get('created')->value;
+    if ($created === NULL || $created === '') {
+      $node->set('created', $now);
+    }
+  }
+  if ($node->hasField('changed')) {
+    $changed = $node->get('changed')->value;
+    if ($changed === NULL || $changed === '') {
+      $node->set('changed', $now);
+    }
+  }
+
+  // Ensure uid/promote/sticky have safe defaults.
+  if ($node->hasField('uid')) {
+    $uid = $node->get('uid')->value;
+    if ($uid === NULL || $uid === '') {
+      $node->set('uid', 0);
+    }
+  }
+  if ($node->hasField('promote')) {
+    $promote = $node->get('promote')->value;
+    if ($promote === NULL || $promote === '') {
+      $node->set('promote', 0);
+    }
+  }
+  if ($node->hasField('sticky')) {
+    $sticky = $node->get('sticky')->value;
+    if ($sticky === NULL || $sticky === '') {
+      $node->set('sticky', 0);
+    }
+  }
+
+  // Ensure langcode/default_langcode are populated on base entity to avoid NOT NULL violations.
+  if ($node->hasField('langcode')) {
+    $langcode_value = $node->get('langcode')->value ?? '';
+    if ($langcode_value === '' || $langcode_value === NULL) {
+      $langcode = \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
+      if (!$langcode) {
+        $langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
+      }
+      if ($langcode) {
+        $node->set('langcode', $langcode);
+      }
+    }
+  }
+  if ($node->hasField('default_langcode')) {
+    $default_langcode_val = $node->get('default_langcode')->value;
+    if ($default_langcode_val === NULL || $default_langcode_val === '') {
+      $node->set('default_langcode', 1);
+    }
+  }
+  if ($node->hasField('revision_translation_affected')) {
+    $rta = $node->get('revision_translation_affected')->value;
+    if ($rta === NULL || $rta === '') {
+      $node->set('revision_translation_affected', 1);
+    }
+  }
+
+  // Ensure all existing translations have non-null status and title.
+  foreach ($node->getTranslationLanguages() as $langcode => $language) {
+    if ($node->hasTranslation($langcode)) {
+      $t = $node->getTranslation($langcode);
+      if ($t->hasField('status')) {
+        $s = $t->get('status')->value;
+        if ($s === NULL || $s === '') {
+          $t->set('status', 1);
+        }
+      }
+      if ($t->hasField('title')) {
+        $ttitle = (string) ($t->get('title')->value ?? '');
+        if (trim($ttitle) === '') {
+          $t->set('title', 'Untitled ' . $node->bundle());
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_presave().
+ * Apply last-resort safeguards for Node entities too.
+ */
+function trailmapper_safeguards_entity_presave(\Drupal\Core\Entity\EntityInterface $entity): void {
+  if ($entity instanceof NodeInterface) {
+    // Mirror the node_presave guarantees.
+    if (method_exists($entity, 'setPublished')) {
+      $entity->setPublished(TRUE);
+    }
+
+    $now = time();
+    $untranslated = $entity->getUntranslated();
+
+    if ($untranslated->hasField('status')) {
+      $base_status = $untranslated->get('status')->value;
+      if ($base_status === NULL || $base_status === '') {
+        $untranslated->set('status', 1);
+      }
+    }
+    if ($untranslated->hasField('title')) {
+      $base_title = (string) ($untranslated->get('title')->value ?? '');
+      if (trim($base_title) === '') {
+        $untranslated->set('title', 'Untitled ' . $entity->bundle());
+      }
+    }
+
+    if ($entity->hasField('created')) {
+      $created = $entity->get('created')->value;
+      if ($created === NULL || $created === '') {
+        $entity->set('created', $now);
+      }
+    }
+    if ($entity->hasField('changed')) {
+      $changed = $entity->get('changed')->value;
+      if ($changed === NULL || $changed === '') {
+        $entity->set('changed', $now);
+      }
+    }
+
+    if ($entity->hasField('uid')) {
+      $uid = $entity->get('uid')->value;
+      if ($uid === NULL || $uid === '') {
+        $entity->set('uid', 0);
+      }
+    }
+    if ($entity->hasField('promote')) {
+      $promote = $entity->get('promote')->value;
+      if ($promote === NULL || $promote === '') {
+        $entity->set('promote', 0);
+      }
+    }
+    if ($entity->hasField('sticky')) {
+      $sticky = $entity->get('sticky')->value;
+      if ($sticky === NULL || $sticky === '') {
+        $entity->set('sticky', 0);
+      }
+    }
+
+    if ($entity->hasField('langcode')) {
+      $langcode_value = $entity->get('langcode')->value ?? '';
+      if ($langcode_value === '' || $langcode_value === NULL) {
+        $langcode = \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
+        if (!$langcode) {
+          $langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
+        }
+        if ($langcode) {
+          $entity->set('langcode', $langcode);
+        }
+      }
+    }
+    if ($entity->hasField('default_langcode')) {
+      $default_langcode_val = $entity->get('default_langcode')->value;
+      if ($default_langcode_val === NULL || $default_langcode_val === '') {
+        $entity->set('default_langcode', 1);
+      }
+    }
+    if ($entity->hasField('revision_translation_affected')) {
+      $rta = $entity->get('revision_translation_affected')->value;
+      if ($rta === NULL || $rta === '') {
+        $entity->set('revision_translation_affected', 1);
+      }
+    }
+
+    foreach ($entity->getTranslationLanguages() as $langcode => $language) {
+      if ($entity->hasTranslation($langcode)) {
+        $t = $entity->getTranslation($langcode);
+        if ($t->hasField('status')) {
+          $s = $t->get('status')->value;
+          if ($s === NULL || $s === '') {
+            $t->set('status', 1);
+          }
+        }
+        if ($t->hasField('title')) {
+          $ttitle = (string) ($t->get('title')->value ?? '');
+          if (trim($ttitle) === '') {
+            $t->set('title', 'Untitled ' . $entity->bundle());
+          }
+        }
+      }
+    }
+  }
+}

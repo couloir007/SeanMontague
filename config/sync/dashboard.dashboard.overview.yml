@@ -1,0 +1,47 @@
+uuid: 993529c3-47d7-48c2-a2f1-8040e7574f9a
+langcode: en
+status: true
+dependencies:
+  config:
+    - views.view.dashboard_content
+  module:
+    - layout_builder
+    - shortcut
+    - views
+id: overview
+label: Overview
+description: ''
+layout:
+  -
+    layout_id: layout_twocol_section
+    layout_settings:
+      label: ''
+      context_mapping: {  }
+      column_widths: 75-25
+    components:
+      776cd0cd-18c2-4ca8-a188-8e3bf8c1604c:
+        uuid: 776cd0cd-18c2-4ca8-a188-8e3bf8c1604c
+        region: first
+        configuration:
+          id: 'views_block:dashboard_content-block_site_content'
+          label: 'Browse Content'
+          label_display: visible
+          provider: views
+          context_mapping: {  }
+          views_label: 'Browse Content'
+          items_per_page: '20'
+        weight: 0
+        additional: {  }
+      588d038b-0f25-4645-8e60-30e4ed1ee104:
+        uuid: 588d038b-0f25-4645-8e60-30e4ed1ee104
+        region: second
+        configuration:
+          id: shortcuts
+          label: Shortcuts
+          label_display: visible
+          provider: shortcut
+          context_mapping: {  }
+        weight: 0
+        additional: {  }
+    third_party_settings: {  }
+weight: 0

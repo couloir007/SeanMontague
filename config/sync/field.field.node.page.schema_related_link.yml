@@ -1,4 +1,4 @@
-uuid: 9448c51e-29c5-4c9a-a219-25999b0673d8
+uuid: db450192-d8b9-4116-acbe-d13b5606aef5
 langcode: en
 status: true
 dependencies:
@@ -12,7 +12,7 @@ field_name: schema_related_link
 entity_type: node
 bundle: page
 label: 'Related links'
-description: 'A link related to this web page, for example to other related web pages.'
+description: ''
 required: false
 translatable: true
 default_value: {  }

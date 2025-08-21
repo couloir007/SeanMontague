@@ -1,10 +1,10 @@
-uuid: d3dd2286-3aa3-4352-abad-36c3a2fb0ed3
+uuid: ed9295e3-d470-4d31-9629-3cbb7e0a5dda
 langcode: en
 status: true
 dependencies: {  }
 id: video
 label: 'Video Object'
-description: 'A video file.'
+description: ''
 source: 'oembed:video'
 queue_thumbnail_downloads: false
 new_revision: false

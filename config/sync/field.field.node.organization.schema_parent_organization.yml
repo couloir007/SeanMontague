@@ -1,4 +1,4 @@
-uuid: f1f6debd-7ffb-4ec2-b5a1-0ffd41c9d021
+uuid: b4f05b99-5c58-44e5-9a4c-1d875b5ad624
 langcode: en
 status: true
 dependencies:
@@ -15,9 +15,9 @@ field_name: schema_parent_organization
 entity_type: node
 bundle: organization
 label: 'Parent organization'
-description: 'The larger organization that this organization is a <a href="https://schema.org/subOrganization">subOrganization</a> of, if any.'
+description: ''
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:

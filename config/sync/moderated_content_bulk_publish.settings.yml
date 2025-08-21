@@ -11,7 +11,7 @@ unpublish:
 archive:
   state:
     archived: archived
-enable_dialog_node_edit_form: false
-enable_dialog_admin_content: true
 disable_toolbar_language_switcher: false
+enable_dialog_node_edit_form: true
+enable_dialog_admin_content: true
 retain_revision_info: false

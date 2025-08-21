@@ -1,4 +1,4 @@
-uuid: 99bfe97d-e653-4998-8994-41f6b1a4b8b5
+uuid: 0270991e-6b92-4578-b2db-d1e1911099b2
 langcode: en
 status: true
 dependencies:
@@ -13,7 +13,7 @@ field_name: body
 entity_type: node
 bundle: person
 label: Description
-description: 'A description of the item.'
+description: ''
 required: false
 translatable: true
 default_value: {  }

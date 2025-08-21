@@ -1,4 +1,4 @@
-uuid: b88df02c-0523-4c4d-b2c3-3c9f8d22c437
+uuid: 5b73dc2f-5d1f-4404-bc05-cfbcb5d1980b
 langcode: en
 status: true
 dependencies:
@@ -6,8 +6,8 @@ dependencies:
     - core.entity_view_mode.node.teaser
     - field.field.node.person.body
     - field.field.node.person.field_editorial
+    - field.field.node.person.field_metatag
     - field.field.node.person.schema_additional_name
-    - field.field.node.person.schema_contact_point
     - field.field.node.person.schema_email
     - field.field.node.person.schema_family_name
     - field.field.node.person.schema_given_name
@@ -53,8 +53,9 @@ content:
     region: content
 hidden:
   field_editorial: true
+  field_metatag: true
+  langcode: true
   schema_additional_name: true
-  schema_contact_point: true
   schema_email: true
   schema_family_name: true
   schema_given_name: true

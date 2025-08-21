@@ -1,11 +1,16 @@
-uuid: fc936ef5-a510-4b00-8123-87e388121c31
+uuid: 36678159-321b-4298-afbc-ace45fd911b0
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  module:
+    - type_tray
+third_party_settings:
+  type_tray:
+    existing_nodes_link_text: 'View existing <em class="placeholder">Web Site</em> content'
 name: 'Web Site'
 type: web_site
-description: 'A WebSite is a set of related web pages and other items typically served from a single web domain and accessible via URLs.'
+description: null
 help: null
 new_revision: true
 preview_mode: 1
-display_submitted: true
+display_submitted: false

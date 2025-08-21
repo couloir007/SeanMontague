@@ -1,24 +1,55 @@
-uuid: cfc48089-4cd1-4144-95c7-f67b8c3b80ba
+uuid: 4caa7a31-3a0e-4825-baaa-f7328e223224
 langcode: en
 status: true
 dependencies:
   config:
     - field.field.node.article.body
     - field.field.node.article.field_editorial
+    - field.field.node.article.field_metatag
+    - field.field.node.article.schema_about
     - field.field.node.article.schema_article_type
+    - field.field.node.article.schema_author
     - field.field.node.article.schema_image
     - field.field.node.article.schema_related_link
     - field.field.node.article.schema_significant_link
+    - field.field.node.article.schema_subject_of
     - node.type.article
   module:
     - allowed_formats
     - field_group
     - inline_entity_form
     - link
+    - metatag
     - path
     - text
 third_party_settings:
   field_group:
+    group_references:
+      children:
+        - schema_about
+        - schema_subject_of
+      label: References
+      region: content
+      parent_name: ''
+      weight: 22
+      format_type: details
+      format_settings:
+        open: true
+        description: ''
+    group_general:
+      children:
+        - schema_article_type
+        - schema_image
+        - body
+        - title
+      label: General
+      region: content
+      parent_name: ''
+      weight: -20
+      format_type: details
+      format_settings:
+        open: true
+        description: ''
     group_editorial:
       children:
         - field_editorial
@@ -29,6 +60,18 @@ third_party_settings:
       format_type: details_sidebar
       format_settings:
         description: 'Track the editorial decisions and status of a document.'
+    group_links:
+      children:
+        - schema_related_link
+        - schema_significant_link
+      label: Links
+      region: content
+      parent_name: ''
+      weight: 20
+      format_type: details
+      format_settings:
+        open: true
+        description: ''
 id: node.article.default
 targetEntityType: node
 bundle: article
@@ -36,7 +79,7 @@ mode: default
 content:
   body:
     type: text_textarea_with_summary
-    weight: 120
+    weight: 19
     region: content
     settings:
       rows: 9
@@ -66,6 +109,21 @@ content:
       collapsed: false
       revision: false
     third_party_settings: {  }
+  field_metatag:
+    type: metatag_firehose
+    weight: 99
+    region: content
+    settings:
+      sidebar: true
+      use_details: true
+    third_party_settings: {  }
+  langcode:
+    type: language_select
+    weight: 200
+    region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
   path:
     type: path
     weight: 220
@@ -79,15 +137,35 @@ content:
     settings:
       display_label: true
     third_party_settings: {  }
+  schema_about:
+    type: entity_reference_autocomplete
+    weight: 0
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   schema_article_type:
     type: options_select
-    weight: 1
+    weight: 0
     region: content
     settings: {  }
     third_party_settings: {  }
+  schema_author:
+    type: entity_reference_autocomplete
+    weight: 222
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   schema_image:
     type: entity_reference_autocomplete
-    weight: 8
+    weight: 23
     region: content
     settings:
       match_operator: CONTAINS
@@ -97,7 +175,7 @@ content:
     third_party_settings: {  }
   schema_related_link:
     type: link_default
-    weight: 95
+    weight: 0
     region: content
     settings:
       placeholder_url: ''
@@ -105,11 +183,26 @@ content:
     third_party_settings: {  }
   schema_significant_link:
     type: link_default
-    weight: 94
+    weight: 1
     region: content
     settings:
       placeholder_url: ''
       placeholder_title: ''
+    third_party_settings: {  }
+  schema_subject_of:
+    type: entity_reference_autocomplete
+    weight: 1
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  simple_sitemap:
+    weight: 220
+    region: content
+    settings: {  }
     third_party_settings: {  }
   status:
     type: boolean_checkbox
@@ -127,11 +220,16 @@ content:
     third_party_settings: {  }
   title:
     type: string_textfield
-    weight: -5
+    weight: 1
     region: content
     settings:
       size: 60
       placeholder: ''
+    third_party_settings: {  }
+  translation:
+    weight: 10
+    region: content
+    settings: {  }
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
@@ -143,4 +241,11 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-hidden: {  }
+  url_redirects:
+    weight: 50
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  publish_on: true
+  unpublish_on: true

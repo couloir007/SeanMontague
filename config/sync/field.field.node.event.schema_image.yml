@@ -1,18 +1,23 @@
-uuid: 53730d82-02f9-48a6-b10f-1bee257903d8
+uuid: 6d90ee48-0fca-4a85-b93e-c61d5cbfe1dd
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.node.schema_image
     - node.type.event
+  module:
+    - epp
+third_party_settings:
+  epp:
+    value: 'target_id: [current-page:query:primary_image_of_page]'
 id: node.event.schema_image
 field_name: schema_image
 entity_type: node
 bundle: event
 label: Image
-description: 'Indicates the main image on the page.'
+description: ''
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:

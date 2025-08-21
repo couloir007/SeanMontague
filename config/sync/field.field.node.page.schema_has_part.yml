@@ -1,0 +1,37 @@
+uuid: f7a1340a-397e-456a-8ecf-1038fde2e824
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_has_part
+    - node.type.article
+    - node.type.page
+    - node.type.web_site
+  module:
+    - epp
+third_party_settings:
+  epp:
+    value: 'target_id: [current-page:query:has_part]'
+id: node.page.schema_has_part
+field_name: schema_has_part
+entity_type: node
+bundle: page
+label: 'Has part'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'schemadotorg:node'
+  handler_settings:
+    target_type: node
+    schema_types:
+      CreativeWork: CreativeWork
+    excluded_schema_types: {  }
+    ignore_additional_mappings: true
+    target_bundles:
+      article: article
+      page: page
+      web_site: web_site
+field_type: entity_reference

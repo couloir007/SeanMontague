@@ -1,4 +1,4 @@
-uuid: 5ae4a00c-9237-4491-af08-24d987d1142c
+uuid: 891ac250-4a2a-4f9c-8204-427c4a307012
 langcode: en
 status: true
 dependencies:
@@ -6,9 +6,12 @@ dependencies:
     - core.entity_view_mode.node.teaser
     - field.field.node.web_site.body
     - field.field.node.web_site.field_editorial
+    - field.field.node.web_site.field_metatag
+    - field.field.node.web_site.schema_about
     - field.field.node.web_site.schema_image
     - field.field.node.web_site.schema_related_link
     - field.field.node.web_site.schema_significant_link
+    - field.field.node.web_site.schema_subject_of
     - node.type.web_site
   module:
     - text
@@ -29,10 +32,14 @@ content:
   links:
     settings: {  }
     third_party_settings: {  }
-    weight: 200
+    weight: -100
     region: content
 hidden:
   field_editorial: true
+  field_metatag: true
+  langcode: true
+  schema_about: true
   schema_image: true
   schema_related_link: true
   schema_significant_link: true
+  schema_subject_of: true

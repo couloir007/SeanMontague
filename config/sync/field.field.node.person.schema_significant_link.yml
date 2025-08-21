@@ -1,4 +1,4 @@
-uuid: 3322d970-4791-408a-9bf9-3c4e8017005f
+uuid: c0510b8f-49c7-46d5-9c83-dfe886f99076
 langcode: en
 status: true
 dependencies:
@@ -12,7 +12,7 @@ field_name: schema_significant_link
 entity_type: node
 bundle: person
 label: 'Significant links'
-description: 'One of the more significant URLs on the page.'
+description: ''
 required: false
 translatable: true
 default_value: {  }

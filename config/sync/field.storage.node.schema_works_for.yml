@@ -1,4 +1,4 @@
-uuid: 4abf7e13-f4a8-468d-8d55-848f44e97b80
+uuid: d3eddad0-b145-4b03-9111-eed03943d383
 langcode: en
 status: true
 dependencies:
@@ -7,11 +7,9 @@ dependencies:
 id: node.schema_works_for
 field_name: schema_works_for
 entity_type: node
-type: string
+type: entity_reference
 settings:
-  max_length: 255
-  case_sensitive: false
-  is_ascii: false
+  target_type: node
 module: core
 locked: false
 cardinality: -1

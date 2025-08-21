@@ -1,12 +1,14 @@
-uuid: de2ba2ac-a022-486d-b28a-6e7c7be68a4b
+uuid: 9248b7b5-fa43-4834-841b-a9b1db0bc3b2
 langcode: en
 status: true
 dependencies:
   config:
     - field.field.node.web_site.body
+    - field.field.node.web_site.schema_about
     - field.field.node.web_site.schema_image
     - field.field.node.web_site.schema_related_link
     - field.field.node.web_site.schema_significant_link
+    - field.field.node.web_site.schema_subject_of
     - node.type.web_site
   module:
     - node
@@ -15,10 +17,12 @@ target_entity_type_id: node
 target_bundle: web_site
 schema_type: WebSite
 schema_properties:
+  schema_about: about
   created: dateCreated
   changed: dateModified
   langcode: inLanguage
   title: name
+  schema_subject_of: subjectOf
   body: text
 additional_mappings:
   WebPage:

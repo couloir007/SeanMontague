@@ -1,4 +1,4 @@
-uuid: d32c1ef6-2d22-42ce-8194-03a23e4186c5
+uuid: 8133f258-0bfa-470e-b202-8387ca61facf
 langcode: en
 status: true
 dependencies:
@@ -6,7 +6,6 @@ dependencies:
     - field.storage.node.schema_subject_of
     - node.type.article
     - node.type.event
-    - node.type.job_posting
     - node.type.organization
     - node.type.page
     - node.type.person
@@ -22,9 +21,9 @@ field_name: schema_subject_of
 entity_type: node
 bundle: person
 label: 'Subject of'
-description: 'A CreativeWork or Event about this Thing.'
+description: ''
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:
@@ -39,7 +38,6 @@ settings:
     target_bundles:
       article: article
       event: event
-      job_posting: job_posting
       organization: organization
       page: page
       person: person

@@ -1,4 +1,4 @@
-uuid: 90f46d72-39e3-4956-8274-7e435a40fa4d
+uuid: e2eda32e-d72e-4401-a109-afc64999eba2
 langcode: en
 status: true
 dependencies:
@@ -15,7 +15,7 @@ bundle: page
 label: 'Editorial information'
 description: ''
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:

@@ -1,12 +1,10 @@
-uuid: 3bf58b38-adcf-40d9-8e00-29c700575b55
+uuid: abf8f3e3-bda0-45ae-b947-2adf5c484bf5
 langcode: en
 status: true
 dependencies:
   config:
     - field.field.node.organization.body
-    - field.field.node.organization.schema_contact_point
     - field.field.node.organization.schema_image
-    - field.field.node.organization.schema_member
     - field.field.node.organization.schema_organization_type
     - field.field.node.organization.schema_parent_organization
     - field.field.node.organization.schema_related_link
@@ -22,10 +20,8 @@ target_bundle: organization
 schema_type: Organization
 schema_properties:
   schema_organization_type: additionalType
-  schema_contact_point: contactPoint
   body: description
   schema_image: image
-  schema_member: member
   title: name
   schema_parent_organization: parentOrganization
   schema_subject_of: subjectOf

@@ -1,11 +1,10 @@
-uuid: 9cfa1e5e-18b8-42c1-b872-5c3383f584dd
+uuid: 3a9f4051-bb3a-4721-acd0-558a66ce556d
 langcode: en
 status: true
 dependencies:
   config:
     - field.field.node.person.body
     - field.field.node.person.schema_additional_name
-    - field.field.node.person.schema_contact_point
     - field.field.node.person.schema_email
     - field.field.node.person.schema_family_name
     - field.field.node.person.schema_given_name
@@ -27,7 +26,6 @@ target_bundle: person
 schema_type: Person
 schema_properties:
   schema_additional_name: additionalName
-  schema_contact_point: contactPoint
   body: description
   schema_email: email
   schema_family_name: familyName

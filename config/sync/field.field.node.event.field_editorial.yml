@@ -1,4 +1,4 @@
-uuid: cfd1c12c-708d-460c-8a5c-453c97e5d5ec
+uuid: bd4b1ac3-af22-4485-873b-86383cafb63e
 langcode: en
 status: true
 dependencies:
@@ -15,7 +15,7 @@ bundle: event
 label: 'Editorial information'
 description: ''
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:

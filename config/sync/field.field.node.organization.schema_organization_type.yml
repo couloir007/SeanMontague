@@ -1,4 +1,4 @@
-uuid: a713b4bc-897f-4ced-8f18-47739c561afb
+uuid: de4a7702-9f90-40f7-9f64-ab3c3a8f98d1
 langcode: en
 status: true
 dependencies:
@@ -12,9 +12,9 @@ field_name: schema_organization_type
 entity_type: node
 bundle: organization
 label: Type
-description: 'An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax.'
+description: ''
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings: {  }

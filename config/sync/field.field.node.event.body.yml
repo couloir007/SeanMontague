@@ -1,4 +1,4 @@
-uuid: d92b8a7a-9b3a-4d5e-96ea-1c25f79f8f4f
+uuid: b26eae8d-75c7-496e-8902-ce93fc2d4cc2
 langcode: en
 status: true
 dependencies:
@@ -13,7 +13,7 @@ field_name: body
 entity_type: node
 bundle: event
 label: Description
-description: 'A description of the item.'
+description: ''
 required: false
 translatable: true
 default_value: {  }

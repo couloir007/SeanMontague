@@ -1,0 +1,8 @@
+uuid: 0b5dda6a-f1f4-4996-93dc-ec93fa6ab0ac
+langcode: en
+status: true
+dependencies: {  }
+name: 'Basic Html'
+format: basic_html
+weight: 0
+filters: {  }
