@@ -1,8 +1,0 @@
-uuid: 077b1dbb-45dc-4312-b503-380ff77b1c06
-langcode: en
-status: true
-dependencies: {  }
-name: 'Full HTML'
-format: full_html
-weight: 0
-filters: {  }

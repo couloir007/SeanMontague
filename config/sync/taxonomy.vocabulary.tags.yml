@@ -1,9 +1,0 @@
-uuid: cab13662-e15e-4731-9f0c-0bee964a491c
-langcode: en
-status: true
-dependencies: {  }
-name: 'Defined Term'
-vid: tags
-description: null
-weight: 0
-new_revision: false

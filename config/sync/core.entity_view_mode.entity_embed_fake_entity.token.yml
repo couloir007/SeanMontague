@@ -1,0 +1,11 @@
+uuid: 5dea0ef4-ec4a-4c16-9c47-8c292192aa35
+langcode: en
+status: true
+dependencies:
+  module:
+    - entity_embed
+id: entity_embed_fake_entity.token
+label: Token
+description: ''
+targetEntityType: entity_embed_fake_entity
+cache: true

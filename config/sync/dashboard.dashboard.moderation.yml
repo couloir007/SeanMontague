@@ -1,9 +1,0 @@
-uuid: a9ec0738-075b-44e4-bdf2-a95625258130
-langcode: en
-status: true
-dependencies: {  }
-id: moderation
-label: Moderation
-description: ''
-layout: {  }
-weight: 1

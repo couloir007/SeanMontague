@@ -1,0 +1,22 @@
+uuid: 12a87771-8952-44d1-b6b5-4c0ffab87d20
+langcode: en
+status: true
+dependencies:
+  theme:
+    - surface
+_core:
+  default_config_hash: T0wbI6qVdThbbIqXDZFg_1VZ3_ittXBdEoUH7d7ux_E
+id: surface_local_tasks
+theme: surface
+region: content
+weight: -20
+provider: null
+plugin: local_tasks_block
+settings:
+  id: local_tasks_block
+  label: Tabs
+  label_display: '0'
+  provider: core
+  primary: true
+  secondary: true
+visibility: {  }

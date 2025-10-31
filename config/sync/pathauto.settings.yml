@@ -20,4 +20,3 @@ safe_tokens:
   - login-url
   - url
   - url-brief
-  - 'schemadotorg:base-path'
