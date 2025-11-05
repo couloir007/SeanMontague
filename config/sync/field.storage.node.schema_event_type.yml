@@ -1,0 +1,90 @@
+uuid: f43a5029-d4e8-48fa-af53-148ee61b7608
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.schema_event_type
+field_name: schema_event_type
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: business_event
+      label: 'Business Event'
+    -
+      value: childrens_event
+      label: 'Childrens Event'
+    -
+      value: comedy_event
+      label: 'Comedy Event'
+    -
+      value: course_instance
+      label: 'Course Instance'
+    -
+      value: dance_event
+      label: 'Dance Event'
+    -
+      value: delivery_event
+      label: 'Delivery Event'
+    -
+      value: education_event
+      label: 'Education Event'
+    -
+      value: event_series
+      label: 'Event Series'
+    -
+      value: exhibition_event
+      label: 'Exhibition Event'
+    -
+      value: festival
+      label: Festival
+    -
+      value: food_event
+      label: 'Food Event'
+    -
+      value: hackathon
+      label: Hackathon
+    -
+      value: literary_event
+      label: 'Literary Event'
+    -
+      value: music_event
+      label: 'Music Event'
+    -
+      value: publication_event
+      label: 'Publication Event'
+    -
+      value: broadcast_event
+      label: '- Broadcast Event'
+    -
+      value: on_demand_event
+      label: '- On Demand Event'
+    -
+      value: sale_event
+      label: 'Sale Event'
+    -
+      value: screening_event
+      label: 'Screening Event'
+    -
+      value: social_event
+      label: 'Social Event'
+    -
+      value: sports_event
+      label: 'Sports Event'
+    -
+      value: theater_event
+      label: 'Theater Event'
+    -
+      value: visual_arts_event
+      label: 'Visual Arts Event'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

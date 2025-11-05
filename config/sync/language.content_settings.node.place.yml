@@ -1,0 +1,16 @@
+uuid: 51d88d6d-db65-44d2-a367-b5cbc7439a3a
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.place
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+id: node.place
+target_entity_type_id: node
+target_bundle: place
+default_langcode: site_default
+language_alterable: false

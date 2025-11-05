@@ -1,0 +1,16 @@
+uuid: d0f55848-ce8f-4d42-8de6-a3bab4c33884
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: j7nYk1quJLHOq9u4dwszS4X_4S4yxdBV-b78WAdS810
+id: image_effects
+label: 'Image Effects'
+type: paths
+dialog_group: administrative
+dialog_type: modal
+dialog_width: '550'
+dialog_title_override: ''
+selection_criteria:
+  paths:
+    - '/admin/config/media/image_effects*'

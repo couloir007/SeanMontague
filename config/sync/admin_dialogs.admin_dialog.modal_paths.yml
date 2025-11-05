@@ -1,0 +1,23 @@
+uuid: b51f9d9a-3e95-41f4-ac20-34c4d9a3793f
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: UiZNMtXPiasCzY84lOrEAD9WTlpjzSnfvirEJEx5DUw
+id: modal_paths
+label: 'Paths (Modal)'
+type: paths
+dialog_group: administrative
+dialog_type: modal
+dialog_width: '550'
+dialog_title_override: ''
+selection_criteria:
+  paths:
+    - '*/admin/config/services/rss-publishing*'
+    - '*/admin/config/development/maintenance*'
+    - '*/admin/modules/install*'
+    - '*/admin/theme/install*'
+    - '*/admin/config/development/logging*'
+    - '*/admin/config/regional/settings*'
+    - '*/admin/config/media/media-settings*'
+    - '*/admin/config/media/image-toolkit*'

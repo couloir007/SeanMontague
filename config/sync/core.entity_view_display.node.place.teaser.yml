@@ -1,0 +1,66 @@
+uuid: 66970b98-e523-4fac-8aee-16a5a3bce223
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.place.body
+    - field.field.node.place.field_editorial
+    - field.field.node.place.field_metatag
+    - field.field.node.place.schema_address
+    - field.field.node.place.schema_image
+    - field.field.node.place.schema_latitude
+    - field.field.node.place.schema_longitude
+    - field.field.node.place.schema_related_link
+    - field.field.node.place.schema_significant_link
+    - field.field.node.place.schema_subject_of
+    - field.field.node.place.schema_telephone
+    - node.type.place
+  module:
+    - address
+    - text
+    - user
+id: node.place.teaser
+targetEntityType: node
+bundle: place
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 17
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -100
+    region: content
+  schema_address:
+    type: address_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 150
+    region: content
+  schema_image:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 8
+    region: content
+hidden:
+  field_editorial: true
+  field_metatag: true
+  langcode: true
+  schema_latitude: true
+  schema_longitude: true
+  schema_related_link: true
+  schema_significant_link: true
+  schema_subject_of: true
+  schema_telephone: true

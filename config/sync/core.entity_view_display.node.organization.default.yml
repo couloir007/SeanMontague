@@ -1,0 +1,168 @@
+uuid: 85702f3b-22aa-4542-a19e-69e923cfd76d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.organization.body
+    - field.field.node.organization.field_editorial
+    - field.field.node.organization.field_metatag
+    - field.field.node.organization.schema_image
+    - field.field.node.organization.schema_organization_type
+    - field.field.node.organization.schema_parent_organization
+    - field.field.node.organization.schema_related_link
+    - field.field.node.organization.schema_significant_link
+    - field.field.node.organization.schema_sub_organization
+    - field.field.node.organization.schema_subject_of
+    - node.type.organization
+  module:
+    - entity_reference_revisions
+    - field_group
+    - link
+    - options
+    - text
+    - user
+third_party_settings:
+  field_group:
+    group_general:
+      children:
+        - schema_organization_type
+        - schema_image
+        - body
+        - title
+      label: General
+      parent_name: ''
+      region: content
+      weight: -20
+      format_type: fieldset
+      format_settings: {  }
+    group_organization:
+      children:
+        - schema_parent_organization
+        - schema_sub_organization
+      label: Organization
+      parent_name: ''
+      region: content
+      weight: -13
+      format_type: fieldset
+      format_settings: {  }
+    group_references:
+      children:
+        - schema_subject_of
+      label: References
+      parent_name: ''
+      region: content
+      weight: 22
+      format_type: fieldset
+      format_settings: {  }
+    group_editorial:
+      children:
+        - field_editorial
+      label: 'Editorial information'
+      parent_name: ''
+      region: content
+      weight: 220
+      format_type: details
+      format_settings: {  }
+    group_links:
+      children:
+        - schema_related_link
+        - schema_significant_link
+      label: Links
+      parent_name: ''
+      region: content
+      weight: 20
+      format_type: fieldset
+      format_settings: {  }
+id: node.organization.default
+targetEntityType: node
+bundle: organization
+mode: default
+content:
+  body:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 18
+    region: content
+  field_editorial:
+    type: entity_reference_revisions_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 24
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -100
+    region: content
+  schema_image:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 23
+    region: content
+  schema_organization_type:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  schema_parent_organization:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  schema_related_link:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  schema_significant_link:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  schema_sub_organization:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  schema_subject_of:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  field_metatag: true
+  langcode: true

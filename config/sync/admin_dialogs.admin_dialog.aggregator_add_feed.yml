@@ -1,0 +1,16 @@
+uuid: 6333d3d2-7a99-4e47-b8a9-8fb1ffeffab3
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: PvWPLFfbKhWPlNVjOE6vMrKWOqWRdVbhTeqjPfQkpK0
+id: aggregator_add_feed
+label: 'Aggregator Add Feed'
+type: paths
+dialog_group: contrib_modules
+dialog_type: modal
+dialog_width: '550'
+dialog_title_override: ''
+selection_criteria:
+  paths:
+    - '/aggregator/sources/add*'

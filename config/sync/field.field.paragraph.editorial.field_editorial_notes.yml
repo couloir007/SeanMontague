@@ -1,0 +1,26 @@
+uuid: 5139d5cc-5dab-47ba-83fe-92cddb97cce3
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_editorial_notes
+    - filter.format.basic_html
+    - paragraphs.paragraphs_type.editorial
+  module:
+    - text
+_core:
+  default_config_hash: LclRyfNGNNLWfHi8tQYWct3RJVsSXKMyBjPlpt7Y_hA
+id: paragraph.editorial.field_editorial_notes
+field_name: field_editorial_notes
+entity_type: paragraph
+bundle: editorial
+label: Notes
+description: 'Enter editorial notes about this document.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - basic_html
+field_type: text_long

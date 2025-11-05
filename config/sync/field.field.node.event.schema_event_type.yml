@@ -1,0 +1,21 @@
+uuid: ec27fb3e-fb95-4b80-91b8-8212bc163220
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_event_type
+    - node.type.event
+  module:
+    - options
+id: node.event.schema_event_type
+field_name: schema_event_type
+entity_type: node
+bundle: event
+label: Type
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

@@ -1,0 +1,51 @@
+_core:
+  default_config_hash: zuSgcf0FZQ68hj5Di_CePzCEVUEfZEslWkKCWuqqNZE
+langcode: en
+generate_values:
+  name:
+    words: 5
+  alternateName:
+    words: 2
+  headline:
+    words: 5
+  alternateHeadline:
+    words: 2
+  givenName:
+    values:
+      - John
+      - Paul
+      - Ringo
+      - George
+  familyName:
+    values:
+      - Lennon
+      - McCartney
+      - Starr
+      - Harrison
+  additionalName: {  }
+  honorificPrefix: {  }
+  honorificSuffix: {  }
+  hasPart: {  }
+  subOrganization: {  }
+  memberOf: {  }
+  subjectOf: {  }
+  containedInPlace: {  }
+  offeredBy: {  }
+  healthCondition: {  }
+  revision_log:
+    sentences: 10
+  schema_name_prefix:
+    words: 2
+  schema_name_suffix:
+    words: 2
+  paragraph--headline:
+    words: 5
+  paragraph--description:
+    sentences: 10
+  paragraph--text:
+    sentences: 20
+  paragraph--editorial--field_editorial_status:
+    word: 20
+  paragraph--editorial--field_editorial_notes:
+    sentences: 10
+  paragraph--editorial--field_editorial_message: {  }

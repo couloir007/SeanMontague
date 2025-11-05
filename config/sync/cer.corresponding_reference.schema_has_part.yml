@@ -1,0 +1,13 @@
+uuid: ec5f2942-fe49-4d34-9bd6-08501a2b7f85
+langcode: en
+status: true
+dependencies: {  }
+id: schema_has_part
+label: 'Schema.org: Has part ↔ Is part of'
+enabled: true
+first_field: schema_has_part
+second_field: schema_is_part_of
+add_direction: append
+bundles:
+  node:
+    - '*'

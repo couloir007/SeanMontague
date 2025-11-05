@@ -1,0 +1,39 @@
+uuid: f1b8912a-a011-46e7-aad4-4ab28f50d167
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.event.body
+    - field.field.node.event.schema_about
+    - field.field.node.event.schema_event_schedule
+    - field.field.node.event.schema_event_type
+    - field.field.node.event.schema_image
+    - field.field.node.event.schema_related_link
+    - field.field.node.event.schema_significant_link
+    - field.field.node.event.schema_subject_of
+    - node.type.event
+  module:
+    - node
+id: node.event
+target_entity_type_id: node
+target_bundle: event
+schema_type: Event
+schema_properties:
+  schema_about: about
+  schema_event_type: additionalType
+  body: description
+  schema_event_schedule: eventSchedule
+  langcode: inLanguage
+  title: name
+  schema_subject_of: subjectOf
+additional_mappings:
+  WebPage:
+    schema_type: WebPage
+    schema_properties:
+      created: dateCreated
+      changed: dateModified
+      langcode: inLanguage
+      title: name
+      schema_image: primaryImageOfPage
+      schema_related_link: relatedLink
+      schema_significant_link: significantLink

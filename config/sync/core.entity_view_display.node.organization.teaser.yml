@@ -1,0 +1,49 @@
+uuid: daf1dc34-e1a0-49d7-bec3-4923910eb36e
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.organization.body
+    - field.field.node.organization.field_editorial
+    - field.field.node.organization.field_metatag
+    - field.field.node.organization.schema_image
+    - field.field.node.organization.schema_organization_type
+    - field.field.node.organization.schema_parent_organization
+    - field.field.node.organization.schema_related_link
+    - field.field.node.organization.schema_significant_link
+    - field.field.node.organization.schema_sub_organization
+    - field.field.node.organization.schema_subject_of
+    - node.type.organization
+  module:
+    - text
+    - user
+id: node.organization.teaser
+targetEntityType: node
+bundle: organization
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 17
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -100
+    region: content
+hidden:
+  field_editorial: true
+  field_metatag: true
+  langcode: true
+  schema_image: true
+  schema_organization_type: true
+  schema_parent_organization: true
+  schema_related_link: true
+  schema_significant_link: true
+  schema_sub_organization: true
+  schema_subject_of: true

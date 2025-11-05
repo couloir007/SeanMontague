@@ -1,0 +1,5 @@
+_core:
+  default_config_hash: _ZlNq8H0ysTIwvv-uDeRrumHbAogl7vA-f4nbYb89Ik
+message_types:
+  SpecialAnnouncement: warning
+  Statement: status

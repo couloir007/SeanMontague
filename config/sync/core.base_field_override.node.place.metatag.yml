@@ -1,0 +1,20 @@
+uuid: 2d960e5b-bc7d-44d9-b6a1-75bdc062392e
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.place
+  module:
+    - metatag
+id: node.place.metatag
+field_name: metatag
+entity_type: node
+bundle: place
+label: 'Metatags (Hidden field for JSON support)'
+description: 'The computed meta tags for the entity.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: metatag_computed

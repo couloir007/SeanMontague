@@ -1,0 +1,21 @@
+uuid: 5b5f40c2-3e50-44a9-a991-da156d1eb8a1
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_knows_language
+    - node.type.person
+  module:
+    - options
+id: node.person.schema_knows_language
+field_name: schema_knows_language
+entity_type: node
+bundle: person
+label: 'Knows languages'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

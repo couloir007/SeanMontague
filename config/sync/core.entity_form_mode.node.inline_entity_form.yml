@@ -1,0 +1,11 @@
+uuid: e80f0ec1-41e1-4755-8588-1ca97b26b2a9
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.inline_entity_form
+label: 'Inline entity form'
+description: ''
+targetEntityType: node
+cache: true

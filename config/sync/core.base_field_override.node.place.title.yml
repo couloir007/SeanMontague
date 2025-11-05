@@ -1,0 +1,18 @@
+uuid: 960c47cd-d699-4b19-bdb1-5ceab5cb23b2
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.place
+id: node.place.title
+field_name: title
+entity_type: node
+bundle: place
+label: Name
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

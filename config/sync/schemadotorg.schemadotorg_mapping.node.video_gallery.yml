@@ -1,0 +1,28 @@
+uuid: b4e33e6c-bbd8-4589-83f6-931d3e2572e3
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.video_gallery.body
+    - field.field.node.video_gallery.schema_about
+    - field.field.node.video_gallery.schema_has_part
+    - field.field.node.video_gallery.schema_is_part_of
+    - field.field.node.video_gallery.schema_subject_of
+    - node.type.video_gallery
+  module:
+    - node
+id: node.video_gallery
+target_entity_type_id: node
+target_bundle: video_gallery
+schema_type: VideoGallery
+schema_properties:
+  schema_about: about
+  created: dateCreated
+  changed: dateModified
+  schema_has_part: hasPart
+  langcode: inLanguage
+  schema_is_part_of: isPartOf
+  title: name
+  schema_subject_of: subjectOf
+  body: text
+additional_mappings: {  }

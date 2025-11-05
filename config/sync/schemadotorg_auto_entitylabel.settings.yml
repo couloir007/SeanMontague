@@ -1,0 +1,5 @@
+_core:
+  default_config_hash: QvFw4u2JKA581XPik4d5XBP0Xeq54x5nzSTYxYdHyuI
+default_types:
+  node--Person:
+    pattern: '[givenName] [familyName]'

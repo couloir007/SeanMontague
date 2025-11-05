@@ -1,0 +1,26 @@
+uuid: eca47bcb-ac6f-46ff-bbe5-ba9503e9c11f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.body
+    - filter.format.full_html
+    - node.type.video_gallery
+  module:
+    - text
+id: node.video_gallery.body
+field_name: body
+entity_type: node
+bundle: video_gallery
+label: Text
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: false
+  required_summary: false
+  allowed_formats:
+    - full_html
+field_type: text_with_summary

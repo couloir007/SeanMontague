@@ -1,0 +1,17 @@
+uuid: 135274d4-72c0-4a8d-9bd4-e68ff78d949c
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: lNe0bu9tPGaRW4Bvw2BM5TclWlsaLBtGdYzYl8KONdk
+id: flush_image_styles
+label: 'Flush Image Styles'
+type: ops
+dialog_group: administrative
+dialog_type: modal
+dialog_width: '550'
+dialog_title_override: ''
+selection_criteria:
+  entity_type: image_style
+  bundles: {  }
+  key: flush

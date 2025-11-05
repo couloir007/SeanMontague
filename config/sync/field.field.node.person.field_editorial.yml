@@ -1,0 +1,31 @@
+uuid: 469cbfd0-a123-4081-9486-fa9cc42b9248
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_editorial
+    - node.type.person
+    - paragraphs.paragraphs_type.editorial
+  module:
+    - entity_reference_revisions
+id: node.person.field_editorial
+field_name: field_editorial
+entity_type: node
+bundle: person
+label: 'Editorial information'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      editorial: editorial
+    negate: 0
+    target_bundles_drag_drop:
+      editorial:
+        weight: 0
+        enabled: true
+field_type: entity_reference_revisions

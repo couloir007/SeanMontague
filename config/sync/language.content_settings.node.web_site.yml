@@ -1,0 +1,16 @@
+uuid: ff154509-ec90-43cd-ae86-401fa90cc861
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.web_site
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+id: node.web_site
+target_entity_type_id: node
+target_bundle: web_site
+default_langcode: site_default
+language_alterable: false

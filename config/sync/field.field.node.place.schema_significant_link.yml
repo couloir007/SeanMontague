@@ -1,0 +1,23 @@
+uuid: 8e37f560-744f-47da-8f61-2d852e30a9c2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_significant_link
+    - node.type.place
+  module:
+    - link
+id: node.place.schema_significant_link
+field_name: schema_significant_link
+entity_type: node
+bundle: place
+label: 'Significant links'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 17
+field_type: link

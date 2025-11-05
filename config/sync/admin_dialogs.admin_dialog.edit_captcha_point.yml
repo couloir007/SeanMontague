@@ -1,0 +1,17 @@
+uuid: f6560b09-37e0-4edf-badd-c24be9182861
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: IxUOG7EDWJrZx0buG14qQIlihyuLyRaTuX3J47Ful5I
+id: edit_captcha_point
+label: 'Edit Captcha Point'
+type: ops
+dialog_group: contrib_modules
+dialog_type: modal
+dialog_width: '550'
+dialog_title_override: ''
+selection_criteria:
+  entity_type: captcha_point
+  key: edit
+  bundles: {  }

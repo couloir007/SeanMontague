@@ -1,0 +1,28 @@
+uuid: 0fa099fb-996d-4817-89c9-d61ace721c4f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_event_schedule
+    - node.type.event
+  module:
+    - smart_date
+id: node.event.schema_event_schedule
+field_name: schema_event_schedule
+entity_type: node
+bundle: event
+label: 'Event schedule'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    default_duration: 60
+    default_duration_increments: "30\r\n60|1 hour\r\n90\r\n120|2 hours\r\ncustom"
+    default_date_type: next_hour
+    default_date: ''
+    min: ''
+    max: ''
+default_value_callback: ''
+settings: {  }
+field_type: smartdate

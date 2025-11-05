@@ -1,0 +1,23 @@
+uuid: c05acac7-e73f-4d2e-a1b7-c64a8ff5a03a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_editorial_review_date
+    - paragraphs.paragraphs_type.editorial
+  module:
+    - datetime
+_core:
+  default_config_hash: B_m-TfiVpJKo0A7tj_XJhB8rBK5j59LyYXAn19RFFEQ
+id: paragraph.editorial.field_editorial_review_date
+field_name: field_editorial_review_date
+entity_type: paragraph
+bundle: editorial
+label: 'Due for review'
+description: 'Enter the date that this document should be reviewed.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

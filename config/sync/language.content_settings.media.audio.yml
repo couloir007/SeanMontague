@@ -1,0 +1,16 @@
+uuid: 32009115-15d7-4eec-b55e-44e3d9e9ce92
+langcode: en
+status: true
+dependencies:
+  config:
+    - media.type.audio
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+id: media.audio
+target_entity_type_id: media
+target_bundle: audio
+default_langcode: site_default
+language_alterable: false

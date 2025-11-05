@@ -1,0 +1,14 @@
+uuid: 4f54ae1b-5de1-4975-a5a2-cf95916ce593
+langcode: en
+status: true
+dependencies: {  }
+id: document
+label: 'Data Download'
+description: ''
+source: file
+queue_thumbnail_downloads: false
+new_revision: false
+source_configuration:
+  source_field: field_media_file
+field_map:
+  name: name

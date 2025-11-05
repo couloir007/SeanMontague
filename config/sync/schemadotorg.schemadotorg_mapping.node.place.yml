@@ -1,0 +1,41 @@
+uuid: 2170aaf6-3e18-455e-b219-85044bfe4169
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.place.body
+    - field.field.node.place.schema_address
+    - field.field.node.place.schema_image
+    - field.field.node.place.schema_latitude
+    - field.field.node.place.schema_longitude
+    - field.field.node.place.schema_related_link
+    - field.field.node.place.schema_significant_link
+    - field.field.node.place.schema_subject_of
+    - field.field.node.place.schema_telephone
+    - node.type.place
+  module:
+    - node
+id: node.place
+target_entity_type_id: node
+target_bundle: place
+schema_type: Place
+schema_properties:
+  schema_address: address
+  body: description
+  schema_image: image
+  schema_latitude: latitude
+  schema_longitude: longitude
+  title: name
+  schema_subject_of: subjectOf
+  schema_telephone: telephone
+additional_mappings:
+  WebPage:
+    schema_type: WebPage
+    schema_properties:
+      created: dateCreated
+      changed: dateModified
+      langcode: inLanguage
+      title: name
+      schema_image: primaryImageOfPage
+      schema_related_link: relatedLink
+      schema_significant_link: significantLink

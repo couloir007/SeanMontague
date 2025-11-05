@@ -1,0 +1,18 @@
+uuid: 567d8174-5930-4d3c-a3ed-eeb44ff15768
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.schema_topics
+id: taxonomy_term.schema_topics.publish_on
+field_name: publish_on
+entity_type: taxonomy_term
+bundle: schema_topics
+label: 'Publish on'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: timestamp

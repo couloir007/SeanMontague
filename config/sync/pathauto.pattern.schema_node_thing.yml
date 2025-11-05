@@ -1,0 +1,31 @@
+uuid: 043c9d9e-7477-43b6-ab8c-865042f9bb86
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: schema_node_thing
+label: 'Schema.org: Content - Thing'
+type: 'canonical_entities:node'
+pattern: '[node:schemadotorg:base-path]/[node:schemadotorg:alternate-name]'
+selection_criteria:
+  9169d6aa-607e-48c7-9975-59dcbf9d1279:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: 9169d6aa-607e-48c7-9975-59dcbf9d1279
+    context_mapping:
+      node: node
+    bundles:
+      article: article
+      event: event
+      image_gallery: image_gallery
+      media_gallery: media_gallery
+      organization: organization
+      page: page
+      person: person
+      place: place
+      video_gallery: video_gallery
+      web_site: web_site
+selection_logic: and
+weight: -10
+relationships: {  }

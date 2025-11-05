@@ -1,0 +1,20 @@
+uuid: e1335e4e-82f0-404e-b318-f6604d3bd26c
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.image_gallery
+  module:
+    - metatag
+id: node.image_gallery.metatag
+field_name: metatag
+entity_type: node
+bundle: image_gallery
+label: 'Metatags (Hidden field for JSON support)'
+description: 'The computed meta tags for the entity.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: metatag_computed

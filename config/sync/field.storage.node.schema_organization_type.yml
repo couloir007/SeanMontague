@@ -1,0 +1,573 @@
+uuid: ee3cc4d3-f7d8-4d36-8985-8b200a99a856
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.schema_organization_type
+field_name: schema_organization_type
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: airline
+      label: Airline
+    -
+      value: consortium
+      label: Consortium
+    -
+      value: cooperative
+      label: Cooperative
+    -
+      value: corporation
+      label: Corporation
+    -
+      value: educational_organization
+      label: 'Educational Organization'
+    -
+      value: college_or_university
+      label: '- College or University'
+    -
+      value: elementary_school
+      label: '- Elementary School'
+    -
+      value: high_school
+      label: '- High School'
+    -
+      value: middle_school
+      label: '- Middle School'
+    -
+      value: preschool
+      label: '- Preschool'
+    -
+      value: school
+      label: '- School'
+    -
+      value: funding_scheme
+      label: 'Funding Scheme'
+    -
+      value: government_organization
+      label: 'Government Organization'
+    -
+      value: library_system
+      label: 'Library System'
+    -
+      value: local_business
+      label: 'Local Business'
+    -
+      value: animal_shelter
+      label: '- Animal Shelter'
+    -
+      value: archive_organization
+      label: '- Archive Organization'
+    -
+      value: automotive_business
+      label: '- Automotive Business'
+    -
+      value: auto_body_shop
+      label: '-- Auto Body Shop'
+    -
+      value: auto_dealer
+      label: '-- Auto Dealer'
+    -
+      value: auto_parts_store
+      label: '-- Auto Parts Store'
+    -
+      value: auto_rental
+      label: '-- Auto Rental'
+    -
+      value: auto_repair
+      label: '-- Auto Repair'
+    -
+      value: auto_wash
+      label: '-- Auto Wash'
+    -
+      value: gas_station
+      label: '-- Gas Station'
+    -
+      value: motorcycle_dealer
+      label: '-- Motorcycle Dealer'
+    -
+      value: motorcycle_repair
+      label: '-- Motorcycle Repair'
+    -
+      value: child_care
+      label: '- Child Care'
+    -
+      value: dentist
+      label: '- Dentist'
+    -
+      value: dry_cleaning_or_laundry
+      label: '- Dry Cleaning or Laundry'
+    -
+      value: emergency_service
+      label: '- Emergency Service'
+    -
+      value: fire_station
+      label: '-- Fire Station'
+    -
+      value: hospital
+      label: '-- Hospital'
+    -
+      value: police_station
+      label: '-- Police Station'
+    -
+      value: employment_agency
+      label: '- Employment Agency'
+    -
+      value: entertainment_business
+      label: '- Entertainment Business'
+    -
+      value: adult_entertainment
+      label: '-- Adult Entertainment'
+    -
+      value: amusement_park
+      label: '-- Amusement Park'
+    -
+      value: art_gallery
+      label: '-- Art Gallery'
+    -
+      value: casino
+      label: '-- Casino'
+    -
+      value: comedy_club
+      label: '-- Comedy Club'
+    -
+      value: movie_theater
+      label: '-- Movie Theater'
+    -
+      value: night_club
+      label: '-- Night Club'
+    -
+      value: financial_service
+      label: '- Financial Service'
+    -
+      value: accounting_service
+      label: '-- Accounting Service'
+    -
+      value: automated_teller
+      label: '-- Automated Teller'
+    -
+      value: bank_or_credit_union
+      label: '-- Bank or Credit Union'
+    -
+      value: insurance_agency
+      label: '-- Insurance Agency'
+    -
+      value: food_establishment
+      label: '- Food Establishment'
+    -
+      value: bakery
+      label: '-- Bakery'
+    -
+      value: bar_or_pub
+      label: '-- Bar or Pub'
+    -
+      value: brewery
+      label: '-- Brewery'
+    -
+      value: cafe_or_coffee_shop
+      label: '-- Cafe or Coffee Shop'
+    -
+      value: distillery
+      label: '-- Distillery'
+    -
+      value: fast_food_restaurant
+      label: '-- Fast Food Restaurant'
+    -
+      value: ice_cream_shop
+      label: '-- Ice Cream Shop'
+    -
+      value: restaurant
+      label: '-- Restaurant'
+    -
+      value: winery
+      label: '-- Winery'
+    -
+      value: government_office
+      label: '- Government Office'
+    -
+      value: post_office
+      label: '-- Post Office'
+    -
+      value: health_and_beauty_business
+      label: '- Health and Beauty Business'
+    -
+      value: beauty_salon
+      label: '-- Beauty Salon'
+    -
+      value: day_spa
+      label: '-- Day Spa'
+    -
+      value: hair_salon
+      label: '-- Hair Salon'
+    -
+      value: health_club
+      label: '-- Health Club'
+    -
+      value: nail_salon
+      label: '-- Nail Salon'
+    -
+      value: tattoo_parlor
+      label: '-- Tattoo Parlor'
+    -
+      value: home_and_construction_business
+      label: '- Home and Construction Business'
+    -
+      value: electrician
+      label: '-- Electrician'
+    -
+      value: general_contractor
+      label: '-- General Contractor'
+    -
+      value: hvac_business
+      label: '-- HVAC Business'
+    -
+      value: house_painter
+      label: '-- House Painter'
+    -
+      value: locksmith
+      label: '-- Locksmith'
+    -
+      value: moving_company
+      label: '-- Moving Company'
+    -
+      value: plumber
+      label: '-- Plumber'
+    -
+      value: roofing_contractor
+      label: '-- Roofing Contractor'
+    -
+      value: internet_cafe
+      label: '- Internet Cafe'
+    -
+      value: legal_service
+      label: '- Legal Service'
+    -
+      value: attorney
+      label: '-- Attorney'
+    -
+      value: notary
+      label: '-- Notary'
+    -
+      value: library
+      label: '- Library'
+    -
+      value: lodging_business
+      label: '- Lodging Business'
+    -
+      value: bed_and_breakfast
+      label: '-- Bed and Breakfast'
+    -
+      value: campground
+      label: '-- Campground'
+    -
+      value: hostel
+      label: '-- Hostel'
+    -
+      value: hotel
+      label: '-- Hotel'
+    -
+      value: motel
+      label: '-- Motel'
+    -
+      value: resort
+      label: '-- Resort'
+    -
+      value: ski_resort
+      label: '--- Ski Resort'
+    -
+      value: vacation_rental
+      label: '-- Vacation Rental'
+    -
+      value: medical_business
+      label: '- Medical Business'
+    -
+      value: community_health
+      label: '-- Community Health'
+    -
+      value: dermatology
+      label: '-- Dermatology'
+    -
+      value: diet_nutrition
+      label: '-- Diet Nutrition'
+    -
+      value: emergency
+      label: '-- Emergency'
+    -
+      value: geriatric
+      label: '-- Geriatric'
+    -
+      value: gynecologic
+      label: '-- Gynecologic'
+    -
+      value: medical_clinic
+      label: '-- Medical Clinic'
+    -
+      value: covid_testing_facility
+      label: '--- Covid Testing Facility'
+    -
+      value: midwifery
+      label: '-- Midwifery'
+    -
+      value: nursing
+      label: '-- Nursing'
+    -
+      value: obstetric
+      label: '-- Obstetric'
+    -
+      value: oncologic
+      label: '-- Oncologic'
+    -
+      value: optician
+      label: '-- Optician'
+    -
+      value: optometric
+      label: '-- Optometric'
+    -
+      value: otolaryngologic
+      label: '-- Otolaryngologic'
+    -
+      value: pediatric
+      label: '-- Pediatric'
+    -
+      value: pharmacy
+      label: '-- Pharmacy'
+    -
+      value: physician
+      label: '-- Physician'
+    -
+      value: individual_physician
+      label: '--- Individual Physician'
+    -
+      value: physicians_office
+      label: '--- Physicians Office'
+    -
+      value: physiotherapy
+      label: '-- Physiotherapy'
+    -
+      value: plastic_surgery
+      label: '-- Plastic Surgery'
+    -
+      value: podiatric
+      label: '-- Podiatric'
+    -
+      value: primary_care
+      label: '-- Primary Care'
+    -
+      value: psychiatric
+      label: '-- Psychiatric'
+    -
+      value: public_health
+      label: '-- Public Health'
+    -
+      value: professional_service
+      label: '- Professional Service'
+    -
+      value: radio_station
+      label: '- Radio Station'
+    -
+      value: real_estate_agent
+      label: '- Real Estate Agent'
+    -
+      value: recycling_center
+      label: '- Recycling Center'
+    -
+      value: self_storage
+      label: '- Self Storage'
+    -
+      value: shopping_center
+      label: '- Shopping Center'
+    -
+      value: sports_activity_location
+      label: '- Sports Activity Location'
+    -
+      value: bowling_alley
+      label: '-- Bowling Alley'
+    -
+      value: exercise_gym
+      label: '-- Exercise Gym'
+    -
+      value: golf_course
+      label: '-- Golf Course'
+    -
+      value: public_swimming_pool
+      label: '-- Public Swimming Pool'
+    -
+      value: sports_club
+      label: '-- Sports Club'
+    -
+      value: stadium_or_arena
+      label: '-- Stadium or Arena'
+    -
+      value: tennis_complex
+      label: '-- Tennis Complex'
+    -
+      value: store
+      label: '- Store'
+    -
+      value: bike_store
+      label: '-- Bike Store'
+    -
+      value: book_store
+      label: '-- Book Store'
+    -
+      value: clothing_store
+      label: '-- Clothing Store'
+    -
+      value: computer_store
+      label: '-- Computer Store'
+    -
+      value: convenience_store
+      label: '-- Convenience Store'
+    -
+      value: department_store
+      label: '-- Department Store'
+    -
+      value: electronics_store
+      label: '-- Electronics Store'
+    -
+      value: florist
+      label: '-- Florist'
+    -
+      value: furniture_store
+      label: '-- Furniture Store'
+    -
+      value: garden_store
+      label: '-- Garden Store'
+    -
+      value: grocery_store
+      label: '-- Grocery Store'
+    -
+      value: hardware_store
+      label: '-- Hardware Store'
+    -
+      value: hobby_shop
+      label: '-- Hobby Shop'
+    -
+      value: home_goods_store
+      label: '-- Home Goods Store'
+    -
+      value: jewelry_store
+      label: '-- Jewelry Store'
+    -
+      value: liquor_store
+      label: '-- Liquor Store'
+    -
+      value: mens_clothing_store
+      label: '-- Mens Clothing Store'
+    -
+      value: mobile_phone_store
+      label: '-- Mobile Phone Store'
+    -
+      value: movie_rental_store
+      label: '-- Movie Rental Store'
+    -
+      value: music_store
+      label: '-- Music Store'
+    -
+      value: office_equipment_store
+      label: '-- Office Equipment Store'
+    -
+      value: outlet_store
+      label: '-- Outlet Store'
+    -
+      value: pawn_shop
+      label: '-- Pawn Shop'
+    -
+      value: pet_store
+      label: '-- Pet Store'
+    -
+      value: shoe_store
+      label: '-- Shoe Store'
+    -
+      value: sporting_goods_store
+      label: '-- Sporting Goods Store'
+    -
+      value: tire_shop
+      label: '-- Tire Shop'
+    -
+      value: toy_store
+      label: '-- Toy Store'
+    -
+      value: wholesale_store
+      label: '-- Wholesale Store'
+    -
+      value: television_station
+      label: '- Television Station'
+    -
+      value: tourist_information_center
+      label: '- Tourist Information Center'
+    -
+      value: travel_agency
+      label: '- Travel Agency'
+    -
+      value: medical_organization
+      label: 'Medical Organization'
+    -
+      value: diagnostic_lab
+      label: '- Diagnostic Lab'
+    -
+      value: veterinary_care
+      label: '- Veterinary Care'
+    -
+      value: ngo
+      label: NGO
+    -
+      value: news_media_organization
+      label: 'News Media Organization'
+    -
+      value: online_business
+      label: 'Online Business'
+    -
+      value: online_store
+      label: '- Online Store'
+    -
+      value: performing_group
+      label: 'Performing Group'
+    -
+      value: dance_group
+      label: '- Dance Group'
+    -
+      value: music_group
+      label: '- Music Group'
+    -
+      value: theater_group
+      label: '- Theater Group'
+    -
+      value: political_party
+      label: 'Political Party'
+    -
+      value: project
+      label: Project
+    -
+      value: funding_agency
+      label: '- Funding Agency'
+    -
+      value: research_project
+      label: '- Research Project'
+    -
+      value: research_organization
+      label: 'Research Organization'
+    -
+      value: search_rescue_organization
+      label: 'Search Rescue Organization'
+    -
+      value: sports_organization
+      label: 'Sports Organization'
+    -
+      value: sports_team
+      label: '- Sports Team'
+    -
+      value: workers_union
+      label: 'Workers Union'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

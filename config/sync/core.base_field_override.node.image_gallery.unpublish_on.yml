@@ -1,0 +1,18 @@
+uuid: 0641483c-fd40-4250-86b6-8b589338cb4e
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.image_gallery
+id: node.image_gallery.unpublish_on
+field_name: unpublish_on
+entity_type: node
+bundle: image_gallery
+label: 'Unpublish on'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: timestamp

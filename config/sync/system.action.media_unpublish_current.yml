@@ -1,0 +1,13 @@
+uuid: 31b762e9-be5e-427c-a6e9-51c1180658b9
+langcode: en
+status: true
+dependencies:
+  module:
+    - moderated_content_bulk_publish
+_core:
+  default_config_hash: z0qRc93RuNB6l-WmjOxpcOUIqmWMrYZsId_GBkcIt-M
+id: media_unpublish_current
+label: 'Unpublish current revision'
+type: media
+plugin: unpublish_current_revision_action
+configuration: {  }

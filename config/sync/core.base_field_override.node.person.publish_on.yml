@@ -1,0 +1,18 @@
+uuid: 2fd20ce6-05d3-4a08-a26f-895ba11ac7d5
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.person
+id: node.person.publish_on
+field_name: publish_on
+entity_type: node
+bundle: person
+label: 'Publish on'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: timestamp

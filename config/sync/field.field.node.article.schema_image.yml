@@ -1,0 +1,33 @@
+uuid: 809f8e4d-ebf4-40c7-937b-1c19cdc7eb4d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_image
+    - node.type.article
+  module:
+    - epp
+third_party_settings:
+  epp:
+    value: 'target_id: [current-page:query:image]'
+id: node.article.schema_image
+field_name: schema_image
+entity_type: node
+bundle: article
+label: Image
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'schemadotorg:media'
+  handler_settings:
+    target_type: media
+    schema_types:
+      ImageObject: ImageObject
+    excluded_schema_types: {  }
+    ignore_additional_mappings: false
+    target_bundles:
+      image: image
+field_type: entity_reference

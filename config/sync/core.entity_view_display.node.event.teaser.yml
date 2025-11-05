@@ -1,0 +1,71 @@
+uuid: 34de8595-a724-40f9-affe-e043551a1bf6
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.event.body
+    - field.field.node.event.field_editorial
+    - field.field.node.event.field_metatag
+    - field.field.node.event.schema_about
+    - field.field.node.event.schema_event_schedule
+    - field.field.node.event.schema_event_type
+    - field.field.node.event.schema_image
+    - field.field.node.event.schema_related_link
+    - field.field.node.event.schema_significant_link
+    - field.field.node.event.schema_subject_of
+    - node.type.event
+  module:
+    - smart_date
+    - text
+    - user
+id: node.event.teaser
+targetEntityType: node
+bundle: event
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 17
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -100
+    region: content
+  schema_event_schedule:
+    type: smartdate_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+      format: default
+      force_chronological: false
+      add_classes: false
+      time_wrapper: true
+      localize: false
+      parts:
+        - start
+        - end
+      duration:
+        separator: ' | '
+        unit: ''
+        decimals: 2
+        suffix: h
+    third_party_settings: {  }
+    weight: 13
+    region: content
+hidden:
+  field_editorial: true
+  field_metatag: true
+  langcode: true
+  schema_about: true
+  schema_event_type: true
+  schema_image: true
+  schema_related_link: true
+  schema_significant_link: true
+  schema_subject_of: true

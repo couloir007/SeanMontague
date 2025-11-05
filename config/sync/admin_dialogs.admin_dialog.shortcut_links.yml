@@ -1,0 +1,16 @@
+uuid: f50f9ce1-49bd-4cf7-a3c4-26a2b4064137
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: eEIMD9ysl4hOF-2Nb3PvbzQCYAjskd40WgNCBjCBrTY
+id: shortcut_links
+label: 'Shortcut Links'
+type: paths
+dialog_group: administrative
+dialog_type: modal
+dialog_width: '550'
+dialog_title_override: ''
+selection_criteria:
+  paths:
+    - '/admin/config/user-interface/shortcut/link/*'

@@ -1,0 +1,43 @@
+uuid: 0854e02a-ad9b-45f7-85cb-ad84b3d2bc1a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_is_part_of
+    - node.type.article
+    - node.type.image_gallery
+    - node.type.media_gallery
+    - node.type.page
+    - node.type.video_gallery
+    - node.type.web_site
+  module:
+    - epp
+third_party_settings:
+  epp:
+    value: 'target_id: [current-page:query:is_part_of]'
+id: node.image_gallery.schema_is_part_of
+field_name: schema_is_part_of
+entity_type: node
+bundle: image_gallery
+label: 'Is part of'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'schemadotorg:node'
+  handler_settings:
+    target_type: node
+    schema_types:
+      CreativeWork: CreativeWork
+    excluded_schema_types: {  }
+    ignore_additional_mappings: true
+    target_bundles:
+      article: article
+      image_gallery: image_gallery
+      media_gallery: media_gallery
+      page: page
+      video_gallery: video_gallery
+      web_site: web_site
+field_type: entity_reference

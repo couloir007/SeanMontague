@@ -1,0 +1,41 @@
+uuid: cee3e299-67eb-4e13-a393-b54d29ac5131
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.article.body
+    - field.field.node.article.field_editorial
+    - field.field.node.article.field_metatag
+    - field.field.node.article.schema_about
+    - field.field.node.article.schema_article_type
+    - field.field.node.article.schema_image
+    - field.field.node.article.schema_related_link
+    - field.field.node.article.schema_significant_link
+    - field.field.node.article.schema_subject_of
+    - field.field.node.article.schema_topic
+    - node.type.article
+  module:
+    - user
+id: node.article.teaser
+targetEntityType: node
+bundle: article
+mode: teaser
+content:
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -100
+    region: content
+hidden:
+  body: true
+  field_editorial: true
+  field_metatag: true
+  langcode: true
+  schema_about: true
+  schema_article_type: true
+  schema_image: true
+  schema_related_link: true
+  schema_significant_link: true
+  schema_subject_of: true
+  schema_topic: true

@@ -1,0 +1,36 @@
+uuid: f999b43e-2fc3-44a6-a733-792c248d4cb1
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_member_of
+    - node.type.organization
+    - node.type.person
+  module:
+    - epp
+third_party_settings:
+  epp:
+    value: 'target_id: [current-page:query:member_of]'
+id: node.person.schema_member_of
+field_name: schema_member_of
+entity_type: node
+bundle: person
+label: 'Member of'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'schemadotorg:node'
+  handler_settings:
+    target_type: node
+    schema_types:
+      MemberProgramTier: MemberProgramTier
+      Organization: Organization
+      ProgramMembership: ProgramMembership
+    excluded_schema_types: {  }
+    ignore_additional_mappings: false
+    target_bundles:
+      organization: organization
+field_type: entity_reference

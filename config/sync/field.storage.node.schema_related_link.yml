@@ -1,0 +1,19 @@
+uuid: af17cce9-37b6-489e-b0cd-e27605622b82
+langcode: en
+status: true
+dependencies:
+  module:
+    - link
+    - node
+id: node.schema_related_link
+field_name: schema_related_link
+entity_type: node
+type: link
+settings: {  }
+module: link
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

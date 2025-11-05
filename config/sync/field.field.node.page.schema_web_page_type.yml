@@ -1,0 +1,21 @@
+uuid: 155226c6-f0eb-40bb-8928-bcaaf8bd64fc
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_web_page_type
+    - node.type.page
+  module:
+    - options
+id: node.page.schema_web_page_type
+field_name: schema_web_page_type
+entity_type: node
+bundle: page
+label: Type
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

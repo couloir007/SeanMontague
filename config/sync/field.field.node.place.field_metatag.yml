@@ -1,0 +1,21 @@
+uuid: 58a7a728-1b5e-49ab-80ae-48b6e194835c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_metatag
+    - node.type.place
+  module:
+    - metatag
+id: node.place.field_metatag
+field_name: field_metatag
+entity_type: node
+bundle: place
+label: 'Meta tags'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: metatag

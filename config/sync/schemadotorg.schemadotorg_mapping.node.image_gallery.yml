@@ -1,0 +1,28 @@
+uuid: adf39b18-88e2-44e5-b17e-87b4af59bfa1
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.image_gallery.body
+    - field.field.node.image_gallery.schema_about
+    - field.field.node.image_gallery.schema_has_part
+    - field.field.node.image_gallery.schema_is_part_of
+    - field.field.node.image_gallery.schema_subject_of
+    - node.type.image_gallery
+  module:
+    - node
+id: node.image_gallery
+target_entity_type_id: node
+target_bundle: image_gallery
+schema_type: ImageGallery
+schema_properties:
+  schema_about: about
+  created: dateCreated
+  changed: dateModified
+  schema_has_part: hasPart
+  langcode: inLanguage
+  schema_is_part_of: isPartOf
+  title: name
+  schema_subject_of: subjectOf
+  body: text
+additional_mappings: {  }

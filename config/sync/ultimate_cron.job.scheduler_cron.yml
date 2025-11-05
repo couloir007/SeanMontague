@@ -1,0 +1,17 @@
+uuid: d0845175-4f64-4ee5-8624-48f3f514a866
+langcode: en
+status: true
+dependencies:
+  module:
+    - scheduler
+title: '(Un)publish scheduled entities'
+id: scheduler_cron
+weight: 0
+module: scheduler
+callback: 'scheduler#cron'
+scheduler:
+  id: simple
+launcher:
+  id: serial
+logger:
+  id: database

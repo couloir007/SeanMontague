@@ -1,0 +1,32 @@
+uuid: 63339a79-10ec-4dfb-adbd-bb33079fdef9
+langcode: en
+status: true
+dependencies:
+  module:
+    - options
+    - paragraphs
+_core:
+  default_config_hash: NIecpQh2xm_G4H1Tj-iLuk04jkXBQdJcbilqlX8jLEw
+id: paragraph.field_editorial_priority
+field_name: field_editorial_priority
+entity_type: paragraph
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: low
+      label: Low
+    -
+      value: medium
+      label: Medium
+    -
+      value: high
+      label: High
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

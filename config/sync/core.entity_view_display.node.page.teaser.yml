@@ -1,0 +1,53 @@
+uuid: cb3704da-4b62-4148-a923-390001a467e3
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.page.body
+    - field.field.node.page.field_editorial
+    - field.field.node.page.field_metatag
+    - field.field.node.page.schema_about
+    - field.field.node.page.schema_has_part
+    - field.field.node.page.schema_image
+    - field.field.node.page.schema_is_part_of
+    - field.field.node.page.schema_main_entity
+    - field.field.node.page.schema_related_link
+    - field.field.node.page.schema_significant_link
+    - field.field.node.page.schema_subject_of
+    - field.field.node.page.schema_web_page_type
+    - node.type.page
+  module:
+    - text
+    - user
+id: node.page.teaser
+targetEntityType: node
+bundle: page
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 18
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -100
+    region: content
+hidden:
+  field_editorial: true
+  field_metatag: true
+  langcode: true
+  schema_about: true
+  schema_has_part: true
+  schema_image: true
+  schema_is_part_of: true
+  schema_main_entity: true
+  schema_related_link: true
+  schema_significant_link: true
+  schema_subject_of: true
+  schema_web_page_type: true

@@ -1,0 +1,17 @@
+uuid: 83ce5ef7-1c81-4fdd-8f71-da061277ff8f
+langcode: en
+status: true
+dependencies:
+  module:
+    - schemadotorg_devel
+title: 'Default cron handler'
+id: schemadotorg_devel_cron
+weight: 0
+module: schemadotorg_devel
+callback: 'schemadotorg_devel#cron'
+scheduler:
+  id: simple
+launcher:
+  id: serial
+logger:
+  id: database

@@ -1,0 +1,16 @@
+uuid: eae68f9c-41f2-4c0d-87ca-94a6acda6ead
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: qlJqjzAouAfvy59ENHocuftqWFojU_LXHghb2YMtUkw
+id: contrib_paths_modal
+label: 'Paths (Modal)'
+type: paths
+dialog_group: contrib_modules
+dialog_type: modal
+dialog_width: '550'
+dialog_title_override: ''
+selection_criteria:
+  paths:
+    - '*/admin/config/content/paragraphs*'

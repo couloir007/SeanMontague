@@ -1,0 +1,18 @@
+uuid: bf52ef69-6a80-4ef4-a6f6-139b693c7615
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.person
+id: node.person.unpublish_on
+field_name: unpublish_on
+entity_type: node
+bundle: person
+label: 'Unpublish on'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: timestamp

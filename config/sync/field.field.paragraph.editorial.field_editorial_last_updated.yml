@@ -1,0 +1,23 @@
+uuid: af37e4c7-17b0-4ba7-b75f-4c4c19e56dbe
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_editorial_last_updated
+    - paragraphs.paragraphs_type.editorial
+  module:
+    - datetime
+_core:
+  default_config_hash: NdC98vCYhCPa0TVh01kTHX7HX_28KqGKT0W11Td6PL8
+id: paragraph.editorial.field_editorial_last_updated
+field_name: field_editorial_last_updated
+entity_type: paragraph
+bundle: editorial
+label: 'Last updated'
+description: 'Enter the date that this document was last updated.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime
