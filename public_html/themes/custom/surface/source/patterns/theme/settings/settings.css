@@ -1,0 +1,181 @@
+/**
+ * @file
+ * Theme settings.
+ */
+
+[data-drupal-selector="edit-site-theme"] {
+  .form-radios {
+    border-radius: var(--radius-6);
+    border-width: 1px;
+    display: inline-flex;
+    flex-wrap: wrap;
+    padding-block: var(--size-1);
+    padding-inline: var(--size-2);
+
+    input {
+      border: 0;
+      height: 1px;
+      margin: 0;
+      opacity: 0;
+      padding: 0;
+      width: 1px;
+
+      &:focus + .form-item__label {
+        box-shadow: 0 0 0 1px var(--white), 0 0 0 2px var(--blue-200);
+      }
+
+      &:checked + .form-item__label {
+        background-color: var(--blue-200);
+        color: var(--blue-700);
+      }
+    }
+
+    .form-type--boolean {
+      margin: 0;
+    }
+
+    .form-item__label {
+      border-radius: var(--radius-4);
+      display: inline-block;
+      font-weight: var(--font-weight-600);
+      margin-block: var(--size-1);
+      padding-block: var(--size-2);
+      padding-inline: var(--size-4);
+
+      &:hover {
+        background-color: var(--blue-200);
+        color: var(--blue-700);
+      }
+    }
+  }
+}
+
+[data-drupal-selector="edit-site-menu"] {
+  .form-radios {
+    display: grid;
+    grid-gap: var(--size-3);
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    margin-block-start: var(--size-2);
+
+    .form-item {
+      display: inline-grid;
+      margin: 0;
+      position: relative;
+
+      input {
+        background-repeat: no-repeat;
+        border-radius: var(--radius-5);
+        cursor: pointer;
+        height: 100px;
+        margin-left: 0;
+        position: static;
+        transform: none;
+        width: 140px;
+
+        &:checked {
+          border-color: var(--blue-500);
+          box-shadow: inset 0 0 0 1px var(--blue-500);
+
+          &:focus {
+            box-shadow: inset 0 0 0 1px var(--blue-500), 0 0 0 2px var(--blue-500);
+          }
+        }
+
+        &:focus {
+          box-shadow: 0 0 0 2px var(--blue-500);
+        }
+      }
+
+      input[data-drupal-selector="edit-site-menu-default"] {
+        background-image: url("../images/menu-default.svg");
+      }
+
+      input[data-drupal-selector="edit-site-menu-dropdown"] {
+        background-image: url("../images/menu-dropdown.svg");
+      }
+
+      input[data-drupal-selector="edit-site-menu-mega"] {
+        background-image: url("../images/menu-mega.svg");
+      }
+
+      .form-item__label {
+        font-size: var(--font-size-sm);
+        display: block;
+        margin-block-start: var(--size-2);
+        margin-block-end: var(--size-4);
+        width: 100%;
+      }
+    }
+  }
+}
+
+[data-drupal-selector="edit-site-search"] {
+  .form-radios {
+    display: grid;
+    grid-gap: var(--size-3);
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    margin-block-start: var(--size-2);
+
+    .form-item {
+      display: inline-grid;
+      margin: 0;
+      position: relative;
+
+      input {
+        background-repeat: no-repeat;
+        border-radius: var(--radius-5);
+        cursor: pointer;
+        height: 100px;
+        margin-left: 0;
+        position: static;
+        transform: none;
+        width: 140px;
+
+        &:checked {
+          border-color: var(--blue-500);
+          box-shadow: inset 0 0 0 1px var(--blue-500);
+
+          &:focus {
+            box-shadow: inset 0 0 0 1px var(--blue-500), 0 0 0 2px var(--blue-500);
+          }
+        }
+
+        &:focus {
+          box-shadow: 0 0 0 2px var(--blue-500);
+        }
+      }
+
+      input[data-drupal-selector="edit-site-search-default"] {
+        background-image: url("../images/search-dropdown.svg");
+      }
+
+      input[data-drupal-selector="edit-site-search-modal"] {
+        background-image: url("../images/search-modal.svg");
+      }
+
+      .form-item__label {
+        font-size: var(--font-size-sm);
+        display: block;
+        margin-block-start: var(--size-2);
+        margin-block-end: var(--size-4);
+        width: 100%;
+      }
+    }
+  }
+}
+
+[data-drupal-selector="edit-site-alert"] {
+  .filter-wrapper {
+    display: none;
+  }
+}
+
+[data-drupal-selector="edit-site-credit"] {
+  .filter-wrapper {
+    display: none;
+  }
+}
+
+[data-drupal-selector="edit-css-editor"] {
+  display: none;
+}

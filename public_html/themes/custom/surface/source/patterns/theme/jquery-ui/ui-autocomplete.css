@@ -1,0 +1,13 @@
+/* Autocomplete */
+.ui-autocomplete {
+  background: var(--white);
+  border-radius: 0 0 0.125rem 0.125rem;
+  border-top: 0;
+  border: 1px solid hsla(233, 11%, 86%, 80%);
+  box-shadow: 0 0.125rem 0.25rem hsla(236, 17%, 16%, 10%);
+  color: hsl(230, 3%, 35%);
+  cursor: default;
+  left: 0;
+  position: absolute;
+  top: 0;
+}

@@ -1,9 +1,9 @@
 /**
  * @file
- * Footer menu styling.
+ * Main menu styling.
  */
 
-.menu--footer {
+.menu-footer {
   @media (--tablet) {
     display: grid;
     grid-column-gap: var(--size-8);
@@ -21,10 +21,8 @@
 
   h4 {
     color: var(--white);
-    font-family: var(--font-body);
     font-size: var(--font-size-3);
     font-weight: var(--font-weight-600);
-    margin-block-end: var(--size-5);
   }
 
   .menu__subnav {

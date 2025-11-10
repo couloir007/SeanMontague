@@ -1,0 +1,4 @@
+---
+data_search: 'modal'
+modifier: 'site-search--modal'
+has_quicklinks: true

@@ -1,0 +1,37 @@
+{#
+/**
+ * @file
+ * Surface theme implementation to display primary and secondary local tasks.
+ *
+ * Available variables:
+ * - primary: HTML list items representing primary tasks.
+ * - secondary: HTML list items representing secondary tasks.
+ *
+ * Each item in these variables (primary and secondary) can be individually
+ * themed in menu-local-task.html.twig.
+ *
+ * @ingroup themeable
+ */
+#}
+
+{% if primary %}
+  {% include '@components/tabs/tabs.twig' with {
+    'id': 'primary-tabs-title',
+    'heading': 'Primary tabs',
+    'aria': 'primary-tabs-title',
+    'data': 'data-drupal-nav-primary-tabs',
+    'modifier': 'tabs--primary',
+    'tabs': primary
+  } only %}
+{% endif %}
+
+{% if secondary %}
+  {% include '@components/tabs/tabs.twig' with {
+    'id': 'secondary-tabs-title',
+    'heading': 'Secondary tabs',
+    'aria': 'secondary-tabs-title',
+    'data': '',
+    'modifier': 'tabs--secondary',
+    'tabs': secondary
+  } only %}
+{% endif %}

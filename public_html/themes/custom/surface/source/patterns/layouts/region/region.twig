@@ -1,5 +1,13 @@
+{{ attach_library('surface/region')}}
+
+{% set classes = [
+  'region',
+  modifier ? modifier,
+  attributes ? attributes.class
+]|join(' ')|trim %}
+
 {% if region_wrapper %}
-  <section class="region{{ modifier ? ' ' ~ modifier }}{{- attributes ? ' ' ~ attributes.class -}}" {{- attributes ? attributes|without(class) -}}{% if id %} id="{{ id }}"{% endif %}>
+  <section class="{{ classes }}" {{ attributes ? attributes|without('class') }} {% if id %}id="{{ id }}"{% endif %}>
 {% endif %}
 
   {% block content %}

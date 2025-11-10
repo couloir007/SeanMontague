@@ -1,7 +1,6 @@
 /* Utility styles - Do not sort. */
 @import 'container';
 @import 'grid';
-@import 'prose';
 @import 'align';
 @import 'aspect';
 @import 'backgrounds';
@@ -11,5 +10,6 @@
 @import 'spacing';
 @import 'sizing';
 @import 'svg';
-@import 'typography';
+@import 'text';
 @import 'visibility';
+@import 'focus';

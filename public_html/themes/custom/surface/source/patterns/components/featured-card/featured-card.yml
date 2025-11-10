@@ -5,7 +5,7 @@ image: |-
 title:
   modifier: 'featured-card__title'
   level: 3
-  text: 'Amendment and Addendum HS 9415'
+  text: 'UCLA Health HIMS Forum'
   url: '#'
 subtitle:
   modifier: 'featured-card__subtitle'
@@ -16,13 +16,10 @@ date:
   modifier: ''
   date: 'October 31, 2023 | 12:30 PM – 1:30 PM'
 cta:
-  modifier: 'button--secondary'
-  text: 'See the full event'
+  modifier: 'button--primary'
+  text: 'Read the full article'
   url: '#'
-event_type:
-  modifier: 'featured-card__type'
-  text: 'In-Person'
-  url: ''
-more_dates: true
-organization: '<a href="#">Davig Geffen School of Medicine</a>'
-readtime: ''
+event_type: ''
+more_dates: false
+organization: 'David Geffen School of Medicine'
+readtime: '5 min read'

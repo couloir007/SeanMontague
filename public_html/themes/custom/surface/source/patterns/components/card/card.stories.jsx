@@ -23,23 +23,7 @@ export const ArticleCard = {
     short_date_month: '',
     meta_description: 'Integer posuere erat a ante venenatis dapibus posuere velit aliquet.',
     organization: '',
-    readtime: '5 min read'
-  },
-};
-
-export const PageCard = {
-  ...EventCard,
-  name: 'Page card',
-  args: {
-    ...data,
-    event_type: '',
-    date: '',
-    date_short: '',
-    more_dates: false,
-    short_date_month: '',
-    organization: '',
-    readtime: '',
-    meta_description: 'Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.'
+    readtime: '5 min read',
   },
 };
 

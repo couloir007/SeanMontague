@@ -1,0 +1,13 @@
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import * as SiteAlertStories from './site-alert.stories';
+
+<Meta of={SiteAlertStories} />
+
+# Site alert
+
+## Site alert technical specs
+
+* `theme` is used as a conditional to display the alert in different background color depending on the theme's branding.
+* `text` is the actual alert text which could include some html tags such as links, paragraphs, etc.
+
+<Story of={SiteAlertStories.SiteAlert} />

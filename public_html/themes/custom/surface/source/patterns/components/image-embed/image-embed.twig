@@ -1,0 +1,93 @@
+{{ attach_library('surface/image-embed') }}
+
+{% set classes = [
+  'image-embed',
+  modifier ? modifier,
+  attributes ? attributes.class
+]|join(' ')|trim %}
+
+{% if mid %}
+  {% if 'small-portrait' in attributes.class %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'a_small_portrait_250x375') }}
+    {% endset %}
+  {% elseif 'small-rectangular' in attributes.class %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'a_small_rectangular_240x160') }}
+    {% endset %}
+  {% elseif 'small-rectangular-tall' in attributes.class %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'a_small_rectangular_tall_480x360') }}
+    {% endset %}
+  {% elseif 'small-square' in attributes.class %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'a_small_square_250px') }}
+    {% endset %}
+  {% elseif 'medium-portrait' in attributes.class %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'b_medium_portrait_360x540') }}
+    {% endset %}
+  {% elseif 'medium-rectangular' in attributes.class %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'b_medium_rectangular_480x320') }}
+    {% endset %}
+  {% elseif 'medium-rectangular-tall' in attributes.class %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'b_medium_rectangular_tall_720_x_540') }}
+    {% endset %}
+  {% elseif 'medium-rectangular-wide' in attributes.class %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'b_medium_rectangular_wide_720x405') }}
+    {% endset %}
+  {% elseif 'medium-square' in attributes.class %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'b_medium_square_500px') }}
+    {% endset %}
+  {% elseif 'large-rectangular' in attributes.class %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'large_rectangular_3_2_720x480') }}
+    {% endset %}
+  {% elseif 'large-rectangular-tall' in attributes.class %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'large_rectangular_tall_960x720') }}
+    {% endset %}
+  {% elseif 'large-square' in attributes.class %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'large_square_720px') }}
+    {% endset %}
+  {% elseif 'extra-large-rectangular' in attributes.class %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'xtra_large_rectangular_3_2_960x640') }}
+    {% endset %}
+  {% elseif 'extra-large-rectangular-wide' in attributes.class %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'xtra_large_rectangular_wide_16_9_960x540') }}
+    {% endset %}
+  {% elseif 'extra-large-square' in attributes.class %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'xtra_large_square_960px') }}
+    {% endset %}
+  {% elseif 'super-large' in attributes.class %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'zsuper_large_full_width_1376px') }}
+    {% endset %}
+  {% elseif 'super-wide' in attributes.class %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'zsuper_wide_1900px') }}
+    {% endset %}
+  {% else %}
+    {% set image %}
+      {{ drupal_entity('media', mid, 'large_rectangular_3_2_720x480') }}
+    {% endset %}
+  {% endif %}
+
+  <figure class="{{ classes }}" {{ attributes ? attributes|without('class') }}>
+    {{ image }}
+  </figure>
+{% else %}
+  <div class="{{ classes }}" {{ attributes ? attributes|without('class') }}>
+    <div class="prose">
+      <pre>No media exists, please update or delete this component.</pre>
+    </div>
+  </div>
+{% endif %}

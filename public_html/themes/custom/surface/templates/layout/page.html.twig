@@ -45,7 +45,7 @@
  */
 #}
 
-{% extends '@layouts/layout-container/layout-container.twig' %}
+{% extends '@layouts/site-container/site-container.twig' %}
   {% block header %}
     {{ page.header }}
   {% endblock %}
@@ -59,25 +59,5 @@
   {% endblock %}
 
   {% block footer %}
-    {% embed '@layouts/site-footer/site-footer.twig' with {
-      'site_extra': site_extra is not empty ? site_extra : false,
-    } %}
-      {% block branding %}
-        {% include '@elements/site-branding/site-branding.twig' with {
-          'site_name': site_name,
-          'modifier': 'site-branding--footer ' ~ logo_style,
-          'logo': footer_logo,
-        } only %}
-
-        {% if site_credit %}
-          {% include '@elements/site-credit/site-credit.twig' with {
-            'site_credit': site_credit
-          } only %}
-        {% endif %}
-      {% endblock %}
-
-      {% block menu %}
-        {{ drupal_menu('footer', expand=true) }}
-      {% endblock %}
-    {% endembed %}
+    {{ page.footer }}
   {% endblock %}

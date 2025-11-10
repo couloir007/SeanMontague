@@ -1,0 +1,5 @@
+---
+theme-class: 'site-search--modal is-pl'
+action: '/search/node'
+title: 'Enter the terms you wish to search for.'
+placeholder: 'Search by keyword or phrase.'

@@ -1,0 +1,102 @@
+/**
+ * @file
+ * Node Teaser specific styles.
+ */
+
+.node--view-mode-teaser {
+  margin-block-end: var(--size-6);
+  position: relative; /* Anchor after pseudo-element. */
+
+  & .node__meta {
+    margin-block-end: var(--size-4);
+
+    & a {
+      color: var(--blue-900);
+      font-weight: var(--font-weight-700);
+    }
+  }
+
+  & .node__top-wrapper {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+
+    @media (--laptop) {
+      position: relative; /* Anchor the image */
+    }
+  }
+
+  & .primary-image {
+    flex-shrink: 0;
+    margin: 0;
+    margin-block-end: var(--size-4);
+    margin-inline-end: var(--size-4);
+
+    /* Ensure title does not wrap under image until necessary. */
+    & + .node__title {
+      flex-basis: calc(100% - calc(4.5 * var(--size-4)));
+
+      @media (--laptop) {
+        flex-basis: auto;
+      }
+    }
+
+    & a {
+      display: block;
+    }
+
+    & img {
+      border-radius: 50%;
+      height: 3.9375rem;
+      object-fit: cover;
+      width: 3.9375rem;
+
+      @media (--laptop) {
+        height: calc(7.1429vw - 2.317rem);
+        width: calc(7.1429vw - 2.317rem);
+      }
+    }
+
+    @media (--laptop) {
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline-start: calc(-7.1429vw - -1.0714px);
+      margin: 0;
+    }
+  }
+
+  & .node__title {
+    color: var(--gray-900);
+    font-size: 24px;
+    line-height: var(--leading-none);
+    margin-block-end: var(--size-4);
+    margin: 0;
+
+    @media (--laptop) {
+      font-size: var(--size-8);
+      line-height: var(--size-12);
+    }
+  }
+
+  & .field--tag-ref {
+    background-color: transparent;
+    margin-block-end: 0;
+    margin-block-start: var(--size-4);
+    margin-inline: 0;
+    padding-block: 0;
+    padding-inline: 0;
+
+    @media (--laptop) {
+      margin-block-start: var(--size-8);
+    }
+  }
+
+  @media (--laptop) {
+    margin-block-end: var(--size-12);
+  }
+}
+
+.views-row:last-child .node--view-mode-teaser {
+  margin-block-end: 0;
+}

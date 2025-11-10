@@ -1,0 +1,5 @@
+---
+modifier: 'region--content'
+id: 'Content'
+content: |-
+  <p style="border: var(--border-size-1) dashed var(--gray-300); color: var(--gray-600); padding: 1rem; max-inline-size: 100%; margin: 0;">Region Content</p>

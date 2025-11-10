@@ -3,33 +3,38 @@ type: theme
 description: 'A clean, accessible, and flexible Drupal front-end theme.'
 alt text: 'Screenshot of Surface, Drupal front-end theme.'
 package: Core
-core_version_requirement: ^8.9 || ^9 || ^10 || ^11
+core_version_requirement: ^10 || ^11
 base theme: false
+dependencies:
+  - components
+  - twig_tweak
+  - twig_field_value
 
 libraries:
   - surface/global
 
 regions:
   header: Header
+  secondary_menu: Secondary menu
+  hero: Hero (full width)
   highlighted: Highlighted
   breadcrumb: Breadcrumb
   content_above: Content Above
   content: Content
+  sidebar: Sidebar
   content_below: Content Below
-  footer: Footer
-  theme: Theme
+  footer_top: Footer Top
+  footer_bottom: Footer Bottom
+  disabled: Disabled
 
 ckeditor5-stylesheets:
-  - dist/css/global.css
+  - dist/css/base.css
   - dist/css/button.css
 
 components:
   namespaces:
-    surface: templates/custom
     images: dist/images
     base: source/patterns/base
-    elements: source/patterns/elements
     layouts: source/patterns/layouts
     components: source/patterns/components
-    collections: source/patterns/collections
     theme: source/patterns/theme

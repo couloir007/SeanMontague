@@ -1,0 +1,10 @@
+{% include '@components/hero/hero.twig' with {
+  'attributes': attributes,
+  'image': content.field_sf_image|field_value,
+  'video': content.field_sf_video|field_value,
+  'video_provider': content.field_sf_video.0['#media'].field_media_oembed_video.value,
+  'title': content.field_sf_title|field_value,
+  'subtitle': content.field_sf_subtitle|field_value is not empty ? content.field_sf_subtitle|field_value,
+  'url': content.field_sf_link|field_value is not empty ? content.field_sf_link.0['#url_title'],
+  'url_title': content.field_sf_link|field_value is not empty ? content.field_sf_link.0['#title'],
+} only %}

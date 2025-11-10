@@ -1,0 +1,9 @@
+uuid: 82b23f3c-59ab-482d-80af-de811b968bb6
+langcode: en
+status: true
+dependencies: {  }
+id: moderation
+label: Moderation
+description: ''
+layout: {  }
+weight: 1

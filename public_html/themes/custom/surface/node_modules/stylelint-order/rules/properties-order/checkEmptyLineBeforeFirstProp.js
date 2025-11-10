@@ -1,15 +1,14 @@
-const stylelint = require('stylelint');
-const { isString } = require('../../utils/validateType');
-const ruleName = require('./ruleName');
-const messages = require('./messages');
-const hasEmptyLineBefore = require('./hasEmptyLineBefore');
-const removeEmptyLinesBefore = require('./removeEmptyLinesBefore');
+import stylelint from 'stylelint';
+import { isString } from '../../utils/validateType.js';
+import { ruleName } from './ruleName.js';
+import { messages } from './messages.js';
+import { hasEmptyLineBefore } from './hasEmptyLineBefore.js';
+import { removeEmptyLinesBefore } from './removeEmptyLinesBefore.js';
 
-module.exports = function checkEmptyLineBeforeFirstProp({
+export function checkEmptyLineBeforeFirstProp({
 	propData,
 	primaryOption,
 	emptyLineBeforeUnspecified,
-	isFixEnabled,
 	context,
 	result,
 }) {
@@ -27,15 +26,14 @@ module.exports = function checkEmptyLineBeforeFirstProp({
 	}
 
 	if (emptyLineBefore && hasEmptyLineBefore(propData.node)) {
-		if (isFixEnabled) {
-			removeEmptyLinesBefore(propData.node, context.newline);
-		} else {
-			stylelint.utils.report({
-				message: messages.rejectedEmptyLineBefore(propData.name),
-				node: propData.node,
-				result,
-				ruleName,
-			});
-		}
+		stylelint.utils.report({
+			message: messages.rejectedEmptyLineBefore(propData.name),
+			node: propData.node,
+			result,
+			ruleName,
+			fix: () => {
+				removeEmptyLinesBefore(propData.node, context.newline);
+			},
+		});
 	}
-};
+}

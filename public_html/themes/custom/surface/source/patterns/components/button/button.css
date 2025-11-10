@@ -1,0 +1,182 @@
+/**
+ * @file
+ * Button styles.
+ */
+
+/* Exclude the initial button styles if the classes `prose` or `button--link` exist in the element. */
+.button:not(:where([class~='prose'] *)) {
+  align-items: center;
+  appearance: none;
+  background-color: var(--grey-300);
+  border-color: var(--grey-300);
+  border-radius: 0;
+  border-width: 1px;
+  color: var(--black);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-system);
+  font-size: var(--font-size-1);
+  font-weight: var(--font-weight-700);
+  inline-size: fit-content;
+  justify-content: center;
+  line-height: var(--leading-none);
+  padding-block: var(--size-4);
+  padding-inline: var(--size-6);
+  position: relative;
+  transition: var(--transition-soft-linear);
+  white-space: nowrap;
+
+  &:visited {
+    color: var(--black);
+  }
+
+  &:hover {
+    background-color: var(--grey-200);
+    border-color: var(--grey-300);
+  }
+
+  &:focus {
+    box-shadow: 0 0 var(--white), 0 0 0 2px var(--grey-500), 0 0 var(--white);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+
+  &[aria-expanded='true'] {
+    &:focus::after {
+      border-color: var(--grey-300);
+    }
+  }
+
+  &:disabled {
+    background-color: var(--grey-300);
+    color: var(--gray-500);
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* If two buttons are added, this should add some separation. */
+  + .button {
+    margin-block: var(--size-4);
+
+    @media (--laptop) {
+      margin-block: 0;
+      margin-inline-start: var(--size-2);
+    }
+  }
+
+  svg {
+    block-size: 1.5rem;
+    inline-size: 1.25rem;
+    margin-inline-start: 0;
+
+    path {
+      color: inherit;
+    }
+  }
+}
+
+/* Button primary */
+.button--primary {
+  background-color: var(--blue-500);
+  border-color: var(--blue-500);
+  color: var(--white);
+  font-family: var(--font-primary);
+
+  &:visited {
+    background-color: var(--blue-500);
+    color: var(--white);
+  }
+
+  &:hover {
+    background-color: var(--blue-700);
+    color: var(--white);
+  }
+
+  &:focus {
+    box-shadow: 0 0 var(--white), 0 0 0 2px var(--blue-300), 0 0 var(--white);
+  }
+
+  &:active {
+    background-color: var(--blue-500);
+    color: var(--white);
+  }
+}
+
+/* Button secondary */
+.button--secondary {
+  background-color: var(--gold-100);
+  border-color: var(--gold-100);
+  color: var(--blue-700);
+  font-family: var(--font-primary);
+
+  &:visited {
+    background-color: var(--gold-100);
+    color: var(--blue-700);
+  }
+
+  &:hover {
+    background-color: var(--gold-500);
+    border-color: var(--gold-500);
+    color: var(--blue-700);
+  }
+
+  &:focus {
+    box-shadow: 0 0 var(--white), 0 0 0 2px var(--gold-500), 0 0 var(--white);
+  }
+
+  &:active {
+    background-color: var(--gold-500);
+    color: var(--blue-700);
+  }
+}
+
+/* Outlined button. */
+.button--outlined {
+  background-color: transparent;
+  border-color: currentColor;
+  border-radius: var(--radius-4);
+  font-family: var(--font-primary);
+
+  &:hover {
+    background-color: var(--black);
+    color: var(--white);
+  }
+}
+
+.button--link {
+  background: transparent;
+  color: inherit;
+  border: none;
+
+  svg {
+    block-size: 1rem;
+    display: inline-block;
+    inline-size: 1rem;
+    margin-inline-start: var(--size-05);
+
+    path {
+      color: inherit;
+    }
+  }
+
+  /* If the link has an icon, ensure it is vertically aligned with text. */
+  &:has(svg) {
+    align-items: center;
+    display: flex;
+  }
+
+  &:hover {
+    background: transparent;
+    color: var(--blue-500);
+  }
+
+  &:focus {
+    box-shadow: none;
+    outline: 0;
+    outline-offset: 0;
+  }
+}
+
+.button--search:hover {
+  text-decoration: underline;
+}

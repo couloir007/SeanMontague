@@ -1,0 +1,12 @@
+{{ attach_library('surface/text') }}
+
+{% set classes = [
+  'text',
+  'prose',
+  modifier ? modifier,
+  attributes ? attributes.class
+]|join(' ')|trim %}
+
+<div class="{{ classes }}" {{ attributes ? attributes|without('class') }}>
+  {{ wysiwyg }}
+</div>

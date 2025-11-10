@@ -1,0 +1,5 @@
+---
+is_active: false
+level: ''
+link: |-
+  <a href="#" class="tabs__link js-tabs-link" data-drupal-link-system-path="#">Edit</a>

@@ -1,0 +1,48 @@
+{% set classes = [
+  'node',
+  'container',
+  'grid',
+  'grid--full',
+  attributes ? attributes.class
+]|join(' ')|trim %}
+
+{% set title_classes = [
+  'node__title',
+  title_attributes ? title_attributes.class
+]|join(' ')|trim %}
+
+{% set content_classes = [
+  'node__content',
+  content_attributes ? content_attributes.class
+]|join(' ')|trim %}
+
+<article class="{{ classes }}" {{ attributes ? attributes|without('class', 'id') }}>
+  <header>
+    {{ title_prefix }}
+      {% if label and not page %}
+      <h2 class="{{ title_classes }}" {{ title_attributes ? title_attributes|without('class') }}>
+        <a href="{{ url }}" rel="bookmark">{{ label }}</a>
+      </h2>
+    {% endif %}
+    {{ title_suffix }}
+
+    {% if display_submitted %}
+      <div class="node__meta">
+      {% if author_picture %}
+        <div class="node__author-image">
+          {{ author_picture }}
+        </div>
+      {% endif %}
+
+        <span{{ author_attributes }}>
+          {{ 'By'|t }} {% apply spaceless %}{{ author_name }}{% endapply %}, {{ date }}
+        </span>
+        {{ metadata }}
+      </div>
+    {% endif %}
+  </header>
+
+  <div class="{{ content_classes }}" {{ content_attributes ? content_attributes|without('class') }}>
+    {{ content }}
+  </div>
+</article>

@@ -1,0 +1,26 @@
+---
+id: 'primary-tabs-title'
+heading: 'Primary tabs'
+aria: 'primary-tabs-title'
+data: 'data-drupal-nav-primary-tabs'
+modifier: 'tabs--primary'
+tabs: |-
+  <li class="tabs__tab is-active">
+    <a href="/about/dgit" class="tabs__link js-tabs-link is-active" data-drupal-link-system-path="node/8">View<span class="visually-hidden">(active tab)</span></a>
+    <button class="tabs__trigger" aria-label="Tabs display toggle" aria-expanded="false">
+      <span class="tabs__trigger-icon">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </button>
+  </li>
+  <li class="tabs__tab">
+    <a href="/node/8/edit" class="tabs__link js-tabs-link" data-drupal-link-system-path="node/8/edit">Edit</a>
+  </li>
+  <li class="tabs__tab">
+    <a href="/node/8/delete" class="tabs__link js-tabs-link" data-drupal-link-system-path="node/8/delete">Delete</a>
+  </li>
+  <li class="tabs__tab">
+    <a href="/node/8/revisions" class="tabs__link js-tabs-link" data-drupal-link-system-path="node/8/revisions">Revisions</a>
+  </li>

@@ -1,0 +1,15 @@
+/**
+ * @file
+ * Site container Layout.
+ */
+
+.site-container {
+  background: var(--page-bg-color, var(--white));
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+
+  .node-unpublished & {
+    background-color: var(--sand-300);
+  }
+}

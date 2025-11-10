@@ -1,0 +1,19 @@
+{{ attach_library('surface/slider-item-preview') }}
+
+{% set classes = [
+  'slider-item-preview'
+] %}
+
+<div{{ attributes.addClass(classes) }}>
+  <div class="slider-item-preview__media">
+    {{ content.field_sf_image }}
+  </div>
+  <div class="slider-item-preview__content">
+    <div class="title">
+      {{ content.field_sf_title|field_value }}
+    </div>
+    <div class="prose">
+      {{ content.field_sf_wysiwyg|field_value }}
+    </div>
+  </div>
+</div>

@@ -14,7 +14,7 @@
 
     > div {
       block-size: var(--size-40);
-      border-color: var(--gray-300);
+      border-color: var(--grey-300);
       border-width: var(--border-size-1);
       box-shadow: var(--shadow-3);
       display: grid;
@@ -38,7 +38,7 @@
 
     > div {
       aspect-ratio: var(--ratio-box);
-      border-color: var(--gray-300);
+      border-color: var(--grey-300);
       border-style: solid;
       border-width: var(--border-size-1);
       display: grid;
@@ -50,25 +50,22 @@
 }
 
 /* Brand & Color Demo */
-.demo-brands,
-.demo-colors {
+.demo-brands {
   display: grid;
   gap: var(--size-8);
   justify-items: flex-start;
   padding-block: var(--size-12);
 
-  .brand-demo,
-  .color-demo {
+  .brand-demo {
     display: grid;
     gap: var(--size-4);
     grid-template-columns: repeat(auto-fill, minmax(max(var(--size-40), 10rem), 1fr));
   }
 
-  .brand-demo__swatch,
-  .color-demo__swatch {
+  .brand-demo__swatch {
     .swatch {
       aspect-ratio: var(--ratio-box);
-      border-color: var(--gray-300);
+      border-color: var(--grey-300);
       border-radius: var(--radius-1);
       border-width: var(--border-size-1);
       display: grid;
@@ -125,23 +122,23 @@
     }
 
     .font-meta__alpha {
-      color: var(--gray-700);
+      color: var(--grey-700);
       inline-size: 100%;
     }
 
     .font-meta__label {
-      color: var(--gray-600);
+      color: var(--grey-700);
     }
 
     .font-meta__preview {
-      border-block-start: var(--border-size-1) solid var(--gray-300);
+      border-block-start: var(--border-size-1) solid var(--grey-300);
       inline-size: fit-content;
       margin: var(--size-4) 0 0;
       padding: var(--size-4) 0 0;
 
       @media (width >= 768px) {
         border-block-start: 0;
-        border-inline-start: var(--border-size-1) solid var(--gray-300);
+        border-inline-start: var(--border-size-1) solid var(--grey-300);
         margin: 0 0 0 var(--size-4);
         padding: 0 0 0 var(--size-4);
       }
@@ -168,7 +165,7 @@
 
     > div {
       aspect-ratio: var(--ratio-box);
-      border-color: var(--gray-300);
+      border-color: var(--grey-300);
       border-radius: var(--radius-3);
       border-width: var(--border-size-1);
       display: grid;
@@ -189,13 +186,63 @@
       flex-grow: 1;
       font-weight: var(--font-weight-300);
       inline-size: calc(25% - 1px);
-      outline: 1px solid var(--gray-100);
+      outline: 1px solid var(--grey-100);
       overflow: hidden;
       padding: 0.8em 1.2em;
     }
 
     h4 {
       margin: 0;
+    }
+  }
+}
+
+/* Typography Demo */
+.demo-typography {
+  .heading {
+    margin-block-end: var(--size-6);
+
+    &:not(:first-child) {
+      margin-block-start: var(--size-10);
+    }
+  }
+
+  .demo-typography__container {
+    display: grid;
+
+    @media (width >= 768px) {
+      grid-template-columns: 1fr 2fr;
+    }
+
+    .demo-meta__container {
+      display: grid;
+
+      @media (width >= 768px) {
+        grid-auto-rows: min-content;
+        grid-template-columns: 1fr 1fr;
+    }
+    }
+
+    .demo-meta {
+      margin-block-end: var(--size-2);
+    }
+
+    .demo-meta__label {
+      color: var(--grey-500);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-700);
+    }
+
+    .demo-meta__value {
+      color: var(--black);
+      font-size: var(--font-size-0);
+    }
+
+    .demo-type__container {
+      background-color: var(--grey-100);
+      display: grid;
+      padding: var(--size-7);
+      place-content: center;
     }
   }
 }
@@ -211,24 +258,6 @@
     font-family: var(--font-system);
     font-size: var(--font-size-3);
     font-weight: var(--font-weight-500);
-  }
-}
-
-/* Styles for demo form elements in Storybook. */
-.form-elements-demo {
-  padding: var(--size-5) !important;
-
-  .form-elements-demo__item {
-    margin-block-end: var(--size-6);
-  }
-
-  .demo-label {
-    font-size: var(--font-size-1);
-    margin-block-end: var(--size-1);
-  }
-
-  > input {
-    margin-block-end: var(--size-5) !important;
   }
 }
 

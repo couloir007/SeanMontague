@@ -1,4 +1,7 @@
 /* eslint-disable */
+/* jshint esversion: 6 */
+
+'use strict';
 
 ((Drupal, once) => {
   const menuContainer = document.querySelector('[data-drupal-selector="site-navigation"]');
@@ -41,7 +44,7 @@
       // Menu toggle
       once('surfaceMenuToggle', '[data-drupal-selector="mobile-button"]', context).forEach(el => el.addEventListener('click', e => {
         e.preventDefault();
-        this.toggleMenu();
+        this.toggleMenu('main');
       }));
     },
 

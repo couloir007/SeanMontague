@@ -1,0 +1,51 @@
+/**
+ * @file
+ * Styling for the Filter module.
+ */
+
+.text-full > .form-item {
+  margin-block-end: 0;
+}
+
+.form-element--editor-format {
+  vertical-align: top;
+}
+
+.filter-wrapper {
+  margin-block-end: var(--size-2);
+  margin-block-start: var(--size-4);
+}
+
+.filter-help {
+  float: inline-end;
+  font-size: var(--font-size-sm);
+  padding-block: var(--size-2);
+}
+
+.compose-tips__item {
+  margin-block: var(--size-6);
+}
+
+.filter-guidelines__item {
+  font-size: var(--font-size-0);
+  line-height: var(--leading-tight);
+  margin-block-start: var(--size-4);
+}
+
+.filter-guidelines p {
+  margin-block: var(--size-1) 0;
+}
+
+/* Filter tips. */
+.filter-tips--long {
+  margin-block-end: var(--size-6);
+}
+
+.filter-tips__item,
+.filter-tips--long p {
+  margin-block: var(--size-2);
+}
+
+.filter-tips__item--short {
+  margin-block: var(--size-1) 0;
+}

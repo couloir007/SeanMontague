@@ -1,0 +1,17 @@
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import * as PagerStories from './pager.stories';
+
+<Meta of={PagerStories} />
+
+# Pager
+
+<Story of={PagerStories.Pager} />
+
+Most commonly used when listing a number of nodes to avoid having to list them all in a single page and jeopardize performance. The pager allows for small chunks of content to be rendered a page at a time.
+
+## Pager technical specs
+
+* `items[]` is an array of pages each of which contains:
+  * Numeric value to determine page number within the pager
+  * `href` which holds a url value for the page's path
+  * `first`, `last`, `previous`, and `next` for navigating the pager

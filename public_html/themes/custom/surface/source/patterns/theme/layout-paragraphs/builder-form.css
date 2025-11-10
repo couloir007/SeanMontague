@@ -1,0 +1,15 @@
+.lpb-form__actions {
+  background: var(--gray-200);
+  margin-block-start: 0;
+  padding: 20px;
+
+  .button {
+    margin-block: 0;
+  }
+}
+
+[data-drupal-selector="layout-paragraphs-layout-options"] {
+  .form-item--layout-paragraphs-config-label {
+    display: none;
+  }
+}

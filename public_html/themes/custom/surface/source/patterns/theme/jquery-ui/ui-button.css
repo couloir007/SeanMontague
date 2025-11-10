@@ -1,0 +1,45 @@
+/**
+ * @file
+ * jQuery UI Button styling.
+ */
+
+.ui-button {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  padding-block: var(--size-4);
+  padding-inline: var(--size-6);
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  vertical-align: middle;
+}
+
+.ui-button-icon-only {
+  font-size: 0;
+  text-indent: -9999px;
+  white-space: nowrap;
+  width: 2em;
+}
+
+/* no icon support for input elements */
+input.ui-button.ui-button-icon-only {
+  text-indent: 0;
+}
+
+.ui-button.ui-icon-notext .ui-icon {
+  padding: 0;
+  width: 2.1em;
+  height: 2.1em;
+  text-indent: -9999px;
+  white-space: nowrap;
+}
+
+input.ui-button.ui-icon-notext .ui-icon {
+  width: auto;
+  height: auto;
+  text-indent: 0;
+  white-space: normal;
+  padding: 0.4em 1em;
+}

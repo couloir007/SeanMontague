@@ -1,0 +1,52 @@
+/**
+ * @file
+ * Visual styles for ajax-progress throbber.
+ */
+
+.ajax-progress,
+.ajax-progress-throbber,
+.ajax-progress-fullscreen {
+  background-color: rgba(255, 255, 255, 5%);
+  border-radius: 0;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  opacity: 1;
+  overflow: hidden;
+  padding: 0;
+  position: fixed;
+  text-indent: -99999em;
+  top: 0;
+  width: 100%;
+  z-index: 999999;
+
+  .pl & {
+    position: relative;
+  }
+
+  &::before {
+    animation: spin 0.8s infinite linear;
+    border-color: var(--sky-700) transparent;
+    border-radius: 20px;
+    border-style: solid;
+    border-width: 4px;
+    bottom: 0;
+    content: " ";
+    display: block;
+    height: 20px;
+    left: 0;
+    margin: auto;
+    overflow: hidden;
+    position: absolute;
+    right: 0;
+    text-indent: -99999em;
+    top: 0;
+    width: 20px;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

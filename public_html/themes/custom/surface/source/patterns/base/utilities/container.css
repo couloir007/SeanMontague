@@ -9,14 +9,10 @@ After this point, the padding is removed and the selectors will not expand
 any wider and they will be center-aligned to the page. */
 .container {
   margin-inline: auto;
-  max-inline-size: var(--size-max-content-width); /* 1376px */
-  padding-inline: var(--size-4);
+  max-inline-size: var(--size-container); /* 1376px */
+  padding-inline: var(--size-4); /* 16px */
 
-  @media (--desktop) {
-    padding-inline: var(--size-8);
-  }
-
-  @media (--desktop-large) { /* 1440px */
+  @media (--laptop-padding) {
     padding-inline: 0;
   }
 }

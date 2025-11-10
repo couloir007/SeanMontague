@@ -1,0 +1,22 @@
+.js {
+  .field--widget-paragraphs {
+    td {
+      padding-block: var(--size-3);
+      padding-inline: var(--size-6);
+    }
+
+    .draggable {
+      .tabledrag-handle {
+        margin: 0;
+        padding: 0;
+      }
+    }
+
+    .tabledrag-handle {
+      .handle {
+        height: 1em;
+        margin: 0;
+      }
+    }
+  }
+}

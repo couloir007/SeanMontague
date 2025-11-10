@@ -8,6 +8,7 @@ ignoreFiles:
 rules:
   at-rule-no-unknown: null
   alpha-value-notation: percentage
+  color-function-alias-notation: null
   color-function-notation: null
   declaration-empty-line-before: never
   declaration-block-no-redundant-longhand-properties: null

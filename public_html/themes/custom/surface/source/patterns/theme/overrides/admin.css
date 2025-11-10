@@ -1,0 +1,8 @@
+/**
+ * @file
+ * Admin overrides.
+ */
+
+button.toolbar-link {
+  font-size: inherit
+}

@@ -1,0 +1,59 @@
+/**
+ * @file
+ * Layout paragraphs component list styles.
+ */
+
+.lpb-component-list {
+  position: relative;
+}
+
+.lpb-component-list__search {
+  margin-block-end: var(--size-5);
+
+  .lpb-component-list-search-input {
+    width: 100%;
+  }
+}
+
+.lpb-component-list__group {
+  .lpb-component-list__group--layout {
+    display: flex;
+    flex-wrap: wrap;
+    margin-block-end: var(--size-2);
+    width: 100%;
+  }
+
+  .lpb-component-list__group--content {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+}
+
+.lpb-component-list__item {
+  align-items: center;
+  display: flex;
+  height: 24px;
+  margin-block: var(--size-2);
+  width: 100%;
+
+  a {
+    align-items: center;
+    border-radius: var(--radius-4);
+    color: var(--midnight-joshua-tree);
+    display: flex;
+    font-size: var(--font-size-0);
+    padding-block: var(--size-3);
+    padding-inline: var(--size-3);
+    width: 100%;
+
+    &:hover {
+      background-color: var(--santa-barbara-sand);
+    }
+  }
+
+  img {
+    margin-right: 10px;
+    max-inline-size: 24px;
+  }
+}

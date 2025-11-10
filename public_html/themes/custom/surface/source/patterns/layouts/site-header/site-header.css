@@ -3,21 +3,11 @@
  * Site header.
  */
 
-:root {
-  --header-outer-height: 156px;
-  --header-inner-height: 92px;
-  --header-height-difference: calc(
-    var(--header-outer-height) - var(--header-inner-height)
-  );
-}
-
 .site-header {
-  background-color: var(--white);
-  box-shadow: var(--shadow-2);
-  display: flex;
-  flex-direction: column;
   inline-size: 100%;
   inset-block-start: 0;
+  padding-block-start: var(--size-5);
+  padding-block-end: var(--size-5);
   position: sticky;
   top: calc(
     var(--header-height-difference) * -1
@@ -34,21 +24,69 @@
       inset-block-start: 60px;
     }
   }
-}
 
-/* Take into account site alert */
-[data-alert="true"] {
-  .site-header {
-    inset-block-start: -70px;
+  .menu-main {
+    color: #333333;
+
+    .menu__item--level-1 .menu__link-inner {
+      padding-block: var(--size-4);
+    }
+
+    .menu__item--level-2 .menu__link-inner {
+      padding-block: 0;
+    }
   }
 
-  /* Take into account logged in user */
-  .gin--vertical-toolbar {
-    .site-header {
-      inset-block-start: 18px;
+  .site-header__container {
+    background: #BFD7C1;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
 
-      @media (--toolbar) {
-        inset-block-start: -9px;
+  .site-secondary__content {
+    height: 100%;
+  }
+
+  .site-secondary__buttons {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    justify-content: flex-end;
+
+    .translate {
+      flex-direction: row;
+    }
+
+    .button {
+      color: #333333;
+      font-weight: var(--font-weight-400);
+    }
+
+    .button--link {
+      padding-inline: 0;
+      padding-inline-end: var(--size-4);
+      padding-block: var(--size-4);
+
+      svg {
+        margin-inline-end: var(--size-1);
+        margin-inline-start: 0;
+      }
+    }
+
+    .button--translate {
+      padding-inline-start: var(--size-4);
+    }
+
+
+    .contact {
+      align-items: center;
+      display: flex;
+      font-weight: var(--font-weight-400);
+      padding-inline-end: 0;
+
+      &:hover {
+        color: var(--blue-500);
       }
     }
   }
@@ -61,17 +99,6 @@
 
     @media (--toolbar) {
       inset-block-start: 70px;
-    }
-  }
-}
-
-/* Take into account alert and node preview */
-[data-alert="true"][data-once="node-preview"] {
-  .site-header {
-    inset-block-start: 40px;
-
-    @media (--toolbar) {
-      inset-block-start: 0;
     }
   }
 }

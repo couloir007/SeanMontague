@@ -18,7 +18,7 @@
     'site_extra': site_extra is not empty ? site_extra : false,
   } %}
     {% block branding %}
-      {% include '@elements/site-branding/site-branding.twig' with {
+      {% include '@components/site-branding/site-branding.twig' with {
         'site_name': site_name,
         'modifier': 'site-branding--footer ' ~ logo_style,
         'logo': footer_logo,
@@ -26,14 +26,14 @@
 
       {% include '@components/menu-social/menu-social.twig' with {
         'facebook_url': facebook_url ? facebook_url,
-        'x_url': twitter_url ? twitter_url,
+        'twitter_url': twitter_url ? twitter_url,
         'instagram_url': instagram_url ? instagram_url,
         'youtube_url': youtube_url ? youtube_url,
         'linkedin_url': linkedin_url ? linkedin_url
       } only %}
 
       {% if site_credit %}
-        {% include '@elements/site-credit/site-credit.twig' with {
+        {% include '@components/site-credit/site-credit.twig' with {
           'site_credit': site_credit
         } only %}
       {% endif %}

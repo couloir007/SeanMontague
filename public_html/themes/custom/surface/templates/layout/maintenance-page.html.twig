@@ -1,0 +1,42 @@
+{#
+/**
+ * @file
+ * Surface's theme implementation to display a single Drupal page while offline.
+ *
+ * All available variables are mirrored in page.html.twig.
+ *
+ * @see template_preprocess_maintenance_page()
+ */
+ #}
+
+{% extends '@layouts/page/page.twig' %}
+{% block header %}
+	<header id="header" class="site-header" data-drupal-selector="site-header" role="banner" data-once="navigation">
+		<section class="site-primary">
+			<div class="container">
+				<div class="site-primary__content">
+					<a href="/" rel="home" class="site-branding ">
+						<img src="themes/custom/surface/dist/images/logo.svg" alt="Home">
+					</a>
+				</div>
+			</div>
+		</section>
+	</header>
+{% endblock %}
+
+{% block main %}
+	{{ page.highlighted }}
+	{{ page.content_above }}
+
+	<div class="container grid grid--full">
+		{% if title %}
+			<h1 class="title" id="page-title">{{ title }}</h1>
+		{% endif %}
+	</div>
+
+	<div class="container grid grid--full" id="content">
+    <div class="prose">
+	    {{ page.content }}
+    </div>
+	</div>
+{% endblock %}

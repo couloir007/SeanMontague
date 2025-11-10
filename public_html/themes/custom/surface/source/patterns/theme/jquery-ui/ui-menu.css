@@ -1,0 +1,55 @@
+.ui-menu {
+  border-radius: var(--radius-2);
+  border-width: 1px;
+
+  .ui-menu {
+    position: absolute;
+  }
+
+  .ui-menu-item {
+    cursor: pointer;
+    padding-block: var(--size-3);
+    padding-inline: var(--size-4);
+
+    &:hover {
+      background-color: var(--gray-100);
+    }
+  }
+
+  .ui-menu-item-wrapper {
+    display: block;
+    position: relative;
+  }
+}
+
+.ui-menu-divider {
+  border-width: 1px 0;
+  font-size: 0;
+  height: 0;
+  line-height: 0;
+  margin: 5px 0;
+}
+
+/* icon support */
+.ui-menu-icons {
+  position: relative;
+}
+
+.ui-menu-icons .ui-menu-item-wrapper {
+  padding-left: 2em;
+}
+
+/* left-aligned */
+.ui-menu .ui-icon {
+  bottom: 0;
+  left: 0.2em;
+  margin: auto 0;
+  position: absolute;
+  top: 0;
+}
+
+/* right-aligned */
+.ui-menu .ui-menu-icon {
+  left: auto;
+  right: 0;
+}

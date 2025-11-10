@@ -28,6 +28,7 @@ module:
   crop: 0
   csv_serialization: 0
   custom_field: 0
+  dashboard: 0
   datetime: 0
   dblog: 0
   default_content: 0

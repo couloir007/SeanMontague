@@ -2,37 +2,549 @@ global:
   version: VERSION
   css:
     base:
-      dist/css/global.css: {}
+      dist/css/base.css: {}
       dist/css/utilities.css: {}
+      dist/css/global.css: {}
+      dist/css/typography.css: {}
+      dist/css/prose.css: {}
     component:
       dist/css/button.css: {}
+    theme:
+      dist/css/admin.css: {}
+      dist/css/ckeditor.css: {}
+  js:
+    dist/js/animations.js: {}
+    dist/js/button-search.js: {}
+    dist/js/menu-utils.js: {}
+
+# Layout Libraries
+block:
+  css:
+    layout:
+      dist/css/block.css: {}
+
+container:
+  css:
+    layout:
+      dist/css/container.css: {}
+
+nav:
+  css:
+    layout:
+      dist/css/nav.css: {}
+
+region:
+  css:
+    layout:
+      dist/css/region.css: {}
+
+site-container:
+  css:
+    layout:
+      dist/css/site-container.css: {}
+
+site-footer:
+  css:
+    layout:
+      dist/css/site-footer.css: {}
+
+site-header:
+  css:
+    layout:
+      dist/css/site-header.css: {}
+  js:
+    dist/js/site-header.js: {}
+
+# Component Libraries
+accordion:
+  css:
+    component:
+      dist/css/accordion.css: {}
+  js:
+    dist/js/accordion.js: {}
+
+accordion-tabs:
+  css:
+    component:
+      dist/css/accordion-tabs.css: {}
+  js:
+    dist/js/accordion-tabs.js: {}
 
 breadcrumb:
   css:
     component:
       dist/css/breadcrumb.css: {}
 
+byline:
+  css:
+    component:
+      dist/css/byline.css: {}
+
+call-to-action:
+  css:
+    component:
+      dist/css/call-to-action.css: {}
+
+callout:
+  css:
+    component:
+      dist/css/callout.css: {}
+
 card:
   css:
     component:
       dist/css/card.css: {}
 
-# Overrides Drupal messages to solve issue in 10.3.
-# https://www.drupal.org/project/uswds_base/issues/3465493
-drupal.message:
-  version: VERSION
-  js:
-    dist/js/messages.js: {}
-  dependencies:
-    - surface/messages
+component-list:
+  css:
+    component:
+      dist/css/component-list.css: {}
+
+contact:
+  css:
+    component:
+      dist/css/contact.css: {}
+
+date:
+  css:
+    component:
+      dist/css/date.css: {}
+
+date-badge:
+  css:
+    component:
+      dist/css/date-badge.css: {}
+
+eyebrow:
+  css:
+    component:
+      dist/css/eyebrow.css: {}
 
 featured-card:
   css:
     component:
       dist/css/featured-card.css: {}
 
-leaflet:
+filter:
   css:
     component:
-      dist/css/leaflet.css: {}
+      dist/css/filter.css: {}
 
+form:
+  css:
+    component:
+      dist/css/form.css: {}
+
+form-boolean:
+  css:
+    component:
+      dist/css/form-boolean.css: {}
+  js:
+    dist/js/form-boolean.js: {}
+
+form-item:
+  css:
+    component:
+      dist/css/form-item.css: {}
+
+form-item-label:
+  css:
+    component:
+      dist/css/form-item-label.css: {}
+
+form-item-upload:
+  css:
+    component:
+      dist/css/form-item-upload.css: {}
+
+form-select:
+  css:
+    component:
+      dist/css/form-select.css: {}
+
+form-text:
+  css:
+    component:
+      dist/css/form-text.css: {}
+
+glide:
+  css:
+    component:
+      dist/css/glide.css: {}
+
+glightbox:
+  js:
+    dist/js/glightbox.js: {}
+
+image-embed:
+  css:
+    component:
+      dist/css/image-embed.css: {}
+
+links:
+  css:
+    component:
+      dist/css/links.css: {}
+
+list:
+  css:
+    component:
+      dist/css/list.css: {}
+
+main:
+  css:
+    component:
+      dist/css/main.css: {}
+
+media:
+  css:
+    component:
+      dist/css/media.css: {}
+
+media-library:
+  css:
+    component:
+      dist/css/media-library.css: {}
+
+menu-caret:
+  css:
+    component:
+      dist/css/menu-caret.css: {}
+
+menu-footer:
+  css:
+    component:
+      dist/css/menu-footer.css: {}
+
+menu-main:
+  css:
+    component:
+      dist/css/menu-main.css: {}
+  js:
+    dist/js/menu-main.js: {}
+    dist/js/menu-main-second-level.js: {}
+
+menu-quicklinks:
+  css:
+    component:
+      dist/css/menu-quicklinks.css: {}
+
+menu-secondary:
+  css:
+    component:
+      dist/css/menu-secondary.css: {}
+
+menu-sidebar:
+  css:
+    component:
+      dist/css/menu-sidebar.css: {}
+  js:
+    dist/js/menu-sidebar.js: {}
+
+menu-social:
+  css:
+    component:
+      dist/css/menu-social.css: {}
+
+menu-toggle:
+  css:
+    component:
+      dist/css/menu-toggle.css: {}
+
+menu-utility:
+  css:
+    component:
+      dist/css/menu-utility.css: {}
+
+messages:
+  css:
+    component:
+      dist/css/messages.css: {}
+  js:
+    dist/js/message.theme.js: {}
+
+mobile-button:
+  css:
+    component:
+      dist/css/mobile-button.css: {}
+
+node:
+  css:
+    component:
+      dist/css/node.css: {}
+
+node-preview-container:
+  css:
+    component:
+      dist/css/node-preview-container.css: {}
+
+node-teaser:
+  css:
+    component:
+      dist/css/node-teaser.css: {}
+
+pager:
+  css:
+    component:
+      dist/css/pager.css: {}
+
+page-title:
+  css:
+    component:
+      dist/css/page-title.css: {}
+
+paragraphs:
+  css:
+    component:
+      dist/css/paragraphs.css: {}
+
+quote:
+  css:
+    component:
+      dist/css/quote.css: {}
+
+readtime:
+  css:
+    component:
+      dist/css/readtime.css: {}
+
+search-block-form:
+  css:
+    component:
+      dist/css/search-block-form.css: {}
+
+search-results:
+  css:
+    component:
+      dist/css/search-results.css: {}
+
+site-alert:
+  css:
+    component:
+      dist/css/site-alert.css: {}
+
+site-branding:
+  css:
+    component:
+      dist/css/site-branding.css: {}
+
+site-navigation:
+  css:
+    component:
+      dist/css/site-navigation.css: {}
+
+site-search:
+  css:
+    component:
+      dist/css/site-search.css: {}
+
+skip-link:
+  css:
+    component:
+      dist/css/skip-link.css: {}
+
+tabs:
+  css:
+    component:
+      dist/css/tabs.css: {}
+  js:
+    dist/js/tabs.js: {}
+
+video:
+  css:
+    component:
+      dist/css/video.css: {}
+
+view-listing-form:
+  css:
+    component:
+      dist/css/view-listing-form.css: {}
+
+views-exposed-form:
+  css:
+    component:
+      dist/css/views-exposed-form.css: {}
+
+# Utility Libraries
+align:
+  css:
+    base:
+      dist/css/align.css: {}
+
+aspect:
+  css:
+    base:
+      dist/css/aspect.css: {}
+
+backgrounds:
+  css:
+    base:
+      dist/css/backgrounds.css: {}
+
+focus:
+  css:
+    base:
+      dist/css/focus.css: {}
+
+grid:
+  css:
+    base:
+      dist/css/grid.css: {}
+
+overflow:
+  css:
+    base:
+      dist/css/overflow.css: {}
+
+position:
+  css:
+    base:
+      dist/css/position.css: {}
+
+sizing:
+  css:
+    base:
+      dist/css/sizing.css: {}
+
+spacing:
+  css:
+    base:
+      dist/css/spacing.css: {}
+
+svg:
+  css:
+    base:
+      dist/css/svg.css: {}
+
+text:
+  css:
+    base:
+      dist/css/text.css: {}
+
+text2:
+  css:
+    base:
+      dist/css/text2.css: {}
+
+translate:
+  css:
+    base:
+      dist/css/translate.css: {}
+  js:
+    dist/js/translate.js: {}
+
+visibility:
+  css:
+    base:
+      dist/css/visibility.css: {}
+
+# Special Purpose Libraries
+admin2:
+  css:
+    theme:
+      dist/css/admin2.css: {}
+
+ajax-progress:
+  css:
+    theme:
+      dist/css/ajax-progress.css: {}
+
+autocomplete-loading:
+  css:
+    theme:
+      dist/css/autocomplete-loading.css: {}
+
+builder:
+  css:
+    theme:
+      dist/css/builder.css: {}
+
+builder-form:
+  css:
+    theme:
+      dist/css/builder-form.css: {}
+
+content-moderation:
+  css:
+    theme:
+      dist/css/content-moderation.css: {}
+
+entity-embed:
+  css:
+    theme:
+      dist/css/entity-embed.css: {}
+
+horizontal-toolbar:
+  css:
+    theme:
+      dist/css/horizontal-toolbar.css: {}
+
+index:
+  css:
+    theme:
+      dist/css/index.css: {}
+
+layout-select:
+  css:
+    theme:
+      dist/css/layout-select.css: {}
+
+print:
+  css:
+    theme:
+      dist/css/print.css: {}
+
+settings:
+  css:
+    theme:
+      dist/css/settings.css: {}
+
+storybook:
+  css:
+    theme:
+      dist/css/storybook.css: {}
+
+styles:
+  css:
+    theme:
+      dist/css/styles.css: {}
+
+tabledrag:
+  css:
+    theme:
+      dist/css/tabledrag.css: {}
+
+toolbar:
+  css:
+    theme:
+      dist/css/toolbar.css: {}
+
+toolbar-secondary:
+  css:
+    theme:
+      dist/css/toolbar-secondary.css: {}
+
+ui-autocomplete:
+  css:
+    theme:
+      dist/css/ui-autocomplete.css: {}
+
+ui-button:
+  css:
+    theme:
+      dist/css/ui-button.css: {}
+
+ui-core:
+  css:
+    theme:
+      dist/css/ui-core.css: {}
+
+ui-dialog:
+  css:
+    theme:
+      dist/css/ui-dialog.css: {}
+
+ui-menu:
+  css:
+    theme:
+      dist/css/ui-menu.css: {}

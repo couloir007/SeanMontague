@@ -1,84 +1,56 @@
 ---
+logo: '../../images/bg/Smithsonian_Ocean.svg'
+logo_si: '../../images/bg/Smithsonian-black.svg'
+logo_nmnh: '../../images/bg/NMNH.svg'
+site_url: 'https://ocean.si.edu'
 items:
-  - title: 'Learn and Train'
+  - title: 'Explore'
     url:
       isRouted: true
       routeName: '<nolink>'
     in_active_trail: false
     below:
-      - title: 'MD Students'
+      - title: 'Ocean Life'
         url: '#'
         in_active_trail: false
         below: false
-      - title: 'Residents and Fellows'
+      - title: 'Ecosystems'
         url: '#'
         in_active_trail: false
         below: false
-      - title: 'PHD Trainees'
+      - title: 'Planet Ocean'
         url: '#'
         in_active_trail: false
         below: false
-      - title: 'Postdoctoral'
+      - title: 'Through Time'
         url: '#'
         in_active_trail: false
         below: false
-      - title: 'Scholars'
+      - title: 'Conservation'
         url: '#'
         in_active_trail: false
         below: false
-      - title: 'Continuing Education'
+      - title: 'Human Connections'
         url: '#'
         in_active_trail: false
         below: false
-  - title: 'Get Involved'
-    url:
-      isRouted: true
-      routeName: '<nolink>'
-    in_active_trail: false
-    below:
-      - title: 'Give to DGSOM'
+      - title: 'At the Museum'
         url: '#'
         in_active_trail: false
         below: false
-      - title: 'Work for UCLA Health'
+      - title: 'Educators'
         url: '#'
         in_active_trail: false
         below: false
-      - title: 'Volunteer for UCLA'
+      - title: 'About'
         url: '#'
         in_active_trail: false
         below: false
-      - title: 'Health'
+      - title: 'Media Archive'
         url: '#'
         in_active_trail: false
         below: false
-      - title: 'Report Misconduct'
-        url: '#'
-        in_active_trail: false
-        below: false
-  - title: 'Connect'
-    url:
-      isRouted: true
-      routeName: '<nolink>'
-    in_active_trail: false
-    below:
-      - title: 'Alumni'
-        url: '#'
-        in_active_trail: false
-        below: false
-      - title: 'Find an Affinity Group'
-        url: '#'
-        in_active_trail: false
-        below: false
-      - title: 'UCLA Directory'
-        url: '#'
-        in_active_trail: false
-        below: false
-      - title: 'Maps and Directions'
-        url: '#'
-        in_active_trail: false
-        below: false
-      - title: 'Talk to our Media Team'
+      - title: 'Terms of Use'
         url: '#'
         in_active_trail: false
         below: false

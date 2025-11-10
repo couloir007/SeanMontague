@@ -12,8 +12,8 @@ _core:
   default_config_hash: UL5ZZvI0Lnp3fmVmhIDxvNI9RlMD0sfBIOi9ozr-k5o
 id: surface_tools
 theme: surface
-region: header
-weight: 0
+region: disabled
+weight: -2
 provider: null
 plugin: 'system_menu_block:tools'
 settings:

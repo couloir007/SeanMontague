@@ -1,0 +1,16 @@
+/**
+ * @file
+ * Byline styles.
+ */
+
+.contact {
+  color: var(--black);;
+  font-family: var(--font-system);
+  font-size: var(--font-size-1);
+  font-weight: var(--font-weight-700);
+  line-height: var(--font-size-1);
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

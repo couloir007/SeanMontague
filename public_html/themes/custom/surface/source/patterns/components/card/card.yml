@@ -18,12 +18,7 @@ date_short:
   month: 'Oct'
   day: '31'
 
-# The 'more_dates' key is used in Storybook as a way to add conditional for
-# displaying the '+ more dates' text on cards that are recuring.
-more_dates: true
-more_dates_url: '#'
-
-organization: '<a href="#">Davig Geffen School of Medicine</a>'
+organization: '<a href="#">David Geffen School of Medicine</a>'
 event_type: 'Virtual'
 readtime: ''
 

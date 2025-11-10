@@ -8,8 +8,8 @@ _core:
   default_config_hash: ABoKnlk20KHqZRw_2Qr4EvaFvH4lnQ2nuhunHeE1JIU
 id: surface_local_actions
 theme: surface
-region: content
-weight: -10
+region: disabled
+weight: 0
 provider: null
 plugin: local_actions_block
 settings:

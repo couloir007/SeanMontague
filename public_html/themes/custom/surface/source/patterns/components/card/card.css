@@ -18,8 +18,6 @@
   overflow: hidden;
 
   .title__link {
-    color: var(--ucla-blue);
-
     &:hover {
       color: var(--gray-900);
     }
@@ -44,7 +42,7 @@
 
 /* This label is only visible when the cards are within the Curated content component. */
 .card__content-type {
-  background-color: var(--ucla-blue);
+  background-color: var(--blue-300);
   color: var(--white);
   display: none;
   font-weight: var(--font-weight-600);
@@ -79,7 +77,6 @@ using margin-top: auto in the date wrapper field below. */
 }
 
 .card__title {
-  font-family: var(--font-heading);
   font-size: var(--font-size-2);
   line-height: var(--leading-normal);
   margin-block-end: var(--size-3);
@@ -103,13 +100,13 @@ meta_description/subtitle. */
   margin-block-end: var(--size-3);
 
   a {
-    color: var(--ucla-blue);
+    color: var(--blue-300);
     display: flex;
   }
 
   svg {
     block-size: 1em;
-    color: var(--ucla-blue);
+    color: var(--blue-300);
     display: inline-block;
     font-size: inherit;
     inline-size: 1em;
@@ -133,15 +130,6 @@ meta_description/subtitle. */
   /* Margin auto allows for the date to always be placed at the bottom
   of the card for position consistency when multiple cards are grouped together . */
   margin-block-start: auto;
-
-  /* We need to know if there are upcoming dates to be able to show
-  the '+ more dates' link/label on cards, however,   we don't need
-  to display them. */
-  .recurring-output--wrapper {
-    details {
-      display: none;
-    }
-  }
 }
 
 .card__date {
@@ -167,6 +155,6 @@ meta_description/subtitle. */
   margin-block-start: var(--size-3);
 
   &:hover {
-    color: var(--ucla-blue);
+    color: var(--blue-300);
   }
 }

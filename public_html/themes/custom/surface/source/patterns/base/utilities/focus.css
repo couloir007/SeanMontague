@@ -1,0 +1,10 @@
+/* Only show focus outline when navigation with keyboard.
+https://medienbaecker.com/articles/focus-outlines */
+*:focus-visible {
+  border-radius: var(--size-05) !important; /* ~ 2px */
+  outline-color: currentColor !important;
+  outline-offset: var(--size-05);
+  outline-style: solid !important;
+  outline-width: var(--size-05) !important;
+  overflow: hidden;
+}

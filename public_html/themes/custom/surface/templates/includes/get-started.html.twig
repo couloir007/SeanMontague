@@ -1,0 +1,60 @@
+{#
+/**
+ * @file
+ * Surface's theme Get Started section.
+ *
+ * This section is enabled when no front page content has been populated.
+ *
+ * TODO:
+ * - Move this markup into Drupal's core Frontpage Views.
+ * - Translate/localize this page for different languages.
+ */
+#}
+
+{% set platform_front_page = 'https://webplatform.healthsciences.ucla.edu/knowledge-base/managing-site/creating-front-page-home-page' %}
+{% set platform_quick_start = 'https://webplatform.healthsciences.ucla.edu/knowledge-base/everyone/quick-start-guide' %}
+{% set platform_everyone = 'https://webplatform.healthsciences.ucla.edu/knowledge-base/everyone' %}
+{% set platform_manage = 'https://webplatform.healthsciences.ucla.edu/knowledge-base/managing-site' %}
+{% set platform_course = 'https://webplatform.healthsciences.ucla.edu/courses' %}
+{% set platform_seo = 'https://webplatform.healthsciences.ucla.edu/node/1306' %}
+{% set platform_test_sites = 'https://webplatform.healthsciences.ucla.edu/support/test-site' %}
+{% set platform_teams = 'https://teams.microsoft.com/dl/launcher/launcher.html?url=%2F_%23%2Fl%2Fteam%2F19%3AWmOPNo9j2t4sqP1hF7l-pVJSZkKrlVk6rjJDAbbXLNc1%40thread.tacv2%2Fconversations%3FgroupId%3D63832456-d6b8-4000-97eb-9b5cf5da8388%26tenantId%3D39c3716b-6471-4fd5-ac04-a7dbaa32782b&type=team&deeplinkId=e425fccc-9587-4435-8abd-13e83de4737a&directDl=true&msLaunch=true&enableMobilePage=true&suppressPrompt=true' %}
+{% set platform_support = 'https://uclahs.az1.qualtrics.com/jfe/form/SV_cCu6gcOCI3rCNtI' %}
+{% set platform_access = 'https://webplatform.healthsciences.ucla.edu/knowledge-base/everyone/roles-and-permissions' %}
+{% set platform_sessions = 'https://uclahs.fyi/3y0Gpac' %}
+{% set platform_support = 'https://uclahs.fyi/3z1cCOT' %}
+
+<div class="prose">
+  <p class="lead">{% trans %}You haven’t created any <a href="{{ platform_front_page }}">Front Page (Home Page)</a>	content yet. Please review this page to learn how to get started.{% endtrans %}</p>
+	<h2>{% trans %}Congratulations and welcome to your new Web Platform site!{% endtrans %}</h2>
+	<p>{% trans %}Welcome to the Web Platform community! We are excited to help you get your message out to the UCLA community and beyond. We have many resources for you. The Web Platform is constantly growing and improving with changes driven by your feedback and input. We want to hear from you.{% endtrans %}</p>
+	<h3>{% trans %}Get Started{% endtrans %}</h3>
+	<p>{% trans %}We have created a dedicated site for anyone creating content on the Web Platform and some key sections are:{% endtrans %}</p>
+	<ol>
+		<li>{% trans %}<a href="{{ platform_quick_start }}">Quick Start Guide:</a> Reviews the basics like creating content and how to use the main navigation bar.{% endtrans %}</li>
+		<li>{% trans %}<a href="{{ platform_everyone }}">For Everyone:</a> This section includes information on the types of pages you can create and/or edit along with best practices.{% endtrans %}</li>
+		<li>{% trans %}<a href="{{ platform_manage }}">Managing a Site:</a> Provides information on configuring your site, general functionality, and user accounts.{% endtrans %}</li>
+	</ol>
+	<h3>{% trans %}Next Steps{% endtrans %}</h3>
+	<p>{% trans %}Bookmark these links to our active Drupal community groups and support resources.{% endtrans %}</p>
+	<ul>
+		<li>{% trans %}<a href="{{ platform_course }}">Take a Web Platform course</a>.{% endtrans %}</li>
+		<li>{% trans %}<a href="{{ platform_seo }}">Learn more about SEO</a> and how to improve your site's ranking.{% endtrans %}</li>
+		<li>{% trans %}Test your content on our	<a href="{{ platform_test_sites }}">test site</a>	before you publish.{% endtrans %}</li>
+		<li>{% trans %}Get support and chat with the Web Platform community on our <a href="{{ platform_teams }}">Teams channel</a>.{% endtrans %}</li>
+		<li>{% trans %}Found a bug, would like an enhancement, need more support or want to make your site live? <a href="{{ platform_support }}">Complete a support form</a>.{% endtrans %}</li>
+	</ul>
+  <h3>{% trans %}New Users (Content Creators){% endtrans %}</h3>
+  <p>{% trans %}Looking to have new users create or approve content? Follow these steps:{% endtrans %}</p>
+  <ol>
+    <li>{% trans %}Learn about the different <a href="{{ platform_access }}">access levels</a>.{% endtrans %}</li>
+    <li>{% trans %}Have the new user attend the required <a href="{{ platform_course }}">101 and 201 courses</a>.{% endtrans %}</li>
+    <li>{% trans %}Site owners receive an email requesting approval for new users.{% endtrans %}</li>
+    <li>{% trans %}New users receive notification of their access.{% endtrans %}</li>
+  </ol>
+  <h3>{% trans %}Still looking for help or have questions?{% endtrans %}</h3>
+  <ul>
+	  <li>{% trans %}<a href="{{ platform_sessions }}">Join a Co-Working session</a>.{% endtrans %}</li>
+	  <li>{% trans %}<a href="{{ platform_support }}">Book a One-on-One support session</a>.{% endtrans %}</li>
+  </ul>
+</div>

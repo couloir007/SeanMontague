@@ -8,8 +8,8 @@ _core:
   default_config_hash: T0wbI6qVdThbbIqXDZFg_1VZ3_ittXBdEoUH7d7ux_E
 id: surface_local_tasks
 theme: surface
-region: content
-weight: -20
+region: disabled
+weight: 1
 provider: null
 plugin: local_tasks_block
 settings:

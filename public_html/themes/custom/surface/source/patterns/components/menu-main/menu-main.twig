@@ -1,3 +1,4 @@
+{{ attach_library('surface/menu-main') }}
 {% macro menu_links(items, attributes, menu_level, aria_id, data_menu) %}
   {% set drupal_selector_primary_nav_level = menu_level <= 1 ? 'menu-main--level-' ~ (menu_level + 1) : false %}
 
@@ -87,7 +88,7 @@
 
             {% if item.below and data_menu != "default" %}
               {% if menu_level == 0 %}
-                {% include '@elements/menu-toggle/menu-toggle.twig' with {
+                {% include '@components/menu-toggle/menu-toggle.twig' with {
                   'id': aria_id,
                   'title': item.title ~ ' sub-navigation',
                 } %}
@@ -95,7 +96,10 @@
 
               {% if data_menu == 'dropdown' and menu_level < 1 %}
                 {% set attributes = attributes.setAttribute('id', aria_id) %}
-                {{ menus.menu_links(item.below, attributes, menu_level + 1, aria_id, data_menu) }}
+
+                <div class="translate__container" data-drupal-selector="translate-container-menu">
+                    {{ menus.menu_links(item.below, attributes, menu_level + 1, aria_id, data_menu) }}
+                  </div>
               {% endif %}
 
               {% if data_menu == 'mega' and menu_level < 2 %}

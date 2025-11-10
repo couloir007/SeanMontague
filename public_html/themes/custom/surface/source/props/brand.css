@@ -1,27 +1,37 @@
 :where(html) {
-  /* Primary Brand Colors */
-  --ucla-blue: hsl(206, 63%, 42%);
-  --ucla-yellow: hsl(49 100% 50%);
+  /* Primary Brand Colors. */
+  --blue-700: hsl(202, 100%, 18%); /* #003b5c */
+  --blue-500: hsl(202, 100%, 26%); /* #005587 */
+  --blue-300: hsl(206, 63%, 42%); /* #2774ae */
+  --blue-100: hsl(212, 95%, 93%); /* #daebfe */
 
-  /* Secondary Brand Colors */
-  --midnight-joshua-tree: hsl(202 100% 18%);
-  --silver-lake-reservoir: hsl(202 100% 26%);
-  --chumash-soil: hsl(44 100% 59%);
-  --santa-monica-sunset: hsl(41 100% 55%);
-  --topanga-creek: hsl(211 67% 73%);
-  --grove-fountain: hsl(212 95% 93%);
-  --burbank-blue: hsl(179 50% 52%);
-  --la-winter: hsl(196 73% 84%);
-  --southbay-waves: hsl(191 82% 41%);
+  /* Primary Brand Yellows. */
+  --gold-900: hsl(41, 100%, 29%); /* #946500 */
+  --gold-500: hsl(44, 100%, 59%); /* #ffc72c */
+  --gold-100: hsl(49, 93%, 88%); /* #fdf3c5 */
 
-  /* Tertiary Brand Colors */
-  --venice-canal: hsl(186 68% 32%);
-  --avocado-toast: hsl(173 43% 68%);
-  --super-bloom: hsl(56 100% 74%);
-  --escondido-falls: hsl(193 77% 65%);
-  --downtown-dusk: hsl(280 31% 81%);
-  --santa-barbara-sand: hsl(45 31% 95%);
-  --midnight-observatory: hsl(202 100% 12%);
-  --malibu-dolphin: hsl(205 6% 42%);
-  --silver-screen: hsl(207 11% 81%);
+  /* Secondary Brand Colors. */
+  --teal-900: hsl(185,52%,18%); /* #164145 */
+  --teal-700: hsl(186, 87%, 21%); /* #075A64 */
+  --teal-500: hsl(173,43%,68%); /* #075A64 */
+  --teal-100: hsl(180, 38%, 85%); /* #DAEEE8 */
+
+  /* Reds. */
+  --red-700: hsl(6, 80%, 36%); /* #a52112 */
+  --red-300: hsl(14, 98%, 79%); /* #fead95 */
+  --red-100: hsl(14, 100%, 92%); /* #ffdfd5 */
+
+  /* Neutral Colors. */
+  --grey-900: hsl(0, 0%, 18%); /* #484848 */
+  --grey-700: hsl(0, 0%, 40%); /* #666666 */
+  --grey-500: hsl(0, 0%, 60%); /* #999999 */
+  --grey-300: hsl(0, 0%, 80%); /* #cccccc */
+  --grey-200: hsl(0, 0%, 87%); /* #dedede */
+  --grey-100: hsl(0, 0%, 94%); /* #efefef */
+  --black: hsl(0, 0%, 0%); /* #000 */
+  --white: hsl(0, 0%, 100%); /* #fff */
+
+  /* Sand. */
+  --sand-500: hsl(37, 21%, 88%); /* #e7e2da */
+  --sand-300: hsl(45, 31%, 95%); /* #f6f4ee */
 }
