@@ -4,18 +4,25 @@
  * Functions to support theming in the Olivero theme.
  */
 
- function surface_preprocess_field(&$variables): void {
-  $rich_field_types = ['text_with_summary', 'text', 'text_long'];
-
-  if (in_array($variables['field_type'], $rich_field_types, TRUE)) {
-    $variables['attributes']['class'][] = 'prose';
-  }
-}
-
-
 /**
- * Implements theme_preprocess to add variables.
+ * Load include files which contain additional theming logic.
  */
-function surface_preprocess(&$variables) {
-    $variables['data_menu'] = 'dropdown';
+foreach (glob(\Drupal::service('extension.list.theme')->getPath('surface') . '/includes/*.theme') as $file) {
+  include $file;
 }
+
+// function surface_preprocess_field(&$variables): void {
+//  $rich_field_types = ['text_with_summary', 'text', 'text_long'];
+//
+//  if (in_array($variables['field_type'], $rich_field_types, TRUE)) {
+//    $variables['attributes']['class'][] = 'prose';
+//  }
+//}
+//
+//
+///**
+// * Implements theme_preprocess to add variables.
+// */
+//function surface_preprocess(&$variables) {
+//    $variables['data_menu'] = 'dropdown';
+//}

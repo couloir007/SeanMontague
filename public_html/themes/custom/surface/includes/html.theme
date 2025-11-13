@@ -20,3 +20,27 @@ function surface_preprocess_maintenance_page(&$variables) {
   // Surface has custom styling for the maintenance page.
   $variables['#attached']['library'][] = 'surface/maintenance-page';
 }
+
+/**
+ * Implements hook_preprocess_region().
+ */
+function surface_preprocess_region(&$variables) {
+  // Make is_front available in all region templates
+  $variables['is_front'] = \Drupal::service('path.matcher')->isFrontPage();
+}
+
+function surface_preprocess_field(&$variables): void {
+  $rich_field_types = ['text_with_summary', 'text', 'text_long'];
+
+  if (in_array($variables['field_type'], $rich_field_types, TRUE)) {
+    $variables['attributes']['class'][] = 'prose';
+  }
+}
+
+
+/**
+ * Implements theme_preprocess to add variables.
+ */
+function surface_preprocess(&$variables) {
+  $variables['data_menu'] = 'dropdown';
+}

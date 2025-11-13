@@ -3,12 +3,24 @@
  * Main menu styling.
  */
 
-.menu-main {
+.menu-main-nav {
+  /* Your styles here */
+  li {
+    margin-inline-start: 5px;
+  }
+}
+
+.menu-main,
+.menu-main h1 {
   /* Menu link level one */
   font-family: var(--font-heading);
+}
+
+.menu-main {
+  /* Menu link level one */
   font-weight: var(--font-weight-500);
 
-  .menu__item--level-1 {
+  .menu__item--level-1, .menu__item--level-1 h1 {
     font-size: var(--font-size-4);
     line-height: var(--leading-tight);
     position: relative;
@@ -58,10 +70,14 @@
       padding-inline: 5px;
     }
 
+    &.menu__item--active-trail,
+    &.menu__item:hover {
+      background: #8BB18E;
+    }
+
     .menu__link--active-trail,
     .menu__link:hover {
-      text-decoration: underline;
-      /*background: #ddd;*/
+      /*text-decoration: underline;*/
       /*color: #666;*/
     }
 

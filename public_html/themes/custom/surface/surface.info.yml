@@ -15,7 +15,6 @@ libraries:
 
 regions:
   header: Header
-  secondary_menu: Secondary menu
   hero: Hero (full width)
   highlighted: Highlighted
   breadcrumb: Breadcrumb

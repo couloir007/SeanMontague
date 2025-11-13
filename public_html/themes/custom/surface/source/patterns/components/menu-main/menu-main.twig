@@ -1,17 +1,17 @@
 {{ attach_library('surface/menu-main') }}
+
 {% macro menu_links(items, attributes, menu_level, aria_id, data_menu) %}
   {% set drupal_selector_primary_nav_level = menu_level <= 1 ? 'menu-main--level-' ~ (menu_level + 1) : false %}
 
   {% import _self as menus %}
   {% if items %}
     {% if menu_level == 0 %}
-<ul class="menu-main menu-main--{{ data_menu }} menu-main--level-1" data-type="{{ data_menu }}" data-drupal-selector="{{ drupal_selector_primary_nav_level }}" {{ attributes ? attributes|without('class', 'id') }}>
-  {% elseif menu_level == 1 %}
-  <ul class="menu-main menu-main--level-2" id="{{ aria_id }}" data-drupal-selector="{{ drupal_selector_primary_nav_level }}" {{ attributes ? attributes|without('class', 'id') }}>
+      <ul class="menu-main menu-main-nav menu-main--{{ data_menu }} menu-main--level-1" data-type="{{ data_menu }}" data-drupal-selector="{{ drupal_selector_primary_nav_level }}" {{ attributes ? attributes|without('class', 'id') }}>
+    {% elseif menu_level == 1 %}
+      <ul class="menu-main menu-main--level-2" id="{{ aria_id }}" data-drupal-selector="{{ drupal_selector_primary_nav_level }}" {{ attributes ? attributes|without('class', 'id') }}>
     {% else %}
-    <ul class="menu-main menu-main--level-3">
-      {% endif %}
-
+      <ul class="menu-main menu-main--level-3">
+    {% endif %}
       {% for item in items %}
         {% if item.url.isRouted and item.url.routeName == '<nolink>' %}
           {% set menu_item_type = 'nolink' %}
@@ -98,8 +98,8 @@
                 {% set attributes = attributes.setAttribute('id', aria_id) %}
 
                 <div class="translate__container" data-drupal-selector="translate-container-menu">
-                    {{ menus.menu_links(item.below, attributes, menu_level + 1, aria_id, data_menu) }}
-                  </div>
+                  {{ menus.menu_links(item.below, attributes, menu_level + 1, aria_id, data_menu) }}
+                </div>
               {% endif %}
 
               {% if data_menu == 'mega' and menu_level < 2 %}
@@ -123,8 +123,8 @@
         </li>
       {% endfor %}
     </ul>
-    {% endif %}
-    {% endmacro %}
+  {% endif %}
+{% endmacro %}
 
     {% import _self as menus %}
     {{ menus.menu_links(items, attributes, 0, 'menu-main__item-', data_menu) }}

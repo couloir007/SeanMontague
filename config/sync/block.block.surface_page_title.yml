@@ -2,6 +2,8 @@ uuid: 3b20b33c-b6aa-43b2-9d86-ff0e493fff12
 langcode: en
 status: true
 dependencies:
+  module:
+    - system
   theme:
     - surface
 _core:
@@ -9,7 +11,7 @@ _core:
 id: surface_page_title
 theme: surface
 region: content
-weight: -2
+weight: -3
 provider: null
 plugin: page_title_block
 settings:
@@ -17,4 +19,8 @@ settings:
   label: 'Page title'
   label_display: '0'
   provider: core
-visibility: {  }
+visibility:
+  request_path:
+    id: request_path
+    negate: true
+    pages: '<front>'

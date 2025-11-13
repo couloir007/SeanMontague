@@ -13,10 +13,30 @@
  */
 #}
 
+
+
 {% if content %}
   {% embed '@layouts/site-header/site-header.twig' %}
 
     {% block primary %}
+      <ul class="menu-main menu-main--dropdown menu-main--level-1" data-type="dropdown" data-drupal-selector="menu-main--level-1">
+        <li class="menu__item menu__item--link menu__item--level-1{% if is_front %} menu__item--active-trail{% endif %}">
+          <a href="{{ path('<front>') }}" class="menu__link menu__link--link menu__link--level-1{% if is_front %} menu__link--active-trail is-active{% endif %}" data-drupal-selector="menu__link--has-children" data-drupal-link-system-path="node/2" aria-current="page">
+            {% if is_front %}
+              <h1 class="menu__link-inner menu__link-inner--level-1">
+            {% else %}
+              <span class="menu__link-inner menu__link-inner--level-1">
+            {% endif %}
+            Sean Montague
+            {% if is_front %}
+              </h1>
+            {% else %}
+              </span>
+            {% endif %}
+          </a>
+        </li>
+      </ul>
+      {% if is_front %}</h1>{% endif %}
       {% embed '@layouts/site-navigation/site-navigation.twig' %}
         {% block menu %}
           {{ drupal_menu('main', expand=true) }}
