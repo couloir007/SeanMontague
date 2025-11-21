@@ -157,3 +157,5 @@ public_html/themes/custom/surface/storybook/css/Oswald-VariableFont_wght.css
 *.mysql.gz
 *.sql.gz
 backup-*.tar.gz
+
+public_html/mapping
