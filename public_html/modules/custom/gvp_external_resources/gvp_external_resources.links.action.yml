@@ -1,0 +1,20 @@
+# External resource local actions
+gvp_external_resource.add_form:
+  route_name: entity.gvp_external_resource.add_form
+  title: 'Add External resource'
+  appears_on:
+    - entity.gvp_external_resource.collection
+
+# External resource endpoint local actions
+external_resource_endpoint.add_form:
+  route_name: entity.external_resource_endpoint.add_form
+  title: 'Add External resource endpoint'
+  appears_on:
+    - entity.external_resource_endpoint.collection
+
+# Volcano external resource local actions
+volcano_external_resource.add_form:
+  route_name: entity.volcano_external_resource.add_form
+  title: 'Add Volcano external resource'
+  appears_on:
+    - entity.volcano_external_resource.collection

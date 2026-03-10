@@ -1,0 +1,84 @@
+# External resource tabs
+entity.gvp_external_resource.canonical:
+  route_name: entity.gvp_external_resource.canonical
+  base_route: entity.gvp_external_resource.canonical
+  title: 'View'
+
+entity.gvp_external_resource.edit_form:
+  route_name: entity.gvp_external_resource.edit_form
+  base_route: entity.gvp_external_resource.canonical
+  title: 'Edit'
+
+entity.gvp_external_resource.delete_form:
+  route_name: entity.gvp_external_resource.delete_form
+  base_route: entity.gvp_external_resource.canonical
+  title: 'Delete'
+  weight: 10
+
+# External resource endpoint tabs
+entity.external_resource_endpoint.canonical:
+  route_name: entity.external_resource_endpoint.canonical
+  base_route: entity.external_resource_endpoint.canonical
+  title: 'View'
+
+entity.external_resource_endpoint.edit_form:
+  route_name: entity.external_resource_endpoint.edit_form
+  base_route: entity.external_resource_endpoint.canonical
+  title: 'Edit'
+
+entity.external_resource_endpoint.delete_form:
+  route_name: entity.external_resource_endpoint.delete_form
+  base_route: entity.external_resource_endpoint.canonical
+  title: 'Delete'
+  weight: 10
+
+# Volcano external resource tabs
+entity.volcano_external_resource.canonical:
+  route_name: entity.volcano_external_resource.canonical
+  base_route: entity.volcano_external_resource.canonical
+  title: 'View'
+
+entity.volcano_external_resource.edit_form:
+  route_name: entity.volcano_external_resource.edit_form
+  base_route: entity.volcano_external_resource.canonical
+  title: 'Edit'
+
+entity.volcano_external_resource.delete_form:
+  route_name: entity.volcano_external_resource.delete_form
+  base_route: entity.volcano_external_resource.canonical
+  title: 'Delete'
+  weight: 10
+
+# Collection tabs
+entity.gvp_external_resource.collection:
+  route_name: entity.gvp_external_resource.collection
+  base_route: entity.gvp_external_resource.collection
+  title: 'List'
+
+gvp_external_resource.settings:
+  route_name: gvp_external_resource.settings
+  base_route: entity.gvp_external_resource.collection
+  title: 'Settings'
+  weight: 20
+
+entity.external_resource_endpoint.collection:
+  route_name: entity.external_resource_endpoint.collection
+  base_route: entity.external_resource_endpoint.collection
+  title: 'List'
+
+external_resource_endpoint.settings:
+  route_name: external_resource_endpoint.settings
+  base_route: entity.external_resource_endpoint.collection
+  title: 'Settings'
+  weight: 20
+
+entity.volcano_external_resource.collection:
+  route_name: entity.volcano_external_resource.collection
+  base_route: entity.volcano_external_resource.collection
+  title: 'List'
+
+volcano_external_resource.settings:
+  route_name: volcano_external_resource.settings
+  base_route: entity.volcano_external_resource.collection
+  title: 'Settings'
+  weight: 20

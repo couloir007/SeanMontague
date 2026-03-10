@@ -1,9 +1,0 @@
-global:
-  css:
-    theme:
-      dist/styles.css: {}
-  js:
-    dist/main.js: {}
-  dependencies:
-    - core/drupal
-    - core/jquery

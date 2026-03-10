@@ -1,0 +1,38 @@
+gvp_external_resource.collection:
+  title: 'External resources'
+  route_name: entity.gvp_external_resource.collection
+  description: 'Manage external resource platforms.'
+  parent: system.admin_structure
+  weight: 10
+
+gvp_external_resource.add_form:
+  title: 'Add External resource'
+  route_name: entity.gvp_external_resource.add_form
+  parent: gvp_external_resource.collection
+  weight: 10
+
+external_resource_endpoint.collection:
+  title: 'External resource endpoints'
+  route_name: entity.external_resource_endpoint.collection
+  description: 'Manage external resource endpoints.'
+  parent: system.admin_structure
+  weight: 11
+
+external_resource_endpoint.add_form:
+  title: 'Add External resource endpoint'
+  route_name: entity.external_resource_endpoint.add_form
+  parent: external_resource_endpoint.collection
+  weight: 10
+
+volcano_external_resource.collection:
+  title: 'Volcano external resources'
+  route_name: entity.volcano_external_resource.collection
+  description: 'Manage volcano external resource links.'
+  parent: system.admin_structure
+  weight: 12
+
+volcano_external_resource.add_form:
+  title: 'Add Volcano external resource'
+  route_name: entity.volcano_external_resource.add_form
+  parent: volcano_external_resource.collection
+  weight: 10

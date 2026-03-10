@@ -1,0 +1,14 @@
+name: GVP External Resources
+type: module
+description: 'GVP External Resources module'
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:node
+  - drupal:link
+  - drupal:text
+  - drupal:options
+  - drupal:field_ui
+  - drupal:user
+  - drupal:system
+  - drupal:field
+  - drupal:views

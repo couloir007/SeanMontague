@@ -1,7 +1,7 @@
 /** @type { import('@storybook/html-vite').Preview } */
 
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
-import { useEffect } from 'storybook/preview-api';
+import { useEffect } from '@storybook/preview-api';
 import Twig from 'twig';
 import twigDrupal from 'twig-drupal-filters';
 

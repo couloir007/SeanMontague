@@ -24,7 +24,7 @@ The most common ones to use include:
 
 ## Design system
 
-Surface uses [Storybook](https://storybook.js.org/) as its design system and that's where all components on the sites are originally built and maintained. Storybook can be accessed on its own by running `npm run watch` and navigating to `http://localhost:6006`.
+Surface uses [Storybook](https://storybook.js.org/) as its design system and that's where all components on the sites are originally built and maintained. Storybook can be accessed on its own by running `npm run watch` and navigating to `http://localhost:6007`.
 
 ## Atomic Design Methodology
 
