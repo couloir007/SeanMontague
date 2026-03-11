@@ -1,0 +1,16 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  schemadotorg_jsonld_endpoint.event_subscriber:
+    class: Drupal\schemadotorg_jsonld_endpoint\EventSubscriber\SchemaDotOrgJsonLdEndpointEventSubscriber
+
+  paramconverter.schemadotorg_jsonld_endpoint.entity_uuid:
+    parent: paramconverter.entity
+    class: Drupal\schemadotorg_jsonld_endpoint\ParamConverter\SchemaDotOrgJsonLdEndpointEntityUuidConverter
+    calls:
+      - [setLanguageManager, ['@language_manager']]
+    tags:
+      # Priority 10, to ensure it runs before @paramconverter.entity.
+      - { name: paramconverter, priority: 10 }

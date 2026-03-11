@@ -1,0 +1,21 @@
+{
+    "name": "drupal/ray_debugger",
+    "description": "Drupal integration for the Ray debugging tool.",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Sean Montague",
+            "email": "montagues@si.edu"
+        },
+        {
+            "name": "Eric Pugh",
+            "email": "pughe@si.edu"
+        }
+    ],
+    "require": {
+        "php": "^7.3|^8.0",
+        "spatie/ray" : "^1.37"
+    }
+}
+

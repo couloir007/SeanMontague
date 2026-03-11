@@ -1,0 +1,22 @@
+name: 'Schema.org Blueprints Demo Headless'
+type: module
+description: 'Provides a demo of the Schema.org Blueprints module used as a headless backend.'
+package: 'Schema.org Blueprints Demo'
+core_version_requirement: ^10.3 || ^11
+lifecycle: experimental
+schemadotorg_production: false
+dependencies:
+  - 'drupal:basic_auth'
+  - 'config_rewrite:config_rewrite'
+  - 'consumer_image_styles:consumer_image_styles'
+  - 'consumers:consumers'
+  - 'decoupled_router:decoupled_router'
+  - 'simple_oauth:simple_oauth'
+  - 'subrequests:subrequests'
+  - 'schemadotorg_demo:schemadotorg_demo_standard'
+  - 'schemadotorg_demo:schemadotorg_demo_api'
+
+# Information added by Drupal.org packaging script on 2025-09-16
+version: '1.0.0-alpha36'
+project: 'schemadotorg_demo'
+datestamp: 1758054168

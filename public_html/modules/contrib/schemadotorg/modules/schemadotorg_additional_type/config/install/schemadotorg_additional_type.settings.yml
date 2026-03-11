@@ -1,0 +1,25 @@
+default_types:
+  - AdministrativeArea
+  - Article
+  - CivicStructure
+  - EducationalOrganization
+  - Event
+  - FoodEstablishment
+  - LocalBusiness
+  - MedicalOrganization
+  - MedicalBusiness
+  - Organization
+  - WebPage
+required_types:
+  - Event
+ignored_types:
+  - Default
+  - default
+  - Other
+  - other
+use_snake_case: true
+default_allowed_values:
+  WebPage:
+    about_page: 'About Page'
+    contact_page: 'Contact Page'
+    medical_web_page: 'Medical Web Page'

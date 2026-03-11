@@ -1,0 +1,11 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_geolocation.manager:
+    class: Drupal\schemadotorg_geolocation\SchemaDotOrgGeolocationManager
+  Drupal\schemadotorg_geolocation\SchemaDotOrgGeolocationManagerInterface: '@schemadotorg_geolocation.manager'
+
+  schemadotorg_geolocation.jsonld_manager:
+    class: Drupal\schemadotorg_geolocation\SchemaDotOrgGeolocationJsonLdManager
+  Drupal\schemadotorg_geolocation\SchemaDotOrgGeolocationJsonLdManagerInterface: '@schemadotorg_geolocation.jsonld_manager'

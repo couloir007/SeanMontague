@@ -1,0 +1,6 @@
+prefix_properties:
+  - WebContent--name
+suffix_properties:
+  - WebContent--name
+prefix_delimiter: ': '
+suffix_delimiter: ' - '

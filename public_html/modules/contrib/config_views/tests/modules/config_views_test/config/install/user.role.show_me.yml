@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: show_me
+label: 'Show me'
+weight: 4
+is_admin: false
+permissions: {  }

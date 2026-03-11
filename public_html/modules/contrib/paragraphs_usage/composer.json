@@ -1,0 +1,27 @@
+{
+    "name": "drupal/paragraphs_usage",
+    "description": "Check if an a paragraph is used in specific content types.",
+    "license": "GPL-2.0+",
+    "type": "drupal-module",
+    "keywords": [
+        "Drupal"
+    ],
+    "authors": [
+        {
+            "name": "Ines WALLON",
+            "homepage": "https://www.drupal.org/u/liber_t",
+            "role": "Maintainer"
+        }
+    ],
+    "homepage": "https://www.drupal.org/project/paragraphs_usage",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/paragraphs_usage",
+        "source": "http://cgit.drupalcode.org/paragraphs_usage"
+    },
+    "require": {
+        "drupal/paragraphs": "^1.12"
+    },
+    "require-dev": {
+        "drupal/admin_toolbar": "^3.1"
+    }
+}

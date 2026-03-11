@@ -1,0 +1,88 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node_type--node_type
+disabled: false
+path: node_type
+resourceType: node_type--node_type
+resourceFields:
+  uuid:
+    disabled: false
+    fieldName: uuid
+    publicName: uuid
+    enhancer:
+      id: ''
+  langcode:
+    disabled: true
+    fieldName: langcode
+    publicName: langcode
+    enhancer:
+      id: ''
+  status:
+    disabled: true
+    fieldName: status
+    publicName: status
+    enhancer:
+      id: ''
+  dependencies:
+    disabled: true
+    fieldName: dependencies
+    publicName: dependencies
+    enhancer:
+      id: ''
+  third_party_settings:
+    disabled: true
+    fieldName: third_party_settings
+    publicName: third_party_settings
+    enhancer:
+      id: ''
+  _core:
+    disabled: true
+    fieldName: _core
+    publicName: _core
+    enhancer:
+      id: ''
+  name:
+    disabled: false
+    fieldName: name
+    publicName: name
+    enhancer:
+      id: ''
+  type:
+    disabled: false
+    fieldName: type
+    publicName: type
+    enhancer:
+      id: ''
+  description:
+    disabled: false
+    fieldName: description
+    publicName: description
+    enhancer:
+      id: ''
+  help:
+    disabled: false
+    fieldName: help
+    publicName: help
+    enhancer:
+      id: ''
+  new_revision:
+    disabled: true
+    fieldName: new_revision
+    publicName: new_revision
+    enhancer:
+      id: ''
+  preview_mode:
+    disabled: true
+    fieldName: preview_mode
+    publicName: preview_mode
+    enhancer:
+      id: ''
+  display_submitted:
+    disabled: true
+    fieldName: display_submitted
+    publicName: display_submitted
+    enhancer:
+      id: ''

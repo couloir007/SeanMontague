@@ -1,0 +1,25 @@
+parameters:
+  level: 6
+
+  # Level 6 throws an error when extending an generic class without adding
+  # special docblock comments.  That's common in Drupal so let's disable
+  # these notices.
+  # @see https://phpstan.org/blog/generics-in-php-using-phpdocs#class-level-generics
+  checkGenericClassInNonGenericObjectType: false
+
+  # We inherit Drupal methods and hooks that don't specify iterable types
+  # on arrays.
+  checkMissingIterableValueType: false
+
+  # If an ignored error is not matched, that's fine.
+  reportUnmatchedIgnoredErrors: false
+
+  ignoreErrors:
+
+      - "#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$(entity|summary|value|format|override|target_revision_id|title)\\.$#"
+      - "#^Access to an undefined property.*\\:\\:\\$devel_generate\\.$#"
+      - "#^Call to an undefined method Drupal\\\\Core\\\\Render\\\\RendererInterface\\:\\:renderInIsolation\\(\\)\\.$#"
+      - "#^Call to method (writeln|confirm|select|choice)\\(\\) on an unknown class Drush\\\\Style\\\\DrushStyle\\.#"
+      - "#^Missing parameter \\$bundle \\(string\\|null\\) in call to method Drupal\\\\schemadotorg\\\\SchemaDotOrgMappingManagerInterface\\:\\:getMappingDefaults\\(\\)\\.$#"
+      - "#^Unable to resolve the template type Current in call to method static method Drupal\\\\Component\\\\Utility\\\\DeprecationHelper\\:\\:backwardsCompatibleCall\\(\\)#"
+

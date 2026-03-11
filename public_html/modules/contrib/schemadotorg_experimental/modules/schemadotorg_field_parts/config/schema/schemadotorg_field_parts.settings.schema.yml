@@ -1,0 +1,22 @@
+schemadotorg_field_parts.settings:
+  type: config_object
+  label: 'Schema.org Field Parts settings'
+  mapping:
+    prefix_properties:
+      type: sequence
+      label: 'Field prefix properties'
+      sequence:
+        type: string
+        label: 'Field prefix property'
+    suffix_properties:
+      type: sequence
+      label: 'Field suffix properties'
+      sequence:
+        type: string
+        label: 'Field suffix property'
+    prefix_delimiter:
+      type: string
+      label: 'Field prefix delimiter'
+    suffix_delimiter:
+      type: string
+      label: 'Field suffix delimiter'

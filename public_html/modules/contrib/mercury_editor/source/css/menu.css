@@ -1,0 +1,95 @@
+.lpb-component-list__group-label {
+  font-size: .8em;
+  text-transform: uppercase;
+  color: #666;
+}
+.lpb-component-list__group--content {
+  label {
+    font-weight: bold;
+    color: gray;
+    text-transform: uppercase;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+}
+.lpb-component-list__item {
+  & a::before {
+    content: ' ';
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin-right: 10px;
+    background: url('../../images/menu-icons/icon-default.png');
+  }
+  &.type-section a::before {
+    background: url('../../images/menu-icons/icon-section.png');
+  }
+  &.type-text a::before {
+    background: url('../../images/menu-icons/icon-text.png');
+  }
+  &.type-image a::before {
+    background: url('../../images/menu-icons/icon-image.png');
+  }
+  &.type-image__image_download a::before {
+    background: url('../../images/menu-icons/icon-image-download.png');
+  }
+  &.type-image__image_link a::before {
+    background: url('../../images/menu-icons/icon-image-link.png');
+  }
+  &.type-gallery a::before {
+    background: url('../../images/menu-icons/icon-image-gallery.png');
+  }
+  &.type-video a::before {
+    background: url('../../images/menu-icons/icon-video.png');
+  }
+  &.type-accordion a::before {
+    background: url('../../images/menu-icons/icon-accordion.png');
+  }
+  &.type-cta a::before {
+    background: url('../../images/menu-icons/icon-call-to-action.png');
+  }
+  &.type-cta__image a::before {
+    background: url('../../images/menu-icons/icon-call-to-action-image.png');
+  }
+  &.type-cta__image_simple a::before {
+    background: url('../../images/menu-icons/icon-call-to-action-image.png');
+  }
+  &.type-date_location a::before {
+    background: url('../../images/menu-icons/icon-date-and-location.png');
+  }
+  &.type-heading a::before {
+    background: url('../../images/menu-icons/icon-heading.png');
+  }
+  &.type-hr a::before {
+    background: url('../../images/menu-icons/icon-horizontal-rule.png');
+  }
+  &.type-iframe a::before {
+    background: url('../../images/menu-icons/icon-iframe.png');
+  }
+  &.type-logo_list a::before {
+    background: url('../../images/menu-icons/icon-logo-list.png');
+  }
+  &.type-person a::before {
+    background: url('../../images/menu-icons/icon-person.png');
+  }
+  &.type-quote a::before {
+    background: url('../../images/menu-icons/icon-quote.png');
+  }
+  &.type-table a::before {
+    background: url('../../images/menu-icons/icon-table.png');
+  }
+  &.type-view a::before {
+    background: url('../../images/menu-icons/icon-view.png');
+  }
+  &.type-jotform a::before {
+    background: url('../../images/menu-icons/icon-form.png');
+  }
+  &.type-card a::before {
+    background: url('../../images/menu-icons/icon-card.png');
+  }
+  &.type-tabs a::before {
+    background: url('../../images/menu-icons/icon-tabs.png');
+  }
+}

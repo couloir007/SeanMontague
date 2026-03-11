@@ -1,0 +1,37 @@
+name: 'Schema.org: Thing'
+props:
+  type: object
+  required:
+    - name
+  properties:
+    subtype:
+      type: string
+      title: Subtype
+      description: 'A more specific subtype for the item.'
+      enum:
+        - ''
+        - Event
+        - Organization
+        - Place
+        - Person
+    name:
+      type: string
+      title: Name
+      description: 'The name of the item.'
+    description:
+      type: string
+      title: Description
+      description: 'A description of the item.'
+    url:
+      type: string
+      title: URL
+      description: 'URL of the item.'
+    align:
+      type: string
+      title: Align
+      description: 'Set the alignment for the quotation.'
+      default: center
+      enum:
+        - center
+        - left
+        - right

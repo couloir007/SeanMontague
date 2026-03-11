@@ -1,0 +1,77 @@
+/**
+ * Styles for the Layout Paragraphs dialogs.
+ */
+.lpb-dialog.ui-dialog {
+  --me-dialog-space-inset: var(--me-space-inset-x-large);
+
+  font-family: var(--me-font-family-sans);
+  background: #fff;
+
+  & .ui-dialog-titlebar,
+  & .ui-widget-content.ui-dialog-buttonpane {
+    border-radius: 0;
+    padding: var(--me-space-inset-y) var(--me-dialog-space-inset);
+    border: none;
+  }
+
+  & .ui-dialog-titlebar {
+    background: var(--me-header-color-background);
+    border: none;
+    color: #333;
+    position: relative;
+
+    & .ui-dialog-titlebar-close {
+      top: 50%;
+      transform: translateY(-50%);
+      right: 10px;
+      border: none;
+      opacity: .8;
+      margin: 0;
+
+      & .ui-icon-closethick {
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        margin: 0;
+        background-color: #130f13;
+        opacity: .4;
+        mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath fill='none' d='M20 4L4 20M4 4l16 16' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+        mask-size: 24px 24px;
+        mask-repeat: no-repeat;
+        mask-position: center center;
+      }
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    & .ui-dialog-title {
+      font-weight: bold;
+      font-size: 1.25em;
+      color: #333;
+    }
+  }
+
+  & .ui-widget-content.ui-dialog-content {
+    background: #fff;
+    padding: var(--me-dialog-space-inset);
+  }
+
+  & .ui-widget-content.ui-dialog-buttonpane {
+    background: #fff;
+    border-top: 1px solid #ddd;
+    padding: var(--me-space-inset-y) var(--me-space-inset-x);
+    margin-top: 0;
+  }
+
+  & .ui-widget-content.ui-dialog-buttonpane .ui-dialog-buttonset {
+    margin: 0;
+    line-height: 1;
+  }
+}
+
+.lpb-dialog .ui-autocomplete.ui-widget-content {
+  position: fixed;
+}

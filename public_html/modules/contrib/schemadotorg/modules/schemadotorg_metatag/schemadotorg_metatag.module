@@ -1,0 +1,159 @@
+<?php
+
+/**
+ * @file
+ * Automatically adds a metatag field to Schema.org types.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
+
+/**
+ * Implements hook_requirements_alter().
+ */
+function schemadotorg_metatag_requirements_alter(array &$requirements): void {
+  // Remove Metatag Schema.org module from requirements,
+  // because it is not recommended.
+  unset($requirements['metatag_schema']);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ */
+function schemadotorg_metatag_schemadotorg_mapping_presave(SchemaDotOrgMappingInterface $mapping): void {
+  /** @var \Drupal\schemadotorg_metatag\SchemaDotOrgMetatagManagerInterface $schemadotorg_metatag_manager */
+  $schemadotorg_metatag_manager = \Drupal::service('schemadotorg_metatag.manager');
+  $schemadotorg_metatag_manager->mappingPresave($mapping);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function schemadotorg_metatag_schemadotorg_mapping_insert(SchemaDotOrgMappingInterface $mapping): void {
+  /** @var \Drupal\schemadotorg_metatag\SchemaDotOrgMetatagManagerInterface $schemadotorg_metatag_manager */
+  $schemadotorg_metatag_manager = \Drupal::service('schemadotorg_metatag.manager');
+  $schemadotorg_metatag_manager->mappingInsert($mapping);
+}
+
+/* ************************************************************************** */
+// Schema.org types settings form.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::afterBuildDetails
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::formAlter
+ */
+function schemadotorg_metatag_form_schemadotorg_types_settings_form_alter(array &$form, FormStateInterface $form_state): void {
+
+  /** @var \Drupal\metatag\MetatagManagerInterface $metatag_manager */
+  $metatag_manager = \Drupal::service('metatag.manager');
+  $metatag_groups = $metatag_manager->sortedGroups();
+  $metatag_group_options = [];
+  foreach ($metatag_groups as $group_name => $group_info) {
+    $metatag_group_options[$group_name] = $group_info['label'];
+  }
+
+  $form['schemadotorg_metatag'] = [
+    '#type' => 'details',
+    '#title' => t('Metatag settings'),
+  ];
+  $form['schemadotorg_metatag']['schema_types'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Schema.org type'),
+    '#description' => t('Enter the Schema.org types that should have a meta tags field added when the Schema.org mapping is created.'),
+    '#example' => "
+- entity_type_id--SchemaType
+- entity_type_id--bundle
+- entity_type_id--bundle--SchemaType
+- '!entity_type_id--SchemaType'
+- '!entity_type_id--bundle'
+- '!entity_type_id--bundle--SchemaType'
+",
+  ];
+  $form['schemadotorg_metatag']['default_groups'] = [
+    '#type' => 'checkboxes',
+    '#title' => t('Default meta tag groups'),
+    '#description' => t('Identify which metatag groups should be available on which entity type / bundle combination. Unselected groups will not appear on the configuration form for that entity type, reducing the size of the form and increasing performance. If no groups are selected for a type, all groups will appear.'),
+    '#options' => $metatag_group_options,
+  ];
+
+  $form['schemadotorg_metatag']['apply'] = [];
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::afterBuildDetails
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::formAlter
+ */
+function schemadotorg_metatag_form_schemadotorg_properties_settings_form_alter(array &$form, FormStateInterface $form_state): void {
+  $entity_types = [
+    'node' => t('content (node)'),
+    'taxonomy_term' => 'taxonomy term (taxonomy_term)',
+    'user' => t('people (user)'),
+  ];
+
+  $form['schemadotorg_metatag'] = [
+    '#type' => 'details',
+    '#title' => t('Metatag settings'),
+  ];
+  foreach ($entity_types as $entity_type_id => $entity_type_label) {
+    $t_args = ['@type' => $entity_type_label];
+    $form['schemadotorg_metatag']['default_tags'][$entity_type_id] = [
+      '#type' => 'schemadotorg_settings',
+      '#title' => t('Default @type meta tags', ['@type' => $entity_type_label]),
+      '#description' => t('Enter Schema.org properties which are mapped to meta tags, using tokens, as they are added to the @type entity type.', $t_args),
+      '#description_link' => 'properties',
+      '#token_link' => TRUE,
+      '#example' => "
+propertyName:
+  meta_tag_name_01: '[node:field_name]'
+  meta_tag_name_02: '[node:field_name:property_01]'
+  meta_tag_name_03: '[node:field_name:property_02:format]'
+SchemaType--propertyName:
+  meta_tag_name_01: '[node:field_name]'
+bundle--propertyName:
+  meta_tag_name_01: '[node:field_name]'
+SchemaType:
+  meta_tag_name_01: '[node:field_name]'
+SchemaType--bundle:
+  meta_tag_name_01: '[node:field_name]'
+",
+    ];
+  }
+  $form['schemadotorg_metatag']['apply_default_tags'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Apply default meta tags to all existing Schema.org entity types.'),
+    '#description' => t('If checked, the above default meta tags will be applied to all existing Schema.org entity types.'),
+    '#prefix' => '<hr/>',
+  ];
+  $form['#submit'][] = 'schemadotorg_metatag_form_schemadotorg_properties_settings_form_submit';
+}
+
+/**
+ * Form submission handler for schemadotorg_properties_settings_form().
+ *
+ * @see schemadotorg_metatag_form_schemadotorg_properties_form_alter()
+ */
+function schemadotorg_metatag_form_schemadotorg_properties_settings_form_submit(array &$form, FormStateInterface $form_state): void {
+  // Apply meta tags to all existing Schema.org content types.
+  if ($form_state->getValue(['schemadotorg_metatag', 'apply_default_tags'])) {
+    /** @var \Drupal\schemadotorg\SchemaDotOrgMappingStorageInterface $mapping_storage */
+    $mapping_storage = \Drupal::entityTypeManager()
+      ->getStorage('schemadotorg_mapping');
+    /** @var \Drupal\schemadotorg\SchemaDotOrgMappingInterface[] $mappings */
+    $mappings = $mapping_storage
+      ->loadByProperties(['target_entity_type_id' => ['node', 'taxonomy_term', 'user']]);
+    foreach ($mappings as $mapping) {
+      $mapping->set('original_schema_properties', []);
+      schemadotorg_metatag_schemadotorg_mapping_presave($mapping);
+    }
+    $mapping_storage->resetCache();
+
+    Drupal::messenger()->addStatus(t('Default meta tags applied to all existing Schema.org entity types.'));
+  }
+}

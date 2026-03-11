@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_media.manager:
+    class: Drupal\schemadotorg_media\SchemaDotOrgMediaManager
+  Drupal\schemadotorg_media\SchemaDotOrgMediaManagerInterface: '@schemadotorg_media.manager'

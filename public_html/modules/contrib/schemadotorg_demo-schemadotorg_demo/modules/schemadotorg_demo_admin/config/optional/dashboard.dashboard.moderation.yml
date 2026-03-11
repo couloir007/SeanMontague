@@ -1,0 +1,140 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - views.view.content_moderation_dashboard_in_review
+    - views.view.content_recent
+    - views.view.moderation_dashboard_recent_changes
+    - views.view.moderation_dashboard_recently_created
+  module:
+    - layout_builder
+    - moderation_dashboard
+    - views
+id: moderation
+label: 'Moderation'
+description: 'Provides a per-user dashboard for moderation.'
+layout:
+  -
+    layout_id: layout_threecol_section
+    layout_settings:
+      label: ''
+      context_mapping: {  }
+      column_widths: 33-34-33
+    components:
+      87bb9a8a-1a10-4952-a2b6-6589084c85e7:
+        uuid: 87bb9a8a-1a10-4952-a2b6-6589084c85e7
+        region: first
+        configuration:
+          id: 'views_block:content_moderation_dashboard_in_review-block_1'
+          label: 'Content in review'
+          label_display: visible
+          provider: views
+          context_mapping: {  }
+          views_label: 'Content in review'
+          items_per_page: none
+        weight: 0
+        additional: {  }
+      d64cbf9d-96fc-4134-8832-eb410489f8d9:
+        uuid: d64cbf9d-96fc-4134-8832-eb410489f8d9
+        region: second
+        configuration:
+          id: 'views_block:moderation_dashboard_recent_changes-block_1'
+          label: 'Recent updates'
+          label_display: visible
+          provider: views
+          context_mapping: {  }
+          views_label: 'Recent updates'
+          items_per_page: none
+        weight: 1
+        additional: {  }
+      6d11443b-2067-4134-86a8-3f761c52f9a5:
+        uuid: 6d11443b-2067-4134-86a8-3f761c52f9a5
+        region: second
+        configuration:
+          id: 'views_block:moderation_dashboard_recently_created-block_1'
+          label: 'Recently created'
+          label_display: visible
+          provider: views
+          context_mapping: {  }
+          views_label: 'Recently created'
+          items_per_page: none
+        weight: 2
+        additional: {  }
+      5bb5f736-2fdf-48d1-a6ba-f43b83ff58ba:
+        uuid: 5bb5f736-2fdf-48d1-a6ba-f43b83ff58ba
+        region: third
+        configuration:
+          id: 'views_block:moderation_dashboard_recently_created-block_2'
+          label: 'Content you created'
+          label_display: visible
+          provider: views
+          context_mapping: {  }
+          views_label: 'Content you created'
+          items_per_page: none
+        weight: 3
+        additional: {  }
+      e69e4d13-cb9a-41a0-8037-ac8a899dfd7e:
+        uuid: e69e4d13-cb9a-41a0-8037-ac8a899dfd7e
+        region: third
+        configuration:
+          id: 'views_block:content_moderation_dashboard_in_review-block_3'
+          label: ''
+          label_display: visible
+          provider: views
+          context_mapping: {  }
+          views_label: ''
+          items_per_page: none
+        weight: 0
+        additional: {  }
+      d11b873a-904d-4174-a368-4cceebe9c29e:
+        uuid: d11b873a-904d-4174-a368-4cceebe9c29e
+        region: second
+        configuration:
+          id: 'views_block:content_recent-block_1'
+          label: ''
+          label_display: visible
+          provider: views
+          context_mapping: {  }
+          views_label: ''
+          items_per_page: none
+        weight: 0
+        additional: {  }
+      ae4dda5c-a139-47e0-aa55-31ffc257eb79:
+        uuid: ae4dda5c-a139-47e0-aa55-31ffc257eb79
+        region: first
+        configuration:
+          id: moderation_dashboard_activity
+          label: 'Editor activity for the last 30 days'
+          label_display: visible
+          provider: moderation_dashboard
+          context_mapping: {  }
+        weight: 9
+        additional: {  }
+      eb557ada-ce78-4259-a553-2ad98812c34e:
+        uuid: eb557ada-ce78-4259-a553-2ad98812c34e
+        region: third
+        configuration:
+          id: 'views_block:moderation_dashboard_recent_changes-block_2'
+          label: 'Your activity'
+          label_display: visible
+          provider: views
+          context_mapping: {  }
+          views_label: 'Your activity'
+          items_per_page: none
+        weight: 2
+        additional: {  }
+      2bb7b576-476c-406e-8d21-c6206f242c62:
+        uuid: 2bb7b576-476c-406e-8d21-c6206f242c62
+        region: first
+        configuration:
+          id: 'views_block:content_moderation_dashboard_in_review-block_2'
+          label: 'Content drafts'
+          label_display: visible
+          provider: views
+          context_mapping: {  }
+          views_label: 'Content drafts'
+          items_per_page: none
+        weight: 8
+        additional: {  }
+    third_party_settings: {  }
+weight: 1

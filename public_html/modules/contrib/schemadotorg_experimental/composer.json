@@ -1,0 +1,40 @@
+{
+    "name": "drupal/schemadotorg_experimental",
+    "description": "Experimental integrations for the Schema.org Blueprints module that are not ready for prime-time.",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "minimum-stability": "dev",
+    "homepage": "https://drupal.org/project/schemadotorg_experimental",
+    "authors": [
+        {
+            "name": "Jacob Rockowitz (jrockowitz)",
+            "homepage": "https://www.drupal.org/u/jrockowitz",
+            "role": "Maintainer"
+        }
+    ],
+    "support": {
+        "issues": "https://drupal.org/project/issues/schemadotorg_experimental",
+        "source": "https://git.drupalcode.org/project/schemadotorg_experimental"
+    },
+    "require": {
+        "drupal/core": "^10.3 || ^11",
+        "drush/drush": "^12.0 || ^13.0",
+        "drupal/schemadotorg": "^1.0"
+    },
+    "require-dev": {
+        "drupal/allowed_formats": "^3.0",
+        "drupal/ckeditor5_embedded_content": "^2.0",
+        "drupal/config_rewrite": "^1.0",
+        "drupal/devel": "^5.0",
+        "drupal/embedded_content": "^2.0",
+        "drupal/entity_reference_revisions": "^1.0",
+        "drupal/field_group": "^4.0",
+        "drupal/inline_entity_form": "^3.0",
+        "drupal/jsonapi_extras": "^3.0",
+        "drupal/layout_paragraphs": "^2.0",
+        "drupal/mercury_editor": "^2.0 || ^3.0",
+        "drupal/paragraphs": "^1.0"
+    }
+}
+
+

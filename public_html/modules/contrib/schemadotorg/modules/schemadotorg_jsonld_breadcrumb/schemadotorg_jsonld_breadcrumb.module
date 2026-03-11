@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Adds Drupal's breadcrumb to the Schema.org JSON-LD for the current route.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_schemadotorg_jsonld().
+ */
+function schemadotorg_jsonld_breadcrumb_schemadotorg_jsonld(RouteMatchInterface $route_match, BubbleableMetadata $bubbleable_metadata): ?array {
+  /** @var \Drupal\schemadotorg_jsonld_breadcrumb\SchemaDotOrgJsonLdBreadcrumbManagerInterface $schemadotorg_jsonld_breadcrumb_manager */
+  $schemadotorg_jsonld_breadcrumb_manager = \Drupal::service('schemadotorg_jsonld_breadcrumb.manager');
+  return $schemadotorg_jsonld_breadcrumb_manager->jsonLd($route_match, $bubbleable_metadata);
+}
+
+/**
+ * Implements hook_schemadotorg_jsonld_alter().
+ */
+function schemadotorg_jsonld_breadcrumb_schemadotorg_jsonld_alter(array &$data, RouteMatchInterface $route_match, BubbleableMetadata $bubbleable_metadata): void {
+  /** @var \Drupal\schemadotorg_jsonld_breadcrumb\SchemaDotOrgJsonLdBreadcrumbManagerInterface $schemadotorg_jsonld_breadcrumb_manager */
+  $schemadotorg_jsonld_breadcrumb_manager = \Drupal::service('schemadotorg_jsonld_breadcrumb.manager');
+  $schemadotorg_jsonld_breadcrumb_manager->jsonLdAlter($data, $route_match, $bubbleable_metadata);
+}

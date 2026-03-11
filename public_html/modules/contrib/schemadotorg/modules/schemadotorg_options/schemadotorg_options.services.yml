@@ -1,0 +1,11 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_options.manager:
+    class: Drupal\schemadotorg_options\SchemaDotOrgOptionsManager
+  Drupal\schemadotorg_options\SchemaDotOrgOptionsManagerInterface: '@schemadotorg_options.manager'
+
+  schemadotorg_options.jsonld_manager:
+    class: Drupal\schemadotorg_options\SchemaDotOrgOptionsJsonLdManager
+  Drupal\schemadotorg_options\SchemaDotOrgOptionsJsonLdManagerInterface: '@schemadotorg_options.jsonld_manager'

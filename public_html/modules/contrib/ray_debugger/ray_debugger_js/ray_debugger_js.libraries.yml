@@ -1,0 +1,9 @@
+node_ray:
+  js:
+    https://cdn.jsdelivr.net/npm/node-ray@1.20.9/dist/standalone.min.js: { type: external, minified: true }
+
+node_ray_init:
+  js:
+    js/node-ray-init.js: { }
+  dependencies:
+    - ray_debugger_js/node_ray

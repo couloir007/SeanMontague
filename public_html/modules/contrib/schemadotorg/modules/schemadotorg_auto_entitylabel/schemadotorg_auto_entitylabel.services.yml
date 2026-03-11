@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_auto_entitylabel.manager:
+    class: Drupal\schemadotorg_auto_entitylabel\SchemaDotOrgAutoEntityLabelManager
+  Drupal\schemadotorg_auto_entitylabel\SchemaDotOrgAutoEntityLabelManagerInterface: '@schemadotorg_auto_entitylabel.manager'

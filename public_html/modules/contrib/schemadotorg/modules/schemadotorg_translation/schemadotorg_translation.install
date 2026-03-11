@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * @file
+ * Installation hooks for the Schema.org Blueprints Translation module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_install().
+ */
+function schemadotorg_translation_install(): void {
+  /** @var \Drupal\schemadotorg_translation\SchemaDotOrgTranslationManagerInterface $manager */
+  $manager = \Drupal::service('schemadotorg_translation.manager');
+  $manager->applyTranslations();
+}
+
+/**
+ * Issue #3528083: Refactor schemadotorg_translation module to improve performance.
+ */
+function schemadotorg_translation_update_10000(): void {
+  $config = \Drupal::configFactory()
+    ->getEditable('schemadotorg_translation.settings');
+  $config->set('excluded_schema_properties', array_merge(
+    $config->get('excluded_schema_properties'),
+    $config->get('excluded_field_names')
+  ));
+  $config->clear('excluded_field_names');
+  $config->save();
+}

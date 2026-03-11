@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_existing_values_autocomplete_widget.manager:
+    class: Drupal\schemadotorg_existing_values_autocomplete_widget\SchemaDotOrgExistingValuesAutocompleteWidgetManagerManager
+  Drupal\schemadotorg_existing_values_autocomplete_widget\SchemaDotOrgExistingValuesAutocompleteWidgetManagerManagerInterface: '@schemadotorg_existing_values_autocomplete_widget.manager'

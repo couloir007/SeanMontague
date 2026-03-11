@@ -1,0 +1,15 @@
+.lp-hint {
+  z-index: 1000;
+}
+.lp-hint[data-orientation="vertical"] {
+  top: 0;
+  border-right: 5px solid blue;
+}
+.lp-hint[data-orientation="horizontal"] {
+  left: 0;
+  width: 100%;
+  border-top: 5px solid blue;
+}
+.gu-mirror {
+  opacity: 1 !important;
+}

@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Installation hooks for the Schema.org Blueprints Demo Devel module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_install().
+ */
+function schemadotorg_demo_devel_install(): void {
+  // Configure development settings.
+  \Drupal::configFactory()->getEditable('system.logging')
+    ->set('error_level', 'verbose')
+    ->save();
+  \Drupal::configFactory()->getEditable('devel.settings')
+    ->set('devel_dumper', 'kint')
+    ->save();
+}

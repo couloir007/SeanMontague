@@ -1,0 +1,10 @@
+default_schema_properties:
+  - node--episode
+  - node--hasCourseInstance
+default_type_form_displays:
+  - node--Episode
+  - node--Course
+  - node--Person
+default_form_display_components:
+  - title
+  - status

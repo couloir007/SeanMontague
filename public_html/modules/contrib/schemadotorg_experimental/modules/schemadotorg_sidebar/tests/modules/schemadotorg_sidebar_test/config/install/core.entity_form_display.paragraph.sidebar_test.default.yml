@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.sidebar_test.field_sidebar_text
+    - paragraphs.paragraphs_type.sidebar_test
+id: paragraph.sidebar_test.default
+targetEntityType: paragraph
+bundle: sidebar_test
+mode: default
+content:
+  field_sidebar_text:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

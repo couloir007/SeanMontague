@@ -1,0 +1,11 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_translation.manager:
+    class: Drupal\schemadotorg_translation\SchemaDotOrgTranslationManager
+  Drupal\schemadotorg_translation\SchemaDotOrgTranslationManagerInterface: '@schemadotorg_translation.manager'
+
+  schemadotorg_translation.jsonld_manager:
+    class: Drupal\schemadotorg_translation\SchemaDotOrgTranslationJsonLdManager
+  Drupal\schemadotorg_translation\SchemaDotOrgTranslationJsonLdManagerInterface: '@schemadotorg_translation.jsonld_manager'

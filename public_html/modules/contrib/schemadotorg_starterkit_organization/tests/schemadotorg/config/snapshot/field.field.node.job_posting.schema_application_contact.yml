@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_application_contact
+    - node.type.job_posting
+id: node.job_posting.schema_application_contact
+field_name: schema_application_contact
+entity_type: node
+bundle: job_posting
+label: 'Application contact'
+description: 'Contact details for further information relevant to this job posting.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

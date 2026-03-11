@@ -1,0 +1,43 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.organization.body
+    - field.field.node.organization.schema_contact_point
+    - field.field.node.organization.schema_image
+    - field.field.node.organization.schema_member
+    - field.field.node.organization.schema_organization_type
+    - field.field.node.organization.schema_parent_organization
+    - field.field.node.organization.schema_sub_organization
+    - field.field.node.organization.schema_subject_of
+    - node.type.organization
+  module:
+    - text
+    - user
+id: node.organization.teaser
+targetEntityType: node
+bundle: organization
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 17
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -100
+    region: content
+hidden:
+  schema_contact_point: true
+  schema_image: true
+  schema_member: true
+  schema_organization_type: true
+  schema_parent_organization: true
+  schema_sub_organization: true
+  schema_subject_of: true

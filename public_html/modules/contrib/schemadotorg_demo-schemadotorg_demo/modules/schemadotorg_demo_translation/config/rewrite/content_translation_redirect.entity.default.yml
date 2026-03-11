@@ -1,0 +1,6 @@
+config_rewrite:
+  replace:
+    - code
+    - mode
+code: 302
+mode: all

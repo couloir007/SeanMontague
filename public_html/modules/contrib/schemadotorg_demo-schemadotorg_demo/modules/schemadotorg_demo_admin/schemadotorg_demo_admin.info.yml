@@ -1,0 +1,33 @@
+name: 'Schema.org Blueprints Demo Admin'
+type: module
+description: 'Enables and configure the Gin admin theme and provides admin UI enhancements.'
+package: 'Schema.org Blueprints Demo'
+core_version_requirement: ^10.3 || ^11
+lifecycle: experimental
+dependencies:
+  - 'admin_dialogs:admin_dialogs'
+  - 'admin_toolbar:admin_toolbar'
+  - 'admin_toolbar:admin_toolbar_search'
+  - 'admin_toolbar:admin_toolbar_tools'
+  - 'autosave_form:autosave_form'
+  - 'config_rewrite:config_rewrite'
+  - 'dashboard:dashboard'
+  - 'default_content:default_content'
+  - 'diff:diff'
+  - 'file_delete:file_delete'
+  - 'local_tasks_more:local_tasks_more'
+  - 'login_destination:login_destination'
+  - 'media_file_delete:media_file_delete'
+  - 'moderated_content_bulk_publish:moderated_content_bulk_publish'
+  - 'moderation_dashboard:moderation_dashboard'
+  - 'moderation_sidebar:moderation_sidebar'
+  - 'queue_ui:queue_ui'
+  - 'r4032login:r4032login'
+  - 'trash:trash'
+  - 'ultimate_cron:ultimate_cron'
+  - 'unpublished_404:unpublished_404'
+
+# Information added by Drupal.org packaging script on 2025-09-16
+version: '1.0.0-alpha36'
+project: 'schemadotorg_demo'
+datestamp: 1758054168

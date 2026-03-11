@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for Paragraph usage module.
+ *
+ * @DCG
+ * This file is no longer required in Drupal 8.
+ * @see https://www.drupal.org/node/2217931
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\paragraphs_usage\EntityTypeInfo;
+
+/**
+ * Implements hook_entity_type_alter().
+ */
+function paragraphs_usage_entity_type_alter(array &$entity_types): void {
+  \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(EntityTypeInfo::class)
+    ->entityTypeAlter($entity_types);
+}
+
+/**
+ * Implements hook_entity_operation().
+ */
+function paragraphs_usage_entity_operation(EntityInterface $entity): void {
+  \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(EntityTypeInfo::class)
+    ->entityOperation($entity);
+}

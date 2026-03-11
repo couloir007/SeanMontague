@@ -1,0 +1,13 @@
+config_rewrite:
+  replace:
+    - paragraph_types.sidebar_test
+paragraph_types:
+  sidebar_test:
+    schema_types:
+      - Thing
+    form_format_type: details
+    form_format_settings:
+      open: true
+    view_format_type: details
+    view_format_settings:
+      open: true

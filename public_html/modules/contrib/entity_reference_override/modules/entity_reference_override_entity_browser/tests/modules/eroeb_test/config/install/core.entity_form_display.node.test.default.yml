@@ -1,0 +1,80 @@
+uuid: 4b04257c-326a-48ef-9d32-fac2a6466b59
+langcode: en
+status: true
+dependencies:
+  config:
+    - entity_browser.browser.user_selection
+    - field.field.node.test.field_user_reference_multi
+    - field.field.node.test.field_user_reference_single
+    - node.type.test
+  module:
+    - entity_reference_override_entity_browser
+id: node.test.default
+targetEntityType: node
+bundle: test
+mode: default
+content:
+  created:
+    type: datetime_timestamp
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_user_reference_multi:
+    weight: 26
+    settings:
+      entity_browser: user_selection
+      field_widget_display: label
+      field_widget_edit: true
+      field_widget_remove: true
+      selection_mode: selection_append
+      open: false
+      field_widget_display_settings: {  }
+    third_party_settings: {  }
+    type: entity_browser_entity_reference_override
+    region: content
+  field_user_reference_single:
+    weight: 27
+    settings:
+      entity_browser: user_selection
+      field_widget_display: label
+      field_widget_edit: true
+      field_widget_remove: true
+      selection_mode: selection_append
+      open: false
+      field_widget_display_settings: {  }
+    third_party_settings: {  }
+    type: entity_browser_entity_reference_override
+    region: content
+  promote:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 15
+    region: content
+    third_party_settings: {  }
+  sticky:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 16
+    region: content
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: -5
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 5
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    region: content
+    third_party_settings: {  }
+hidden: {  }

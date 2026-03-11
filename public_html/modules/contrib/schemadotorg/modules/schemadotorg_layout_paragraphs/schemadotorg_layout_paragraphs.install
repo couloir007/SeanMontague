@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * @file
+ * Installation hooks for the Schema.org Blueprints Layout Paragraphs module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Component\Serialization\Yaml;
+
+/**
+ * Implements hook_install().
+ */
+function schemadotorg_layout_paragraphs_install(bool $is_syncing): void {
+  if ($is_syncing) {
+    return;
+  }
+
+  // Setting weight to 11 so that hooks are triggered after
+  // the Schema.org Blueprints Paragraphs module
+  // and the Schema.org Blueprints Additional Mappings module.
+  module_set_weight('schemadotorg_layout_paragraphs', 11);
+}
+
+/**
+ * Change default 'schema_default_types' to 'default_types' in 'schemadotorg_layout_paragraphs.settings'.
+ */
+function schemadotorg_layout_paragraphs_update_10000(): void {
+  $config = \Drupal::configFactory()->getEditable('schemadotorg_layout_paragraphs.settings');
+  $config->set('default_types', $config->get('default_schema_types'));
+  $config->clear('default_types');
+  $config->save();
+}
+
+/**
+ * Add 'default_paragraph_layouts' to 'schemadotorg_layout_paragraphs.settings'.
+ */
+function schemadotorg_layout_paragraphs_update_10001(): void {
+  $module_path = \Drupal::service('extension.list.module')->getPath('schemadotorg_layout_paragraphs');
+  $config_file_path = $module_path . '/config/install/schemadotorg_layout_paragraphs.settings.yml';
+  $config_data = Yaml::decode(file_get_contents($config_file_path));
+
+  $config = \Drupal::configFactory()->getEditable('schemadotorg_layout_paragraphs.settings');
+  $config->set('default_paragraph_layouts', $config_data['default_paragraph_layouts']);
+  $config->save();
+}
+
+/**
+ * Issue #3468527: Improve Mercury Editor support. Add default view_display components configuration.
+ */
+function schemadotorg_layout_paragraphs_update_10002(): void {
+  \Drupal::configFactory()
+    ->getEditable('schemadotorg_layout_paragraphs.settings')
+    ->set('default_view_display_components', ['mainEntity', 'links'])
+    ->save();
+}
+
+/**
+ * Setting weight to 11 after the Schema.org Blueprints Additional Mappings module.
+ */
+function schemadotorg_layout_paragraphs_update_10003(): void {
+  module_set_weight('schemadotorg_layout_paragraphs', 11);
+}

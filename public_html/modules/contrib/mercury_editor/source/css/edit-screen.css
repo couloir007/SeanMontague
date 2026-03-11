@@ -1,0 +1,107 @@
+:root {
+  --me-dialog-min-width: 10px;
+  --me-toolbar-offset-y: 54px;
+  /* Match .ui-front for jQuery UI compatibility */
+  --me-dialog-z-index: 100;
+}
+
+.path-mercury-editor {
+  background: #efefef;
+
+  & .page-wrapper {
+    height: 100vh;
+  }
+}
+
+#me-toolbar,
+#me-iframe-wrapper {
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+}
+
+#me-iframe-wrapper {
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: calc(100vh - var(--me-toolbar-offset-y));
+  min-height: fit-content;
+  overflow-y: scroll;
+}
+
+#me-preview {
+  margin: 0 auto;
+  box-shadow: 0 0 40px 0 rgba(0, 0, 0, .2);
+}
+.lpb-dialog {
+  & form {
+    padding: 0 var(--me-space-inset-x, 1rem) 0 var(--me-space-inset-x, 1rem);
+  }
+  & form.layout-paragraphs-delete-component-form {
+    margin-top: var(--me-space-inset-y, 1rem);
+  }
+}
+#me-toolbar {
+  display: flex;
+  flex-basis: 1;
+  justify-content: space-between;
+  background-color: var(--me-color-background);
+  width: 100%;
+  position: sticky;
+  left: 0;
+  top: 0;
+  height: var(--me-toolbar-offset-y);
+  border-bottom: var(--me-border-width, 1px) var(--me-border-style, solid) var(--me-border-color, #e5e5e5);
+  & > * {
+    flex-basis: 30%;
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+  & .me-mobile-presets {
+    position: absolute;
+    line-height: 1;
+    left: 50%;
+    margin-left: 50px;
+    top: 0;
+    border: none;
+    padding: 0 35px 0 5px;
+    min-height: 2rem;
+    top: 11px;
+    color: #555;
+    &:hover {
+      border: none;
+      box-shadow: none;
+    }
+  }
+}
+
+.me-toolbar__branding {
+  display: flex;
+  align-items: center;
+}
+
+.me-toolbar__logo {
+  display: block;
+  height: 30px;
+  width: 78px;
+  background-image: var(--me-logo-horizontal);
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  overflow: hidden;
+  text-indent: -9999px;
+  margin: 0;
+}
+
+.me-toolbar__group {
+  display: flex;
+  &:last-child {
+    display: flex;
+    justify-content: flex-end;
+  }
+  &.screen-actions {
+    justify-content: center;
+  }
+}

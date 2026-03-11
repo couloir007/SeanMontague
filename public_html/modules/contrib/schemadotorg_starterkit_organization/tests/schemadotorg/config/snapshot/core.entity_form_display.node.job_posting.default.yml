@@ -1,0 +1,232 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.job_posting.body
+    - field.field.node.job_posting.schema_application_contact
+    - field.field.node.job_posting.schema_base_salary
+    - field.field.node.job_posting.schema_date_posted
+    - field.field.node.job_posting.schema_education_requirements
+    - field.field.node.job_posting.schema_eligibility_to_work_req
+    - field.field.node.job_posting.schema_employer_overview
+    - field.field.node.job_posting.schema_employment_type
+    - field.field.node.job_posting.schema_experience_requirements
+    - field.field.node.job_posting.schema_hiring_organization
+    - field.field.node.job_posting.schema_job_benefits
+    - field.field.node.job_posting.schema_job_location
+    - field.field.node.job_posting.schema_job_location_type
+    - field.field.node.job_posting.schema_qualifications
+    - field.field.node.job_posting.schema_responsibilities
+    - field.field.node.job_posting.schema_skills
+    - field.field.node.job_posting.schema_subject_of
+    - field.field.node.job_posting.schema_valid_through
+    - node.type.job_posting
+  module:
+    - custom_field
+    - datetime
+    - path
+    - text
+id: node.job_posting.default
+targetEntityType: node
+bundle: job_posting
+mode: default
+content:
+  body:
+    type: text_textarea_with_summary
+    weight: 17
+    region: content
+    settings:
+      rows: 9
+      summary_rows: 3
+      placeholder: ''
+      show_summary: false
+    third_party_settings: {  }
+  created:
+    type: datetime_timestamp
+    weight: 200
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 220
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  promote:
+    type: boolean_checkbox
+    weight: 210
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  schema_application_contact:
+    type: string_textfield
+    weight: 110
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  schema_base_salary:
+    type: number
+    weight: 110
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  schema_date_posted:
+    type: datetime_default
+    weight: 67
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  schema_education_requirements:
+    type: custom_stacked
+    weight: 155
+    region: content
+    settings:
+      label: true
+      wrapper: fieldset
+      open: true
+    third_party_settings: {  }
+  schema_eligibility_to_work_req:
+    type: string_textfield
+    weight: 115
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  schema_employer_overview:
+    type: text_textarea
+    weight: 120
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  schema_employment_type:
+    type: string_textfield
+    weight: 115
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  schema_experience_requirements:
+    type: custom_stacked
+    weight: 155
+    region: content
+    settings:
+      label: true
+      wrapper: fieldset
+      open: true
+    third_party_settings: {  }
+  schema_hiring_organization:
+    type: entity_reference_autocomplete
+    weight: 160
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  schema_job_benefits:
+    type: string_textfield
+    weight: 115
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  schema_job_location:
+    type: string_textfield
+    weight: 110
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  schema_job_location_type:
+    type: string_textfield
+    weight: 110
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  schema_qualifications:
+    type: string_textfield
+    weight: 115
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  schema_responsibilities:
+    type: string_textfield
+    weight: 115
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  schema_skills:
+    type: string_textfield
+    weight: 115
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  schema_subject_of:
+    type: entity_reference_autocomplete
+    weight: 165
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  schema_valid_through:
+    type: datetime_default
+    weight: 68
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 220
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  sticky:
+    type: boolean_checkbox
+    weight: 210
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: -5
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 200
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden: {  }

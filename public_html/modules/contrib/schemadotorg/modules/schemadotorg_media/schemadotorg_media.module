@@ -1,0 +1,129 @@
+<?php
+
+/**
+ * @file
+ * Integrates the Media and Media Library module with the Schema.org Blueprints module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\media\MediaTypeInterface;
+
+/* ************************************************************************** */
+// Create Schema.org Media mapping.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_schemadotorg_mapping_defaults_alter().
+ */
+function schemadotorg_media_schemadotorg_mapping_defaults_alter(array &$defaults, string $entity_type_id, ?string $bundle, string $schema_type): void {
+  /** @var \Drupal\schemadotorg_media\SchemaDotOrgMediaManagerInterface $schemadotorg_media_manager */
+  $schemadotorg_media_manager = \Drupal::service('schemadotorg_media.manager');
+  $schemadotorg_media_manager->mappingDefaultsAlter($defaults, $entity_type_id, $bundle, $schema_type);
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function schemadotorg_media_form_schemadotorg_mapping_form_alter(array &$form, FormStateInterface &$form_state): void {
+  /** @var \Drupal\schemadotorg_media\SchemaDotOrgMediaManagerInterface $schemadotorg_media_manager */
+  $schemadotorg_media_manager = \Drupal::service('schemadotorg_media.manager');
+  $schemadotorg_media_manager->mappingFormAlter($form, $form_state);
+}
+
+/**
+ * Implements hook_schemadotorg_bundle_entity_alter().
+ */
+function schemadotorg_media_schemadotorg_bundle_entity_alter(array &$values, string $schema_type, string $entity_type_id): void {
+  /** @var \Drupal\schemadotorg_media\SchemaDotOrgMediaManagerInterface $schemadotorg_media_manager */
+  $schemadotorg_media_manager = \Drupal::service('schemadotorg_media.manager');
+  $schemadotorg_media_manager->bundleEntityAlter($values, $schema_type, $entity_type_id);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function schemadotorg_media_media_type_insert(MediaTypeInterface $media_type): void {
+  /** @var \Drupal\schemadotorg_media\SchemaDotOrgMediaManagerInterface $schemadotorg_media_manager */
+  $schemadotorg_media_manager = \Drupal::service('schemadotorg_media.manager');
+  $schemadotorg_media_manager->mediaTypeInsert($media_type);
+}
+
+/**
+ * Implements hook_schemadotorg_property_field_alter().
+ */
+function schemadotorg_media_schemadotorg_property_field_alter(
+  string $schema_type,
+  string $schema_property,
+  array &$field_storage_values,
+  array &$field_values,
+  ?string &$widget_id,
+  array &$widget_settings,
+  ?string &$formatter_id,
+  array &$formatter_settings,
+): void {
+  /** @var \Drupal\schemadotorg_media\SchemaDotOrgMediaManagerInterface $schemadotorg_media_manager */
+  $schemadotorg_media_manager = \Drupal::service('schemadotorg_media.manager');
+  $schemadotorg_media_manager->propertyFieldAlter(
+    $schema_type,
+    $schema_property,
+    $field_storage_values,
+    $field_values,
+    $widget_id,
+    $widget_settings,
+    $formatter_id,
+    $formatter_settings
+  );
+}
+
+/* ************************************************************************** */
+// Schema.org types settings form.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::afterBuildDetails
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::formAlter
+ */
+function schemadotorg_media_form_schemadotorg_types_settings_form_alter(array &$form, FormStateInterface $form_state): void {
+  /** @var \Drupal\media\MediaSourceManager $source_manager */
+  $source_manager = \Drupal::service('plugin.manager.media.source');
+
+  $form['schemadotorg_media'] = [
+    '#type' => 'details',
+    '#title' => t('Media settings'),
+  ];
+  $t_args = [
+    ':href' => 'https://schema.org/MediaObject',
+    '%plugins' => implode('; ', array_keys($source_manager->getDefinitions())),
+  ];
+  $form['schemadotorg_media']['default_sources'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Default media sources'),
+    '#description' => t('Enter the default media source plugin ids (i.e. %plugins) used when creating Schema.org <a href=":href">MediaObject</a> types.', $t_args),
+    '#description_link' => 'types',
+    '#example' => 'SchemaType: source_plugin_id',
+  ];
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::afterBuildDetails
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::formAlter
+ */
+function schemadotorg_media_form_schemadotorg_properties_settings_form_alter(array &$form, FormStateInterface $form_state): void {
+  $form['schemadotorg_media'] = [
+    '#type' => 'details',
+    '#title' => t('Media settings'),
+  ];
+  $form['schemadotorg_media']['source_field_mappings'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Source field mappings'),
+    '#description' => t('Enter the media type source field to Schema.org property mapping.'),
+    '#description_link' => 'properties',
+    '#example' => 'field_name: propertyName',
+  ];
+}

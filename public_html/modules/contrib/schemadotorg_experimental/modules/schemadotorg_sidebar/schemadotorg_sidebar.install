@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Installation hooks for the Schema.org Blueprints Sidebar module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Issue #3529896: Improve sidebar module settings.
+ */
+function schemadotorg_sidebar_update_10000(): void {
+  $config = \Drupal::configFactory()->getEditable('schemadotorg_sidebar.settings');
+  $paragraph_types = $config->get('paragraph_types');
+  foreach ($paragraph_types as $paragraph_type_id => $schema_types) {
+    $paragraph_types[$paragraph_type_id]['schema_types'] = $schema_types;
+  }
+  $config->set('paragraph_types', $paragraph_types)->save();
+}

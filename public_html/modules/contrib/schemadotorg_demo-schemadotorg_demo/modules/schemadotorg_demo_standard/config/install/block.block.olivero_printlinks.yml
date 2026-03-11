@@ -1,0 +1,32 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - entity_print
+    - system
+  theme:
+    - olivero
+id: olivero_printlinks
+theme: olivero
+region: content
+weight: 0
+provider: null
+plugin: print_links
+settings:
+  id: print_links
+  label: 'Print Links'
+  label_display: '0'
+  provider: entity_print
+  context_mapping:
+    entity: '@node.node_route_context:node'
+  pdf_enabled: true
+  pdf_link_text: 'View PDF'
+  epub_enabled: false
+  epub_link_text: 'View EPub'
+  word_docx_enabled: false
+  word_docx_link_text: 'View Word Document'
+visibility:
+  request_path:
+    id: request_path
+    negate: true
+    pages: "/node/add/*\r\n/node/*/*\r\n/print/*\r\n/devel/*"

@@ -1,0 +1,12 @@
+name: EXPERIMENTAL Entity Reference Override - Entity Reference Revisions integration
+type: module
+description: Entity reference revisions with overridable title.
+core_version_requirement: ^10.1 || ^11
+package: Field types
+dependencies:
+  - entity_reference_override:entity_reference_override
+  - entity_reference_revisions:entity_reference_revisions
+# Information added by Drupal.org packaging script on 2025-04-11
+version: '2.0.0-beta4'
+project: 'entity_reference_override'
+datestamp: 1744343665

@@ -1,0 +1,127 @@
+<?php
+
+/**
+ * @file
+ * Manages translations for Schema.org types and properties as they are created.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Field\FieldConfigInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
+
+/**
+ * Implements hook_presave().
+ */
+function schemadotorg_translation_entity_insert(EntityInterface $entity): void {
+  /** @var \Drupal\schemadotorg_translation\SchemaDotOrgTranslationManagerInterface $manager */
+  $manager = \Drupal::service('schemadotorg_translation.manager');
+  $manager->entityInsert($entity);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ */
+function schemadotorg_translation_field_config_presave(FieldConfigInterface $field_config): void {
+  /** @var \Drupal\schemadotorg_translation\SchemaDotOrgTranslationManagerInterface $manager */
+  $manager = \Drupal::service('schemadotorg_translation.manager');
+  $manager->fieldConfigPresave($field_config);
+}
+
+/**
+ * Implements hook_schemadotorg_jsonld_schema_type_entity_alter().
+ */
+function schemadotorg_translation_schemadotorg_jsonld_schema_type_entity_alter(array &$data, EntityInterface $entity, ?SchemaDotOrgMappingInterface $mapping, BubbleableMetadata $bubbleable_metadata): void {
+  /** @var \Drupal\schemadotorg_translation\SchemaDotOrgTranslationJsonLdManagerInterface $schemadotorg_translation_jsonld_manager */
+  $schemadotorg_translation_jsonld_manager = \Drupal::service('schemadotorg_translation.jsonld_manager');
+  $schemadotorg_translation_jsonld_manager->schemaTypeEntityAlter($data, $entity, $mapping, $bubbleable_metadata);
+}
+
+/* ************************************************************************** */
+// Schema.org general settings form.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::afterBuildDetails
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::formAlter
+ */
+function schemadotorg_translation_form_schemadotorg_general_settings_form_alter(array &$form, FormStateInterface $form_state): void {
+  $form['schemadotorg_translation'] = [
+    '#type' => 'details',
+    '#title' => t('Translation settings'),
+  ];
+  $form['schemadotorg_translation']['excluded_schema_types'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Excluded Schema.org types'),
+    '#description' => t('Enter Schema.org types that should never be translated.'),
+    '#description_link' => 'types',
+    '#example' => '
+- SchemaType
+- entity_type_id--SchemaType
+- entity_type_id--bundle
+- entity_type_id--bundle--SchemaType
+',
+  ];
+  $form['schemadotorg_translation']['excluded_schema_properties'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Excluded Schema.org properties and fields'),
+    '#description' => t('Enter Schema.org properties and field names that should never be translated.'),
+    '#description_link' => 'properties',
+    '#example' => '
+- propertyName
+- SchemaType--propertyName
+- entity_type_id--bundle--schema_type--schema_property
+- field_name
+- entity_type_id--bundle--field_name
+',
+  ];
+  $form['schemadotorg_translation']['included_field_names'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Included field names'),
+    '#description' => t('Enter field names that should always be translated.'),
+    '#example' => '
+- field_name_01
+- field_name_02
+- field_name_03
+',
+  ];
+  $form['schemadotorg_translation']['included_field_types'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Included field types'),
+    '#description' => t('Enter field types that should always be translated.'),
+    '#example' => '
+- field_type_01
+- field_type_02
+- field_type_03
+',
+  ];
+  $form['schemadotorg_translation']['apply_translation_settings'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Apply translation settings to all existing Schema.org mappings.'),
+    '#description' => t('If checked, the above translation settings will be applied to all existing Schema.org mappings.'),
+    '#prefix' => '<hr/>',
+  ];
+  $form['#submit'][] = 'schemadotorg_translation_form_schemadotorg_types_settings_form_submit';
+}
+
+/**
+ * Form submission handler for schemadotorg_types_settings_form().
+ *
+ * @see schemadotorg_translation_form_schemadotorg_types_settings_form_alter()
+ */
+function schemadotorg_translation_form_schemadotorg_types_settings_form_submit(array &$form, FormStateInterface $form_state): void {
+  // Apply translation settings to all existing Schema.org mappings
+  // by triggering the mapping's target bundle entities insert hook.
+  $apply_translation_settings = $form_state->getValue(['schemadotorg_translation', 'apply_translation_settings']);
+  if ($apply_translation_settings) {
+    /** @var \Drupal\schemadotorg_translation\SchemaDotOrgTranslationManagerInterface $manager */
+    $manager = \Drupal::service('schemadotorg_translation.manager');
+    $manager->applyTranslations();
+    \Drupal::messenger()->addStatus(t('Translation settings applied to all existing Schema.org mappings.'));
+  }
+}

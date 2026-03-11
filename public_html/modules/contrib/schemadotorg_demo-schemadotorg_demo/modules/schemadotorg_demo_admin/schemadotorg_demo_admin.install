@@ -1,0 +1,89 @@
+<?php
+
+/**
+ * @file
+ * Installation hooks for the Schema.org Blueprints Demo Standard Admin module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Config\FileStorage;
+
+/**
+ * Implements hook_install().
+ */
+function schemadotorg_demo_admin_install(): void {
+  /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
+  $theme_installer = \Drupal::service('theme_installer');
+
+  /** @var \Drupal\Core\Extension\ModuleInstallerInterface $module_installer */
+  $module_installer = \Drupal::service('module_installer');
+
+  /* ************************************************************************ */
+  // User.
+  /* ************************************************************************ */
+
+  /** @var \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager */
+  $menu_link_manager = \Drupal::service('plugin.manager.menu.link');
+
+  // Disabled user page because it is included in the toolbar.
+  $menu_link_manager->updateDefinition('user.page', ['enabled' => FALSE]);
+
+  /* ************************************************************************ */
+  // Admin theme.
+  /* ************************************************************************ */
+
+  \Drupal::configFactory()->getEditable('system.theme.global')
+    ->set('features.node_user_picture', FALSE)
+    ->save();
+
+  /* ************************************************************************ */
+  // Gin Admin Theme.
+  /* ************************************************************************ */
+
+  // Enable the Gin admin theme.
+  $theme_installer->install(['gin']);
+
+  // Flush cache to enable the Gin admin theme.
+  drupal_flush_all_caches();
+
+  // Enable the Gin related modules.
+  $module_installer->install(['gin_login', 'gin_toolbar', 'gin_type_tray', 'gin_moderation_sidebar']);
+
+  // Configure the Gin admin theme.
+  \Drupal::configFactory()->getEditable('system.theme')
+    ->set('admin', 'gin')
+    ->save();
+  \Drupal::configFactory()->getEditable('gin.settings')
+    ->set('classic_toolbar', 'horizontal')
+    ->set('show_description_toggle', TRUE)
+    ->set('show_user_theme_settings', TRUE)
+    ->set('sticky_action_buttons', TRUE)
+    ->save();
+
+  // Install optional config.
+  $config_path = \Drupal::service('extension.path.resolver')->getPath('module', 'schemadotorg_demo_admin');
+  $config_source = new FileStorage($config_path);
+  \Drupal::service('config.installer')->installOptionalConfig($config_source);
+
+  /* ************************************************************************ */
+  // Masquerade.
+  /* ************************************************************************ */
+
+  // Install masquerade module after the moderation dashboard module to
+  // prevent the below warning.
+  //
+  // The "extra_field_block:user:user:masquerade" was not found.
+  //
+  // Below are the steps required to reproduce this issue.
+  //
+  // <code>
+  // ddev install default;
+  // ddev drush en -y masquerade;
+  // ddev drush en -y moderation_dashboard;
+  // </code>
+  // .
+  // @see https://www.drupal.org/project/masquerade/issues/3110355
+  // @see https://www.drupal.org/node/3416592
+  $module_installer->install(['masquerade']);
+}

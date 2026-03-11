@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_field_parts.manager:
+    class: Drupal\schemadotorg_field_parts\SchemaDotOrgFieldPartsManager
+  Drupal\schemadotorg_field_parts\SchemaDotOrgFieldPartsManagerInterface: '@schemadotorg_field_parts.manager'

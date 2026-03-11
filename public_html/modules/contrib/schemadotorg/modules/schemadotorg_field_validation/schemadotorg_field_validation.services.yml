@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_field_validation.manager:
+    class: Drupal\schemadotorg_field_validation\SchemaDotOrgFieldValidationManager
+  Drupal\schemadotorg_field_validation\SchemaDotOrgFieldValidationManagerInterface: '@schemadotorg_field_validation.manager'

@@ -1,0 +1,14 @@
+name: 'Schema.org Blueprints Sidebar test'
+type: module
+description: 'Support module for Schema.org Blueprints Sidebar testing.'
+package: Testing
+schemadotorg_production: false
+dependencies:
+  - 'drupal:text'
+  - 'config_rewrite:config_rewrite'
+  - 'schemadotorg:schemadotorg_sidebar'
+
+# Information added by Drupal.org packaging script on 2025-09-16
+version: '1.0.0-alpha36'
+project: 'schemadotorg_experimental'
+datestamp: 1758054172

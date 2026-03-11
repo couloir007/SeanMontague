@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - focal_point
+name: schemadotorg_4x3
+label: 'Schema.org 4x3'
+effects:
+  95156793-5f78-4684-9f17-fda420efc57b:
+    uuid: 95156793-5f78-4684-9f17-fda420efc57b
+    id: focal_point_scale_and_crop
+    weight: 1
+    data:
+      width: 1200
+      height: 900
+      crop_type: focal_point

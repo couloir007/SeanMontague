@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Installation hooks for the Local Tasks More Test module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_install().
+ */
+function local_tasks_more_test_install(): void {
+  $config = \Drupal::configFactory()
+    ->getEditable('local_tasks_more.settings');
+  $base_routes = $config->get('base_routes');
+  $base_routes[] = 'local_tasks_more_test.01';
+  $config->set('base_routes', array_unique($base_routes));
+  $config->save();
+}

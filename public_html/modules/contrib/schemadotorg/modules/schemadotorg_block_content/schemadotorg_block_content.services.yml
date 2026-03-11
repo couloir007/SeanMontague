@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_block_content.jsonld_manager:
+    class: Drupal\schemadotorg_block_content\SchemaDotOrgBlockContentJsonLdManager
+  Drupal\schemadotorg_block_content\SchemaDotOrgBlockContentJsonLdManagerInterface: '@schemadotorg_block_content.jsonld_manager'

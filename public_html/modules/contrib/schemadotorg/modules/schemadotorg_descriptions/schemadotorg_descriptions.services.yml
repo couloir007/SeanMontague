@@ -1,0 +1,15 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_descriptions.manager:
+    class: Drupal\schemadotorg_descriptions\SchemaDotOrgDescriptionsManager
+  Drupal\schemadotorg_descriptions\SchemaDotOrgDescriptionsManagerInterface: '@schemadotorg_descriptions.manager'
+
+  schemadotorg_descriptions.config_factory_override:
+    class: Drupal\schemadotorg_descriptions\Config\SchemaDotOrgDescriptionsConfigFactoryOverride
+    arguments: ['@config.factory', '@cache.data', '@cache.discovery', '@schemadotorg.schema_type_manager', '@schemadotorg.schema_type_builder']
+    tags:
+      - { name: config.factory.override }
+      - { name: event_subscriber }
+  Drupal\schemadotorg_descriptions\Config\SchemaDotOrgDescriptionConfigFactoryOverrideInterface: '@schemadotorg_descriptions.config_factory_override'

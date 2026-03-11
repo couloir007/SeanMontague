@@ -1,0 +1,11 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_address.manager:
+    class: Drupal\schemadotorg_address\SchemaDotOrgAddressManager
+  Drupal\schemadotorg_address\SchemaDotOrgAddressManagerInterface: '@schemadotorg_address.manager'
+
+  schemadotorg_address.jsonld_manager:
+    class: Drupal\schemadotorg_address\SchemaDotOrgAddressJsonLdManager
+  Drupal\schemadotorg_address\SchemaDotOrgAddressJsonLdManagerInterface: '@schemadotorg_address.jsonld_manager'

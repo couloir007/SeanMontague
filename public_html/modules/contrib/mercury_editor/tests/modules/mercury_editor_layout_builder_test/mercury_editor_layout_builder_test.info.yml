@@ -1,0 +1,13 @@
+name: Mercury Editor Layout Builder Test
+description: 'Test module for using Mercury Editor with Layout Builder.'
+type: module
+core_version_requirement: ^9 || ^10 || ^11
+package: Testing
+dependencies:
+  - layout_builder
+  - mercury_editor_setup_test
+
+# Information added by Drupal.org packaging script on 2025-12-03
+version: '2.2.5'
+project: 'mercury_editor'
+datestamp: 1764723330

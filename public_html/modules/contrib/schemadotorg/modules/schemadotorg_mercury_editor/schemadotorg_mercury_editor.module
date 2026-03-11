@@ -1,0 +1,114 @@
+<?php
+
+/**
+ * @file
+ * Automatically enables the Mercury Editor for Schema.org types.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @see mercury_editor_form_layout_paragraphs_component_form_alter()
+ */
+function schemadotorg_mercury_editor_form_layout_paragraphs_component_form_alter(array &$form, FormStateInterface $form_state): void {
+  $form += ['#after_build' => []];
+  $form['#after_build'] = array_merge(
+    ['schemadotorg_mercury_editor_form_layout_paragraphs_component_form_after_build'],
+    $form['#after_build'],
+  );
+}
+
+/**
+ * After build callback for the form.
+ *
+ * @see mercury_editor_form_layout_paragraphs_component_form_alter()
+ */
+function schemadotorg_mercury_editor_form_layout_paragraphs_component_form_after_build(array $form, FormStateInterface $form_state): array {
+  // Check if behavior plugins are being used.
+  if (!isset($form['behavior_plugins'])) {
+    return $form;
+  }
+
+  // Because style options are enabled for all paragraph types,
+  // we need to hide the 'Styles' tab if there are no visible behavior plugins.
+  // @see \Drupal\schemadotorg_layout_paragraphs\SchemaDotOrgLayoutParagraphsManager::paragraphsTypeCreate
+  $visible_children = Element::getVisibleChildren($form['behavior_plugins']);
+  if (empty($visible_children)) {
+    unset($form['tabs']['#options']['styles']);
+    unset($form['behavior_plugins']['#attributes']['class']);
+  }
+  if ($visible_children === ['style_options']
+    && !Element::getVisibleChildren($form['behavior_plugins']['style_options'])) {
+    unset($form['tabs']['#options']['styles']);
+    unset($form['behavior_plugins']['#attributes']['class']);
+  }
+  return $form;
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function schemadotorg_mercury_editor_form_schemadotorg_mapping_form_alter(array &$form, FormStateInterface &$form_state): void {
+  /** @var \Drupal\schemadotorg_mercury_editor\SchemaDotOrgMercuryEditorManagerInterface $schemadotorg_mercury_editor_manager */
+  $schemadotorg_mercury_editor_manager = \Drupal::service('schemadotorg_mercury_editor.manager');
+  $schemadotorg_mercury_editor_manager->mappingFormAlter($form, $form_state);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ */
+function schemadotorg_mercury_editor_schemadotorg_mapping_presave(SchemaDotOrgMappingInterface $mapping): void {
+  /** @var \Drupal\schemadotorg_mercury_editor\SchemaDotOrgMercuryEditorManagerInterface $schemadotorg_mercury_editor_manager */
+  $schemadotorg_mercury_editor_manager = \Drupal::service('schemadotorg_mercury_editor.manager');
+  $schemadotorg_mercury_editor_manager->mappingPresave($mapping);
+}
+
+/**
+ * Implements hook_schemadotorg_property_field_alter().
+ *
+ * @see schemadotorg_paragraphs_schemadotorg_property_field_alter()
+ */
+function schemadotorg_mercury_editor_schemadotorg_property_field_alter(
+  string $schema_type,
+  string $schema_property,
+  array &$field_storage_values,
+  array &$field_values,
+  ?string &$widget_id,
+  array &$widget_settings,
+  ?string &$formatter_id,
+  array &$formatter_settings,
+): void {
+  /** @var \Drupal\schemadotorg_mercury_editor\SchemaDotOrgMercuryEditorManagerInterface $schemadotorg_mercury_editor_manager */
+  $schemadotorg_mercury_editor_manager = \Drupal::service('schemadotorg_mercury_editor.manager');
+  $schemadotorg_mercury_editor_manager->propertyFieldAlter(
+    $schema_type,
+    $schema_property,
+    $field_storage_values,
+    $field_values,
+    $widget_id,
+    $widget_settings,
+    $formatter_id,
+    $formatter_settings
+  );
+}
+
+/**
+ * Implements hook_gin_content_form_routes().
+ */
+function schemadotorg_mercury_editor_gin_content_form_routes(): array {
+  // Ensure that Mercury editor node forms
+  // via Gin Admin theme have description toggle.
+  $content_types = \Drupal::config('mercury_editor.settings')
+    ->get('bundles.node') ?? [];
+  $routes = ['mercury_editor.node_form'];
+  foreach ($content_types as $content_type) {
+    $routes[] = 'node.add.' . $content_type;
+  }
+  return $routes;
+}

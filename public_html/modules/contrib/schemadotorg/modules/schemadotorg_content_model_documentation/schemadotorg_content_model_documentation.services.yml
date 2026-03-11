@@ -1,0 +1,11 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_content_model_documentation.manager:
+    class: Drupal\schemadotorg_content_model_documentation\SchemaDotOrgContentModelDocumentationManager
+  Drupal\schemadotorg_content_model_documentation\SchemaDotOrgContentModelDocumentationManagerInterface: '@schemadotorg_content_model_documentation.manager'
+
+  schemadotorg_content_model_documentation.builder:
+    class: Drupal\schemadotorg_content_model_documentation\SchemaDotOrgContentModelDocumentationBuilder
+  Drupal\schemadotorg_content_model_documentation\SchemaDotOrgContentModelDocumentationBuilderInterface: '@schemadotorg_content_model_documentation.builder'

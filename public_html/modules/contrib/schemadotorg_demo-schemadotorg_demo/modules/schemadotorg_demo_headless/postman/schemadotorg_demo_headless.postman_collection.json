@@ -1,0 +1,505 @@
+{
+	"info": {
+		"_postman_id": "d1c8f97f-340e-46fe-a86a-f1dad5fdaed7",
+		"name": "schemadotorg_demo_headless",
+		"description": "This is a JSON API compliant implementation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5776296"
+	},
+	"item": [
+		{
+			"name": "jsonapi",
+			"item": [
+				{
+					"name": "node/page",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/jsonapi/node/page",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"jsonapi",
+								"node",
+								"page"
+							]
+						},
+						"description": "<em class=\"placeholder\"><a href=\"http://jsonapi.org/format/#fetching\">Collection endpoint</a></em> for the WebPage resource type. Collections are a list of <em class=\"placeholder\"><a href=\"http://jsonapi.org/format/#document-resource-objects\">resource objects</a></em> for a particular resource type. In the JSON API module for Drupal all collections are homogeneous, which means that all the items in a collection are of the same type."
+					},
+					"response": [
+						{
+							"name": "successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/WebPage?resourceVersion=minim quis&filter=&sort=&page=&include=minim quis",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"WebPage"
+									],
+									"query": [
+										{
+											"key": "resourceVersion",
+											"value": "minim quis"
+										},
+										{
+											"key": "filter",
+											"value": ""
+										},
+										{
+											"key": "sort",
+											"value": ""
+										},
+										{
+											"key": "page",
+											"value": ""
+										},
+										{
+											"key": "include",
+											"value": "minim quis"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "null"
+						}
+					]
+				},
+				{
+					"name": "node_type - page",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/jsonapi/node_type?filter[drupal_internal__type]=page",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"jsonapi",
+								"node_type"
+							],
+							"query": [
+								{
+									"key": "filter[drupal_internal__type]",
+									"value": "page"
+								}
+							]
+						},
+						"description": "<em class=\"placeholder\"><a href=\"http://jsonapi.org/format/#fetching\">Collection endpoint</a></em> for the WebPage resource type. Collections are a list of <em class=\"placeholder\"><a href=\"http://jsonapi.org/format/#document-resource-objects\">resource objects</a></em> for a particular resource type. In the JSON API module for Drupal all collections are homogeneous, which means that all the items in a collection are of the same type."
+					},
+					"response": [
+						{
+							"name": "successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/WebPage?resourceVersion=minim quis&filter=&sort=&page=&include=minim quis",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"WebPage"
+									],
+									"query": [
+										{
+											"key": "resourceVersion",
+											"value": "minim quis"
+										},
+										{
+											"key": "filter",
+											"value": ""
+										},
+										{
+											"key": "sort",
+											"value": ""
+										},
+										{
+											"key": "page",
+											"value": ""
+										},
+										{
+											"key": "include",
+											"value": "minim quis"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "null"
+						}
+					]
+				},
+				{
+					"name": "schemadotorg_mapping - page",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/jsonapi/schemadotorg_mapping?filter[target_entity_type_id]=node&filter[target_bundle]=page",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"jsonapi",
+								"schemadotorg_mapping"
+							],
+							"query": [
+								{
+									"key": "filter[target_entity_type_id]",
+									"value": "node"
+								},
+								{
+									"key": "filter[target_bundle]",
+									"value": "page"
+								}
+							]
+						},
+						"description": "<em class=\"placeholder\"><a href=\"http://jsonapi.org/format/#fetching\">Collection endpoint</a></em> for the WebPage resource type. Collections are a list of <em class=\"placeholder\"><a href=\"http://jsonapi.org/format/#document-resource-objects\">resource objects</a></em> for a particular resource type. In the JSON API module for Drupal all collections are homogeneous, which means that all the items in a collection are of the same type."
+					},
+					"response": [
+						{
+							"name": "successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/WebPage?resourceVersion=minim quis&filter=&sort=&page=&include=minim quis",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"WebPage"
+									],
+									"query": [
+										{
+											"key": "resourceVersion",
+											"value": "minim quis"
+										},
+										{
+											"key": "filter",
+											"value": ""
+										},
+										{
+											"key": "sort",
+											"value": ""
+										},
+										{
+											"key": "page",
+											"value": ""
+										},
+										{
+											"key": "include",
+											"value": "minim quis"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "null"
+						}
+					]
+				},
+				{
+					"name": "jsonapi_resource_config - page",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/jsonapi/jsonapi_resource_config?filter[resourceType]=node--page",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"jsonapi",
+								"jsonapi_resource_config"
+							],
+							"query": [
+								{
+									"key": "filter[resourceType]",
+									"value": "node--page"
+								}
+							]
+						},
+						"description": "<em class=\"placeholder\"><a href=\"http://jsonapi.org/format/#fetching\">Collection endpoint</a></em> for the WebPage resource type. Collections are a list of <em class=\"placeholder\"><a href=\"http://jsonapi.org/format/#document-resource-objects\">resource objects</a></em> for a particular resource type. In the JSON API module for Drupal all collections are homogeneous, which means that all the items in a collection are of the same type."
+					},
+					"response": [
+						{
+							"name": "successful operation",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/WebPage?resourceVersion=minim quis&filter=&sort=&page=&include=minim quis",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"WebPage"
+									],
+									"query": [
+										{
+											"key": "resourceVersion",
+											"value": "minim quis"
+										},
+										{
+											"key": "filter",
+											"value": ""
+										},
+										{
+											"key": "sort",
+											"value": ""
+										},
+										{
+											"key": "page",
+											"value": ""
+										},
+										{
+											"key": "include",
+											"value": "minim quis"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "null"
+						}
+					]
+				},
+				{
+					"name": "field_config - node:page",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/jsonapi/field_config?filter[entity_type]=node&filter[bundle]=page",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"jsonapi",
+								"field_config"
+							],
+							"query": [
+								{
+									"key": "filter[entity_type]",
+									"value": "node"
+								},
+								{
+									"key": "filter[bundle]",
+									"value": "page"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "base_field_override - node:page",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/jsonapi/base_field_override?filter[entity_type]=node&filter[bundle]=page",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"jsonapi",
+								"base_field_override"
+							],
+							"query": [
+								{
+									"key": "filter[entity_type]",
+									"value": "node"
+								},
+								{
+									"key": "filter[bundle]",
+									"value": "page"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "subrequests - node:page",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n        \"requestId\": \"node_type\",\n        \"uri\": \"{{baseUrl}}/jsonapi/node_type?filter[drupal_internal__type]=page\",\n        \"action\": \"view\",\n        \"headers\": {\n            \"Accept\": \"application/vnd.api+json\",\n            \"Bearer\": \"{{token}}\"\n        }\n    },\n    {\n        \"requestId\": \"field_config\",\n        \"uri\": \"{{baseUrl}}/jsonapi/field_config?filter[entity_type]=node&filter[bundle]=page\",\n        \"action\": \"view\",\n        \"headers\": {\n            \"Accept\": \"application/vnd.api+json\",\n            \"Bearer\": \"{{token}}\"\n        }\n    },\n    {\n        \"requestId\": \"base_field_override\",\n        \"uri\": \"{{baseUrl}}/jsonapi/base_field_override?filter[entity_type]=node&filter[bundle]=page\",\n        \"action\": \"view\",\n        \"headers\": {\n            \"Accept\": \"application/vnd.api+json\",\n            \"Bearer\": \"{{token}}\"\n        }\n    },\n    {\n        \"requestId\": \"schemadotorg_mapping\",\n        \"uri\": \"{{baseUrl}}/jsonapi/schemadotorg_mapping?filter[target_entity_type_id]=node&filter[target_bundle]=page\",\n        \"action\": \"view\",\n        \"headers\": {\n            \"Accept\": \"application/vnd.api+json\",\n            \"Bearer\": \"{{token}}\"\n        }\n    },    \n    {\n        \"requestId\": \"jsonapi_resource_config\",\n        \"uri\": \"{{baseUrl}}/jsonapi/jsonapi_resource_config?filter[resourceType]=node--page\",\n        \"action\": \"view\",\n        \"headers\": {\n            \"Accept\": \"application/vnd.api+json\",\n            \"Bearer\": \"{{token}}\"\n        }\n    }    \n    \n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/subrequests?_format=json",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"subrequests"
+							],
+							"query": [
+								{
+									"key": "_format",
+									"value": "json"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "accessTokenUrl",
+				"value": "{{baseUrl}}/oauth/token",
+				"type": "string"
+			},
+			{
+				"key": "tokenName",
+				"value": "token",
+				"type": "string"
+			},
+			{
+				"key": "password",
+				"value": "headless",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "headless",
+				"type": "string"
+			},
+			{
+				"key": "grant_type",
+				"value": "password_credentials",
+				"type": "string"
+			},
+			{
+				"key": "client_authentication",
+				"value": "header",
+				"type": "string"
+			},
+			{
+				"key": "authUrl",
+				"value": "",
+				"type": "string"
+			},
+			{
+				"key": "clientSecret",
+				"value": "secret",
+				"type": "string"
+			},
+			{
+				"key": "clientId",
+				"value": "00000000-0000-0000-0000-000000000000",
+				"type": "string"
+			},
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://schemadotorg.ddev.site",
+			"type": "string"
+		}
+	]
+}

@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_physical.jsonld_manager:
+    class: Drupal\schemadotorg_physical\SchemaDotOrgPhysicalJsonLdManager
+  Drupal\schemadotorg_physical\SchemaDotOrgPhysicalJsonLdManagerInterface: '@schemadotorg_physical.jsonld_manager'

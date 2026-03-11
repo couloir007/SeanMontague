@@ -1,0 +1,12 @@
+name: Ray Debugger Twig
+description: Use the Ray Debugging tool in Twig templates.
+type: module
+core_version_requirement: ">=8.8"
+package: Development
+dependencies:
+  - drupal:ray_debugger
+
+# Information added by Drupal.org packaging script on 2023-06-13
+version: '1.0.4'
+project: 'ray_debugger'
+datestamp: 1686699075

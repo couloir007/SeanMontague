@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * @file
+ * Installation hooks for the Schema.org Blueprints Mercury Editor module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_install().
+ */
+function schemadotorg_mercury_editor_install(bool $is_syncing): void {
+  if ($is_syncing) {
+    return;
+  }
+
+  // Setting weight to 12 so that hooks are called after
+  // the Schema.org mapping and related fields are inserted and created.
+  module_set_weight('schemadotorg_mercury_editor', 12);
+}
+
+/**
+ * Setting weight to 12 so that hooks are called after the Schema.org mapping and related fields are inserted and created.
+ */
+function schemadotorg_mercury_editor_update_10000(): void {
+  module_set_weight('schemadotorg_mercury_editor', 12);
+}

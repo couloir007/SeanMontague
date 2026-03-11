@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Adds a show more tasks toggle to primary or secondary local tasks.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Menu\Plugin\Block\LocalTasksBlock;
+
+/**
+ * Implements hook_local_tasks_alter().
+ */
+function local_tasks_more_local_tasks_alter(array &$local_tasks): void {
+  /** @var \Drupal\local_tasks_more\LocalTasksMoreManagerInterface $local_tasks_more_manager */
+  $local_tasks_more_manager = \Drupal::service('local_tasks_more.manager');
+  $local_tasks_more_manager->localTasksAlter($local_tasks);
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function local_tasks_more_menu_local_tasks_alter(array &$data, string $route_name, RefinableCacheableDependencyInterface &$cacheability): void {
+  /** @var \Drupal\local_tasks_more\LocalTasksMoreManagerInterface $local_tasks_more_manager */
+  $local_tasks_more_manager = \Drupal::service('local_tasks_more.manager');
+  $local_tasks_more_manager->menuLocalTasksAlter($data, $route_name, $cacheability);
+}
+
+/**
+ * Implements hook_preprocess_menu_local_task().
+ */
+function local_tasks_more_preprocess_menu_local_task(array &$variables): void {
+  /** @var \Drupal\local_tasks_more\LocalTasksMoreManagerInterface $local_tasks_more_manager */
+  $local_tasks_more_manager = \Drupal::service('local_tasks_more.manager');
+  $local_tasks_more_manager->preprocessMenuLocalTask($variables);
+}
+
+/**
+ * Implements kook_block_view_alter().
+ */
+function local_tasks_more_block_view_alter(array &$build, BlockPluginInterface $block): void {
+  // Remove the contextual links from the local tasks block.
+  if ($block instanceof LocalTasksBlock) {
+    unset($build['#contextual_links']);
+  }
+}

@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_editorial.manager:
+    class: Drupal\schemadotorg_editorial\SchemaDotOrgEditorialManager
+  Drupal\schemadotorg_editorial\SchemaDotOrgEditorialManagerInterface: '@schemadotorg_editorial.manager'

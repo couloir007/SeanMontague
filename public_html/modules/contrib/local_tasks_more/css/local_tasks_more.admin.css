@@ -1,0 +1,8 @@
+/**
+ * @file
+ * Local Tasks More Admin styles.
+ */
+
+textarea[name="alter_local_tasks"] {
+  font-family: monospace;
+}

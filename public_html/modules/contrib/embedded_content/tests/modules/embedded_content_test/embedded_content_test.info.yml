@@ -1,0 +1,12 @@
+name: Embedded Content Test
+type: module
+description: 'Provides testing fixtures'
+package: Testing
+# version: VERSION
+dependencies:
+  - drupal:embedded_content
+
+# Information added by Drupal.org packaging script on 2025-01-22
+version: '2.0.3'
+project: 'embedded_content'
+datestamp: 1737579250

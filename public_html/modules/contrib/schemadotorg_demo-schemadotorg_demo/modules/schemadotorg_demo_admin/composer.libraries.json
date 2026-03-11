@@ -1,0 +1,44 @@
+{
+  "require": {
+    "drupal/admin_dialogs": "^1.0",
+    "drupal/admin_toolbar": "^3.0",
+    "drupal/autosave_form": "^1.0",
+    "drupal/config_rewrite": "^1.0",
+    "drupal/dashboard": "^2.0",
+    "drupal/default_content": "^2.0",
+    "drupal/diff": "^1.0",
+    "drupal/gin": "^4.0",
+    "drupal/gin_login": "^2.0",
+    "drupal/gin_moderation_sidebar": "^1.0",
+    "drupal/gin_type_tray": "^1.0",
+    "drupal/file_delete": "^3.0",
+    "drupal/local_tasks_more": "^1.0",
+    "drupal/login_destination": "^2.0",
+    "drupal/masquerade": "^2.0",
+    "drupal/media_file_delete":  "^1.0",
+    "drupal/moderated_content_bulk_publish": "^2.0",
+    "drupal/moderation_dashboard": "^3.0",
+    "drupal/moderation_sidebar": "^1.0",
+    "drupal/queue_ui": "^3.0",
+    "drupal/trash": "^3.0",
+    "drupal/r4032login": "^2.0",
+    "drupal/ultimate_cron": "^2.0",
+    "drupal/unpublished_404": "^2.0"
+  },
+  "extra": {
+    "patches": {
+      "drupal/core": {
+        "Issue #3480321: Second level menu items can't be reached if they have children": "https://www.drupal.org/files/issues/2025-02-07/drupal-3480321-57.patch"
+      },
+      "drupal/dashboard": {
+        "Issue #3490876: Add Gin layer wrapper style for Dashboard and reset for nested style with overrides method": "https://www.drupal.org/files/issues/2024-12-12/dashboard-issue-3490876-comment-6.patch"
+      },
+      "drupal/autosave_form": {
+        "Issue #3355495: PHP 8.2 deprecation issue with AutosaveFormBuilder": "https://www.drupal.org/files/issues/2023-04-20/autosave_form-dynamic-property-deprecation.patch"
+      },
+      "drupal/moderation_sidebar": {
+        "Issue #3468716: Default Drupal core's moderation control widget to hidden when this module is enabled": "https://www.drupal.org/files/issues/2024-08-17/moderation_sidebar-issue-3468716-comment-3.patch"
+      }
+    }
+  }
+}

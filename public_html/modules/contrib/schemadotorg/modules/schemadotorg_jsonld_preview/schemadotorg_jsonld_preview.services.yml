@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_jsonld_preview.builder:
+    class: Drupal\schemadotorg_jsonld_preview\SchemaDotOrgJsonLdPreviewBuilder
+  Drupal\schemadotorg_jsonld_preview\SchemaDotOrgJsonLdPreviewBuilderInterface: '@schemadotorg_jsonld_preview.builder'

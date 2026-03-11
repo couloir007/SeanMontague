@@ -1,0 +1,23 @@
+{
+  "name": "drupal/unpublished_404",
+  "description": "Displays 404 page not found instead of 403 access denied if user tries to access any unauthorized or unpublished node.",
+  "type": "drupal-module",
+  "keywords": ["Drupal", "Unpublished 404"],
+  "homepage": "http://drupal.org/project/unpublished_404",
+  "authors": [
+    {
+      "name": "Gaurav Kapoor (gaurav.kapoor)",
+      "homepage": "https://www.drupal.org/u/gauravkapoor",
+      "role": "Maintainer"
+    },
+    {
+      "name": "Angelo Porretta (captainpants)",
+      "homepage": "https://www.drupal.org/u/captainpants",
+      "role": "Maintainer"
+    }
+  ],
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/unpublished_404",
+    "source": "https://git.drupalcode.org/project/unpublished_404"
+  }
+}

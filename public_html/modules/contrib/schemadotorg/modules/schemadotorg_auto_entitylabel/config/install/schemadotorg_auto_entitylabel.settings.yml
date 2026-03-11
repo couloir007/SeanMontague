@@ -1,0 +1,3 @@
+default_types:
+  node--Person:
+    pattern: '[givenName] [familyName]'

@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file
+ * Displays Schema.org content blocks as status messages.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_block_view_alter().
+ */
+function schemadotorg_block_content_status_block_view_alter(array &$build, BlockPluginInterface $block): void {
+  /** @var \Drupal\schemadotorg_block_content_status\SchemaDotOrgBlockContentStatusManagerInterface $schema_block_content_status_manager */
+  $schema_block_content_status_manager = \Drupal::service('schemadotorg_block_content_status.manager');
+  $schema_block_content_status_manager->blockViewAlter($build, $block);
+}
+
+/* ************************************************************************** */
+// Schema.org types settings form.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::afterBuildDetails
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::formAlter
+ */
+function schemadotorg_block_content_status_form_schemadotorg_types_settings_form_alter(array &$form, FormStateInterface $form_state): void {
+  $form['schemadotorg_block_content_status'] = [
+    '#type' => 'details',
+    '#title' => t('Block content status settings'),
+  ];
+  $form['schemadotorg_block_content_status']['message_types'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Block status message types'),
+    '#description' => t('Enter the message types to wrap content blocks when displayed on the page.'),
+    '#description_link' => 'types',
+    '#example' => '
+SchemaType01: status
+SchemaType02: warning
+SchemaType03: info
+',
+  ];
+}

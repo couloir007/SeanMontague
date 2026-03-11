@@ -1,0 +1,4 @@
+config_rewrite:
+  replace:
+    - existing_nodes_link_text
+existing_nodes_link_text: ''

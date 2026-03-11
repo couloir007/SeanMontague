@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * Support module for Schema.org Blueprints Settings element testing.
+ */
+
+use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function schemadotorg_settings_form_test_schemadotorg_mapping_insert(SchemaDotOrgMappingInterface $mapping): void {
+  // Do nothing, except test re-apply settings.
+}

@@ -1,0 +1,14 @@
+general:
+  label: 'General'
+  description: 'General and basic field types.'
+reference:
+  label: 'Reference'
+  description: 'Entity reference field types.'
+
+
+General:
+  label: 'General'
+  description: 'General and basic field types.'
+Reference:
+  label: 'Reference'
+  description: 'Entity reference field types.'

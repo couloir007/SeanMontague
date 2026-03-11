@@ -1,0 +1,108 @@
+<?php
+
+/**
+ * @file
+ * Installation hooks for the Schema.org Blueprints Demo Headless module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_install().
+ */
+function schemadotorg_demo_headless_install(): void {
+  /* ************************************************************************ */
+  // Admin theme.
+  /* ************************************************************************ */
+
+  /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
+  $theme_installer = \Drupal::service('theme_installer');
+
+  // Switch the default theme to Gin.
+  \Drupal::configFactory()->getEditable('system.theme')
+    ->set('default', 'gin')
+    ->save();
+
+  // Clone Olivero blocks to the Gin admin theme.
+  $blocks = \Drupal::entityTypeManager()
+    ->getStorage('block')
+    ->loadMultiple([
+      'olivero_printlinks',
+      'olivero_schemadotorg_diagrams',
+      'olivero_schemadotorg_jsonld_preview',
+      'olivero_schemadotorg_jsonapi_preview',
+    ]);
+  foreach ($blocks as $block) {
+    $new_id = str_replace('olivero_', 'gin_', $block->id());
+    $block
+      ->createDuplicateBlock($new_id, 'gin')
+      ->save();
+  }
+
+  // Uninstall the Olivero theme.
+  $theme_installer->uninstall(['olivero']);
+
+  /* ************************************************************************ */
+  // Modules.
+  /* ************************************************************************ */
+
+  // Uninstall Mercury Editor because it does not make sense with the
+  // Gin Admin Theme.
+  if (\Drupal::moduleHandler()->moduleExists('mercury_editor')) {
+    /** @var \Drupal\Core\Extension\ModuleInstallerInterface $module_installer */
+    $module_installer = \Drupal::service('module_installer');
+    $module_installer->uninstall(['mercury_editor']);
+  }
+
+  /* ************************************************************************ */
+  // Headless user and role.
+  /* ************************************************************************ */
+
+  /** @var \Drupal\user\UserStorageInterface $user_storage */
+  $user_storage = \Drupal::entityTypeManager()->getStorage('user');
+
+  // Create 'headless' user account used for basic authentication preview.
+  $accounts = $user_storage->loadByProperties(['name' => 'headless']);
+  if ($accounts) {
+    $account = reset($accounts);
+  }
+  else {
+    $account = $user_storage->create([
+      'name' => 'headless',
+      'pass' => 'headless',
+      'mail' => 'headless@example.com',
+      'roles' => ['schemadotorg_demo_headless'],
+      'status' => TRUE,
+    ]);
+    $account->save();
+  }
+
+  // Create 'headless' consumer with uuid, client id, and secret with image styles.
+  /** @var \Drupal\consumers\ConsumerStorage $consumer_storage */
+  $consumer_storage = \Drupal::entityTypeManager()->getStorage('consumer');
+  $consumers = $consumer_storage->loadByProperties(['uuid' => '00000000-0000-0000-0000-000000000000']);
+  if (!$consumers) {
+    $consumer = $consumer_storage->create([
+      'label' => 'Schema.org Blueprints Headless Demo',
+      'description' => 'This is demo account intended to be used to show how to access content via headless architecture.',
+      'uuid' => '00000000-0000-0000-0000-000000000000',
+      'client_id' => '00000000-0000-0000-0000-000000000000',
+      'secret' => 'secret',
+      'roles' => [
+        ['target_id' => 'schemadotorg_demo_headless'],
+      ],
+      'user_id' => [
+        ['target_id' => $account->id()],
+      ],
+    ]);
+    $consumer->save();
+  }
+
+  // Set Oauth public and private keys.
+  // (i.e. /Users/USER/Sites/schemadotorg/keys)
+  $key_directory = dirname(\Drupal::root()) . '/keys';
+  \Drupal::configFactory()->getEditable('simple_oauth.settings')
+    ->set('public_key', $key_directory . '/public.key')
+    ->set('private_key', $key_directory . '/private.key')
+    ->save();
+}

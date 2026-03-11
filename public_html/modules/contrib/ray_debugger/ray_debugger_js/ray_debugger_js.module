@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * Implements hook_page_attachments().
+ */
+function ray_debugger_js_page_attachments(array &$attachments) {
+  $attachments['#attached']['library'][] = 'ray_debugger_js/node_ray_init';
+}

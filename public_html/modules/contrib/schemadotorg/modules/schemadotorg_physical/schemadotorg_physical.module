@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Allows Physical fields to be used to create a http://schema.org/QuantitativeValue.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Render\BubbleableMetadata;
+
+/**
+ * Implements hook_schemadotorg_jsonld_schema_property_alter().
+ */
+function schemadotorg_physical_schemadotorg_jsonld_schema_property_alter(mixed &$value, FieldItemInterface $item, BubbleableMetadata $bubbleable_metadata): void {
+  /** @var \Drupal\schemadotorg_physical\SchemaDotOrgPhysicalJsonLdManagerInterface $schemadotorg_physical_jsonld_manager */
+  $schemadotorg_physical_jsonld_manager = \Drupal::service('schemadotorg_physical.jsonld_manager');
+  $schemadotorg_physical_jsonld_manager->schemaPropertyAlter($value, $item, $bubbleable_metadata);
+}

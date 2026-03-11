@@ -1,0 +1,11 @@
+name: 'Schema.org Blueprints JSON-LD Cache Test'
+type: module
+description: 'Provides cache test for Schema.org JSON-LD module.'
+package: Testing
+dependencies:
+  - 'schemadotorg:schemadotorg_jsonld'
+
+# Information added by Drupal.org packaging script on 2025-09-16
+version: '1.0.0-alpha36'
+project: 'schemadotorg'
+datestamp: 1758054124

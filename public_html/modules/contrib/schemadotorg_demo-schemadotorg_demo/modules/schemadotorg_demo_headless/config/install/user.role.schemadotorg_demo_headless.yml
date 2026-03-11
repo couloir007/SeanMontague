@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - schemadotorg_demo_headless
+    - subrequests
+  enforced:
+    module:
+      - schemadotorg_demo_headless
+id: schemadotorg_demo_headless
+label: 'Headless'
+weight: 0
+is_admin: null
+permissions:
+  - 'access user profiles'
+  - 'administer node fields'
+  - 'bypass node access'
+  - 'issue subrequests'

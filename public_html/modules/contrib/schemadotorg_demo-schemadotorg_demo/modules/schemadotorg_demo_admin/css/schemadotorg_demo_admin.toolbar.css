@@ -1,0 +1,60 @@
+/**
+ * @file
+ * Schema.org standard admin toolbar styles.
+ */
+
+/* Search */
+input#admin-toolbar-search-input {
+  width: 200px;
+}
+
+/* Workspaces */
+.gin--horizontal-toolbar .workspaces-dialog {
+  top: 66px !important;
+}
+
+.workspaces-toolbar-tab {
+  border-radius: var(--gin-border-s) !important;
+}
+
+.workspaces-toolbar-tab .ajax-progress-throbber {
+  display: none !important;
+}
+
+/* Set toolbar icons */
+.toolbar .toolbar-bar .toolbar-icon.toolbar-icon-system-dashboard::before {
+  -webkit-mask-image: url(../images/dashboard.svg);
+  mask-image: url(../images/dashboard.svg);
+}
+
+.toolbar .toolbar-bar .toolbar-icon.toolbar-icon-language::before {
+  -webkit-mask-image: url(../images/language.svg);
+  mask-image: url(../images/language.svg);
+}
+
+.toolbar .toolbar-bar .toolbar-icon.toolbar-icon-moderation-sidebar::before {
+  -webkit-mask-image: url(../images/moderation.svg);
+  mask-image: url(../images/moderation.svg);
+}
+
+.toolbar .toolbar-bar .toolbar-icon.toolbar-icon-announce::before {
+  -webkit-mask-image: url(../images/announce.svg);
+  mask-image: url(../images/announce.svg);
+}
+
+.toolbar .toolbar-bar .toolbar-icon.toolbar-icon-workspace::before {
+  -webkit-mask-image: url(../images/workspace.svg);
+  mask-image: url(../images/workspace.svg);
+}
+
+.toolbar
+  .toolbar-bar
+  .toolbar-icon.toolbar-icon-announcements-feed-announcement::before {
+  -webkit-mask-image: url(../images/announce.svg);
+  mask-image: url(../images/announce.svg);
+}
+
+.toolbar .toolbar-bar .toolbar-icon.toolbar-icon-masquerade::before {
+  -webkit-mask-image: url(../images/masquerade.svg);
+  mask-image: url(../images/masquerade.svg);
+}

@@ -1,0 +1,8 @@
+config_rewrite:
+  replace:
+    - paragraph_types.editorial
+paragraph_types:
+  editorial:
+    schema_types:
+      - Thing
+    view_format_type: details

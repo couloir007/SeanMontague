@@ -1,0 +1,150 @@
+/*
+  Restrict form description widths to ~75 characters. Otherwise they can make
+  the dialog wider than necessary when using `fit-content` width – looking awkward.
+*/
+mercury-dialog .form-item__description {
+  max-width: 75ch;
+}
+
+/* Need highly specific selector to override gin styles. */
+.layout-paragraphs-component-form label,
+  .layout-paragraphs-component-form summary,
+  .layout-paragraphs-component-form p {
+    font-weight: normal;
+    color: var(--me-color-text);
+    font-size: 1em;
+    margin-bottom: .5em;
+  }
+.layout-paragraphs-component-form legend {
+    margin-bottom: 0;
+    text-transform: uppercase;
+    letter-spacing: var(--me-letter-spacing-loose);
+    font-size: .9em;
+  }
+.layout-paragraphs-component-form fieldset {
+    border-radius: 3px;
+  }
+.layout-paragraphs-component-form fieldset .layout-paragraphs-component-form fieldset:hover {
+      border-color: var(--me-color-border-focus);
+    }
+.layout-paragraphs-component-form .fieldset-wrapper {
+    margin: 0;
+  }
+.layout-paragraphs-component-form .form-item {
+    font-size: 1em;
+  }
+.layout-paragraphs-component-form .description {
+    font-size: .8em;
+    margin: 5px 0;
+  }
+.layout-paragraphs-component-form summary {
+    font-size: .9em;
+    letter-spacing: var(--me-letter-spacing-loose);
+    font-weight: var(--me-font-weight-medium);
+    background-color: var(--me-header-color-background);
+    line-height: 1;
+    text-transform: uppercase;
+  }
+.layout-paragraphs-component-form details {
+    margin-bottom: 1em;
+    border-color: var(--me-color-border);
+  }
+.layout-paragraphs-component-form details .layout-paragraphs-component-form details:hover {
+      border-color: var(--me-color-border-focus);
+    }
+.layout-paragraphs-component-form input:not([type="checkbox"]):not([type="radio"]):not(.media-library-item__remove),
+  .layout-paragraphs-component-form textarea,
+  .layout-paragraphs-component-form select {
+    height: auto;
+    line-height: 1.2;
+    border-radius: 3px;
+    padding: 8px 12px;
+  }
+.layout-paragraphs-component-form input,
+  .layout-paragraphs-component-form textarea,
+  .layout-paragraphs-component-form select,
+  .layout-paragraphs-component-form .cke.cke_chrome {
+    border-radius: 3px;
+    border-color: var(--me-color-border);
+  }
+.layout-paragraphs-component-form input:hover, .layout-paragraphs-component-form textarea:hover, .layout-paragraphs-component-form select:hover, .layout-paragraphs-component-form .cke.cke_chrome:hover {
+      border-color: var(--me-color-border-focus);
+    }
+.layout-paragraphs-component-form select {
+    background-image: url(/modules/contrib/mercury_editor/images/icons/icon-down.png);
+    background-position: right 6px top 50%;
+    background-repeat: no-repeat;
+    background-size: 30px 30px;
+    font-size: 1em;
+    padding-right: 30px;
+  }
+.layout-paragraphs-component-form .cke.cke_chrome {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+.layout-paragraphs-component-form .cke.cke_chrome:hover+.filter-wrapper {
+    border-color: var(--me-color-border);
+  }
+.layout-paragraphs-component-form .cke_bottom {
+    border-top: none;
+  }
+.layout-paragraphs-component-form .js-form-type-select:after {
+    content: none;
+  }
+.layout-paragraphs-component-form .filter-wrapper .form-item {
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+.layout-paragraphs-component-form .filter-wrapper .form-item label {
+        white-space: nowrap;
+        margin: 0 8px 0 0;
+      }
+.layout-paragraphs-component-form .filter-wrapper .form-item select {
+        width: auto;
+        line-height: 1;
+      }
+.layout-paragraphs-component-form .filter-wrapper .form-item label,
+      .layout-paragraphs-component-form .filter-wrapper .form-item select {
+        font-size: .9em;
+      }
+.layout-paragraphs-component-form .filter-wrapper .js-form-type-select:after {
+      top: .5rem;
+    }
+.layout-paragraphs-component-form .filter-wrapper .filter-help {
+      font-size: .9em;
+      line-height: 2.25;
+    }
+.layout-paragraphs-component-form .filter-wrapper a {
+      color: var(--me-color-text);
+      text-decoration: underline;
+    }
+.layout-paragraphs-component-form .filter-wrapper a:hover {
+        color: #000;
+        text-decoration: none;
+      }
+.layout-paragraphs-component-form .filter-wrapper ul {
+      list-style: disc;
+      margin: 10px;
+      padding: 0 16px;
+    }
+.layout-paragraphs-component-form textarea {
+    margin-bottom: 0;
+    display: block;
+  }
+.layout-paragraphs-component-form .field--type-text-long:hover .cke.cke_chrome,
+  .layout-paragraphs-component-form .field--type-text-long:hover .filter-wrapper,
+  .layout-paragraphs-component-form .js-text-format-wrapper:hover textarea,
+  .layout-paragraphs-component-form .js-text-format-wrapper:hover .filter-wrapper {
+    border-color: var(--me-color-border);
+  }
+.layout-paragraphs-component-form .heading-widget--container-with-size {
+    margin-bottom: 0;
+
+  }
+.layout-paragraphs-component-form .heading-widget--container-with-size>div {
+      flex-grow: 0;
+    }
+.layout-paragraphs-component-form .heading-widget--container-with-size>div:last-child {
+      flex-grow: 0;
+    }

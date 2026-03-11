@@ -1,0 +1,16 @@
+types:
+  node:Person:
+    properties:
+      memberOf: true
+      contactPoint: true
+  node:Organization:
+    properties:
+      subOrganization: true
+      parentOrganization: true
+      member: true
+      contactPoint: true
+  node:JobPosting:
+    properties:
+      hiringOrganization:
+        schema_types:
+          Organization: Organization

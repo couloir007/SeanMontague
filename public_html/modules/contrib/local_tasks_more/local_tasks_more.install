@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * Installation hooks for the Local Tasks More module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_install().
+ */
+function local_tasks_more_install(): void {
+  // Alter local tasks after all other modules.
+  module_set_weight('local_tasks_more', 10);
+}

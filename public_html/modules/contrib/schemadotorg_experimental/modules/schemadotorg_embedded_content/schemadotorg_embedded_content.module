@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Provides support for inserting rich and styled Schema.org type into HTML.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_schemadotorg_jsonld().
+ *
+ * @see \Drupal\embedded_content\Plugin\Filter\EmbeddedContent::process
+ * @see \Drupal\media\Plugin\Filter\MediaEmbed::process
+ */
+function schemadotorg_embedded_content_schemadotorg_jsonld(RouteMatchInterface $route_match, BubbleableMetadata $bubbleable_metadata): ?array {
+  /** @var \Drupal\schemadotorg_embedded_content\SchemaDotOrgEmbeddedContentJsonLdManagerInterface $schema_embedded_content_jsonld_manager */
+  $schema_embedded_content_jsonld_manager = \Drupal::service('schemadotorg_embedded_content.jsonld_manager');
+  return $schema_embedded_content_jsonld_manager->schemaDotOrgJsonld($route_match, $bubbleable_metadata);
+}

@@ -1,0 +1,40 @@
+.layout-select {
+  margin-top: 10px;
+
+  & .layout-select__item {
+
+    &.form-type--radio {
+      display: block;
+      margin: 1px;
+    }
+
+    &.js-form-type-radio:not(:first-child),
+    &.js-form-type-checkbox:not(:first-child) {
+      margin: 1px;
+    }
+
+    & label.option {
+      font-size: 1em;
+      outline: none;
+      margin: 1px;
+      border-radius: 2px;
+    }
+
+    & input:checked+label.option {
+      outline: 1px solid blue;
+    }
+
+    & input:focus:checked+label.option {
+      outline: 4px solid blue;
+    }
+
+    & label.option:hover {
+      outline: 1px solid blue;
+    }
+
+    & .layout-icon__region {
+      stroke: transparent;
+      fill: #C3C1C3;
+    }
+  }
+}

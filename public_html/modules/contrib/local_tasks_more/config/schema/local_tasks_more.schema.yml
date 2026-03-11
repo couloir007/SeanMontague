@@ -1,0 +1,50 @@
+# Schema for the configuration files of the Local Tasks More module.
+local_tasks_more.settings:
+  type: config_object
+  label: 'Local Tasks More settings'
+  mapping:
+    base_routes:
+      type: sequence
+      label: 'Base routes'
+      sequence:
+        type: string
+        label: 'Base route'
+    alter_local_tasks:
+      type: sequence
+      label: 'Local task alterations'
+      sequence:
+        type: mapping
+        label: 'Local task alteration'
+        mapping:
+          plugin_id:
+            type: string
+            label: 'Local task plugin ID'
+          status:
+            type: boolean
+            label: Status
+          title:
+            type: string
+            label: Title
+          weight:
+            type: integer
+            label: Weight
+    primary:
+      type: mapping
+      label: 'Primary local tasks settings'
+      mapping:
+        limit:
+          type: integer
+          label: 'Primary local tasks limit'
+        threshold:
+          type: integer
+          label: 'Primary local tasks threshold'
+    secondary:
+      type: mapping
+      label: 'Secondary local tasks settings'
+      mapping:
+        limit:
+          type: integer
+          label: 'Secondary local tasks limit'
+        threshold:
+          type: integer
+          label: 'Secondary local tasks threshold'

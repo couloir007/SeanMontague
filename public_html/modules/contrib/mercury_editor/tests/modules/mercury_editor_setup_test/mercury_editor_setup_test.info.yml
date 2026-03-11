@@ -1,0 +1,15 @@
+name: Mercury Editor Setup Test
+description: 'Test module for Mercury Editor setup.'
+package: 'Testing'
+type: module
+core_version_requirement: ^9 || ^10 || ^11
+dependencies:
+  - drupal:contextual
+  - mercury_editor:mercury_editor
+  - media:media
+  - media:media_library
+
+# Information added by Drupal.org packaging script on 2025-12-03
+version: '2.2.5'
+project: 'mercury_editor'
+datestamp: 1764723330

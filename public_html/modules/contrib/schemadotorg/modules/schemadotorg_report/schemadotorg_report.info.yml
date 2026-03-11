@@ -1,0 +1,14 @@
+name: 'Schema.org Blueprints Report'
+type: module
+description: 'Provides a report for browsing Schema.org types, properties, and naming conventions.'
+package: 'Schema.org Blueprints Documentation'
+core_version_requirement: ^10.3 || ^11
+configure: schemadotorg_report
+schemadotorg_production: false
+dependencies:
+  - 'schemadotorg:schemadotorg'
+
+# Information added by Drupal.org packaging script on 2025-09-16
+version: '1.0.0-alpha36'
+project: 'schemadotorg'
+datestamp: 1758054124

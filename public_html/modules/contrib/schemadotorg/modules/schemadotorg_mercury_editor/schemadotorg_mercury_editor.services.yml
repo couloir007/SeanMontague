@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_mercury_editor.manager:
+    class: Drupal\schemadotorg_mercury_editor\SchemaDotOrgMercuryEditorManager
+  Drupal\schemadotorg_mercury_editor\SchemaDotOrgMercuryEditorManagerInterface: '@schemadotorg_mercury_editor.manager'

@@ -1,0 +1,13 @@
+name: 'Entity reference override Entity Browser'
+type: module
+description: 'Extends the Entity Browser widget to add overridable entity titles.'
+core_version_requirement: ^10.1 || ^11
+package: Field types
+dependencies:
+  - entity_browser:entity_browser
+  - entity_reference_override:entity_reference_override
+
+# Information added by Drupal.org packaging script on 2025-04-11
+version: '2.0.0-beta4'
+project: 'entity_reference_override'
+datestamp: 1744343665

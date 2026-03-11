@@ -1,0 +1,12 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_embedded_content.jsonld_manager:
+    class: Drupal\schemadotorg_embedded_content\SchemaDotOrgEmbeddedContentJsonLdManager
+  Drupal\schemadotorg_embedded_content\SchemaDotOrgEmbeddedContentJsonLdManagerInterface: '@schemadotorg_embedded_content.jsonld_manager'
+
+  schemadotorg_embedded_content.jsonld_builder:
+    class: Drupal\schemadotorg_embedded_content\SchemaDotOrgEmbeddedJsonLdBuilder
+  Drupal\schemadotorg_embedded_content\SchemaDotOrgEmbeddedJsonLdBuilderInterface: '@schemadotorg_embedded_content.jsonld_builder'
+

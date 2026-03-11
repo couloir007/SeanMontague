@@ -1,0 +1,10 @@
+schemadotorg_block_content_status.settings:
+  type: config_object
+  label: 'Schema.org Block content status settings'
+  mapping:
+    message_types:
+      type: sequence
+      label: 'Message types'
+      sequence:
+        type: string
+        label: 'Message type'

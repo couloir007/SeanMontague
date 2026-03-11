@@ -1,0 +1,4 @@
+services:
+  plugin.manager.embedded_content:
+    class: Drupal\embedded_content\EmbeddedContentPluginManager
+    parent: default_plugin_manager

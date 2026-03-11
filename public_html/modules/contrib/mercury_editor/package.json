@@ -1,0 +1,36 @@
+{
+  "name": "mercury_editor",
+  "version": "1.0.0",
+  "description": "Effortless drag-and-drop publishing for Drupal",
+  "main": "rollup.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf build && rollup -c && postcss source/css --dir build/css --base source/css",
+    "dev:css": "gulp css --watch",
+    "dev:js": "rollup -c -w",
+    "dev": "concurrently --kill-others \"npm:dev:*\""
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "browser-sync": "^3.0.3",
+    "concurrently": "^6.2.0",
+    "cross-var": "^1.1.0",
+    "cypress-mercury-editor": "^2.0.1",
+    "eslint": "^8.7.0",
+    "postcss-cli": "^8.3.1",
+    "postcss-inline-svg": "^6.0.0",
+    "postcss-pxtorem": "^6.0.0",
+    "prettier": "^2.5.1",
+    "rollup": "^2.50.2",
+    "rollup-plugin-terser": "^7.0.2"
+  },
+  "dependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "gulp": "^5.0.0",
+    "gulp-postcss": "^9.0.1",
+    "mercury-dialog": "^0.0.34",
+    "postcss": "^8.3.0",
+    "postcss-preset-env": "^7.8.3"
+  }
+}

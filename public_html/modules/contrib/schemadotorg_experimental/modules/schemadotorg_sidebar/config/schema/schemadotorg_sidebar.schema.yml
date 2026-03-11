@@ -1,0 +1,29 @@
+schemadotorg_sidebar.settings:
+  type: config_entity
+  label: 'Schema.org Sidebar settings'
+  mapping:
+    paragraph_types:
+      type: sequence
+      label: 'Sidebar paragraph types'
+      sequence:
+        type: mapping
+        label: 'Sidebar paragraph types'
+        mapping:
+          schema_types:
+            type: sequence
+            label: 'Sidebar Schema.org types'
+            sequence:
+              type: string
+              label: 'Sidebar Schema.org type'
+          form_format_type:
+            type: string
+            label: 'Form field group format type'
+          form_format_settings:
+            type: ignore
+            label: 'Form field group format settings'
+          view_format_type:
+            type: string
+            label: 'View field group format type'
+          view_format_settings:
+            type: ignore
+            label: 'View field group format settings'

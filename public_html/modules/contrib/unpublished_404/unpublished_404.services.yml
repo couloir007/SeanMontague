@@ -1,0 +1,6 @@
+services:
+  unpublished_404.not_found:
+    class: Drupal\unpublished_404\EventSubscriber\NotFound
+    arguments: ['@current_user']
+    tags:
+      - { name: event_subscriber }

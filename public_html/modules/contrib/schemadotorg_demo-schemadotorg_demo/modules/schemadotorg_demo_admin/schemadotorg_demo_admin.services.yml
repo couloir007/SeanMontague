@@ -1,0 +1,5 @@
+services:
+  schemadotorg_demo_admin.route_subscriber:
+    class: \Drupal\schemadotorg_demo_admin\Routing\SchemaDotOrgDemoAdminSubscriber
+    tags:
+      - { name: event_subscriber }

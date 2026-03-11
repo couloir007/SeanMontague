@@ -1,0 +1,51 @@
+diagram:
+  version: VERSION
+  css:
+    theme:
+      css/diagram.css: {}
+  dependencies:
+    - core/drupal
+
+sortable-init:
+  css:
+    theme:
+      css/sortable.css: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/once
+    - content_model_documentation/sortable
+
+sortable:
+  remote: https://github.com/tofsjonas/sortable
+  version: VERSION
+  license:
+      name: MIT
+      url: https://github.com/tofsjonas/sortable/blob/main/LICENSE
+      gpl-compatible: true
+  js:
+    https://cdn.jsdelivr.net/gh/tofsjonas/sortable@latest/sortable.min.js: { type: external, minified: true }
+    https://cdn.jsdelivr.net/gh/tofsjonas/sortable@latest/sortable.a11y.min.js: { type: external, minified: true }
+
+search_fields_form:
+  version: VERSION
+  css:
+    theme:
+      css/search-fields-form.css: {}
+
+select2:
+  remote: https://github.com/select2/select2
+  version: 4.1.0-rc.0
+  license:
+    name: MIT
+    url: https://github.com/select2/select2/blob/develop/LICENSE.md
+    gpl-compatible: true
+  js:
+    https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js: { type: external, minified: true }
+    js/select2-init.js: {}
+  css:
+    theme:
+      https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css: { type: external, minified: true }
+  dependencies:
+    - core/jquery
+    - core/once

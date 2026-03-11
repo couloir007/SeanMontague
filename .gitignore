@@ -97,9 +97,9 @@
 # file.
 # ------------------------------------------------------------------
 /drush/Commands/contrib/
-/public_html/core/
-/public_html/modules/contrib/
-/public_html/themes/contrib/
+#/public_html/core/
+#/public_html/modules/contrib/
+#/public_html/themes/contrib/
 /public_html/profiles/contrib/
 #/public_html/libraries/
 /public_html/private/scripts/quicksilver

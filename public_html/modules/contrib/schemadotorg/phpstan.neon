@@ -1,0 +1,118 @@
+parameters:
+  level: 6
+
+  # Level 6 throws an error when extending an generic class without adding
+  # special docblock comments.  That's common in Drupal so let's disable
+  # these notices.
+  # @see https://phpstan.org/blog/generics-in-php-using-phpdocs#class-level-generics
+  checkGenericClassInNonGenericObjectType: false
+
+  # We inherit Drupal methods and hooks that don't specify iterable types
+  # on arrays.
+  checkMissingIterableValueType: false
+
+  # If an ignored error is not matched, that's fine.
+  reportUnmatchedIgnoredErrors: false
+
+  ignoreErrors:
+
+      ##########################################################################
+      # Global: Deprecations.
+      ##########################################################################
+
+      - "#^Unable to resolve the template type Current in call to method static method Drupal\\\\Component\\\\Utility\\\\DeprecationHelper\\:\\:backwardsCompatibleCall\\(\\)#"
+
+      - "#^Call to an undefined method Drupal\\\\Core\\\\Render\\\\RendererInterface\\:\\:renderInIsolation\\(\\)\\.$#"
+
+      ##########################################################################
+      # Global: Undefined property.
+      ##########################################################################
+
+      - "#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItem(List)?Interface\\:\\:\\$(comment|day|duration|end_value|endhours|entity|format|from|lat|limit|lng|override|override_format|starthours|summary|timezone|to|uri|value)\\.$#"
+
+      - "#^Access to an undefined property.*\\:\\:\\$devel_generate\\.$#"
+
+      ##########################################################################
+      # Global: Dependency inject ::create method.
+      ##########################################################################
+
+      - "#^Unsafe usage of new static#"
+
+      ##########################################################################
+      # Global: Forms.
+      ##########################################################################
+
+      - "#^Parameter \\#2 \\$message of method Drupal\\\\Core\\\\Form\\\\FormStateInterface\\:\\:(setErrorByName|setError)\\(\\) expects string, Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup given\\.#"
+
+      - "#^Method Drupal\\\\Core\\\\Form\\\\FormBuilderInterface\\:\\:getForm\\(\\) invoked with \\d parameters, 1 required\\.$#"
+
+      ##########################################################################
+      # Global: Drush.
+      ##########################################################################s
+
+      - "#^Call to method (writeln|confirm|select|choice)\\(\\) on an unknown class Drush\\\\Style\\\\DrushStyle\\.#"
+
+      ##########################################################################
+      # Global: SchemaDotOrg custom entity properties.
+      ##########################################################################
+
+      - "#^Access to an undefined property.*(schemaDotOrgType|schemaDotOrgProperty|schemaDotOrgField)\\.$#"
+
+      ##########################################################################
+      # Global: Tests.
+      ##########################################################################
+
+      - message: "#^Call to an undefined method.*::method\\(\\).#"
+        paths:
+          - *Test.php
+          - *TestBase.php
+
+      - message: "#^Property.*Storage.*does not accept.*EntityStorageInterface\\.$#"
+        paths:
+          - *Test.php
+          - *TestBase.php
+          - src/Plugin/EntityReferenceSelection/SchemaDotOrgEntityReferenceSelection.php
+
+      ##########################################################################
+      # Access to an undefined property for fields.
+      ##########################################################################
+
+      - message: "#^Access to an undefined property Drupal\\\\taxonomy\\\\TermInterface\\:\\:\\$(parent|depth)\\.$#"
+        count: 3
+        path: src/Plugin/EntityReferenceSelection/SchemaDotOrgTermReferenceSelection.php
+
+      - message: "#^Access to an undefined property Drupal\\\\content_model_documentation\\\\Entity\\\\CMDocumentInterface\\:\\:\\$(documented_entity|notes)\\.$#"
+        count: 11
+        path: modules/schemadotorg_content_model_documentation/tests/src/Kernel/SchemaDotOrgContentModelDocumentationKernelTest.php
+
+      - message: "#^Access to an undefined property Drupal\\\\link\\\\LinkItemInterface\\:\\:\\$uri\\.$#"
+        count: 1
+        path: modules/schemadotorg_jsonld/src/SchemaDotOrgJsonLdManager.php
+
+      - message: "#^Access to protected property Drupal\\\\smart_date_recur\\\\Entity\\\\SmartDateRule\\:\\:\\$limit\\.$#"
+        count: 1
+        path: modules/schemadotorg_smart_date/src/SchemaDotOrgSmartDateJsonLdManager.php
+
+      - message: "#^Access to an undefined property Drupal\\\\physical\\\\Plugin\\\\Field\\\\FieldType\\\\(Measurement|Dimensions)Item\\:\\:\\$(number|unit|height|width|length)\\.$#"
+        count: 6
+        path: modules/schemadotorg_physical/src/SchemaDotOrgPhysicalJsonLdManager.php
+
+      ##########################################################################
+      # Fields.
+      ##########################################################################
+
+      - message: "#^Parameter \\#1 \\$item of method Drupal\\\\schemadotorg_jsonld\\\\SchemaDotOrgJsonLdManagerInterface\\:\\:getSchemaPropertyValue\\(\\) expects Drupal\\\\Core\\\\Field\\\\FieldItemInterface, Drupal\\\\Core\\\\TypedData\\\\TypedDataInterface\\|null given\\.$#"
+        count: 5
+        path: modules/schemadotorg_jsonld/tests/src/Kernel/SchemaDotOrgJsonLdManagerKernelTest.php
+
+      - message: "#^Parameter \\#2 \\$times of function str_repeat expects int, Drupal\\\\Core\\\\Field\\\\FieldItemListInterface given.$#"
+        count: 1
+        path: src/Plugin/EntityReferenceSelection/SchemaDotOrgTermReferenceSelection.php
+
+      ##########################################################################
+      # Paragraphs.
+      ##########################################################################
+
+      - message: "#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\FieldableEntityInterface::getParentEntity\\(\\)\\.$#"
+        count: 2
+        path:  modules/schemadotorg_paragraphs/schemadotorg_paragraphs.module

@@ -1,0 +1,44 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg.installer:
+    class: Drupal\schemadotorg\SchemaDotOrgInstaller
+  Drupal\schemadotorg\SchemaDotOrgInstallerInterface: '@schemadotorg.installer'
+
+  schemadotorg.names:
+    class: Drupal\schemadotorg\SchemaDotOrgNames
+  Drupal\schemadotorg\SchemaDotOrgNamesInterface: '@schemadotorg.names'
+
+  schemadotorg.config_manager:
+    class: Drupal\schemadotorg\SchemaDotOrgConfigManager
+  Drupal\schemadotorg\SchemaDotOrgConfigManagerInterface: '@schemadotorg.config_manager'
+
+  schemadotorg.schema_type_manager:
+    class: Drupal\schemadotorg\SchemaDotOrgSchemaTypeManager
+  Drupal\schemadotorg\SchemaDotOrgSchemaTypeManagerInterface: '@schemadotorg.schema_type_manager'
+
+  schemadotorg.schema_type_builder:
+    class: Drupal\schemadotorg\SchemaDotOrgSchemaTypeBuilder
+  Drupal\schemadotorg\SchemaDotOrgSchemaTypeBuilderInterface: '@schemadotorg.schema_type_builder'
+
+  schemadotorg.entity_type_builder:
+    class: Drupal\schemadotorg\SchemaDotOrgEntityTypeBuilder
+  Drupal\schemadotorg\SchemaDotOrgEntityTypeBuilderInterface: '@schemadotorg.entity_type_builder'
+
+  schemadotorg.entity_display_builder:
+    class: Drupal\schemadotorg\SchemaDotOrgEntityDisplayBuilder
+  Drupal\schemadotorg\SchemaDotOrgEntityDisplayBuilderInterface: '@schemadotorg.entity_display_builder'
+
+  schemadotorg.entity_field_manager:
+    class: Drupal\schemadotorg\SchemaDotOrgEntityFieldManager
+  Drupal\schemadotorg\SchemaDotOrgEntityFieldManagerInterface: '@schemadotorg.entity_field_manager'
+
+  schemadotorg.mapping_manager:
+    class: Drupal\schemadotorg\SchemaDotOrgMappingManager
+  Drupal\schemadotorg\SchemaDotOrgMappingManagerInterface: '@schemadotorg.mapping_manager'
+
+  schemadotorg.breadcrumb:
+    class: Drupal\schemadotorg\Breadcrumb\SchemaDotOrgBreadcrumbBuilder
+    tags:
+      - { name: breadcrumb_builder, priority: 1000 }

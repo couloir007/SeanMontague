@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_sidebar.manager:
+    class: Drupal\schemadotorg_sidebar\SchemaDotOrgSidebarManager
+  Drupal\schemadotorg_sidebar\SchemaDotOrgSidebarManagerInterface: '@schemadotorg_sidebar.manager'

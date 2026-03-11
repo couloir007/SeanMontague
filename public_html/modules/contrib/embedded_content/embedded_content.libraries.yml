@@ -1,0 +1,15 @@
+embedded_content:
+  js:
+    js/build/embeddedContent.js: { minified: true }
+  css:
+    theme:
+      css/embedded_content.css: {}
+  dependencies:
+    - core/ckeditor5
+    - core/ckeditor5.essentials
+    - editor/drupal.editor.dialog
+    - core/drupal.dialog.off_canvas
+
+admin:
+  js:
+    js/admin.js: {  }

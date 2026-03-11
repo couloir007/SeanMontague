@@ -1,0 +1,39 @@
+<?php
+
+/**
+ * @file
+ * Adds an 'Editorial information' paragraph to the sidebar on node edit forms.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ */
+function schemadotorg_editorial_node_presave(NodeInterface $node): void {
+  /** @var \Drupal\schemadotorg_editorial\SchemaDotOrgEditorialManagerInterface $schema_editorial_manager */
+  $schema_editorial_manager = \Drupal::service('schemadotorg_editorial.manager');
+  $schema_editorial_manager->nodePresave($node);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_prepare_form().
+ */
+function schemadotorg_editorial_node_prepare_form(NodeInterface $node, string $operation, FormStateInterface $form_state): void {
+  /** @var \Drupal\schemadotorg_editorial\SchemaDotOrgEditorialManagerInterface $schema_editorial_manager */
+  $schema_editorial_manager = \Drupal::service('schemadotorg_editorial.manager');
+  $schema_editorial_manager->nodePrepareForm($node, $operation, $form_state);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view_alter().
+ */
+function schemadotorg_editorial_node_view_alter(array &$build, NodeInterface $node, EntityViewDisplayInterface $display): void {
+  /** @var \Drupal\schemadotorg_editorial\SchemaDotOrgEditorialManagerInterface $schema_editorial_manager */
+  $schema_editorial_manager = \Drupal::service('schemadotorg_editorial.manager');
+  $schema_editorial_manager->nodeViewAlter($build, $node, $display);
+}

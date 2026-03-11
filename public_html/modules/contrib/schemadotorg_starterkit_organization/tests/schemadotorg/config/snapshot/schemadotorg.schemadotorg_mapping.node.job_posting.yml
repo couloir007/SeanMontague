@@ -1,0 +1,50 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.job_posting.body
+    - field.field.node.job_posting.schema_application_contact
+    - field.field.node.job_posting.schema_base_salary
+    - field.field.node.job_posting.schema_date_posted
+    - field.field.node.job_posting.schema_education_requirements
+    - field.field.node.job_posting.schema_eligibility_to_work_req
+    - field.field.node.job_posting.schema_employer_overview
+    - field.field.node.job_posting.schema_employment_type
+    - field.field.node.job_posting.schema_experience_requirements
+    - field.field.node.job_posting.schema_hiring_organization
+    - field.field.node.job_posting.schema_job_benefits
+    - field.field.node.job_posting.schema_job_location
+    - field.field.node.job_posting.schema_job_location_type
+    - field.field.node.job_posting.schema_qualifications
+    - field.field.node.job_posting.schema_responsibilities
+    - field.field.node.job_posting.schema_skills
+    - field.field.node.job_posting.schema_subject_of
+    - field.field.node.job_posting.schema_valid_through
+    - node.type.job_posting
+  module:
+    - node
+id: node.job_posting
+target_entity_type_id: node
+target_bundle: job_posting
+schema_type: JobPosting
+schema_properties:
+  schema_application_contact: applicationContact
+  schema_base_salary: baseSalary
+  schema_date_posted: datePosted
+  body: description
+  schema_education_requirements: educationRequirements
+  schema_eligibility_to_work_req: eligibilityToWorkRequirement
+  schema_employer_overview: employerOverview
+  schema_employment_type: employmentType
+  schema_experience_requirements: experienceRequirements
+  schema_hiring_organization: hiringOrganization
+  schema_job_benefits: jobBenefits
+  schema_job_location: jobLocation
+  schema_job_location_type: jobLocationType
+  schema_qualifications: qualifications
+  schema_responsibilities: responsibilities
+  schema_skills: skills
+  schema_subject_of: subjectOf
+  title: title
+  schema_valid_through: validThrough
+additional_mappings: {  }

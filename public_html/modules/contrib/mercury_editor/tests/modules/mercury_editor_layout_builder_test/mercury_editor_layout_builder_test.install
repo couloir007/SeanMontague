@@ -1,0 +1,21 @@
+<?php
+
+use Drupal\layout_builder\Section;
+use Drupal\layout_builder\SectionComponent;
+use Drupal\layout_builder\LayoutEntityHelperTrait;
+use \Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+
+/**
+ * @file
+ * Install, update and uninstall functions for the mercury_editor_layout_builder_test module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function mercury_editor_layout_builder_test_install() {
+  $layout_display = LayoutBuilderEntityViewDisplay::load('node.me_test_ct.default');
+  $layout_display->enableLayoutBuilder()
+    ->setOverridable()
+    ->save();
+}

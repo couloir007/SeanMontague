@@ -1,0 +1,98 @@
+<?php
+
+/**
+ * @file
+ * Creates automatic entity label settings for Schema.org types.
+ */
+
+declare(strict_types=1);
+
+use Drupal\auto_entitylabel\AutoEntityLabelManager;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ *
+ * Creates automatic entity label settings for a Schema.org mapping.
+ *
+ * @see \Drupal\auto_entitylabel\Form\AutoEntityLabelForm::submitForm
+ */
+function schemadotorg_auto_entitylabel_schemadotorg_mapping_insert(SchemaDotOrgMappingInterface $mapping): void {
+  /** @var \Drupal\schemadotorg_auto_entitylabel\SchemaDotOrgAutoEntityLabelManagerInterface $schemadotorg_auto_entitylabel_manager */
+  $schemadotorg_auto_entitylabel_manager = \Drupal::service('schemadotorg_auto_entitylabel.manager');
+  $schemadotorg_auto_entitylabel_manager->mappingInsert($mapping);
+}
+
+/* ************************************************************************** */
+// Schema.org properties settings form.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::afterBuildDetails
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::formAlter
+ */
+function schemadotorg_auto_entitylabel_form_schemadotorg_types_settings_form_alter(array &$form, FormStateInterface $form_state): void {
+  // Automatic label generation statuses.
+  // The below options are copied from the 'Automatic entity label' form.
+  // @see \Drupal\auto_entitylabel\Form\AutoEntityLabelForm::buildForm
+  $options = [
+    AutoEntityLabelManager::DISABLED => [
+      'text' => ('Disabled'),
+      'description' => t('Selecting this option will disable the auto labels for the entity.'),
+    ],
+    AutoEntityLabelManager::ENABLED => [
+      'text' => t('Automatically generate the label and hide the label field') . ' [' . t('DEFAULT') . ']',
+      'description' => t('Selecting this option will hide the title field and will generate a new option based on the pattern provided below.'),
+    ],
+    AutoEntityLabelManager::OPTIONAL => [
+      'text' => ('Automatically generate the label if the label field is left empty'),
+      'description' => t('Selecting this option will make the label field optional and will generate a label if the label field is left empty.'),
+    ],
+    AutoEntityLabelManager::PREFILLED => [
+      'text' => t('Automatically prefill the label'),
+      'description' => t('Selecting this option will prefills the label field with the generated pattern provided below. This option provides limited token support because it only prefills the label and it will not be able to replace all the tokens like current node based tokens for ex: [node:nid] because that token has not been generated yet.'),
+    ],
+  ];
+  $example = [];
+  foreach ($options as $value => $option) {
+    $example[] = '# status: ' . $value . ' = ' . $option['text'];
+    $example[] = '# ' . $option['description'];
+    $example[] = '';
+  }
+
+  $form['schemadotorg_auto_entitylabel'] = [
+    '#type' => 'details',
+    '#title' => t('Automatic entity labels settings'),
+  ];
+  $form['schemadotorg_auto_entitylabel']['default_types'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Default types auto entity labels'),
+    '#description' => t('Enter default types auto entity label settings.'),
+    '#description_link' => 'types',
+    '#example' => implode(PHP_EOL, $example) . "
+SchemaType:
+  status: 1
+  pattern: '[propertyName01] [propertyName02]'
+bundle:
+  status: 1
+  pattern: '[propertyName01] [propertyName02]'
+SchemaType--bundle:
+  status: 1
+  pattern: '[propertyName01] [propertyName02]'
+entity_type_id--SchemaType:
+  status: 1
+  pattern: '[propertyName01] [propertyName02]'
+entity_type_id--bundle:
+  status: 1
+  pattern: '[propertyName01] [propertyName02]'
+entity_type_id--SchemaType--bundle:
+  status: 1
+  pattern: '[propertyName01] [propertyName02]'
+",
+  ];
+
+  $form['schemadotorg_auto_entitylabel']['apply'] = [];
+}

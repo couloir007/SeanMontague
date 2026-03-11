@@ -1,0 +1,21 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  schemadotorg_starterkit.manager:
+    class: Drupal\schemadotorg_starterkit\SchemaDotOrgStarterkitManager
+  Drupal\schemadotorg_starterkit\SchemaDotOrgStarterkitManagerInterface: '@schemadotorg_starterkit.manager'
+
+  schemadotorg_starterkit.converter:
+    class: Drupal\schemadotorg_starterkit\SchemaDotOrgStarterkitConverter
+  Drupal\schemadotorg_starterkit\SchemaDotOrgStarterkitConverterInterface: '@schemadotorg_starterkit.converter'
+
+  schemadotorg_starterkit.event_subscriber:
+    class: Drupal\schemadotorg_starterkit\EventSubscriber\SchemaDotOrgStarterkitEventSubscriber
+
+  schemadotorg_starterkit.breadcrumb:
+    class: Drupal\schemadotorg_starterkit\Breadcrumb\SchemaDotOrgStarterkitBreadcrumbBuilder
+    tags:
+      - { name: breadcrumb_builder, priority: 1000 }
+

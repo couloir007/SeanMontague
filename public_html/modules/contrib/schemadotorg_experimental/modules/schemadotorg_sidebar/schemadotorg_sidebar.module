@@ -1,0 +1,109 @@
+<?php
+
+/**
+ * @file
+ * Adds paragraph types to the sidebar on node edit forms.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\NodeInterface;
+use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
+
+/**
+ * Implements hook_schemadotorg_mapping_insert().
+ */
+function schemadotorg_sidebar_schemadotorg_mapping_insert(SchemaDotOrgMappingInterface $mapping): void {
+  /** @var \Drupal\schemadotorg_sidebar\SchemaDotOrgSidebarManagerInterface $schema_sidebar_manager */
+  $schema_sidebar_manager = \Drupal::service('schemadotorg_sidebar.manager');
+  $schema_sidebar_manager->mappingInsert($mapping);
+}
+
+/**
+ * Implements hook_field_widget_single_element_WIDGET_TYPE_form_alter().
+ */
+function schemadotorg_sidebar_field_widget_single_element_inline_entity_form_simple_form_alter(array &$element, FormStateInterface $form_state, array $context): void {
+  /** @var \Drupal\schemadotorg_sidebar\SchemaDotOrgSidebarManagerInterface $schema_sidebar_manager */
+  $schema_sidebar_manager = \Drupal::service('schemadotorg_sidebar.manager');
+  $schema_sidebar_manager->fieldWidgetSingleElementInlineEntityFormSimpleFormAlter($element, $form_state, $context);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view_alter().
+ */
+function schemadotorg_sidebar_node_view_alter(array &$build, NodeInterface $node, EntityViewDisplayInterface $display): void {
+  /** @var \Drupal\schemadotorg_sidebar\SchemaDotOrgSidebarManagerInterface $schema_sidebar_manager */
+  $schema_sidebar_manager = \Drupal::service('schemadotorg_sidebar.manager');
+  $schema_sidebar_manager->nodeViewAlter($build, $node, $display);
+}
+
+/* ************************************************************************** */
+// Schema.org types settings form.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::afterBuildDetails
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::formAlter
+ */
+function schemadotorg_sidebar_form_schemadotorg_types_settings_form_alter(array &$form, FormStateInterface $form_state): void {
+  $form['schemadotorg_sidebar'] = [
+    '#type' => 'details',
+    '#title' => t('Sidebar settings'),
+  ];
+  $form['schemadotorg_sidebar']['paragraph_types'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Sidebar paragraphs types'),
+    '#description' => t("Enter paragraphs types that should be placed in a Schema.org type's node edit form sidebar. The sidebar's title and description will be copied from the paragraph type."),
+    '#description_link' => 'types',
+    '#example' => "
+paragraph_type:
+  paragraph_type_id:
+    schema_types:
+      - SchemaType
+      - bundle
+      - bundle--SchemaType
+      - '-SchemaType'
+      - '-bundle'
+      - '-bundle--SchemaType'
+    # form_format_type: (details_sidebar|details|fieldset)
+    form_format_type: details_sidebar
+    form_format_settings:
+      open: true
+    # view_format_type: (details|fieldset|hidden)
+    view_format_type: details
+    view_format_settings:
+      open: true
+",
+  ];
+  $form['schemadotorg_sidebar']['apply_paragraph_types'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Apply sidebar paragraphs to all existing Schema.org content types.'),
+    '#description' => t('If checked, the above sidebar paragraphs will be applied to all existing Schema.org content types.'),
+    '#prefix' => '<hr/>',
+  ];
+  $form['#submit'][] = 'schemadotorg_sidebar_form_schemadotorg_types_settings_form_submit';
+}
+
+/**
+ * Form submission handler for schemadotorg_types_settings_form().
+ *
+ * @see schemadotorg_sidebar_form_schemadotorg_types_settings_form_alter()
+ */
+function schemadotorg_sidebar_form_schemadotorg_types_settings_form_submit(array &$form, FormStateInterface $form_state): void {
+  // Apply sidebars to all existing Schema.org content types.
+  if ($form_state->getValue(['schemadotorg_sidebar', 'apply_paragraph_types'])) {
+    /** @var \Drupal\schemadotorg\SchemaDotOrgMappingInterface[] $mappings */
+    $mappings = \Drupal::entityTypeManager()
+      ->getStorage('schemadotorg_mapping')
+      ->loadByProperties(['target_entity_type_id' => 'node']);
+    foreach ($mappings as $mapping) {
+      schemadotorg_sidebar_schemadotorg_mapping_insert($mapping);
+    }
+
+    \Drupal::messenger()->addStatus(t('Sidebar paragraphs applied to all existing Schema.org content types.'));
+  }
+}

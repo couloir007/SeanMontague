@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_jsonapi_preview.builder:
+    class: Drupal\schemadotorg_jsonapi_preview\SchemaDotOrgJsonApiPreviewBuilder
+  Drupal\schemadotorg_jsonapi_preview\SchemaDotOrgJsonApiPreviewBuilderInterface: '@schemadotorg_jsonapi_preview.builder'

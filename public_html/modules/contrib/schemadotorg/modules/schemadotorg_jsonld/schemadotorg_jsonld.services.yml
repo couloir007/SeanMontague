@@ -1,0 +1,21 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_jsonld.manager:
+    class: Drupal\schemadotorg_jsonld\SchemaDotOrgJsonLdManager
+  Drupal\schemadotorg_jsonld\SchemaDotOrgJsonLdManagerInterface: '@schemadotorg_jsonld.manager'
+
+  schemadotorg_jsonld.builder:
+    class: Drupal\schemadotorg_jsonld\SchemaDotOrgJsonLdBuilder
+  Drupal\schemadotorg_jsonld\SchemaDotOrgJsonLdBuilderInterface: '@schemadotorg_jsonld.builder'
+
+  schemadotorg_jsonld.breadcrumb:
+    class: Drupal\schemadotorg_jsonld\Breadcrumb\SchemaDotOrgJsonLdBreadcrumbBuilder
+    tags:
+      - { name: breadcrumb_builder, priority: 1000 }
+
+  variation_cache.schemadotorg_jsonld:
+    class: Drupal\Core\Cache\VariationCacheInterface
+    factory: variation_cache_factory:get
+    arguments: [schemadotorg_jsonld]

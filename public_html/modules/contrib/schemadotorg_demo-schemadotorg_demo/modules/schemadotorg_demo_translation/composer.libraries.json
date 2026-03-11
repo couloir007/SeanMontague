@@ -1,0 +1,7 @@
+{
+  "require": {
+    "drupal/config_rewrite": "^1.0",
+    "drupal/content_translation_redirect": "^2.0",
+    "drupal/toolbar_language_switcher": "^2.0"
+  }
+}

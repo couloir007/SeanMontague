@@ -1,0 +1,70 @@
+schemadotorg_taxonomy.settings:
+  type: config_object
+  label: 'Schema.org Taxonomy settings'
+  mapping:
+    default_vocabularies:
+      type: sequence
+      label: 'Default vocabularies'
+      sequence:
+        type: mapping
+        label: 'Default vocabulary'
+        mapping:
+          id:
+            type: string
+            label: 'Vocabulary ID'
+          label:
+            type: text
+            label: 'Vocabulary name'
+          description:
+            type: text
+            label: 'Vocabulary description'
+          auto_create:
+            type: boolean
+            label: 'Auto create'
+          field_name:
+            type: text
+            label: 'Vocabulary field name'
+          group:
+            type: string
+            label: 'Group name'
+          unlimited:
+            type: boolean
+            label: 'Unlimited values'
+          required:
+            type: boolean
+            label: 'Required field'
+          widget_id:
+            type: string
+            label: 'Widget ID'
+          widget_settings:
+            type: ignore
+            label: 'Widget settings'
+          formatter_id:
+            type: string
+            label: 'Formatter ID'
+          formatter_settings:
+            type: ignore
+            label: 'Formatter settings'
+          schema_types:
+            type: sequence
+            label: 'Schema.org types'
+            sequence:
+              type: string
+              label: 'Schema.org type'
+
+    schema_property_vocabularies:
+      type: sequence
+      label: 'Default properties'
+      sequence:
+        type: mapping
+        label: 'Default property'
+        mapping:
+          id:
+            type: string
+            label: 'Vocabulary ID'
+          label:
+            type: text
+            label: 'Vocabulary name'
+          description:
+            type: text
+            label: 'Vocabulary description'

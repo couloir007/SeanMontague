@@ -1,0 +1,11 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_paragraphs.manager:
+    class: Drupal\schemadotorg_paragraphs\SchemaDotOrgParagraphsManager
+  Drupal\schemadotorg_paragraphs\SchemaDotOrgParagraphsManagerInterface: '@schemadotorg_paragraphs.manager'
+
+  schemadotorg_paragraphs.jsonld_manager:
+    class: Drupal\schemadotorg_paragraphs\SchemaDotOrgParagraphsJsonLdManager
+  Drupal\schemadotorg_paragraphs\SchemaDotOrgParagraphsJsonLdManagerInterface: '@schemadotorg_paragraphs.jsonld_manager'

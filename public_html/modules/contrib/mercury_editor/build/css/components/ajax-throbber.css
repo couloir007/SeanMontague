@@ -1,0 +1,75 @@
+
+  .lp-builder .ajax-progress-throbber, .lpb-dialog .ajax-progress-throbber, .layout-paragraphs-builder-form .ajax-progress-throbber, .lpb-formatter .ajax-progress-throbber {
+    display: flex;
+    align-items: center;
+    align-self: center;
+    font-size: 1em;
+    line-height: 1;
+  }
+
+.lp-builder .ajax-progress-throbber .throbber, .lpb-dialog .ajax-progress-throbber .throbber, .layout-paragraphs-builder-form .ajax-progress-throbber .throbber, .lpb-formatter .ajax-progress-throbber .throbber {
+      background-image: url(../../../images/icons/throbber.png);
+      background-size: 100% auto;
+      animation: loading-throbber 1s infinite linear;
+      transform: translateZ(0);
+      position: absolute;
+      height: 24px;
+      width: 24px;
+      display: inline-block;
+      vertical-align: middle;
+      border-radius: 12px;
+      left: 100%;
+      margin: auto;
+      top: 0;
+      bottom: 0;
+    }
+
+.lp-builder .ajax-progress-throbber .throbber::before, .lpb-dialog .ajax-progress-throbber .throbber::before, .layout-paragraphs-builder-form .ajax-progress-throbber .throbber::before, .lpb-formatter .ajax-progress-throbber .throbber::before {
+      content: none;
+    }
+
+@keyframes loading-throbber {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.lpb-enable__button {
+  position: relative;
+}
+
+.lpb-enable__button .ajax-progress-throbber {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    margin-left: 5px;
+    transform: translateY(-50%);
+  }
+
+.lpb-enable__button .ajax-progress-throbber .throbber {
+      box-shadow: 0 0 3px rgba(0, 0, 0, .25);
+    }
+
+.lpb-btn--add.before+.ajax-progress-throbber,
+.lpb-btn--add.after+.ajax-progress-throbber,
+.lpb-btn.before+.ajax-progress-throbber,
+.lpb-btn.after+.ajax-progress-throbber {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 560;
+}
+
+.lpb-btn--add.before+.ajax-progress-throbber,
+.lpb-btn.before+.ajax-progress-throbber {
+  top: 0;
+}
+
+.lpb-btn--add.after+.ajax-progress-throbber,
+.lpb-btn.after+.ajax-progress-throbber {
+  top: 100%;
+}

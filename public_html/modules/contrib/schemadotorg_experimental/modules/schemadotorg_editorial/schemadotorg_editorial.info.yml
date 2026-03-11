@@ -1,0 +1,21 @@
+name: 'Schema.org Blueprints Editorial'
+type: module
+description: "Adds an 'Editorial information' paragraph to the sidebar on node edit forms."
+package: 'Schema.org Blueprints Other'
+core_version_requirement: ^10.3 || ^11
+schemadotorg_production: false
+lifecycle: experimental
+dependencies:
+  - 'drupal:datetime'
+  - 'drupal:field'
+  - 'drupal:node'
+  - 'drupal:options'
+  - 'drupal:text'
+  - 'config_rewrite:config_rewrite'
+  - 'schemadotorg:schemadotorg_allowed_formats'
+  - 'schemadotorg:schemadotorg_sidebar'
+
+# Information added by Drupal.org packaging script on 2025-09-16
+version: '1.0.0-alpha36'
+project: 'schemadotorg_experimental'
+datestamp: 1758054172

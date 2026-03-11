@@ -1,0 +1,169 @@
+mercury_editor:
+  css:
+    component:
+      build/css/components/buttons.css: {}
+      build/css/components/controls.css: {}
+      build/css/components/component.css: {}
+      build/css/components/dialog.css: {}
+      build/css/components/drag-hint.css: {}
+      build/css/components/empty-message.css: {}
+      build/css/components/entity-browser.css: {}
+      build/css/components/form.css: {}
+      build/css/components/frontend-builder.css: {}
+      build/css/components/paragraphs-widget.css: {}
+      build/css/components/table.css: {}
+    theme:
+      build/css/theme/theme.css: {}
+  dependencies:
+    - mercury_editor/base
+    - mercury_editor/unpublished_hint
+    - core/once
+
+component_form:
+  js:
+    build/js/component-form.js: {}
+  dependencies:
+    - core/once
+
+ajax_progress:
+  js:
+    build/js/ajax-progress.js: {}
+  css:
+    component:
+      build/css/components/ajax-progress.css: {}
+  dependencies:
+    - core/drupal.ajax
+
+unpublished_hint:
+  css:
+    component:
+      build/css/components/unpublished-hint.css: {}
+
+google_fonts:
+  css:
+    base:
+      //fonts.googleapis.com/css?family=IBM+Plex+Sans:400,400i,500,700,700i|IBM+Plex+Serif&display=swap: { type: external }
+
+base:
+  css:
+    base:
+      build/css/base/settings.css: {}
+      build/css/base/base.css: {}
+    component:
+      build/css/components/ajax-throbber.css: {}
+  dependencies:
+    - mercury_editor/google_fonts
+
+lpb_component_list:
+  css:
+    component:
+      build/css/components/lpb-component-list.css: {}
+  dependencies:
+    - mercury_editor/base
+
+lpb_component_delete_form:
+  css:
+    component:
+      build/css/components/lpb-component-delete-form.css: {}
+
+horizontal_tabs:
+  css:
+    component:
+      build/css/horizontal-tabs.css: {}
+  js:
+    build/js/horizontal-tabs.js: {}
+
+layout_select:
+  css:
+    component:
+      build/css/components/layout-select.css: {}
+
+# Mercury Editor Dialog
+dialog.element:
+  js:
+    build/js/dialog.element.min.js: {minified: true}
+
+dialog.drupal:
+  css:
+    component:
+      build/css/dialog.css: {}
+  js:
+    build/js/dialog.drupal.js: {}
+  dependencies:
+    - mercury_editor/dialog.element
+
+dialog.ajax:
+  js:
+    build/js/dialog.ajax.js: {}
+  dependencies:
+    - core/drupal.dialog.ajax
+    - mercury_editor/dialog.drupal
+
+# Edit Screen
+edit_screen:
+  css:
+    component:
+      build/css/edit-screen.css: {}
+  js:
+    build/js/edit-screen.js: {}
+  dependencies:
+    - core/once
+    - core/jquery
+    - layout_paragraphs/builder
+    - mercury_editor/mercury_editor
+    - mercury_editor/edit_screen.ajax
+    - mercury_editor/ajax_progress
+    - mercury_editor/post_messages_listener
+
+node_form:
+  css:
+    component:
+      build/css/node-form.css: {}
+  js:
+    build/js/node-form.js: {}
+  dependencies:
+    - mercury_editor/sync_changes
+
+# Preview Screen
+preview_screen:
+  css:
+    component:
+      build/css/preview-screen.css: {}
+  js:
+    build/js/preview-screen.js: {}
+  dependencies:
+    - layout_paragraphs/builder
+    - mercury_editor/post_messages_listener
+
+# iFrame Actions
+post_messages_listener:
+  js:
+    build/js/post-messages-listener.js: {}
+
+edit_screen.ajax:
+  js:
+    build/js/edit-screen.ajax.js: {}
+  dependencies:
+    - core/drupal.ajax
+
+sync_changes:
+  js:
+    build/js/sync-changes.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+
+menu:
+  css:
+    component:
+      build/css/menu.css: {}
+
+image_radios:
+  css:
+    component:
+      build/css/image-radios.css: {}
+
+# Entity Browser integration
+entity_browser.modal_selection:
+  js:
+    build/js/entity_browser.modal_selection.js: {}

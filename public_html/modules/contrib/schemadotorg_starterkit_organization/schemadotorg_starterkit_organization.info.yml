@@ -1,0 +1,26 @@
+name: 'Schema.org Blueprints Starter Kit: Organization'
+type: module
+description: 'A starter kit that creates Schema.org Organization and LocalBusiness types with views.'
+package: 'Schema.org Blueprints Starter Kit'
+configure: schemadotorg.settings.types
+core_version_requirement: ^10.3 || ^11
+schemadotorg_production: false
+dependencies:
+  - 'drupal:menu_ui'
+  - 'config_rewrite:config_rewrite'
+  - 'schemadotorg:schemadotorg'
+  - 'schemadotorg:schemadotorg_additional_type'
+  - 'schemadotorg:schemadotorg_auto_entitylabel'
+  - 'schemadotorg:schemadotorg_cer'
+  - 'schemadotorg:schemadotorg_custom_field'
+  - 'schemadotorg:schemadotorg_diagram'
+  - 'schemadotorg:schemadotorg_epp'
+  - 'schemadotorg:schemadotorg_entity_reference_override'
+  - 'schemadotorg:schemadotorg_node'
+  - 'schemadotorg:schemadotorg_pathauto'
+  - 'schemadotorg:schemadotorg_starterkit'
+
+# Information added by Drupal.org packaging script on 2025-09-16
+version: '1.0.0-alpha36'
+project: 'schemadotorg_starterkit_organization'
+datestamp: 1758054289

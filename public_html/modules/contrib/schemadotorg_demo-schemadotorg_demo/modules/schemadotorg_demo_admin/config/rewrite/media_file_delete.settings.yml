@@ -1,0 +1,4 @@
+config_rewrite:
+  replace:
+    - delete_file_default
+delete_file_default: true

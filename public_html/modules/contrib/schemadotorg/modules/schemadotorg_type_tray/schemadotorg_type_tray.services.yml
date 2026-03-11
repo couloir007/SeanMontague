@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_type_tray.manager:
+    class: Drupal\schemadotorg_type_tray\SchemaDotOrgTypeTrayManager
+  Drupal\schemadotorg_type_tray\SchemaDotOrgTypeTrayManagerInterface: '@schemadotorg_type_tray.manager'

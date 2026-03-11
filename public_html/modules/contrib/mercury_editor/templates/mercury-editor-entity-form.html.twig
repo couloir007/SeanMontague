@@ -1,0 +1,19 @@
+{#
+/**
+ * @file
+ * Theme override for a node edit form.
+ *
+ * Single-column template for the node edit form.
+ *
+ * @see claro_form_node_form_alter()
+ */
+#}
+{{ attach_library('mercury_editor/node_form') }}
+{{ form['status_messages'] }}
+<header class="me-node-form__header">
+  <h1 class="me-node-form__title">{{ form['#title'] }}</h1>
+</header>
+{{ form|without('status_messages', 'advanced', 'footer', 'actions', 'gin_actions', 'gin_sidebar', 'gin_sidebar_toggle') }}
+{{ form.advanced }}
+{{ form.actions }}
+{{ form.footer }}

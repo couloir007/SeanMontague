@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ * Enables and configures API support for the Schema.org Blueprints Demo.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_page_attachments().
+ */
+function schemadotorg_demo_api_page_attachments(array &$page): void {
+  if (\Drupal::routeMatch()->getRouteName() === 'openapi.documentation') {
+    $page['#attached']['library'][] = 'schemadotorg_demo_api/schemadotorg_demo_api';
+  }
+}

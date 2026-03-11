@@ -1,0 +1,13 @@
+name: Entity reference field tree widget
+type: module
+description: A field widget for entity reference tree
+package: Field Widget
+core_version_requirement: ^10 || ^11
+
+dependencies:
+  - drupal:field
+
+# Information added by Drupal.org packaging script on 2026-02-11
+version: '2.4.2'
+project: 'entity_reference_tree'
+datestamp: 1770786006

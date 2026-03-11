@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @file
+ * Installation hooks for the Schema.org Blueprints Role module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Change 'schema_types' to 'field_instances' in 'schemadotorg_role.settings'.
+ */
+function schemadotorg_role_update_10001(): void {
+  $config = \Drupal::configFactory()
+    ->getEditable('schemadotorg_role.settings');
+  $schema_types = $config->get('schema_types');
+  $field_instances = [];
+  foreach ($schema_types as $type => $fields) {
+    [$schema_type, $schema_property] = explode('--', $type);
+    $field_instances[$schema_type] = [$schema_property => $fields];
+  }
+  $config->set('field_instances', $field_instances);
+  $config->clear('schema_types');
+  $config->save();
+}
+
+/**
+ * Issue #3448906: Improve roles support for the Entity Reference Override module.
+ */
+function schemadotorg_role_update_10002(): void {
+  \Drupal::configFactory()
+    ->getEditable('schemadotorg_role.settings')
+    ->clear('entity_reference_overrides')
+    ->save();
+}

@@ -1,0 +1,116 @@
+langcode: en
+status: true
+dependencies: {  }
+id: base_field_override--base_field_override
+disabled: false
+path: base_field_override
+resourceType: base_field_override--base_field_override
+resourceFields:
+  uuid:
+    disabled: false
+    fieldName: uuid
+    publicName: uuid
+    enhancer:
+      id: ''
+  langcode:
+    disabled: true
+    fieldName: langcode
+    publicName: langcode
+    enhancer:
+      id: ''
+  status:
+    disabled: true
+    fieldName: status
+    publicName: status
+    enhancer:
+      id: ''
+  dependencies:
+    disabled: true
+    fieldName: dependencies
+    publicName: dependencies
+    enhancer:
+      id: ''
+  third_party_settings:
+    disabled: true
+    fieldName: third_party_settings
+    publicName: third_party_settings
+    enhancer:
+      id: ''
+  _core:
+    disabled: true
+    fieldName: _core
+    publicName: _core
+    enhancer:
+      id: ''
+  id:
+    disabled: true
+    fieldName: id
+    publicName: id
+    enhancer:
+      id: ''
+  field_name:
+    disabled: false
+    fieldName: field_name
+    publicName: field_name
+    enhancer:
+      id: ''
+  entity_type:
+    disabled: false
+    fieldName: entity_type
+    publicName: entity_type
+    enhancer:
+      id: ''
+  bundle:
+    disabled: false
+    fieldName: bundle
+    publicName: bundle
+    enhancer:
+      id: ''
+  label:
+    disabled: false
+    fieldName: label
+    publicName: label
+    enhancer:
+      id: ''
+  description:
+    disabled: false
+    fieldName: description
+    publicName: description
+    enhancer:
+      id: ''
+  required:
+    disabled: true
+    fieldName: required
+    publicName: required
+    enhancer:
+      id: ''
+  translatable:
+    disabled: true
+    fieldName: translatable
+    publicName: translatable
+    enhancer:
+      id: ''
+  default_value:
+    disabled: true
+    fieldName: default_value
+    publicName: default_value
+    enhancer:
+      id: ''
+  default_value_callback:
+    disabled: true
+    fieldName: default_value_callback
+    publicName: default_value_callback
+    enhancer:
+      id: ''
+  settings:
+    disabled: true
+    fieldName: settings
+    publicName: settings
+    enhancer:
+      id: ''
+  field_type:
+    disabled: true
+    fieldName: field_type
+    publicName: field_type
+    enhancer:
+      id: ''

@@ -1,0 +1,86 @@
+/**
+ * @file
+ * Schema.org standard styles.
+ */
+
+/* ************************************************************************** */
+/* Olivero */
+/* ************************************************************************** */
+
+.messages .olivero-details__summary {
+  color: var(--color-text-neutral-loud);
+}
+
+.messages .olivero-details__wrapper {
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-inline-start: 0;
+  margin-inline-end: 0;
+}
+
+.messages .olivero-details__wrapper pre.schemadotorg-codemirror-mode {
+  color: #333;
+}
+
+/* ************************************************************************** */
+/* Messages */
+/* ************************************************************************** */
+
+/**
+ * Allow messages text content to inherit color.
+ *
+ * This ensures that message content is displayed as expected.
+ */
+.messages .text-content {
+  color: inherit;
+  font-family: inherit;
+}
+
+/* ************************************************************************** */
+/* Block */
+/* ************************************************************************** */
+
+.region > .block-schemadotorg-diagram,
+.region > .block-schemadotorg-jsonapi-preview,
+.region > .block-schemadotorg-jsonld-preview {
+  margin-block-end: 0;
+}
+
+/* ************************************************************************** */
+/* Entity embed. */
+/* ************************************************************************** */
+
+.align-left.embedded-entity {
+  width: 40%;
+  margin: 0 1rem 1rem 0;
+}
+
+.align-right.embedded-entity {
+  width: 40%;
+  margin: 0 0 1rem 1rem;
+}
+
+.align-center.embedded-entity {
+  width: 60%;
+  margin: 1rem auto;
+}
+
+/* ************************************************************************** */
+/* Entity Print. */
+/* ************************************************************************** */
+
+/* Adjust print links spacing */
+div.block-print-links .button--small {
+  margin: 0;
+}
+
+/* ************************************************************************** */
+/* Address. */
+/* ************************************************************************** */
+
+/* Bold main address information */
+.address .given-name,
+.address .family-name,
+.address .organization {
+  font-weight: bold;
+}

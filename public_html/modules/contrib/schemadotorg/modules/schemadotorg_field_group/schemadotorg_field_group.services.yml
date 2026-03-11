@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_field_group.entity_display_builder:
+    class: Drupal\schemadotorg_field_group\SchemaDotOrgFieldGroupEntityDisplayBuilder
+  Drupal\schemadotorg_field_group\SchemaDotOrgFieldGroupEntityDisplayBuilderInterface: '@schemadotorg_field_group.entity_display_builder'

@@ -1,0 +1,13 @@
+name: 'Schema.org Blueprints Views Test'
+type: module
+description: 'Provides test views for Schema.org module'
+package: Testing
+dependencies:
+  - 'drupal:views'
+  - 'drupal:node'
+  - 'schemadotorg:schemadotorg'
+
+# Information added by Drupal.org packaging script on 2025-09-16
+version: '1.0.0-alpha36'
+project: 'schemadotorg'
+datestamp: 1758054124

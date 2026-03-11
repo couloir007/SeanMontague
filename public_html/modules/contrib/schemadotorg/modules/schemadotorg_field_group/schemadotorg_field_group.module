@@ -1,0 +1,289 @@
+<?php
+
+/**
+ * @file
+ * Creates field groups when Schema.org properties are mapping to a field.
+ */
+
+/* phpcs:disable Drupal.NamingConventions.ValidFunctionName.InvalidPrefix */
+
+declare(strict_types=1);
+
+use Drupal\Component\Serialization\Yaml;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\field\FieldConfigInterface;
+use Drupal\schemadotorg\SchemaDotOrgEntityDisplayBuilderInterface;
+use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
+
+/**
+ * Implements hook_schemadotorg_mapping_apply().
+ */
+function schemadotorg_field_group_schemadotorg_mapping_apply(SchemaDotOrgMappingInterface $mapping): void {
+  /** @var \Drupal\schemadotorg_field_group\SchemaDotOrgFieldGroupEntityDisplayBuilderInterface $schema_field_group_display_builder */
+  $schema_field_group_display_builder = \Drupal::service('schemadotorg_field_group.entity_display_builder');
+  $schema_field_group_display_builder->mappingApply($mapping);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ */
+function schemadotorg_field_group_schemadotorg_mapping_presave(SchemaDotOrgMappingInterface $mapping): void {
+  /** @var \Drupal\schemadotorg_field_group\SchemaDotOrgFieldGroupEntityDisplayBuilderInterface $schema_field_group_display_builder */
+  $schema_field_group_display_builder = \Drupal::service('schemadotorg_field_group.entity_display_builder');
+  $schema_field_group_display_builder->mappingPreSave($mapping);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ */
+function schemadotorg_field_group_entity_form_display_presave(EntityFormDisplayInterface $form_display): void {
+  /** @var \Drupal\schemadotorg_field_group\SchemaDotOrgFieldGroupEntityDisplayBuilderInterface $schema_field_group_display_builder */
+  $schema_field_group_display_builder = \Drupal::service('schemadotorg_field_group.entity_display_builder');
+  $schema_field_group_display_builder->entityDisplayPreSave($form_display);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ */
+function schemadotorg_field_group_entity_view_display_presave(EntityViewDisplayInterface $view_display): void {
+  /** @var \Drupal\schemadotorg_field_group\SchemaDotOrgFieldGroupEntityDisplayBuilderInterface $schema_field_group_display_builder */
+  $schema_field_group_display_builder = \Drupal::service('schemadotorg_field_group.entity_display_builder');
+  $schema_field_group_display_builder->entityDisplayPreSave($view_display);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Display a warning message when default component weights are being applied
+ * to the display.
+ */
+function schemadotorg_field_group_form_entity_form_display_edit_form_alter(array &$form, FormStateInterface $form_state): void {
+  /** @var \Drupal\schemadotorg_field_group\SchemaDotOrgFieldGroupEntityDisplayBuilderInterface $schema_field_group_display_builder */
+  $schema_field_group_display_builder = \Drupal::service('schemadotorg_field_group.entity_display_builder');
+  $schema_field_group_display_builder->alterEntityDisplayEditForm($form, $form_state);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function schemadotorg_field_group_form_entity_view_display_edit_form_alter(array &$form, FormStateInterface $form_state): void {
+  /** @var \Drupal\schemadotorg_field_group\SchemaDotOrgFieldGroupEntityDisplayBuilderInterface $schema_field_group_display_builder */
+  $schema_field_group_display_builder = \Drupal::service('schemadotorg_field_group.entity_display_builder');
+  $schema_field_group_display_builder->alterEntityDisplayEditForm($form, $form_state);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ *
+ * Delete empty field groups created when a field is deleted.
+ *
+ * You can use the below drush command to replicate this issue.
+ *
+ * <code>
+ * drush schemadotorg:create-type user:Person
+ * drush schemadotorg:delete-type --delete-fields user:Person
+ * </code>
+ */
+function field_group_field_config_delete(FieldConfigInterface $field_config): void {
+  if ($field_config->isSyncing()) {
+    return;
+  }
+
+  /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository */
+  $entity_display_repository = \Drupal::service('entity_display.repository');
+
+  $entity_type_id = $field_config->getTargetEntityTypeId();
+  $bundle = $field_config->getTargetBundle();
+  $field_name = $field_config->getName();
+
+  $mode_types = [
+    'form' => 'getFormModeOptionsByBundle',
+    'view' => 'getViewModeOptionsByBundle',
+  ];
+  foreach ($mode_types as $context => $mode_method) {
+    /** @var array $mode_options */
+    $mode_options = $entity_display_repository->$mode_method($entity_type_id, $bundle);
+    $modes = array_keys($mode_options);
+    foreach ($modes as $mode) {
+      $groups = field_group_info_groups($entity_type_id, $bundle, $context, $mode);
+      foreach ($groups as $group) {
+        if (!in_array($field_name, $group->children)) {
+          continue;
+        }
+
+        // Remove a deleted field from the group's children.
+        $group->children = array_filter($group->children, function ($child) use ($field_name) {
+          return $child !== $field_name;
+        });
+
+        // If the group's children are now empty, delete the group,
+        // otherwise, update the group.
+        if (empty($group->children)) {
+          field_group_delete_field_group($group);
+        }
+        else {
+          field_group_group_save($group);
+        }
+      }
+    }
+  }
+}
+
+/* ************************************************************************** */
+// Schema.org properties settings form.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::afterBuildDetails
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::formAlter
+ */
+function schemadotorg_field_group_form_schemadotorg_properties_settings_form_alter(array &$form, FormStateInterface $form_state): void {
+  $form['schemadotorg_field_group'] = [
+    '#type' => 'details',
+    '#title' => t('Field group settings'),
+  ];
+  $form['schemadotorg_field_group']['default_field_groups'] = [
+    '#type' => 'container',
+  ];
+  $entity_types = [
+    'user' => t('people (user)'),
+    'node' => t('content (node)'),
+  ];
+  foreach ($entity_types as $entity_type_id => $entity_type_label) {
+    $t_args = ['@type' => $entity_type_label];
+    $form['schemadotorg_field_group']['default_field_groups'][$entity_type_id] = [
+      '#type' => 'schemadotorg_settings',
+      '#title' => t('Default @type field groups', ['@type' => $entity_type_label]),
+      '#description' => t('Enter the default field groups and field order used to group Schema.org properties as they are added to the @type entity type.', $t_args)
+        . '<br/>'
+        . t("NOTE: Schema.org properties that are not assigned to a field group will be automatically added to field group based on the property's associated Schema.org type."),
+      '#description_link' => 'properties',
+      '#example' => '
+group_name:
+  name: Group label
+  description: Group description
+  weight: 0
+  form_type: details
+  form_settings:
+    open: true
+  view_type: fieldset
+  view_settings: {  }
+  properties:
+    - SchemaType--schemaProperty
+    - bundle--schemaProperty
+    - schemaProperty
+    - SchemaType--field_name
+    - bundle--field_name
+    - field_name
+',
+    ];
+  }
+  $form['schemadotorg_field_group']['default_schema_type_field_groups'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Default Schema.org type field groups'),
+    '#description' => t('Enter the default Schema.org type field groups.'),
+    '#description_link' => 'properties',
+    '#example' => 'SchemaType: group_name',
+  ];
+  $type_options = [
+    'details' => t('Details'),
+    'html_element' => t('HTML element'),
+    'fieldset' => t('Fieldset'),
+    'tab' => t('Tab'),
+  ];
+  $form['schemadotorg_field_group']['default_form_type'] = [
+    '#type' => 'select',
+    '#title' => t('Default field group form type'),
+    '#description' => t("Select the default field group type used when adding a field group to an entity type's default form."),
+    '#options' => $type_options,
+    '#required' => TRUE,
+  ];
+  $form['schemadotorg_field_group']['default_view_type'] = [
+    '#type' => 'select',
+    '#title' => t('Default field group view type'),
+    '#description' => t("Select the default field group type used when adding a field group to an entity type's default view display."),
+    '#options' => $type_options,
+    '#required' => TRUE,
+  ];
+  $patterns = SchemaDotOrgEntityDisplayBuilderInterface::PATTERNS;
+  $examples = [];
+  foreach ($patterns as $pattern) {
+    $example = implode('--', $pattern);
+    $example = str_replace('schema_type', 'SchemaType', $example);
+    $example = str_replace('schema_property', 'schemaProperty', $example);
+    $examples[] = $example;
+  }
+  $form['schemadotorg_field_group']['disable_field_groups'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Disable field groups'),
+    '#description' => t('Enter the Schema.org types and properties that should NOT have field groups automatically applied to them.')
+    . '<br/>'
+    . '<strong>' . t('Please make sure to include any fields that will be placed in custom field group or should never be placed in a field group.') . '</strong>',
+    '#example' => '- ' . implode(PHP_EOL . '- ', $examples),
+  ];
+  $form['schemadotorg_field_group']['update_default_field_groups'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Update default field groups for ungrouped Schema.org properties.'),
+    '#description' => t('If checked, the ungrouped Schema.org property/field names will be appended to the default field groups using the field name.'),
+    '#return_value' => TRUE,
+  ];
+
+  $form['schemadotorg_field_group']['apply'] = [];
+
+  // Convert content (node) field group weights to default Schema.org property field weights.
+  $form['schemadotorg_field_group']['convert'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Convert content (node) field group weights to default Schema.org property field weights.'),
+    '#description' => t("If checked, the 'Default Schema.org property field weights' will be updated to use the 'Default content (node) field groups' property/field weights."),
+    '#return_value' => TRUE,
+  ];
+  $default_field_groups = \Drupal::config('schemadotorg_field_group.settings')
+    ->get('default_field_groups.node');
+  $default_field_weights = [];
+  foreach ($default_field_groups as $default_field_group) {
+    $default_field_weights = array_merge($default_field_weights, $default_field_group['properties']);
+  }
+  $form['schemadotorg_field_group']['default_field_weights'] = [
+    '#type' => 'details',
+    '#title' => t('Default Schema.org property field weights'),
+    '#description' => t('Below is an example of default Schema.org property field weights generated from the current content (node) field group weights.'),
+    'code' => [
+      '#type' => 'html_tag',
+      '#tag' => 'pre',
+      '#plain_text' => Yaml::encode($default_field_weights),
+      '#attributes' => ['data-schemadotorg-codemirror-mode' => 'text/x-yaml'],
+      '#attached' => ['library' => ['schemadotorg/codemirror.yaml']],
+    ],
+  ];
+
+  // Add submit callback.
+  $form['#submit'][] = 'schemadotorg_field_group_form_schemadotorg_properties_settings_form_submit';
+}
+
+/**
+ * Form submission handler for schemadotorg_field_group_form_schemadotorg_properties_settings_form_alter().
+ *
+ * @see schemadotorg_field_group_form_schemadotorg_properties_settings_form_alter()
+ */
+function schemadotorg_field_group_form_schemadotorg_properties_settings_form_submit(array &$form, FormStateInterface $form_state): void {
+  if ($form_state->getValue(['schemadotorg_field_group', 'convert'])) {
+    $default_field_groups = \Drupal::config('schemadotorg_field_group.settings')
+      ->get('default_field_groups.node');
+
+    $default_field_weights = [];
+    foreach ($default_field_groups as $default_field_group) {
+      $default_field_weights = array_merge($default_field_weights, $default_field_group['properties']);
+    }
+
+    \Drupal::configFactory()
+      ->getEditable('schemadotorg.settings')
+      ->set('schema_properties.default_field_weights', $default_field_weights)
+      ->save();
+
+    \Drupal::messenger()->addStatus(t('Content (node) field group weights converted to default Schema.org property field weights.'));
+  }
+}

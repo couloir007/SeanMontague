@@ -1,0 +1,6 @@
+config_rewrite:
+  replace:
+    - minimum_multiple
+    - jquery_selector
+minimum_multiple: 0
+jquery_selector: 'select[multiple]'

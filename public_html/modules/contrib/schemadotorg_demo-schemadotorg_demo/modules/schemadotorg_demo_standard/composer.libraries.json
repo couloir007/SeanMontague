@@ -1,0 +1,48 @@
+{
+  "require": {
+    "dompdf/dompdf": "^3.0",
+    "drupal/anchor_link": "^3.0",
+    "drupal/better_exposed_filters": "^7.0",
+    "drupal/block_field": "^1.0",
+    "drupal/chosen": "^4.0",
+    "drupal/ckeditor5_paste_filter": "^1.0",
+    "drupal/ckeditor_codemirror": "^3.0",
+    "drupal/ckeditor_emoji": "^2.0",
+    "drupal/ckeditor_details": "^2.0",
+    "drupal/ckeditor_link_styles": "^1.0",
+    "drupal/ckeditor5_plugin_pack": "^1.0",
+    "drupal/config_rewrite": "^1.0",
+    "drupal/convert_bundles": "^3.0",
+    "drupal/dropzonejs": "^2.0",
+    "drupal/duration_field": "2.x-dev",
+    "drupal/quick_node_clone": "^1.0",
+    "drupal/entity_print": "^2.0",
+    "drupal/entity_browser_enhanced": "^2.0",
+    "drupal/link_attributes": "^2.0",
+    "drupal/linkit": "^7.0",
+    "drupal/media_library_media_modify": "^2.0",
+    "drupal/menu_select": "^2.0",
+    "drupal/markup": "^2.0",
+    "drupal/range": "^1.0",
+    "drupal/redirect": "^1.0",
+    "drupal/redirect_metrics": "^2.0",
+    "drupal/revision_log_default": "^1.0",
+    "drupal/scheduler_content_moderation_integration": "^3.0",
+    "drupal/time_field": "^2.0",
+    "drupal/token": "^1.0",
+    "drupal/token_filter": "^2.0",
+    "drupal/views_bulk_operations": "^4.0",
+    "drupal/viewsreference": "^2.0",
+    "drupal/wse": "^2.0",
+    "mnsami/composer-custom-directory-installer": "^2.0",
+    "tecnickcom/tcpdf": "^6.0"
+  },
+  "extra": {
+    "patches": {
+      "drupal/core": {
+        "Issue #2764829: EditorConfig file lack settings for markdown files": "https://www.drupal.org/files/issues/2023-02-21/drupal-2764829-25.patch",
+        "Issue #3359817: Do not generate sample values for entity references": "https://www.drupal.org/files/issues/2023-05-11/3359817-5-drupal-8.5.x.patch"
+      }
+    }
+  }
+}

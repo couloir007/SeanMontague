@@ -1,0 +1,21 @@
+name: 'Schema.org Blueprints Demo Translation'
+type: module
+description: 'Provides translation support for the Schema.org Blueprints demo.'
+package: 'Schema.org Blueprints Demo'
+core_version_requirement: ^10.3 || ^11
+lifecycle: experimental
+schemadotorg_production: false
+dependencies:
+  - 'drupal:config_translation'
+  - 'drupal:content_translation'
+  - 'drupal:language'
+  - 'drupal:locale'
+  - 'config_rewrite:config_rewrite'
+  - 'content_translation_redirect:content_translation_redirect'
+  - 'toolbar_language_switcher:toolbar_language_switcher'
+  - 'schemadotorg:schemadotorg_translation'
+
+# Information added by Drupal.org packaging script on 2025-09-16
+version: '1.0.0-alpha36'
+project: 'schemadotorg_demo'
+datestamp: 1758054168

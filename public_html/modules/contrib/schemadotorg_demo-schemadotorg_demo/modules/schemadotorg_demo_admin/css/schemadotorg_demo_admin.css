@@ -1,0 +1,349 @@
+/**
+ * @file
+ * Schema.org standard admin styles.
+ */
+
+/* ************************************************************************** */
+/* Schema.org Blueprints. */
+/* ************************************************************************** */
+
+/* Make documentation the same font-size as the help block in the Gin Admin theme. */
+.field--name-schema-cm-documentation {
+  font-size: var(--gin-font-size-s);
+}
+
+/* Add icon to 'Read documentation' link. @see msk_help.css */
+.schemadotorg-content-model-documentation-link::before {
+  content: "🔍 ";
+  font-size: 0.8em;
+}
+
+/* ************************************************************************** */
+/* Gin Admin Theme. */
+/* ************************************************************************** */
+
+.dropbutton .dropbutton__items {
+  overflow: scroll;
+  max-height: 420px;
+}
+
+/* @todo Determine why sticky table headers are not working as expected via Gin Admin Theme */
+div.gin-table-scroll-wrapper {
+  overflow: inherit;
+}
+
+/* ************************************************************************** */
+/* Fields. */
+/* ************************************************************************** */
+
+/* Adjust field spacing */
+.field {
+  margin-bottom: var(--gin-spacing-l);
+}
+
+/* Adjust field label weight */
+h4.form-item__label,
+label.form-item__label {
+  font-weight: var(--gin-font-weight-bold);
+}
+
+/* Change cursor when a submit button is disabled */
+input[type="submit"]:disabled {
+  cursor: not-allowed;
+}
+
+/* Adjust duration field spacing */
+.form-type--duration .duration-inner-wrapper .form-type--number {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* ************************************************************************** */
+/* Node. */
+/* ************************************************************************** */
+
+/* Adjust node teaser display */
+.node--view-mode-teaser {
+  margin: var(--gin-spacing-l);
+  padding: var(--gin-spacing-l);
+  border: 1px solid var(--gin-border-color-layer);
+  border-radius: var(--gin-border-l);
+  background: var(--gin-bg-layer);
+  box-shadow: var(--gin-shadow-l1);
+}
+
+.node--view-mode-teaser .clearfix::after {
+  display: none;
+}
+
+.node--view-mode-teaser h2 {
+  margin-top: 0;
+}
+
+@media (min-width: 64em) {
+  .node--view-mode-teaser::after {
+    display: table;
+    clear: both;
+    content: "";
+  }
+
+  .node--view-mode-teaser .media--type-image {
+    float: right;
+    max-width: 400px;
+    margin: 0 0 0 var(--gin-spacing-l);
+  }
+
+  .node--view-mode-teaser .media--type-image .field {
+    margin: 0;
+  }
+}
+
+/* ************************************************************************** */
+/* Media. */
+/* ************************************************************************** */
+
+/* Allow video iframe to resize */
+iframe.media-oembed-content {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 16/9;
+}
+
+/* ************************************************************************** */
+/* Views. */
+/* ************************************************************************** */
+
+/* Adjust nodes inside a views grid for the content browser */
+.views-view-grid .views-col > article {
+  margin: var(--gin-spacing-l);
+  padding: var(--gin-spacing-l);
+  border: 1px solid var(--gin-border-color-layer);
+  border-radius: var(--gin-border-l);
+  background: var(--gin-bg-layer);
+  box-shadow: var(--gin-shadow-l1);
+}
+
+/* Adjust node teaser display */
+.views-row .node--view-mode-teaser {
+  margin: var(--gin-spacing-l) 0;
+}
+
+/* ************************************************************************** */
+/* Layout paragraphs */
+/* ************************************************************************** */
+
+.lpb-enable {
+  z-index: 100;
+}
+
+.lpb-enable__empty-message__wrapper {
+  padding: 1.25rem;
+  border: 1px solid var(--gin-border-color);
+}
+
+.lpb-enable-button {
+  margin-top: 1.25rem;
+}
+
+/* ************************************************************************** */
+/* Mercury editor. */
+/* ************************************************************************** */
+
+/* Allow add component search to resize */
+mercury-dialog .lpb-component-list {
+  width: inherit;
+  max-width: inherit;
+}
+
+/* Adjust sidebar details spacing */
+[dir="ltr"] .me-node-form .claro-details__summary,
+[dir="rtl"] .me-node-form .claro-details__summary {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+/* Adjust meta (not in a <details> widget) spacing */
+mercury-dialog .entity-meta__header,
+mercury-dialog .entity-meta__revision {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+mercury-dialog .me-node-form .field--widget-moderation-state-default {
+  border: none;
+}
+
+mercury-dialog
+  .me-node-form
+  .field--widget-moderation-state-default
+  .form-item {
+  margin: 0;
+}
+
+/* Adjust form (delete) actions spacing */
+mercury-dialog .form-actions {
+  border-top: var(--accordion-border-size) solid var(--accordion-border-color);
+}
+
+mercury-dialog .form-actions .action-link {
+  margin-bottom: 0;
+}
+
+/* ************************************************************************** */
+/* Custom field. */
+/* ************************************************************************** */
+
+.field--type-custom {
+  margin: var(--gin-spacing-l) 0;
+  padding: var(--gin-spacing-l);
+  border: 1px solid var(--gin-border-color-layer);
+  border-radius: var(--gin-border-l);
+}
+
+.field--type-custom > .field__label {
+  margin-bottom: var(--gin-spacing-xs);
+  font-size: var(--gin-font-size-s);
+  font-weight: var(--gin-font-weight-semibold);
+}
+
+.customfield__item {
+  margin-bottom: var(--gin-spacing-l);
+}
+
+.customfield__label {
+  font-weight: bold;
+}
+
+/* ************************************************************************** */
+/* Entity Reference Tree. */
+/* ************************************************************************** */
+
+/* Adjust button positioning. */
+div.field--widget-entity-reference-tree {
+  justify-content: inherit;
+}
+
+.field--widget-entity-reference-tree > .form-item {
+  margin: 0;
+}
+
+.field--widget-entity-reference-tree > a.button {
+  margin: 1.5rem 0 1rem 0;
+}
+
+/* ************************************************************************** */
+/* Duration field. */
+/* ************************************************************************** */
+
+/* Adjust duration field spacing */
+.form-type--duration .duration-inner-wrapper .form-type--number {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* ************************************************************************** */
+/* Office hours. */
+/* ************************************************************************** */
+
+.office-hours-slot td .form-datetime-wrapper {
+  white-space: nowrap;
+}
+
+.office-hours-slot td .office-hours-link {
+  display: block;
+  margin: 0;
+}
+
+.office-hours-slot td .office-hours-link + .office-hours-link {
+  margin-top: 0.25rem;
+}
+
+/* ************************************************************************** */
+/* Range. */
+/* ************************************************************************** */
+
+.field--widget-range-text-fields .fieldset__description {
+  clear: both;
+}
+
+/* ************************************************************************** */
+/* Smart date. */
+/* ************************************************************************** */
+
+.field--type-smartdate .field-multiple-table tr .form-item:not(:last-of-type) {
+  margin-bottom: 0;
+}
+
+/* ************************************************************************** */
+/* Entity Browser. */
+/* ************************************************************************** */
+
+div.gin-entity-browser form.entity-browser-form {
+  padding-top: var(--gin-spacing-l);
+}
+
+div.gin-entity-browser .entity-browser-form .views-row {
+  border: none;
+}
+
+div.view-display-id-entity_browser_thumbnails .views-col img {
+  border: 3px solid var(--gin-border-color);
+  border-radius: calc(var(--gin-border-xl) + 2px);
+}
+
+div.view-display-id-entity_browser_thumbnails .views-col.selected img {
+  border-width: 3px;
+}
+
+div.view-display-id-entity_browser_thumbnails .views-col .no-image {
+  max-width: 95%;
+  max-height: 100%;
+  text-align: center;
+  border: 3px solid var(--gin-border-color);
+  border-radius: calc(var(--gin-border-xl) + 2px);
+  background-color: #eee;
+  font-weight: bold;
+  line-height: 200px;
+}
+
+div.view-display-id-entity_browser_thumbnails .views-col.selected .no-image {
+  border: 3px solid #37802f;
+}
+
+div.view-display-id-entity_browser_thumbnails .views-field {
+  padding: 0 10px;
+}
+
+div.view-display-id-entity_browser_thumbnails
+  .views-field.views-field-schema-image {
+  min-height: 40px;
+}
+
+div.view-display-id-entity_browser_thumbnails
+  .views-field.views-field-schema-image {
+  padding: 0;
+}
+
+div.entity-browser-submit-container {
+  z-index: 11;
+}
+
+/* ************************************************************************** */
+/* Views.
+/* ************************************************************************** */
+
+/* Set all inputs to a fixed width. */
+.schemadotorg-demo-admin-views-exposed-form input.form-text,
+.schemadotorg-demo-admin-views-exposed-form select.form-select {
+  width: 180px;
+  white-space: nowrap;
+}
+
+/* Do not bold input labels nested in a fieldset. */
+.schemadotorg-demo-admin-views-exposed-form fieldset label {
+  font-weight: normal;
+}
+
+.schemadotorg-demo-admin-views-exposed-form .form-actions #edit-reset {
+  margin-left: var(--gin-spacing-xs);
+}

@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_block_content_status.manager:
+    class: Drupal\schemadotorg_block_content_status\SchemaDotOrgBlockContentStatusManager
+  Drupal\schemadotorg_block_content_status\SchemaDotOrgBlockContentStatusManagerInterface: '@schemadotorg_block_content_status.manager'

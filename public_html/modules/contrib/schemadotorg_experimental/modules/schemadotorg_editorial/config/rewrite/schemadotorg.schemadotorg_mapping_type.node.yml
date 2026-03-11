@@ -1,0 +1,5 @@
+config_rewrite:
+  replace:
+    - default_component_weights.group_editorial
+default_component_weights:
+  group_editorial: 220

@@ -1,0 +1,72 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.job_posting.body
+    - field.field.node.job_posting.schema_application_contact
+    - field.field.node.job_posting.schema_base_salary
+    - field.field.node.job_posting.schema_date_posted
+    - field.field.node.job_posting.schema_education_requirements
+    - field.field.node.job_posting.schema_eligibility_to_work_req
+    - field.field.node.job_posting.schema_employer_overview
+    - field.field.node.job_posting.schema_employment_type
+    - field.field.node.job_posting.schema_experience_requirements
+    - field.field.node.job_posting.schema_hiring_organization
+    - field.field.node.job_posting.schema_job_benefits
+    - field.field.node.job_posting.schema_job_location
+    - field.field.node.job_posting.schema_job_location_type
+    - field.field.node.job_posting.schema_qualifications
+    - field.field.node.job_posting.schema_responsibilities
+    - field.field.node.job_posting.schema_skills
+    - field.field.node.job_posting.schema_subject_of
+    - field.field.node.job_posting.schema_valid_through
+    - node.type.job_posting
+  module:
+    - datetime
+    - text
+    - user
+id: node.job_posting.teaser
+targetEntityType: node
+bundle: job_posting
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 17
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -100
+    region: content
+  schema_date_posted:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 67
+    region: content
+hidden:
+  schema_application_contact: true
+  schema_base_salary: true
+  schema_education_requirements: true
+  schema_eligibility_to_work_req: true
+  schema_employer_overview: true
+  schema_employment_type: true
+  schema_experience_requirements: true
+  schema_hiring_organization: true
+  schema_job_benefits: true
+  schema_job_location: true
+  schema_job_location_type: true
+  schema_qualifications: true
+  schema_responsibilities: true
+  schema_skills: true
+  schema_subject_of: true
+  schema_valid_through: true

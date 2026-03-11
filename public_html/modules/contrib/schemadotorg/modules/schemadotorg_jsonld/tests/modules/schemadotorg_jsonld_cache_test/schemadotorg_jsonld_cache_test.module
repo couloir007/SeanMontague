@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Provides cache test for Schema.org JSON-LD module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_schemadotorg_jsonld().
+ */
+function schemadotorg_jsonld_cache_test_schemadotorg_jsonld(RouteMatchInterface $route_match, BubbleableMetadata $bubbleable_metadata): array {
+  // Add https://schema.org/Website to JSON-LD without bubbleable metadata,
+  // so that we can test clearing the cache updates the JSON-LD variation cache.
+  return [
+    '@type' => 'WebSite',
+    'name' => \Drupal::config('system.site')->get('name'),
+  ];
+}

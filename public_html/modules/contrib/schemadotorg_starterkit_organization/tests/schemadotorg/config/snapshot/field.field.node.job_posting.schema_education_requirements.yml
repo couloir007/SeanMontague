@@ -1,0 +1,54 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_education_requirements
+    - node.type.job_posting
+  module:
+    - custom_field
+id: node.job_posting.schema_education_requirements
+field_name: schema_education_requirements
+entity_type: node
+bundle: job_posting
+label: 'Education requirements'
+description: 'Educational background needed for the position or Occupation.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  add_more_label: ''
+  field_settings:
+    description:
+      type: text
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: Description
+        settings:
+          description: 'A description of the item.'
+          description_display: after
+          size: 60
+          placeholder: ''
+          maxlength: 255
+          maxlength_js: false
+          prefix: ''
+          suffix: ''
+          required: false
+    credential_category:
+      type: text
+      weight: 1
+      check_empty: false
+      widget_settings:
+        label: 'Credential category'
+        settings:
+          description: 'The category or type of credential being described, for example "degree”, “certificate”, “badge”, or more specific term.'
+          description_display: after
+          size: 60
+          placeholder: ''
+          maxlength: 255
+          maxlength_js: false
+          prefix: ''
+          suffix: ''
+          required: false
+field_type: custom

@@ -1,0 +1,140 @@
+local_tasks_more_test.01:
+  path: 'local_tasks_more_test/01'
+  defaults:
+    _title: 'Local Task More Test 01'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.02:
+  path: 'local_tasks_more_test/02'
+  defaults:
+    _title: 'Local Task More Test 02'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.03:
+  path: 'local_tasks_more_test/03'
+  defaults:
+    _title: 'Local Task More Test 03'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.04:
+  path: 'local_tasks_more_test/04'
+  defaults:
+    _title: 'Local Task More Test 04'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.05:
+  path: 'local_tasks_more_test/05'
+  defaults:
+    _title: 'Local Task More Test 05'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.06:
+  path: 'local_tasks_more_test/06'
+  defaults:
+    _title: 'Local Task More Test 06'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.07:
+  path: 'local_tasks_more_test/07'
+  defaults:
+    _title: 'Local Task More Test 07'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.08:
+  path: 'local_tasks_more_test/08'
+  defaults:
+    _title: 'Local Task More Test 08'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.09:
+  path: 'local_tasks_more_test/09'
+  defaults:
+    _title: 'Local Task More Test 09'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.10:
+  path: 'local_tasks_more_test/10'
+  defaults:
+    _title: 'Local Task More Test 10'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.11:
+  path: 'local_tasks_more_test/11'
+  defaults:
+    _title: 'Local Task More Test 11'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.12:
+  path: 'local_tasks_more_test/12'
+  defaults:
+    _title: 'Local Task More Test 12'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.13:
+  path: 'local_tasks_more_test/13'
+  defaults:
+    _title: 'Local Task More Test 13'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.14:
+  path: 'local_tasks_more_test/14'
+  defaults:
+    _title: 'Local Task More Test 14'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.15:
+  path: 'local_tasks_more_test/15'
+  defaults:
+    _title: 'Local Task More Test 15'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.16:
+  path: 'local_tasks_more_test/16'
+  defaults:
+    _title: 'Local Task More Test 16'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.17:
+  path: 'local_tasks_more_test/17'
+  defaults:
+    _title: 'Local Task More Test 17'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.18:
+  path: 'local_tasks_more_test/18'
+  defaults:
+    _title: 'Local Task More Test 18'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.19:
+  path: 'local_tasks_more_test/19'
+  defaults:
+    _title: 'Local Task More Test 19'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'
+local_tasks_more_test.20:
+  path: 'local_tasks_more_test/20'
+  defaults:
+    _title: 'Local Task More Test 20'
+    _controller: '\Drupal\local_tasks_more_test\Controller\LocalTasksMoreTestController'
+  requirements:
+    _access: 'TRUE'

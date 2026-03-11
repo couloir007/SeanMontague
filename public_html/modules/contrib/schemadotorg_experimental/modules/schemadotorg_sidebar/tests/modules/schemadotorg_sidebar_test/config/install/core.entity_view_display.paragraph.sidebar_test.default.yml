@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.sidebar_test.field_sidebar_text
+    - paragraphs.paragraphs_type.sidebar_test
+id: paragraph.sidebar_test.default
+targetEntityType: paragraph
+bundle: sidebar_test
+mode: default
+content:
+  field_sidebar_text:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true

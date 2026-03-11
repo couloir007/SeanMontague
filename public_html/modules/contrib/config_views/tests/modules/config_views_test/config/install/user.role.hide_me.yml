@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: hide_me
+label: 'Hide me'
+weight: 5
+is_admin: false
+permissions: {  }

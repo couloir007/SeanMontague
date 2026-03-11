@@ -1,0 +1,20 @@
+name: 'Schema.org Blueprints Demo'
+type: module
+description: |
+  Provides an opinionated demo of the Schema.org Blueprints built on top of Drupal's standard profile with default content and translations.
+  THIS MODULE SHOULD ONLY BE INSTALLED ON A PLAIN VANILLA STANDARD INSTANCE OF DRUPAL
+package: 'Schema.org Blueprints Demo'
+core_version_requirement: ^10.3 || ^11
+lifecycle: experimental
+schemadotorg_production: false
+dependencies:
+  - 'schemadotorg_demo:schemadotorg_demo_standard'
+  - 'schemadotorg_demo:schemadotorg_demo_experimental'
+  - 'schemadotorg_demo:schemadotorg_demo_admin'
+  - 'schemadotorg_demo:schemadotorg_demo_api'
+  - 'schemadotorg_demo:schemadotorg_demo_translation'
+
+# Information added by Drupal.org packaging script on 2025-09-16
+version: '1.0.0-alpha36'
+project: 'schemadotorg_demo'
+datestamp: 1758054168

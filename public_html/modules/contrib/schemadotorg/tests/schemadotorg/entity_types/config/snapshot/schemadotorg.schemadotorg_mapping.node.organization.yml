@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.organization.body
+    - field.field.node.organization.schema_image
+    - node.type.organization
+  module:
+    - node
+id: node.organization
+target_entity_type_id: node
+target_bundle: organization
+schema_type: Organization
+schema_properties:
+  body: description
+  schema_image: image
+  title: name
+additional_mappings: {  }

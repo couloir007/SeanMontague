@@ -1,0 +1,81 @@
+local_tasks_more_test.01:
+  title: 'Primary 01'
+  route_name: local_tasks_more_test.01
+  base_route: local_tasks_more_test.01
+local_tasks_more_test.02:
+  title: 'Primary 02'
+  route_name: local_tasks_more_test.02
+  base_route: local_tasks_more_test.01
+local_tasks_more_test.03:
+  title: 'Primary 03'
+  route_name: local_tasks_more_test.03
+  base_route: local_tasks_more_test.01
+local_tasks_more_test.04:
+  title: 'Primary 04'
+  route_name: local_tasks_more_test.04
+  base_route: local_tasks_more_test.01
+local_tasks_more_test.05:
+  title: 'Primary 05'
+  route_name: local_tasks_more_test.05
+  base_route: local_tasks_more_test.01
+local_tasks_more_test.06:
+  title: 'Primary 06'
+  route_name: local_tasks_more_test.06
+  base_route: local_tasks_more_test.01
+local_tasks_more_test.07:
+  title: 'Primary 07'
+  route_name: local_tasks_more_test.07
+  base_route: local_tasks_more_test.01
+local_tasks_more_test.08:
+  title: 'Primary 08'
+  route_name: local_tasks_more_test.08
+  base_route: local_tasks_more_test.01
+local_tasks_more_test.09:
+  title: 'Primary 09'
+  route_name: local_tasks_more_test.09
+  base_route: local_tasks_more_test.01
+local_tasks_more_test.10:
+  title: 'Primary 10'
+  route_name: local_tasks_more_test.10
+  base_route: local_tasks_more_test.10
+
+local_tasks_more_test.11:
+  title: 'Secondary 11'
+  route_name: local_tasks_more_test.11
+  parent_id: local_tasks_more_test.01
+local_tasks_more_test.12:
+  title: 'Secondary 12'
+  route_name: local_tasks_more_test.12
+  parent_id: local_tasks_more_test.01
+local_tasks_more_test.13:
+  title: 'Secondary 13'
+  route_name: local_tasks_more_test.13
+  parent_id: local_tasks_more_test.01
+local_tasks_more_test.14:
+  title: 'Secondary 14'
+  route_name: local_tasks_more_test.14
+  parent_id: local_tasks_more_test.01
+local_tasks_more_test.15:
+  title: 'Secondary 15'
+  route_name: local_tasks_more_test.15
+  parent_id: local_tasks_more_test.01
+local_tasks_more_test.16:
+  title: 'Secondary 16'
+  route_name: local_tasks_more_test.16
+  parent_id: local_tasks_more_test.01
+local_tasks_more_test.17:
+  title: 'Secondary 17'
+  route_name: local_tasks_more_test.17
+  parent_id: local_tasks_more_test.01
+local_tasks_more_test.18:
+  title: 'Secondary 18'
+  route_name: local_tasks_more_test.18
+  parent_id: local_tasks_more_test.01
+local_tasks_more_test.19:
+  title: 'Secondary 19'
+  route_name: local_tasks_more_test.19
+  parent_id: local_tasks_more_test.01
+local_tasks_more_test.20:
+  title: 'Secondary 20'
+  route_name: local_tasks_more_test.20
+  parent_id: local_tasks_more_test.01

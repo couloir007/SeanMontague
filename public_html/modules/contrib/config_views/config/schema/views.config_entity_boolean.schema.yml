@@ -1,0 +1,3 @@
+views.filter.config_entity_boolean:
+  type: views_filter
+  label: 'Config Entity Boolean'

@@ -1,0 +1,96 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - custom_field
+    - node
+    - views
+id: node.field_test_multiple
+field_name: field_test_multiple
+entity_type: node
+type: custom
+settings:
+  columns:
+    string_test:
+      name: string_test
+      type: string
+      length: 255
+    string_long_test:
+      name: string_long_test
+      type: string_long
+    integer_test:
+      name: integer_test
+      type: integer
+      unsigned: false
+      size: normal
+    decimal_test:
+      name: decimal_test
+      type: decimal
+      unsigned: false
+      precision: 10
+      scale: 2
+    float_test:
+      name: float_test
+      type: float
+      unsigned: false
+      size: normal
+    email_test:
+      name: email_test
+      type: email
+    telephone_test:
+      name: telephone_test
+      type: telephone
+      length: 256
+    uri_test:
+      name: uri_test
+      type: uri
+    boolean_test:
+      name: boolean_test
+      type: boolean
+    uuid_test:
+      name: uuid_test
+      type: uuid
+    color_test:
+      name: color_test
+      type: color
+    map_test:
+      name: map_test
+      type: map
+    map_string_test:
+      name: map_string_test
+      type: map_string
+    datetime_test:
+      name: datetime_test
+      type: datetime
+      datetime_type: datetime
+    entity_reference_test:
+      name: entity_reference_test
+      type: entity_reference
+      target_type: node
+    file_test:
+      name: file_test
+      type: file
+      target_type: file
+      uri_scheme: public
+    image_test:
+      name: image_test
+      type: image
+      target_type: file
+      uri_scheme: public
+    viewfield_test:
+      name: viewfield_test
+      type: viewfield
+      target_type: view
+    time_test:
+      name: time_test
+      type: time
+    link_test:
+      name: link_test
+      type: link
+module: custom_field
+locked: false
+cardinality: 3
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

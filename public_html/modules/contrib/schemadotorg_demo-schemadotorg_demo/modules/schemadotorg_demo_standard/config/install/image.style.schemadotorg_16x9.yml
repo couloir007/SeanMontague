@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - focal_point
+name: schemadotorg_16x9
+label: 'Schema.org 16x9'
+effects:
+  6b60f450-0e8b-4ef8-a1d4-3f868cd9b6a9:
+    uuid: 6b60f450-0e8b-4ef8-a1d4-3f868cd9b6a9
+    id: focal_point_scale_and_crop
+    weight: 1
+    data:
+      width: 1200
+      height: 675
+      crop_type: focal_point

@@ -1,0 +1,13 @@
+name: Content Lock Test
+type: module
+description: 'Test module for Content Lock with Mercury Editor.'
+core_version_requirement: ^9.4 || ^10 || ^11
+package: 'Mercury Editor Testing'
+dependencies:
+  - content_lock:content_lock
+  - mercury_editor:mercury_editor
+
+# Information added by Drupal.org packaging script on 2025-12-03
+version: '2.2.5'
+project: 'mercury_editor'
+datestamp: 1764723330

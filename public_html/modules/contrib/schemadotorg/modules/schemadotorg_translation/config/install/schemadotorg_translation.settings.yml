@@ -1,0 +1,17 @@
+excluded_schema_types: {  }
+excluded_schema_properties:
+  - additionalType
+included_field_names:
+  - changed
+  - created
+  - path
+  - status
+  - uid
+included_field_types:
+  - address
+  - image
+  - link
+  - string
+  - string_long
+  - text_long
+  - text_with_summary

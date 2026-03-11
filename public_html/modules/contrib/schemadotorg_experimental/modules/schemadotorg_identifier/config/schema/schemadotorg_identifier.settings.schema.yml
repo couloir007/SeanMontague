@@ -1,0 +1,38 @@
+schemadotorg_identifier.settings:
+  type: config_object
+  label: 'Schema.org Identifier settings'
+  mapping:
+    field_definitions:
+      type: sequence
+      label: 'Field definitions'
+      sequence:
+        type: mapping
+        label: 'Field definitions'
+        mapping:
+          property_id:
+            type: string
+            label: 'Property ID'
+          field_name:
+            type: string
+            label: 'Field name'
+          label:
+            type: string
+            label: Label
+          description:
+            type: string
+            label: Description
+          required:
+            type: boolean
+            label: Required
+          max_length:
+            type: integer
+            label: 'Maximum length'
+    schema_types:
+      type: sequence
+      label: 'Schema.org types'
+      sequence:
+        type: sequence
+        label: 'Schema.org type'
+        sequence:
+          type: string
+          label: 'Identifier field'

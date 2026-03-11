@@ -1,0 +1,24 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_roles
+    - node.type.article
+id: node.article.field_roles
+field_name: field_roles
+entity_type: node
+bundle: article
+label: Roles
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: config_views
+  handler_settings:
+    view:
+      view_name: restricted_roles
+      display_name: entity_reference_1
+      arguments: {  }
+field_type: entity_reference

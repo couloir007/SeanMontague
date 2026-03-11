@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * @file
+ * Installation hooks for the Schema.org Blueprints Metatag module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Issue #3511774: Define Schema.org types that should have a meta tags field.
+ */
+function schemadotorg_metatag_update_10000(): void {
+  \Drupal::configFactory()
+    ->getEditable('schemadotorg_metatag.settings')
+    ->set('schema_types', ['node--Thing'])
+    ->save();
+}

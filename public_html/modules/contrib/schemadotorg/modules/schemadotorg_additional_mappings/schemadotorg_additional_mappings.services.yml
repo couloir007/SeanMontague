@@ -1,0 +1,12 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_additional_mappings.manager:
+    class: Drupal\schemadotorg_additional_mappings\SchemaDotOrgAdditionalMappingsManager
+  Drupal\schemadotorg_additional_mappings\SchemaDotOrgAdditionalMappingsManagerInterface: '@schemadotorg_additional_mappings.manager'
+
+  schemadotorg_additional_mappings.jsonld_manager:
+    class: Drupal\schemadotorg_additional_mappings\SchemaDotOrgAdditionalMappingsJsonLdManager
+  Drupal\schemadotorg_additional_mappings\SchemaDotOrgAdditionalMappingsJsonLdManagerInterface: '@schemadotorg_additional_mappings.jsonld_manager'
+

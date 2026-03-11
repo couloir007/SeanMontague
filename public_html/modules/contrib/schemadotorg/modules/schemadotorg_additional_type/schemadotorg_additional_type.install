@@ -1,0 +1,60 @@
+<?php
+
+/**
+ * @file
+ * Installation hooks for the Schema.org Blueprints Additional Type module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_install().
+ */
+function schemadotorg_additional_type_install(bool $is_syncing): void {
+  if ($is_syncing) {
+    return;
+  }
+
+  // Setting weight to 1 so that the Schema.org Additional TYpe
+  // hooks are triggered after the Navigation module.
+  module_set_weight('schemadotorg_additional_type', 1);
+}
+
+/**
+ * Issue #3460229: Add the ability to require additional type before displaying the node edit form.
+ */
+function schemadotorg_additional_type_update_10000(): void {
+  \Drupal::configFactory()
+    ->getEditable('schemadotorg_additional_type.settings')
+    ->set('required_types', ['Event'])
+    ->save();
+}
+
+/**
+ * Issue #3461525: Use snake case for additional type values.
+ */
+function schemadotorg_additional_type_update_10001(): void {
+  \Drupal::configFactory()
+    ->getEditable('schemadotorg_additional_type.settings')
+    ->set('use_snake_case', TRUE)
+    ->save();
+}
+
+/**
+ * Issue #3527491: Schema.org Additional Type content create dialog not working with core navigation links.
+ */
+function schemadotorg_additional_type_update_10002(): void {
+  // Setting weight to 1 so that the Schema.org Additional TYpe
+  // hooks are triggered after the Navigation module.
+  module_set_weight('schemadotorg_additional_type', 1);
+}
+
+/**
+ * Issue #3540563: Allow certain additional types to be ignored.
+ */
+function schemadotorg_additional_type_update_10003(): void {
+  \Drupal::configFactory()
+    ->getEditable('schemadotorg_additional_type.settings')
+    ->set('ignored_types', ['Default', 'default', 'Other', 'other'])
+    ->save();
+}

@@ -1,0 +1,23 @@
+name: 'Schema.org: Quotation'
+props:
+  type: object
+  required:
+    - text
+  properties:
+    text:
+      type: string
+      title: Text
+      description: 'The textual content of this Quotation.'
+    spoken_by_character:
+      type: string
+      title: 'Spoken by'
+      description: 'The person to whom the quotation is attributed.'
+    align:
+      type: string
+      title: Align
+      description: 'Set the alignment for the quotation.'
+      default: center
+      enum:
+        - center
+        - left
+        - right

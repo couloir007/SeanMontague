@@ -1,0 +1,8 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  schemadotorg_export.event_subscriber:
+    class: Drupal\schemadotorg_export\EventSubscriber\SchemaDotOrgExportEventSubscriber
+  Drupal\schemadotorg_export\EventSubscriber\SchemaDotOrgExportEventSubscriberInterface: '@schemadotorg_export.event_subscriber'

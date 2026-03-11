@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * @file
+ * Installation hooks for the Schema.org Blueprints Demo Standard API module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_install().
+ */
+function schemadotorg_demo_api_install(): void {
+
+  /* ************************************************************************ */
+  // Shortcuts.
+  /* ************************************************************************ */
+
+  $shortcut_storage = \Drupal::entityTypeManager()->getStorage('shortcut');
+
+  // Add shortcuts linking to key Schema.org Blueprints URLs.
+  $shortcuts = [
+    '/api/documentation/redoc' => 'JSON:API: ReDoc',
+    '/api/documentation/swagger' => 'JSON:API: Swagger',
+  ];
+  $weight = 10;
+  foreach ($shortcuts as $path => $title) {
+    $values = [
+      'shortcut_set' => 'default',
+      'title' => $title,
+      'link' => ['uri' => 'internal:' . $path],
+      'weight' => $weight,
+    ];
+    if (empty($shortcut_storage->loadByProperties($values))) {
+      $shortcut_storage->create($values)->save();
+      $weight++;
+    }
+  }
+
+  // Create path aliases for /api/*.
+  $path_alias_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
+  $path_aliases = [
+    '/admin/config/services/openapi/redoc/jsonapi' => '/api/documentation/redoc',
+    '/admin/config/services/openapi/swagger/jsonapi' => '/api/documentation/swagger',
+    '/openapi/jsonapi' => '/api/openapi',
+  ];
+  foreach ($path_aliases as $path => $alias) {
+    $values = ['path' => $path, 'alias' => $alias, 'langcode' => 'en'];
+    if (empty($path_alias_storage->loadByProperties($values))) {
+      $path_alias_storage->create($values)->save();
+    }
+  }
+
+}

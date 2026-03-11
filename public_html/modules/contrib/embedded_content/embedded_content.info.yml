@@ -1,0 +1,12 @@
+name: Embedded Content
+type: module
+description: Provides an Embedded Content plugin and Ckeditor 5 plugin.
+package: Custom
+core_version_requirement: ^9 || ^10 || ^11
+dependencies:
+  - drupal:ckeditor5
+
+# Information added by Drupal.org packaging script on 2025-01-22
+version: '2.0.3'
+project: 'embedded_content'
+datestamp: 1737579250

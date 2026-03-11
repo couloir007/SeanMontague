@@ -1,0 +1,4 @@
+config_rewrite:
+  replace:
+    - preserve_destination
+preserve_destination: true

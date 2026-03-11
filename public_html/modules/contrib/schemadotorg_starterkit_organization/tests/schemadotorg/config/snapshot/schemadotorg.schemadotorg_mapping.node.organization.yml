@@ -1,0 +1,30 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.organization.body
+    - field.field.node.organization.schema_contact_point
+    - field.field.node.organization.schema_image
+    - field.field.node.organization.schema_member
+    - field.field.node.organization.schema_organization_type
+    - field.field.node.organization.schema_parent_organization
+    - field.field.node.organization.schema_sub_organization
+    - field.field.node.organization.schema_subject_of
+    - node.type.organization
+  module:
+    - node
+id: node.organization
+target_entity_type_id: node
+target_bundle: organization
+schema_type: Organization
+schema_properties:
+  schema_organization_type: additionalType
+  schema_contact_point: contactPoint
+  body: description
+  schema_image: image
+  schema_member: member
+  title: name
+  schema_parent_organization: parentOrganization
+  schema_subject_of: subjectOf
+  schema_sub_organization: subOrganization
+additional_mappings: {  }

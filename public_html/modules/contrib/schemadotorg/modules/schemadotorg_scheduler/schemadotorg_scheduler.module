@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * @file
+ * Automatically enables scheduling Schema.org types.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function schemadotorg_scheduler_schemadotorg_mapping_insert(SchemaDotOrgMappingInterface $mapping): void {
+  /** @var \Drupal\schemadotorg_scheduler\SchemaDotOrgSchedulerManagerInterface $schemadotorg_scheduler_manager */
+  $schemadotorg_scheduler_manager = \Drupal::service('schemadotorg_scheduler.manager');
+  $schemadotorg_scheduler_manager->mappingInsert($mapping);
+}
+
+/**
+ * Implements hook_schemadotorg_jsonld_schema_type_entity_load().
+ */
+function schemadotorg_scheduler_schemadotorg_jsonld_schema_type_entity_load(array &$data, EntityInterface $entity, ?SchemaDotOrgMappingInterface $mapping, BubbleableMetadata $bubbleable_metadata): void {
+  /** @var \Drupal\schemadotorg_scheduler\SchemaDotOrgSchedulerJsonLdManagerInterface $schemadotorg_scheduler_jsonld_manager */
+  $schemadotorg_scheduler_jsonld_manager = \Drupal::service('schemadotorg_scheduler.jsonld_manager');
+  $schemadotorg_scheduler_jsonld_manager->schemaTypeEntityLoad($data, $entity, $mapping, $bubbleable_metadata);
+}
+
+/* ************************************************************************** */
+// Schema.org types settings form.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::afterBuildDetails
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::formAlter
+ */
+function schemadotorg_scheduler_form_schemadotorg_types_settings_form_alter(array &$form, FormStateInterface $form_state): void {
+  $form['schemadotorg_scheduler'] = [
+    '#type' => 'details',
+    '#title' => t('Scheduler settings'),
+  ];
+  $form['schemadotorg_scheduler']['scheduled_types'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Scheduled Schema.org types'),
+    '#description' => t('Enter the Schema.org types that support scheduling and whether the Schema.org types should support publish, unpublish or both.')
+    . ' '
+    . t('Scheduled Schema.org type settings will be applied to all subtypes.'),
+    '#example' => '
+SchemeType:
+  - publish
+  - unpublish
+SchemaType:
+  - publish
+',
+  ];
+
+  $form['schemadotorg_scheduler']['apply'] = [];
+}

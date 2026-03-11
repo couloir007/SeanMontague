@@ -1,0 +1,29 @@
+<?php
+
+use Drupal\block\Entity\Block;
+
+function mercury_editor_block_visibility_test_install() {
+  $values = array(
+    'id' => 'mercury_editor_test_block_olivero_1',
+    'plugin' => 'mercury_editor_test_block',
+    'region' => 'content',
+    'settings' => array(
+      'label' => 'Mercury Editor Test Block',
+    ),
+    'theme' => 'olivero',
+    'visibility' => [],
+    'weight' => -10,
+  );
+  $block = Block::create($values);
+  $block->setVisibilityConfig('entity_bundle:node', [
+    'id' => 'entity_bundle:node',
+    'negate' => FALSE,
+    'context_mapping' => [
+      'node' => '@node.node_route_context:node',
+    ],
+    'bundles' => [
+      'me_test_ct' => 'me_test_ct',
+    ],
+  ]);
+  $block->save();
+}

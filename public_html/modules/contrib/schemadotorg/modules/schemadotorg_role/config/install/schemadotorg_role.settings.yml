@@ -1,0 +1,22 @@
+field_definitions:
+  host:
+    field_name: schema_role_host
+    label: Hosts
+    description: 'Person responsible for guests at an event.'
+    role_name: Host
+  guest:
+    field_name: schema_role_guest
+    label: Guests
+    description: 'Person visiting or attending an event.'
+    role_name: Guest
+field_instances:
+  PodcastSeries:
+    actor:
+      - host
+  PodcastSeason:
+    actor:
+      - host
+  PodcastEpisode:
+    actor:
+      - host
+      - guest

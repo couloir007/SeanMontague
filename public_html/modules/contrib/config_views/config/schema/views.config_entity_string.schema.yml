@@ -1,0 +1,17 @@
+views.filter.config_entity_string:
+  type: views_filter
+  label: 'Config Entity String'
+  mapping:
+    expose:
+      type: mapping
+      label: 'Exposed'
+      mapping:
+        required:
+          type: boolean
+          label: 'Required'
+        placeholder:
+          type: label
+          label: 'Placeholder'
+    value:
+      type: string
+      label: 'Value'

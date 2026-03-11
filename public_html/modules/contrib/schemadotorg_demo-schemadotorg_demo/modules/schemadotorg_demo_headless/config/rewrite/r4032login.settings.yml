@@ -1,0 +1,4 @@
+config_rewrite:
+  replace:
+    - match_noredirect_pages
+match_noredirect_pages: /oauth/token

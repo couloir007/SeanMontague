@@ -1,0 +1,12 @@
+{
+  "name": "drupal/local_tasks_more",
+  "type": "drupal-module",
+  "description": "Local Tasks More",
+  "keywords": ["Drupal"],
+  "homepage": "https://www.drupal.org/sandbox/jrockowitz/3485942",
+  "license": "GPL-2.0+",
+  "minimum-stability": "dev",
+  "require": {
+    "drupal/core": "^10.3 || ^11"
+  }
+}

@@ -1,0 +1,10 @@
+alpinejs_ray:
+  js:
+    https://cdn.jsdelivr.net/npm/axios@latest/dist/axios.min.js: { type: external, minified: true }
+    https://cdn.jsdelivr.net/npm/alpinejs-ray@2/dist/standalone.min.js: { type: external, minified: true }
+
+alpinejs_ray_init:
+  js:
+    js/alpinejs-ray-init.js: {}
+  dependencies:
+    - ray_debugger_alpinejs/alpinejs_ray

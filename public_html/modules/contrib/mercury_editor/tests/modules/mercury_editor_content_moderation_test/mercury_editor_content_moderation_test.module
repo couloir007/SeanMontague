@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Contains mercury_editor_content_moderation_test module.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * Enables content moderation on me_test_ct.
+ */
+function mercury_editor_content_moderation_test_install() {
+  /** @var \Drupal\workflows\WorkflowInterface $workflow */
+  $workflow = \Drupal::entityTypeManager()
+    ->getStorage("workflow")
+    ->loadByProperties(["id" => "editorial"])["editorial"];
+  $config = $workflow->getTypePlugin()->getConfiguration();
+  $config["entity_types"]["node"][] = "me_test_ct";
+  $workflow->getTypePlugin()->setConfiguration($config);
+  $workflow->save();
+}

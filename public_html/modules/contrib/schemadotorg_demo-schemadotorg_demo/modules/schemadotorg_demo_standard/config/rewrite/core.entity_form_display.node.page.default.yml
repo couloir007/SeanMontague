@@ -1,0 +1,9 @@
+config_rewrite:
+  replace:
+    - content.body.third_party_settings.allowed_formats
+content:
+  body:
+    third_party_settings:
+      allowed_formats:
+        hide_help: '1'
+        hide_guidelines: '1'

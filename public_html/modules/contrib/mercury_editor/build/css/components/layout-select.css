@@ -1,0 +1,30 @@
+.layout-select {
+  margin-top: 10px;
+}
+.layout-select .layout-select__item.form-type--radio {
+      display: block;
+      margin: 1px;
+    }
+.layout-select .layout-select__item.js-form-type-radio:not(:first-child),
+    .layout-select .layout-select__item.js-form-type-checkbox:not(:first-child) {
+      margin: 1px;
+    }
+.layout-select .layout-select__item label.option {
+      font-size: 1em;
+      outline: none;
+      margin: 1px;
+      border-radius: 2px;
+    }
+.layout-select .layout-select__item input:checked+label.option {
+      outline: 1px solid blue;
+    }
+.layout-select .layout-select__item input:focus:checked+label.option {
+      outline: 4px solid blue;
+    }
+.layout-select .layout-select__item label.option:hover {
+      outline: 1px solid blue;
+    }
+.layout-select .layout-select__item .layout-icon__region {
+      stroke: transparent;
+      fill: #C3C1C3;
+    }

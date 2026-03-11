@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_employment_type
+    - node.type.job_posting
+id: node.job_posting.schema_employment_type
+field_name: schema_employment_type
+entity_type: node
+bundle: job_posting
+label: 'Employment type'
+description: 'Type of employment (e.g. full-time, part-time, contract, temporary, seasonal, internship).'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

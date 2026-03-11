@@ -1,0 +1,4 @@
+config_rewrite:
+  replace:
+    - enable_dialog_node_edit_form
+enable_dialog_node_edit_form: false

@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_job_location
+    - node.type.job_posting
+id: node.job_posting.schema_job_location
+field_name: schema_job_location
+entity_type: node
+bundle: job_posting
+label: 'Job location'
+description: 'A (typically single) geographic location associated with the job position.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

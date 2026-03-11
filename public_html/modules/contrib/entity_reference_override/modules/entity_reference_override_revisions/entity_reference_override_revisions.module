@@ -1,0 +1,34 @@
+<?php
+
+/**
+ * @file
+ * Contains entity_reference_override_revisions.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function entity_reference_override_revisions_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the entity_reference_override_revisions module.
+    case 'help.page.entity_reference_override_revisions':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Entity reference revisions with overridable title') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function entity_reference_override_revisions_field_formatter_info_alter(&$info) {
+  // Update the entity_reference_override formatters for
+  // entity_reference_override_revisions use.
+  $info['entity_reference_override_entity']['field_types'][] = 'entity_reference_override_revisions';
+  $info['entity_reference_override_label']['field_types'][] = 'entity_reference_override_revisions';
+}

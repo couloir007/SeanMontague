@@ -1,0 +1,15 @@
+name: 'Schema.org Blueprints JSON-LD Preview'
+type: module
+description: "Lets users preview a web page's Schema.org JSON-LD."
+package: 'Schema.org Blueprints JSON-LD'
+core_version_requirement: ^10.3 || ^11
+configure: schemadotorg_jsonld.settings
+schemadotorg_production: false
+dependencies:
+  - 'drupal:block'
+  - 'schemadotorg:schemadotorg_jsonld'
+
+# Information added by Drupal.org packaging script on 2025-09-16
+version: '1.0.0-alpha36'
+project: 'schemadotorg'
+datestamp: 1758054124

@@ -1,0 +1,12 @@
+name: Paragraphs usage
+type: module
+description: "Check if an a paragraph is used in specific content types."
+package: Paragraphs
+core_version_requirement: ^9 || ^10 || ^11
+dependencies:
+  - paragraphs:paragraphs
+
+# Information added by Drupal.org packaging script on 2024-08-16
+version: '1.0.5'
+project: 'paragraphs_usage'
+datestamp: 1723806863

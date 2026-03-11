@@ -1,0 +1,10 @@
+name: Ray Debugger
+description: Integration for the Ray debugging tool.
+type: module
+core_version_requirement: ">=8.8"
+package: Development
+
+# Information added by Drupal.org packaging script on 2023-06-13
+version: '1.0.4'
+project: 'ray_debugger'
+datestamp: 1686699075

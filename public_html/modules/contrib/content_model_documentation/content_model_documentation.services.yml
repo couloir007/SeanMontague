@@ -1,0 +1,38 @@
+services:
+  content_model_documentation.cm_document_manager:
+    class: Drupal\content_model_documentation\CMDocumentManager
+    arguments:
+      - '@entity_type.manager'
+      - '@datetime.time'
+      - '@entity_type.bundle.info'
+      - '@messenger'
+  content_model_documentation.documentation_renderer:
+    class: Drupal\content_model_documentation\CMDocumentRenderer
+    arguments: [ '@config.factory', '@router.admin_context', '@current_user' ]
+  content_model_documentation.documentable.entity.provider:
+    class: Drupal\content_model_documentation\DocumentableEntityProvider
+    arguments:
+      - '@config.factory'
+      - '@content_model_documentation.documentable.modules'
+      - '@entity_field.manager'
+      - '@entity_type.manager'
+  content_model_documentation.related_entities:
+    class: Drupal\content_model_documentation\RelatedEntities
+    arguments:
+      - '@entity_field.manager'
+      - '@entity_type.bundle.info'
+      - '@entity_type.manager'
+      - '@entity.definition_update_manager'
+  content_model_documentation.documentable.modules:
+    class: Drupal\content_model_documentation\DocumentableModules
+    arguments:
+      - '@config.factory'
+      - '@extension.list.module'
+      - '@module_handler'
+      - '@keyvalue'
+  content_model_documentation.fields_report:
+    class: Drupal\content_model_documentation\FieldsReportManager
+    arguments:
+      - '@entity_type.manager'
+      - '@entity_field.manager'
+      - '@entity_type.bundle.info'

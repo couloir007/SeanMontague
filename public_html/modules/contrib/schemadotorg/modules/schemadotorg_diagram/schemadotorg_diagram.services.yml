@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_diagram.builder:
+    class: Drupal\schemadotorg_diagram\SchemaDotOrgDiagramBuilder
+  Drupal\schemadotorg_diagram\SchemaDotOrgDiagramBuilderInterface: '@schemadotorg_diagram.builder'

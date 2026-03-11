@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_content_moderation.manager:
+    class: Drupal\schemadotorg_content_moderation\SchemaDotOrgContentModerationManager
+  Drupal\schemadotorg_content_moderation\SchemaDotOrgContentModerationManagerInterface: '@schemadotorg_content_moderation.manager'

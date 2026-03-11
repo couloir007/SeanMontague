@@ -1,0 +1,737 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+.AlignLeft { text-align: left; }
+.AlignCenter { text-align: center; }
+.AlignRight { text-align: right; }
+body { font-family: sans-serif; font-size: 11pt; }
+img.AutoScale { max-width: 100%; max-height: 100%; }
+td { vertical-align: top; padding-left: 4px; padding-right: 4px; }
+
+tr.SectionGap td { font-size: 4px; border-left: none; border-top: none; border-bottom: 1px solid Black; border-right: 1px solid Black; }
+tr.SectionAll td { border-left: none; border-top: none; border-bottom: 1px solid Black; border-right: 1px solid Black; }
+tr.SectionBegin td { border-left: none; border-top: none; border-right: 1px solid Black; }
+tr.SectionEnd td { border-left: none; border-top: none; border-bottom: 1px solid Black; border-right: 1px solid Black; }
+tr.SectionMiddle td { border-left: none; border-top: none; border-right: 1px solid Black; }
+tr.SubsectionAll td { border-left: none; border-top: none; border-bottom: 1px solid Gray; border-right: 1px solid Black; }
+tr.SubsectionEnd td { border-left: none; border-top: none; border-bottom: 1px solid Gray; border-right: 1px solid Black; }
+table.fc { border-top: 1px solid Black; border-left: 1px solid Black; width: 100%; font-family: monospace; font-size: 10pt; }
+td.TextItemInsigMod { color: #000000; background-color: #EEEEFF; }
+td.TextItemInsigOrphan { color: #000000; background-color: #FAEEFF; }
+td.TextItemNum { color: #696969; background-color: #ECECEC; }
+td.TextItemSame { color: #000000; background-color: #FFFFFF; }
+td.TextItemSigMod { color: #000000; background-color: #FFE3E3; }
+td.TextItemSigOrphan { color: #000000; background-color: #F1E3FF; }
+.TextSegInsigDiff { color: #0000FF; }
+.TextSegReplacedDiff { color: #0000FF; font-style: italic; }
+.TextSegSigDiff { color: #FF0000; }
+td.TextItemInsigAdd { color: #000000; background-color: #EEEEFF; }
+td.TextItemInsigDel { color: #000000; background-color: #EEEEFF; text-decoration: line-through; }
+td.TextItemSigAdd { color: #000000; background-color: #FFE3E3; }
+td.TextItemSigDel { color: #000000; background-color: #FFE3E3; text-decoration: line-through; }
+</style>
+<title>composer.example.json diff</title>
+</head>
+<body>
+composer.example.json<br>
+Produced: 4/11/24 10:41:27 AM<br>
+&nbsp; &nbsp;
+<br>
+Mode:&nbsp; All &nbsp;
+<br>
+Left file: composer.original.json &nbsp;
+<br>
+Right file: composer.example.json &nbsp;
+<br>
+<table class="fc" cellspacing="0" cellpadding="0">
+<tr class="SectionAll">
+<td class="TextItemSame">{</td>
+<td class="AlignCenter">=</td>
+<td class="TextItemSame">{</td>
+</tr>
+<tr class="SectionBegin">
+<td class="TextItemInsigMod">&nbsp; &quot;name&quot;: &quot;drupal/recommended-project&quot;,</td>
+<td class="AlignCenter">&lt;&gt;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>&quot;name&quot;: &quot;drupal/recommended-project&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp; &quot;description&quot;: &quot;Project template for Drupal projects with a relocated document root&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>&quot;description&quot;: &quot;Project template for Drupal projects with a relocated document root&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp; &quot;type&quot;: &quot;project&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>&quot;type&quot;: &quot;project&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp; &quot;license&quot;: &quot;GPL-2.0-or-later&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>&quot;license&quot;: &quot;GPL-2.0-or-later&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp; &quot;homepage&quot;: &quot;https://www.drupal.org/project/drupal&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>&quot;homepage&quot;: &quot;https://www.drupal.org/project/drupal&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp; &quot;support&quot;: {</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>&quot;support&quot;: {</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; &quot;docs&quot;: &quot;https://www.drupal.org/docs/user_guide/en/index.html&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>&quot;docs&quot;: &quot;https://www.drupal.org/docs/user_guide/en/index.html&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; &quot;chat&quot;: &quot;https://www.drupal.org/node/314178&quot;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>&quot;chat&quot;: &quot;https://www.drupal.org/node/314178&quot;</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp; },</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>},</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp; &quot;repositories&quot;: [</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>&quot;repositories&quot;: [</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; {</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>{</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;type&quot;: &quot;composer&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;type&quot;: &quot;composer&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;url&quot;: &quot;https://packages.drupal.org/8&quot;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;url&quot;: &quot;https://packages.drupal.org/8&quot;</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">},</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">{</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;type&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">&quot;package&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;package&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">{</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;name&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">&quot;drupal/schemadotorg_demo_profile&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;type&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">&quot;drupal-profile&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;version&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">&quot;1.0.x-dev&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;source&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">{</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;url&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">&quot;https://git.drupalcode.org/project/schemadotorg_demo_profile.git&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;type&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">&quot;git&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;reference&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">&quot;1.0.x&quot;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; }</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span>}</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">}</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">}</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp; ],</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>],</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp; &quot;require&quot;: {</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>&quot;require&quot;: {</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; &quot;composer/installers&quot;: &quot;^2.0&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>&quot;composer/installers&quot;: &quot;^2.0&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; &quot;drupal/core-composer-scaffold&quot;: &quot;^10.2&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>&quot;drupal/core-composer-scaffold&quot;: &quot;^10.2&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; &quot;drupal/core-project-message&quot;: &quot;^10.2&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>&quot;drupal/core-project-message&quot;: &quot;^10.2&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; &quot;drupal/core-recommended&quot;: &quot;^10.2&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>&quot;drupal/core-recommended&quot;: &quot;^10.2&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;drupal/schemadotorg_demo-schemadotorg_demo&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">&quot;^1.0&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;drupal/schemadotorg_demo_profile&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">&quot;1.0.x-dev&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSigMod">&nbsp;&nbsp;&nbsp; &quot;drush/drush&quot;: &quot;^12.1&quot;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>&quot;drush/drush&quot;: &quot;^12.1&quot;<span class="TextSegSigDiff">,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;wikimedia/composer-merge-plugin&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">&quot;^2.1&quot;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp; },</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>},</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp; &quot;conflict&quot;: {</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>&quot;conflict&quot;: {</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; &quot;drupal/drupal&quot;: &quot;*&quot;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>&quot;drupal/drupal&quot;: &quot;*&quot;</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp; },</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>},</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSigMod">&nbsp; &quot;minimum-stability&quot;: &quot;<span class="TextSegSigDiff">stable</span>&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>&quot;minimum-stability&quot;: &quot;<span class="TextSegSigDiff">d</span><span class="TextSegSigDiff">ev</span>&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp; &quot;prefer-stable&quot;: true,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>&quot;prefer-stable&quot;: true,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp; &quot;config&quot;: {</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>&quot;config&quot;: {</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; &quot;allow-plugins&quot;: {</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>&quot;allow-plugins&quot;: {</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;composer/installers&quot;: true,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;composer/installers&quot;: true,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;drupal/core-composer-scaffold&quot;: true,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;drupal/core-composer-scaffold&quot;: true,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;drupal/core-project-message&quot;: true,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;drupal/core-project-message&quot;: true,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;phpstan/extension-installer&quot;: true,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;phpstan/extension-installer&quot;: true,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;dealerdirect/phpcodesniffer-composer-installer&quot;: true</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;dealerdirect/phpcodesniffer-composer-installer&quot;: true<span class="TextSegSigDiff">,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;wikimedia/composer-merge-plugin&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">true,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;cweagans/composer-patches&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">true,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;mnsami/composer-custom-directory-installer&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">true</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; },</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>},</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; &quot;sort-packages&quot;: true</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>&quot;sort-packages&quot;: true</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp; },</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>},</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp; &quot;extra&quot;: {</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>&quot;extra&quot;: {</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; &quot;drupal-scaffold&quot;: {</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>&quot;drupal-scaffold&quot;: {</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;locations&quot;: {</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;locations&quot;: {</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;web-root&quot;: &quot;web/&quot;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;web-root&quot;: &quot;web/&quot;</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; }</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>}</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; },</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>},</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; &quot;installer-paths&quot;: {</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>&quot;installer-paths&quot;: {</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;web/modules/contrib/schemadotorg_demo&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">[</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;drupal/schemadotorg_demo-schemadotorg_demo&quot;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">],</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;web/core&quot;: [</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;web/core&quot;: [</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;type:drupal-core&quot;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;type:drupal-core&quot;</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; ],</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>],</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;web/libraries/{$name}&quot;: [</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;web/libraries/{$name}&quot;: [</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;type:drupal-library&quot;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;type:drupal-library&quot;<span class="TextSegSigDiff">,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;swagger-api/swagger-ui&quot;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; ],</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>],</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;web/modules/contrib/{$name}&quot;: [</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;web/modules/contrib/{$name}&quot;: [</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;type:drupal-module&quot;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;type:drupal-module&quot;</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; ],</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>],</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;web/profiles/contrib/{$name}&quot;: [</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;web/profiles/contrib/{$name}&quot;: [</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;type:drupal-profile&quot;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;type:drupal-profile&quot;</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; ],</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>],</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;web/themes/contrib/{$name}&quot;: [</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;web/themes/contrib/{$name}&quot;: [</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;type:drupal-theme&quot;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;type:drupal-theme&quot;</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; ],</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>],</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;drush/Commands/contrib/{$name}&quot;: [</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;drush/Commands/contrib/{$name}&quot;: [</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;type:drupal-drush&quot;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;type:drupal-drush&quot;</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; ],</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>],</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;web/modules/custom/{$name}&quot;: [</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;web/modules/custom/{$name}&quot;: [</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;type:drupal-custom-module&quot;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;type:drupal-custom-module&quot;</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; ],</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>],</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;web/profiles/custom/{$name}&quot;: [</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;web/profiles/custom/{$name}&quot;: [</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;type:drupal-custom-profile&quot;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;type:drupal-custom-profile&quot;</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; ],</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>],</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;web/themes/custom/{$name}&quot;: [</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;web/themes/custom/{$name}&quot;: [</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;type:drupal-custom-theme&quot;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;type:drupal-custom-theme&quot;</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; ]</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>]</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">},</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;merge-plugin&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">{</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;include&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">[</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;web/modules/contrib/chosen/composer.libraries.json&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;web/modules/contrib/ckeditor_codemirror/composer.libraries.json&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;web/modules/contrib/dropzonejs/composer.libraries.json&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;web/modules/contrib/schemadotorg/composer.libraries.json&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;web/modules/contrib/schemadotorg_experimental/composer.libraries.json&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;web/modules/contrib/schemadotorg_demo/modules/schemadotorg_demo_admin/composer.libraries.json&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;web/modules/contrib/schemadotorg_demo/modules/schemadotorg_demo_api/composer.libraries.json&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;web/modules/contrib/schemadotorg_demo/modules/schemadotorg_demo_devel/composer.libraries.json&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;web/modules/contrib/schemadotorg_demo/modules/schemadotorg_demo_headless/composer.libraries.json&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;web/modules/contrib/schemadotorg_demo/modules/schemadotorg_demo_layout_paragraphs/composer.libraries.json&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;web/modules/contrib/schemadotorg_demo/modules/schemadotorg_demo_standard/composer.libraries.json&quot;,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;web/modules/contrib/schemadotorg_demo/modules/schemadotorg_demo_translation/composer.libraries.json&quot;</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">],</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;merge-extra&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">true,</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemSame">&nbsp;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemSigMod"><span class="TextSegInsigDiff">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="TextSegSigDiff">&quot;merge-extra-deep&quot;:</span><span class="TextSegInsigDiff"> </span><span class="TextSegSigDiff">true</span></td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; },</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>},</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; &quot;drupal-core-project-message&quot;: {</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>&quot;drupal-core-project-message&quot;: {</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;include-keys&quot;: [</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;include-keys&quot;: [</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;homepage&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;homepage&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;support&quot;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;support&quot;</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; ],</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>],</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; &quot;post-create-project-cmd-message&quot;: [</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>&quot;post-create-project-cmd-message&quot;: [</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;&lt;bg=blue;fg=white&gt;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &lt;/&gt;&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;&lt;bg=blue;fg=white&gt;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &lt;/&gt;&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;&lt;bg=blue;fg=white&gt;&nbsp; Congratulations, you’ve installed the Drupal codebase&nbsp; &lt;/&gt;&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;&lt;bg=blue;fg=white&gt;&nbsp; Congratulations, you’ve installed the Drupal codebase&nbsp; &lt;/&gt;&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;&lt;bg=blue;fg=white&gt;&nbsp; from the drupal/recommended-project template!&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/&gt;&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;&lt;bg=blue;fg=white&gt;&nbsp; from the drupal/recommended-project template!&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;/&gt;&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;&lt;bg=blue;fg=white&gt;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &lt;/&gt;&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;&lt;bg=blue;fg=white&gt;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &lt;/&gt;&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;&lt;bg=yellow;fg=black&gt;Next steps&lt;/&gt;:&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;&lt;bg=yellow;fg=black&gt;Next steps&lt;/&gt;:&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;&nbsp; * Install the site: https://www.drupal.org/docs/installing-drupal&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;&nbsp; * Install the site: https://www.drupal.org/docs/installing-drupal&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;&nbsp; * Read the user guide: https://www.drupal.org/docs/user_guide/en/index.html&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;&nbsp; * Read the user guide: https://www.drupal.org/docs/user_guide/en/index.html&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;&nbsp; * Get support: https://www.drupal.org/support&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;&nbsp; * Get support: https://www.drupal.org/support&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;&nbsp; * Get involved with the Drupal community:&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;&nbsp; * Get involved with the Drupal community:&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;&nbsp; &nbsp; &nbsp; https://www.drupal.org/getting-involved&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;&nbsp; &nbsp; &nbsp; https://www.drupal.org/getting-involved&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;&nbsp; * Remove the plugin that prints this message:&quot;,</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;&nbsp; * Remove the plugin that prints this message:&quot;,</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &quot;&nbsp; &nbsp; &nbsp; composer remove drupal/core-project-message&quot;</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; &nbsp; </span>&quot;&nbsp; &nbsp; &nbsp; composer remove drupal/core-project-message&quot;</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;&nbsp; ]</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; &nbsp; </span>]</td>
+</tr>
+<tr class="SectionMiddle">
+<td class="TextItemInsigMod">&nbsp;&nbsp;&nbsp; }</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp; &nbsp;<span class="TextSegInsigDiff">&nbsp; &nbsp; </span>}</td>
+</tr>
+<tr class="SectionEnd">
+<td class="TextItemInsigMod">&nbsp; }</td>
+<td class="AlignCenter">&nbsp;</td>
+<td class="TextItemInsigMod">&nbsp;&nbsp;<span class="TextSegInsigDiff">&nbsp; </span>}</td>
+</tr>
+<tr class="SectionAll">
+<td class="TextItemSame">}</td>
+<td class="AlignCenter">=</td>
+<td class="TextItemSame">}</td>
+</tr>
+</table>
+<br>
+</body>
+</html>

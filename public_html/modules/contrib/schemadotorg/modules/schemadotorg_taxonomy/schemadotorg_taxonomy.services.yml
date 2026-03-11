@@ -1,0 +1,15 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_taxonomy.jsonld_manager:
+    class: Drupal\schemadotorg_taxonomy\SchemaDotOrgTaxonomyJsonLdManager
+  Drupal\schemadotorg_taxonomy\SchemaDotOrgTaxonomyJsonLdManagerInterface: '@schemadotorg_taxonomy.jsonld_manager'
+
+  schemadotorg_taxonomy.default_vocabulary_manager:
+    class: Drupal\schemadotorg_taxonomy\SchemaDotOrgTaxonomyDefaultVocabularyManager
+  Drupal\schemadotorg_taxonomy\SchemaDotOrgTaxonomyDefaultVocabularyManagerInterface: '@schemadotorg_taxonomy.default_vocabulary_manager'
+
+  schemadotorg_taxonomy.property_vocabulary_manager:
+    class: Drupal\schemadotorg_taxonomy\SchemaDotOrgTaxonomyPropertyVocabularyManager
+  Drupal\schemadotorg_taxonomy\SchemaDotOrgTaxonomyPropertyVocabularyManagerInterface: '@schemadotorg_taxonomy.property_vocabulary_manager'

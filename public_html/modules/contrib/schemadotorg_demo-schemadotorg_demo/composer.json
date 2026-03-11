@@ -1,0 +1,37 @@
+{
+    "name": "drupal/schemadotorg_demo",
+    "description": "Provides an opinionated demo of the Schema.org Blueprints.",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "minimum-stability": "dev",
+    "homepage": "https://drupal.org/project/schemadotorg_demo",
+    "authors": [
+        {
+            "name": "Jacob Rockowitz (jrockowitz)",
+            "homepage": "https://www.drupal.org/u/jrockowitz",
+            "role": "Maintainer"
+        }
+    ],
+    "support": {
+        "issues": "https://drupal.org/project/issues/schemadotorg_demo",
+        "source": "https://git.drupalcode.org/project/schemadotorg_demo"
+    },
+    "extra": {
+        "drush": {
+            "services": {
+                "drush.services.yml": "^12"
+            }
+        }
+    },
+    "require": {
+        "drupal/core": "^10.3 || ^11",
+        "drupal/schemadotorg": "^1.0",
+        "drupal/schemadotorg_experimental": "^1.0"
+    },
+    "require-dev": {
+        "drupal/consumers": "^1.0",
+        "drupal/office_hours": "^1.0",
+        "drupal/metatag": "^1.0"
+    }
+
+}

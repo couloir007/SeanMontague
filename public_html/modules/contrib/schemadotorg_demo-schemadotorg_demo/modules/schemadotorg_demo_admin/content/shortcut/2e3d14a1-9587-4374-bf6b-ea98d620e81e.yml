@@ -1,0 +1,18 @@
+_meta:
+  version: '1.0'
+  entity_type: shortcut
+  uuid: 2e3d14a1-9587-4374-bf6b-ea98d620e81e
+  bundle: default
+  default_langcode: en
+default:
+  title:
+    -
+      value: 'Dashboard'
+  weight:
+    -
+      value: -100
+  link:
+    -
+      uri: 'internal:/admin/dashboard'
+      title: ''
+      options: {  }

@@ -1,0 +1,13 @@
+/**
+ * @file
+ * Local Tasks More styles.
+ */
+
+.local-tasks-more-toggle svg {
+  width: 1em;
+  height: 1em;
+}
+
+nav.tabs-wrapper ul.tabs li.local-tasks-more-tab {
+  display: none;
+}

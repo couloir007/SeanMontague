@@ -1,0 +1,7 @@
+.lpb-controls-label {
+  font-size: .9em;
+  color: var(--me-color-text);
+}
+.is-layout .lpb-controls-label {
+  color: var(--me-color-text-reversed)
+}

@@ -1,0 +1,16 @@
+{
+  "require": {
+    "drupal/config_rewrite": "^1.0",
+    "drupal/consumer_image_styles": "^4.0",
+    "drupal/decoupled_router": "2.0.5",
+    "drupal/subrequests": "^3.0",
+    "drupal/simple_oauth": "^6.0"
+  },
+  "extra": {
+    "patches": {
+      "drupal/decoupled_router": {
+        "Issue #3111456: Unable to resolve path on node in other language than default": "https://www.drupal.org/files/issues/2024-07-11/decouple_router-3111456-resolve-language-issue-63--get-translation-re-rolled.patch"
+      }
+    }
+  }
+}

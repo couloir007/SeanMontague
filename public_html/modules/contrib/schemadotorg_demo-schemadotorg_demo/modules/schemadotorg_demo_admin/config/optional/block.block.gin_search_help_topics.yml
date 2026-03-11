@@ -1,0 +1,26 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - search
+    - system
+    - help
+  theme:
+    - gin
+id: gin_search_help_topics
+theme: gin
+region: help
+weight: 0
+provider: null
+plugin: search_form_block
+settings:
+  id: search_form_block
+  label: 'Search help topics'
+  label_display: '0'
+  provider: search
+  page_id: help_search
+visibility:
+  request_path:
+    id: request_path
+    negate: false
+    pages: "/admin/help\r\n/admin/help/topic/*"

@@ -1,0 +1,97 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.organization.body
+    - field.field.node.organization.schema_contact_point
+    - field.field.node.organization.schema_image
+    - field.field.node.organization.schema_member
+    - field.field.node.organization.schema_organization_type
+    - field.field.node.organization.schema_parent_organization
+    - field.field.node.organization.schema_sub_organization
+    - field.field.node.organization.schema_subject_of
+    - node.type.organization
+  module:
+    - custom_field
+    - entity_reference_override
+    - image
+    - options
+    - text
+    - user
+id: node.organization.default
+targetEntityType: node
+bundle: organization
+mode: default
+content:
+  body:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 17
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -100
+    region: content
+  schema_contact_point:
+    type: custom_formatter
+    label: above
+    settings:
+      fields: {  }
+    third_party_settings: {  }
+    weight: 155
+    region: content
+  schema_image:
+    type: image
+    label: hidden
+    settings:
+      image_link: ''
+      image_style: ''
+      image_loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: 8
+    region: content
+  schema_member:
+    type: entity_reference_override_label
+    label: above
+    settings:
+      link: true
+      override_action: suffix
+    third_party_settings: {  }
+    weight: 73
+    region: content
+  schema_organization_type:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  schema_parent_organization:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 165
+    region: content
+  schema_sub_organization:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 165
+    region: content
+  schema_subject_of:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 165
+    region: content
+hidden: {  }

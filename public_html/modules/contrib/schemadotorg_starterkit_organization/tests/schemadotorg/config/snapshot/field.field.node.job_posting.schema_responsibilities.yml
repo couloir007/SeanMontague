@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_responsibilities
+    - node.type.job_posting
+id: node.job_posting.schema_responsibilities
+field_name: schema_responsibilities
+entity_type: node
+bundle: job_posting
+label: Responsibilities
+description: 'Responsibilities associated with this role or Occupation.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

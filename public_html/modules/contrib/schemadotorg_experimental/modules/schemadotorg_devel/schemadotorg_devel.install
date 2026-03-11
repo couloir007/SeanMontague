@@ -1,0 +1,88 @@
+<?php
+
+/**
+ * @file
+ * Installation hooks for the Schema.org Blueprints Devel module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Component\Serialization\Yaml;
+
+/**
+ * Implements hook_install().
+ */
+function schemadotorg_devel_install(bool $is_syncing): void {
+  if ($is_syncing) {
+    return;
+  }
+
+  // Can't use dpm with Kint or ddm to file properly.
+  // @see https://gitlab.com/drupalspoons/devel/-/issues/525#note_1988672373
+  if (\Drupal::moduleHandler()->moduleExists('devel')) {
+    /** @var \Drupal\Core\Extension\ModuleInstallerInterface $module_installer */
+    $module_installer = \Drupal::service('module_installer');
+    $module_installer->uninstall(['big_pipe']);
+    \Drupal::configFactory()
+      ->getEditable('devel.settings')
+      ->set('devel_dumper', 'var_dumper')
+      ->save();
+  }
+}
+
+/**
+ * Issue #3469455: Improve devel generate.
+ */
+function schemadotorg_devel_update_10000(): void {
+  $module_path = \Drupal::service('extension.list.module')
+    ->getPath('schemadotorg_devel');
+  $data = Yaml::decode(file_get_contents($module_path . '/config/install/schemadotorg_devel.settings.yml'));
+  $generate_values = $data['generate_values'];
+
+  $config = \Drupal::configFactory()
+    ->getEditable('schemadotorg_devel.settings');
+
+  foreach ($config->get('generate_schema_property_values') as $name => $values) {
+    $generate_values[$name] = [];
+    if ($values) {
+      $generate_values[$name]['values'] = $values;
+    }
+  }
+
+  $config
+    ->set('generate_values', $generate_values)
+    ->clear('generate_schema_property_values')
+    ->save();
+}
+
+/**
+ * Issue #3469455: Create 'schemadotorg_devel_generate_paragraphs' table.
+ */
+function schemadotorg_devel_update_10001(): void {
+  $schema = schemadotorg_devel_schema();
+  \Drupal::database()->schema()->createTable(
+    'schemadotorg_devel_generate_paragraphs',
+    $schema['schemadotorg_devel_generate_paragraphs']
+  );
+}
+
+/**
+ * Implements hook_schema().
+ */
+function schemadotorg_devel_schema(): array {
+  $schema['schemadotorg_devel_generate_paragraphs'] = [
+    'description' => 'Track paragraphs that are created and possibly orphaned.',
+    'fields' => [
+     'revision_id' => [
+        'type' => 'int',
+        'not null' => TRUE,
+     ],
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+      ],
+    ],
+    'primary key' => ['revision_id'],
+  ];
+  return $schema;
+}

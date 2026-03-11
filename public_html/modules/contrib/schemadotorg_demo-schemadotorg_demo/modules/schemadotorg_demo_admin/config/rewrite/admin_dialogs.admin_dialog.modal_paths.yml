@@ -1,0 +1,14 @@
+config_rewrite:
+  replace:
+    - selection_criteria.paths
+selection_criteria:
+  paths:
+    - '*/admin/config/services/rss-publishing*'
+    - '*/admin/config/development/maintenance*'
+    - '*/admin/modules/install*'
+    - '*/admin/theme/install*'
+    - '*/admin/config/development/logging*'
+    - '*/admin/config/regional/settings*'
+    - '*/admin/config/media/media-settings*'
+    - '*/admin/config/media/image-toolkit*'
+    - '*/node/*/delete'

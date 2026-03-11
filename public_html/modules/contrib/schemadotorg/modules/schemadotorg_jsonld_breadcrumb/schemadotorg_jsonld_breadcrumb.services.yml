@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_jsonld_breadcrumb.manager:
+    class: Drupal\schemadotorg_jsonld_breadcrumb\SchemaDotOrgJsonLdBreadcrumbManager
+  Drupal\schemadotorg_jsonld_breadcrumb\SchemaDotOrgJsonLdBreadcrumbManagerInterface: '@schemadotorg_jsonld_breadcrumb.manager'

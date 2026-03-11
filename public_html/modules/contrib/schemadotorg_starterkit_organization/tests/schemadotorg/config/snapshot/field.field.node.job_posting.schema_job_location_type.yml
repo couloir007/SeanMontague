@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_job_location_type
+    - node.type.job_posting
+id: node.job_posting.schema_job_location_type
+field_name: schema_job_location_type
+entity_type: node
+bundle: job_posting
+label: 'Job location type'
+description: 'A description of the job location (e.g. TELECOMMUTE for telecommute jobs).'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

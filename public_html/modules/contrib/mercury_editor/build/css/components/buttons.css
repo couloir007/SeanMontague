@@ -1,0 +1,191 @@
+/* Remove claro-specific styles. */
+.me-dialog__buttonpane .button:not(:focus) {
+  box-shadow: none;
+}
+
+/* Expose dialog resize handle in safari. */
+.me-dialog__buttonpane {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+}
+
+/* All buttons in dialog content pane. */
+.lpb-dialog.ui-dialog .ui-dialog-content.ui-widget-content .button,
+/* Save / close buttons in main builder interface. */
+.lpb-form__actions .button,
+/* Dialog button pane buttons. */
+.lpb-dialog.ui-dialog .ui-widget-content.ui-dialog-buttonpane .button,
+[class*="me-button"],
+.me-dialog__buttonpane .button {
+  border: none !important;
+  border-radius: 2px !important;
+
+}
+.lpb-dialog.ui-dialog .ui-dialog-content.ui-widget-content .button,
+/* Save / close buttons in main builder interface. */
+.lpb-form__actions .button,
+/* Dialog button pane buttons. */
+.lpb-dialog.ui-dialog .ui-widget-content.ui-dialog-buttonpane .button,
+[class*="me-button"],
+.me-dialog__buttonpane .button {
+
+  /* Remove hyper-specific gin theme styles. */
+
+  /* Fonts */
+  font-size: var(--me-font-size-button, calc(13px + 2 * ((100vw - 320px) / 1360)));
+  font-family: var(--me-font-family-sans);
+  font-weight: 700;
+  letter-spacing: var(--me-letter-spacing-loose);
+  text-transform: uppercase;
+  line-height: 1.1;
+  text-decoration: none;
+
+  /* Layout */
+  display: inline-block;
+  height: auto;
+  padding: .6em;
+  position: relative;
+  vertical-align: middle;
+  margin: .5rem .2rem;
+
+  /* Color */
+  color: var(--me-button-color-text);
+  background-color: var(--me-button-color-background);
+
+  /* Transition */
+  transition: var(--me-transition);
+
+  /* States */
+
+}
+.lpb-dialog.ui-dialog .ui-dialog-content.ui-widget-content .button:not([disabled]):hover, .lpb-form__actions .button:not([disabled]):hover, .lpb-dialog.ui-dialog .ui-widget-content.ui-dialog-buttonpane .button:not([disabled]):hover, [class*="me-button"]:not([disabled]):hover, .me-dialog__buttonpane .button:not([disabled]):hover {
+    background-color: var(--me-button-color-background-hover);
+    color: var(--me-button-color-text-hover);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+.lpb-dialog.ui-dialog .ui-dialog-content.ui-widget-content .button[disabled], .lpb-form__actions .button[disabled], .lpb-dialog.ui-dialog .ui-widget-content.ui-dialog-buttonpane .button[disabled], [class*="me-button"][disabled], .me-dialog__buttonpane .button[disabled] {
+    opacity: .6;
+  }
+.lpb-dialog.ui-dialog .ui-dialog-content.ui-widget-content .button.action-link, .lpb-form__actions .button.action-link, .lpb-dialog.ui-dialog .ui-widget-content.ui-dialog-buttonpane .button.action-link, .action-link[class*="me-button"], .me-dialog__buttonpane .button.action-link {
+    background: none;
+    position: relative;
+    padding: .6em;
+    margin: 1em;
+  }
+.lpb-dialog.ui-dialog .ui-dialog-content.ui-widget-content .button.action-link:hover, .lpb-form__actions .button.action-link:hover, .lpb-dialog.ui-dialog .ui-widget-content.ui-dialog-buttonpane .button.action-link:hover, .action-link[class*="me-button"]:hover, .me-dialog__buttonpane .button.action-link:hover {
+      text-decoration: underline;
+    }
+.lpb-dialog.ui-dialog .ui-dialog-content.ui-widget-content .button.action-link--icon-trash, .lpb-form__actions .button.action-link--icon-trash, .lpb-dialog.ui-dialog .ui-widget-content.ui-dialog-buttonpane .button.action-link--icon-trash, .action-link--icon-trash[class*="me-button"], .me-dialog__buttonpane .button.action-link--icon-trash {
+    padding-left: 25px;
+    margin-right: 0;
+    float: right;
+  }
+.lpb-dialog.ui-dialog .ui-dialog-content.ui-widget-content .button.action-link--icon-trash:before, .lpb-form__actions .button.action-link--icon-trash:before, .lpb-dialog.ui-dialog .ui-widget-content.ui-dialog-buttonpane .button.action-link--icon-trash:before, .action-link--icon-trash[class*="me-button"]:before, .me-dialog__buttonpane .button.action-link--icon-trash:before {
+      position: absolute;
+      left: 0;
+      content: "\274c"; /* use the hex value here... */
+      color: #FFF;
+      text-align: center;
+      /* Overwrite claro action-link styles. */
+      background-image: none;
+      top: auto;
+    }
+
+.me-button--primary,
+mercury-dialog .me-dialog__buttonpane .lpb-btn--save,
+mercury-dialog .me-dialog__buttonpane :only-child,
+mercury-dialog .me-dialog__buttonpane .button--primary {
+  color: var(--me-button-color-text-primary);
+  background-color: var(--me-button-color-background-primary);
+}
+
+.me-button--primary:not([disabled]):hover, mercury-dialog .me-dialog__buttonpane .lpb-btn--save:not([disabled]):hover, mercury-dialog .me-dialog__buttonpane :only-child:not([disabled]):hover, mercury-dialog .me-dialog__buttonpane .button--primary:not([disabled]):hover {
+    color: var(--me-button-color-text-primary-hover);
+    background-color: var(--me-button-color-background-primary-hover);
+  }
+
+.me-button--secondary {
+  color: var(--me-button-color-text-secondary);
+  background-color: var(--me-button-color-background-secondary);
+}
+
+.me-button--secondary:not([disabled]):hover {
+    color: var(--me-button-color-text-secondary-hover);
+    background-color: var(--me-button-color-background-secondary-hover);
+  }
+
+.me-button--cancel,
+mercury-dialog .me-dialog__buttonpane .lpb-btn--cancel,
+mercury-dialog .me-dialog__buttonpane .button--cancel {
+  color: var(--me-button-color-text-cancel);
+  background-color: var(--me-button-color-background-cancel);
+}
+
+.me-button--cancel:not([disabled]):hover, mercury-dialog .me-dialog__buttonpane .lpb-btn--cancel:not([disabled]):hover, mercury-dialog .me-dialog__buttonpane .button--cancel:not([disabled]):hover {
+    color: var(--me-button-color-text-cancel-hover);
+    background-color: var(--me-button-color-background-cancel-hover);
+  }
+
+.me-button--icon span {
+  display: block;
+  overflow: hidden;
+  height: var(--me-button-icon-height);
+  width: var(--me-button-icon-width);
+  text-indent: calc(var(--me-button-icon-width) + 2px);
+  white-space: nowrap;
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  -webkit-mask-position: 50% 50%;
+          mask-position: 50% 50%;
+  -webkit-mask-size: var(--me-button-icon-height) var(--me-button-icon-width);
+          mask-size: var(--me-button-icon-height) var(--me-button-icon-width);
+  -webkit-mask-image: var(--me-button-icon);
+          mask-image: var(--me-button-icon);
+  background-color: var(--me-button-color-icon);
+}
+
+.me-button--icon:hover span {
+  --me-button-color-icon: var(--me-button-color-icon-hover);
+}
+
+.me-button--sidebar-collapse {
+  --me-button-icon: url("data:image/svg+xml;charset=utf-8,%3Csvg%20width%3D'16'%20height%3D'16'%20fill%3D'none'%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%3E%20%3Cpath%20fill-rule%3D'evenodd'%20clip-rule%3D'evenodd'%20d%3D'M0%202C0%200.895431%200.895431%200%202%200H10V16H2C0.89543%2016%200%2015.1046%200%2014V2ZM4%204L8%208L4%2012L3%2011L6%208L3%205L4%204ZM14%200H12V16H14C15.1046%2016%2016%2015.1046%2016%2014V2C16%200.895431%2015.1046%200%2014%200Z'%20fill%3D'%23130F13'%2F%3E%20%3C%2Fsvg%3E%20");
+}
+.me-button--sidebar-expand {
+  --me-button-icon: url("data:image/svg+xml;charset=utf-8,%3Csvg%20width%3D'16'%20height%3D'16'%20viewBox%3D'0%200%2016%2016'%20fill%3D'none'%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%3E%20%3Cpath%20fill-rule%3D'evenodd'%20clip-rule%3D'evenodd'%20d%3D'M0%202C0%200.895431%200.895431%200%202%200H10V16H2C0.89543%2016%200%2015.1046%200%2014V2ZM6%2012L2%208L6%204L7%205L4%208L7%2011L6%2012ZM14%200H12V16H14C15.1046%2016%2016%2015.1046%2016%2014V2C16%200.895431%2015.1046%200%2014%200Z'%20fill%3D'%23130F13'%2F%3E%20%3C%2Fsvg%3E%20");
+}
+.me-button--desktop {
+  --me-button-icon: url("data:image/svg+xml;charset=utf-8,%3Csvg%20width%3D'17'%20height%3D'16'%20fill%3D'none'%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%3E%3Cg%20clip-path%3D'url%28%23a%29'%3E%3Cpath%20d%3D'M6.371%2016.2c-.36%200-.61-.163-.75-.49-.14-.327-.084-.617.17-.87l1.04-1.04h-4.8c-.44%200-.817-.157-1.13-.47a1.538%201.538%200%200%201-.47-1.13V2.6c0-.44.157-.817.47-1.13.314-.314.69-.47%201.13-.47h12.8c.44%200%20.817.157%201.13.47.314.314.47.69.47%201.13v9.6c0%20.44-.157.817-.47%201.13-.314.314-.69.47-1.13.47h-4.8l1.04%201.04c.254.253.31.543.17.87-.14.327-.39.49-.75.49h-4.12Zm-4.34-6.4h12.8V2.6h-12.8v7.2Z'%20fill%3D'%23fff'%2F%3E%3C%2Fg%3E%3Cdefs%3E%3CclipPath%20id%3D'a'%3E%3Cpath%20fill%3D'%23fff'%20d%3D'M.431%200h16v16h-16z'%2F%3E%3C%2FclipPath%3E%3C%2Fdefs%3E%3C%2Fsvg%3E%20");
+}
+.me-button--mobile {
+  --me-button-icon: url("data:image/svg+xml;charset=utf-8,%3Csvg%20width%3D'17'%20height%3D'16'%20viewBox%3D'0%200%2017%2016'%20fill%3D'none'%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%3E%20%3Cpath%20d%3D'M12.1585%2013.0909H4.88582V2.90909H12.1585M12.1585%200H4.88582C4.07855%200%203.43127%200.647273%203.43127%201.45455V14.5455C3.43127%2014.9312%203.58452%2015.3012%203.8573%2015.574C4.13008%2015.8468%204.50005%2016%204.88582%2016H12.1585C12.5443%2016%2012.9143%2015.8468%2013.1871%2015.574C13.4598%2015.3012%2013.6131%2014.9312%2013.6131%2014.5455V1.45455C13.6131%201.06878%2013.4598%200.698807%2013.1871%200.426027C12.9143%200.153246%2012.5443%200%2012.1585%200Z'%20fill%3D'white'%2F%3E%20%3C%2Fsvg%3E%20");
+}
+
+.me-dialog__buttonpane .button + .button {
+  margin-left: .75rem;
+}
+
+[class*="me-button"] + [class*="me-button"] {
+  margin-left: 0;
+}
+
+.lpb-dialog.ui-dialog .ui-widget-content.ui-dialog-buttonpane .button {
+  margin-left: 8px;
+}
+
+/* Add Section Buttons */
+.lp-builder .lpb-btn {
+    line-height: 24px;
+    font-weight: var(--me-font-weight-medium);
+    text-transform: uppercase;
+    z-index: 540;
+    border-radius: 3px;
+    background-color: #00659B;
+    color: #fff;
+  }
+.lp-builder .lpb-btn.before {
+    top: -18px;
+  }
+.lp-builder .lpb-btn.after {
+    bottom: -18px;
+  }

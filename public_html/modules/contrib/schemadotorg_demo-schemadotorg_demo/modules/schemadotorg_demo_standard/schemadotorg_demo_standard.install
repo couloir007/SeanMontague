@@ -1,0 +1,103 @@
+<?php
+
+/**
+ * @file
+ * Installation hooks for the Schema.org Blueprints Demo Standard module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\block\Entity\Block;
+use Drupal\block_content\Entity\BlockContent;
+use Drupal\Core\Url;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\node\Entity\NodeType;
+
+/**
+ * Implements hook_install().
+ */
+function schemadotorg_demo_standard_install(): void {
+
+  /* ************************************************************************ */
+  // Block content.
+  /* ************************************************************************ */
+
+  /** @var \Drupal\schemadotorg\SchemaDotOrgMappingManagerInterface $mapping_manager */
+  $mapping_manager = \Drupal::service('schemadotorg.mapping_manager');
+
+  // Create the Statement block type and Schema.org mapping.
+  $mapping_manager->createType('block_content', 'Statement');
+
+  $theme = \Drupal::config('system.theme')->get('default');
+  $block_id = $theme . '_schemadotorg_demo';
+  if (!Block::load($block_id)) {
+    // Create a Statement content block.
+    $t_args = [':href' => Url::fromRoute('schemadotorg_help.page', ['name' => 'schemadotorg'])->toString()];
+    $block_content = BlockContent::create([
+      'type' => 'statement',
+      'info' => 'Schema.org Blueprints Demo',
+      'body' => [
+        'value' => (string) t('Welcome to a demo of the <a href=":href">Schema.org Blueprints module</a>!', $t_args),
+        'format' => 'full_html',
+      ],
+    ]);
+    $block_content->save();
+
+    // Place the Statement content block.
+    $block = Block::create([
+      'plugin' => 'block_content:' . $block_content->uuid(),
+      'region' => 'content',
+      'id' => $theme . '_schemadotorg_demo',
+      'theme' => $theme,
+      'label' => 'Schema.org Blueprints Demo',
+      'label_display' => FALSE,
+      'weight' => -5,
+      'visibility' => [
+        'request_path' => [
+          'id' => 'request_path',
+          'pages' => '<front>',
+        ],
+      ],
+    ]);
+    $block->save();
+  }
+
+  /* ************************************************************************ */
+  // Type tray.
+  /* ************************************************************************ */
+
+  // Remove the 'Type tray' module's default link text to view existing nodes on each content type.
+  foreach (NodeType::loadMultiple() as $node_type) {
+    $node_type->setThirdPartySetting('type_tray', 'existing_nodes_link_text', '');
+    $node_type->save();
+  }
+
+  /* ************************************************************************ */
+  // Comment.
+  /* ************************************************************************ */
+
+  // Remove comment fields and uninstall the comment.module.
+  $field_config = FieldConfig::loadByName('node', 'article', 'comment');
+  if ($field_config) {
+    $field_config->delete();
+  }
+  $field_storage_config = FieldStorageConfig::loadByName('entity', 'comment');
+  if ($field_storage_config) {
+    $field_storage_config->delete();
+  }
+  /** @var \Drupal\Core\Extension\ModuleInstallerInterface $module_installer */
+  $module_installer = \Drupal::service('module_installer');
+  $module_installer->uninstall(['comment']);
+  drupal_flush_all_caches();
+
+  /* ************************************************************************ */
+  // Finalize.
+  /* ************************************************************************ */
+
+  // @todo Update to work with Drupal 11.x.
+  // Make sure update status is checked.
+  if (function_exists('update_cron')) {
+    update_cron();
+  }
+}

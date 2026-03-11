@@ -1,0 +1,132 @@
+<?php
+
+/**
+ * @file
+ * Provides development tools for the Schema.org Blueprints module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\NodeInterface;
+
+/* ************************************************************************** */
+// Devel generate enhancements.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ *
+ * Manages node.add and test local tasks.
+ */
+function schemadotorg_devel_menu_local_tasks_alter(array &$data, string $route_name, RefinableCacheableDependencyInterface $cacheability): void {
+  /** @var \Drupal\schemadotorg_devel\SchemaDotOrgDevelGenerateInterface $schemadotorg_devel_generate */
+  $schemadotorg_devel_generate = \Drupal::service('schemadotorg_devel.generate');
+  $schemadotorg_devel_generate->menuLocalTasksAlter($data, $route_name, $cacheability);
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function schemadotorg_devel_form_node_form_alter(array &$form, FormStateInterface $form_state, string $form_id): void {
+  /** @var \Drupal\schemadotorg_devel\SchemaDotOrgDevelGenerateInterface $schemadotorg_devel_generate */
+  $schemadotorg_devel_generate = \Drupal::service('schemadotorg_devel.generate');
+  $schemadotorg_devel_generate->nodeFormAlter($form, $form_state, $form_id);
+}
+
+/**
+ * Implements hook_node_create().
+ */
+function schemadotorg_devel_node_create(NodeInterface $node): void {
+  /** @var \Drupal\schemadotorg_devel\SchemaDotOrgDevelGenerateInterface $schemadotorg_devel_generate */
+  $schemadotorg_devel_generate = \Drupal::service('schemadotorg_devel.generate');
+  $schemadotorg_devel_generate->nodeCreate($node);
+}
+
+/**
+ * Implements hook_node_presave().
+ */
+function schemadotorg_devel_node_presave(NodeInterface $node): void {
+  /** @var \Drupal\schemadotorg_devel\SchemaDotOrgDevelGenerateInterface $schemadotorg_devel_generate */
+  $schemadotorg_devel_generate = \Drupal::service('schemadotorg_devel.generate');
+  $schemadotorg_devel_generate->nodePresave($node);
+}
+
+/**
+ * Implements hook_entity_presave().
+ */
+function schemadotorg_devel_entity_presave(EntityInterface $entity): void {
+  /** @var \Drupal\schemadotorg_devel\SchemaDotOrgDevelGenerateInterface $schemadotorg_devel_generate */
+  $schemadotorg_devel_generate = \Drupal::service('schemadotorg_devel.generate');
+  $schemadotorg_devel_generate->entityPresave($entity);
+}
+
+/**
+ * Implements template_preprocess_node().
+ */
+function schemadotorg_devel_preprocess_node(array &$variables): void {
+  /** @var \Drupal\schemadotorg_devel\SchemaDotOrgDevelGenerateInterface $schemadotorg_devel_generate */
+  $schemadotorg_devel_generate = \Drupal::service('schemadotorg_devel.generate');
+  $schemadotorg_devel_generate->preprocessNode($variables);
+}
+
+/**
+ * Implements hook_cron().
+ */
+function schemadotorg_devel_cron(): void {
+  /** @var \Drupal\schemadotorg_devel\SchemaDotOrgDevelGenerateInterface $schemadotorg_devel_generate */
+  $schemadotorg_devel_generate = \Drupal::service('schemadotorg_devel.generate');
+  $schemadotorg_devel_generate->deleteOrphanedParagraphs();
+}
+
+/* ************************************************************************** */
+// Schema.org general settings form.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::afterBuildDetails
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::formAlter
+ */
+function schemadotorg_devel_form_schemadotorg_general_settings_form_alter(array &$form, FormStateInterface $form_state): void {
+  $form['schemadotorg_devel'] = [
+    '#type' => 'details',
+    '#title' => t('Development settings'),
+  ];
+  $form['schemadotorg_devel']['generate_values'] = [
+    '#title' => t('Schema.org devel generate values'),
+    '#type' => 'schemadotorg_settings',
+    '#description' => t('Enter values to be used when generating content using the Devel generate module.')
+    . ' '
+    . t('Leave empty to disable the generation of property values.'),
+    '#description_link' => 'types',
+    '#example' => '
+# Empty
+propertyName01: {  }
+# Generate value based on one of the below settings.
+propertyName02:
+  # Values
+  values:
+    - value01
+    - value02
+    - value03
+  # String length
+  string: 50
+  # Name length
+  name: 50
+  # Machine name length
+  machine_name: 32
+  # Word length
+  word: 20
+  # Sentences minimum word count
+  sentences: 10
+  # Paragraph count
+  paragraphs: 3
+SchemaType--propertyName02: {  }
+entity_type_id--bundle--field_name: {  }
+',
+  ];
+}

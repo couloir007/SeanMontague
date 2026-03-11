@@ -1,0 +1,116 @@
+.lpb-form__actions {
+  margin: 0 !important;
+}
+.lpb-form__actions {
+  background-color: #fff;
+  bottom: 0;
+  box-shadow: 0 0 3px rgba(0, 0, 0, .25), 0 0 12px rgba(0, 0, 0, .25);
+  display: flex;
+  flex-wrap: wrap;
+  font-family: var(--me-font-family-sans);
+  left: var(--ginVerticalToolbarOffset, 0);
+  padding: 20px;
+  position: fixed;
+  right: 0;
+  transition: var(--ginTransition, all .2s ease-out);
+  z-index: 100;
+}
+.lpb-form__actions input[type='submit'] {
+    margin: 0 10px 0 0;
+  }
+.gin--vertical-toolbar .lpb-form__actions {
+  padding-left: 84px;
+}
+.gin--vertical-toolbar[data-toolbar-menu="open"] .lpb-form__actions {
+  padding-left: 275px;
+}
+
+/**
+  * Component hover styles. Uses a class instead of hover state for slight
+  * pause, to avoid jumpiness.
+  */
+.lp-builder:not(.is-navigating) .js-lpb-component.focused {
+  outline: 1px solid blue;
+  z-index: 1000;
+}
+.lp-builder:not(.is-navigating) .js-lpb-component.focused .js-lpb-region {
+  outline: 1px dotted rgba(0, 0, 255, 0.5);
+}
+.lp-builder:not(.is-navigating) .js-lpb-component.focused > .js-lpb-ui {
+  opacity: 1;
+}
+
+/**
+ * Mercury Editor controls modifications.
+ */
+.is-mercury-edit-mode .lp-builder {
+    z-index: 100;
+  }
+.is-mercury-edit-mode .lpb-controls {
+    padding: 0 5px 0 0;
+    border-radius: 4px;
+    top: -20px;
+    left: -10px;
+    right: auto;
+  }
+.is-mercury-edit-mode .lpb-controls .reveal-on-hover {
+      max-width: 0;
+      display: flex;
+    }
+.is-mercury-edit-mode .lpb-controls.focused .reveal-on-hover {
+        max-width: 500px;
+        animation: controlsSlideOpen .25s;
+      }
+.is-mercury-edit-mode .lpb-controls.blurred .reveal-on-hover {
+      animation: controlsSlideClosed .25s;
+    }
+.is-mercury-edit-mode .lpb-controls.is-layout {
+      top: -25px;
+      left: -15px;
+      right: -10px;
+      left: auto;
+    }
+.is-mercury-edit-mode .lpb-controls-label {
+    padding: 0 5px 0 0;
+    text-transform: uppercase;
+    font-size: .7em;
+    letter-spacing: 2px;
+  }
+.is-mercury-edit-mode .lpb-tooltiptext {
+    left: var(--me-lpb-tooltip-text-left, -12px);
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    width: 1px;
+    height: 1px;
+    word-wrap: normal;
+  }
+.is-mercury-edit-mode .lp-builder:not(.is-dragging) .lpb-tooltip--focus:focus + .lpb-tooltiptext,
+  .is-mercury-edit-mode .lp-builder:not(.is-dragging) .lpb-tooltip--hover:hover + .lpb-tooltiptext,
+  .is-mercury-edit-mode .lpb-tooltiptext--visible {
+    overflow: visible;
+    clip: auto;
+    width: auto;
+    height: auto;
+  }
+.is-mercury-edit-mode .lpb-tooltiptext::after {
+    left: var(--me-lpb-tooltip-text-arrow-left, 20px);
+  }
+
+@keyframes controlsSlideOpen {
+  0% {
+    max-width: 0;
+  }
+  100% {
+    max-width: 500px;
+  }
+}
+
+
+@keyframes controlsSlideClosed {
+  0% {
+    max-width: 500px;
+  }
+  100% {
+    max-width: 0;
+  }
+}

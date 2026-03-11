@@ -1,0 +1,11 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_scheduler.manager:
+    class: Drupal\schemadotorg_scheduler\SchemaDotOrgSchedulerManager
+  Drupal\schemadotorg_scheduler\SchemaDotOrgSchedulerManagerInterface: '@schemadotorg_scheduler.manager'
+
+  schemadotorg_scheduler.jsonld_manager:
+    class: Drupal\schemadotorg_scheduler\SchemaDotOrgSchedulerJsonLdManager
+  Drupal\schemadotorg_scheduler\SchemaDotOrgSchedulerJsonLdManagerInterface: '@schemadotorg_scheduler.jsonld_manager'

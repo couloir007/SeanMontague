@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Contains entity_reference_override_entity_browser.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function entity_reference_override_entity_browser_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.entity_reference_override_entity_brwoser':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Integrates Entity Reference Override with Entity Browser') . '</p>';
+      return $output;
+
+    default:
+  }
+}

@@ -1,0 +1,3 @@
+paragraphs_usage.menu:
+  deriver: Drupal\paragraphs_usage\Plugin\Derivative\ParagraphsUsageMenuLinks
+  menu_name: admin

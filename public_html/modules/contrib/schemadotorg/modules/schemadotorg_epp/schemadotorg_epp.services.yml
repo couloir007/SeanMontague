@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_epp.manager:
+    class: Drupal\schemadotorg_epp\SchemaDotOrgEppManager
+  Drupal\schemadotorg_epp\SchemaDotOrgEppManagerInterface: '@schemadotorg_epp.manager'

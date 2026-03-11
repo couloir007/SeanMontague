@@ -1,0 +1,3 @@
+paragraphs_usage.task:
+  class: \Drupal\Core\Menu\LocalTaskDefault
+  deriver: \Drupal\paragraphs_usage\Plugin\Derivative\ParagraphsUsageLocalTask

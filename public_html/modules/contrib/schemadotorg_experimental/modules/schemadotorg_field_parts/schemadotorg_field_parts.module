@@ -1,0 +1,165 @@
+<?php
+
+/**
+ * @file
+ * Allows Field Parts to be used to create Schema.org relationships.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\schemadotorg\Entity\SchemaDotOrgMapping;
+use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
+use Drupal\schemadotorg_field_parts\SchemaDotOrgFieldPartsManagerInterface;
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ */
+function schemadotorg_field_parts_schemadotorg_mapping_presave(SchemaDotOrgMappingInterface $mapping): void {
+  /** @var \Drupal\schemadotorg_field_parts\SchemaDotOrgFieldPartsManagerInterface $field_parts_manager */
+  $field_parts_manager = \Drupal::service('schemadotorg_field_parts.manager');
+  $field_parts_manager->mappingPresave($mapping);
+}
+
+/* ************************************************************************** */
+// JSON-LD.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_schemadotorg_jsonld_schema_type_entity_load().
+ */
+
+/**
+ * Make sure this is a content entity with a mapping.
+ */
+function schemadotorg_field_parts_schemadotorg_jsonld_schema_type_entity_load(array &$data, EntityInterface $entity, ?SchemaDotOrgMappingInterface $mapping, BubbleableMetadata $bubbleable_metadata): void {
+  if (!$entity instanceof ContentEntityInterface
+    || !$mapping) {
+    return;
+  }
+
+  $config = \Drupal::config('schemadotorg_field_parts.settings');
+  $schema_properties = $mapping->getSchemaProperties();
+  foreach ($schema_properties as $field_name => $schema_property) {
+    if (!isset($data[$schema_property])) {
+      continue;
+    }
+
+    // Add prefix and suffix values to the Schema.property's value.
+    $value = $data[$schema_property];
+    foreach (SchemaDotOrgFieldPartsManagerInterface::PARTS as $part) {
+      $part_field_name = $field_name . '_' . $part;
+      $part_delimiter = $config->get($part . '_delimiter');
+      if ($part_delimiter
+        && $entity->hasField($part_field_name)
+        && $entity->{$part_field_name}->value) {
+        $part_value = $entity->{$part_field_name}->value;
+        if ($part === SchemaDotOrgFieldPartsManagerInterface::PREFIX) {
+          $value = $part_value . $part_delimiter . $value;
+        }
+        else {
+          $value = $value . $part_delimiter . $part_value;
+        }
+      }
+    }
+    $data[$schema_property] = $value;
+  }
+}
+
+/* ************************************************************************** */
+// JSON:API.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_jsonapi_resource_config_presave().
+ */
+function schemadotorg_field_parts_jsonapi_resource_config_presave(EntityInterface $entity): void {
+  /** @var \Drupal\jsonapi_extras\Entity\JsonapiResourceConfig $entity */
+  // Make sure the Schema.org Blueprints JSON:API module is installed.
+  if (!\Drupal::moduleHandler()->moduleExists('schemadotorg_jsonapi')) {
+    return;
+  }
+
+  // Make sure this is a new JSON:API resource config.
+  if (!$entity->isNew()) {
+    return;
+  }
+
+  // Get the Schema.org mapping.
+  [$entity_type_id, $bundle] = explode('--', $entity->id());
+  $mapping = SchemaDotOrgMapping::load("$entity_type_id.$bundle");
+  if (!$mapping) {
+    return;
+  }
+
+  // Enable and update public name for field parts.
+  $resource_fields = $entity->get('resourceFields');
+
+  $schema_properties = $mapping->getSchemaProperties();
+  foreach ($schema_properties as $field_name => $schema_property) {
+    if (!isset($resource_fields[$field_name])) {
+      continue;
+    }
+
+    foreach (SchemaDotOrgFieldPartsManagerInterface::PARTS as $part) {
+      $part_field_name = $field_name . '_' . $part;
+      if (!isset($resource_fields[$part_field_name])) {
+        continue;
+      }
+      $part_public_name = $resource_fields[$field_name]['publicName'] . '_' . $part;
+      $resource_fields[$part_field_name]['publicName'] = $part_public_name;
+      $resource_fields[$part_field_name]['disabled'] = FALSE;
+    }
+  }
+  $entity->set('resourceFields', $resource_fields);
+}
+
+/* ************************************************************************** */
+// Schema.org properties settings form.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::afterBuildDetails
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::formAlter
+ */
+function schemadotorg_field_parts_form_schemadotorg_properties_settings_form_alter(array &$form, FormStateInterface $form_state): void {
+  $form['schemadotorg_field_parts'] = [
+    '#type' => 'details',
+    '#title' => t('Field parts settings'),
+  ];
+  $form['schemadotorg_field_parts']['prefix_properties'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Field prefix properties'),
+    '#description' => t('Enter the Schema.org properties that should support field prefixes.'),
+    '#description_link' => 'properties',
+    '#example' => '
+- schemaProperty:
+- SchemaType--propertyName',
+  ];
+  $form['schemadotorg_field_parts']['suffix_properties'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Field suffix properties'),
+    '#description' => t('Enter the Schema.org properties that should support field suffixes.'),
+    '#description_link' => 'properties',
+    '#example' => '
+- schemaProperty
+- SchemaType--propertyName
+- entity_type_id--bundle--field_name
+- entity_type_id--bundle--propertyName',
+  ];
+  $form['schemadotorg_field_parts']['prefix_delimiter'] = [
+    '#type' => 'textfield',
+    '#title' => t('Field prefix delimiter'),
+    '#description' => t("Enter the field prefix delimiter. Leave blank to not prepend the field prefix the Schema.org property's value."),
+  ];
+  $form['schemadotorg_field_parts']['suffix_delimiter'] = [
+    '#type' => 'textfield',
+    '#title' => t('Field suffix delimiter'),
+    '#description' => t("Enter the field suffix delimiter. Leave blank to not append the field suffix the Schema.org property's value."),
+  ];
+}

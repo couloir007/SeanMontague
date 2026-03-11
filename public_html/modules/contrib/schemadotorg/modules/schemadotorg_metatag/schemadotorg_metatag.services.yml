@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_metatag.manager:
+    class: Drupal\schemadotorg_metatag\SchemaDotOrgMetatagManager
+  Drupal\schemadotorg_metatag\SchemaDotOrgMetatagManagerInterface: '@schemadotorg_metatag.manager'

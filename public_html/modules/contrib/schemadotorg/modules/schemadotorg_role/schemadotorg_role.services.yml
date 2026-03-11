@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_role.field_manager:
+    class: Drupal\schemadotorg_role\SchemaDotOrgRoleFieldManager
+  Drupal\schemadotorg_role\SchemaDotOrgRoleFieldManagerInterface: '@schemadotorg_role.field_manager'

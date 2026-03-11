@@ -1,0 +1,6 @@
+config_rewrite:
+  replace:
+    - settings.allowed_formats
+settings:
+  allowed_formats:
+    - full_html

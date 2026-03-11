@@ -1,0 +1,14 @@
+local_tasks_more:
+  css:
+    component:
+      css/local_tasks_more.css: {}
+  js:
+    js/local_tasks_more.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+
+local_tasks_more.admin:
+  css:
+    component:
+      css/local_tasks_more.admin.css: {}

@@ -1,0 +1,12 @@
+name: 'Local Tasks More Test'
+type: module
+description: 'Test module for Local Tasks More module'
+package: Testing
+core_version_requirement: ^10.3 || ^11
+dependencies:
+  - 'local_tasks_more:local_tasks_more'
+
+# Information added by Drupal.org packaging script on 2024-11-18
+version: '1.0.0-beta2'
+project: 'local_tasks_more'
+datestamp: 1731944868

@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_editorial_notes
+    - paragraphs.paragraphs_type.editorial
+  module:
+    - text
+id: paragraph.editorial.field_editorial_notes
+field_name: field_editorial_notes
+entity_type: paragraph
+bundle: editorial
+label: Notes
+description: 'Enter editorial notes about this document.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - basic_html
+field_type: text_long

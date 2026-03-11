@@ -1,0 +1,38 @@
+uuid: 45f381d8-a56e-4aa0-a5a2-b918814726bb
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.test.field_user_reference_multi
+    - field.field.node.test.field_user_reference_single
+    - node.type.test
+  module:
+    - entity_reference_override
+    - user
+id: node.test.default
+targetEntityType: node
+bundle: test
+mode: default
+content:
+  field_user_reference_multi:
+    weight: 101
+    label: above
+    settings:
+      override_action: title
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_override_label
+    region: content
+  field_user_reference_single:
+    weight: 102
+    label: above
+    settings:
+      override_action: title
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_override_label
+    region: content
+  links:
+    weight: 100
+    region: content
+hidden: {  }

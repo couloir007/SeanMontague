@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_identifier.manager:
+    class: Drupal\schemadotorg_identifier\SchemaDotOrgIdentifierManager
+  Drupal\schemadotorg_identifier\SchemaDotOrgIdentifierManagerInterface: '@schemadotorg_identifier.manager'

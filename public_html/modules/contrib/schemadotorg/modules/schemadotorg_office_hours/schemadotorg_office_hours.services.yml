@@ -1,0 +1,11 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_office_hours.manager:
+    class: Drupal\schemadotorg_office_hours\SchemaDotOrgOfficeHoursManager
+  Drupal\schemadotorg_office_hours\SchemaDotOrgOfficeHoursManagerInterface: '@schemadotorg_office_hours.manager'
+
+  schemadotorg_office_hours.jsonld_manager:
+    class: Drupal\schemadotorg_office_hours\SchemaDotOrgOfficeHoursJsonLdManager
+  Drupal\schemadotorg_office_hours\SchemaDotOrgOfficeHoursJsonLdManagerInterface: '@schemadotorg_office_hours.jsonld_manager'

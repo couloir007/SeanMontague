@@ -1,0 +1,21 @@
+.quotation {
+  margin-bottom: 1em;
+  padding: 1em;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+
+.quotation.align-left,
+.quotation.align-right {
+  width: 50%;
+}
+
+.quotation.align-left {
+  float: left;
+  padding: 0 1em 1em 0;
+}
+
+.quotation.align-right {
+  float: right;
+  padding: 0 0 1em 1em;
+}

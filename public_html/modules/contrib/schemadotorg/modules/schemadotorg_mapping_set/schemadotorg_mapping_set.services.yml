@@ -1,0 +1,12 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_mapping_set.manager:
+    class: Drupal\schemadotorg_mapping_set\SchemaDotOrgMappingSetManager
+  Drupal\schemadotorg_mapping_set\SchemaDotOrgMappingSetManagerInterface: '@schemadotorg_mapping_set.manager'
+
+  schemadotorg_mapping_set.breadcrumb:
+    class: Drupal\schemadotorg_mapping_set\Breadcrumb\SchemaDotOrgMappingSetBreadcrumbBuilder
+    tags:
+      - { name: breadcrumb_builder, priority: 1000 }

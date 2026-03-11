@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_eligibility_to_work_req
+    - node.type.job_posting
+id: node.job_posting.schema_eligibility_to_work_req
+field_name: schema_eligibility_to_work_req
+entity_type: node
+bundle: job_posting
+label: 'Eligibility to work requirements'
+description: 'The legal requirements such as citizenship, visa and other documentation required for an applicant to this job.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

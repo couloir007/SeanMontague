@@ -1,0 +1,6 @@
+config_rewrite:
+  replace:
+    - include_count
+    - default_disabled
+include_count: true
+default_disabled: true

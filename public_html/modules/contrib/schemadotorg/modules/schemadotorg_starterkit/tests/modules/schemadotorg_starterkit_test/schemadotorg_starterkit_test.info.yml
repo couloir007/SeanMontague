@@ -1,0 +1,18 @@
+name: 'Schema.org Blueprints Starter Kit: Test'
+type: module
+description: 'Support module for Schema.org Blueprints Start Kit testing.'
+package: Testing
+dependencies:
+  - 'drupal:user'
+  - 'drupal:node'
+  - 'drupal:views'
+  - 'config_rewrite:config_rewrite'
+  - 'schemadotorg:schemadotorg'
+  - 'schemadotorg:schemadotorg_additional_mappings'
+  - 'schemadotorg:schemadotorg_field_group'
+  - 'schemadotorg:schemadotorg_starterkit'
+
+# Information added by Drupal.org packaging script on 2025-09-16
+version: '1.0.0-alpha36'
+project: 'schemadotorg'
+datestamp: 1758054124

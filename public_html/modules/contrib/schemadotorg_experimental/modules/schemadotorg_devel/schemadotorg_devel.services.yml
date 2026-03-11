@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_devel.generate:
+    class: Drupal\schemadotorg_devel\SchemaDotOrgDevelGenerate
+    Drupal\schemadotorg_devel\SchemaDotOrgDevelGenerateInterface: '@schemadotorg_devel.generate'

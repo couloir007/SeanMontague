@@ -1,0 +1,4 @@
+schemadotorg_demo_api:
+  css:
+    component:
+      css/schemadotorg_demo_api.css: { }

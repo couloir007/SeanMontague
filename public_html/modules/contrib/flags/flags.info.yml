@@ -1,0 +1,11 @@
+name: Flags
+type: module
+description: Provides flags for countries and languages along with simple API.
+core: "8.x"
+core_version_requirement: ^8 || ^9 || ^10
+package: Flags
+
+# Information added by Drupal.org packaging script on 2023-04-15
+version: '8.x-1.0-beta4'
+project: 'flags'
+datestamp: 1681554385

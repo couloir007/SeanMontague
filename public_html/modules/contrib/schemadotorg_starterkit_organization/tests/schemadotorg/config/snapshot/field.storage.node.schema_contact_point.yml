@@ -1,0 +1,35 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - custom_field
+    - node
+id: node.schema_contact_point
+field_name: schema_contact_point
+entity_type: node
+type: custom
+settings:
+  columns:
+    contact_type:
+      name: contact_type
+      type: string
+      length: 255
+    telephone:
+      name: telephone
+      type: string
+      length: 255
+    email:
+      name: email
+      type: string
+      length: 255
+    description:
+      name: description
+      type: string
+      length: 255
+module: custom_field
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_simple_sitemap.manager:
+    class: Drupal\schemadotorg_simple_sitemap\SchemaDotOrgSimpleSitemapManager
+  Drupal\schemadotorg_simple_sitemap\SchemaDotOrgSimpleSitemapManagerInterface: '@schemadotorg_simple_sitemap.manager'

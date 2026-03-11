@@ -1,0 +1,74 @@
+embedded_content.dialog:
+  path: '/embedded-content/dialog/{embedded_content_button}/{filter_format}'
+  defaults:
+    _title_callback: '\Drupal\embedded_content\Form\EmbeddedContentDialogForm::title'
+    _form: '\Drupal\embedded_content\Form\EmbeddedContentDialogForm'
+    uuid: null
+  requirements:
+    _custom_access: '\Drupal\embedded_content\Form\EmbeddedContentDialogForm::checkAccess'
+
+embedded_content.preview:
+  path: '/embedded-content/preview/{editor}'
+  options:
+    parameters:
+      editor:
+        type: 'entity:editor'
+  defaults:
+    _controller: '\Drupal\embedded_content\Controller\EmbeddedContentPreviewController::preview'
+  requirements:
+    _custom_access: '\Drupal\embedded_content\Controller\EmbeddedContentPreviewController::checkAccess'
+    _csrf_token: 'TRUE'
+
+embedded_content.admin:
+  path: 'admin/config/content/embedded-content'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Embedded content'
+  requirements:
+    _permission: 'access administration pages'
+
+entity.embedded_content_button.collection:
+  path: '/admin/config/content/embedded-content/button'
+  defaults:
+    _entity_list: 'embedded_content_button'
+    _title: 'Embedded content configuration'
+  requirements:
+    _permission: 'administer embedded content'
+
+entity.embedded_content_button.add_form:
+  path: '/admin/config/content/embedded-content/button/add'
+  defaults:
+    _entity_form: 'embedded_content_button.add'
+    _title: 'Add an embedded content button'
+  requirements:
+    _permission: 'administer embedded_content'
+
+entity.embedded_content_button.edit_form:
+  path: '/admin/config/content/embedded-content/button/{embedded_content_button}'
+  defaults:
+    _entity_form: 'embedded_content_button.edit'
+    _title: 'Edit an embedded content button'
+  requirements:
+    _permission: 'administer embedded content'
+
+entity.embedded_content_button.delete_form:
+  path: '/admin/config/content/embedded-content/button/{embedded_content_button}/delete'
+  defaults:
+    _entity_form: 'embedded_content_button.delete'
+    _title: 'Delete an embedded content button'
+  requirements:
+    _permission: 'administer embedded content'
+
+embedded_content.embedded_content_button.icon:
+  path: '/embedded-content/icon/{embedded_content_button}'
+  defaults:
+    _controller: 'Drupal\embedded_content\Controller\EmbeddedContentIconController::build'
+  requirements:
+    _custom_access: '\Drupal\embedded_content\Controller\EmbeddedContentIconController::checkAccess'
+
+embedded_content.embedded_content_button.icon_css:
+  path: '/embedded-content/admin-css/{embedded_content_button}'
+  defaults:
+    _controller: 'Drupal\embedded_content\Controller\EmbeddedContentIconController::buildAdminCss'
+  requirements:
+    _custom_access: '\Drupal\embedded_content\Controller\EmbeddedContentIconController::checkAccess'

@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_entity_reference_override.manager:
+    class: Drupal\schemadotorg_entity_reference_override\SchemaDotOrgEntityReferenceOverrideManager
+  Drupal\schemadotorg_entity_reference_override\SchemaDotOrgEntityReferenceOverrideManagerInterface: '@schemadotorg_entity_reference_override.manager'

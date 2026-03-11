@@ -1,0 +1,25 @@
+{
+    "name": "drupal/schemadotorg_starterkit_organization",
+    "type": "drupal-module",
+    "description": "A starter kit that creates Schema.org Organization and LocalBusiness types with views.",
+    "keywords": ["Drupal"],
+    "license": "GPL-2.0+",
+    "homepage": "https://www.drupal.org/project/schemadotorg_starterkit_organization",
+    "minimum-stability": "dev",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/schemadotorg_starterkit_organization",
+        "source": "https://git.drupalcode.org/project/schemadotorg_starterkit_organization"
+    },
+    "require": {
+        "drupal/core": "^10.3 || ^11",
+        "drupal/schemadotorg": "^1.0",
+        "drupal/auto_entitylabel": "^3.0",
+        "drupal/cer": "^5.0",
+        "drupal/config_rewrite": "^1.0",
+        "drupal/custom_field": "^3.0",
+        "drupal/entity_reference_override": "^2.0",
+        "drupal/epp": "^1.0",
+        "drupal/pathauto": "^1.0",
+        "drupal/token": "^1.0"
+    }
+}

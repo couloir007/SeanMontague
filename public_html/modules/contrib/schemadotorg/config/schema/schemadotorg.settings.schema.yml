@@ -1,0 +1,220 @@
+schemadotorg.settings:
+  type: config_object
+  label: 'Schema.org settings'
+  mapping:
+    requirements:
+      type: mapping
+      label: Requirements
+      mapping:
+        recommended_modules:
+          type: boolean
+          label: 'Check for recommended modules'
+    schema_data:
+      type: mapping
+      label: 'Schema.org data'
+      mapping:
+        file:
+          type: string
+          label: 'Schema.org data file or URL'
+    schema_types:
+      type: mapping
+      label: 'Schema.org types'
+      mapping:
+        default_types:
+          type: sequence
+          label: 'Default types'
+          sequence:
+            type: mapping
+            label: 'Default types'
+            mapping:
+              name:
+                type: string
+                label: 'Machine name'
+              label:
+                type: text
+                label: Label
+              description:
+                type: text
+                label: Description
+        default_properties:
+          type: sequence
+          label: 'Default Schema.org type properties'
+          sequence:
+            type: sequence
+            label: 'Schema.org type'
+            sequence:
+              type: string
+              label: 'Schema.org property'
+        default_field_types:
+          type: sequence
+          label: 'Default field types'
+          sequence:
+            type: sequence
+            label: 'Schema.org type'
+            sequence:
+              type: string
+              label: 'Field types'
+        categories:
+          type: sequence
+          label: 'Categories'
+          sequence:
+            type: mapping
+            label: 'Category'
+            mapping:
+              label:
+                type: text
+                label: Label
+              color:
+                type: string
+                label: Color
+              types:
+                type: sequence
+                label: Types
+                sequence:
+                  type: string
+                  label: Type
+    schema_properties:
+      type: mapping
+      label: 'Schema.org properties'
+      mapping:
+        range_includes:
+          type: sequence
+          label: 'Schema.org type/property custom range includes'
+          sequence:
+            type: sequence
+            label: 'Schema.org types/properties'
+            sequence:
+              type: string
+              label: 'Schema.org type'
+        ignored_properties:
+          type: sequence
+          label: 'Ignored properties'
+          sequence:
+            type: string
+            label: 'Schema.org property'
+        default_fields:
+          type: sequence
+          label: 'Default fields'
+          sequence:
+            type: mapping
+            label: 'Default field'
+            mapping:
+              type:
+                type: string
+                label: Type
+              name:
+                type: string
+                label: Name
+              machine_name:
+                type: string
+                label: Machine name
+              label:
+                type: text
+                label: Label
+              description:
+                type: text
+                label: Description
+              unlimited:
+                type: boolean
+                label: 'Unlimited values'
+              required:
+                type: boolean
+                label: 'Required field'
+              max_length:
+                type: integer
+                label: 'Maximum length'
+              default_value:
+                type: ignore
+                label: 'Default value'
+              prefix:
+                type: text
+                label: Prefix
+              suffix:
+                type: text
+                label: Suffix
+              scale:
+                type: integer
+                label: Scale
+              min:
+                type: integer
+                label: Minimum
+              max:
+                type: integer
+                label: Maximum
+              granularity:
+                type: text
+                label: Granularity
+              allowed_formats:
+                type: sequence
+                label: 'Allowed formats'
+                sequence:
+                  type: string
+                  label: 'Allowed format'
+              schema_types:
+                type: sequence
+                label: 'Handler settings: Schema.org types'
+                sequence:
+                  type: string
+                  label: 'Schema.org type'
+              excluded_schema_types:
+                type: sequence
+                label: 'Handler settings: Excluded Schema.org types'
+                sequence:
+                  type: string
+                  label: 'Excluded Schema.org type'
+              ignore_additional_mappings:
+                type: boolean
+                label: 'Ignore additional Schema.org mappings'
+              field_storage_settings:
+                type: ignore
+                label: 'Field storage settings'
+              field_settings:
+                type: ignore
+                label: 'Field settings'
+              widget_id:
+                type: string
+                label: 'Widget ID'
+              widget_settings:
+                type: ignore
+                label: 'Widget settings'
+              formatter_id:
+                type: string
+                label: 'Formatter ID'
+              formatter_settings:
+                type: ignore
+                label: 'Formatter settings'
+              copy:
+                type: boolean
+                label: 'Copy existing field, form, and view settings'
+
+        default_field_formatter_settings:
+          type: sequence
+          label: 'Default field formatter settings'
+          sequence:
+            type: mapping
+            label: 'Default field formatter setting'
+            mapping:
+              label:
+                type: string
+                label: Label
+        default_field_types:
+          type: sequence
+          label: 'Default field types'
+          sequence:
+            type: sequence
+            label: 'Schema.org property'
+            sequence:
+              type: string
+              label: 'Field types'
+        default_field_weights:
+          type: sequence
+          label: 'Default field weights'
+          sequence:
+            type: string
+            label: 'Default field weight'
+        disable_entity_display:
+          type: sequence
+          label: 'Disable entity form/view display'
+          sequence:
+            type: string
+            label: 'Entity form/view display'

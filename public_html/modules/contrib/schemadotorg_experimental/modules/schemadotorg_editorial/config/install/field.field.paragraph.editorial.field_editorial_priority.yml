@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_editorial_priority
+    - paragraphs.paragraphs_type.editorial
+  module:
+    - options
+id: paragraph.editorial.field_editorial_priority
+field_name: field_editorial_priority
+entity_type: paragraph
+bundle: editorial
+label: Priority
+description: "Select the document's editorial review priority."
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

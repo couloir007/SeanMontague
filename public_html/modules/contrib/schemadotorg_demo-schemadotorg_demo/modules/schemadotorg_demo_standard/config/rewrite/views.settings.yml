@@ -1,0 +1,11 @@
+config_rewrite:
+  replace:
+    - ui.show.advanced_column
+    - ui.show.default_display
+    - ui.show.sql_query.enabled
+ui:
+  show:
+    advanced_column: true
+    default_display: true
+    sql_query:
+      enabled: true

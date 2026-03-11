@@ -1,0 +1,187 @@
+/*
+  Restrict form description widths to ~75 characters. Otherwise they can make
+  the dialog wider than necessary when using `fit-content` width – looking awkward.
+*/
+mercury-dialog .form-item__description {
+  max-width: 75ch;
+}
+
+/* Need highly specific selector to override gin styles. */
+.layout-paragraphs-component-form {
+
+  & label,
+  & summary,
+  & p {
+    font-weight: normal;
+    color: var(--me-color-text);
+    font-size: 1em;
+    margin-bottom: .5em;
+  }
+
+  & legend {
+    margin-bottom: 0;
+    text-transform: uppercase;
+    letter-spacing: var(--me-letter-spacing-loose);
+    font-size: .9em;
+  }
+
+  & fieldset {
+    border-radius: 3px;
+
+    & &:hover {
+      border-color: var(--me-color-border-focus);
+    }
+  }
+
+  & .fieldset-wrapper {
+    margin: 0;
+  }
+
+  & .form-item {
+    font-size: 1em;
+  }
+
+  & .description {
+    font-size: .8em;
+    margin: 5px 0;
+  }
+
+  & summary {
+    font-size: .9em;
+    letter-spacing: var(--me-letter-spacing-loose);
+    font-weight: var(--me-font-weight-medium);
+    background-color: var(--me-header-color-background);
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  & details {
+    margin-bottom: 1em;
+    border-color: var(--me-color-border);
+
+    & &:hover {
+      border-color: var(--me-color-border-focus);
+    }
+  }
+
+  & input:not([type="checkbox"]):not([type="radio"]):not(.media-library-item__remove),
+  & textarea,
+  & select {
+    height: auto;
+    line-height: 1.2;
+    border-radius: 3px;
+    padding: 8px 12px;
+  }
+
+  & input,
+  & textarea,
+  & select,
+  & .cke.cke_chrome {
+    border-radius: 3px;
+    border-color: var(--me-color-border);
+
+    &:hover {
+      border-color: var(--me-color-border-focus);
+    }
+  }
+
+  & select {
+    background-image: url(/modules/contrib/mercury_editor/images/icons/icon-down.png);
+    background-position: right 6px top 50%;
+    background-repeat: no-repeat;
+    background-size: 30px 30px;
+    font-size: 1em;
+    padding-right: 30px;
+  }
+
+  & .cke.cke_chrome {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  & .cke.cke_chrome:hover+.filter-wrapper {
+    border-color: var(--me-color-border);
+  }
+
+  & .cke_bottom {
+    border-top: none;
+  }
+
+  & .js-form-type-select:after {
+    content: none;
+  }
+
+  & .filter-wrapper {
+    & .form-item {
+      display: flex;
+      align-items: center;
+      position: relative;
+
+      & label {
+        white-space: nowrap;
+        margin: 0 8px 0 0;
+      }
+
+      & select {
+        width: auto;
+        line-height: 1;
+      }
+
+      & label,
+      & select {
+        font-size: .9em;
+      }
+    }
+
+    & .js-form-type-select:after {
+      top: .5rem;
+    }
+
+    & .filter-help {
+      font-size: .9em;
+      line-height: 2.25;
+    }
+
+    & a {
+      color: var(--me-color-text);
+      text-decoration: underline;
+
+      &:hover {
+        color: #000;
+        text-decoration: none;
+      }
+    }
+
+    & ul {
+      list-style: disc;
+      margin: 10px;
+      padding: 0 16px;
+    }
+  }
+
+  & textarea {
+    margin-bottom: 0;
+    display: block;
+  }
+
+  & .field--type-text-long:hover .cke.cke_chrome,
+  & .field--type-text-long:hover .filter-wrapper,
+  & .js-text-format-wrapper:hover textarea,
+  & .js-text-format-wrapper:hover .filter-wrapper {
+    border-color: var(--me-color-border);
+  }
+
+  & .heading-widget--container-with-size {
+    margin-bottom: 0;
+
+    &>div {
+      flex-grow: 0;
+    }
+
+    &>div:last-child {
+      flex-grow: 0;
+    }
+
+  }
+
+}

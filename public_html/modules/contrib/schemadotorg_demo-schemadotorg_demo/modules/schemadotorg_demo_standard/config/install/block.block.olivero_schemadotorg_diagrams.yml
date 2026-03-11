@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - schemadotorg_diagram
+  theme:
+    - olivero
+id: olivero_schemadotorg_diagrams
+theme: olivero
+region: content
+weight: 10
+provider: null
+plugin: schemadotorg_diagram
+settings:
+  id: schemadotorg_diagram
+  label: 'Schema.org Blueprints Diagrams'
+  label_display: '0'
+  provider: schemadotorg_diagram
+visibility:
+  request_path:
+    id: request_path
+    negate: true
+    pages: "/mercury-editor/*"

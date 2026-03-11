@@ -1,0 +1,5 @@
+config_rewrite: replace
+default_css: true
+force_download: false
+print_engines:
+  pdf_engine: dompdf

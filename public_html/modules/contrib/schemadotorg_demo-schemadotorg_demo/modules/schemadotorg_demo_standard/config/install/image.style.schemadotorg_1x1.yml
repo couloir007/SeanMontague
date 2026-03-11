@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - focal_point
+name: schemadotorg_1x1
+label: 'Schema.org 1x1'
+effects:
+  8ffe70de-f455-4c76-97a8-f36bd2505b64:
+    uuid: 8ffe70de-f455-4c76-97a8-f36bd2505b64
+    id: focal_point_scale_and_crop
+    weight: 1
+    data:
+      width: 1200
+      height: 1200
+      crop_type: focal_point

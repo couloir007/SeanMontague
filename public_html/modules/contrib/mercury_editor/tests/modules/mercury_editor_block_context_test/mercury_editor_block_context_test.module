@@ -1,0 +1,7 @@
+<?php
+
+function mercury_editor_block_context_test_block_loader() {
+  $block = \Drupal\block\Entity\Block::load('olivero_mercuryeditortestblock');
+  $visibility = $block->getVisibility();
+
+}

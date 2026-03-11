@@ -1,0 +1,102 @@
+<?php
+
+/**
+ * @file
+ * Enhance content type integration with the Schema.org Blueprints module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Component\Utility\SortArray;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function schemadotorg_node_module_implements_alter(array &$implementations, string|int $hook): void {
+  if ($hook === 'local_tasks_alter') {
+    $implementation = $implementations['schemadotorg_node'];
+    unset($implementations['schemadotorg_node']);
+    $implementations['schemadotorg_node'] = $implementation;
+  }
+}
+
+/**
+ * Implements hook_local_tasks_alter().
+ */
+function schemadotorg_node_local_tasks_alter(array &$local_tasks): void {
+  $schemadotorg_tasks = [];
+  foreach ($local_tasks as $name => $local_task) {
+    if (str_starts_with($name, 'entity.node.schemadotorg_')) {
+      $schemadotorg_tasks[$name] = $local_task;
+    }
+  }
+  if (count($schemadotorg_tasks) <= 1) {
+    return;
+  }
+
+  uasort($schemadotorg_tasks, [SortArray::class, 'sortByWeightElement']);
+  $local_tasks['entity.node.schemadotorg'] = reset($schemadotorg_tasks);
+  $local_tasks['entity.node.schemadotorg']['title'] = t('Schema.org');
+  $local_tasks['entity.node.schemadotorg']['provider'] = 'schemadotorg_node';
+  $local_tasks['entity.node.schemadotorg']['id'] = 'entity.node.schemadotorg';
+  foreach (array_keys($schemadotorg_tasks) as $name) {
+    $local_tasks[$name]['base_route'] = NULL;
+    $local_tasks[$name]['parent_id'] = 'entity.node.schemadotorg';
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function schemadotorg_node_schemadotorg_mapping_insert(SchemaDotOrgMappingInterface $mapping): void {
+  /** @var \Drupal\schemadotorg_node\SchemaDotOrgNodeManagerInterface $schemadotorg_node_manager */
+  $schemadotorg_node_manager = \Drupal::service('schemadotorg_node.manager');
+  $schemadotorg_node_manager->mappingInsert($mapping);
+}
+
+/* ************************************************************************** */
+// Schema.org types settings form.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::afterBuildDetails
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::formAlter
+ */
+function schemadotorg_node_form_schemadotorg_types_settings_form_alter(array &$form, FormStateInterface $form_state): void {
+  $form['schemadotorg_node'] = [
+    '#type' => 'details',
+    '#title' => t('Node settings'),
+  ];
+  $form['schemadotorg_node']['display_submitted'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Display author and date information'),
+    '#description' => t('Set the default state for displaying the author username and publish date for Schema.org types'),
+    '#description_link' => 'types',
+    '#example' => "
+SchemaType: false
+bundle: true
+",
+  ];
+  $form['schemadotorg_node']['menu_ui'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Menu settings'),
+    '#description' => t('Enter the available menus and parent for Schema.org types'),
+    '#description_link' => 'types',
+    '#access' => \Drupal::moduleHandler()->moduleExists('menu_ui'),
+    '#example' => "
+SchemaType:
+  available_menus: { }
+  parent: ''
+bundle:
+  available_menus: { }
+  parent: ''
+",
+  ];
+
+  $form['schemadotorg_node']['apply'] = [];
+
+}

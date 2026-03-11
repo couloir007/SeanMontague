@@ -1,0 +1,7 @@
+entity.embedded_content.buttons:
+  title: 'Embedded Content: Buttons'
+  parent: system.admin_config_content
+  description: 'Embedded content button configuration entities.'
+  route_name: entity.embedded_content_button.collection
+  menu_name: admin
+  weight: -10

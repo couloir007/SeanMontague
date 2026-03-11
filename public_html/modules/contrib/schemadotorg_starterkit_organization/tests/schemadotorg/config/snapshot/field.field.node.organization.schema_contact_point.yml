@@ -1,0 +1,91 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_contact_point
+    - node.type.organization
+  module:
+    - custom_field
+id: node.organization.schema_contact_point
+field_name: schema_contact_point
+entity_type: node
+bundle: organization
+label: 'Contact points'
+description: 'A contact point for a person or organization.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  add_more_label: ''
+  field_settings:
+    contact_type:
+      type: select
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'Contact type'
+        settings:
+          description: 'A person or organization can have different contact points, for different purposes.'
+          description_display: after
+          required: false
+          empty_option: '- Select -'
+          allowed_values:
+            -
+              key: mobile
+              value: Mobile
+            -
+              key: home
+              value: Home
+            -
+              key: work
+              value: Work
+    telephone:
+      type: text
+      weight: 1
+      check_empty: false
+      widget_settings:
+        label: Telephone
+        settings:
+          description: 'The telephone number.'
+          description_display: after
+          size: 60
+          placeholder: ''
+          maxlength: 255
+          maxlength_js: false
+          prefix: ''
+          suffix: ''
+          required: false
+    email:
+      type: text
+      weight: 2
+      check_empty: false
+      widget_settings:
+        label: Email
+        settings:
+          description: 'Email address.'
+          description_display: after
+          size: 60
+          placeholder: ''
+          maxlength: 255
+          maxlength_js: false
+          prefix: ''
+          suffix: ''
+          required: false
+    description:
+      type: text
+      weight: 3
+      check_empty: false
+      widget_settings:
+        label: Description
+        settings:
+          description: 'A description of the item.'
+          description_display: after
+          size: 60
+          placeholder: ''
+          maxlength: 255
+          maxlength_js: false
+          prefix: ''
+          suffix: ''
+          required: false
+field_type: custom

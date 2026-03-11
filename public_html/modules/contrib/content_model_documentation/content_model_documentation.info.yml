@@ -1,0 +1,18 @@
+name: 'Content Model Documentation'
+type: module
+description: 'Adds admin displays for the site architecture and history.'
+configure: entity.cm_document.config_form
+core_version_requirement: ^10 || ^11
+package: 'Architecture'
+dependencies:
+  - drupal:better_exposed_filters
+  - drupal:config_views
+  - drupal:mermaid_diagram_field
+  - drupal:path_alias
+  - drupal:views
+  - drupal:views_data_export
+
+# Information added by Drupal.org packaging script on 2025-11-30
+version: '1.0.37'
+project: 'content_model_documentation'
+datestamp: 1764475768

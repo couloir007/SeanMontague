@@ -1,0 +1,13 @@
+{
+    "name": "drupal/embedded_content",
+    "type": "drupal-module",
+    "description": "Provides a way to embed rich content into ckeditor without having to grant html editing rights.",
+    "homepage": "http://drupal.org/project/embedded_content",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "drupal/core": "^9 || ^10 || ^11",
+        "symfony/css-selector": "^6 || ^7",
+        "symfony/dom-crawler": "^6 || ^7",
+        "ext-libxml": "*"
+    }
+}

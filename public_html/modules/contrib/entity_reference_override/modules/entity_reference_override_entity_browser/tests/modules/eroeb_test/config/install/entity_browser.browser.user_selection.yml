@@ -1,0 +1,27 @@
+uuid: 538948e1-eb1c-48ef-9bd1-6fd836ddda49
+langcode: en
+status: true
+dependencies:
+  module:
+    - views
+name: user_selection
+label: user_selection
+display: modal
+display_configuration:
+  width: '650'
+  height: '500'
+  link_text: 'Select entities'
+selection_display: no_display
+selection_display_configuration: {  }
+widget_selector: tabs
+widget_selector_configuration: {  }
+widgets:
+  2457d20e-56fa-45d2-9d9d-32ddebbcfd19:
+    settings:
+      view: user_select
+      view_display: entity_browser_1
+      submit_text: 'Select entities'
+    uuid: 2457d20e-56fa-45d2-9d9d-32ddebbcfd19
+    weight: 1
+    label: view
+    id: view

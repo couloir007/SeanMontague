@@ -1,0 +1,16 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  schemadotorg_jsonapi.manager:
+    class: Drupal\schemadotorg_jsonapi\SchemaDotOrgJsonApiManager
+  Drupal\schemadotorg_jsonapi\SchemaDotOrgJsonApiManagerInterface: '@schemadotorg_jsonapi.manager'
+
+  schemadotorg_jsonapi.event_subscriber:
+    class: Drupal\schemadotorg_jsonapi\EventSubscriber\SchemaDotOrgJsonApiEventSubscriber
+
+  schemadotorg_jsonapi.breadcrumb:
+    class: Drupal\schemadotorg_jsonapi\Breadcrumb\SchemaDotOrgJsonApiBreadcrumbBuilder
+    tags:
+      - { name: breadcrumb_builder, priority: 1000 }

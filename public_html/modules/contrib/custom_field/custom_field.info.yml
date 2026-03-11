@@ -1,0 +1,15 @@
+name: Custom Field
+type: module
+description: Create simple, but flexible, multi-value fields without the hassle of entity references.
+core_version_requirement: ^10.3
+package: Field
+dependencies:
+  - drupal:field
+  - drupal:file
+  - drupal:image
+  - drupal:link
+
+# Information added by Drupal.org packaging script on 2025-08-29
+version: '3.1.16'
+project: 'custom_field'
+datestamp: 1756499049

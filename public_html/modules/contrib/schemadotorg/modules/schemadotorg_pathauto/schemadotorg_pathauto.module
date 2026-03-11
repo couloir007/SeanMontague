@@ -1,0 +1,83 @@
+<?php
+
+/**
+ * @file
+ * Automatically enables URL aliases (via pathauto) for Schema.org types.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
+use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
+
+/**
+ * Implements hook_help().
+ */
+function schemadotorg_pathauto_help(string $route_name, RouteMatchInterface $route_match): string|NULL {
+  if ($route_name === 'schemadotorg_pathauto.report') {
+    return '<p>' . t("The <strong>Schema.org: Paths</strong> report summarizes the URL aliases generate via pathauto for Schema.org mappings.") . '</p>';
+  }
+  return NULL;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function schemadotorg_pathauto_schemadotorg_mapping_insert(SchemaDotOrgMappingInterface $mapping): void {
+  /** @var \Drupal\schemadotorg_pathauto\SchemaDotOrgPathautoManagerInterface $schema_pathauto_manager */
+  $schema_pathauto_manager = \Drupal::service('schemadotorg_pathauto.manager');
+  $schema_pathauto_manager->mappingInsert($mapping);
+}
+
+/* ************************************************************************** */
+// Schema.org types settings form.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::afterBuildDetails
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::formAlter
+ */
+function schemadotorg_pathauto_form_schemadotorg_types_settings_form_alter(array &$form, FormStateInterface $form_state): void {
+  $form['schemadotorg_pathauto'] = [
+    '#type' => 'details',
+    '#title' => t('Pathauto settings'),
+  ];
+  $form['schemadotorg_pathauto']['patterns'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Schema.org type pathauto patterns'),
+    '#description' => t('Enter the entity types and Schema.org types that support pathauto.')
+      . '  '
+      . t('Note: Only one Pathauto pattern will created for each item and additional Schema.org types will be added to the Pathauto pattern.'),
+    '#description_link' => 'types',
+    '#token_link' => TRUE,
+    '#example' => "
+node--Thing: '[node:schemadotorg:base-path]/[node:title]'
+",
+  ];
+  $form['schemadotorg_pathauto']['base_paths'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Schema.org type base paths'),
+    '#description' => t('Enter the base paths for Schema.org types.')
+      . '  '
+      . t('Please specify Schema.org type base path from specific types to more general type.'),
+    '#description_link' => 'types',
+    '#token_link' => TRUE,
+    '#example' => "
+SchemaType: base-path
+SchemaType--bundle: base-path
+entity_type_id--SchemaType--bundle: base-path
+bundle--additional_type: base-path
+",
+  ];
+
+  $t_args = [
+    ':href' => Url::fromRoute('pathauto.bulk.update.form')->toString(),
+  ];
+  $form['schemadotorg_pathauto']['apply'] = [
+    '#message' => t('Pathauto patterns applied to all existing Schema.org mappings. You may wish to <a href=":href">bulk regenerate</a> URL aliases.', $t_args),
+  ];
+}

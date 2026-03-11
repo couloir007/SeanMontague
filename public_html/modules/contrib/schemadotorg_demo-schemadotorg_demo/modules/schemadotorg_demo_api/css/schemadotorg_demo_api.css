@@ -1,0 +1,15 @@
+/**
+ * @file
+ * Schema.org API styles.
+ */
+
+/**
+ * Hide the API version from JSON:API.
+ *
+ * Issue #2887220: ReDoc: "(Versioning not supported)"
+ * @see https://www.drupal.org/node/2887220
+ */
+div.swagger-ui .info .title small,
+.api-info-version {
+  display: none;
+}

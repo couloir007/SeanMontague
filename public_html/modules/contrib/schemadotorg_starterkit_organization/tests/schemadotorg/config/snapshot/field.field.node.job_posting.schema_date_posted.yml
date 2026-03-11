@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_date_posted
+    - node.type.job_posting
+  module:
+    - datetime
+id: node.job_posting.schema_date_posted
+field_name: schema_date_posted
+entity_type: node
+bundle: job_posting
+label: 'Date posted'
+description: 'Publication date of an online listing.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

@@ -1,0 +1,137 @@
+{
+    "name": "drupal/recommended-project",
+    "description": "Project template for Drupal projects with a relocated document root",
+    "type": "project",
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://www.drupal.org/project/drupal",
+    "support": {
+        "docs": "https://www.drupal.org/docs/user_guide/en/index.html",
+        "chat": "https://www.drupal.org/node/314178"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "drupal/schemadotorg_demo_profile",
+                "type": "drupal-profile",
+                "version": "1.0.x-dev",
+                "source": {
+                    "url": "https://git.drupalcode.org/project/schemadotorg_demo_profile.git",
+                    "type": "git",
+                    "reference": "1.0.x"
+                }
+            }
+        }
+    ],
+    "require": {
+        "composer/installers": "^2.0",
+        "drupal/core-composer-scaffold": "^10.2",
+        "drupal/core-project-message": "^10.2",
+        "drupal/core-recommended": "^10.2",
+        "drupal/schemadotorg_demo-schemadotorg_demo": "^1.0",
+        "drupal/schemadotorg_demo_profile": "1.0.x-dev",
+        "drush/drush": "^12.1",
+        "wikimedia/composer-merge-plugin": "^2.1"
+    },
+    "conflict": {
+        "drupal/drupal": "*"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "drupal/core-composer-scaffold": true,
+            "drupal/core-project-message": true,
+            "phpstan/extension-installer": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "wikimedia/composer-merge-plugin": true,
+            "cweagans/composer-patches": true,
+            "mnsami/composer-custom-directory-installer": true
+        },
+        "sort-packages": true
+    },
+    "extra": {
+        "drupal-scaffold": {
+            "locations": {
+                "web-root": "web/"
+            }
+        },
+        "installer-paths": {
+            "web/modules/contrib/schemadotorg_demo": [
+                "drupal/schemadotorg_demo-schemadotorg_demo"
+            ],
+            "web/core": [
+                "type:drupal-core"
+            ],
+            "web/libraries/{$name}": [
+                "type:drupal-library",
+                "swagger-api/swagger-ui"
+            ],
+            "web/modules/contrib/{$name}": [
+                "type:drupal-module"
+            ],
+            "web/profiles/contrib/{$name}": [
+                "type:drupal-profile"
+            ],
+            "web/themes/contrib/{$name}": [
+                "type:drupal-theme"
+            ],
+            "drush/Commands/contrib/{$name}": [
+                "type:drupal-drush"
+            ],
+            "web/modules/custom/{$name}": [
+                "type:drupal-custom-module"
+            ],
+            "web/profiles/custom/{$name}": [
+                "type:drupal-custom-profile"
+            ],
+            "web/themes/custom/{$name}": [
+                "type:drupal-custom-theme"
+            ]
+        },
+        "merge-plugin": {
+            "include": [
+                "web/modules/contrib/chosen/composer.libraries.json",
+                "web/modules/contrib/ckeditor_codemirror/composer.libraries.json",
+                "web/modules/contrib/dropzonejs/composer.libraries.json",
+                "web/modules/contrib/schemadotorg/composer.libraries.json",
+                "web/modules/contrib/schemadotorg_experimental/composer.libraries.json",
+                "web/modules/contrib/schemadotorg_demo/modules/schemadotorg_demo_admin/composer.libraries.json",
+                "web/modules/contrib/schemadotorg_demo/modules/schemadotorg_demo_api/composer.libraries.json",
+                "web/modules/contrib/schemadotorg_demo/modules/schemadotorg_demo_devel/composer.libraries.json",
+                "web/modules/contrib/schemadotorg_demo/modules/schemadotorg_demo_headless/composer.libraries.json",
+                "web/modules/contrib/schemadotorg_demo/modules/schemadotorg_demo_layout_paragraphs/composer.libraries.json",
+                "web/modules/contrib/schemadotorg_demo/modules/schemadotorg_demo_standard/composer.libraries.json",
+                "web/modules/contrib/schemadotorg_demo/modules/schemadotorg_demo_translation/composer.libraries.json"
+            ],
+            "merge-extra": true,
+            "merge-extra-deep": true
+        },
+        "drupal-core-project-message": {
+            "include-keys": [
+                "homepage",
+                "support"
+            ],
+            "post-create-project-cmd-message": [
+                "<bg=blue;fg=white>                                                         </>",
+                "<bg=blue;fg=white>  Congratulations, you’ve installed the Drupal codebase  </>",
+                "<bg=blue;fg=white>  from the drupal/recommended-project template!          </>",
+                "<bg=blue;fg=white>                                                         </>",
+                "",
+                "<bg=yellow;fg=black>Next steps</>:",
+                "  * Install the site: https://www.drupal.org/docs/installing-drupal",
+                "  * Read the user guide: https://www.drupal.org/docs/user_guide/en/index.html",
+                "  * Get support: https://www.drupal.org/support",
+                "  * Get involved with the Drupal community:",
+                "      https://www.drupal.org/getting-involved",
+                "  * Remove the plugin that prints this message:",
+                "      composer remove drupal/core-project-message"
+            ]
+        }
+    }
+}

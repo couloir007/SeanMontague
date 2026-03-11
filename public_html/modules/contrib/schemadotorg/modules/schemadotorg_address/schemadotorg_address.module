@@ -1,0 +1,83 @@
+<?php
+
+/**
+ * @file
+ * Allows an address field to be used to create a http://schema.org/PostalAddress.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\BubbleableMetadata;
+
+/**
+ * Implements hook_schemadotorg_property_field_alter().
+ */
+function schemadotorg_address_schemadotorg_property_field_alter(
+  string $schema_type,
+  string $schema_property,
+  array &$field_storage_values,
+  array &$field_values,
+  ?string &$widget_id,
+  array &$widget_settings,
+  ?string &$formatter_id,
+  array &$formatter_settings,
+): void {
+  /** @var \Drupal\schemadotorg_address\SchemaDotOrgAddressManagerInterface $schemadotorg_address_manager */
+  $schemadotorg_address_manager = \Drupal::service('schemadotorg_address.manager');
+  $schemadotorg_address_manager->propertyFieldAlter(
+    $schema_type,
+    $schema_property,
+    $field_storage_values,
+    $field_values,
+    $widget_id,
+    $widget_settings,
+    $formatter_id,
+    $formatter_settings
+  );
+}
+
+/**
+ * Implements hook_schemadotorg_jsonld_schema_property_alter().
+ */
+function schemadotorg_address_schemadotorg_jsonld_schema_property_alter(mixed &$value, FieldItemInterface $item, BubbleableMetadata $bubbleable_metadata): void {
+  /** @var \Drupal\schemadotorg_address\SchemaDotOrgAddressJsonLdManagerInterface $schemadotorg_address_jsonld_manager */
+  $schemadotorg_address_jsonld_manager = \Drupal::service('schemadotorg_address.jsonld_manager');
+  $schemadotorg_address_jsonld_manager->schemaPropertyAlter($value, $item, $bubbleable_metadata);
+}
+
+/* ************************************************************************** */
+// Schema.org properties settings form.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::afterBuildDetails
+ * @see \Drupal\schemadotorg\Form\SchemaDotOrgSettingsFormBase::formAlter
+ */
+function schemadotorg_address_form_schemadotorg_properties_settings_form_alter(array &$form, FormStateInterface $form_state): void {
+  $form['schemadotorg_address'] = [
+    '#type' => 'details',
+    '#title' => t('Address settings'),
+  ];
+  $form['schemadotorg_address']['field_overrides'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Field overrides'),
+    '#description' => t('Enter Schema.org properties with address field properties that should be overridden.'),
+    '#description_link' => 'types',
+    '#example' => '
+propertyName:
+  givenName: optional
+  additionalName: hidden
+  familyName: required
+  organization: optional
+  addressLine1: required
+  postalCode: required
+  locality: required
+  administrativeArea: required
+  countryCode: required
+',
+  ];
+}

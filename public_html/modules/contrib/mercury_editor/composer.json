@@ -1,0 +1,32 @@
+{
+  "name": "drupal/mercury_editor",
+  "type": "drupal-module",
+  "description": "Mercury Editor",
+  "keywords": ["Drupal"],
+  "homepage": "https://drupal.org/project/mercury_editor",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/mercury_editor",
+    "source": "https://git.drupalcode.org/project/mercury_editor"
+  },
+  "license": "GPL-2.0+",
+  "minimum-stability": "dev",
+  "repositories": [
+    {
+      "type": "package",
+      "package": {
+          "name": "ckeditor-plugin/editorplaceholder",
+          "version": "4.17",
+          "type": "ckeditor-plugin",
+          "dist": {
+              "url": "https://download.ckeditor.com/editorplaceholder/releases/editorplaceholder_4.17.2.zip",
+              "type": "zip"
+          }
+      }
+    }
+  ],
+  "require": {
+    "drupal/layout_paragraphs": ">=2.1 <2.2",
+    "drupal/style_options": "^1 || ^2",
+    "php": ">=8.1"
+  }
+}

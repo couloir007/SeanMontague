@@ -1,0 +1,17 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  schemadotorg_recipe.manager:
+    class: Drupal\schemadotorg_recipe\SchemaDotOrgRecipeManager
+  Drupal\schemadotorg_recipe\SchemaDotOrgRecipeManagerInterface: '@schemadotorg_recipe.manager'
+
+  schemadotorg_recipe.event_subscriber:
+    class: Drupal\schemadotorg_recipe\EventSubscriber\SchemaDotOrgRecipeEventSubscriber
+  Drupal\schemadotorg_recipe\EventSubscriber\SchemaDotOrgRecipeEventSubscriberInterface: '@schemadotorg_recipe.event_subscriber'
+
+  schemadotorg_recipe.breadcrumb:
+    class: Drupal\schemadotorg_recipe\Breadcrumb\SchemaDotOrgRecipeBreadcrumbBuilder
+    tags:
+      - { name: breadcrumb_builder, priority: 1000 }

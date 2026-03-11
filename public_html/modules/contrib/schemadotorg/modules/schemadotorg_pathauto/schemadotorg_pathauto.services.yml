@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_pathauto.manager:
+    class: Drupal\schemadotorg_pathauto\SchemaDotOrgPathautoManager
+  Drupal\schemadotorg_pathauto\SchemaDotOrgPathautoManagerInterface: '@schemadotorg_pathauto.manager'

@@ -1,0 +1,245 @@
+<?php
+
+/**
+ * @file
+ * Enables and configure the Gin admin theme and provides admin UI enhancements.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+use Drupal\schemadotorg\Entity\SchemaDotOrgMapping;
+
+/* ************************************************************************** */
+// CSS/JS.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_page_attachments().
+ */
+function schemadotorg_demo_admin_page_attachments(array &$page): void {
+  // Attach CSS that fixes minor UI issues with minor UX enhancements.
+  /** @var \Drupal\Core\Theme\ThemeManagerInterface $theme_manager */
+  $theme_manager = \Drupal::service('theme.manager');
+  $theme_name = $theme_manager->getActiveTheme()->getName();
+  if (in_array($theme_name, ['claro', 'gin'])) {
+    $page['#attached']['library'][] = 'schemadotorg_demo_admin/schemadotorg_demo_admin';
+  }
+
+  // Admin toolbar enhancements.
+  $page['#attached']['library'][] = 'schemadotorg_demo_admin/schemadotorg_demo_admin.toolbar';
+}
+
+/* ************************************************************************** */
+// Schema.org enhancements.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function schemadotorg_demo_admin_form_schemadotorg_report_relationships_filter_form_alter(array &$form, FormStateInterface $form_state, string $form_id): void {
+  // Wrap filter form in an <div> to prevent Gin Admin theme form wrapper from
+  // appearing.
+  // @see /admin/reports/schemadotorg/docs/relationships/targets
+  $form += ['#prefix' => '<div>', '#suffix' => '</div>'];
+}
+
+/* ************************************************************************** */
+// Toolbar enhancements.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_toolbar_alter().
+ */
+function schemadotorg_demo_admin_toolbar_alter(array &$items): void {
+  // Change admin toolbar search placeholder text.
+  $search =& NestedArray::getValue($items, ['administration_search', 'tab', 'search']);
+  if ($search) {
+    $search['#attributes']['placeholder'] = t('Quick search');
+  }
+
+  // Issue #3325299: Missing icon in toolbar.
+  // @see masquerade_toolbar()
+  if (NestedArray::keyExists($items, ['masquerade_switch_back', 'tab'])) {
+    $items['masquerade_switch_back']['tab']['#attributes'] = [
+      'class' => [
+        'toolbar-icon',
+        'toolbar-icon-masquerade',
+      ],
+    ];
+  }
+
+  // Alter secondary toolbar when navigation module is enabled.
+  if (\Drupal::moduleHandler()->moduleExists('navigation')) {
+    // Remove shortcuts from toolbar when navigation is enabled.
+    unset($items['shortcuts']);
+  }
+}
+
+/* ************************************************************************** */
+// Dashboard enhancements.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_preprocess_HOOK().
+ *
+ * Move Moderation Dashboard from 'User' to 'Dashboards' toolbar links.
+ *
+ * @see moderation_dashboard_preprocess_links__toolbar_user()
+ */
+function schemadotorg_demo_admin_preprocess_links__toolbar_user(array &$variables): void {
+  unset($variables['links']['moderation_dashboard']);
+}
+
+/* ************************************************************************** */
+// Views enhancements.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function schemadotorg_demo_admin_form_views_exposed_form_alter(array &$form, FormStateInterface $form_state): void {
+  // Only alter the exposed filter form for admin routes.
+  if (!\Drupal::service('router.admin_context')->isAdminRoute()) {
+    return;
+  }
+
+  // Add custom .schemadotorg-demo-admin-views-exposed-form to all exposed filter forms
+  // via the admin UI/UX.
+  $form['#attributes']['class'][] = 'schemadotorg-demo-admin-views-exposed-form';
+}
+
+/* ************************************************************************** */
+// Form enhancements.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function schemadotorg_demo_admin_form_node_form_alter(array &$form, FormStateInterface $form_state, string $form_id): void {
+  // Close the 'URL alias' details widget in the sidebar.
+  $path_widget =& NestedArray::getValue($form, ['path', 'widget', '0']);
+  $path_widget['#open'] = FALSE;
+
+  // Allow the state of details widget to be tracked.
+  // @see schemadotorg_demo_admin_preprocess_details().
+  $form['#attached']['library'][] = 'schemadotorg/schemadotorg.details';
+}
+
+/**
+ * Implements hook_preprocess_details().
+ */
+function schemadotorg_demo_admin_preprocess_details(array &$variables): void {
+  // Allow the state of details widget to be tracked.
+  // @see schemadotorg_demo_admin_form_node_form_alter
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  if ($route_name && in_array($route_name, ['node.add', 'entity.node.edit_form', 'mercury_editor.editor'])) {
+    $id = $variables['attributes']['id'] ?? $variables['element']['#id'] ?? NULL;
+    if ($id) {
+      $variables['attributes']['data-schemadotorg-details-key'] = 'node-edit-form--' . $id;
+    }
+  }
+}
+
+/* ************************************************************************** */
+// Meta tag enhancements.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_field_widget_single_element_form_alter().
+ */
+function schemadotorg_demo_admin_field_widget_single_element_metatag_firehose_form_alter(array &$element, FormStateInterface $form_state, array $context): void {
+  // @see https://www.drupal.org/project/metatag/issues/3108108
+  /** @var \Drupal\metatag\Plugin\Field\FieldType\MetatagFieldItemList $items */
+  $items = $context['items'];
+  $entity = $items->getEntity();
+  if (!SchemaDotOrgMapping::loadByEntity($entity)) {
+    return;
+  }
+
+  // Move meta tag markup elements in the meta tag detail description.
+  $active_theme_name = \Drupal::service('theme.manager')->getActiveTheme()->getName();
+  if ($active_theme_name === 'gin') {
+    $description_keys = [
+      'preamble' => 'preamble',
+      'intro_text' => 'intro_text',
+      'tokens' => 'tokens',
+    ];
+    $element['#description'] = array_intersect_key($element, $description_keys);
+    $element = array_diff_key($element, $description_keys);
+  }
+
+  $hide_groups_details = TRUE;
+  $allowed_metatags = ['title', 'description', 'keywords', 'robots'];
+  $allowed_robots = ['noindex'];
+  _schemadotorg_demo_admin_field_widget_single_element_metatag_firehose_form_alter_recursive($element, $hide_groups_details, $allowed_metatags, $allowed_robots);
+}
+
+/**
+ * Recurse through the metatag widget and only display allowed metatags.
+ */
+function _schemadotorg_demo_admin_field_widget_single_element_metatag_firehose_form_alter_recursive(array &$elements, bool $hide_groups_details, array $allowed_metatags, array $allowed_robots): void {
+  foreach (Element::children($elements) as $key) {
+    $element =& $elements[$key];
+    $type = $element['#type'] ?? '';
+
+    if (!in_array($key, $allowed_metatags)
+      && $type !== 'details') {
+      $element['#access'] = FALSE;
+    }
+    elseif ($key === 'robots') {
+      if ($allowed_robots) {
+        foreach (Element::children($element['robots-keyed']) as $child_key) {
+          $element['robots-keyed'][$child_key]['#access'] = FALSE;
+        }
+
+        $allowed_robots = array_combine($allowed_robots, $allowed_robots);
+        $robots_element =& $element['robots'];
+        $robots_element['#options'] = array_intersect_key($robots_element['#options'], $allowed_robots);
+        foreach (Element::children($robots_element) as $robots_key) {
+          unset($robots_element[$robots_key]);
+        }
+      }
+    }
+    else {
+      if ($type === 'details' && $hide_groups_details) {
+        $element['#type'] = 'container';
+      }
+      _schemadotorg_demo_admin_field_widget_single_element_metatag_firehose_form_alter_recursive($element, $hide_groups_details, $allowed_metatags, $allowed_robots);
+    }
+  }
+}
+
+/* ************************************************************************** */
+// Content moderation sidebar enhancements.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_moderation_sidebar_alter().
+ */
+function schemadotorg_demo_admin_moderation_sidebar_alter(array &$build, EntityInterface $entity): void {
+  // Remove secondary actions which repeat the visible local tasks.
+  unset($build['actions']['secondary']);
+}
+
+/* ************************************************************************** */
+// Entity embed enhancements.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function schemadotorg_demo_admin_form_entity_embed_dialog_alter(array &$form, FormStateInterface $form_state): void {
+  // Disable captioning and align attributes.
+  if (isset($form['attributes'])) {
+    if (isset($form['attributes']['data-caption'])) {
+      $form['attributes']['data-caption']['#access'] = FALSE;
+    }
+    if (isset($form['attributes']['data-align'])) {
+      $form['attributes']['data-align']['#access'] = FALSE;
+    }
+  }
+}

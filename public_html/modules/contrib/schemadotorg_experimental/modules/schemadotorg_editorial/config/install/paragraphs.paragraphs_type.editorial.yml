@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies: {  }
+id: editorial
+label: 'Editorial information'
+icon_uuid: null
+icon_default: null
+description: 'Track the editorial decisions and status of a document.'
+behavior_plugins: {  }

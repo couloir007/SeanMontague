@@ -1,0 +1,15 @@
+name: Ray Debugger AlpineJS
+description: Use the Ray Debugging tool with AlpineJS.
+type: module
+core_version_requirement: ">=8.8"
+package: Development
+dependencies:
+  - drupal:ray_debugger
+libraries:
+  - ray_debugger_alpinejs/alpinejs_ray
+  - ray_debugger_alpinejs/alpinejs_ray_init
+
+# Information added by Drupal.org packaging script on 2023-06-13
+version: '1.0.4'
+project: 'ray_debugger'
+datestamp: 1686699075

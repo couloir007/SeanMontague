@@ -1,0 +1,14 @@
+schemadotorg_demo_admin:
+  css:
+    component:
+      css/schemadotorg_demo_admin.css: { }
+  js:
+    js/schemadotorg_demo_admin.js: { }
+  dependencies:
+    - core/drupal
+    - core/once
+
+schemadotorg_demo_admin.toolbar:
+  css:
+    component:
+      css/schemadotorg_demo_admin.toolbar.css: { }

@@ -1,0 +1,12 @@
+{
+  "require-dev": {
+    "drupal/devel": "^5.0"
+  },
+  "extra": {
+    "patches": {
+      "drupal/core": {
+        "Issue #2949573: Call to a member function getCacheTags() on null ": "https://www.drupal.org/files/issues/2021-12-23/core-getCacheTags-null-2949573-26.patch"
+      }
+    }
+  }
+}

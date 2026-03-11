@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  schemadotorg_ui.route_subscriber:
+    class: Drupal\schemadotorg_ui\Routing\SchemaDotOrgRouteSubscriber

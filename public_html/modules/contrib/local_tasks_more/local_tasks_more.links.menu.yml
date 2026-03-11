@@ -1,0 +1,5 @@
+local_tasks_more.settings:
+  title: Local Tasks More
+  description: Configure local tasks and more
+  parent: system.admin_config_ui
+  route_name: local_tasks_more.settings

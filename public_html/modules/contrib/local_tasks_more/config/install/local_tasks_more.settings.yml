@@ -1,0 +1,14 @@
+langcode: und
+primary:
+  limit: 5
+  threshold: 2
+secondary:
+  limit: 5
+  threshold: 2
+base_routes:
+  - 'entity.node.canonical'
+alter_local_tasks:
+  - plugin_id: entity.node.delete_form
+    status: false
+  - plugin_id: convert_bundles.entities:entity.node.convert_bundles
+    title: Convert

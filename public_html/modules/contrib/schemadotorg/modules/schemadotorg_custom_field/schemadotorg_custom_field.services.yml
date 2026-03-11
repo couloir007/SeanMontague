@@ -1,0 +1,11 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_custom_field.manager:
+    class: Drupal\schemadotorg_custom_field\SchemaDotOrgCustomFieldManager
+  Drupal\schemadotorg_custom_field\SchemaDotOrgCustomFieldManagerInterface: '@schemadotorg_custom_field.manager'
+
+  schemadotorg_custom_field.jsonld_manager:
+    class: Drupal\schemadotorg_custom_field\SchemaDotOrgCustomFieldJsonLdManager
+  Drupal\schemadotorg_custom_field\SchemaDotOrgCustomFieldJsonLdManagerInterface: '@schemadotorg_custom_field.jsonld_manager'

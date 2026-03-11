@@ -1,0 +1,31 @@
+uuid: 543f8c67-52ce-4c12-8a39-efe29fd235b4
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_user_reference_single
+    - node.type.test
+  module:
+    - entity_reference_override
+id: node.test.field_user_reference_single
+field_name: field_user_reference_single
+entity_type: node
+bundle: test
+label: user_reference_single
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:user'
+  handler_settings:
+    include_anonymous: false
+    filter:
+      type: _none
+    target_bundles: null
+    sort:
+      field: _none
+    auto_create: false
+  override_label: 'Custom text'
+field_type: entity_reference_override

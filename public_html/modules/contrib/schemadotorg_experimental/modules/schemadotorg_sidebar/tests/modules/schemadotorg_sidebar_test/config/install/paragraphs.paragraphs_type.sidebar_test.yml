@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies: {  }
+id: sidebar_test
+label: 'Sidebar test'
+icon_uuid: null
+icon_default: null
+description: 'This is a test of paragraph type being used as a sidebar.'
+behavior_plugins: {  }

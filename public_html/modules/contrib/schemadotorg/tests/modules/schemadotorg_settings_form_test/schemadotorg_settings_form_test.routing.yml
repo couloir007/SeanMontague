@@ -1,0 +1,17 @@
+schemadotorg_settings_form_test.simple_form:
+  path: '/schemadotorg-settings-simple-form-test'
+  defaults:
+    _title: 'Schema.org Settings Simple Form Test'
+    _form: 'Drupal\schemadotorg_settings_form_test\Form\SchemaDotOrgSettingsSimpleTestForm'
+  requirements:
+    # Needs to be accessed by an anonymous user.
+    _access: 'TRUE'
+
+schemadotorg_settings_form_test.custom_form:
+  path: '/schemadotorg-settings-custom-form-test'
+  defaults:
+    _title: 'Schema.org Settings Custom Form Test'
+    _form: 'Drupal\schemadotorg_settings_form_test\Form\SchemaDotOrgSettingsCustomTestForm'
+  requirements:
+    # Needs to be accessed by an anonymous user.
+    _access: 'TRUE'

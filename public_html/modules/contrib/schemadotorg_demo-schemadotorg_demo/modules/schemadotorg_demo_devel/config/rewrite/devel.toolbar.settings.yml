@@ -1,0 +1,12 @@
+config_rewrite:
+  replace:
+    - toolbar_items
+toolbar_items:
+  - devel.cache_clear
+  - devel.configs_list
+  - devel.container_info.service
+  - devel.route_info.item
+  - devel.admin_settings_link
+  - devel.entity_info_page
+  - devel.plugin_type_info
+  - devel.route_info

@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_node.manager:
+    class: Drupal\schemadotorg_node\SchemaDotOrgNodeManager
+  Drupal\schemadotorg_node\SchemaDotOrgNodeManagerInterface: '@schemadotorg_node.manager'

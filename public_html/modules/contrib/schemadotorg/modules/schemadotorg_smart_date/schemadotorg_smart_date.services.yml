@@ -1,0 +1,12 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_smart_date.manager:
+    class: Drupal\schemadotorg_smart_date\SchemaDotOrgSmartDateManager
+  Drupal\schemadotorg_smart_date\SchemaDotOrgSmartDateManagerInterface: '@schemadotorg_smart_date.manager'
+
+  schemadotorg_smart_date.jsonld_manager:
+    class: Drupal\schemadotorg_smart_date\SchemaDotOrgSmartDateJsonLdManager
+  Drupal\schemadotorg_smart_date\SchemaDotOrgSmartDateJsonLdManagerInterface: '@schemadotorg_smart_date.jsonld_manager'
+

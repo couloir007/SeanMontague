@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - focal_point
+name: node_browser
+label: 'Node browser (200x200)'
+effects:
+  22404c39-b7d4-4f02-b004-176350193f7f:
+    uuid: 22404c39-b7d4-4f02-b004-176350193f7f
+    id: focal_point_scale_and_crop
+    weight: 1
+    data:
+      width: 200
+      height: 200
+      crop_type: focal_point

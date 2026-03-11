@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_allowed_formats.manager:
+    class: Drupal\schemadotorg_allowed_formats\SchemaDotOrgAllowedFormatsManager
+  Drupal\schemadotorg_allowed_formats\SchemaDotOrgAllowedFormatsManagerInterface: '@schemadotorg_allowed_formats.manager'

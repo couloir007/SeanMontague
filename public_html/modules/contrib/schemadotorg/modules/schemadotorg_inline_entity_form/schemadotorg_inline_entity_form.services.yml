@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+
+  schemadotorg_inline_entity_form.manager:
+    class: Drupal\schemadotorg_inline_entity_form\SchemaDotOrgInlineEntityFormManager
+  Drupal\schemadotorg_inline_entity_form\SchemaDotOrgInlineEntityFormManagerInterface: '@schemadotorg_inline_entity_form.manager'

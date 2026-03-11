@@ -1,0 +1,9 @@
+name: Unpublished 404
+type: module
+core_version_requirement: ^8.8 || ^9 || ^10 || ^11
+description: Replaces 403 Forbidden responses with 404 Not Found responses if an unauthorized user attempts to visit an unpublished node.
+
+# Information added by Drupal.org packaging script on 2025-01-22
+version: '2.0.3'
+project: 'unpublished_404'
+datestamp: 1737506849

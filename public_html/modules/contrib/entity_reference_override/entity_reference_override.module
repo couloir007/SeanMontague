@@ -1,0 +1,61 @@
+<?php
+
+/**
+ * @file
+ * Contains entity_reference_override.module..
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function entity_reference_override_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the entity_reference_override module.
+    case 'help.page.entity_reference_override':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('The Entity Reference Override module provides an entity reference field paired with an accompanying text field which can be used to replace, on the referencing entities representation of the referenced entity, certain aspects of the referenced entity.') . '</p>';
+      $output .= '<p>' . t('Any one of these elements on the referenced entity can be overridden by the referencing entity:') . '</p>';
+      $output .= '<ul>';
+      $output .= '<li>' . t('Title') . '</li>';
+      $output .= '<li>' . t('Classes added to rendered entities') . '</li>';
+      $output .= '<li>' . t('Display mode for the rendered entity') . '</li>';
+      $output .= '<li>' . t('Any text field (experimental)') . '</li>';
+      $output .= '</ul>';
+      $output .= '<p>' . t('Note that only one of these is overridable at a time, as this module provides only one text field.') . '</p>';
+      $output .= '<h3>' . t('Usage') . '</h3>';
+      $output .= '<p>' . t('Go to the <em>Manage fields</em> tab of any fieldable entity, for example <em>Administration » Structure » Content types » Article » Manage fields</em> for the article content type.  Press <strong>Add field</strong>, and using the <strong>Add a new field</strong> dropdown, scrolling to under <strong>Reference</strong>, select "Entity reference w/custom text", provide a label for your entity referencing field, and then press <strong>Save and continue</strong>.') . '</p>';
+      $output .= '<p>' . t('On the resulting page, select what type of item to reference and allowed number of values as you would for any entity reference field, and <strong>Save field settings</strong>.') . '</p>';
+      $output .= '<p>' . t('On the <strong>Manage Form Display</strong> page, choose the field to override.') . '</p>';
+      $output .= '<h3>' . t('Project page and issues') . '</h3>';
+      $output .= '<p>' . t('Please <a href="https://www.drupal.org/project/entity_reference_override">visit the project page</a> for more information and <a href="https://www.drupal.org/project/issues/entity_reference_override?categories=All">review the open issues</a> if you have a problem or feature request.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_entity_usage_track_info().
+ */
+function entity_reference_override_entity_usage_track_info_alter(&$info) {
+  // Track usage of entities related in entity_reference_override fields.
+  // @see https://www.drupal.org/project/entity_usage
+  if (!empty($info['entity_reference']['field_types'])) {
+    $info['entity_reference']['field_types'][] = 'entity_reference_override';
+  }
+}
+
+/**
+ * Use validation to clean up our form data.
+ */
+function entity_reference_override_validate_custom_text($element, FormStateInterface &$form_state, $form) {
+  $field_name = $element['#parents'][0];
+  $delta = $element['#parents'][1];
+  $field_values = $form_state->getValue($field_name);
+  $form_state->setValue([$field_name, $delta, 'override'], $field_values[$delta]['override']['value']);
+  $form_state->setValue([$field_name, $delta, 'override_format'], $field_values[$delta]['override']['format']);
+}

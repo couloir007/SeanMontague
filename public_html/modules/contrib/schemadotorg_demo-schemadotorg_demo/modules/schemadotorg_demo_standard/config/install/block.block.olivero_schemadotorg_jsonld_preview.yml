@@ -1,0 +1,24 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - schemadotorg_jsonld_preview
+  theme:
+    - olivero
+id: olivero_schemadotorg_jsonld_preview
+theme: olivero
+region: content
+weight: 12
+provider: null
+plugin: schemadotorg_jsonld_preview
+settings:
+  id: schemadotorg_jsonld_preview
+  label: 'Schema.org Blueprints JSON-LD Preview'
+  label_display: '0'
+  provider: schemadotorg_jsonld_preview
+  format: jsonld
+visibility:
+  request_path:
+    id: request_path
+    negate: true
+    pages: "/mercury-editor/*\r\n/node/*/mercury-editor-preview\r\n/entity-browser/*"

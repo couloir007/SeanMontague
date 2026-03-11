@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file
+ * Provides a demo of the Schema.org Blueprints module used as a headless backend.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Session\AccountInterface;
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ */
+function schemadotorg_demo_headless_base_field_override_access(EntityInterface $entity, string $operation, AccountInterface $account): AccessResultInterface {
+  return AccessResult::allowedIf($operation === 'view' && in_array('schemadotorg_demo_headless', $account->getRoles()));
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ */
+function schemadotorg_demo_headless_field_config_access(EntityInterface $entity, string $operation, AccountInterface $account): AccessResultInterface {
+  return AccessResult::allowedIf($operation === 'view' && in_array('schemadotorg_demo_headless', $account->getRoles()));
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ */
+function schemadotorg_demo_headless_node_type_access(EntityInterface $entity, string $operation, AccountInterface $account): AccessResultInterface {
+  return AccessResult::allowedIf($operation === 'view' && in_array('schemadotorg_demo_headless', $account->getRoles()));
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ */
+function schemadotorg_demo_headless_schemadotorg_mapping_access(EntityInterface $entity, string $operation, AccountInterface $account): AccessResultInterface {
+  return AccessResult::allowedIf($operation === 'view' && in_array('schemadotorg_demo_headless', $account->getRoles()));
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ */
+function schemadotorg_demo_headless_entity_access(EntityInterface $entity, string $operation, AccountInterface $account): AccessResultInterface {
+  return AccessResult::allowedIf($operation === 'view' && in_array('schemadotorg_demo_headless', $account->getRoles()));
+}

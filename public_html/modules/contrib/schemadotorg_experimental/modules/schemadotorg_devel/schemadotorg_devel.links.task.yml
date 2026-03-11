@@ -1,0 +1,8 @@
+schemadotorg_devel.node.add:
+  title: 'Add content'
+  route_name: node.add
+  base_route: node.add
+schemadotorg_devel.node.generate:
+  title: 'Generate content'
+  route_name: node.add
+  base_route: node.add

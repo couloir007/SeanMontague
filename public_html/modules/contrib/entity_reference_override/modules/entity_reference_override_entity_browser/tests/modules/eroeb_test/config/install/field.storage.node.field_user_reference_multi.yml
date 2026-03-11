@@ -1,0 +1,21 @@
+uuid: edeeed2b-f658-4bb8-b095-f7bfa03db7f3
+langcode: en
+status: true
+dependencies:
+  module:
+    - entity_reference_override
+    - node
+    - user
+id: node.field_user_reference_multi
+field_name: field_user_reference_multi
+entity_type: node
+type: entity_reference_override
+settings:
+  target_type: user
+module: entity_reference_override
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

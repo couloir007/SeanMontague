@@ -1,0 +1,93 @@
+.lpb-component-list__group-label {
+  font-size: .8em;
+  text-transform: uppercase;
+  color: #666;
+}
+.lpb-component-list__group--content {
+  label {
+    font-weight: bold;
+    color: gray;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    margin-bottom: 10px;
+  }
+}
+.lpb-component-list__item a::before {
+    content: ' ';
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin-right: 10px;
+    background: url('../../images/menu-icons/icon-default.png');
+  }
+.lpb-component-list__item.type-section a::before {
+    background: url('../../images/menu-icons/icon-section.png');
+  }
+.lpb-component-list__item.type-text a::before {
+    background: url('../../images/menu-icons/icon-text.png');
+  }
+.lpb-component-list__item.type-image a::before {
+    background: url('../../images/menu-icons/icon-image.png');
+  }
+.lpb-component-list__item.type-image__image_download a::before {
+    background: url('../../images/menu-icons/icon-image-download.png');
+  }
+.lpb-component-list__item.type-image__image_link a::before {
+    background: url('../../images/menu-icons/icon-image-link.png');
+  }
+.lpb-component-list__item.type-gallery a::before {
+    background: url('../../images/menu-icons/icon-image-gallery.png');
+  }
+.lpb-component-list__item.type-video a::before {
+    background: url('../../images/menu-icons/icon-video.png');
+  }
+.lpb-component-list__item.type-accordion a::before {
+    background: url('../../images/menu-icons/icon-accordion.png');
+  }
+.lpb-component-list__item.type-cta a::before {
+    background: url('../../images/menu-icons/icon-call-to-action.png');
+  }
+.lpb-component-list__item.type-cta__image a::before {
+    background: url('../../images/menu-icons/icon-call-to-action-image.png');
+  }
+.lpb-component-list__item.type-cta__image_simple a::before {
+    background: url('../../images/menu-icons/icon-call-to-action-image.png');
+  }
+.lpb-component-list__item.type-date_location a::before {
+    background: url('../../images/menu-icons/icon-date-and-location.png');
+  }
+.lpb-component-list__item.type-heading a::before {
+    background: url('../../images/menu-icons/icon-heading.png');
+  }
+.lpb-component-list__item.type-hr a::before {
+    background: url('../../images/menu-icons/icon-horizontal-rule.png');
+  }
+.lpb-component-list__item.type-iframe a::before {
+    background: url('../../images/menu-icons/icon-iframe.png');
+  }
+.lpb-component-list__item.type-logo_list a::before {
+    background: url('../../images/menu-icons/icon-logo-list.png');
+  }
+.lpb-component-list__item.type-person a::before {
+    background: url('../../images/menu-icons/icon-person.png');
+  }
+.lpb-component-list__item.type-quote a::before {
+    background: url('../../images/menu-icons/icon-quote.png');
+  }
+.lpb-component-list__item.type-table a::before {
+    background: url('../../images/menu-icons/icon-table.png');
+  }
+.lpb-component-list__item.type-view a::before {
+    background: url('../../images/menu-icons/icon-view.png');
+  }
+.lpb-component-list__item.type-jotform a::before {
+    background: url('../../images/menu-icons/icon-form.png');
+  }
+.lpb-component-list__item.type-card a::before {
+    background: url('../../images/menu-icons/icon-card.png');
+  }
+.lpb-component-list__item.type-tabs a::before {
+    background: url('../../images/menu-icons/icon-tabs.png');
+  }

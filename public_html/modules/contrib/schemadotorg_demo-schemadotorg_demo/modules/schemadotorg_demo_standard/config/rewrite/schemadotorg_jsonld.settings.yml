@@ -1,0 +1,6 @@
+config_rewrite:
+  replace:
+    - schema_type_entity_references_display.media--image
+schema_type_entity_references_display:
+  media--image: '[media:field_media_image:schemadotorg_1x1:url], [media:field_media_image:schemadotorg_4x3:url], [media:field_media_image:schemadotorg_16x9:url]'
+

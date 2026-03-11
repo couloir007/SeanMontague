@@ -1,0 +1,15 @@
+name: 'Schema.org Blueprints Metatag'
+type: module
+description: 'Automatically adds a metatag field to Schema.org types with default tags for Schema.org properties.'
+package: 'Schema.org Blueprints Other'
+core_version_requirement: ^10.3 || ^11
+configure: schemadotorg.settings.types
+schemadotorg_production: false
+dependencies:
+  - 'metatag:metatag'
+  - 'schemadotorg:schemadotorg'
+
+# Information added by Drupal.org packaging script on 2025-09-16
+version: '1.0.0-alpha36'
+project: 'schemadotorg'
+datestamp: 1758054124

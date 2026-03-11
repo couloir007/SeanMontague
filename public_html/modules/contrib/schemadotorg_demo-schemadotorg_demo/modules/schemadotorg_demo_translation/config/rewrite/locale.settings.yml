@@ -1,0 +1,7 @@
+config_rewrite:
+  replace:
+    - translation.import_enabled
+    - translation.use_source
+translation:
+  use_source: local
+  import_enabled: false

@@ -1,0 +1,23 @@
+name: 'Schema.org Blueprints Demo API'
+type: module
+description: 'Enables and configures API support for the Schema.org Blueprints Demo.'
+package: 'Schema.org Blueprints Demo'
+core_version_requirement: ^10.3 || ^11
+lifecycle: experimental
+dependencies:
+  - 'config_rewrite:config_rewrite'
+  - 'openapi:openapi'
+  - 'openapi_jsonapi:openapi_jsonapi'
+  - 'openapi_ui:openapi_ui'
+  - 'openapi_ui_redoc:openapi_ui_redoc'
+  - 'openapi_ui_swagger:openapi_ui_swagger'
+  - 'schemata:schemata'
+  - 'schemata:schemata_json_schema'
+  - 'schemadotorg:schemadotorg_jsonapi'
+  - 'schemadotorg:schemadotorg_jsonapi_preview'
+
+
+# Information added by Drupal.org packaging script on 2025-09-16
+version: '1.0.0-alpha36'
+project: 'schemadotorg_demo'
+datestamp: 1758054168

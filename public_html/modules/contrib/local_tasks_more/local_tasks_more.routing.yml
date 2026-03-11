@@ -1,0 +1,7 @@
+local_tasks_more.settings:
+  path: '/admin/config/user-interface/local-tasks-more'
+  defaults:
+    _title: 'Local Tasks More'
+    _form: 'Drupal\local_tasks_more\Form\LocalTasksMoreSettingsForm'
+  requirements:
+    _permission: 'administer site configuration'

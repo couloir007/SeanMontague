@@ -1,0 +1,13 @@
+name: Entity reference override Entity Browser test module
+type: module
+core_version_requirement: ^8 || ^9 || ^10
+package: Testing
+dependencies:
+  - entity_reference_override_entity_browser
+  - node
+  - views
+
+# Information added by Drupal.org packaging script on 2025-04-11
+version: '2.0.0-beta4'
+project: 'entity_reference_override'
+datestamp: 1744343665

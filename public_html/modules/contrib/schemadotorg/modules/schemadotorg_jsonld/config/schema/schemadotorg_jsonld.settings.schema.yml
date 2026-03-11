@@ -1,0 +1,56 @@
+schemadotorg_jsonld.settings:
+  type: config_object
+  label: 'Schema.org JSON-LD settings'
+  mapping:
+    schema_type_default_values:
+      type: sequence
+      label: 'Default Schema.org type default values'
+      sequence:
+        type: mapping
+        label: 'Schema.org type'
+        mapping:
+          currency:
+            type: string
+            label: Currency
+          priceCurrency:
+            type: string
+            label: 'Price currency'
+          unitCode:
+            type: string
+            label: 'Unit text'
+          unitText:
+            type: text
+            label: 'Unit text'
+          valueReference:
+            type: ignore
+            label: 'Value reference'
+    schema_type_main_properties:
+      type: sequence
+      label: 'Schema.org types main properties'
+      sequence:
+        type: string
+        label: 'Schema.org type main property'
+    schema_property_order:
+      type: sequence
+      label: 'Schema.org property order'
+      sequence:
+        type: string
+        label: 'Schema.org property'
+    schema_property_image_styles:
+      type: sequence
+      label: 'Field name image styles'
+      sequence:
+        type: string
+        label: 'Field name image style'
+    schema_type_entity_references_display:
+      type: sequence
+      label: 'Schema.org type entity references by'
+      sequence:
+        type: string
+        label: 'Schema.org type entity reference by'
+    exclude_url:
+      type: sequence
+      label: 'Exclude URL'
+      sequence:
+        type: string
+        label: 'Exclude URL'

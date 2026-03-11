@@ -1,0 +1,34 @@
+schemadotorg_additional_type.settings:
+  type: config_object
+  label: 'Schema.org Additional type settings'
+  mapping:
+    default_types:
+      type: sequence
+      label: 'Schema.org default additional type types'
+      sequence:
+        type: string
+        label: 'Schema.org default additional type type'
+    required_types:
+      type: sequence
+      label: 'Schema.org required additional type types'
+      sequence:
+        type: string
+        label: 'Schema.org required additional type type'
+    ignored_types:
+      type: sequence
+      label: 'Schema.org ignored additional type types'
+      sequence:
+        type: string
+        label: 'Schema.org ignored additional type type'
+    use_snake_case:
+      type: boolean
+      label: 'Use snake case for additional type values'
+    default_allowed_values:
+      type: sequence
+      label: 'Schema.org default additional types allowed values'
+      sequence:
+        type: sequence
+        label: 'Schema.org default additional type allowed values'
+        sequence:
+          type: string
+          label: 'Schema.org default additional type allowed value'

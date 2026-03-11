@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_base_salary
+    - node.type.job_posting
+id: node.job_posting.schema_base_salary
+field_name: schema_base_salary
+entity_type: node
+bundle: job_posting
+label: 'Base salary'
+description: 'The base salary of the job or of an employee in an EmployeeRole.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

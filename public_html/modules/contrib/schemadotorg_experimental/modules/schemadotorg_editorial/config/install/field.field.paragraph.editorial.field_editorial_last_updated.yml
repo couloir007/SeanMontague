@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_editorial_last_updated
+    - paragraphs.paragraphs_type.editorial
+  module:
+    - datetime
+id: paragraph.editorial.field_editorial_last_updated
+field_name: field_editorial_last_updated
+entity_type: paragraph
+bundle: editorial
+label: 'Last updated'
+description: 'Enter the date that this document was last updated.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

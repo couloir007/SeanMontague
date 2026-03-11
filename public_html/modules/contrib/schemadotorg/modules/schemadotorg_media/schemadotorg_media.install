@@ -1,0 +1,87 @@
+<?php
+
+/**
+ * @file
+ * Installation hooks for the Schema.org Blueprints Media module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\field\Entity\FieldConfig;
+use Drupal\schemadotorg\Entity\SchemaDotOrgMapping;
+use Drupal\schemadotorg\Entity\SchemaDotOrgMappingType;
+
+/**
+ * Implements hook_install().
+ */
+function schemadotorg_media_install(bool $is_syncing): void {
+  if ($is_syncing) {
+    return;
+  }
+
+  /** @var \Drupal\schemadotorg\SchemaDotOrgMappingManagerInterface $mapping_manager */
+  $mapping_manager = \Drupal::service('schemadotorg.mapping_manager');
+  $mapping_manager->createDefaultTypes('media');
+}
+
+/**
+ * Issue #3510533: Content URL field is being added to document media type.
+ */
+function schemadotorg_media_update_10000(): void {
+  $base_fields = [
+    'field_media_audio_file' => 'AudioObject--field_media_audio_file',
+    'field_media_document' => 'DataDownload--field_media_document',
+    'field_media_image' => 'ImageObject--field_media_image',
+    'field_media_oembed_video' => 'VideoObject--field_media_oembed_video',
+    'field_media_video_file' => 'VideoObject--field_media_video_file',
+  ];
+  /** @var \Drupal\schemadotorg\SchemaDotOrgMappingTypeInterface $schema_mapping_type */
+  $schema_mapping_type = SchemaDotOrgMappingType::load('media');
+  $default_base_fields = $schema_mapping_type->get('default_base_fields');
+  foreach ($base_fields as $source_field_name => $destination_field_name) {
+    if (isset($default_base_fields[$source_field_name])) {
+      $default_base_fields[$destination_field_name] = $default_base_fields[$source_field_name];
+      unset($default_base_fields[$source_field_name]);
+    }
+  }
+  $schema_mapping_type->set('default_base_fields', $default_base_fields);
+  $schema_mapping_type->save();
+
+  /** @var \Drupal\schemadotorg\SchemaDotOrgMappingInterface|null $schema_mapping */
+  $schema_mapping = SchemaDotOrgMapping::load('media.document');
+  // Make sure the document mapping exists.
+  if (!$schema_mapping) {
+    return;
+  }
+
+  $field_name = $schema_mapping->getSchemaPropertyFieldName('contentUrl');
+  // If the field name does not exist or is mapping correctly, assume it was fixed manually.
+  if (empty($field_name) || $field_name === 'field_media_document') {
+    return;
+  }
+
+  // Otherwise, map https://schema.org/contentUrl to field_media_document.
+  $schema_mapping->setSchemaPropertyMapping('field_media_document', 'contentUrl');
+  $schema_mapping->save();
+
+  $field_config = FieldConfig::load('media.document.field_media_audio_file');
+  // If the field config does not exist assume it was fixed manually.
+  if (!$field_config) {
+    return;
+  }
+
+  // Make sure that no files were update to field_media_audio_file.
+  $count = \Drupal::database()
+    ->select('media__field_media_audio_file')
+    ->condition('bundle', 'document')
+    ->countQuery()
+    ->execute()
+    ->fetchField();
+  if ($count) {
+    return;
+  }
+
+  // Delete the instance of the field_media_audio_file field from the
+  // document media type.
+  $field_config->delete();
+}

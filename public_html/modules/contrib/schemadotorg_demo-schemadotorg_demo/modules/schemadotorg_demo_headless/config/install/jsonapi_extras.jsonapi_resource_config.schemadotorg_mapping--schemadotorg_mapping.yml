@@ -1,0 +1,76 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - schemadotorg
+id: schemadotorg_mapping--schemadotorg_mapping
+disabled: false
+path: schemadotorg_mapping
+resourceType: schemadotorg_mapping--schemadotorg_mapping
+resourceFields:
+  uuid:
+    disabled: false
+    fieldName: uuid
+    publicName: uuid
+    enhancer:
+      id: ''
+  langcode:
+    disabled: true
+    fieldName: langcode
+    publicName: langcode
+    enhancer:
+      id: ''
+  status:
+    disabled: true
+    fieldName: status
+    publicName: status
+    enhancer:
+      id: ''
+  dependencies:
+    disabled: true
+    fieldName: dependencies
+    publicName: dependencies
+    enhancer:
+      id: ''
+  third_party_settings:
+    disabled: true
+    fieldName: third_party_settings
+    publicName: third_party_settings
+    enhancer:
+      id: ''
+  _core:
+    disabled: true
+    fieldName: _core
+    publicName: _core
+    enhancer:
+      id: ''
+  id:
+    disabled: false
+    fieldName: id
+    publicName: id
+    enhancer:
+      id: ''
+  target_entity_type_id:
+    disabled: false
+    fieldName: target_entity_type_id
+    publicName: target_entity_type_id
+    enhancer:
+      id: ''
+  target_bundle:
+    disabled: false
+    fieldName: target_bundle
+    publicName: target_bundle
+    enhancer:
+      id: ''
+  schema_type:
+    disabled: false
+    fieldName: schema_type
+    publicName: schema_type
+    enhancer:
+      id: ''
+  schema_properties:
+    disabled: false
+    fieldName: schema_properties
+    publicName: schema_properties
+    enhancer:
+      id: ''
