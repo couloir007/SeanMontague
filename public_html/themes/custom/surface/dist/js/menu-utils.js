@@ -1,0 +1,1 @@
+(e=>{e.surface={};function o(){var t=document.querySelector('[data-drupal-selector="mobile-button"]');return t?window.getComputedStyle(t).getPropertyValue("display")==="none":!1}e.surface.isDesktopNav=o})(Drupal);

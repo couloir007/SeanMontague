@@ -1,0 +1,1 @@
+.text{display:flow-root}.layout--onecol .text{padding-inline:var(--size-4)}@media(min-width:768px){.layout--onecol .text{margin-inline:auto;max-inline-size:var(--size-tablet)}}@media(min-width:1024px){.layout--onecol .text{max-inline-size:var(--size-laptop)}}@media(min-width:1280px){.layout--onecol .text{max-inline-size:var(--size-container);padding-inline:var(--size-8)}}
