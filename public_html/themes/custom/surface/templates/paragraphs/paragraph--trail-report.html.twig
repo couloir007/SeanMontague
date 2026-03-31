@@ -1,41 +1,13 @@
-{# Trail report — ride/ski outing with map, stats, elevation profile #}
-{{ attach_library('surface/surface-article') }}
-{{ attach_library('surface/surface-article-header') }}
-{{ attach_library('surface/surface-article-map-section') }}
-
-{% include '@collections/article-header/surface-article-header.twig' with {
-  'attributes':    attributes.addClass('paragraph', 'paragraph--type--trail-report'),
-  'title':         label,
-  'category':      content.field_category|field_value,
-  'category_key':  content.field_category.0['#plain_text']|lower|replace({' ': '-'}),
-  'date':          content.field_date_published|field_value,
-  'difficulty':    content.field_difficulty|field_value,
-  'subtitle':      content.field_subtitle|field_value is not empty ? content.field_subtitle|field_value,
-  'stats': [
-    { 'label': 'Distance',   'value': content.field_distance.0['#markup'],   'unit': 'miles' },
-    { 'label': 'Elevation',  'value': content.field_elev_gain.0['#markup'],  'unit': 'ft gain' },
-    { 'label': 'Est. Time',  'value': content.field_est_time.0['#markup'],   'unit': 'hours' },
-    { 'label': 'Difficulty', 'value': content.field_difficulty|field_value,  'is_small': true },
-    { 'label': 'Season',     'value': content.field_season|field_value,      'is_small': true },
-  ],
-} only %}
-
-{# Pull map center from the referenced Place node's geo field #}
-{% set place_node = content.field_place.0['#node'] is defined ? content.field_place.0['#node'] : null %}
-{% if place_node and place_node.field_geo is defined %}
-  {% set map_center = place_node.field_geo.lat ~ ',' ~ place_node.field_geo.lon %}
-{% endif %}
-
-{% include '@collections/article-map-section/surface-article-map-section.twig' with {
-  'map_id':     'trail-map-' ~ paragraph.id(),
-  'map_center': map_center|default('44.594,-71.913'),
-  'map_zoom':   13,
-  'elev_gain':  content.field_elev_gain.0['#markup'],
-  'elev_loss':  content.field_elev_loss.0['#markup'],
-  'elev_min':   content.field_elev_min.0['#markup'],
-  'elev_max':   content.field_elev_max.0['#markup'],
-} only %}
-
 <div{{ attributes.addClass('paragraph', 'paragraph--type--trail-report') }}>
-  {{ content.field_body|field_value }}
+  {% include '@collections/places-card/surface-places-card.twig' with {
+    'title':      node.label,
+    'date':       node.schema_date_published.value|date('M j, Y'),
+    'image_url':  node.schema_image.entity.uri.value|image_style('large'),
+    'category':   node.schema_category.entity.label,
+    'url':        url,
+    'stats': [
+      { 'label': 'Dist', 'value': node.schema_distance.value, 'unit': 'mi' },
+      { 'label': 'Gain', 'value': node.schema_elev_gain.value, 'unit': 'ft' },
+    ]
+  } only %}
 </div>

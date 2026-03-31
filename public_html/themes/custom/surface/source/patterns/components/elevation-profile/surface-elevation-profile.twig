@@ -1,7 +1,6 @@
 {{ attach_library('surface/surface-elevation-profile') }}
 
 <div class="surface-elevation-profile{{ modifier ? ' ' ~ modifier }}"
-     data-once="elevation-profile"
      {% if map_id %}data-map-id="{{ map_id }}"{% endif %}
      {% if elev_data %}data-elev='{{ elev_data|json_encode }}'{% endif %}>
   <div class="surface-elevation-profile__header">

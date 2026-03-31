@@ -1,0 +1,10 @@
+{% if content %}
+  <div{{ attributes.addClass('surface-article-wrap') }}>
+    <div{{ region_attributes.main.addClass('surface-article__body') }}>
+      {{ content.main }}
+    </div>
+    <aside{{ region_attributes.aside.addClass('surface-article__sidebar') }}>
+      {{ content.aside }}
+    </aside>
+  </div>
+{% endif %}

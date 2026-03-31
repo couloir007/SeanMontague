@@ -1,0 +1,12 @@
+name: Form Item Label
+description: Label for form elements.
+status: active
+variables:
+  attributes:
+    type: attributes
+  title:
+    type: string
+  title_display:
+    type: string
+  required:
+    type: boolean

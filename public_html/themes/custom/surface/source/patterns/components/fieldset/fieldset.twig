@@ -1,0 +1,38 @@
+{#
+/**
+ * @file
+ * Template for fieldset element.
+ */
+#}
+{{ attach_library('surface/fieldset') }}
+
+{%
+  set classes = [
+    'fieldset',
+    errors ? 'fieldset--error',
+  ]
+%}
+<fieldset{{ attributes.addClass(classes) }}>
+  {% if legend.title %}
+    <legend{{ legend.attributes.addClass('fieldset__legend') }}>
+      <span class="fieldset__legend-text">{{ legend.title }}</span>
+    </legend>
+  {% endif %}
+  <div class="fieldset__wrapper">
+    {% if errors %}
+      <div class="fieldset__error-message">
+        {{ errors }}
+      </div>
+    {% endif %}
+    {% if prefix %}
+      <span class="fieldset__prefix">{{ prefix }}</span>
+    {% endif %}
+    {{ children }}
+    {% if suffix %}
+      <span class="fieldset__suffix">{{ suffix }}</span>
+    {% endif %}
+    {% if description.content %}
+      <div{{ description.attributes.addClass('fieldset__description') }}>{{ description.content }}</div>
+    {% endif %}
+  </div>
+</fieldset>

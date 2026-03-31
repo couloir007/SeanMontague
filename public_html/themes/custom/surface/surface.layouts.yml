@@ -202,3 +202,33 @@ six_column:
       label: Fifth
     sixth:
       label: Sixth
+
+# Bare single-column section
+section_bare:
+  label: 'Section (bare)'
+  path: templates/layout
+  template: layout--section-bare
+  library: surface/layout
+  category: 'Surface'
+  default_region: content
+  icon_map:
+    - [content]
+  regions:
+    content:
+      label: Content
+
+# Bare two-column layout (article + sidebar)
+section_two_col:
+  label: 'Section Two Column (bare)'
+  path: templates/layout
+  template: layout--section-two-col
+  library: surface/layout
+  category: 'Surface'
+  default_region: main
+  icon_map:
+    - [main, aside]
+  regions:
+    main:
+      label: Main
+    aside:
+      label: Aside

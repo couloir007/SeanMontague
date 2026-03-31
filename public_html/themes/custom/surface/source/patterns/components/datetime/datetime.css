@@ -1,0 +1,23 @@
+/**
+ * @file
+ * Datetime styles.
+ */
+.datetime-wrapper {
+  margin-bottom: var(--size-4);
+
+  &__title {
+    font-size: var(--font-size-base);
+    margin-bottom: var(--size-1);
+  }
+
+  &__content {
+    display: flex;
+    gap: var(--size-2);
+  }
+
+  &__description {
+    color: var(--muted);
+    font-size: var(--font-size-sm);
+    margin-top: var(--size-1);
+  }
+}

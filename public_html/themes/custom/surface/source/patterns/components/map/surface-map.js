@@ -92,6 +92,11 @@
     window._surfaceMaps = window._surfaceMaps || {};
     window._surfaceMaps[el.id || 'map'] = map;
     if (!window._surfaceMapInstance) window._surfaceMapInstance = map;
+
+    // Dispatch event for other components (like elevation profile) to connect
+    window.dispatchEvent(new CustomEvent('surface-map-ready', {
+      detail: { map_id: el.id, map: map }
+    }));
   }
 
   function initAll(context) {

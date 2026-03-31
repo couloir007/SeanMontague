@@ -1,0 +1,25 @@
+/**
+ * @file
+ * Input styles.
+ */
+
+.input {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2);
+  color: var(--text);
+  font-family: var(--font-primary);
+  padding: var(--size-2) var(--size-3);
+  transition: border-color var(--ease-2);
+  width: 100%;
+
+  &:focus {
+    border-color: var(--sky);
+    outline: 2px solid var(--sky);
+    outline-offset: 2px;
+  }
+
+  &::placeholder {
+    color: var(--muted);
+  }
+}

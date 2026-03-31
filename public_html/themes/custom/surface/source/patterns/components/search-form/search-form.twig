@@ -1,0 +1,13 @@
+{#
+/**
+ * @file
+ * Template for search form.
+ */
+#}
+{{ attach_library('surface/search-form') }}
+
+<form{{ attributes.addClass('search-form') }}>
+  <div class="search-form__wrapper">
+    {{ children }}
+  </div>
+</form>

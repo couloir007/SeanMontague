@@ -1,0 +1,22 @@
+{#
+/**
+ * @file
+ * Template for datetime element.
+ */
+#}
+{{ attach_library('surface/datetime') }}
+
+<div{{ attributes.addClass('datetime-wrapper') }}>
+  {% if title %}
+    <h4{{ title_attributes.addClass('datetime-wrapper__title') }}>{{ title }}</h4>
+  {% endif %}
+  <div class="datetime-wrapper__content">
+    {{ content }}
+    {{ children }}
+  </div>
+  {% if description %}
+    <div class="datetime-wrapper__description">
+      {{ description }}
+    </div>
+  {% endif %}
+</div>

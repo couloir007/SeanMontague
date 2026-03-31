@@ -1,0 +1,8 @@
+name: User Password Form
+description: User password reset form wrapper.
+status: active
+variables:
+  attributes:
+    type: attributes
+  children:
+    type: string

@@ -151,6 +151,38 @@ form-item-label:
   css:
     component:
       dist/css/form-item-label.css: {}
+details:
+  css:
+    component:
+      dist/css/details.css: {}
+fieldset:
+  css:
+    component:
+      dist/css/fieldset.css: {}
+checkbox:
+  css:
+    component:
+      dist/css/checkbox.css: {}
+checkbox-toggle:
+  css:
+    component:
+      dist/css/checkbox-toggle.css: {}
+datetime:
+  css:
+    component:
+      dist/css/datetime.css: {}
+search-form:
+  css:
+    component:
+      dist/css/search-form.css: {}
+user-login-form:
+  css:
+    component:
+      dist/css/user-login-form.css: {}
+user-pass-form:
+  css:
+    component:
+      dist/css/user-pass-form.css: {}
 
 form-item-upload:
   css:
@@ -180,6 +212,11 @@ image-embed:
   css:
     component:
       dist/css/image-embed.css: {}
+
+input:
+  css:
+    component:
+      dist/css/input.css: {}
 
 links:
   css:
@@ -390,11 +427,6 @@ surface-hero:
   css:
     component:
       dist/css/surface-hero.css: {}
-  js:
-    dist/js/surface-hero.js: {}
-  dependencies:
-    - core/drupal
-    - core/once
 
 surface-map:
   css:
@@ -403,8 +435,6 @@ surface-map:
   js:
     dist/js/surface-map.js: {}
   dependencies:
-    - core/drupal
-    - core/once
     - surface/leaflet
 
 surface-article:
@@ -436,7 +466,6 @@ surface-elevation-profile:
   js:
     dist/js/surface-elevation-profile.js: {}
   dependencies:
-    - core/drupal
     - surface/leaflet
 
 surface-stats-bar:

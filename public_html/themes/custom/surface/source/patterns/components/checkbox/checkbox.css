@@ -1,0 +1,8 @@
+/**
+ * @file
+ * Checkbox styles.
+ */
+.checkbox {
+  margin-right: var(--size-2);
+  vertical-align: middle;
+}

@@ -1,0 +1,28 @@
+name: Fieldset
+description: Wrapper for groups of form elements.
+status: active
+variables:
+  attributes:
+    type: attributes
+  legend:
+    type: object
+    properties:
+      title:
+        type: string
+      attributes:
+        type: attributes
+  errors:
+    type: string
+  prefix:
+    type: string
+  suffix:
+    type: string
+  children:
+    type: string
+  description:
+    type: object
+    properties:
+      content:
+        type: string
+      attributes:
+        type: attributes

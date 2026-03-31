@@ -1,0 +1,8 @@
+name: User Login Form
+description: User login form wrapper.
+status: active
+variables:
+  attributes:
+    type: attributes
+  children:
+    type: string

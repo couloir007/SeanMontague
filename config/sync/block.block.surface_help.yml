@@ -1,0 +1,22 @@
+uuid: c4b2656e-fcb8-4fb9-a497-c24277b657aa
+langcode: en
+status: true
+dependencies:
+  module:
+    - help
+  theme:
+    - surface
+_core:
+  default_config_hash: VfPFqqxfkomud5CO8DUijw85QIl9GIxh_nIxLOYESxg
+id: surface_help
+theme: surface
+region: content_above
+weight: 0
+provider: null
+plugin: help_block
+settings:
+  id: help_block
+  label: Help
+  label_display: '0'
+  provider: help
+visibility: {  }

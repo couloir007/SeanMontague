@@ -14,13 +14,15 @@
 
 {% if autocomplete_message %}
   <div class="claro-autocomplete">
-    <input{{ attributes }}/>
+    {% include '@components/checkbox-toggle/checkbox-toggle.twig' with {
+      'attributes': attributes
+    } %}
     <div hidden class="claro-autocomplete__message">{{autocomplete_message}}</div>
   </div>
   {{ children }}
 {% else %}
-  <input{{ attributes }}/>{{ children }}
-  <span class="checkbox-toggle">
-    <span class="checkbox-toggle__inner"></span>
-  </span>
+  {% include '@components/checkbox-toggle/checkbox-toggle.twig' with {
+    'attributes': attributes
+  } %}
+  {{ children }}
 {% endif %}

@@ -1,0 +1,6 @@
+name: Checkbox
+description: Checkbox input element.
+status: active
+variables:
+  attributes:
+    type: attributes

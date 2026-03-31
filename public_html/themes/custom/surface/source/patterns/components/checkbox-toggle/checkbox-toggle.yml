@@ -1,0 +1,6 @@
+name: Checkbox Toggle
+description: Checkbox input styled as a toggle switch.
+status: active
+variables:
+  attributes:
+    type: attributes

@@ -1,0 +1,26 @@
+/**
+ * @file
+ * Fieldset styles.
+ */
+.fieldset {
+  border: 1px solid var(--grey-200);
+  margin-bottom: var(--size-4);
+  padding: var(--size-4);
+
+  &__legend {
+    font-weight: var(--font-weight-500);
+    padding: 0 var(--size-2);
+  }
+
+  &__description {
+    color: var(--muted);
+    font-size: var(--font-size-sm);
+    margin-top: var(--size-2);
+  }
+
+  &__error-message {
+    color: var(--red-700);
+    font-weight: var(--font-weight-500);
+    margin-bottom: var(--size-2);
+  }
+}

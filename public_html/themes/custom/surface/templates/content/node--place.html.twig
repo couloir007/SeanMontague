@@ -1,0 +1,17 @@
+<div class="surface-place-container">
+  <div class="surface-place-content">
+    {{ content.body|field_value }}
+  </div>
+  <div class="surface-place-sidebar">
+    {% include '@components/map/surface-map.twig' with {
+      'map_id': 'place-map-' ~ node.id,
+      'center': node.schema_geo.value.lat ~ ',' ~ node.schema_geo.value.lon,
+      'zoom': 13,
+      'markers': [{
+        'lat': node.schema_geo.value.lat,
+        'lon': node.schema_geo.value.lon,
+        'label': '<strong>' ~ node.label ~ '</strong>'
+      }]
+    } only %}
+  </div>
+</div>

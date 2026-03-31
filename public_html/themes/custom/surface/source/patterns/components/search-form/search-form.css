@@ -1,0 +1,11 @@
+/**
+ * @file
+ * Search form styles.
+ */
+.search-form {
+  &__wrapper {
+    align-items: flex-end;
+    display: flex;
+    gap: var(--size-2);
+  }
+}

@@ -1,0 +1,24 @@
+/**
+ * @file
+ * Form item styles.
+ */
+.form-item {
+  margin-bottom: var(--size-4);
+
+  &__description {
+    color: var(--muted);
+    font-size: var(--font-size-sm);
+    margin-top: var(--size-1);
+  }
+
+  &__error-message {
+    color: var(--red-700);
+    font-weight: var(--font-weight-500);
+    margin-top: var(--size-1);
+  }
+
+  &--disabled {
+    opacity: 50%;
+    pointer-events: none;
+  }
+}

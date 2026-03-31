@@ -11,6 +11,7 @@
  */
 #}
 
-<div{{ attributes.addClass('form-items-inline') }}>
-  {{ content }}
-</div>
+{% include '@components/datetime/datetime.twig' with {
+  'attributes': attributes,
+  'content': content
+} %}

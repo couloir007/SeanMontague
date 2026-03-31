@@ -1,0 +1,9 @@
+{% include '@collections/article/surface-article.twig' with {
+  'header': {
+    'title':        node.label,
+    'date':         node.schema_date_published.value|date('F j, Y'),
+    'category':     node.schema_category.entity.label,
+    'category_key': node.schema_category.entity.field_key.value,
+  },
+  'body': content.body|field_value|render,
+} only %}

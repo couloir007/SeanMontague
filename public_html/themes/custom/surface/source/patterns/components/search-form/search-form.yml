@@ -1,0 +1,8 @@
+name: Search Form
+description: Search form wrapper.
+status: active
+variables:
+  attributes:
+    type: attributes
+  children:
+    type: string

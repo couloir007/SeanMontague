@@ -1,0 +1,16 @@
+{#
+/**
+ * @file
+ * Template for form element label.
+ */
+#}
+{%
+  set classes = [
+    title_display == 'after' ? 'option',
+    title_display == 'invisible' ? 'visually-hidden',
+    required ? 'form-item__label--required',
+  ]
+%}
+{% if title is not empty or required -%}
+  <label{{ attributes.addClass(classes).addClass('form-item__label') }}>{{ title }}</label>
+{%- endif %}

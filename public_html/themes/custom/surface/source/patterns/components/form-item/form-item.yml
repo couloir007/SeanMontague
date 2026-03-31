@@ -1,0 +1,45 @@
+name: Form Item
+description: Wrapper for form elements.
+status: active
+variables:
+  attributes:
+    type: attributes
+    description: HTML attributes for the wrapper.
+  type:
+    type: string
+    description: Type of the form element.
+  name:
+    type: string
+    description: Name of the form element.
+  title_display:
+    type: string
+    description: Where the label should be displayed (before, after, invisible).
+  disabled:
+    type: boolean
+    description: Whether the element is disabled.
+  errors:
+    type: string
+    description: Error message(s) for the element.
+  label:
+    type: string
+    description: The label for the element.
+  prefix:
+    type: string
+    description: Prefix for the element.
+  suffix:
+    type: string
+    description: Suffix for the element.
+  description:
+    type: object
+    description: The description for the element.
+    properties:
+      content:
+        type: string
+      attributes:
+        type: attributes
+  description_display:
+    type: string
+    description: Where the description should be displayed (before, after, invisible).
+  children:
+    type: string
+    description: The form element itself.

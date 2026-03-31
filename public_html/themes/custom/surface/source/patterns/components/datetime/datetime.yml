@@ -1,0 +1,16 @@
+name: Datetime
+description: Datetime input wrapper.
+status: active
+variables:
+  attributes:
+    type: attributes
+  title:
+    type: string
+  title_attributes:
+    type: attributes
+  content:
+    type: string
+  children:
+    type: string
+  description:
+    type: string

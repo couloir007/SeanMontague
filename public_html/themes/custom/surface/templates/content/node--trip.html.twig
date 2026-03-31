@@ -1,0 +1,25 @@
+{% set markers = [] %}
+{% for item in node.schema_destination %}
+  {% set place = item.entity %}
+  {% if place and place.schema_geo.value %}
+    {% set geo = place.schema_geo.value %}
+    {% set markers = markers|merge([{
+      'lat':   geo.lat,
+      'lon':   geo.lon,
+      'color': '#3a5a40',
+      'label': '<strong>' ~ place.label ~ '</strong>',
+    }]) %}
+  {% endif %}
+{% endfor %}
+
+{% include '@components/map/surface-map.twig' with {
+  'map_id':      'trip-map-' ~ node.id,
+  'center':      markers[0] ? markers[0].lat ~ ',' ~ markers[0].lon : '44.593,-71.918',
+  'zoom':        8,
+  'interactive': 'true',
+  'markers':     markers,
+} only %}
+
+<div class="prose">
+  {{ content.body|field_value }}
+</div>

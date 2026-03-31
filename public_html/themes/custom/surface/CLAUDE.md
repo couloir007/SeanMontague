@@ -15,6 +15,10 @@ This is a personal outlet — not a portfolio or consulting site.
 ```
 surface/
 ├── source/
+│   ├── assets/            # CSS,
+│   │   └── images/        # SVGs,
+│   ├── props/             # Design tokens (CSS custom properties)
+│   │   └── nek.css        # NEK palette and font stacks
 │   └── patterns/
 │       ├── base/          # Global CSS, reset, typography, utilities
 │       ├── elements/      # Atomic pieces: button, byline, date, eyebrow,
@@ -35,12 +39,11 @@ surface/
 │   ├── layout/            # page.html.twig, layout--*.html.twig
 │   ├── paragraphs/        # paragraph--*.html.twig
 │   └── field/             # field--*.html.twig
-├── props/                 # Design tokens (CSS custom properties)
-│   └── nek.css            # NEK palette and font stacks
 ├── surface.info.yml
 ├── surface.libraries.yml
 ├── surface.layouts.yml
 └── surface.theme
+```,search:
 ```
 
 ### Twig Namespaces (vite.config.js + surface.info.yml)
@@ -68,7 +71,7 @@ surface/
 
 ## Design Tokens
 
-All tokens defined in `props/nek.css` and `props/`:
+All tokens defined in `source/props/nek.css` and `source/props/`:
 
 ```css
 /* Palette */
