@@ -1,0 +1,22 @@
+uuid: 7b0b944e-aa37-4d2f-bc92-cc223de21955
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.podcast_episode
+id: node.podcast_episode.sticky
+field_name: sticky
+entity_type: node
+bundle: podcast_episode
+label: 'Sticky at top of lists'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

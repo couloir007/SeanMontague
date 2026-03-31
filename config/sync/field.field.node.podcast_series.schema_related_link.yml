@@ -1,0 +1,23 @@
+uuid: 2a87c170-05a4-48c5-9918-28d6044a1b60
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_related_link
+    - node.type.podcast_series
+  module:
+    - link
+id: node.podcast_series.schema_related_link
+field_name: schema_related_link
+entity_type: node
+bundle: podcast_series
+label: 'Related links'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 17
+field_type: link

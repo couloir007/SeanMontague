@@ -3,7 +3,7 @@ import header from './site-header.twig';
 import data from './site-header.yml';
 
 const settings = {
-  title: 'Layouts/Site header',
+  title: 'Layouts/Site Header',
 };
 
 export const Stacked = {

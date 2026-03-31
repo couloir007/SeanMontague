@@ -4,7 +4,8 @@
  */
 
 .site-container {
-  background: var(--page-bg-color, var(--white));
+  overflow-x: hidden;
+  background: var(--bg);
   display: grid;
   grid-template-rows: auto 1fr auto;
   min-height: 100vh;

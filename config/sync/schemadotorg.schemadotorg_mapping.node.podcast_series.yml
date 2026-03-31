@@ -1,0 +1,42 @@
+uuid: 66d5d358-e79f-4bc8-95fe-e2be94309bb4
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.podcast_series.body
+    - field.field.node.podcast_series.schema_about
+    - field.field.node.podcast_series.schema_image
+    - field.field.node.podcast_series.schema_related_link
+    - field.field.node.podcast_series.schema_same_as
+    - field.field.node.podcast_series.schema_significant_link
+    - field.field.node.podcast_series.schema_subject_of
+    - field.field.node.podcast_series.schema_web_feed
+    - node.type.podcast_series
+  module:
+    - node
+id: node.podcast_series
+target_entity_type_id: node
+target_bundle: podcast_series
+schema_type: PodcastSeries
+schema_properties:
+  schema_about: about
+  created: dateCreated
+  changed: dateModified
+  body: text
+  schema_image: image
+  langcode: inLanguage
+  title: name
+  schema_same_as: sameAs
+  schema_subject_of: subjectOf
+  schema_web_feed: webFeed
+additional_mappings:
+  WebPage:
+    schema_type: WebPage
+    schema_properties:
+      created: dateCreated
+      changed: dateModified
+      langcode: inLanguage
+      title: name
+      schema_image: primaryImageOfPage
+      schema_related_link: relatedLink
+      schema_significant_link: significantLink

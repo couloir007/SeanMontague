@@ -5,7 +5,6 @@ dependencies:
   config:
     - field.storage.node.schema_topic
     - node.type.article
-    - taxonomy.vocabulary.schema_topics
 id: node.article.schema_topic
 field_name: schema_topic
 entity_type: node
@@ -19,8 +18,7 @@ default_value_callback: ''
 settings:
   handler: 'default:taxonomy_term'
   handler_settings:
-    target_bundles:
-      schema_topics: schema_topics
+    target_bundles: {  }
     sort:
       field: name
       direction: asc

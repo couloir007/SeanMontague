@@ -12,6 +12,7 @@ export default defineConfig({
       namespaces: {
         assets: join(__dirname, './source/assets'),
         base: join(__dirname, './source/patterns/base'),
+        collections: join(__dirname, './source/patterns/collections'),
         components: join(__dirname, './source/patterns/components'),
         layouts: join(__dirname, './source/patterns/layouts'),
         theme: join(__dirname, './source/patterns/theme'),

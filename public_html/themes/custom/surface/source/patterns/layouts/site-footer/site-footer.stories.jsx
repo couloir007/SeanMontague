@@ -3,7 +3,7 @@ import footer from './site-footer.twig';
 import data from './site-footer.yml';
 
 const settings = {
-  title: 'Layouts/Site footer',
+  title: 'Layouts/Site Footer',
 };
 
 export const SiteFooter = {

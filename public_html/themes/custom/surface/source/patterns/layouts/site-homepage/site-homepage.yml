@@ -1,0 +1,168 @@
+header:
+  logo_text: 'Sean Montague <span>· Burke, VT</span>'
+  logo_url: '/'
+  links:
+    - text: 'Writing'
+      url: '#writing'
+    - text: 'Places'
+      url: '#places'
+    - text: 'About'
+      url: '#about'
+    - text: 'Contact'
+      url: '#contact'
+hero:
+  map_id: 'hero-map'
+  eyebrow: 'Burke, Vermont · Northeast Kingdom'
+  name: 'SEAN<br>MONTAGUE'
+  tagline: 'Maps, trails, and growing things. Web developer at the Smithsonian, living and exploring in the Northeast Kingdom.'
+  ctas:
+    - text: 'Explore the Maps'
+      url: '#maps'
+      style: 'primary'
+    - text: 'Read the Writing'
+      url: '#writing'
+      style: 'ghost'
+  categories:
+    - text: 'Kingdom Trails'
+      url: '#places'
+      icon: '🌲'
+    - text: 'Burke Mountain'
+      url: '#places'
+      icon: '⛷'
+    - text: 'Permaculture'
+      url: '#places'
+      icon: '🌱'
+    - text: 'Leaflet Maps'
+      url: '#maps'
+      icon: '🗺'
+    - text: 'Writing'
+      url: '#writing'
+      icon: '✍'
+
+marquee:
+  items:
+    - 'Kingdom Trails'
+    - 'Burke Mountain'
+    - 'Leaflet Mapping'
+    - 'Permaculture'
+    - 'Drupal'
+    - 'Northeast Kingdom'
+    - 'Open Source'
+    - 'Smithsonian NMNH'
+
+maps:
+  label: 'Interactive Maps'
+  title: 'The Kingdom, <em>mapped.</em>'
+  content: '<p>Custom Leaflet maps of the places I know best — Kingdom Trails singletrack, Burke Mountain terrain, back-road touring routes, and the land around Burke.</p><p>Built with Leaflet.js, OpenTopoMap tiles, and GeoJSON from years of riding, skiing, and wandering. All open-source, all hand-crafted.</p>'
+  links:
+    - text: 'Kingdom Trails Network'
+    - text: 'Burke Mountain Ski Lines'
+    - text: 'NEK Touring Routes'
+    - text: 'Burke Area Trails'
+  map_id: 'featured-map'
+
+writing:
+  cards:
+    - category: 'Kingdom Trails'
+      modifier: 'trails'
+      title: 'The Best Singletrack in Vermont Nobody Talks About'
+      excerpt: "Kingdom Trails has 100+ miles but most visitors ride the same ten. Here's what's hiding in the back of the map."
+      meta: 'March 2025 · 8 min read'
+    - category: 'Burke Mountain'
+      modifier: 'trails'
+      title: 'A Season of Skiing Burke: Notes from a Local'
+      excerpt: "Burke doesn't have the terrain of Stowe but it has something better — solitude, character, and a vertical that earns it."
+      meta: 'February 2025 · 6 min read'
+    - category: 'Permaculture'
+      modifier: 'garden'
+      title: 'Year Three of the Food Forest: What Actually Worked'
+      excerpt: "Planting a food forest in Zone 5 Vermont is an exercise in patience and humility. Three years in, here's the honest report."
+      meta: 'October 2024 · 10 min read'
+    - category: 'Leaflet + Drupal'
+      modifier: 'maps'
+      title: 'Building a Trail Map with Leaflet and Drupal'
+      excerpt: "Notes from embedding interactive Leaflet maps in Drupal using custom GeoJSON fields and Twig — the approach behind this site's maps."
+      meta: 'September 2024 · 12 min read'
+    - category: 'Permaculture'
+      modifier: 'garden'
+      title: 'Sheet Mulching on a Slope: Lessons from the NEK'
+      excerpt: 'Sheet mulching works. Sheet mulching on a 20% grade in Vermont mud season is a different problem entirely.'
+      meta: 'May 2024 · 7 min read'
+    - category: 'Drupal'
+      modifier: 'tech'
+      title: 'GeoJSON as a Drupal Field Type: A Case Study'
+      excerpt: 'Notes from building a Drupal module for storing and rendering GeoJSON geometries as interactive Leaflet maps.'
+      meta: 'March 2024 · 9 min read'
+
+places:
+  items:
+    - label: 'Kingdom Trails HQ'
+      coords: '44.5965° N, 71.9105° W'
+      subtitle: 'East Burke, Vermont'
+      name: 'Kingdom Trails'
+      desc: 'Over 100 miles of meticulously maintained singletrack in the hills above East Burke. One of the best mountain bike trail networks in North America — and genuinely my backyard.'
+      tags:
+        - 'Mountain Biking'
+        - 'Trail Running'
+        - 'Leaflet Maps'
+        - 'GeoJSON'
+    - label: 'Burke Mountain Resort'
+      coords: '44.5847° N, 71.9012° W'
+      subtitle: 'Burke, Vermont'
+      name: 'Burke Mountain'
+      desc: '3,271 feet and 2,011 vertical feet of no-frills Vermont skiing. Local knowledge matters here. I have been mapping the lines, glades, and snow pockets for years.'
+      tags:
+        - 'Skiing'
+        - 'Backcountry'
+        - 'Terrain Maps'
+        - 'Winter Routes'
+    - subtitle: 'Burke, Vermont'
+      name: 'The Home Place'
+      desc: 'A small homestead in Burke where I am building a food forest, growing perennials, and practicing permaculture design in Zone 5. Slow work with long payoffs.'
+      tags:
+        - 'Permaculture'
+        - 'Food Forest'
+        - 'Zone 5'
+        - 'Perennials'
+    - label: 'Smithsonian NMNH'
+      subtitle: 'Washington, DC'
+      name: 'Natural History Museum'
+      desc: 'Web developer at the Smithsonian National Museum of Natural History, working on Drupal architecture, interactive mapping, and open-source tools for one of the world great natural history collections.'
+      tags:
+        - 'Drupal'
+        - 'Twig'
+        - 'SVG / D3'
+        - 'Open Source'
+
+about:
+  label: 'About'
+  title: 'Builder, rider, <em>grower.</em>'
+  skills:
+    - 'Smithsonian NMNH'
+    - 'Drupal & Twig'
+    - 'Leaflet & GIS / Mapping'
+    - 'SVG & Data Visualization'
+    - 'JavaScript / Open Source'
+    - 'Permaculture Design'
+    - 'Kingdom Trails regular'
+  paragraphs:
+    - "I'm Sean Montague — a web developer based in Burke, Vermont, in the Northeast Kingdom. I work at the Smithsonian National Museum of Natural History, building Drupal systems, interactive maps, and data visualization tools for one of the world's great natural history institutions."
+    - "This site is a personal outlet for the things I care about outside of work: riding Kingdom Trails, skiing Burke Mountain, building a food forest, and making maps of the places I know well."
+    - "The technical stuff — Leaflet, GeoJSON, Twig, SVG — bleeds into the personal projects too. That's fine by me."
+
+contact:
+  label: 'Contact'
+  headline: 'Say hello.'
+  sub: 'Always happy to talk trails, maps, or growing things.'
+  email: 'sean@seanmontague.com'
+
+footer:
+  brand_text: 'Sean Montague · Burke, VT'
+  copyright_text: '© 2025 Sean Montague'
+  links:
+    - text: 'GitHub'
+      url: '#'
+    - text: 'Drupal.org'
+      url: '#'
+    - text: 'LinkedIn'
+      url: '#'

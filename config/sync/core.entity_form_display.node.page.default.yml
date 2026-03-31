@@ -27,6 +27,29 @@ dependencies:
     - text
 third_party_settings:
   field_group:
+    group_general:
+      children:
+        - title
+        - schema_image
+        - body
+      label: General
+      region: content
+      parent_name: ''
+      weight: -20
+      format_type: details
+      format_settings:
+        open: true
+        description: ''
+    group_editorial:
+      children:
+        - field_editorial
+      label: 'Editorial information'
+      region: content
+      parent_name: ''
+      weight: 220
+      format_type: details_sidebar
+      format_settings:
+        description: 'Track the editorial decisions and status of a document.'
     group_references:
       children:
         - schema_about
@@ -35,20 +58,6 @@ third_party_settings:
       region: content
       parent_name: ''
       weight: 22
-      format_type: details
-      format_settings:
-        open: true
-        description: ''
-    group_general:
-      children:
-        - schema_web_page_type
-        - schema_image
-        - title
-        - body
-      label: General
-      region: content
-      parent_name: ''
-      weight: -20
       format_type: details
       format_settings:
         open: true
@@ -77,16 +86,6 @@ third_party_settings:
       format_settings:
         open: true
         description: ''
-    group_editorial:
-      children:
-        - field_editorial
-      label: 'Editorial information'
-      region: content
-      parent_name: ''
-      weight: 220
-      format_type: details_sidebar
-      format_settings:
-        description: 'Track the editorial decisions and status of a document.'
 id: node.page.default
 targetEntityType: node
 bundle: page
@@ -237,6 +236,11 @@ content:
   schema_web_page_type:
     type: options_select
     weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  simple_sitemap:
+    weight: 220
     region: content
     settings: {  }
     third_party_settings: {  }

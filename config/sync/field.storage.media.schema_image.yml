@@ -1,0 +1,19 @@
+uuid: d0b495a3-78f5-4def-9d78-3745ee9a50fa
+langcode: en
+status: true
+dependencies:
+  module:
+    - media
+id: media.schema_image
+field_name: schema_image
+entity_type: media
+type: entity_reference
+settings:
+  target_type: media
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

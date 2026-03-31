@@ -1,9 +1,0 @@
-uuid: b1759ed5-9425-414e-92a0-31f1b3bd1639
-langcode: en
-status: true
-dependencies: {  }
-name: Topics
-vid: schema_topics
-description: null
-weight: 0
-new_revision: false

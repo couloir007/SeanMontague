@@ -4,22 +4,29 @@
  */
 
 .site-navigation {
-  display: none;
+  display: block;
 
-  &.is-active {
-    display: block;
+  @media (width <= 960px) {
+    display: none;
   }
+}
 
-  @media (--mobile-large) {
-    display: block;
-  }
+.site-navigation__links {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+}
 
-  /* Secondary menu mobile */
-  .menu-secondary {
-    display: block;
+.site-navigation__link {
+  color: var(--muted);
+  font-family: var(--font-mono-nek);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s;
 
-    @media (--mobile-large) {
-      display: none;
-    }
+  &:hover {
+    color: var(--bright);
   }
 }

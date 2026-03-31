@@ -1,0 +1,20 @@
+uuid: 4edb08f8-ddd4-495d-be23-a479ea0b31e6
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.podcast_episode
+  module:
+    - metatag
+id: node.podcast_episode.metatag
+field_name: metatag
+entity_type: node
+bundle: podcast_episode
+label: 'Metatags (Hidden field for JSON support)'
+description: 'The computed meta tags for the entity.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: metatag_computed

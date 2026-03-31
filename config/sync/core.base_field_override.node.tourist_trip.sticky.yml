@@ -1,0 +1,22 @@
+uuid: dabef458-866f-437b-b6a5-2a6f6d264c08
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.tourist_trip
+id: node.tourist_trip.sticky
+field_name: sticky
+entity_type: node
+bundle: tourist_trip
+label: 'Sticky at top of lists'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

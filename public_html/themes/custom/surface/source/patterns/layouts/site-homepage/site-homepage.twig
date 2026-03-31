@@ -1,0 +1,40 @@
+{% extends "@layouts/site-container/site-container.twig" %}
+
+{% block header %}
+  {% include "@components/nav/surface-nav.twig" with header %}
+{% endblock %}
+
+{% block main %}
+  {{ attach_library('surface/site-homepage') }}
+  {% include "@components/hero/surface-hero.twig" with hero %}
+
+  {% include "@components/marquee/surface-marquee.twig" with marquee %}
+
+  {% include "@collections/map-section/surface-map-section.twig" with maps %}
+
+  <section class="surface-homepage__writing" id="writing">
+    <span class="surface-homepage__eyebrow">Writing</span>
+    <div class="surface-homepage__cards-grid">
+      {% for card_item in writing.cards %}
+        {% include "@components/card/surface-card.twig" with card_item %}
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="surface-homepage__places" id="places">
+    <span class="surface-homepage__eyebrow">Places & Projects</span>
+    <div class="surface-homepage__places-grid">
+      {% for place in places.items %}
+        {% include "@components/places-card/surface-places-card.twig" with place %}
+      {% endfor %}
+    </div>
+  </section>
+
+  {% include "@components/about/surface-about.twig" with about %}
+
+  {% include "@components/contact/surface-contact.twig" with contact %}
+{% endblock %}
+
+{% block footer %}
+  {% include "@components/footer/surface-footer.twig" with footer %}
+{% endblock %}

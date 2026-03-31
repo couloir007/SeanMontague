@@ -1,0 +1,11 @@
+{{ attach_library('surface/surface-footer') }}
+
+<footer class="surface-footer{{ modifier ? ' ' ~ modifier }}">
+  <div class="surface-footer__brand">{{ brand_text|default('Sean Montague · Burke, VT') }}</div>
+  <p class="surface-footer__copy">{{ copyright_text|default('© 2025 Sean Montague') }}</p>
+  <ul class="surface-footer__links">
+    {% for item in links %}
+      <li><a href="{{ item.url }}">{{ item.text }}</a></li>
+    {% endfor %}
+  </ul>
+</footer>

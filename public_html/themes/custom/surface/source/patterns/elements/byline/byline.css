@@ -1,0 +1,20 @@
+.byline {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+}
+
+.byline__name {
+  color: var(--bright);
+  font-family: var(--font-mono-nek);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.byline__date {
+  color: var(--muted);
+  font-family: var(--font-mono-nek);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+}

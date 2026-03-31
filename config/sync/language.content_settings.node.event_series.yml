@@ -1,0 +1,16 @@
+uuid: e8fcbb3b-c89f-4c04-a5fd-5836e14db694
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.event_series
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+id: node.event_series
+target_entity_type_id: node
+target_bundle: event_series
+default_langcode: site_default
+language_alterable: false

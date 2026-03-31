@@ -1,44 +1,15 @@
 {{ attach_library('surface/site-header') }}
 
 <header id="header" class="site-header" data-drupal-selector="site-header" role="banner" data-once="navigation">
-  <div class="container site-header__container">
-    <section class="site-primary">
-        <div class="site-primary__content">
-          {% block primary %}
-{#            {% include '@components/mobile-button/mobile-button.twig' %}#}
-            {% embed '@layouts/site-navigation/site-navigation.twig' %}
-              {% block menu %}
-                {% include '@components/menu-main/menu-main.twig' with {
-                  'data_menu': data_menu,
-                  'is_demo': is_demo,
-                  'items': items
-                } only %}
-              {% endblock %}
-            {% endembed %}
-          {% endblock %}
-        </div>
-    </section>
+  <div class="site-header__container">
+    <a href="{{ site_url|default('/') }}" class="site-header__logo">
+      {{ site_name|default('Sean Montague')|raw }} <span>{{ site_slogan|default('Burke, VT')|raw }}</span>
+    </a>
 
-    <section class="site-secondary">
-        <div class="site-secondary__content">
-          <div class="site-secondary__buttons">
-            {% block buttons %}
-              {% include '@components/translate/translate.twig' %}
-              {% include '@components/button-search/button-search.twig' with {
-                'label': 'Search Demo',
-                'is_demo': true
-              } %}
-              {% include '@components/contact/contact.twig' with {
-                'url': '/contact',
-                'text': 'Contact Sean'
-              } only %}
-            {% endblock %}
-          </div>
-        </div>
-
-      {% block search %}
-        {% include '@components/site-search/site-search.twig' %}
-      {% endblock %}
-    </section>
+    {% block navigation %}
+      {% include '@layouts/site-navigation/site-navigation.twig' with {
+        'items': items
+      } only %}
+    {% endblock %}
   </div>
 </header>

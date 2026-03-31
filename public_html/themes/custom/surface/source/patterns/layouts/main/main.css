@@ -4,6 +4,7 @@
  */
 
 .main {
+  min-width: 0;
   position: relative;
   width: 100%;
 }

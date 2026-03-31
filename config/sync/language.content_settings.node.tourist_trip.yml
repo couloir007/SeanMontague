@@ -1,0 +1,16 @@
+uuid: de514602-8a6b-4d55-b007-33fa6c63850c
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.tourist_trip
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+id: node.tourist_trip
+target_entity_type_id: node
+target_bundle: tourist_trip
+default_langcode: site_default
+language_alterable: false

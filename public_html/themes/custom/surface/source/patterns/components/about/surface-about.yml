@@ -1,0 +1,14 @@
+label: 'About'
+title: "Builder, rider, <em>grower.</em>"
+skills:
+  - 'Smithsonian NMNH'
+  - 'Drupal & Twig'
+  - 'Leaflet & GIS / Mapping'
+  - 'SVG & Data Visualization'
+  - 'JavaScript / Open Source'
+  - 'Permaculture Design'
+  - 'Kingdom Trails regular'
+paragraphs:
+  - "I'm Sean Montague — a web developer based in Burke, Vermont, in the Northeast Kingdom. I work at the Smithsonian National Museum of Natural History, building Drupal systems, interactive maps, and data visualization tools."
+  - "This site is a personal outlet for the things I care about outside of work: riding Kingdom Trails, skiing Burke Mountain, building a food forest, and making maps of the places I know well."
+  - "The technical stuff — Leaflet, GeoJSON, Twig, SVG — bleeds into the personal projects too. That's fine by me."

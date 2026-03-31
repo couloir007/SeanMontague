@@ -1,0 +1,6 @@
+links:
+  - text: 'Monospaced Link'
+    url: '#'
+  - text: 'Display Link'
+    url: '#'
+    modifier: 'surface-link--display'

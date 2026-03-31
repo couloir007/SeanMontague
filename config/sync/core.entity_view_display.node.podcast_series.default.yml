@@ -1,0 +1,188 @@
+uuid: 22d757b1-2e43-4e6e-9562-8040aa6672fd
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.podcast_series.body
+    - field.field.node.podcast_series.field_editorial
+    - field.field.node.podcast_series.field_metatag
+    - field.field.node.podcast_series.schema_about
+    - field.field.node.podcast_series.schema_image
+    - field.field.node.podcast_series.schema_related_link
+    - field.field.node.podcast_series.schema_role_host
+    - field.field.node.podcast_series.schema_same_as
+    - field.field.node.podcast_series.schema_significant_link
+    - field.field.node.podcast_series.schema_subject_of
+    - field.field.node.podcast_series.schema_web_feed
+    - node.type.podcast_series
+  module:
+    - entity_reference_override
+    - entity_reference_revisions
+    - field_group
+    - link
+    - text
+    - user
+third_party_settings:
+  field_group:
+    group_references:
+      children:
+        - schema_about
+        - schema_subject_of
+      label: References
+      parent_name: ''
+      region: content
+      weight: 22
+      format_type: fieldset
+      format_settings: {  }
+    group_general:
+      children:
+        - schema_image
+        - body
+        - title
+      label: General
+      parent_name: ''
+      region: content
+      weight: -20
+      format_type: fieldset
+      format_settings: {  }
+    group_links:
+      children:
+        - schema_same_as
+        - schema_web_feed
+        - schema_related_link
+        - schema_significant_link
+      label: Links
+      parent_name: ''
+      region: content
+      weight: 20
+      format_type: fieldset
+      format_settings: {  }
+    group_relationships:
+      children:
+        - schema_role_host
+      label: Relationships
+      parent_name: ''
+      region: content
+      weight: 23
+      format_type: fieldset
+      format_settings: {  }
+    group_editorial:
+      children:
+        - field_editorial
+      label: 'Editorial information'
+      parent_name: ''
+      region: content
+      weight: 220
+      format_type: details
+      format_settings: {  }
+id: node.podcast_series.default
+targetEntityType: node
+bundle: podcast_series
+mode: default
+content:
+  body:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 20
+    region: content
+  field_editorial:
+    type: entity_reference_revisions_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 24
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -100
+    region: content
+  schema_about:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  schema_image:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 23
+    region: content
+  schema_related_link:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  schema_role_host:
+    type: entity_reference_override_label
+    label: above
+    settings:
+      link: true
+      override_action: suffix
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  schema_same_as:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  schema_significant_link:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  schema_subject_of:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  schema_web_feed:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 2
+    region: content
+hidden:
+  field_metatag: true
+  langcode: true

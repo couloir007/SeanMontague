@@ -1,0 +1,142 @@
+.surface-hero {
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Map fills entire hero — explicit dimensions required by Leaflet */
+.surface-hero__map-bg {
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 0;
+}
+
+.surface-hero__map-bg .surface-map,
+.surface-hero__map-bg > div {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.surface-hero__overlay {
+  background:
+    linear-gradient(to bottom, rgba(247,246,242,0.7) 0%, rgba(247,246,242,0.4) 40%, rgba(247,246,242,0.85) 82%, var(--bg) 100%),
+    linear-gradient(to right, rgba(247,246,242,0.65) 0%, transparent 60%);
+  inset: 0;
+  position: absolute;
+  z-index: 1;
+}
+
+.surface-hero__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  max-width: 680px;
+  padding: 0 48px 48px;
+  position: relative;
+  z-index: 2;
+}
+
+.surface-hero__eyebrow {
+  color: var(--forest);
+  font-family: var(--font-mono-nek);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+.surface-hero__name {
+  color: var(--bright);
+  font-family: var(--font-display-nek);
+  font-size: clamp(64px, 9vw, 120px);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 0.9;
+}
+
+.surface-hero__tagline {
+  color: var(--text);
+  font-family: var(--font-serif-nek);
+  font-size: 19px;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.5;
+  margin-top: 20px;
+  max-width: 500px;
+}
+
+.surface-hero__cta-row {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.surface-hero__btn-primary {
+  background: var(--forest);
+  color: #fff;
+  font-family: var(--font-mono-nek);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  padding: 11px 26px;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: opacity 0.2s ease;
+}
+
+.surface-hero__btn-primary:hover { opacity: 0.82; }
+
+.surface-hero__btn-ghost {
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--font-mono-nek);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  padding-bottom: 2px;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.surface-hero__btn-ghost:hover { border-color: var(--text); color: var(--bright); }
+
+.surface-hero__categories {
+  backdrop-filter: blur(8px);
+  background: rgba(247, 246, 242, 0.92);
+  border-top: 1px solid rgba(0, 0, 0, 0.09);
+  display: flex;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.surface-hero__cat {
+  align-items: center;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  color: var(--muted);
+  display: flex;
+  flex: 1;
+  font-family: var(--font-mono-nek);
+  font-size: 10px;
+  gap: 8px;
+  letter-spacing: 0.15em;
+  padding: 15px 20px;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.surface-hero__cat:last-child { border-right: none; }
+.surface-hero__cat:hover { background: var(--surface); color: var(--bright); }
+
+@media (max-width: 960px) {
+  .surface-hero__content { padding: 0 24px 40px; }
+  .surface-hero__categories { flex-wrap: wrap; }
+  .surface-hero__cat { flex: 1 1 50%; }
+}

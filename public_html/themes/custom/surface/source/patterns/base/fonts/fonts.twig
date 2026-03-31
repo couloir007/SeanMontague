@@ -1,25 +1,18 @@
-<section class="demo-fonts">
-  {% for title, list in fonts %}
-    <div class="just-for-gap">
-      <div class="heading">{{ title|capitalize }}</div>
-      {% for item in list %}
-        {% set font_family = 'font-family: ' ~ item.family ~ '; ' %}
-        {% set font_style = 'font-style: ' ~ item.style ~ '; ' %}
-        {% set font_weight = 'font-weight: ' ~ item.weight ~ ';' %}
-        {% set preview_style = font_family ~ font_style ~ font_weight %}
+{{ attach_library('base/fonts') }}
 
-        <article class="font-demo">
-          <div class="font-preview" style="{{ preview_style }}">AaBbCc</div>
-          <div class="font-meta">
-            <div class="font-meta__alpha" style="{{ preview_style }}">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br/>abcdefghijklmnopqrstuvwxyz<br/>1234567890(,.;:?!$&*)</div>
-            <div class="font-meta__preview">
-              <div><span class="font-meta__label">Family:</span> {{ item.family }}</div>
-              <div><span class="font-meta__label">Style:</span> {{ item.style|capitalize }}</div>
-              <div><span class="font-meta__label">Weight:</span> {{ item.weight }}</div>
-            </div>
-          </div>
-        </article>
-      {% endfor %}
+<div class="font-specimens">
+  {% for font in fonts %}
+    <div class="font-specimen">
+      <div class="font-specimen__meta">
+        <span class="font-specimen__name">{{ font.name }}</span>
+        <code class="font-specimen__var">{{ font.var }}</code>
+        <span class="font-specimen__usage">{{ font.usage }}</span>
+      </div>
+      <div class="font-specimen__sample" style="font-family: '{{ font.name }}', {{ font.name == 'Bebas Neue' or font.name == 'DM Mono' ? 'sans-serif' : 'serif' }};">
+        A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+        a b c d e f g h i j k l m n o p q r s t u v w x y z
+        0 1 2 3 4 5 6 7 8 9
+      </div>
     </div>
   {% endfor %}
-</section>
+</div>

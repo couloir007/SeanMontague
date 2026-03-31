@@ -1,0 +1,20 @@
+uuid: 45ef0191-97d4-45c2-9831-b695ed2fd137
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.podcast_series
+id: node.podcast_series.menu_link
+field_name: menu_link
+entity_type: node
+bundle: podcast_series
+label: 'Menu link'
+description: 'Computed menu link for the node (only available during node saving).'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: default
+  handler_settings: {  }
+field_type: entity_reference

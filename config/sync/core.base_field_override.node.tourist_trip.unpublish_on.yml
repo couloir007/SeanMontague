@@ -1,0 +1,18 @@
+uuid: 3170c14d-8677-4555-84f1-84be18040925
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.tourist_trip
+id: node.tourist_trip.unpublish_on
+field_name: unpublish_on
+entity_type: node
+bundle: tourist_trip
+label: 'Unpublish on'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: timestamp

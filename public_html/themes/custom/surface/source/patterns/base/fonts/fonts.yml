@@ -1,34 +1,15 @@
----
 fonts:
-  Georgia:
-    - family: 'Georgia, Times New Roman, serif'
-      style: 'normal'
-      weight: '400'
-    - family: 'Georgia, Times New Roman, serif'
-      style: 'normal'
-      weight: '700'
-  Helvetica:
-    - family: 'Helvetica, sans-serif'
-      style: 'normal'
-      weight: '300'
-    - family: 'Helvetica, sans-serif'
-      style: 'normal'
-      weight: '400'
-    - family: 'Helvetica, sans-serif'
-      style: 'normal'
-      weight: '700'
-  Verdana:
-    - family: 'Verdana, Geneva, sans-serif'
-      style: 'normal'
-      weight: '400'
-    - family: 'Verdana, Geneva, sans-serif'
-      style: 'normal'
-      weight: '700'
-  system:
-    - family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Oxygen-Sans', Ubuntu, Cantarell, 'Fira Sans', Droid Sans, sans-serif"
-      style: 'normal'
-      weight: '400'
-  mono:
-    - family: "Menlo, Consolas, 'Lucida Console', 'Liberation Mono', 'Courier New', monospace, sans-serif"
-      style: 'normal'
-      weight: '400'
+  - name: 'Bebas Neue'
+    var: '--font-display-nek'
+    usage: 'Hero titles, section headlines, stats values'
+    import: "https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
+
+  - name: 'Cormorant Garamond'
+    var: '--font-serif-nek'
+    usage: 'Body text, article headings, italic accents, subtitles'
+    import: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap"
+
+  - name: 'DM Mono'
+    var: '--font-mono-nek'
+    usage: 'Labels, navigation, metadata, category tags, stat labels'
+    import: "https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&display=swap"

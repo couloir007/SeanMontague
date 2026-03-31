@@ -1,4 +1,4 @@
-uuid: 82f304dd-3726-48fc-b8cd-4fc2d298a4bf
+uuid: a92d1855-24c5-421b-9127-8ecbcea4358d
 langcode: en
 status: true
 dependencies:
@@ -229,6 +229,11 @@ content:
       match_limit: 10
       size: 60
       placeholder: ''
+    third_party_settings: {  }
+  simple_sitemap:
+    weight: 220
+    region: content
+    settings: {  }
     third_party_settings: {  }
   status:
     type: boolean_checkbox

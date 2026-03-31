@@ -1,0 +1,20 @@
+uuid: 3ae8f6d3-d435-4e01-b249-c56f7048fcec
+langcode: en
+status: true
+dependencies:
+  module:
+    - entity_reference_override
+    - node
+id: node.schema_role_host
+field_name: schema_role_host
+entity_type: node
+type: entity_reference_override
+settings:
+  target_type: node
+module: entity_reference_override
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

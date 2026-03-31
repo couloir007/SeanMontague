@@ -1,0 +1,6 @@
+.readtime {
+  color: var(--muted);
+  font-family: var(--font-mono-nek);
+  font-size: 0.625rem;
+  letter-spacing: 0.15em;
+}

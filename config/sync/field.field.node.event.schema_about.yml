@@ -1,18 +1,18 @@
-uuid: ff56c499-5640-485d-ae2f-628a54b81699
+uuid: f1272953-ad9a-49cd-805d-b0205487e90b
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.node.schema_about
-    - node.type.article
+    - node.type.blog_posting
     - node.type.event
-    - node.type.image_gallery
-    - node.type.media_gallery
-    - node.type.organization
+    - node.type.event_series
     - node.type.page
     - node.type.person
     - node.type.place
-    - node.type.video_gallery
+    - node.type.podcast_episode
+    - node.type.podcast_series
+    - node.type.tourist_trip
     - node.type.web_site
   module:
     - epp
@@ -38,14 +38,14 @@ settings:
     excluded_schema_types: {  }
     ignore_additional_mappings: false
     target_bundles:
-      article: article
+      blog_posting: blog_posting
       event: event
-      image_gallery: image_gallery
-      media_gallery: media_gallery
-      organization: organization
+      event_series: event_series
       page: page
       person: person
       place: place
-      video_gallery: video_gallery
+      podcast_episode: podcast_episode
+      podcast_series: podcast_series
+      tourist_trip: tourist_trip
       web_site: web_site
 field_type: entity_reference

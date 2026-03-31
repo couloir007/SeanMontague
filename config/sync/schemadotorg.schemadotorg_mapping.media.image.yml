@@ -1,9 +1,9 @@
-uuid: e497b75c-feea-44b7-9812-2bf89c053116
+uuid: 09d45071-9859-4efa-ab20-b453c1176a1c
 langcode: en
 status: true
 dependencies:
   config:
-    - field.field.media.image.field_media_image
+    - field.field.media.image.schema_image
     - media.type.image
   module:
     - media
@@ -14,7 +14,7 @@ schema_type: ImageObject
 schema_properties:
   created: dateCreated
   changed: dateModified
-  field_media_image: image
+  schema_image: image
   langcode: inLanguage
   name: name
   thumbnail: thumbnail

@@ -1,0 +1,75 @@
+uuid: ef800608-06b5-4f73-b06d-f427ed43bc39
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.podcast_episode.body
+    - field.field.node.podcast_episode.field_editorial
+    - field.field.node.podcast_episode.field_metatag
+    - field.field.node.podcast_episode.schema_about
+    - field.field.node.podcast_episode.schema_assoc_media
+    - field.field.node.podcast_episode.schema_date_published
+    - field.field.node.podcast_episode.schema_duration
+    - field.field.node.podcast_episode.schema_episode_number
+    - field.field.node.podcast_episode.schema_image
+    - field.field.node.podcast_episode.schema_related_link
+    - field.field.node.podcast_episode.schema_role_guest
+    - field.field.node.podcast_episode.schema_role_host
+    - field.field.node.podcast_episode.schema_same_as
+    - field.field.node.podcast_episode.schema_significant_link
+    - field.field.node.podcast_episode.schema_subject_of
+    - node.type.podcast_episode
+  module:
+    - text
+    - user
+id: node.podcast_episode.teaser
+targetEntityType: node
+bundle: podcast_episode
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 17
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -100
+    region: content
+  schema_duration:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 110
+    region: content
+  schema_episode_number:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 110
+    region: content
+hidden:
+  field_editorial: true
+  field_metatag: true
+  langcode: true
+  schema_about: true
+  schema_assoc_media: true
+  schema_date_published: true
+  schema_image: true
+  schema_related_link: true
+  schema_role_guest: true
+  schema_role_host: true
+  schema_same_as: true
+  schema_significant_link: true
+  schema_subject_of: true

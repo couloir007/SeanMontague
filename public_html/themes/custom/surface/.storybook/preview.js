@@ -18,6 +18,9 @@ import 'https://kit.fontawesome.com/a0eb0bad75.js';
 // Imports the CSS for all components combined into a single stylesheet.
 import '../source/patterns/styles.css';
 
+// Imports the JS for all components combined into a single entry point.
+import '../source/patterns/scripts.js';
+
 // Imports all Storybook CSS for display.
 import '../source/patterns/storybook.css';
 

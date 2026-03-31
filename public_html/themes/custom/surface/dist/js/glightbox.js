@@ -1,1 +1,0 @@
-((t,o)=>{t.behaviors.surfaceLightbox={attach:function(c){t.surfaceLightbox.init(c)}},t.surfaceLightbox={init:function(i){o("surfaceLightboxInit",".glightbox",i).forEach(()=>{GLightbox({})})}}})(Drupal,once);

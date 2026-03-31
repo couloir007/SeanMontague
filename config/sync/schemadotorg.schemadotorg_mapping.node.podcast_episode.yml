@@ -1,0 +1,47 @@
+uuid: 1fe2f370-4a4d-42ee-8e96-a5ec3c20669a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.podcast_episode.body
+    - field.field.node.podcast_episode.schema_about
+    - field.field.node.podcast_episode.schema_assoc_media
+    - field.field.node.podcast_episode.schema_date_published
+    - field.field.node.podcast_episode.schema_duration
+    - field.field.node.podcast_episode.schema_episode_number
+    - field.field.node.podcast_episode.schema_image
+    - field.field.node.podcast_episode.schema_related_link
+    - field.field.node.podcast_episode.schema_same_as
+    - field.field.node.podcast_episode.schema_significant_link
+    - field.field.node.podcast_episode.schema_subject_of
+    - node.type.podcast_episode
+  module:
+    - node
+id: node.podcast_episode
+target_entity_type_id: node
+target_bundle: podcast_episode
+schema_type: PodcastEpisode
+schema_properties:
+  schema_about: about
+  schema_assoc_media: associatedMedia
+  created: dateCreated
+  changed: dateModified
+  schema_date_published: datePublished
+  body: text
+  schema_duration: duration
+  schema_episode_number: episodeNumber
+  langcode: inLanguage
+  title: name
+  schema_same_as: sameAs
+  schema_subject_of: subjectOf
+additional_mappings:
+  WebPage:
+    schema_type: WebPage
+    schema_properties:
+      created: dateCreated
+      changed: dateModified
+      langcode: inLanguage
+      title: name
+      schema_image: primaryImageOfPage
+      schema_related_link: relatedLink
+      schema_significant_link: significantLink

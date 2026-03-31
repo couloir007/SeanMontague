@@ -1,0 +1,38 @@
+{{ attach_library('surface/surface-article') }}
+{{ attach_library('surface/surface-article-header') }}
+
+{% if header %}
+  {% include '@collections/article-header/surface-article-header.twig' with header only %}
+{% endif %}
+
+{# Article-level map + elevation section — full width #}
+{% include '@collections/article-map-section/surface-article-map-section.twig' with {
+  'label':       map_label,
+  'title':       map_title,
+  'text':        map_text,
+  'map_id':      map_id,
+  'map_center':  map_center,
+  'map_zoom':    map_zoom,
+  'map_markers': map_markers,
+  'map_lines':   map_lines,
+  'elev_gain':   elev_gain,
+  'elev_loss':   elev_loss,
+  'elev_min':    elev_min,
+  'elev_max':    elev_max,
+  'elev_data':   elev_data,
+} only %}
+
+{# Body + sidebar #}
+<div class="surface-article-wrap">
+  <article class="surface-article__body">
+    {{ body|raw }}
+  </article>
+  <aside class="surface-article__sidebar">
+    {% for card in sidebar_cards %}
+      <div class="surface-sidebar-card">
+        <div class="surface-sidebar-card__header">{{ card.heading }}</div>
+        <div class="surface-sidebar-card__body">{{ card.body|raw }}</div>
+      </div>
+    {% endfor %}
+  </aside>
+</div>

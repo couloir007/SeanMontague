@@ -1,0 +1,44 @@
+.surface-homepage__writing {
+  border-bottom: 1px solid var(--border);
+  padding: 80px 48px;
+}
+
+.surface-homepage__eyebrow {
+  color: var(--muted);
+  display: block;
+  font-family: var(--font-mono-nek);
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+}
+
+.surface-homepage__cards-grid {
+  border: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.surface-homepage__places {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 80px 48px;
+}
+
+.surface-homepage__places-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (width <= 960px) {
+  .surface-homepage__writing,
+  .surface-homepage__places {
+    padding: 60px 24px;
+  }
+
+  .surface-homepage__cards-grid,
+  .surface-homepage__places-grid {
+    grid-template-columns: 1fr;
+  }
+}

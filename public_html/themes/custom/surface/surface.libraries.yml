@@ -365,6 +365,135 @@ views-exposed-form:
     component:
       dist/css/views-exposed-form.css: {}
 
+# Surface Patterns
+surface-about:
+  css:
+    component:
+      dist/css/surface-about.css: {}
+
+surface-card:
+  css:
+    component:
+      dist/css/surface-card.css: {}
+
+surface-contact:
+  css:
+    component:
+      dist/css/surface-contact.css: {}
+
+surface-footer:
+  css:
+    component:
+      dist/css/surface-footer.css: {}
+
+surface-hero:
+  css:
+    component:
+      dist/css/surface-hero.css: {}
+  js:
+    dist/js/surface-hero.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+
+surface-map:
+  css:
+    component:
+      dist/css/surface-map.css: {}
+  js:
+    dist/js/surface-map.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - surface/leaflet
+
+surface-article:
+  css:
+    component:
+      dist/css/surface-article.css: {}
+  dependencies:
+    - surface/surface-article-map-section
+
+surface-article-header:
+  css:
+    component:
+      dist/css/surface-article-header.css: {}
+  dependencies:
+    - surface/surface-stats-bar
+
+surface-article-map-section:
+  css:
+    component:
+      dist/css/surface-article-map-section.css: {}
+  dependencies:
+    - surface/surface-map
+    - surface/surface-elevation-profile
+
+surface-elevation-profile:
+  css:
+    component:
+      dist/css/surface-elevation-profile.css: {}
+  js:
+    dist/js/surface-elevation-profile.js: {}
+  dependencies:
+    - core/drupal
+    - surface/leaflet
+
+surface-stats-bar:
+  css:
+    component:
+      dist/css/surface-stats-bar.css: {}
+
+surface-links:
+  css:
+    component:
+      dist/css/surface-links.css: {}
+
+surface-map-section:
+  css:
+    component:
+      dist/css/surface-map-section.css: {}
+  js:
+    dist/js/surface-map-section.js: {}
+  dependencies:
+    - surface/surface-map
+    - core/drupal
+    - core/once
+
+surface-marquee:
+  css:
+    component:
+      dist/css/surface-marquee.css: {}
+
+surface-nav:
+  css:
+    component:
+      dist/css/surface-nav.css: {}
+
+surface-places-card:
+  css:
+    component:
+      dist/css/surface-places-card.css: {}
+
+site-homepage:
+  css:
+    layout:
+      dist/css/site-homepage.css: {}
+
+# External Libraries
+leaflet:
+  remote: https://unpkg.com/leaflet@1.9.4/dist/leaflet.js
+  version: 1.9.4
+  license:
+    name: BSD-2-Clause
+    url: https://github.com/Leaflet/Leaflet/blob/main/LICENSE
+    gpl-compatible: true
+  css:
+    theme:
+      https://unpkg.com/leaflet@1.9.4/dist/leaflet.css: { type: external, minified: true }
+  js:
+    https://unpkg.com/leaflet@1.9.4/dist/leaflet.js: { type: external, minified: true }
+
 # Utility Libraries
 align:
   css:

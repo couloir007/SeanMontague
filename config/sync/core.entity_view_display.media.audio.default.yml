@@ -3,25 +3,26 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.media.audio.field_media_audio_file
+    - field.field.media.audio.schema_content_url
     - media.type.audio
   module:
-    - file
+    - link
 id: media.audio.default
 targetEntityType: media
 bundle: audio
 mode: default
 content:
-  field_media_audio_file:
-    type: file_audio
-    label: visually_hidden
+  schema_content_url:
+    type: link
+    label: above
     settings:
-      controls: true
-      autoplay: false
-      loop: false
-      multiple_file_display_type: tags
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
     third_party_settings: {  }
-    weight: 0
+    weight: 12
     region: content
 hidden:
   created: true

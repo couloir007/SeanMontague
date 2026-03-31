@@ -1,0 +1,18 @@
+uuid: bfe35291-53e1-4ac2-ae36-a76620322791
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.blog_posting
+id: node.blog_posting.publish_on
+field_name: publish_on
+entity_type: node
+bundle: blog_posting
+label: 'Publish on'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: timestamp

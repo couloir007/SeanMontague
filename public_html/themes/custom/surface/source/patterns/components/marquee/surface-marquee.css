@@ -1,0 +1,33 @@
+.surface-marquee {
+  width: 100%;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  padding: 13px 0;
+}
+
+.surface-marquee__track {
+  animation: surface-marquee-scroll 30s linear infinite;
+  display: flex;
+  white-space: nowrap;
+}
+
+.surface-marquee__item {
+  color: #c0bbb2;
+  flex-shrink: 0;
+  font-family: var(--font-mono-nek);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  padding: 0 36px;
+  text-transform: uppercase;
+}
+
+.surface-marquee__dot {
+  color: var(--forest);
+  margin-right: 36px;
+}
+
+@keyframes surface-marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}

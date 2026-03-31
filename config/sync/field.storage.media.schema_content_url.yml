@@ -1,0 +1,19 @@
+uuid: ca546341-a88b-4d03-b88d-8f106dfdfa7e
+langcode: en
+status: true
+dependencies:
+  module:
+    - link
+    - media
+id: media.schema_content_url
+field_name: schema_content_url
+entity_type: media
+type: link
+settings: {  }
+module: link
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,23 @@
+uuid: 3225a6f0-a4a8-43fe-a953-ecb3460c550c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_significant_link
+    - node.type.event_series
+  module:
+    - link
+id: node.event_series.schema_significant_link
+field_name: schema_significant_link
+entity_type: node
+bundle: event_series
+label: 'Significant links'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 17
+field_type: link

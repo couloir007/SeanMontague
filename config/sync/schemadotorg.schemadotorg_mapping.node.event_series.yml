@@ -1,0 +1,37 @@
+uuid: c516436a-7577-4964-af5a-16b19eab9413
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.event_series.body
+    - field.field.node.event_series.schema_about
+    - field.field.node.event_series.schema_event_schedule
+    - field.field.node.event_series.schema_image
+    - field.field.node.event_series.schema_related_link
+    - field.field.node.event_series.schema_significant_link
+    - field.field.node.event_series.schema_subject_of
+    - node.type.event_series
+  module:
+    - node
+id: node.event_series
+target_entity_type_id: node
+target_bundle: event_series
+schema_type: EventSeries
+schema_properties:
+  schema_about: about
+  body: description
+  schema_event_schedule: eventSchedule
+  langcode: inLanguage
+  title: name
+  schema_subject_of: subjectOf
+additional_mappings:
+  WebPage:
+    schema_type: WebPage
+    schema_properties:
+      created: dateCreated
+      changed: dateModified
+      langcode: inLanguage
+      title: name
+      schema_image: primaryImageOfPage
+      schema_related_link: relatedLink
+      schema_significant_link: significantLink

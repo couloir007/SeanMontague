@@ -1,4 +1,4 @@
-uuid: 34aa52b7-344e-4294-94b5-b505a43f7fc6
+uuid: f64629cd-8a6b-409f-9cb4-8ac4a42320cb
 langcode: en
 status: true
 dependencies:
@@ -219,6 +219,11 @@ content:
     region: content
     settings:
       placeholder: ''
+    third_party_settings: {  }
+  simple_sitemap:
+    weight: 220
+    region: content
+    settings: {  }
     third_party_settings: {  }
   status:
     type: boolean_checkbox

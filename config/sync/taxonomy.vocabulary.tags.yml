@@ -1,0 +1,9 @@
+uuid: 7654b73e-809a-4c6f-a89e-f9d6befad65b
+langcode: en
+status: true
+dependencies: {  }
+name: 'Defined Term'
+vid: tags
+description: null
+weight: 0
+new_revision: false

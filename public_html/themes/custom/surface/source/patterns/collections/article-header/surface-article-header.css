@@ -1,0 +1,86 @@
+.surface-article-header {
+  margin: 0 auto;
+  max-width: 1100px;
+  padding: 120px 48px 0;
+}
+
+.surface-article-header__meta {
+  margin-bottom: 24px;
+}
+
+.surface-article-header__meta-top {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+}
+
+.surface-article-header__category {
+  background: rgba(58, 90, 64, 6%);
+  border: 1px solid rgba(58, 90, 64, 30%);
+  color: var(--forest);
+  font-family: var(--font-mono-nek);
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  padding: 4px 10px;
+  text-transform: uppercase;
+}
+
+.surface-article-header__category--trail {
+  background: rgba(122, 52, 16, 6%);
+  border-color: rgba(122, 52, 16, 30%);
+  color: var(--trail);
+}
+
+.surface-article-header__category--maps {
+  background: rgba(74, 124, 158, 6%);
+  border-color: rgba(74, 124, 158, 30%);
+  color: var(--sky);
+}
+
+.surface-article-header__category--tech {
+  background: rgba(107, 101, 96, 6%);
+  border-color: rgba(107, 101, 96, 30%);
+  color: var(--stone);
+}
+
+.surface-article-header__difficulty {
+  background: #fff3e0;
+  border: 1px solid #f0d090;
+  color: #a05a00;
+  font-family: var(--font-mono-nek);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  padding: 4px 10px;
+  text-transform: uppercase;
+}
+
+.surface-article-header__date {
+  color: var(--muted);
+  font-family: var(--font-mono-nek);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+}
+
+.surface-article-header__title {
+  color: var(--bright);
+  font-family: var(--font-display-nek);
+  font-size: clamp(40px, 6vw, 80px);
+  letter-spacing: 0.02em;
+  line-height: 0.95;
+  margin-bottom: 24px;
+}
+
+.surface-article-header__subtitle {
+  color: var(--muted);
+  font-family: var(--font-serif-nek);
+  font-size: 22px;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.5;
+  margin-bottom: 40px;
+  max-width: 720px;
+}
+
+@media (width <= 640px) {
+  .surface-article-header { padding: 100px 24px 0; }
+}

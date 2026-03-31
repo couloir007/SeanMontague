@@ -1,0 +1,23 @@
+uuid: 40e6a591-4804-4675-96c4-e38d43c6a085
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_duration
+    - node.type.podcast_episode
+id: node.podcast_episode.schema_duration
+field_name: schema_duration
+entity_type: node
+bundle: podcast_episode
+label: Duration
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

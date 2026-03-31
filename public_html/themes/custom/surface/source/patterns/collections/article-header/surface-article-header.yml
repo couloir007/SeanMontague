@@ -1,0 +1,24 @@
+category: 'Kingdom Trails'
+category_key: 'garden'
+difficulty: 'Intermediate'
+date: 'March 12, 2025'
+title: "First Ride at<br>Kingdom Trails"
+subtitle: 'A suggested intermediate loop with moderate climbing — what to expect, where to start, and why you will be back before the week is out.'
+stats:
+  - label: 'Distance'
+    value: '12.7'
+    unit: 'miles'
+  - label: 'Elevation'
+    value: '2,600'
+    unit: 'ft gain'
+  - label: 'Est. Time'
+    value: '2.5–3'
+    unit: 'hours'
+  - label: 'Difficulty'
+    value: 'Intermediate'
+    unit: 'blue / some black'
+    is_small: true
+  - label: 'Season'
+    value: 'May–Oct'
+    unit: 'check conditions'
+    is_small: true

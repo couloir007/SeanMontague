@@ -1,0 +1,23 @@
+uuid: a50f877e-dbab-45b8-80a7-4a167563788e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_related_link
+    - node.type.tourist_trip
+  module:
+    - link
+id: node.tourist_trip.schema_related_link
+field_name: schema_related_link
+entity_type: node
+bundle: tourist_trip
+label: 'Related links'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 17
+field_type: link

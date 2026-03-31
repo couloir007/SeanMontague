@@ -1,9 +1,0 @@
-uuid: 74a51988-fe5d-42a0-a629-a3e1dfdfd337
-langcode: en
-status: true
-dependencies: {  }
-name: 'Defined Term'
-vid: defined_term
-description: null
-weight: 0
-new_revision: false

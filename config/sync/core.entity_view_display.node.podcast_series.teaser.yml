@@ -1,0 +1,51 @@
+uuid: 6406ead8-29e3-474e-841d-4c6ff77bb9f0
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.podcast_series.body
+    - field.field.node.podcast_series.field_editorial
+    - field.field.node.podcast_series.field_metatag
+    - field.field.node.podcast_series.schema_about
+    - field.field.node.podcast_series.schema_image
+    - field.field.node.podcast_series.schema_related_link
+    - field.field.node.podcast_series.schema_role_host
+    - field.field.node.podcast_series.schema_same_as
+    - field.field.node.podcast_series.schema_significant_link
+    - field.field.node.podcast_series.schema_subject_of
+    - field.field.node.podcast_series.schema_web_feed
+    - node.type.podcast_series
+  module:
+    - text
+    - user
+id: node.podcast_series.teaser
+targetEntityType: node
+bundle: podcast_series
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 17
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -100
+    region: content
+hidden:
+  field_editorial: true
+  field_metatag: true
+  langcode: true
+  schema_about: true
+  schema_image: true
+  schema_related_link: true
+  schema_role_host: true
+  schema_same_as: true
+  schema_significant_link: true
+  schema_subject_of: true
+  schema_web_feed: true

@@ -1,0 +1,23 @@
+:where(html) {
+  /* NEK palette */
+  --bg: #f7f6f2;
+  --surface: #ffffff;
+  --surface2: #f0ede6;
+  --border: #e0dbd1;
+  --muted: #7a7568;
+  --text: #2c2a25;
+  --bright: #161410;
+  --forest: #3a5a40;
+  --trail: #7a3410;
+  --sky: #4a7c9e;
+  --stone: #6b6560;
+
+  /* NEK font stacks */
+  --font-mono-nek: 'DM Mono', monospace;
+  --font-serif-nek: 'Cormorant Garamond', serif;
+  --font-display-nek: 'Bebas Neue', sans-serif;
+
+  /* Override global font-primary/secondary with NEK fonts */
+  --font-primary: var(--font-serif-nek);
+  --font-secondary: var(--font-display-nek);
+}

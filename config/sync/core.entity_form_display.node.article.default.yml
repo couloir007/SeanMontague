@@ -6,12 +6,8 @@ dependencies:
     - field.field.node.article.body
     - field.field.node.article.field_editorial
     - field.field.node.article.field_metatag
-    - field.field.node.article.schema_about
-    - field.field.node.article.schema_article_type
-    - field.field.node.article.schema_image
     - field.field.node.article.schema_related_link
     - field.field.node.article.schema_significant_link
-    - field.field.node.article.schema_subject_of
     - field.field.node.article.schema_topic
     - node.type.article
   module:
@@ -24,24 +20,10 @@ dependencies:
     - text
 third_party_settings:
   field_group:
-    group_references:
-      children:
-        - schema_about
-        - schema_subject_of
-      label: References
-      region: content
-      parent_name: ''
-      weight: 22
-      format_type: details
-      format_settings:
-        open: true
-        description: ''
     group_general:
       children:
-        - schema_article_type
-        - schema_image
-        - body
-        - title
+        2: body
+        3: title
       label: General
       region: content
       parent_name: ''
@@ -142,32 +124,6 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
-  schema_about:
-    type: entity_reference_autocomplete
-    weight: 0
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-  schema_article_type:
-    type: options_select
-    weight: 0
-    region: content
-    settings: {  }
-    third_party_settings: {  }
-  schema_image:
-    type: entity_reference_autocomplete
-    weight: 23
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
   schema_related_link:
     type: linkit
     weight: 0
@@ -187,16 +143,6 @@ content:
       placeholder_title: ''
       linkit_profile: default
       linkit_auto_link_text: true
-    third_party_settings: {  }
-  schema_subject_of:
-    type: entity_reference_autocomplete
-    weight: 1
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
     third_party_settings: {  }
   schema_topic:
     type: entity_reference_autocomplete

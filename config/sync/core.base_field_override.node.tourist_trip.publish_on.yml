@@ -1,0 +1,18 @@
+uuid: b6a7970b-4df2-4101-a6c8-4a7e34780aeb
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.tourist_trip
+id: node.tourist_trip.publish_on
+field_name: publish_on
+entity_type: node
+bundle: tourist_trip
+label: 'Publish on'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: timestamp

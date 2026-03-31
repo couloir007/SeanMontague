@@ -3,10 +3,8 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.media.video.field_media_oembed_video
     - media.type.video
   module:
-    - media
     - path
 id: media.video.default
 targetEntityType: media
@@ -18,14 +16,6 @@ content:
     weight: 200
     region: content
     settings: {  }
-    third_party_settings: {  }
-  field_media_oembed_video:
-    type: oembed_textfield
-    weight: 0
-    region: content
-    settings:
-      size: 60
-      placeholder: ''
     third_party_settings: {  }
   langcode:
     type: language_select

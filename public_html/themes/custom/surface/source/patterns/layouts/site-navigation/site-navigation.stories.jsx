@@ -3,7 +3,7 @@ import site_navigation from './site-navigation.twig';
 import data from './site-navigation.yml';
 
 const settings = {
-  title: 'Layouts/Site navigation',
+  title: 'Layouts/Site Navigation',
 };
 
 export const Stacked = {

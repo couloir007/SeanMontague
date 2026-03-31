@@ -1,9 +1,9 @@
-uuid: 1b3398cf-21d3-4f24-b20b-9bd289dd6f9e
+uuid: 97050deb-be8e-443c-ac2d-354e93e14259
 langcode: en
 status: true
 dependencies:
   config:
-    - field.field.media.audio.field_media_audio_file
+    - field.field.media.audio.schema_content_url
     - media.type.audio
   module:
     - media
@@ -12,7 +12,7 @@ target_entity_type_id: media
 target_bundle: audio
 schema_type: AudioObject
 schema_properties:
-  field_media_audio_file: contentUrl
+  schema_content_url: contentUrl
   created: dateCreated
   changed: dateModified
   langcode: inLanguage

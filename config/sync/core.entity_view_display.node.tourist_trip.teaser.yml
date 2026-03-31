@@ -1,0 +1,33 @@
+uuid: 08586975-e996-40bd-a2cb-8c3395eafc37
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.tourist_trip.field_editorial
+    - field.field.node.tourist_trip.field_metatag
+    - field.field.node.tourist_trip.schema_image
+    - field.field.node.tourist_trip.schema_related_link
+    - field.field.node.tourist_trip.schema_significant_link
+    - field.field.node.tourist_trip.schema_subject_of
+    - node.type.tourist_trip
+  module:
+    - user
+id: node.tourist_trip.teaser
+targetEntityType: node
+bundle: tourist_trip
+mode: teaser
+content:
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -100
+    region: content
+hidden:
+  field_editorial: true
+  field_metatag: true
+  langcode: true
+  schema_image: true
+  schema_related_link: true
+  schema_significant_link: true
+  schema_subject_of: true

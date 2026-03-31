@@ -4,101 +4,50 @@
  */
 
 .site-header {
+  background: var(--bg);
+  border-bottom: 1px solid transparent;
   inline-size: 100%;
   inset-block-start: 0;
-  padding-block-start: var(--size-5);
-  padding-block-end: var(--size-5);
-  position: sticky;
-  top: calc(
-    var(--header-height-difference) * -1
-  ); /* Multiply by -1 to get a negative value */
-  transition: height 0.1s ease;
-  will-change: height;
-  z-index: var(--layer-30);
+  padding: 22px 48px;
+  position: fixed;
+  transition:
+    border-color 0.3s,
+    padding 0.3s;
+  z-index: var(--layer-50);
+
+  &.scrolled {
+    border-bottom-color: var(--border);
+    padding: 16px 48px;
+  }
 
   /* Take into account logged in user */
-  .gin--vertical-toolbar & {
+  :where(.gin--vertical-toolbar) & {
     inset-block-start: 87px;
 
-    @media (--toolbar) {
+    @media (width <= 960px) {
       inset-block-start: 60px;
     }
   }
 
-  .site-primary__content {
-    display: flex;
-  }
-
-  .menu-main h1 {
-    color: #333333;
-  }
-
-  .menu-main {
-    color: #333333;
-
-    .menu__item--level-1 .menu__link-inner {
-      padding-block: var(--size-4);
-    }
-
-    .menu__item--level-2 .menu__link-inner {
-      padding-block: 0;
-    }
-  }
-
-  .site-header__container {
-    background: #BFD7C1;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding-inline: 0;
-  }
-
-  .site-secondary__content {
-    height: 100%;
-  }
-
-  .site-secondary__buttons {
-    display: flex;
-    flex-direction: row;
-    height: 100%;
-    justify-content: flex-end;
-
-    .translate {
-      flex-direction: row;
-      width: calc(100% + 100px);
-    }
-
-    .button {
-      color: #333333;
-      font-weight: var(--font-weight-400);
-    }
-
-    .button--link {
-      inline-size: 100%;
-      padding-inline: 0;
-      padding-inline-end: var(--size-4);
-      padding-block: var(--size-4);
-
-      svg {
-        margin-inline-end: var(--size-1);
-        margin-inline-start: 0;
-      }
-    }
-
-    .button--translate {
-      inline-size: 100%;
-      padding-inline-start: 0;
-    }
+  @media (width <= 960px) {
+    padding: 18px 24px;
   }
 }
 
-/* Take into account node preview */
-[data-once="node-preview"] {
-  .site-header {
-    inset-block-start: 109px;
+.site-header__container {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
 
-    @media (--toolbar) {
-      inset-block-start: 70px;
-    }
+.site-header__logo {
+  color: var(--bright);
+  font-family: var(--font-mono-nek);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+
+  span {
+    color: var(--forest);
   }
 }

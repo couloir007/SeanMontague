@@ -1,4 +1,4 @@
-uuid: 8b481785-12cf-4fe5-8c79-9e28f84c9388
+uuid: 7b247b88-ac1d-43d7-bc8e-b1342e0e5883
 langcode: en
 status: true
 dependencies:
@@ -16,7 +16,6 @@ dependencies:
     - entity_reference_revisions
     - field_group
     - link
-    - metatag
     - text
     - user
 third_party_settings:
@@ -28,7 +27,18 @@ third_party_settings:
       label: References
       parent_name: ''
       region: content
-      weight: 5
+      weight: 22
+      format_type: fieldset
+      format_settings: {  }
+    group_general:
+      children:
+        - title
+        - body
+        - schema_image
+      label: General
+      parent_name: ''
+      region: content
+      weight: -20
       format_type: fieldset
       format_settings: {  }
     group_editorial:
@@ -47,7 +57,7 @@ third_party_settings:
       label: Links
       parent_name: ''
       region: content
-      weight: 4
+      weight: 20
       format_type: fieldset
       format_settings: {  }
 id: node.web_site.default
@@ -57,10 +67,10 @@ mode: default
 content:
   body:
     type: text_default
-    label: hidden
+    label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 2
+    weight: 20
     region: content
   field_editorial:
     type: entity_reference_revisions_entity_view
@@ -70,13 +80,6 @@ content:
       link: ''
     third_party_settings: {  }
     weight: 23
-    region: content
-  field_metatag:
-    type: metatag_empty_formatter
-    label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    weight: 6
     region: content
   links:
     settings: {  }
@@ -98,7 +101,7 @@ content:
       view_mode: default
       link: false
     third_party_settings: {  }
-    weight: 3
+    weight: 25
     region: content
   schema_related_link:
     type: link
@@ -133,4 +136,5 @@ content:
     weight: 1
     region: content
 hidden:
+  field_metatag: true
   langcode: true

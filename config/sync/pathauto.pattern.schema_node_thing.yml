@@ -17,13 +17,19 @@ selection_criteria:
       node: node
     bundles:
       article: article
+      blog_posting: blog_posting
       event: event
+      event_series: event_series
+      how_to: how_to
       image_gallery: image_gallery
       media_gallery: media_gallery
       organization: organization
       page: page
       person: person
       place: place
+      podcast_episode: podcast_episode
+      podcast_series: podcast_series
+      tourist_trip: tourist_trip
       video_gallery: video_gallery
       web_site: web_site
 selection_logic: and

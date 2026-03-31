@@ -1,14 +1,13 @@
-uuid: f06626c8-7ee6-4bfe-901a-630846d8b060
+uuid: 871fdabe-798a-4dcc-9aba-db6d88ea831b
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.node.schema_has_part
-    - node.type.article
-    - node.type.image_gallery
-    - node.type.media_gallery
+    - node.type.blog_posting
     - node.type.page
-    - node.type.video_gallery
+    - node.type.podcast_episode
+    - node.type.podcast_series
     - node.type.web_site
   module:
     - epp
@@ -34,10 +33,9 @@ settings:
     excluded_schema_types: {  }
     ignore_additional_mappings: true
     target_bundles:
-      article: article
-      image_gallery: image_gallery
-      media_gallery: media_gallery
+      blog_posting: blog_posting
       page: page
-      video_gallery: video_gallery
+      podcast_episode: podcast_episode
+      podcast_series: podcast_series
       web_site: web_site
 field_type: entity_reference

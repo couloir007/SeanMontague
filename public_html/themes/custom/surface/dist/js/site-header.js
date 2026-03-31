@@ -1,1 +1,1 @@
-document.addEventListener("DOMContentLoaded",()=>{const e=document.querySelector(".site-header .site-branding"),d=document.querySelector(".site-primary__content");window.addEventListener("scroll",()=>{window.scrollY>0?(e.classList.add("primary-hidden"),d.classList.add("primary-hidden")):(e.classList.remove("primary-hidden"),d.classList.remove("primary-hidden"))})});
+document.addEventListener("DOMContentLoaded",()=>{const e=document.getElementById("header");e&&window.addEventListener("scroll",()=>{e.classList.toggle("scrolled",window.scrollY>60)})});

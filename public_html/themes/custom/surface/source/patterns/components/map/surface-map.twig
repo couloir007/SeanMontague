@@ -1,0 +1,12 @@
+{{ attach_library('surface/surface-map') }}
+
+<div
+  id="{{ map_id|default('surface-map') }}"
+  class="surface-map{{ modifier ? ' ' ~ modifier }}"
+  data-once="surface-map"
+  data-map-center="{{ center|default('44.593,-71.918') }}"
+  data-map-zoom="{{ zoom|default(12) }}"
+  data-map-interactive="{{ interactive|default('true') }}"
+  {% if markers %}data-map-markers="{{ markers|json_encode|e('html_attr') }}"{% endif %}
+  {% if lines %}data-map-lines="{{ lines|json_encode|e('html_attr') }}"{% endif %}
+></div>

@@ -198,7 +198,7 @@ module:
   minimal: 1000
 theme:
   stark: 0
-  surface: 0
   claro: 0
   gin: 0
+  olivero: 0
 profile: minimal

@@ -1,0 +1,37 @@
+uuid: b3c14501-f95e-442e-94b0-7018a69313e8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_role_host
+    - node.type.podcast_series
+  module:
+    - entity_reference_override
+    - epp
+third_party_settings:
+  epp:
+    value: 'target_id: [current-page:query:actor]'
+id: node.podcast_series.schema_role_host
+field_name: schema_role_host
+entity_type: node
+bundle: podcast_series
+label: Hosts
+description: 'Person responsible for guests at an event.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'schemadotorg:node'
+  handler_settings:
+    target_type: node
+    schema_types:
+      PerformingGroup: PerformingGroup
+      Person: Person
+    excluded_schema_types: {  }
+    ignore_additional_mappings: false
+    target_bundles:
+      person: person
+  override_label: 'Enter role'
+  override_format: null
+field_type: entity_reference_override

@@ -1,0 +1,23 @@
+uuid: 7e5eff8e-6c27-4f48-a73a-ae63c5153498
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_web_feed
+    - node.type.podcast_series
+  module:
+    - link
+id: node.podcast_series.schema_web_feed
+field_name: schema_web_feed
+entity_type: node
+bundle: podcast_series
+label: 'Web feed'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 17
+field_type: link

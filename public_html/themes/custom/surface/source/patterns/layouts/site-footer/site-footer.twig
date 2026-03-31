@@ -1,11 +1,11 @@
 {{ attach_library('surface/site-footer') }}
 
 <footer class="site-footer">
-  <div class="container l-constrain">
-    <div class="site-footer__content grid">
-      <div class="site-footer__branding">
-
-      </div>
-    </div>
-  </div>
+  <div class="site-footer__brand">{{ brand_text|default('Sean Montague · Burke, VT') }}</div>
+  <p class="site-footer__copy">{{ copyright_text|default('© 2025 Sean Montague') }}</p>
+  <ul class="site-footer__links">
+    {% for item in links %}
+      <li><a href="{{ item.url }}">{{ item.text }}</a></li>
+    {% endfor %}
+  </ul>
 </footer>

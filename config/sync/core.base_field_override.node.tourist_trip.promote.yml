@@ -1,0 +1,22 @@
+uuid: 202d5a71-dea4-4411-b335-a4cf662594c7
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.tourist_trip
+id: node.tourist_trip.promote
+field_name: promote
+entity_type: node
+bundle: tourist_trip
+label: 'Promoted to front page'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 1
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

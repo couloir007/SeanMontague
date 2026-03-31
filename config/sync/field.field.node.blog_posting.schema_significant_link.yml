@@ -1,0 +1,23 @@
+uuid: 183cf154-f39f-43d5-b26f-3cf346d28144
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_significant_link
+    - node.type.blog_posting
+  module:
+    - link
+id: node.blog_posting.schema_significant_link
+field_name: schema_significant_link
+entity_type: node
+bundle: blog_posting
+label: 'Significant links'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 17
+field_type: link

@@ -1,0 +1,68 @@
+{#
+ * @file node--trail-report.html.twig
+ *
+ * Trail-report content type — ride/hike outing with map, stats bar, and
+ * elevation profile. Geo is pulled from the referenced field_place node.
+ *
+ * GPX route lines and elevation data require preprocess:
+ *   surface_preprocess_node__trail_report() should set:
+ *     $variables['gpx_lines']     — [{coords, color, weight}]
+ *     $variables['gpx_elev_data'] — [[lon, lat, alt], ...]
+ #}
+
+{# ── Place → geo → map center ─────────────────────────────────────────── #}
+{% set place = node.field_place.entity %}
+{% set geo   = place ? place.field_geo.value : null %}
+{% set map_center = geo ? geo.lat ~ ',' ~ geo.lon : '44.594,-71.913' %}
+
+{# ── Markers: one pin per referenced Place (supports multi-value) ─────── #}
+{% set markers = [] %}
+{% for item in node.field_place %}
+  {% set p = item.entity %}
+  {% if p and p.field_geo.value %}
+    {% set g = p.field_geo.value %}
+    {% set markers = markers|merge([{
+      'lat':   g.lat,
+      'lon':   g.lon,
+      'color': '#3a5a40',
+      'label': '<strong>' ~ p.label ~ '</strong>',
+    }]) %}
+  {% endif %}
+{% endfor %}
+
+{# ── Stats array → passed to surface-article-header → surface-stats-bar ── #}
+{% set stats = [
+  { 'label': 'Distance',   'value': node.field_distance.value,   'unit': 'miles' },
+  { 'label': 'Elevation',  'value': node.field_elev_gain.value,  'unit': 'ft gain' },
+  { 'label': 'Est. Time',  'value': node.field_est_time.value,   'unit': 'hours' },
+  { 'label': 'Difficulty', 'value': content.field_difficulty|field_value, 'is_small': true },
+  { 'label': 'Season',     'value': node.field_season.value,     'is_small': true },
+] %}
+
+<article{{ attributes.addClass('node', 'node--type-trail-report') }}>
+  {{ title_prefix }}
+  {{ title_suffix }}
+
+  {% include '@collections/article/surface-article.twig' with {
+    'header': {
+      'title':        label,
+      'date':         node.field_date_published.value|date('F j, Y'),
+      'category':     node.field_category.entity.label,
+      'category_key': node.field_category.entity.label|lower|replace({' ': '-'}),
+      'difficulty':   content.field_difficulty|field_value,
+      'subtitle':     node.field_subtitle.value,
+      'stats':        stats,
+    },
+    'map_id':      'trail-map-' ~ node.id,
+    'map_center':  map_center,
+    'map_zoom':    13,
+    'map_markers': markers,
+    'map_lines':   gpx_lines|default([]),
+    'elev_gain':   node.field_elev_gain.value,
+    'elev_loss':   node.field_elev_loss.value,
+    'elev_min':    node.field_elev_min.value,
+    'elev_max':    node.field_elev_max.value,
+    'elev_data':   gpx_elev_data|default([]),
+    'body':        content.body|field_value|render,
+  } only %}
+</article>

@@ -1,5 +1,0 @@
----
-is_active: true
-level: 'primary'
-link: |-
-  <a href="#" class="tabs__link js-tabs-link is-active" data-drupal-link-system-path="#">View<span class="visually-hidden">(active tab)</span></a>

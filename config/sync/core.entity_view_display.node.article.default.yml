@@ -6,39 +6,22 @@ dependencies:
     - field.field.node.article.body
     - field.field.node.article.field_editorial
     - field.field.node.article.field_metatag
-    - field.field.node.article.schema_about
-    - field.field.node.article.schema_article_type
-    - field.field.node.article.schema_image
     - field.field.node.article.schema_related_link
     - field.field.node.article.schema_significant_link
-    - field.field.node.article.schema_subject_of
     - field.field.node.article.schema_topic
     - node.type.article
   module:
     - entity_reference_revisions
     - field_group
     - link
-    - options
     - text
     - user
 third_party_settings:
   field_group:
-    group_references:
-      children:
-        - schema_about
-        - schema_subject_of
-      label: References
-      parent_name: ''
-      region: content
-      weight: 22
-      format_type: fieldset
-      format_settings: {  }
     group_general:
       children:
-        - schema_article_type
-        - schema_image
-        - body
-        - title
+        2: body
+        3: title
       label: General
       parent_name: ''
       region: content
@@ -90,30 +73,6 @@ content:
     third_party_settings: {  }
     weight: -100
     region: content
-  schema_about:
-    type: entity_reference_label
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    weight: 0
-    region: content
-  schema_article_type:
-    type: list_default
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    weight: 0
-    region: content
-  schema_image:
-    type: entity_reference_entity_view
-    label: hidden
-    settings:
-      view_mode: default
-      link: false
-    third_party_settings: {  }
-    weight: 23
-    region: content
   schema_related_link:
     type: link
     label: above
@@ -135,14 +94,6 @@ content:
       url_plain: false
       rel: ''
       target: ''
-    third_party_settings: {  }
-    weight: 1
-    region: content
-  schema_subject_of:
-    type: entity_reference_label
-    label: above
-    settings:
-      link: true
     third_party_settings: {  }
     weight: 1
     region: content

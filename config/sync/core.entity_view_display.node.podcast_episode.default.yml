@@ -1,0 +1,238 @@
+uuid: 184c0dc6-5de8-426a-b747-d32c5a7efa72
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.podcast_episode.body
+    - field.field.node.podcast_episode.field_editorial
+    - field.field.node.podcast_episode.field_metatag
+    - field.field.node.podcast_episode.schema_about
+    - field.field.node.podcast_episode.schema_assoc_media
+    - field.field.node.podcast_episode.schema_date_published
+    - field.field.node.podcast_episode.schema_duration
+    - field.field.node.podcast_episode.schema_episode_number
+    - field.field.node.podcast_episode.schema_image
+    - field.field.node.podcast_episode.schema_related_link
+    - field.field.node.podcast_episode.schema_role_guest
+    - field.field.node.podcast_episode.schema_role_host
+    - field.field.node.podcast_episode.schema_same_as
+    - field.field.node.podcast_episode.schema_significant_link
+    - field.field.node.podcast_episode.schema_subject_of
+    - node.type.podcast_episode
+  module:
+    - datetime
+    - entity_reference_override
+    - entity_reference_revisions
+    - field_group
+    - link
+    - text
+    - user
+third_party_settings:
+  field_group:
+    group_references:
+      children:
+        - schema_about
+        - schema_subject_of
+      label: References
+      parent_name: ''
+      region: content
+      weight: 22
+      format_type: fieldset
+      format_settings: {  }
+    group_general:
+      children:
+        - schema_assoc_media
+        - body
+        - title
+        - schema_image
+      label: General
+      parent_name: ''
+      region: content
+      weight: -20
+      format_type: fieldset
+      format_settings: {  }
+    group_podcast_episode:
+      children:
+        - schema_date_published
+        - schema_duration
+        - schema_episode_number
+      label: 'Podcast episode'
+      parent_name: ''
+      region: content
+      weight: 0
+      format_type: fieldset
+      format_settings: {  }
+    group_links:
+      children:
+        - schema_same_as
+        - schema_related_link
+        - schema_significant_link
+      label: Links
+      parent_name: ''
+      region: content
+      weight: 20
+      format_type: fieldset
+      format_settings: {  }
+    group_relationships:
+      children:
+        - schema_role_host
+        - schema_role_guest
+      label: Relationships
+      parent_name: ''
+      region: content
+      weight: 23
+      format_type: fieldset
+      format_settings: {  }
+    group_editorial:
+      children:
+        - field_editorial
+      label: 'Editorial information'
+      parent_name: ''
+      region: content
+      weight: 220
+      format_type: details
+      format_settings: {  }
+id: node.podcast_episode.default
+targetEntityType: node
+bundle: podcast_episode
+mode: default
+content:
+  body:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 20
+    region: content
+  field_editorial:
+    type: entity_reference_revisions_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 112
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -100
+    region: content
+  schema_about:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  schema_assoc_media:
+    type: entity_reference_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 31
+    region: content
+  schema_date_published:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 111
+    region: content
+  schema_duration:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 110
+    region: content
+  schema_episode_number:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 110
+    region: content
+  schema_image:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 25
+    region: content
+  schema_related_link:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  schema_role_guest:
+    type: entity_reference_override_label
+    label: above
+    settings:
+      link: true
+      override_action: suffix
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  schema_role_host:
+    type: entity_reference_override_label
+    label: above
+    settings:
+      link: true
+      override_action: suffix
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  schema_same_as:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  schema_significant_link:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  schema_subject_of:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  field_metatag: true
+  langcode: true

@@ -2,29 +2,34 @@ import { Meta } from "@storybook/addon-docs/blocks";
 
 <Meta title="Getting started/Intro" />
 
-# UCLA Health Web Platform
+# seanmontague.com — Design System
 
-## An enterprise content management system for the Health Sciences at UCLA.
+A personal site design system built on Drupal with Storybook for component development.
+Follows the [Surface theme](https://github.com/uclahs/surface) pattern hierarchy.
 
-## Development approach
+## Patterns organization
 
-At the core of the platform are the best practices and standards of today's development ecosystem.
-The platform makes heavy use of the [Atomic Design](https://atomicdesign.bradfrost.com/table-of-contents/) methodology however it does not use the naming convention of such methodology. Instead, we have organized our patterns as follows:
+* **Base** — Global CSS, design tokens, utilities, typography, and reset styles.
+* **Elements** — The smallest indivisible patterns: button, byline, date, eyebrow, images, links, list, pager, quote, readtime, skip-link, text, title, video.
+* **Components** — Composed from two or more elements: nav, hero, marquee, map, card, places-card, about, contact, footer, elevation-profile, stats-bar.
+* **Collections** — Composed from two or more components: article, article-header, map-section, article-map-section.
+* **Layouts** — Drupal region and page-level wrappers: block, region, site-container, site-header, site-footer, site-navigation, site-homepage.
+* **Pages** — Full page prototypes: page-homepage, page-article.
+* **Theme** — Drupal-specific admin UI overrides only (ckeditor, toolbar, media-library, etc.).
 
-### Patterns organization
+## Design language
 
-* **Base**: These are the global pieces used across the project which include things like typography, colors, sizes, borders and more.
-* **Elements**: These are the smallest patterns on any project and act as the foundation to larger patterns.
-* **Components**: A component is made up from two or more Elements.
-* **Collections**: A collection is made up from two or more Components.
-* **Layouts**: Can combine two or more Collections and you can think of them as regions of a website.
-* **Pages**: Intended to create prototypes of pages such as Medschool's homepage and others.
+**Palette** — Warm off-white (`--bg: #f7f6f2`), near-black type (`--bright: #161410`),
+forest green (`--forest: #3a5a40`), trail brown (`--trail: #7a3410`), sky blue (`--sky: #4a7c9e`).
+
+**Typography** — Three-font stack defined in `props/nek.css`:
+- `Bebas Neue` (`--font-display-nek`) — hero titles, stats values
+- `Cormorant Garamond` (`--font-serif-nek`) — body text, article headings, italic accents
+- `DM Mono` (`--font-mono-nek`) — labels, navigation, metadata, category tags
 
 ## Tooling
-The tooling for the platform has been carefully vetted and selected so only the absolute necessary is included. These tools include:
 
 * [Vite](https://vite.dev/) (JS Edition)
 * [Storybook](https://storybook.js.org/) (HTML Edition)
-* Vanilla JavaScript
-* Twig
-* PostCSS
+* Twig + PostCSS + Vanilla JS
+* Leaflet.js for interactive maps
