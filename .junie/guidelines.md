@@ -105,3 +105,10 @@ The `external_pg` module provides a service to connect to an external PostgreSQL
 - Follow [Drupal Coding Standards](https://www.drupal.org/docs/develop/standards).
 - Use BEM for CSS in the `surface` theme.
 - Javascript should follow ES6+ standards.
+
+---
+
+## Accessibility Resources
+For WCAG compliance and standard accessibility checks:
+- [Axe Rule: Color Contrast](https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=axeAPI)
+- [Axe Rule: Link in Text Block](https://dequeuniversity.com/rules/axe/4.11/link-in-text-block?application=axeAPI)

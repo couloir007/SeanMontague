@@ -604,6 +604,14 @@ drush cr
 
 ---
 
+## Accessibility Resources
+
+For WCAG compliance and accessibility checks:
+- [Axe Rule: Color Contrast](https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=axeAPI)
+- [Axe Rule: Link in Text Block](https://dequeuniversity.com/rules/axe/4.11/link-in-text-block?application=axeAPI)
+
+---
+
 ## What NOT to Do
 
 - Do not add `@components/surface/` paths — old nested structure, removed

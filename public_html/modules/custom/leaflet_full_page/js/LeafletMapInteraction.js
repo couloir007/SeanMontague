@@ -185,7 +185,8 @@
         features.forEach(feature => {
           if (feature.type === 'point') {
             // Create marker for feature
-            const marker = L.marker([feature.lat, feature.lon]);
+            const title = (feature.label || feature.popup || feature.title || '').replace(/<[^>]*>?/gm, '');
+            const marker = L.marker([feature.lat, feature.lon], { title: title || 'Map Marker' });
 
             // Store entity_id on marker directly as custom property
             marker.entity_id = feature.entity_id;

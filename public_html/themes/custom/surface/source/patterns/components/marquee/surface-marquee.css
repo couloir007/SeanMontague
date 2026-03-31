@@ -1,9 +1,9 @@
 .surface-marquee {
-  width: 100%;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   overflow: hidden;
   padding: 13px 0;
+  width: 100%;
 }
 
 .surface-marquee__track {
@@ -13,7 +13,7 @@
 }
 
 .surface-marquee__item {
-  color: #c0bbb2;
+  color: var(--muted);
   flex-shrink: 0;
   font-family: var(--font-mono-nek);
   font-size: 10px;

@@ -52,7 +52,8 @@
       if (mapInst) {
         scrubMarker = L.circleMarker([elevData[0][1], elevData[0][0]], {
           radius: 7, color: '#fff', weight: 2,
-          fillColor: '#3a5a40', fillOpacity: 1
+          fillColor: '#3a5a40', fillOpacity: 1,
+          interactive: false
         }).addTo(mapInst);
       }
     }

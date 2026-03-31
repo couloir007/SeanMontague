@@ -79,7 +79,11 @@
     });
 
     markers.forEach(function (m) {
-      L.marker([m.lat, m.lon], { icon: pinIcon(m.color || '#3a5a40') })
+      var title = m.label ? m.label.replace(/<[^>]*>?/gm, '') : '';
+      L.marker([m.lat, m.lon], {
+        icon: pinIcon(m.color || '#3a5a40'),
+        title: title
+      })
         .addTo(map)
         .bindPopup(m.label || '');
     });

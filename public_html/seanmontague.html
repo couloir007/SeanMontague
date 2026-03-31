@@ -16,7 +16,7 @@
   --surface: #ffffff;
   --surface2:#f0ede6;
   --border:  #e0dbd1;
-  --muted:   #7a7568;
+  --muted:   #736e62;
   --text:    #2c2a25;
   --bright:  #161410;
   --forest:  #3a5a40;
@@ -152,7 +152,7 @@ nav.scrolled { border-bottom-color: var(--border); padding: 16px 48px; }
 .marquee-item {
   font-family: var(--mono); font-size: 10px;
   letter-spacing: 0.22em; text-transform: uppercase;
-  color: #c0bbb2; padding: 0 36px; flex-shrink: 0;
+  color: var(--muted); padding: 0 36px; flex-shrink: 0;
 }
 .marquee-item .dot { color: var(--forest); margin-right: 36px; }
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
@@ -610,13 +610,13 @@ L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
   maxZoom: 17,
   attribution: '© <a href="https://opentopomap.org">OpenTopoMap</a> © <a href="https://openstreetmap.org">OSM</a>'
 }).addTo(heroMap);
-L.marker([44.5965, -71.9105], { icon: pin('#3a5a40') }).addTo(heroMap)
+L.marker([44.5965, -71.9105], { icon: pin('#3a5a40'), title: 'Kingdom Trails HQ' }).addTo(heroMap)
   .bindPopup('<strong>Kingdom Trails HQ</strong><br>East Burke, VT');
-L.marker([44.5847, -71.9012], { icon: pin('#7a3410') }).addTo(heroMap)
+L.marker([44.5847, -71.9012], { icon: pin('#7a3410'), title: 'Burke Mountain' }).addTo(heroMap)
   .bindPopup('<strong>Burke Mountain</strong><br>3,271 ft · 2,011 vert');
-L.marker([44.5958, -71.9120], { icon: pin('#4a7c9e') }).addTo(heroMap)
+L.marker([44.5958, -71.9120], { icon: pin('#4a7c9e'), title: 'Burke, VT' }).addTo(heroMap)
   .bindPopup('<strong>Burke, VT</strong>');
-L.marker([44.5920, -71.9250], { icon: pin('#7a7568') }).addTo(heroMap)
+L.marker([44.5920, -71.9250], { icon: pin('#7a7568'), title: 'Darling Hill' }).addTo(heroMap)
   .bindPopup('<strong>Darling Hill</strong>');
 
 // Force size recalc after paint
@@ -660,9 +660,9 @@ L.geoJSON({
 }, { style: { color:'#7a3410', weight:2.5, opacity:0.75, dashArray:'4,4' } })
 .addTo(featMap).bindPopup('Burke Mountain');
 
-L.marker([44.5965,-71.9105], { icon: pin('#3a5a40') }).addTo(featMap)
+L.marker([44.5965,-71.9105], { icon: pin('#3a5a40'), title: 'Kingdom Trails HQ' }).addTo(featMap)
   .bindPopup('<strong>Kingdom Trails HQ</strong>');
-L.marker([44.5847,-71.9012], { icon: pin('#7a3410') }).addTo(featMap)
+L.marker([44.5847,-71.9012], { icon: pin('#7a3410'), title: 'Burke Mountain' }).addTo(featMap)
   .bindPopup('<strong>Burke Mountain</strong><br>3,271 ft summit');
 </script>
 </body>

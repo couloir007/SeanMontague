@@ -16,7 +16,7 @@
   --surface: #ffffff;
   --surface2:#f0ede6;
   --border:  #e0dbd1;
-  --muted:   #7a7568;
+  --muted:   #736e62;
   --text:    #2c2a25;
   --bright:  #161410;
   --forest:  #3a5a40;
@@ -801,7 +801,7 @@ L.geoJSON({ type:'Feature', geometry:{ type:'LineString', coordinates: routeCoor
   { latlng:[44.588812,-71.945434], label:'<strong>Start / Finish</strong><br>812 ft', color:'#3a5a40' },
   { latlng:[44.607766,-71.893419], label:'<strong>High Point</strong><br>1,595 ft',  color:'#7a3410' },
   { latlng:[44.613136,-71.898428], label:'<strong>Ridge</strong><br>1,302 ft',        color:'#4a7c9e' },
-].forEach(wp => L.marker(wp.latlng, {icon:pin(wp.color)}).addTo(map).bindPopup(wp.label));
+].forEach(wp => L.marker(wp.latlng, {icon:pin(wp.color), title:wp.label.replace(/<[^>]*>?/gm, '')}).addTo(map).bindPopup(wp.label));
 
 // ── Elevation profile ──
 let cumDist = [0];
@@ -814,7 +814,8 @@ const canvas  = document.getElementById('elevation-chart');
 const tooltip = document.getElementById('elev-tooltip');
 
 const scrubMarker = L.circleMarker([elevData[0][1], elevData[0][0]], {
-  radius:7, color:'#fff', weight:2, fillColor:'#3a5a40', fillOpacity:1
+  radius:7, color:'#fff', weight:2, fillColor:'#3a5a40', fillOpacity:1,
+  interactive: false
 }).addTo(map);
 
 function drawChart(hoverFraction) {
