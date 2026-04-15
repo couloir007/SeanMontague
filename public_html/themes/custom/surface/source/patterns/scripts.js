@@ -5,5 +5,5 @@
  * into a single entry point that Storybook can import.
  */
 
-import './components/elevation-profile/surface-elevation-profile.js';
-import './components/map/surface-map.js';
+import './components/elevation-profile/elevation-profile.js';
+import './components/map/map.js';

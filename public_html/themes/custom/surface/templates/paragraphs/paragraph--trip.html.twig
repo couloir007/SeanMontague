@@ -1,9 +1,9 @@
 {# Trip — travel post with multi-destination map #}
-{{ attach_library('surface/surface-article') }}
-{{ attach_library('surface/surface-article-header') }}
-{{ attach_library('surface/surface-map') }}
+{{ attach_library('surface/article') }}
+{{ attach_library('surface/article-header') }}
+{{ attach_library('surface/map') }}
 
-{% include '@collections/article-header/surface-article-header.twig' with {
+{% include '@collections/article-header/article-header.twig' with {
   'attributes': attributes.addClass('paragraph', 'paragraph--type--trip'),
   'title':      label,
   'date':       content.field_date_published|field_value,
@@ -24,12 +24,12 @@
   {% endif %}
 {% endfor %}
 
-{% include '@components/map/surface-map.twig' with {
+{% include '@components/map/map.twig' with {
   'map_id':      'trip-map-' ~ paragraph.id(),
   'zoom':        8,
   'interactive': 'true',
   'markers':     markers,
-  'modifier':    'surface-map--standalone',
+  'modifier':    'map--standalone',
 } only %}
 
 <div{{ attributes.addClass('paragraph', 'paragraph--type--trip') }}>

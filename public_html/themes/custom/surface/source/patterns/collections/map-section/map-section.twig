@@ -1,0 +1,42 @@
+{{ attach_library('surface/map-section') }}
+
+<section class="map-section" id="{{ section_id|default('maps') }}">
+
+  {% if label %}
+    <span class="map-section__label">{{ label }}</span>
+  {% endif %}
+
+  <div class="map-section__layout">
+
+    <div class="map-section__content">
+      {% if title %}
+        <h2 class="map-section__title">{{ title|raw }}</h2>
+      {% endif %}
+      {% if text %}
+        <div class="map-section__text">{{ text|raw }}</div>
+      {% endif %}
+      {% if links %}
+        <div class="map-section__links">
+          {% for link in links %}
+            <a href="{{ link.url }}" class="map-section__link-item">
+              <span>{{ link.text }}</span>
+              <span class="map-section__arrow">→</span>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="map-section__map-container">
+      {% include '@components/map/map.twig' with {
+        'map_id':      map_id|default('featured-map'),
+        'center':      map_center,
+        'zoom':        map_zoom|default(13),
+        'interactive': 'true',
+        'markers':     map_markers,
+        'lines':       map_lines,
+      } only %}
+    </div>
+
+  </div>
+</section>

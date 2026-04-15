@@ -1,0 +1,17 @@
+{{ attach_library('surface/nav') }}
+
+<nav class="nav{{ modifier ? ' ' ~ modifier }}" id="nav">
+  {% if logo_text %}
+    <a href="{{ logo_url|default('/') }}" class="nav__logo">{{ logo_text|raw }}</a>
+  {% endif %}
+  {% if links %}
+    <ul class="nav__links">
+      {% for item in links %}
+        <li><a href="{{ item.url }}">{{ item.text }}</a></li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  {% if back_text %}
+    <a href="{{ back_url|default('#') }}" class="nav__back">{{ back_text }}</a>
+  {% endif %}
+</nav>

@@ -1,7 +1,7 @@
 {% if content %}
-  {% include '@components/nav/surface-nav.twig' with {
+  {% include '@components/nav/nav.twig' with {
     'logo_text': 'Sean Montague <span>/ Burke, VT</span>',
     'logo_url': path('<front>'),
-    'modifier': is_front ? '' : 'surface-nav--scrolled',
+    'modifier': is_front ? '' : 'nav--scrolled',
   } only %}
 {% endif %}

@@ -1,0 +1,1 @@
+.site-navigation{display:block}@media(max-width:960px){.site-navigation{display:none}}.site-navigation__links{display:flex;gap:36px;list-style:none}.site-navigation__link{color:var(--muted);font-family:var(--font-mono-nek);font-size:10px;letter-spacing:.18em;text-decoration:none;text-transform:uppercase;transition:color .2s}.site-navigation__link:hover{color:var(--bright)}

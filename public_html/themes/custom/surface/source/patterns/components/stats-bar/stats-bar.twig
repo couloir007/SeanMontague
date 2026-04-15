@@ -1,0 +1,13 @@
+{{ attach_library('surface/stats-bar') }}
+
+<div class="stats-bar{{ modifier ? ' ' ~ modifier }}">
+  {% for stat in stats %}
+    <div class="stats-bar__item{{ stat.is_small ? ' stats-bar__item--small-value' }}">
+      <span class="stats-bar__label">{{ stat.label }}</span>
+      <span class="stats-bar__value">{{ stat.value }}</span>
+      {% if stat.unit %}
+        <span class="stats-bar__unit">{{ stat.unit }}</span>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>

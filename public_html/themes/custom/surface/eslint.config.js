@@ -9,8 +9,7 @@ export default [
       'node_modules',
       'storybook',
       '**/glide.min.js',
-      '**/typewriter.core.js',
-      '**/glightbox.js'
+      '**/typewriter.core.js'
     ],
   },
   {

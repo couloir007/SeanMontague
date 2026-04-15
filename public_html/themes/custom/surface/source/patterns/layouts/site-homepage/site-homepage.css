@@ -1,9 +1,9 @@
-.surface-homepage__writing {
+.homepage__writing {
   border-bottom: 1px solid var(--border);
   padding: 80px 48px;
 }
 
-.surface-homepage__eyebrow {
+.homepage__eyebrow {
   color: var(--muted);
   display: block;
   font-family: var(--font-mono-nek);
@@ -13,32 +13,32 @@
   text-transform: uppercase;
 }
 
-.surface-homepage__cards-grid {
+.homepage__cards-grid {
   border: 1px solid var(--border);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
 }
 
-.surface-homepage__places {
+.homepage__places {
   background: var(--surface2);
   border-bottom: 1px solid var(--border);
   padding: 80px 48px;
 }
 
-.surface-homepage__places-grid {
+.homepage__places-grid {
   display: grid;
   gap: 20px;
   grid-template-columns: repeat(2, 1fr);
 }
 
 @media (width <= 960px) {
-  .surface-homepage__writing,
-  .surface-homepage__places {
+  .homepage__writing,
+  .homepage__places {
     padding: 60px 24px;
   }
 
-  .surface-homepage__cards-grid,
-  .surface-homepage__places-grid {
+  .homepage__cards-grid,
+  .homepage__places-grid {
     grid-template-columns: 1fr;
   }
 }

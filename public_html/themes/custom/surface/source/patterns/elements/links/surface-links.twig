@@ -1,7 +1,0 @@
-{{ attach_library('surface/surface-links') }}
-
-<div class="surface-links{{ modifier ? ' ' ~ modifier }}">
-  {% for link in links %}
-    <a href="{{ link.url|default('#') }}" class="surface-link{{ link.modifier ? ' ' ~ link.modifier }}">{{ link.text }}</a>
-  {% endfor %}
-</div>

@@ -1,9 +1,9 @@
 {% if content %}
-  <div{{ attributes.addClass('surface-article-wrap') }}>
-    <div{{ region_attributes.main.addClass('surface-article__body') }}>
+  <div{{ attributes.addClass('article-wrap') }}>
+    <div{{ region_attributes.main.addClass('article__body') }}>
       {{ content.main }}
     </div>
-    <aside{{ region_attributes.aside.addClass('surface-article__sidebar') }}>
+    <aside{{ region_attributes.aside.addClass('article__sidebar') }}>
       {{ content.aside }}
     </aside>
   </div>

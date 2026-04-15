@@ -43,7 +43,6 @@ surface/
 ├── surface.libraries.yml
 ├── surface.layouts.yml
 └── surface.theme
-```,search:
 ```
 
 ### Twig Namespaces (vite.config.js + surface.info.yml)
@@ -306,7 +305,7 @@ paragraph template.
 
 ```twig
 {% for item in content.schema_tags|field_value %}
-  <span class="surface-card__tag">{{ item }}</span>
+  <span class="card__tag">{{ item }}</span>
 {% endfor %}
 ```
 
@@ -369,7 +368,7 @@ paragraph template.
 {% set geo = place ? place.schema_geo.value : null %}
 {% set map_center = geo ? geo.lat ~ ',' ~ geo.lon : '44.593,-71.918' %}
 
-{% include '@collections/article/surface-article.twig' with {
+{% include '@collections/article/article.twig' with {
   'header': {
     'title':      node.label,
     'date':       node.schema_date_published.value|date('F j, Y'),
@@ -394,7 +393,7 @@ paragraph template.
 ### node--article.html.twig
 
 ```twig
-{% include '@collections/article/surface-article.twig' with {
+{% include '@collections/article/article.twig' with {
   'header': {
     'title':        node.label,
     'date':         node.schema_date_published.value|date('F j, Y'),
@@ -422,7 +421,7 @@ paragraph template.
   {% endif %}
 {% endfor %}
 
-{% include '@components/map/surface-map.twig' with {
+{% include '@components/map/map.twig' with {
   'map_id':      'trip-map-' ~ node.id,
   'center':      markers[0] ? markers[0].lat ~ ',' ~ markers[0].lon : '44.593,-71.918',
   'zoom':        8,
@@ -505,11 +504,11 @@ section_two_col:
 
 ```twig
 {% if content %}
-  <div{{ attributes.addClass('surface-article-wrap') }}>
-    <div{{ region_attributes.main.addClass('surface-article__body') }}>
+  <div{{ attributes.addClass('article-wrap') }}>
+    <div{{ region_attributes.main.addClass('article__body') }}>
       {{ content.main }}
     </div>
-    <aside{{ region_attributes.aside.addClass('surface-article__sidebar') }}>
+    <aside{{ region_attributes.aside.addClass('article__sidebar') }}>
       {{ content.aside }}
     </aside>
   </div>
@@ -520,12 +519,12 @@ section_two_col:
 
 ## Leaflet Map Component
 
-The `surface-map` component is configured entirely via data attributes.
+The `map` component is configured entirely via data attributes.
 All JS init is a plain IIFE — works in both Drupal and Storybook.
 Tile provider: USGS National Map (free, no API key, feet).
 
 ```twig
-{% include '@components/map/surface-map.twig' with {
+{% include '@components/map/map.twig' with {
   'map_id':      'unique-map-id',
   'center':      '44.593,-71.918',
   'zoom':        12,
@@ -535,17 +534,17 @@ Tile provider: USGS National Map (free, no API key, feet).
 } only %}
 ```
 
-Map containers require explicit height. The `.surface-map` div fills 100%
+Map containers require explicit height. The `.map` div fills 100%
 of its parent — the parent must have a fixed height:
 
 ```css
 /* Hero — position absolute, fills 100vh parent */
-.surface-hero__map-bg { position: absolute; inset: 0; }
-.surface-hero__map-bg .surface-map { height: 100%; width: 100%; }
+.hero__map-bg { position: absolute; inset: 0; }
+.hero__map-bg .map { height: 100%; width: 100%; }
 
 /* Map section — explicit container height */
-.surface-map-section__map-container { height: 440px; position: relative; }
-.surface-map-section__map-container .surface-map { height: 100% !important; }
+.map-section__map-container { height: 440px; position: relative; }
+.map-section__map-container .map { height: 100% !important; }
 ```
 
 ---
@@ -554,30 +553,30 @@ of its parent — the parent must have a fixed height:
 
 Every pattern file gets its own library entry. The library name matches
 the CSS/JS filename. Components attach their own library via
-`{{ attach_library('surface/surface-[name]') }}` in the Twig template.
+`{{ attach_library('surface/[name]') }}` in the Twig template.
 
 ```yaml
-surface-map:
+map:
   css:
     component:
-      dist/css/surface-map.css: {}
+      dist/css/map.css: {}
   js:
-    dist/js/surface-map.js: {}
+    dist/js/map.js: {}
 
-surface-article:
+article:
   css:
     component:
-      dist/css/surface-article.css: {}
+      dist/css/article.css: {}
   dependencies:
-    - surface/surface-article-map-section
+    - surface/article-map-section
 
-surface-article-map-section:
+article-map-section:
   css:
     component:
-      dist/css/surface-article-map-section.css: {}
+      dist/css/article-map-section.css: {}
   dependencies:
-    - surface/surface-map
-    - surface/surface-elevation-profile
+    - surface/map
+    - surface/elevation-profile
 ```
 
 ---
@@ -585,28 +584,130 @@ surface-article-map-section:
 ## Common Commands
 
 ```bash
-# Build Storybook assets
-npm run build
+# Build Storybook assets (from theme directory)
+lando npm run build
 
 # Watch mode (Storybook + Vite)
-npm run watch
+lando npm run watch
 
-# Drush — Schema.org content type creation order
-drush schemadotorg:create-type taxonomy_term:DefinedTerm
-drush schemadotorg:create-type media:ImageObject
-drush schemadotorg:create-type node:Place
-drush schemadotorg:create-type node:BlogPosting
-drush schemadotorg:create-type node:TouristTrip
+# Schema.org content type creation — always in this dependency order
+lando drush schemadotorg:create-type taxonomy_term:DefinedTerm
+lando drush schemadotorg:create-type media:ImageObject
+lando drush schemadotorg:create-type media:AudioObject
+lando drush schemadotorg:create-type node:Person
+lando drush schemadotorg:create-type node:Place
+lando drush schemadotorg:create-type node:BlogPosting
+lando drush schemadotorg:create-type node:TouristTrip
+lando drush schemadotorg:create-type node:Event
 
 # Clear cache after template changes
-drush cr
+lando drush cr
 ```
 
 ---
 
-## Accessibility Resources
+## Accessibility — Keyboard Navigation
 
-For WCAG compliance and accessibility checks:
+The theme has these foundations already in place:
+- `skip-link.twig` included in `html.html.twig` — links to `#main-content`
+- `<main id="main-content" tabindex="-1">` in `site-container.twig`
+- `focus.css` — `*:focus-visible` outline using `currentColor`
+
+### Rules for every generated template
+
+**Always include ARIA landmarks on structural elements:**
+
+```twig
+<header role="banner">        {# site header — one per page #}
+<nav role="navigation">       {# always add aria-label when multiple navs exist #}
+<main id="main-content" tabindex="-1" role="main">
+<aside role="complementary">  {# sidebar #}
+<footer role="contentinfo">   {# site footer #}
+```
+
+**Label navigation when multiple nav elements exist on a page:**
+
+```twig
+<nav role="navigation" aria-label="{{ 'Main navigation'|t }}">
+<nav role="navigation" aria-label="{{ 'Breadcrumb'|t }}">
+<nav role="navigation" aria-label="{{ 'Article navigation'|t }}">
+```
+
+**Interactive elements must be keyboard reachable:**
+
+```twig
+{# Links always use <a href> — never divs or spans with onclick #}
+<a href="{{ url }}">{{ label }}</a>
+
+{# Buttons that don't navigate use <button> not <a> #}
+<button type="button" class="nav__toggle">{{ 'Menu'|t }}</button>
+
+{# Never remove focus outline — focus.css handles styling via focus-visible #}
+{# Never add outline: none or outline: 0 anywhere in component CSS #}
+```
+
+**Skip link is already in html.html.twig — do not add it again:**
+
+```twig
+{# Already rendered via html.html.twig: #}
+{% include '@elements/skip-link/skip-link.twig' %}
+
+{# Target must exist on every page: #}
+<main id="main-content" tabindex="-1">
+```
+
+**Tab order — follow DOM order, never use positive tabindex:**
+
+```twig
+{# CORRECT — natural DOM order #}
+<div class="hero__content">
+  <h1>...</h1>
+  <p>...</p>
+  <a href="#">CTA</a>
+</div>
+
+{# WRONG — positive tabindex breaks natural tab order #}
+<a href="#" tabindex="3">CTA</a>
+
+{# Only tabindex="-1" is permitted — for programmatic focus targets only #}
+<main id="main-content" tabindex="-1">
+```
+
+**Images — always include alt text:**
+
+```twig
+{# Decorative — empty alt #}
+<img src="{{ url }}" alt="">
+
+{# Informative — descriptive alt from media entity #}
+{% set alt = node.field_image.entity.field_media_image.alt %}
+<img src="{{ img_url }}" alt="{{ alt }}">
+```
+
+**Map component — non-interactive maps must not receive keyboard focus:**
+
+```twig
+{# Hero background — not keyboard navigable #}
+{% include '@components/map/map.twig' with {
+  'interactive': 'false',
+} only %}
+
+{# Interactive maps — keyboard zoom via Leaflet defaults #}
+{% include '@components/map/map.twig' with {
+  'interactive': 'true',
+} only %}
+```
+
+**Form inputs — always associate labels:**
+
+```twig
+<label for="contact-email">{{ 'Email'|t }}</label>
+<input id="contact-email" type="email" name="email">
+{# Never rely on placeholder as the only label #}
+```
+
+### WCAG Resources
+
 - [Axe Rule: Color Contrast](https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=axeAPI)
 - [Axe Rule: Link in Text Block](https://dequeuniversity.com/rules/axe/4.11/link-in-text-block?application=axeAPI)
 
@@ -619,7 +720,7 @@ For WCAG compliance and accessibility checks:
 - Do not drop `{{ region_attributes.NAME }}` from layout regions — breaks LP
 - Do not output `{{ content.field_name }}` without `|field_value` — outputs wrapper divs
 - Do not hardcode map heights in component CSS without the `!important`
-  override rule for the `.surface-map` child
+  override rule for the `.map` child
 - Do not use `once()` in map/elevation JS — use the plain IIFE dual-context
   pattern that works in both Drupal and Storybook
 - Do not create content types before their dependencies (Place before

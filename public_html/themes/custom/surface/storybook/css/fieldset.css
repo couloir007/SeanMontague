@@ -1,0 +1,1 @@
+.fieldset{border:1px solid var(--grey-200);margin-bottom:var(--size-4);padding:var(--size-4)}.fieldset__legend{font-weight:var(--font-weight-500);padding:0 var(--size-2)}.fieldset__description{color:var(--muted);font-size:var(--font-size-sm);margin-top:var(--size-2)}.fieldset__error-message{color:var(--red-700);font-weight:var(--font-weight-500);margin-bottom:var(--size-2)}

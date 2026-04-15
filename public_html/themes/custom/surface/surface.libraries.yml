@@ -26,11 +26,6 @@ container:
     layout:
       dist/css/container.css: {}
 
-nav:
-  css:
-    layout:
-      dist/css/nav.css: {}
-
 region:
   css:
     layout:
@@ -84,20 +79,10 @@ callout:
     component:
       dist/css/callout.css: {}
 
-card:
-  css:
-    component:
-      dist/css/card.css: {}
-
 component-list:
   css:
     component:
       dist/css/component-list.css: {}
-
-contact:
-  css:
-    component:
-      dist/css/contact.css: {}
 
 date:
   css:
@@ -196,7 +181,6 @@ glide:
     component:
       dist/css/glide.css: {}
 
-glightbox: {}
 
 image-embed:
   css:
@@ -207,11 +191,6 @@ input:
   css:
     component:
       dist/css/input.css: {}
-
-links:
-  css:
-    component:
-      dist/css/links.css: {}
 
 list:
   css:
@@ -384,104 +363,104 @@ views-exposed-form:
       dist/css/views-exposed-form.css: {}
 
 # Surface Patterns
-surface-about:
+about:
   css:
     component:
-      dist/css/surface-about.css: {}
+      dist/css/about.css: {}
 
-surface-card:
+card:
   css:
     component:
-      dist/css/surface-card.css: {}
+      dist/css/card.css: {}
 
-surface-contact:
+contact:
   css:
     component:
-      dist/css/surface-contact.css: {}
+      dist/css/contact.css: {}
 
-surface-footer:
+footer:
   css:
     component:
-      dist/css/surface-footer.css: {}
+      dist/css/footer.css: {}
 
-surface-hero:
+hero:
   css:
     component:
-      dist/css/surface-hero.css: {}
+      dist/css/hero.css: {}
 
-surface-map:
+map:
   css:
     component:
-      dist/css/surface-map.css: {}
+      dist/css/map.css: {}
   js:
-    dist/js/surface-map.js: {}
+    dist/js/map.js: {}
   dependencies:
     - surface/leaflet
 
-surface-article:
+article:
   css:
     component:
-      dist/css/surface-article.css: {}
+      dist/css/article.css: {}
   dependencies:
-    - surface/surface-article-map-section
+    - surface/article-map-section
 
-surface-article-header:
+article-header:
   css:
     component:
-      dist/css/surface-article-header.css: {}
+      dist/css/article-header.css: {}
   dependencies:
-    - surface/surface-stats-bar
+    - surface/stats-bar
 
-surface-article-map-section:
+article-map-section:
   css:
     component:
-      dist/css/surface-article-map-section.css: {}
+      dist/css/article-map-section.css: {}
   dependencies:
-    - surface/surface-map
-    - surface/surface-elevation-profile
+    - surface/map
+    - surface/elevation-profile
 
-surface-elevation-profile:
+elevation-profile:
   css:
     component:
-      dist/css/surface-elevation-profile.css: {}
+      dist/css/elevation-profile.css: {}
   js:
-    dist/js/surface-elevation-profile.js: {}
+    dist/js/elevation-profile.js: {}
   dependencies:
     - surface/leaflet
 
-surface-stats-bar:
+stats-bar:
   css:
     component:
-      dist/css/surface-stats-bar.css: {}
+      dist/css/stats-bar.css: {}
 
-surface-links:
+links:
   css:
     component:
-      dist/css/surface-links.css: {}
+      dist/css/links.css: {}
 
-surface-map-section:
+map-section:
   css:
     component:
-      dist/css/surface-map-section.css: {}
+      dist/css/map-section.css: {}
   dependencies:
-    - surface/surface-map
+    - surface/map
     - core/drupal
     - core/once
 
-surface-marquee:
+marquee:
   css:
     component:
-      dist/css/surface-marquee.css: {}
+      dist/css/marquee.css: {}
 
-surface-nav:
+nav:
   css:
     component:
-      dist/css/surface-nav.css: {}
+      dist/css/nav.css: {}
 
-surface-places-card:
+places-card:
   css:
     component:
-      dist/css/surface-places-card.css: {}
+      dist/css/places-card.css: {}
 
 site-homepage:
   css:

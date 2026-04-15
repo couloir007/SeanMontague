@@ -1,0 +1,25 @@
+{{ attach_library('surface/places-card') }}
+
+<div class="places-card{{ modifier ? ' ' ~ modifier }}">
+  <div class="places-card__meta">
+    {% if subtitle %}
+      <span class="places-card__subtitle">{{ subtitle }}</span>
+    {% endif %}
+    {% if coords %}
+      <span class="places-card__coords">{{ coords }}</span>
+    {% endif %}
+  </div>
+  {% if name %}
+    <h3 class="places-card__name">{{ name }}</h3>
+  {% endif %}
+  {% if desc %}
+    <p class="places-card__desc">{{ desc }}</p>
+  {% endif %}
+  {% if tags %}
+    <div class="places-card__tags">
+      {% for tag in tags %}
+        <span class="places-card__tag">{{ tag }}</span>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>

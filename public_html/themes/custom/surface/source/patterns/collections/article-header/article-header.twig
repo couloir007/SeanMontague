@@ -1,0 +1,28 @@
+{{ attach_library('surface/article-header') }}
+
+<div class="article-header{{ modifier ? ' ' ~ modifier }}">
+  <div class="article-header__meta">
+    <div class="article-header__meta-top">
+      {% if category %}
+        <span class="article-header__category article-header__category--{{ category_key|default('default') }}">{{ category }}</span>
+      {% endif %}
+      {% if date %}
+        <span class="article-header__date">{{ date }}</span>
+      {% endif %}
+      {% if difficulty %}
+        <span class="article-header__difficulty">{{ difficulty }}</span>
+      {% endif %}
+    </div>
+  </div>
+  {% if title %}
+    <h1 class="article-header__title">{{ title|raw }}</h1>
+  {% endif %}
+  {% if subtitle %}
+    <p class="article-header__subtitle">{{ subtitle }}</p>
+  {% endif %}
+  {% if stats %}
+    {% include '@components/stats-bar/stats-bar.twig' with {
+      'stats': stats
+    } only %}
+  {% endif %}
+</div>

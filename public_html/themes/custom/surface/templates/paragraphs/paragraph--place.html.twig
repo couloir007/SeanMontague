@@ -1,9 +1,9 @@
-{# Place — rendered as a surface-places-card #}
-{{ attach_library('surface/surface-places-card') }}
+{# Place — rendered as a places-card #}
+{{ attach_library('surface/places-card') }}
 
 {% set geo = paragraph.field_geo is defined and paragraph.field_geo.lat is not empty %}
 
-{% include '@components/places-card/surface-places-card.twig' with {
+{% include '@components/places-card/places-card.twig' with {
   'attributes': attributes.addClass('paragraph', 'paragraph--type--place'),
   'name':       label,
   'subtitle':   content.field_address|field_value,

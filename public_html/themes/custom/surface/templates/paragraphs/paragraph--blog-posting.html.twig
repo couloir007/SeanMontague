@@ -1,8 +1,8 @@
 {# Blog post — writing content type #}
-{{ attach_library('surface/surface-article') }}
-{{ attach_library('surface/surface-article-header') }}
+{{ attach_library('surface/article') }}
+{{ attach_library('surface/article-header') }}
 
-{% include '@collections/article-header/surface-article-header.twig' with {
+{% include '@collections/article-header/article-header.twig' with {
   'attributes':    attributes.addClass('paragraph', 'paragraph--type--blog-posting'),
   'title':         label,
   'category':      content.field_category|field_value,

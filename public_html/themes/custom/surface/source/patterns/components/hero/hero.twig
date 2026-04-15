@@ -1,0 +1,50 @@
+{{ attach_library('surface/hero') }}
+
+<header class="hero{{ modifier ? ' ' ~ modifier }}" id="home">
+
+  <div class="hero__map-bg">
+    {% include '@components/map/map.twig' with {
+      'map_id':      map_id|default('hero-map'),
+      'center':      map_center|default('44.593,-71.918'),
+      'zoom':        map_zoom|default(11),
+      'interactive': 'false',
+      'markers':     map_markers|default([]),
+      'lines':       map_lines|default([]),
+    } only %}
+  </div>
+
+  <div class="hero__overlay"></div>
+
+  <div class="hero__content">
+    {% if eyebrow %}
+      <p class="hero__eyebrow">{{ eyebrow }}</p>
+    {% endif %}
+    {% if name %}
+      <h1 class="hero__name">{{ name|raw }}</h1>
+    {% endif %}
+    {% if tagline %}
+      <p class="hero__tagline">{{ tagline }}</p>
+    {% endif %}
+    {% if cta_primary or cta_ghost %}
+      <div class="hero__cta-row">
+        {% if cta_primary %}
+          <a href="{{ cta_primary.url|default('#') }}" class="hero__btn-primary">{{ cta_primary.text }}</a>
+        {% endif %}
+        {% if cta_ghost %}
+          <a href="{{ cta_ghost.url|default('#') }}" class="hero__btn-ghost">{{ cta_ghost.text }}</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+  {% if categories %}
+    <div class="hero__categories">
+      {% for cat in categories %}
+        <a href="{{ cat.url|default('#') }}" class="hero__cat">
+          {{ cat.icon ? cat.icon ~ ' ' }}{{ cat.text }}
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+</header>

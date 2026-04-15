@@ -1,0 +1,6 @@
+import{a as s}from"./about-CIrfN03M.js";import"./twig-DVM_DCke.js";import"./_commonjsHelpers-D6-XlEtG.js";import"./twig-CTQ74SmP.js";const i={label:"About",title:"Builder, rider, <em>grower.</em>",skills:["Smithsonian NMNH","Drupal & Twig","Leaflet & GIS / Mapping","SVG & Data Visualization","JavaScript / Open Source","Permaculture Design","Kingdom Trails regular"],paragraphs:["I'm Sean Montague — a web developer based in Burke, Vermont, in the Northeast Kingdom. I work at the Smithsonian National Museum of Natural History, building Drupal systems, interactive maps, and data visualization tools.","This site is a personal outlet for the things I care about outside of work: riding Kingdom Trails, skiing Burke Mountain, building a food forest, and making maps of the places I know well.","The technical stuff — Leaflet, GeoJSON, Twig, SVG — bleeds into the personal projects too. That's fine by me."]},d={title:"Components/About"},e={render:o=>s(o),args:{...i}};var a,t,r;e.parameters={...e.parameters,docs:{...(a=e.parameters)==null?void 0:a.docs,source:{originalSource:`{
+  render: args => about(args),
+  args: {
+    ...data
+  }
+}`,...(r=(t=e.parameters)==null?void 0:t.docs)==null?void 0:r.source}}};const p=["Default"];export{e as Default,p as __namedExportsOrder,d as default};

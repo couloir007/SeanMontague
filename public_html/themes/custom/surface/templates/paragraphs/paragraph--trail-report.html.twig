@@ -1,5 +1,5 @@
 <div{{ attributes.addClass('paragraph', 'paragraph--type--trail-report') }}>
-  {% include '@collections/places-card/surface-places-card.twig' with {
+  {% include '@collections/places-card/places-card.twig' with {
     'title':      node.label,
     'date':       node.schema_date_published.value|date('M j, Y'),
     'image_url':  node.schema_image.entity.uri.value|image_style('large'),

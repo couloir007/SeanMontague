@@ -1,0 +1,7 @@
+{{ attach_library('surface/links') }}
+
+<div class="links{{ modifier ? ' ' ~ modifier }}">
+  {% for link in links %}
+    <a href="{{ link.url|default('#') }}" class="link{{ link.modifier ? ' ' ~ link.modifier }}">{{ link.text }}</a>
+  {% endfor %}
+</div>

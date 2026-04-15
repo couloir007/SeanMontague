@@ -1,0 +1,28 @@
+{{ attach_library('surface/about') }}
+
+<section class="about{{ modifier ? ' ' ~ modifier }}" id="about">
+  {% if label %}
+    <span class="about__label">{{ label }}</span>
+  {% endif %}
+  <div class="about__grid">
+    <div>
+      {% if title %}
+        <h2 class="about__aside-title">{{ title|raw }}</h2>
+      {% endif %}
+      {% if skills %}
+        <ul class="about__skills">
+          {% for skill in skills %}
+            <li>{{ skill }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+    <div class="about__body">
+      {% if paragraphs %}
+        {% for p in paragraphs %}
+          <p>{{ p }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>

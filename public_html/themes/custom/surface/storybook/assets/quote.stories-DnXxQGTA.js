@@ -1,0 +1,26 @@
+import{t as g,T as y}from"./twig-DVM_DCke.js";import{D as w,a as v}from"./twig-CTQ74SmP.js";v(y);y.cache(!1);const i=e=>e,d=(e={})=>{const s=g.twig({id:"/media/sean/0c49c450-91fc-4810-9e56-9c253853713d/Shared/www/SeanMontague/public_html/themes/custom/surface/source/patterns/elements/quote/quote.twig",data:[{type:"output",position:{start:0,end:37},stack:[{type:"Twig.expression.type._function",position:{start:0,end:37},fn:"attach_library",params:[{type:"Twig.expression.type.parameter.start",value:"(",match:["("],position:{start:0,end:37}},{type:"Twig.expression.type.string",value:"surface/quote",position:{start:0,end:37}},{type:"Twig.expression.type.parameter.end",value:")",match:[")"],position:{start:0,end:37},expression:!1}]}]},{type:"raw",value:`
+
+`,position:{start:37,end:39}},{type:"logic",token:{type:"Twig.logic.type.set",key:"classes",expression:[{type:"Twig.expression.type.array.start",value:"[",match:["["]},{type:"Twig.expression.type.string",value:"quote"},{type:"Twig.expression.type.comma"},{type:"Twig.expression.type.variable",value:"modifier",match:["modifier"]},{type:"Twig.expression.type.variable",value:"modifier",match:["modifier"]},{type:"Twig.expression.type.operator.binary",value:"?",precidence:16,associativity:"rightToLeft",operator:"?"},{type:"Twig.expression.type.comma"},{type:"Twig.expression.type.variable",value:"attributes",match:["attributes"]},{type:"Twig.expression.type.variable",value:"attributes",match:["attributes"]},{type:"Twig.expression.type.key.period",key:"class"},{type:"Twig.expression.type.operator.binary",value:"?",precidence:16,associativity:"rightToLeft",operator:"?"},{type:"Twig.expression.type.array.end",value:"]",match:["]"]},{type:"Twig.expression.type.filter",value:"join",match:["|join","join"],params:[{type:"Twig.expression.type.parameter.start",value:"(",match:["("]},{type:"Twig.expression.type.string",value:" "},{type:"Twig.expression.type.parameter.end",value:")",match:[")"],expression:!1}]},{type:"Twig.expression.type.filter",value:"trim",match:["|trim","trim"]}],position:{start:39,end:143}},position:{start:39,end:143}},{type:"raw",value:`
+<div class="`,position:{start:144,end:157}},{type:"output",position:{start:157,end:170},stack:[{type:"Twig.expression.type.variable",value:"classes",match:["classes"],position:{start:157,end:170}}]},{type:"raw",value:'" ',position:{start:170,end:172}},{type:"output",position:{start:172,end:218},stack:[{type:"Twig.expression.type.variable",value:"attributes",match:["attributes"],position:{start:172,end:218}},{type:"Twig.expression.type.variable",value:"attributes",match:["attributes"],position:{start:172,end:218}},{type:"Twig.expression.type.filter",value:"without",match:["|without","without"],position:{start:172,end:218},params:[{type:"Twig.expression.type.parameter.start",value:"(",match:["("],position:{start:172,end:218}},{type:"Twig.expression.type.string",value:"class",position:{start:172,end:218}},{type:"Twig.expression.type.parameter.end",value:")",match:[")"],position:{start:172,end:218},expression:!1}]},{type:"Twig.expression.type.operator.binary",value:"?",position:{start:172,end:218},precidence:16,associativity:"rightToLeft",operator:"?"}]},{type:"raw",value:`>
+  <div class="quote__container">
+    <div class="quote__wrapper">
+      <blockquote>
+        `,position:{start:218,end:313}},{type:"output",position:{start:313,end:324},stack:[{type:"Twig.expression.type.variable",value:"quote",match:["quote"],position:{start:313,end:324}}]},{type:"raw",value:`
+        <em>`,position:{start:324,end:337}},{type:"output",position:{start:337,end:349},stack:[{type:"Twig.expression.type.variable",value:"author",match:["author"],position:{start:337,end:349}}]},{type:"raw",value:`</em>
+      </blockquote>
+    </div>
+  </div>
+</div>
+`,position:{start:349,end:349}}],precompiled:!0});s.options.allowInlineIncludes=!0;try{let t=e.defaultAttributes?e.defaultAttributes:[];return Array.isArray(t)||(t=Object.entries(t)),i(s.render({attributes:new w(t),...e}))}catch(t){return i("An error occurred whilst rendering /media/sean/0c49c450-91fc-4810-9e56-9c253853713d/Shared/www/SeanMontague/public_html/themes/custom/surface/source/patterns/elements/quote/quote.twig: "+t.toString())}},m={modifier:"",quote:"<p>Donut wafer jelly danish jelly. Cake donut bonbon marshmallow shortbread jelly-o cotton candy lollipop. Wafer jelly-o liquorice carrot cake apple pie fruitcake shortbread gummies.&nbsp;</p>",author:"Chaz Chumley"},h={title:"Elements/Quote"},a={render:e=>d(e),args:{...m}},r={...a,render:e=>d(e),args:{...m,image:""}};var o,p,n;a.parameters={...a.parameters,docs:{...(o=a.parameters)==null?void 0:o.docs,source:{originalSource:`{
+  render: args => quote(args),
+  args: {
+    ...data
+  }
+}`,...(n=(p=a.parameters)==null?void 0:p.docs)==null?void 0:n.source}}};var u,l,c;r.parameters={...r.parameters,docs:{...(u=r.parameters)==null?void 0:u.docs,source:{originalSource:`{
+  ...MediaQuote,
+  render: args => quote(args),
+  args: {
+    ...data,
+    image: ''
+  }
+}`,...(c=(l=r.parameters)==null?void 0:l.docs)==null?void 0:c.source}}};const b=["MediaQuote","Quote"],f=Object.freeze(Object.defineProperty({__proto__:null,MediaQuote:a,Quote:r,__namedExportsOrder:b,default:h},Symbol.toStringTag,{value:"Module"}));export{a as M,f as Q,r as a};

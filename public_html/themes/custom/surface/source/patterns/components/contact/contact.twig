@@ -1,0 +1,16 @@
+{{ attach_library('surface/contact') }}
+
+<section class="contact{{ modifier ? ' ' ~ modifier }}" id="contact">
+  {% if label %}
+    <span class="contact__label">{{ label }}</span>
+  {% endif %}
+  {% if headline %}
+    <h2 class="contact__headline">{{ headline }}</h2>
+  {% endif %}
+  {% if sub %}
+    <p class="contact__sub">{{ sub }}</p>
+  {% endif %}
+  {% if email %}
+    <a href="mailto:{{ email }}" class="contact__email">{{ email }}</a>
+  {% endif %}
+</section>

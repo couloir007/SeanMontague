@@ -2,7 +2,7 @@
 {% set geo = place ? place.schema_geo.value : null %}
 {% set map_center = geo ? geo.lat ~ ',' ~ geo.lon : '44.593,-71.918' %}
 
-{% include '@collections/article/surface-article.twig' with {
+{% include '@collections/article/article.twig' with {
   'header': {
     'title':      node.label,
     'date':       node.schema_date_published.value|date('F j, Y'),

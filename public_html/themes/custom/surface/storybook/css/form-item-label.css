@@ -1,0 +1,1 @@
+.form-item__label{display:block;font-weight:var(--font-weight-500);margin-bottom:var(--size-1)}.form-item__label--required:after{color:var(--red-700);content:" *";vertical-align:super}.option{display:inline-block;font-weight:400}
