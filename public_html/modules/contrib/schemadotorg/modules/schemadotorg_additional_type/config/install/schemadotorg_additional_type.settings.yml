@@ -23,3 +23,6 @@ default_allowed_values:
     about_page: 'About Page'
     contact_page: 'Contact Page'
     medical_web_page: 'Medical Web Page'
+default_field_values: {  }
+field_access: {  }
+jsonld_values: {  }

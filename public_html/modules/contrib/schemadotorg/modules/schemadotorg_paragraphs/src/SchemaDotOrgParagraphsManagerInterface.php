@@ -80,7 +80,7 @@ interface SchemaDotOrgParagraphsManagerInterface {
   public function fieldWidgetCompleteFormAlter(array &$field_widget_complete_form, FormStateInterface $form_state, array $context): void;
 
   /**
-   * Set paragraphs type icon before it is saved..
+   * Set paragraphs type icon before it is saved.
    *
    * @param \Drupal\paragraphs\ParagraphsTypeInterface $paragraphs_type
    *   The paragraphs type.

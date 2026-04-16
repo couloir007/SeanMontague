@@ -9,7 +9,7 @@ field_name: schema_recipe_ingredient
 entity_type: node
 bundle: recipe
 label: Ingredients
-description: 'A single ingredient used in the recipe, e.g. sugar, flour or garlic.'
+description: 'An ingredient or ordered list of ingredients and potentially quantities used in the recipe, e.g. 1 cup of sugar, flour or garlic.'
 required: false
 translatable: true
 default_value: {  }

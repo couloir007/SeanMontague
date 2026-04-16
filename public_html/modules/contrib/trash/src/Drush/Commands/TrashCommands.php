@@ -8,6 +8,8 @@ use Consolidation\AnnotatedCommand\Hooks\HookManager;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\trash\TrashManagerInterface;
+use Drupal\trash\TrashViewBuilder;
+use Drupal\views\Entity\View;
 use Drush\Attributes as CLI;
 use Drush\Commands\AutowireTrait;
 use Drush\Commands\DrushCommands;
@@ -26,6 +28,7 @@ final class TrashCommands extends DrushCommands {
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
     protected TrashManagerInterface $trashManager,
+    protected TrashViewBuilder $trashViewBuilder,
   ) {
     parent::__construct();
   }
@@ -85,6 +88,71 @@ final class TrashCommands extends DrushCommands {
     }
     else {
       $this->io()->success(dt('No trashed entities to purge.'));
+    }
+  }
+
+  /**
+   * Exports the Trash overview page views.
+   *
+   * This allows site builders to customize the default using Views UI.
+   */
+  #[CLI\Command(name: 'trash:export-views', aliases: ['tev'])]
+  #[CLI\Argument(name: 'entity_type_id', description: 'The entity type to export the Trash overview page view for.')]
+  #[CLI\Option(name: 'all', description: 'Export the Trash overview page view for all Trash entity types.')]
+  #[CLI\Option(name: 'overwrite', description: 'Overwrite any existing views.')]
+  public function exportViews(
+    ?string $entity_type_id = NULL,
+    array $options = [
+      'all' => FALSE,
+      'overwrite' => FALSE,
+    ],
+  ): void {
+    $entity_type_ids = $this->trashManager->getEnabledEntityTypes();
+    if (!$entity_type_ids) {
+      throw new UserAbortException(dt('No entity types enabled.'));
+    }
+    if ($options['all']) {
+      $confirmation_message = dt('Are you sure you want to export the Trash overview page view for all Trash entity types?');
+    }
+    else {
+      if (!$entity_type_id || !in_array($entity_type_id, $entity_type_ids, TRUE)) {
+        $entity_types = [];
+        foreach ($entity_type_ids as $entity_type_id) {
+          $entity_types[$entity_type_id] = $this->entityTypeManager->getDefinition($entity_type_id)->getLabel();
+        }
+        if (!($entity_type_id = $this->io()->choice('Please specify a valid entity type', $entity_types))) {
+          throw new UserAbortException();
+        }
+      }
+      $entity_type_ids = [$entity_type_id];
+      $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
+      $confirmation_message = dt('Are you sure you want to export the Trash overview page views for the @entity_type entity type?', [
+        '@entity_type' => $entity_type->getLabel(),
+      ]);
+    }
+
+    if (!$this->io()->confirm($confirmation_message)) {
+      throw new UserAbortException();
+    }
+
+    foreach ($entity_type_ids as $entity_type_id) {
+      $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
+      $trash_view = View::load('trash_' . $entity_type_id);
+      if (!$trash_view || !empty($options['overwrite'])) {
+        $view_executable = $this->trashViewBuilder->buildView($entity_type, TRUE);
+        if (!empty($options['overwrite']) && $trash_view) {
+          $trash_view->delete();
+        }
+        $view_executable->save();
+        $this->io()->writeln(dt('<info>Exported the @entity_type Trash overview page view.</info>', [
+          '@entity_type' => $entity_type->getLabel(),
+        ]));
+      }
+      else {
+        $this->io()->writeln(dt('<comment>Skipped export of the Trash overview page view for @entity_type because it already exists.</comment>', [
+          '@entity_type' => $entity_type->getLabel(),
+        ]));
+      }
     }
   }
 

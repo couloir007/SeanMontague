@@ -6,6 +6,7 @@ namespace Drupal\schemadotorg_options;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\schemadotorg\SchemaDotOrgEntityFieldManagerInterface;
+use Drupal\schemadotorg\SchemaDotOrgNamesInterface;
 use Drupal\schemadotorg\SchemaDotOrgSchemaTypeManagerInterface;
 
 /**
@@ -18,6 +19,8 @@ final class SchemaDotOrgOptionsManager implements SchemaDotOrgOptionsManagerInte
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
+   * @param \Drupal\schemadotorg\SchemaDotOrgNamesInterface $schemaNames
+   *   The Schema.org names service.
    * @param \Drupal\schemadotorg\SchemaDotOrgSchemaTypeManagerInterface $schemaTypeManager
    *   The Schema.org schema type manager.
    * @param \Drupal\schemadotorg\SchemaDotOrgEntityFieldManagerInterface $schemaEntityFieldManager
@@ -25,6 +28,7 @@ final class SchemaDotOrgOptionsManager implements SchemaDotOrgOptionsManagerInte
    */
   public function __construct(
     public ConfigFactoryInterface $configFactory,
+    public SchemaDotOrgNamesInterface $schemaNames,
     public SchemaDotOrgSchemaTypeManagerInterface $schemaTypeManager,
     public SchemaDotOrgEntityFieldManagerInterface $schemaEntityFieldManager,
   ) {}
@@ -111,7 +115,7 @@ final class SchemaDotOrgOptionsManager implements SchemaDotOrgOptionsManagerInte
       return;
     }
 
-    // Set allowed values based the Schema.org types range includes.
+    // Set allowed values based on the Schema.org types range includes.
     $range_includes = $this->schemaTypeManager->parseIds($property_definition['range_includes']);
 
     // Set allowed values function if it exists.
@@ -128,11 +132,47 @@ final class SchemaDotOrgOptionsManager implements SchemaDotOrgOptionsManagerInte
       }
     }
 
-    // Set allowed values from all range includes that are enumerations.
+    // Set allowed values from range includes that are enumerations.
+    $snake_case = $this->configFactory
+      ->get('schemadotorg_options.settings')
+      ->get('use_snake_case');
+    $aliases = $this->configFactory
+      ->get('schemadotorg_options.settings')
+      ->get('allowed_value_aliases');
+    $alias_options = [
+      'multiple' => FALSE,
+      'parents' => FALSE,
+      'negate' => FALSE,
+    ];
+    $alias_patterns = [
+      ['schema_type', 'schema_property', 'enumeration_value'],
+      ['schema_property', 'enumeration_value'],
+      ['enumeration_value'],
+    ];
     $allowed_values = [];
     foreach ($range_includes as $range_include) {
-      if ($this->schemaTypeManager->isEnumerationType($range_include)) {
-        $allowed_values += $this->schemaTypeManager->getTypeChildrenAsOptions($range_include);
+      if (!$this->schemaTypeManager->isEnumerationType($range_include)) {
+        continue;
+      }
+
+      $enumeration_allowed_values = $this->schemaTypeManager->getTypeChildrenAsOptions($range_include);
+      foreach ($enumeration_allowed_values as $value => $text) {
+        $alias_parts = [
+          'schema_type' => $schema_type,
+          'schema_property' => $schema_property,
+          'enumeration_type' => $range_include,
+          'enumeration_value' => $value,
+        ];
+        $alias_value = $this->schemaTypeManager->getSetting($aliases, $alias_parts, $alias_options, $alias_patterns);
+        if ($alias_value) {
+          $allowed_values[$alias_value] = $text;
+        }
+        elseif ($snake_case) {
+          $allowed_values[$this->schemaNames->camelCaseToSnakeCase($value)] = $text;
+        }
+        else {
+          $allowed_values[$value] = $text;
+        }
       }
     }
 

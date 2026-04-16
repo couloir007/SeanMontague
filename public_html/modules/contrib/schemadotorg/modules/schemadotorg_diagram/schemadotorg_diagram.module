@@ -73,9 +73,9 @@ property_name:
 }
 
 /**
- * Form submission handler for schemadotorg_jsonld_preview_settings_form().
+ * Form submission handler for schemadotorg_diagram_settings_form_().
  *
- * @see schemadotorg_diagram_form_schemadotorg_jsonapi_settings_form_alter()
+ * @see schemadotorg_diagram_form_schemadotorg_general_settings_form_alter()
  */
 function schemadotorg_diagram_settings_form_submit(array &$form, FormStateInterface $form_state): void {
   // Clear all plugin caches.

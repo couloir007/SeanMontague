@@ -32,3 +32,9 @@ variables:
   OPT_IN_TEST_NEXT_MINOR: 1
   OPT_IN_TEST_NEXT_MAJOR: 1
   _CSPELL_IGNORE_PATHS: '/data/schemaorg-all-http.jsonld, phpcs.xml.dist'
+
+# Allow Composer to resolve dependencies for next-major testing even if Metatag
+# hasn't yet expanded its declared Drupal core compatibility.
+composer (next major):
+  variables:
+    _LENIENT_ALLOW_LIST: metatag,token

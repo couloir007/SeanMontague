@@ -100,6 +100,47 @@ class SchemaDotOrgAdditionalTypeJsonLdKernelTest extends SchemaDotOrgJsonLdKerne
     ];
     $this->assertEquals($expected_result, $this->builder->buildEntity($other_node));
 
+    // Create an event with JSON-LD additional type support.
+    $this->config('schemadotorg_additional_type.settings')
+      ->set('default_types', ['Event'])
+      ->set('jsonld_values', [
+        'circus' => [
+          'additional_type' => 'https://www.wikidata.org/wiki/Q47928',
+        ],
+        'conference' => [
+          'type' => 'ExhibitionEvent',
+          'additional_type' => 'https://www.wikidata.org/wiki/Q625994',
+        ],
+      ])
+      ->set('default_allowed_values.Event', ['circus' => 'Circus', 'conference' => 'Conference'])
+      ->save();
+    $this->createSchemaEntity('node', 'Event');
+    $event_node = Node::create([
+      'type' => 'event',
+      'title' => 'Event',
+      'schema_event_type' => 'circus',
+    ]);
+    $event_node->save();
+
+    // Check that JSON-LD @type and additionalType values are applied.
+    $expected_result = [
+      '@type' => 'Event',
+      '@url' => $event_node->toUrl()->setAbsolute()->toString(),
+      'inLanguage' => 'en',
+      'name' => 'Event',
+      'additionalType' => 'https://www.wikidata.org/wiki/Q47928',
+    ];
+    $this->assertEquals($expected_result, $this->builder->buildEntity($event_node));
+
+    $event_node->schema_event_type->value = 'conference';
+    $expected_result = [
+      '@type' => 'ExhibitionEvent',
+      '@url' => $event_node->toUrl()->setAbsolute()->toString(),
+      'inLanguage' => 'en',
+      'name' => 'Event',
+      'additionalType' => 'https://www.wikidata.org/wiki/Q625994',
+    ];
+    $this->assertEquals($expected_result, $this->builder->buildEntity($event_node));
   }
 
 }

@@ -12,6 +12,9 @@ schemadotorg_custom_field.settings:
           schema_type:
             type: string
             label: 'Schema.org type'
+          schema_role:
+            type: string
+            label: 'Schema.org role'
           schema_properties:
             type: sequence
             label: 'Schema.org properties'
@@ -64,6 +67,9 @@ schemadotorg_custom_field.settings:
                 required:
                   type: boolean
                   label: Required
+                check_empty:
+                  type: boolean
+                  label: 'Check empty'
                 empty_option:
                   type: text
                   label: 'Empty option'
@@ -87,6 +93,9 @@ schemadotorg_custom_field.settings:
                   sequence:
                     type: boolean
                     label: 'Enabled attributes'
+                widget_settings:
+                  type: ignore
+                  label: 'Widget settings'
           widget_id:
             type: string
             label: 'Widget ID'

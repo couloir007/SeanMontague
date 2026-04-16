@@ -328,7 +328,7 @@ function schemadotorg_preprocess_page_title(array &$variables): void {
   $route_name = \Drupal::routeMatch()->getRouteName();
 
   // Only alter schemadotorg routes.
-  if (!str_contains($route_name, 'schemadotorg')) {
+  if (empty($route_name) || !str_contains($route_name, 'schemadotorg')) {
     return;
   }
 

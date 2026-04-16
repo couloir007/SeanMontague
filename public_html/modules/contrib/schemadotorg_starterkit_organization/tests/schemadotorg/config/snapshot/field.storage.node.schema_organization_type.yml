@@ -524,6 +524,9 @@ settings:
       value: online_store
       label: '- Online Store'
     -
+      value: online_marketplace
+      label: '-- Online Marketplace'
+    -
       value: performing_group
       label: 'Performing Group'
     -

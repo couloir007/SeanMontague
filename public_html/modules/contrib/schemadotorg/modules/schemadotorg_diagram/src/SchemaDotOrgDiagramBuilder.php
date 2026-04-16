@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\schemadotorg_diagram;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -170,13 +170,11 @@ class SchemaDotOrgDiagramBuilder implements SchemaDotOrgDiagramBuilderInterface 
     // Mermaid.js diagram.
     $build['mermaid'] = [
       '#type' => 'container',
-      '#attributes' => ['class' => ['mermaid', 'schemadotorg-mermaid']],
+      '#attributes' => ['class' => ['mermaid', 'schemadotorg-mermaid', 'schemadotorg-diagram-mermaid']],
       '#markup' => implode(PHP_EOL, $output),
     ];
 
-    // Attach the mermaid.js and dialog libraries.
-    $build['#attached']['library'][] = 'schemadotorg/schemadotorg.mermaid';
-    $build['#attached']['library'][] = 'schemadotorg/schemadotorg.dialog';
+    $build['#attached']['library'][] = 'schemadotorg_diagram/schemadotorg_diagram';
 
     // @todo Determine how best to cache the diagram.
     $build['#cache']['max-age'] = 0;
@@ -200,13 +198,8 @@ class SchemaDotOrgDiagramBuilder implements SchemaDotOrgDiagramBuilderInterface 
 
     $node_id = '1-' . $node->id();
 
-    foreach ($node->get($parent_field_name) as $item) {
-      /** @var \Drupal\node\NodeInterface|null $parent_node */
-      $parent_node = $item->entity;
-      if (!$parent_node) {
-        continue;
-      }
-
+    $parent_nodes = $this->getReferencedNodes($node, $parent_field_name);
+    foreach ($parent_nodes as $parent_node) {
       $parent_id = '0-' . $parent_node->id();
 
       // Build parent container and link.
@@ -234,25 +227,31 @@ class SchemaDotOrgDiagramBuilder implements SchemaDotOrgDiagramBuilderInterface 
     }
 
     $parent_id = ($depth - 1) . '-' . $node->id();
+    $child_nodes = $this->getReferencedNodes($node, $child_field_name);
     foreach ($node->get($child_field_name) as $item) {
-      /** @var \Drupal\node\NodeInterface|null $child_node */
-      $child_node = $item->entity;
+      // @phpstan-ignore-next-line
+      $child_node = $child_nodes[$item->target_id] ?? NULL;
       if (!$child_node) {
         continue;
       }
 
       $child_id = $depth . '-' . $child_node->id();
 
-      // Build connector from parent to child with entity reference override
-      // as the connector label.
-      $override = $item->override ?? NULL;
-      $override_format = $item->override_format ?? NULL;
-      if ($override) {
+      if (isset($item->override)) {
+        // Build connector from parent to child with entity reference override
+        // as the connector label.
+        $override = $item->override;
+        $override_format = $item->override_format ?? NULL;
         $connector_label = $override_format
           ? (string) check_markup($override, $override_format)
           : $override;
         $connector_label = Unicode::truncate($connector_label, 30, TRUE, TRUE);
         $output[] = $parent_id . ' --- |"`' . $connector_label . '`"|' . $child_id;
+      }
+      elseif (isset($item->role_name)) {
+        // Build connector from parent to child with custom field role name
+        // as the connector label.
+        $output[] = $parent_id . ' --- |"`' . $item->role_name . '`"|' . $child_id;
       }
       else {
         $output[] = $parent_id . ' --- ' . $child_id;
@@ -265,6 +264,39 @@ class SchemaDotOrgDiagramBuilder implements SchemaDotOrgDiagramBuilderInterface 
         $this->buildChildNodesOutputRecursive($output, $child_node, $depth + 1);
       }
     }
+  }
+
+  /**
+   * Retrieves the nodes referenced by a specific field of the given node.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   The node containing the field with referenced entities.
+   * @param string $field_name
+   *   The name of the field from which to retrieve the referenced nodes.
+   *
+   * @return \Drupal\node\NodeInterface[]
+   *   An array of entity objects representing the referenced nodes.
+   */
+  protected function getReferencedNodes(NodeInterface $node, string $field_name): array {
+    $settings = $node->get($field_name)->getFieldDefinition()->getSettings();
+    $target_type = NestedArray::getValue($settings, ['columns', 'target_id', 'target_type'])
+      ?? $settings['target_type']
+      ?? NULL;
+    $entities = [];
+    foreach ($node->get($field_name) as $item) {
+      // @phpstan-ignore-next-line
+      $target_id = $item->target_id ?? NULL;
+      if (!$target_id) {
+        continue;
+      }
+
+      /** @var \Drupal\node\NodeInterface|null $target_node */
+      $target_node = $this->entityTypeManager->getStorage($target_type)->load($target_id);
+      if ($target_node) {
+        $entities[$target_node->id()] = $target_node;
+      }
+    }
+    return $entities;
   }
 
   /**
@@ -355,14 +387,20 @@ class SchemaDotOrgDiagramBuilder implements SchemaDotOrgDiagramBuilderInterface 
       return NULL;
     }
 
-    $field_name = $mapping->getSchemaPropertyFieldName($schema_property);
-    if (!$field_name
-      || !$node->hasField($field_name)
-      || !($node->get($field_name) instanceof EntityReferenceFieldItemListInterface)) {
+    $field_name = $mapping->getSchemaPropertyFieldName($schema_property, TRUE);
+    if (!$field_name || !$node->hasField($field_name)) {
       return NULL;
     }
 
-    return $field_name;
+    $field_definition = $node->get($field_name)->getFieldDefinition();
+    $settings = $field_definition->getSettings();
+    $field_type = NestedArray::getValue($settings, ['columns', 'target_id', 'type'])
+      ?? $field_definition->getType();
+    if (str_contains($field_type, 'entity_reference')) {
+      return $field_name;
+    }
+
+    return NULL;
   }
 
 }

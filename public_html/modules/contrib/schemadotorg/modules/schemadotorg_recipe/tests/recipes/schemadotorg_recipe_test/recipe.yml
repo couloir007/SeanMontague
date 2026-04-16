@@ -1,0 +1,35 @@
+name: 'Schema.org Recipe Test'
+description: 'Test recipe for the Schema.org Blueprints module''s createSchemaType config action'
+type: 'Schema.org Blueprints Recipe'
+install:
+  - smart_date
+  - smart_date_recur
+  - schemadotorg_smart_date
+config:
+  strict: false
+  import:
+    smart_date: '*'
+  actions:
+    core.extension:
+      executeInstallHook:
+        - schemadotorg_smart_date
+    schemadotorg.schemadotorg_mapping.node.event:
+      createSchemaType:
+        schema_type: Event
+    schemadotorg.schemadotorg_mapping.node.custom_thing:
+      createSchemaType:
+        schema_type: Thing
+        entity:
+          label: 'Something'
+        properties:
+          name:
+            required: true
+          description:  true
+          image: true
+          custom:
+            name: custom
+            type: string
+            label: Custom
+            group: general
+            default_value:
+              - value: 'Custom value'

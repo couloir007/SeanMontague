@@ -47,23 +47,29 @@ class SchemaDotOrgAdditionalTypeEntityKernelTest extends SchemaDotOrgEntityKerne
   public function testCreateSchemaEntity(): void {
     // Check creating node:Event Schema.org mapping with additional type.
     $mapping = $this->createSchemaEntity('node', 'Event');
+    /** @var \Drupal\field\FieldConfigInterface $field_config */
+    $field_config = $this->entityTypeManager
+      ->getStorage('field_config')
+      ->load("node.event.schema_event_type");
+
     $this->assertEquals('node', $mapping->getTargetEntityTypeId());
     $this->assertEquals('event', $mapping->getTargetBundle());
     $this->assertEquals('Event', $mapping->getSchemaType());
     $this->assertEquals('schema_event_type', $mapping->getSchemaPropertyFieldName('additionalType'));
+    $this->assertTrue($field_config->isRequired());
 
     // Check creating 'Person' with additional type.
     $mapping = $this->createSchemaEntity('node', 'Person');
     $this->assertEquals('schema_person_type', $mapping->getSchemaPropertyFieldName('additionalType'));
 
-    // Check creating another 'Person' with additional type.
+    // Check creating another 'Person' with an additional type.
     $defaults = [
       'entity' => ['id' => 'another_person'],
     ];
     $mapping = $this->createSchemaEntity('node', 'Person', $defaults);
     $this->assertEquals('schema_person_type', $mapping->getSchemaPropertyFieldName('additionalType'));
 
-    // Check creating other 'Person' with additional type.
+    // Check creating other 'Person' with an additional type.
     $defaults = [
       'entity' => ['id' => 'other_person'],
       'properties' => [
@@ -103,7 +109,7 @@ class SchemaDotOrgAdditionalTypeEntityKernelTest extends SchemaDotOrgEntityKerne
     ];
     $this->assertEquals($expected_schema_properties, $node_mapping->getSchemaProperties());
 
-    // Check getting the field name for a additional type property.
+    // Check getting the field name for an additional type property.
     $this->assertEquals('schema_thing_type', $node_mapping->getSchemaPropertyFieldName('additionalType'));
 
     // Check getting additional type value.
@@ -114,6 +120,24 @@ class SchemaDotOrgAdditionalTypeEntityKernelTest extends SchemaDotOrgEntityKerne
     ]);
     $node->save();
     $this->assertEquals('Course', SchemaDotOrgMapping::getAdditionalType($node));
+
+    // Check getting additional type default field values based on specificity.
+    $this->config('schemadotorg_additional_type.settings')
+      ->set('default_field_values',
+        [
+          'node--event' => [
+            'title' => 'This is an event',
+          ],
+          'node--event--Course' => [
+            'title' => 'This is a course',
+          ],
+        ],
+      )
+      ->save();
+    $node = Node::create(['type' => 'event']);
+    $this->assertEquals('This is an event', $node->label());
+    $node = Node::create(['type' => 'event', 'schema_event_type' => 'Course']);
+    $this->assertEquals('This is a course', $node->label());
   }
 
 }

@@ -29,7 +29,7 @@ content:
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 17
+    weight: 18
     region: content
   links:
     settings: {  }
@@ -49,7 +49,7 @@ content:
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 25
+    weight: 26
     region: content
   schema_family_name:
     type: string
@@ -76,7 +76,7 @@ content:
       image_loading:
         attribute: lazy
     third_party_settings: {  }
-    weight: 8
+    weight: 9
     region: content
   schema_knows_language:
     type: string
@@ -111,7 +111,7 @@ content:
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 24
+    weight: 25
     region: content
   schema_works_for:
     type: string

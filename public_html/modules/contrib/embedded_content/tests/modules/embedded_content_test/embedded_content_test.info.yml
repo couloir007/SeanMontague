@@ -6,7 +6,7 @@ package: Testing
 dependencies:
   - drupal:embedded_content
 
-# Information added by Drupal.org packaging script on 2025-01-22
-version: '2.0.3'
+# Information added by Drupal.org packaging script on 2026-02-13
+version: '2.0.4'
 project: 'embedded_content'
-datestamp: 1737579250
+datestamp: 1770987508

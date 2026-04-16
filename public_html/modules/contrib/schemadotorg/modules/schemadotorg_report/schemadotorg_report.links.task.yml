@@ -60,6 +60,10 @@ schemadotorg_report.properties.identifier:
   title: Identifiers
   route_name: schemadotorg_report.properties.identifier
   parent_id: schemadotorg_report.properties
+schemadotorg_report.properties.ignored:
+  title: Ignored
+  route_name: schemadotorg_report.properties.ignored
+  parent_id: schemadotorg_report.properties
 schemadotorg_report.properties.descriptions:
   title: Descriptions
   route_name: schemadotorg_report.properties.descriptions

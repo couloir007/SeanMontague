@@ -60,6 +60,13 @@ function schemadotorg_report_help(string $route_name, RouteMatchInterface $route
     case 'schemadotorg_report.properties.inverse_of':
       return '<p>' . t('The <strong>Schema.org: Inverse of</strong> report lists Schema.org properties that have inverse relationships.') . '</p>';
 
+    case 'schemadotorg_report.properties.identifier':
+      return '<p>' . t('The <strong>Schema.org: Identifiers</strong> report lists Schema.org identifier properties representing any kind of identifier for any kind of Thing.') . '</p>';
+
+    case 'schemadotorg_report.properties.ignored':
+      $t_args = [':href' => Url::fromRoute('schemadotorg.settings.properties')->toString()];
+      return '<p>' . t('The <strong>Schema.org: Ignored properties</strong> report lists <a href=":href">ignored Schema.org properties</a>.', $t_args) . '</p>';
+
     case 'schemadotorg_report.properties.descriptions':
       return '<p>' . t('The <strong>Schema.org: Property descriptions</strong> report lists Schema.org property default and custom descriptions.') . '</p>';
 

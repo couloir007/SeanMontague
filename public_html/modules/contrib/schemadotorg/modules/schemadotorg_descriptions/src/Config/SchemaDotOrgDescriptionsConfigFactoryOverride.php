@@ -26,7 +26,7 @@ use Drupal\schemadotorg\Utility\SchemaDotOrgStringHelper;
  * @see https://www.flocondetoile.fr/blog/dynamically-override-configuration-drupal-8
  * @see https://www.drupal.org/docs/drupal-apis/configuration-api/configuration-override-system
  */
-class SchemaDotOrgDescriptionsConfigFactoryOverride extends ConfigFactoryOverrideBase implements SchemaDotOrgDescriptionConfigFactoryOverrideInterface {
+class SchemaDotOrgDescriptionsConfigFactoryOverride extends ConfigFactoryOverrideBase implements SchemaDotOrgDescriptionsConfigFactoryOverrideInterface {
   use StringTranslationTrait;
 
   /**
@@ -174,7 +174,7 @@ class SchemaDotOrgDescriptionsConfigFactoryOverride extends ConfigFactoryOverrid
     // Reset cached descriptions.
     $this->defaultCacheBackend->delete(static::CACHE_ID);
 
-    // Skip resetting anything else if description are not being applied.
+    // Skip resetting anything else if description overrides are not being applied.
     if (!$this->applyDescriptionOverrides()) {
       return;
     }
@@ -205,35 +205,15 @@ class SchemaDotOrgDescriptionsConfigFactoryOverride extends ConfigFactoryOverrid
     $overrides = [];
 
     /* ********************************************************************** */
-    // Entity types, bundles, and fields.
-    /* ********************************************************************** */
-
-    $custom_descriptions = $this->configFactory
-      ->getEditable('schemadotorg_descriptions.settings')
-      ->get('custom_descriptions');
-    // Load the unaltered or not overridden field instance configuration.
-    $config_names = array_merge(
-      $this->configFactory->listAll('field.field.'),
-      $this->configFactory->listAll('core.base_field_override.')
-    );
-    foreach ($config_names as $config_name) {
-      [, , $entity_type_id, $bundle, $field_name] = explode('.', $config_name);
-      $description = $custom_descriptions["$entity_type_id--$bundle--$field_name"]
-        ?? $custom_descriptions["$entity_type_id--$field_name"]
-        ?? $custom_descriptions["$bundle--$field_name"]
-        ?? $custom_descriptions[$field_name]
-        ?? NULL;
-      if ($description) {
-        $overrides[$config_name] = ['description' => $description];
-      }
-    }
-
-    /* ********************************************************************** */
     // Schema.org type and properties.
     /* ********************************************************************** */
 
+    $type_keys = [];
     $type_overrides = [];
+
+    $property_keys = [];
     $property_overrides = [];
+
     // Load the unaltered or not overridden Schema.org mapping configuration.
     $config_names = $this->configFactory->listAll('schemadotorg.schemadotorg_mapping.');
     foreach ($config_names as $config_name) {
@@ -241,31 +221,78 @@ class SchemaDotOrgDescriptionsConfigFactoryOverride extends ConfigFactoryOverrid
 
       $entity_type_id = $config->get('target_entity_type_id');
       $bundle = $config->get('target_bundle');
-
-      // Get main Schema.org type.
       $schema_type = $config->get('schema_type');
-
-      // Set entity type override.
-      $type_overrides["$entity_type_id.type.$bundle"] = $schema_type;
-
-      // Get main and additional mappings Schema.org properties.
       $schema_properties = $config->get('schema_properties') ?: [];
+      // @todo We could apply additional mapping Schema.org types to keys.
       $additional_mappings = $config->get('additional_mappings') ?: [];
       foreach ($additional_mappings as $additional_mapping) {
         $schema_properties += $additional_mapping['schema_properties'];
       }
 
-      // Set entity field instance override.
-      $type_property_overrides = [];
+      // Set entity type override.
+      $type_overrides["$entity_type_id.type.$bundle"] = $schema_type;
+      $type_keys["$entity_type_id.type.$bundle"] = [
+        "$entity_type_id--$schema_type--$bundle",
+        "$entity_type_id--$schema_type",
+        "$entity_type_id--$bundle",
+        "$schema_type--$bundle",
+        $schema_type,
+        $bundle,
+      ];
+
+      // Set entity field instance overrides.
       foreach ($schema_properties as $field_name => $schema_property) {
-        $type_property_overrides["field.field.$entity_type_id.$bundle.$field_name"] = $schema_property;
+        $property_overrides["field.field.$entity_type_id.$bundle.$field_name"] = $schema_property;
+        $property_keys["field.field.$entity_type_id.$bundle.$field_name"] = [
+          "$entity_type_id--$schema_type--$schema_property",
+          "$entity_type_id--$schema_type--$field_name",
+          "$entity_type_id--$bundle--$schema_property",
+          "$entity_type_id--$bundle--$field_name",
+          "$entity_type_id--$schema_property",
+          "$entity_type_id--$field_name",
+          "$schema_type--$schema_property",
+          "$schema_type--$field_name",
+          "$bundle---$schema_property",
+          "$bundle--$field_name",
+          $schema_property,
+          $field_name,
+        ];
       }
-      $this->setItemDescriptionOverrides('properties', $type_property_overrides, $schema_type);
-      $property_overrides += $type_property_overrides;
     }
 
-    $this->setItemDescriptionOverrides('types', $type_overrides);
+    $this->setItemDescriptionOverrides('properties', $property_overrides, $property_keys);
+    $this->setItemDescriptionOverrides('types', $type_overrides, $type_keys);
     $overrides += $type_overrides + $property_overrides;
+
+    /* ********************************************************************** */
+    // Allows unmapped fields to be overwritten.
+    /* ********************************************************************** */
+
+    $custom_descriptions = $this->configFactory
+      ->getEditable('schemadotorg_descriptions.settings')
+      ->get('custom_descriptions');
+
+    // Load the unaltered or not overridden field instance configuration.
+    $config_names = array_merge(
+      $this->configFactory->listAll('field.field.'),
+      $this->configFactory->listAll('core.base_field_override.')
+    );
+    foreach ($config_names as $config_name) {
+      if (isset($overrides[$config_name])) {
+        continue;
+      }
+
+      [, , $entity_type_id, $bundle, $field_name] = explode('.', $config_name);
+      $description = $this->getCustomDescription($custom_descriptions, [
+        "$entity_type_id--$bundle--$field_name",
+        "$entity_type_id--$field_name",
+        "$bundle--$field_name",
+        $field_name,
+      ]);
+      if ($description !== FALSE) {
+        $overrides[$config_name] = ['description' => $description];
+      }
+    }
 
     $this->defaultCacheBackend->set(static::CACHE_ID, $overrides);
 
@@ -273,19 +300,20 @@ class SchemaDotOrgDescriptionsConfigFactoryOverride extends ConfigFactoryOverrid
   }
 
   /**
-   * Set configuration override descriptions for Schema.org types or properties.
+   * Sets item description overrides for configurations.
    *
    * @param string $table
-   *   Schema.org types or properties table.
-   * @param array $overrides
-   *   An associative array of configuration overrides.
-   * @param string $type
-   *   The Schema.org type.
+   *   The table identifier where the data items are stored.
+   * @param array &$overrides
+   *   An array of configuration overrides to be updated.
+   * @param array $keys
+   *   An array of keys mapping configuration names to Schema.org item identifiers.
    *
    * @return array
-   *   Configuration override descriptions for Schema.org types or properties.
+   *   The modified array of overrides containing the description and help text
+   *   as applicable.
    */
-  protected function setItemDescriptionOverrides(string $table, array &$overrides, string $type = ''): array {
+  protected function setItemDescriptionOverrides(string $table, array &$overrides, array $keys): array {
     $items = $this->schemaTypeManager->getItems($table, $overrides, ['label', 'comment']);
     $options = ['base_path' => 'https://schema.org/'];
 
@@ -296,13 +324,10 @@ class SchemaDotOrgDescriptionsConfigFactoryOverride extends ConfigFactoryOverrid
       ->getEditable('schemadotorg_descriptions.settings')
       ->get('custom_descriptions') ?? [];
     foreach ($overrides as $config_name => $id) {
-      if (array_key_exists("$type--$id", $custom_descriptions)) {
-        $description = $custom_descriptions["$type--$id"];
-        $help = $custom_descriptions["$type--$id"];
-      }
-      elseif (array_key_exists($id, $custom_descriptions)) {
-        $description = $custom_descriptions[$id];
-        $help = $custom_descriptions[$id];
+      $custom_description = $this->getCustomDescription($custom_descriptions, $keys[$config_name]);
+      if ($custom_description !== FALSE) {
+        $description = $custom_description;
+        $help = $custom_description;
       }
       elseif (isset($items[$id])) {
         $comment = $items[$id]['comment'];
@@ -336,6 +361,28 @@ class SchemaDotOrgDescriptionsConfigFactoryOverride extends ConfigFactoryOverrid
     }
 
     return $overrides;
+  }
+
+  /**
+   * Retrieves a custom description based on the provided keys.
+   *
+   * @param array $custom_descriptions
+   *   An associative array of custom descriptions where keys represent identifiers
+   *   and values represent the corresponding descriptions.
+   * @param array $keys
+   *   An array of keys to search in the custom descriptions.
+   *
+   * @return string|bool|null
+   *   The corresponding custom description as a string if found, NULL if a matching
+   *   description is null, or FALSE if no matching key is found in the descriptions.
+   */
+  protected function getCustomDescription(array $custom_descriptions, array $keys): string|null|bool {
+    foreach ($keys as $key) {
+      if (array_key_exists($key, $custom_descriptions)) {
+        return $custom_descriptions[$key];
+      }
+    }
+    return FALSE;
   }
 
 }

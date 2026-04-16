@@ -2,6 +2,80 @@
 
 All notable changes to `ray` will be documented in this file
 
+## 1.47.0 - 2026-02-20
+
+Add Laravel 13 support
+
+## 1.46.0 - 2026-02-06
+
+### What's new
+
+- Add `yellow()` as an alias for `orange()`
+- Add `grey()` as an alias for `gray()`
+
+## 1.45.0 - 2026-01-26
+
+### What's Changed
+
+* Add methods to retrieve windows and theme from Ray app
+* Bump actions/checkout from 5 to 6 by @dependabot in https://github.com/spatie/ray/pull/1001
+* Bump actions/cache from 4 to 5 by @dependabot in https://github.com/spatie/ray/pull/1016
+* Bump dependabot/fetch-metadata from 2.4.0 to 2.5.0 by @dependabot in https://github.com/spatie/ray/pull/1020
+
+**Full Changelog**: https://github.com/spatie/ray/compare/1.44.1...1.45.0
+
+## 1.44.1 - 2025-11-21
+
+### What's Changed
+
+* Fix RemoveRayCallRector to remove chained method calls by @FlorianRiquelme in https://github.com/spatie/ray/pull/991
+
+### New Contributors
+
+* @FlorianRiquelme made their first contribution in https://github.com/spatie/ray/pull/991
+
+**Full Changelog**: https://github.com/spatie/ray/compare/1.44.0...1.44.1
+
+## 1.44.0 - 2025-11-20
+
+### What's Changed
+
+* Provide backwards compatibility with PHPStan 1.x. by @pfrenssen in https://github.com/spatie/ray/pull/952
+* Update Dependencies by @sweptsquash in https://github.com/spatie/ray/pull/955
+* Bump dependabot/fetch-metadata from 2.2.0 to 2.3.0 by @dependabot[bot] in https://github.com/spatie/ray/pull/961
+* Laravel 12.x Compatibility by @laravel-shift in https://github.com/spatie/ray/pull/966
+* Use static:: instead of self:: for late static binding by @TumTum in https://github.com/spatie/ray/pull/970
+* Add offset and limit support to trace by @dimitri-koenig in https://github.com/spatie/ray/pull/974
+* Bump dependabot/fetch-metadata from 2.3.0 to 2.4.0 by @dependabot[bot] in https://github.com/spatie/ray/pull/979
+* Update issue template by @AlexVanderbist in https://github.com/spatie/ray/pull/986
+* Fix PHP 8.5 deprecations by @IonBazan in https://github.com/spatie/ray/pull/989
+* Bump stefanzweifel/git-auto-commit-action from 5 to 7 by @dependabot[bot] in https://github.com/spatie/ray/pull/988
+* Bump actions/checkout from 4 to 5 by @dependabot[bot] in https://github.com/spatie/ray/pull/984
+* Fix searchConfigFilesOnDisk to handle empty string parameter by @bjo3rnf in https://github.com/spatie/ray/pull/992
+
+### New Contributors
+
+* @pfrenssen made their first contribution in https://github.com/spatie/ray/pull/952
+* @laravel-shift made their first contribution in https://github.com/spatie/ray/pull/966
+* @TumTum made their first contribution in https://github.com/spatie/ray/pull/970
+* @dimitri-koenig made their first contribution in https://github.com/spatie/ray/pull/974
+* @IonBazan made their first contribution in https://github.com/spatie/ray/pull/989
+* @bjo3rnf made their first contribution in https://github.com/spatie/ray/pull/992
+
+**Full Changelog**: https://github.com/spatie/ray/compare/1.41.3...1.44.0
+
+## 1.43.1 - 2025-10-29
+
+### What's Changed
+
+* Fix searchConfigFilesOnDisk to handle empty string parameter by @bjo3rnf in https://github.com/spatie/ray/pull/992
+
+### New Contributors
+
+* @bjo3rnf made their first contribution in https://github.com/spatie/ray/pull/992
+
+**Full Changelog**: https://github.com/spatie/ray/compare/1.43.0...1.43.1
+
 ## 1.43.0 - 2025-10-16
 
 ### What's Changed

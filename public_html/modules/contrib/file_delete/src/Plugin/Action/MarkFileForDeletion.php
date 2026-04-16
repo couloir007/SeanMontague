@@ -15,7 +15,7 @@ use Drupal\file\FileUsage\FileUsageInterface;
  * Marks a file for deletion by setting it to temporary.
  */
 #[Action(
-  id: 'mark_file_for_deletion',
+  id: 'file_delete_mark_temporary',
   label: new TranslatableMarkup('Mark file for deletion'),
   type: 'file'
 )]

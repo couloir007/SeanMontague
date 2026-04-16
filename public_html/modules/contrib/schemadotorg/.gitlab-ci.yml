@@ -49,7 +49,7 @@ include:
 
 composer:
   variables:
-    DRUPAL_CORE: 10.4.x-dev
+    DRUPAL_CORE: 10.5.x-dev
     # _LENIENT_ALLOW_LIST: "cer, config_views, content_model_documentation, duration_field, embed, entity_embed, entity_reference_override, media_library_media_modify, mermaid_diagram_field"
 
 variables:

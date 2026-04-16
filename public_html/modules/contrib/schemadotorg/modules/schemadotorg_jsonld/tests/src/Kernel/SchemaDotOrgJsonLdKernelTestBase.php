@@ -21,10 +21,7 @@ abstract class SchemaDotOrgJsonLdKernelTestBase extends SchemaDotOrgEntityKernel
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [
-    'filter',
-    'schemadotorg_jsonld',
-  ];
+  protected static $modules = ['schemadotorg_jsonld'];
 
   /**
    * The date formatter service.

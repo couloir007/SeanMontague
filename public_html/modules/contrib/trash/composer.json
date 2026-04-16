@@ -10,7 +10,8 @@
         "drush/drush": "<12.5.1"
     },
     "require-dev": {
-        "drupal/wse": "*",
-        "drupal/redirect": "*"
+        "drupal/pathauto": "*",
+        "drupal/redirect": "*",
+        "drupal/wse": "*"
     }
 }

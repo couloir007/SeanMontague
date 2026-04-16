@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\schemadotorg_cer;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\Plugin\DataType\EntityReference;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\field\FieldStorageConfigInterface;
 use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
 use Drupal\schemadotorg\SchemaDotOrgSchemaTypeManagerInterface;
 
@@ -146,20 +147,47 @@ class SchemaDotOrgCorrespondingReferenceManager implements SchemaDotOrgCorrespon
     $field_config_storage = $this->entityTypeManager
       ->getStorage('field_storage_config');
 
-    /** @var \Drupal\Core\Field\FieldConfigInterface[] $fields */
+    /** @var \Drupal\field\FieldStorageConfigInterface[] $fields */
     $fields = $field_config_storage->loadMultiple(["node.$first_field_name", "node.$second_field_name"]);
     if (count($fields) !== 2) {
       return FALSE;
     }
 
     foreach ($fields as $field) {
-      if ($field instanceof EntityReference
-        || $field->getSetting('target_type') !== 'node') {
+      if (!$this->isValidCorrespondingReferenceField($field)) {
         return FALSE;
       }
     }
 
     return TRUE;
+  }
+
+  /**
+   * Validates if the given field is a corresponding reference field.
+   *
+   * @param \Drupal\field\FieldStorageConfigInterface $field
+   *   The field storage configuration object to validate.
+   *
+   * @return bool
+   *   TRUE if the field is a valid corresponding reference field, FALSE otherwise.
+   *
+   * @see \Drupal\schemadotorg\Plugin\EntityReferenceSelection\SchemaDotOrgEntityReferenceSelection::updateFieldConfig
+   */
+  protected function isValidCorrespondingReferenceField(FieldStorageConfigInterface $field): bool {
+    $settings = $field->getSettings();
+    $field_type = $field->getType();
+    if ($field_type === 'custom'
+      && NestedArray::getValue($settings, ['columns', 'target_id', 'type']) === 'entity_reference'
+      && NestedArray::getValue($settings, ['columns', 'target_id', 'target_type']) === 'node') {
+      return TRUE;
+    }
+    elseif (str_contains($field_type, 'entity_reference')
+      && NestedArray::getValue($settings, ['target_type']) === 'node') {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
   }
 
 }

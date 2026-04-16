@@ -6,15 +6,20 @@ namespace Drupal\schemadotorg_additional_type;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field\FieldStorageConfigInterface;
 use Drupal\node\NodeInterface;
 use Drupal\schemadotorg\SchemaDotOrgEntityFieldManagerInterface;
+use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
 use Drupal\schemadotorg\SchemaDotOrgNamesInterface;
 use Drupal\schemadotorg\SchemaDotOrgSchemaTypeManagerInterface;
 use Drupal\schemadotorg\Traits\SchemaDotOrgMappingStorageTrait;
@@ -68,7 +73,7 @@ class SchemaDotOrgAdditionalTypeManager implements SchemaDotOrgAdditionalTypeMan
       return;
     }
 
-    // Make sure the mapping defaults have a additionalType because
+    // Make sure the mapping defaults have an additionalType because
     // enumerations don't have an additional type.
     if (!isset($defaults['properties']['additionalType'])) {
       return;
@@ -198,13 +203,14 @@ class SchemaDotOrgAdditionalTypeManager implements SchemaDotOrgAdditionalTypeMan
     // Set the details summary to display the hard coded field type.
     $form['mapping']['additional_type'][static::ADD_FIELD]['#attributes'] = ['data-schemadotorg-ui-summary' => $this->t('List (text)')];
 
-    // Do not allow unlimited and required to be set.
-    $form['mapping']['additional_type'][static::ADD_FIELD]['unlimited']['#access'] = FALSE;
-    $form['mapping']['additional_type'][static::ADD_FIELD]['unlimited']['#default_value'] = FALSE;
-    $form['mapping']['additional_type'][static::ADD_FIELD]['required']['#access'] = FALSE;
-    $form['mapping']['additional_type'][static::ADD_FIELD]['required']['#default_value'] = FALSE;
+    // Set required.
+    $form['mapping']['additional_type'][static::ADD_FIELD]['required']['#default_value'] = $this->isAdditionalTypeRequired(
+      $mapping->getTargetEntityTypeId(),
+      $mapping->getTargetBundle(),
+      $mapping->getSchemaType()
+    );
 
-    // Hard code the field type.
+    // Hard-code the field type.
     $form['mapping']['additional_type'][static::ADD_FIELD]['type'] = [
       '#type' => 'item',
       '#title' => $this->t('Type'),
@@ -274,6 +280,82 @@ AdditionalType: Additional Type
   /**
    * {@inheritdoc}
    */
+  public function entityCreate(EntityInterface $entity, bool $override = FALSE): void {
+    // Only content entities support default field values.
+    if (!$entity instanceof ContentEntityInterface) {
+      return;
+    }
+
+    // Check that the entity type has a Schema.org mapping type.
+    if (!$this->loadMappingType($entity->getEntityTypeId())) {
+      return;
+    }
+
+    // Support all entity types so that all default values can be stored
+    // in one place.
+    $parts = [
+      'entity_type_id' => $entity->getEntityTypeId(),
+      'bundle' => $entity->bundle(),
+    ];
+    $mapping = $this->getMappingStorage()->loadByEntity($entity);
+    if ($mapping) {
+      $additional_type_field_name = $mapping->getSchemaPropertyFieldName('additionalType');
+      $additional_type = $entity->hasField($additional_type_field_name)
+        ? $entity->get($additional_type_field_name)->value
+        : NULL;
+      $parts += [
+        'schema_type' => $mapping->getSchemaType(),
+        'additional_type' => $additional_type,
+      ];
+    }
+
+    $default_field_values = $this->getDefaultFieldValues($parts);
+    foreach ($default_field_values as $field_name => $value) {
+      $field_name = $mapping?->getSchemaPropertyFieldName($field_name, TRUE)
+        ?? $field_name;
+
+      // Check if the entity has this field defined.
+      if (!$entity->hasField($field_name)) {
+        return;
+      }
+
+      // Skip updating the field if $override is FALSE (not forcing update)
+      // and the field already has a value (is not empty).
+      if (!$override && !$entity->get($field_name)->isEmpty()) {
+        continue;
+      }
+
+      // Handle field values that are associative arrays (non-sequential keys)
+      if (is_array($value) && !isset($value[0])) {
+        // Directly set the field value since it's already properly structured.
+        $entity->get($field_name)->setValue($value);
+      }
+      else {
+        // Get the field definition to determine the main property name.
+        $field_definition = $entity->get($field_name)->getFieldDefinition();
+        $main_property = $field_definition->getFieldStorageDefinition()->getMainPropertyName();
+
+        // Ensure value is an array for consistent processing.
+        $value = (array) $value;
+
+        // Process each value item to ensure proper field structure.
+        foreach ($value as $index => $item) {
+          // If the item is not an array, wrap it in an array with the main property key
+          // This converts simple values into the expected field value structure.
+          if (!is_array($item)) {
+            $value[$index] = [$main_property => $item];
+          }
+        }
+
+        // Set the properly structured field values on the entity.
+        $entity->set($field_name, $value);
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function nodePrepareForm(NodeInterface $node, string $operation, FormStateInterface $form_state): void {
     if (!$node->access('update')) {
       return;
@@ -304,6 +386,9 @@ AdditionalType: Additional Type
     }
 
     $node->get($field_name)->value = $value;
+    if ($node->isNew()) {
+      $this->entityCreate($node);
+    }
   }
 
   /**
@@ -362,7 +447,8 @@ AdditionalType: Additional Type
       $url = $link['#url'];
       $route_parameters = $url->getRouteParameters();
       $node_type = $route_parameters['node_type'] ?? NULL;
-      if ($this->isNodeTypeAdditionalTypeRequired($node_type)) {
+      if ($this->isNodeTypeAdditionalTypeRequired($node_type)
+        && !$this->isNodeTypeAdditionalTypeInUrl($node_type, $url)) {
         $this->setLinkOptionsAttributes($link, '#options');
       }
     }
@@ -382,6 +468,128 @@ AdditionalType: Additional Type
     $link[$key]['attributes']['class'][] = 'use-ajax';
     $link[$key]['attributes']['data-dialog-type'] = 'modal';
     $link[$key]['attributes']['data-dialog-options'] = Json::encode(['width' => 600]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isAdditionalTypeRequired(string $entity_type_id, ?string $bundle, string $schema_type): bool {
+    $required_types = $this->configFactory
+      ->get('schemadotorg_additional_type.settings')
+      ->get('required_types');
+    $parts = [
+      'entity_type_id' => $entity_type_id,
+      'bundle' => $bundle,
+      'schema_type' => $schema_type,
+    ];
+    return (bool) $this->schemaTypeManager->getSetting($required_types, $parts, ['parents' => FALSE]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isNodeTypeAdditionalTypeRequired(string $node_type): bool {
+    $mapping = $this->getMappingStorage()->loadByBundle('node', $node_type);
+    if (!$mapping
+      || !$mapping->hasSchemaPropertyMapping('additionalType', TRUE)) {
+      return FALSE;
+    }
+
+    if ($this->isMappingAdditionalTypeMultiple($mapping)) {
+      return FALSE;
+    }
+
+    return $this->isAdditionalTypeRequired(
+      $mapping->getTargetEntityTypeId(),
+      $mapping->getTargetBundle(),
+      $mapping->getSchemaType()
+    );
+  }
+
+  /**
+   * Determines if the additional type Schema.org field name for a node type exists in the URL.
+   *
+   * @param string $node_type
+   *   The node type.
+   * @param \Drupal\Core\Url $url
+   *   The URL object.
+   *
+   * @return bool
+   *   TRUE if the additional type Schema.org field name for a node type
+   *   exists in the URL.
+   */
+  protected function isNodeTypeAdditionalTypeInUrl(string $node_type, Url $url): bool {
+    $mapping = $this->getMappingStorage()->loadByBundle('node', $node_type);
+    if (!$mapping
+      || !$mapping->hasSchemaPropertyMapping('additionalType', TRUE)) {
+      return FALSE;
+    }
+
+    $additional_type_field_name = $mapping->getSchemaPropertyFieldName('additionalType');
+    $query = $url->getOption('query');
+    return !empty($query[$additional_type_field_name]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isMappingAdditionalTypeMultiple(SchemaDotOrgMappingInterface $mapping): bool {
+    $field_storage_config = $this->getFieldStorageConfig($mapping);
+    return $field_storage_config && $field_storage_config->isMultiple();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMappingAdditionalTypeAllowedValues(SchemaDotOrgMappingInterface $mapping): ?array {
+    $field_storage_config = $this->getFieldStorageConfig($mapping);
+    return ($field_storage_config)
+      ? options_allowed_values($field_storage_config) ?: NULL
+      : NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultFieldValues(array $parts): array {
+    $default_field_values = $this->configFactory
+      ->get('schemadotorg_additional_type.settings')
+      ->get('default_field_values');
+    $multiple_default_field_values = $this->schemaTypeManager->getSetting($default_field_values, $parts, ['parents' => FALSE, 'multiple' => TRUE]);
+    if (!$multiple_default_field_values) {
+      return [];
+    }
+
+    $field_values = [];
+    foreach ($multiple_default_field_values as $default_field_values) {
+      $field_values += $default_field_values;
+    }
+
+    return $field_values;
+  }
+
+  /**
+   * Retrieves the field storage configuration for a Schema.org mapping's property.
+   *
+   * @param \Drupal\schemadotorg\SchemaDotOrgMappingInterface $mapping
+   *   The Schema.org mapping entity for which the field storage configuration
+   *   is being retrieved.
+   *
+   * @return \Drupal\field\FieldStorageConfigInterface|null
+   *   The field storage configuration associated with the specified Schema.org
+   *   property, or NULL if no configuration exists for the property.
+   */
+  protected function getFieldStorageConfig(SchemaDotOrgMappingInterface $mapping): ?FieldStorageConfigInterface {
+    $field_name = $mapping->getSchemaPropertyFieldName('additionalType');
+    if (!$field_name) {
+      return NULL;
+    }
+
+    /** @var \Drupal\field\FieldStorageConfigInterface|null $field_storage_config */
+    $field_storage_config = $this->entityTypeManager
+      ->getStorage('field_storage_config')
+      ->load("node.$field_name");
+    return $field_storage_config;
   }
 
   /**
@@ -408,55 +616,6 @@ AdditionalType: Additional Type
       'schema_type' => $schema_type,
     ];
     return (bool) $this->schemaTypeManager->getSetting($default_types, $parts, ['parents' => FALSE]);
-  }
-
-  /**
-   * Check if the additional type is required for a given Schema.org type and bundle.
-   *
-   * @param string $entity_type_id
-   *   The entity type ID.
-   * @param string|null $bundle
-   *   The Schema.org type.
-   * @param string $schema_type
-   *   The bundle name.
-   *
-   * @return bool
-   *   TRUE if the additional type is required, FALSE otherwise.
-   */
-  protected function isAdditionalTypeRequired(string $entity_type_id, ?string $bundle, string $schema_type): bool {
-    $required_types = $this->configFactory
-      ->get('schemadotorg_additional_type.settings')
-      ->get('required_types');
-    $parts = [
-      'entity_type_id' => $entity_type_id,
-      'bundle' => $bundle,
-      'schema_type' => $schema_type,
-    ];
-    return (bool) $this->schemaTypeManager->getSetting($required_types, $parts, ['parents' => FALSE]);
-  }
-
-  /**
-   * Determines if the additionalType property is required for a given content type.
-   *
-   * @param string $node_type
-   *   A content type.
-   *
-   * @return bool
-   *   TRUE if the additionalType property is required for the
-   *   specified content type, otherwise FALSE.
-   */
-  protected function isNodeTypeAdditionalTypeRequired(string $node_type): bool {
-    $mapping = $this->getMappingStorage()->loadByBundle('node', $node_type);
-    if (!$mapping
-      || !$mapping->hasSchemaPropertyMapping('additionalType', TRUE)) {
-      return FALSE;
-    }
-
-    return $this->isAdditionalTypeRequired(
-      $mapping->getTargetEntityTypeId(),
-      $mapping->getTargetBundle(),
-      $mapping->getSchemaType()
-    );
   }
 
   /**

@@ -76,37 +76,44 @@ trait TrashStorageTrait {
     $revisionable = $this->getEntityType()->isRevisionable();
 
     foreach ($entities as $entity) {
-      // The original entity can not be loaded if it's soft-deleted, so we need
-      // to set it manually.
-      if (method_exists($entity, 'setOriginal')) {
-        $entity->setOriginal(clone $entity);
-      }
-      else {
-        $entity->original = clone $entity;
-      }
-
-      // Allow code to run before restoring from trash.
-      $this->getTrashManager()->getHandler($this->entityTypeId)->preTrashRestore($entity);
-      $this->invokeHook('pre_trash_restore', $entity);
-
-      $deleted_timestamp = $entity->get($field_name)->value;
-      $entity->set($field_name, NULL);
-
-      // Always create a new revision if the entity type is revisionable.
-      if ($revisionable) {
-        /** @var \Drupal\Core\Entity\RevisionableInterface $entity */
-        $entity->setNewRevision(TRUE);
-
-        if ($entity instanceof RevisionLogInterface) {
-          $entity->setRevisionUserId(\Drupal::currentUser()->id());
-          $entity->setRevisionCreationTime(\Drupal::time()->getRequestTime());
+      $transaction = $this->database->startTransaction();
+      try {
+        // The original entity can not be loaded if it's soft-deleted, so we
+        // need to set it manually.
+        if (method_exists($entity, 'setOriginal')) {
+          $entity->setOriginal(clone $entity);
         }
-      }
-      $entity->save();
+        else {
+          $entity->original = clone $entity;
+        }
 
-      // Allow code to run after restoring from trash.
-      $this->getTrashManager()->getHandler($this->entityTypeId)->postTrashRestore($entity, $deleted_timestamp);
-      $this->invokeHook('trash_restore', $entity);
+        // Allow code to run before restoring from trash.
+        $this->getTrashManager()->getHandler($this->entityTypeId)->preTrashRestore($entity);
+        $this->invokeHook('pre_trash_restore', $entity);
+
+        $deleted_timestamp = $entity->get($field_name)->value;
+        $entity->set($field_name, NULL);
+
+        // Always create a new revision if the entity type is revisionable.
+        if ($revisionable) {
+          /** @var \Drupal\Core\Entity\RevisionableInterface $entity */
+          $entity->setNewRevision(TRUE);
+
+          if ($entity instanceof RevisionLogInterface) {
+            $entity->setRevisionUserId(\Drupal::currentUser()->id());
+            $entity->setRevisionCreationTime(\Drupal::time()->getRequestTime());
+          }
+        }
+        $entity->save();
+
+        // Allow code to run after restoring from trash.
+        $this->getTrashManager()->getHandler($this->entityTypeId)->postTrashRestore($entity, $deleted_timestamp);
+        $this->invokeHook('trash_restore', $entity);
+      }
+      catch (\Exception $e) {
+        $transaction->rollBack();
+        throw $e;
+      }
     }
   }
 
@@ -161,27 +168,6 @@ trait TrashStorageTrait {
     }
 
     return $query;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setPersistentCache($entities) {
-    if (!$this->entityType->isPersistentlyCacheable()) {
-      return;
-    }
-
-    // Ensure that deleted entities are never stored in the persistent cache.
-    foreach ($entities as $id => $entity) {
-      if (trash_entity_is_deleted($entity)) {
-        unset($entities[$id]);
-      }
-    }
-    if (empty($entities)) {
-      return;
-    }
-
-    parent::setPersistentCache($entities);
   }
 
   /**

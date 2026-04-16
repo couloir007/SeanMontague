@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\schemadotorg_report\Traits;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
 use Drupal\schemadotorg\Traits\SchemaDotOrgMappingStorageTrait;
@@ -15,7 +16,7 @@ trait SchemaDotOrgReportRelationshipsTrait {
   use SchemaDotOrgMappingStorageTrait;
 
   /**
-   * An array of empty relationships..
+   * An array of empty relationships.
    */
   protected array $relationships = [
     'hierarchical' => [],
@@ -195,6 +196,12 @@ trait SchemaDotOrgReportRelationshipsTrait {
     }
     elseif ($field_type === 'link') {
       return 'link';
+    }
+    elseif ($field_type === 'custom') {
+      $settings = $field_definition->getSettings();
+      return (NestedArray::getValue($settings, ['columns', 'target_id', 'type']) === 'entity_reference')
+        ? 'reference'
+        : NULL;
     }
     return NULL;
   }

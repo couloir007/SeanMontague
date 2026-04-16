@@ -21,6 +21,9 @@ class RedirectTrashHandler extends DefaultTrashHandler {
   #[Hook('redirect_presave')]
   public function preSave(EntityInterface $entity): void {
     assert($entity instanceof Redirect);
+    if (!$this->trashManager->isEntityTypeEnabled($entity->getEntityTypeId())) {
+      return;
+    }
 
     // Set a random hash value for deleted redirects in order to allow new ones
     // to be created with the same source URL.
@@ -32,8 +35,10 @@ class RedirectTrashHandler extends DefaultTrashHandler {
   /**
    * {@inheritdoc}
    */
-  public function preTrashRestore(EntityInterface $entity): void {
-    parent::preTrashRestore($entity);
+  public function validateRestore(EntityInterface $entity): void {
+    $entity_key = $entity->getEntityTypeId() . ':' . $entity->id();
+    $this->validatedEntities[$entity_key] = TRUE;
+
     assert($entity instanceof Redirect);
     $storage = $this->entityTypeManager->getStorage('redirect');
 
@@ -52,6 +57,22 @@ class RedirectTrashHandler extends DefaultTrashHandler {
     if ($result) {
       throw new UnrestorableEntityException((string) $this->t('There is an existing redirect with the same source URL.'));
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preTrashRestore(EntityInterface $entity): void {
+    $entity_key = $entity->getEntityTypeId() . ':' . $entity->id();
+
+    // Only run validation if it hasn't been done already (e.g., by form
+    // validation).
+    if (empty($this->validatedEntities[$entity_key])) {
+      $this->validateRestore($entity);
+    }
+
+    // Clear the validation flag for this entity.
+    unset($this->validatedEntities[$entity_key]);
   }
 
 }

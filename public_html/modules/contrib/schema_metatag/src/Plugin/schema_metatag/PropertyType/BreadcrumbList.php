@@ -2,6 +2,7 @@
 
 namespace Drupal\schema_metatag\Plugin\schema_metatag\PropertyType;
 
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -29,9 +30,9 @@ class BreadcrumbList extends ItemListElement {
   protected $breadcrumbManager;
 
   /**
-   * Renderer.
+   * The renderer.
    *
-   * @var \Drupal\Core\Render\Renderer
+   * @var \Drupal\Core\Render\RendererInterface
    */
   protected $renderer;
 
@@ -122,7 +123,7 @@ class BreadcrumbList extends ItemListElement {
         $text = $item->getText();
         if (is_array($text)) {
           // Handling backward compatibility.
-          if (method_exists($this->renderer, 'renderPlain')) {
+          if (method_exists(RendererInterface::class, 'renderPlain')) {
             // @phpstan-ignore-next-line as it is deprecated in D10.3 and removed from D12.
             $text = $this->renderer->renderPlain($text);
           }

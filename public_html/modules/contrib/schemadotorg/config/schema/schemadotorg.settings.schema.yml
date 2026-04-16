@@ -124,8 +124,11 @@ schemadotorg.settings:
                 type: integer
                 label: 'Maximum length'
               default_value:
-                type: ignore
+                type: sequence
                 label: 'Default value'
+                sequence:
+                  type: ignore
+                  label: 'Value'
               prefix:
                 type: text
                 label: Prefix

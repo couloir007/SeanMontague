@@ -118,6 +118,7 @@ final class PublishLatestRevisionLatestDraftTest extends WebDriverTestBase {
     // 5) Verify that both 'REV 1' and 'REV 2' revision logs still exist.
     // (Reported bug says they may be missing/overwritten.)
     $this->drupalLogin($this->rootUser);
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = \Drupal::entityTypeManager()->getStorage('node');
     $node = Node::load($nid);
     $rev_ids = $storage->revisionIds($node);

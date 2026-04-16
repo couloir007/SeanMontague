@@ -71,6 +71,30 @@ default_schema_properties:
         data_type: string
       frequency:
         data_type: string
+  member:
+    schema_type: Person
+    schema_role: Role
+    schema_properties:
+      roleName:
+        data_type: string
+  alumni:
+    schema_type: Person
+    schema_role: Role
+    schema_properties:
+      roleName:
+        data_type: string
+      startDate:
+        data_type: datetime
+        datetime_type: date
+      endDate:
+        data_type: datetime
+        datetime_type: date
+      givenName:
+        data_type: string
+      familyName:
+        data_type: string
+      alternateName:
+        data_type: string
   nutrition:
     schema_type: NutritionInformation
     schema_properties:

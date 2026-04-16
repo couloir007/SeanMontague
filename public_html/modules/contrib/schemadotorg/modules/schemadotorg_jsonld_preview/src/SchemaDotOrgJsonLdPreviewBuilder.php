@@ -194,7 +194,8 @@ class SchemaDotOrgJsonLdPreviewBuilder implements SchemaDotOrgJsonLdPreviewBuild
     $build['data'] = [];
     if (array_is_list($data)) {
       foreach ($data as $item) {
-        $build['data'][$item['@type']] = $this->buildDataSchemaType($item);
+        $type = (array) $item['@type'];
+        $build['data'][implode('-', $type)] = $this->buildDataSchemaType($item);
       }
     }
     else {
@@ -215,13 +216,13 @@ class SchemaDotOrgJsonLdPreviewBuilder implements SchemaDotOrgJsonLdPreviewBuild
    *   inside a details widget.
    */
   protected function buildDataSchemaType(array $data): array {
-    $schema_type = $data['@type'];
+    $schema_type = (array) $data['@type'];
 
     $build = [
       '#type' => 'details',
-      '#title' => $schema_type,
+      '#title' => implode('; ', $schema_type),
       '#attributes' => [
-        'data-schemadotorg-details-key' => 'schemadotorg-data-preview-' . $this->schemaNames->camelCaseToSnakeCase($schema_type),
+        'data-schemadotorg-details-key' => 'schemadotorg-data-preview-' . $this->schemaNames->camelCaseToSnakeCase(implode('-', $schema_type)),
       ],
       'table' => [
         '#theme' => 'table',

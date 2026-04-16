@@ -107,6 +107,9 @@ class Ray
     /** @var Closure|null */
     public static $beforeSendRequest = null;
 
+    /** @var array<callable> */
+    public static $afterSendCallbacks = [];
+
     public static function create(?Client $client = null, ?string $uuid = null): self
     {
         $settings = SettingsFactory::createFromConfigFile();
@@ -170,6 +173,16 @@ class Ray
     public static function useClient(Client $client): void
     {
         self::$client = $client;
+    }
+
+    public function windows(): array
+    {
+        return self::$client->getWindows();
+    }
+
+    public function theme(): ?array
+    {
+        return self::$client->getTheme();
     }
 
     public function newScreen(string $name = ''): self
@@ -838,6 +851,13 @@ class Ray
         self::$client->send($request);
 
         self::rateLimiter()->hit();
+
+        foreach (static::$afterSendCallbacks as $callback) {
+            try {
+                $callback($this, $request);
+            } catch (\Throwable $e) {
+            }
+        }
 
         return $this;
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\schemadotorg\Plugin\EntityReferenceSelection;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginBase;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
@@ -389,17 +390,35 @@ abstract class SchemaDotOrgEntityReferenceSelection extends SelectionPluginBase 
   public static function updateFieldConfig(FieldConfigInterface $field_config): void {
     // Check that the field type is an entity reference
     // and the entity reference handler is a 'schemadotorg' handler.
-    if (!str_starts_with($field_config->getType(), 'entity_reference')
-      || !str_starts_with($field_config->getSetting('handler'), 'schemadotorg')) {
-      return;
+    if (str_starts_with($field_config->getType(), 'entity_reference')) {
+      $settings = $field_config->getSettings();
+      $handler = $settings['handler'];
+      if (str_starts_with($handler, 'schemadotorg')) {
+        $handler_settings = $settings['handler_settings'];
+        $handler_settings['target_bundles'] = SchemaDotOrgEntityReferenceSelection::getTargetBundles($handler_settings);
+
+        $field_config->setSetting('handler_settings', $handler_settings);
+      }
+    }
+    elseif ($field_config->getType() === 'custom') {
+      $settings = $field_config->getSettings();
+      $has_entity_reference = FALSE;
+      foreach ($settings['columns'] as $column_name => $column) {
+        if ($column['type'] === 'entity_reference') {
+          $handler = NestedArray::getValue($settings, ['field_settings', $column_name, 'widget_settings', 'settings', 'handler']);
+          if (str_starts_with($handler, 'schemadotorg')) {
+            $has_entity_reference = TRUE;
+            $handler_settings =& NestedArray::getValue($settings, ['field_settings', $column_name, 'widget_settings', 'settings', 'handler_settings']);
+            $handler_settings['target_bundles'] = SchemaDotOrgEntityReferenceSelection::getTargetBundles($handler_settings);
+
+          }
+        }
+      }
+      if ($has_entity_reference) {
+        $field_config->setSettings($settings);
+      }
     }
 
-    $settings = $field_config->getSettings();
-    $handler_settings = $settings['handler_settings'];
-
-    $target_bundles = SchemaDotOrgEntityReferenceSelection::getTargetBundles($handler_settings);
-    $handler_settings['target_bundles'] = $target_bundles;
-    $field_config->setSetting('handler_settings', $handler_settings);
   }
 
 }

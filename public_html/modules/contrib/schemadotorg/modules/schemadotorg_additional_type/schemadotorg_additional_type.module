@@ -7,10 +7,14 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeInterface;
 use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
 
@@ -18,11 +22,17 @@ use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
  * Implements hook_help().
  */
 function schemadotorg_additional_type_help(string $route_name, RouteMatchInterface $route_match): string|NULL {
-  if ($route_name === 'schemadotorg_additional_type.settings') {
-    return '<p>' . t('The <strong>Schema.org additional type settings</strong> page allows administrators to configure default setting for additional typing.') . '<p>';
-  }
+  switch ($route_name) {
+    case 'schemadotorg_additional_type.settings':
+      return '<p>' . t('The <strong>Schema.org additional type settings</strong> page allows administrators to configure default setting for additional typing.') . '<p>';
 
-  return NULL;
+    case 'schemadotorg_additional_type.report':
+      return '<p>' . t('The <strong>Schema.org additional types</strong> page lists all Schema.org types and additional types for nodes with default field values.') . '<p>';
+
+    default:
+      return NULL;
+
+  }
 }
 
 /* ************************************************************************** */
@@ -50,6 +60,15 @@ function schemadotorg_additional_type_form_schemadotorg_mapping_form_alter(array
 /* ************************************************************************** */
 // Node add/edit form enhancements.
 /* ************************************************************************** */
+
+/**
+ * Implements hook_entity_create().
+ */
+function schemadotorg_additional_type_entity_create(EntityInterface $entity): void {
+  /** @var \Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeManagerInterface $additional_type_manager */
+  $additional_type_manager = \Drupal::service('schemadotorg_additional_type.manager');
+  $additional_type_manager->entityCreate($entity);
+}
 
 /**
  * Implements hook_ENTITY_TYPE_prepare_form().
@@ -95,6 +114,32 @@ function schemadotorg_additional_type_preprocess_links(array &$variables): void 
   $additional_type_manager = \Drupal::service('schemadotorg_additional_type.manager');
   $additional_type_manager->preprocessLinks($variables);
 }
+
+/* ************************************************************************** */
+// Field access.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_entity_field_access().
+ */
+function schemadotorg_additional_type_entity_field_access(string $operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL): AccessResult {
+  /** @var \Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeFieldAccessHandlerInterface $additional_type_field_access_handler */
+  $additional_type_field_access_handler = \Drupal::service('schemadotorg_additional_type.field_access_handler');
+  return $additional_type_field_access_handler->entityFieldAccess($operation, $field_definition, $account, $items);
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function schemadotorg_additional_type_entity_update(EntityInterface $entity): void {
+  /** @var \Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeFieldAccessHandlerInterface $additional_type_field_access_handler */
+  $additional_type_field_access_handler = \Drupal::service('schemadotorg_additional_type.field_access_handler');
+  $additional_type_field_access_handler->resetCache($entity);
+}
+
+/* ************************************************************************** */
+// JSON-LD enhancements.
+/* ************************************************************************** */
 
 /**
  * Implements hook_schemadotorg_jsonld_schema_type_entity_alter().
@@ -155,10 +200,10 @@ function schemadotorg_additional_type_form_schemadotorg_types_settings_form_alte
     '#type' => 'schemadotorg_settings',
     '#title' => t('Schema.org default additional types allowed values'),
     '#description' => t('Enter default additional type allowed values for Schema.org types.')
-      . ' '
-      . t('Additional type allowed values that are not valid Schema.org types will be rendered as an <a href=":href">additionalType</a> property via JSON-LD', [':href' => 'https://schema.org/additionalType'])
-      . ' '
-      . t('Additional type values can be snake case machine names that will automatically be converted to Schema.org types when appropriate.'),
+    . ' '
+    . t('Additional type allowed values that are not valid Schema.org types will be rendered as an <a href=":href">additionalType</a> property via JSON-LD', [':href' => 'https://schema.org/additionalType'])
+    . ' '
+    . t('Additional type values can be snake case machine names that will automatically be converted to Schema.org types when appropriate.'),
     '#description_link' => 'types',
     '#example' => '
 SchemaType:
@@ -179,10 +224,96 @@ bundle:
   schema_subtype_03: Subtype 03
 ',
   ];
+  $form['schemadotorg_additional_type']['default_field_values'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Schema.org additional type default field values'),
+    '#description' => t('Enter default field values for additional types.'),
+    '#description_link' => 'types',
+    '#example' => "
+entity_type_id—-bundle—additional_type:
+  field_name: value
+  schemaProperty: value
+  body:
+   - value: 'This is the body'
+     summary: 'This is the summary'
+     format: basic_html
+entity_type_id—SchemaType—bundle--additional_type:
+  field_name: value
+  schemaProperty: value
+",
+  ];
+  $form['schemadotorg_additional_type']['field_access'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Schema.org additional type field access rules'),
+    '#description' => t('Enter rules to control field access for entity types and bundles based on additional types, roles, and permissions.'),
+    '#description_link' => 'types',
+    '#example' => "
+node--Thing:
+  # Fall-through is allowed when no conditions are specified.
+  # The below 'disambiguatingDescription' will have the same rules
+  # as the 'alternateName' field.
+  disambiguatingDescription: { }
+  alternateName:
+    # Operation (view|edit|any)
+    # Use 'any' operator to check field access for all operations.
+    any:
+      # Operation (and|or). Defaults to 'and'.
+      operator: and
+      # Check the entity's additional type.
+      additional_types:
+        - person
+      # Check the entity's bundle/type.
+      bundles:
+        - thing
+      # Check the field's parent entity access.
+      entity_access:
+        - update
+      # Check the current user's permissions.
+      permissions:
+        - 'access content'
+      # Use '!' to negate a condition.
+      # Check the current user's roles.
+      '!roles':
+        - anonymous
+      # Check the entity's Schema.org type
+      '!schema_type':
+        - Thing
+",
+  ];
+  $form['schemadotorg_additional_type']['jsonld_values'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('Schema.org additional type JSON-LD'),
+    '#description' => t('Enter @type and <a href=":href">https://schema.org/additionalType</a> values for JSON-LD.', [':href' => 'https://schema.org/additionalType'])
+      . ' '
+      . t('Additional types can point to <a href=":href">wikidata</a> URIs.', [':href' => 'https://www.wikidata.org/']),
+    '#description_link' => 'types',
+    '#example' => '
+SchemaType--allowed_value:
+  type: SchemaType
+  additional_type: https://www.wikidata.org/wiki/Q4XXXX
+allowed_value:
+  additional_type: https://www.wikidata.org/wiki/Q4XXXX
+',
+    '#access' => \Drupal::moduleHandler()->moduleExists('schemadotorg_jsonld'),
+  ];
   $form['schemadotorg_additional_type']['use_snake_case'] = [
     '#type' => 'checkbox',
     '#title' => t('Use snake case for additional type values'),
-    '#description' => t('If checked, additional type value will automatically be snake cased.'),
+    '#description' => t('If checked, additional type values will automatically be converted to a snake case values.'),
     '#return_value' => TRUE,
   ];
+
+  // Add submit callback.
+  $form['#submit'][] = 'schemadotorg_additional_type_settings_form_submit';
+}
+
+/**
+ * Form submission handler for schemadotorg_additional_type_form_settings().
+ *
+ * @see schemadotorg_additional_type_form_schemadotorg_types_settings_form_alter()
+ */
+function schemadotorg_additional_type_settings_form_submit(array &$form, FormStateInterface $form_state): void {
+  /** @var \Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeFieldAccessHandlerInterface $additional_type_field_access_handler */
+  $additional_type_field_access_handler = \Drupal::service('schemadotorg_additional_type.field_access_handler');
+  $additional_type_field_access_handler->resetCache();
 }

@@ -15,6 +15,9 @@ schemadotorg_identifier.settings:
           field_name:
             type: string
             label: 'Field name'
+          type:
+            type: string
+            label: 'Field type'
           label:
             type: string
             label: Label
@@ -27,6 +30,24 @@ schemadotorg_identifier.settings:
           max_length:
             type: integer
             label: 'Maximum length'
+          field_storage_settings:
+            type: ignore
+            label: 'Field storage settings'
+          field_settings:
+            type: ignore
+            label: 'Field settings'
+          widget_id:
+            type: string
+            label: 'Widget ID'
+          widget_settings:
+            type: ignore
+            label: 'Widget settings'
+          formatter_id:
+            type: string
+            label: 'Formatter ID'
+          formatter_settings:
+            type: ignore
+            label: 'Formatter settings'
     schema_types:
       type: sequence
       label: 'Schema.org types'

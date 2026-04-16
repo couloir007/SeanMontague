@@ -90,7 +90,7 @@ content:
     third_party_settings: {  }
   schema_end_date:
     type: datetime_default
-    weight: 15
+    weight: 16
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -114,7 +114,7 @@ content:
     third_party_settings: {  }
   schema_start_date:
     type: datetime_default
-    weight: 14
+    weight: 15
     region: content
     settings: {  }
     third_party_settings: {  }

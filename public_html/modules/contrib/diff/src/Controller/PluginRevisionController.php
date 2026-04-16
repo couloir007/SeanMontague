@@ -125,6 +125,7 @@ class PluginRevisionController extends ControllerBase {
     $entity_type_id = $left_revision->getEntityTypeId();
     /** @var \Drupal\Core\Entity\EntityInterface $entity */
     $entity = $route_match->getParameter($entity_type_id);
+    $entity_type = $entity->getEntityType();
 
     $entity_type_id = $entity->getEntityTypeId();
     $storage = $this->entityTypeManager()->getStorage($entity_type_id);
@@ -139,21 +140,28 @@ class PluginRevisionController extends ControllerBase {
     $left_revision = $left_revision->getTranslation($langcode);
     $right_revision = $right_revision->getTranslation($langcode);
 
-    $revisions_ids = [];
-    // Filter revisions of current translation and where the translation is
-    // affected.
-    foreach ($this->getRevisionIds($storage, $entity->id()) as $revision_id) {
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
-      $revision = $storage->loadRevision($revision_id);
-      if ($revision->hasTranslation($langcode) && $revision->getTranslation($langcode)->isRevisionTranslationAffected()) {
-        $revisions_ids[] = $revision_id;
-      }
-    }
     if ($entity->id() !== $left_revision->id() || $entity->id() !== $right_revision->id()) {
       throw new NotFoundHttpException();
     }
     if (!$right_revision->access('view') || !$left_revision->access('view')) {
       throw new AccessDeniedHttpException();
+    }
+
+    $revisions_ids = $this->getRevisionIds($storage, $entity->id());
+    // Filter revisions of current translation and where the translation is
+    // affected.
+    if ($entity_type->isTranslatable()) {
+      $result = $storage->getQuery()
+        ->addTag('diff_compare_revisions_list')
+        ->allRevisions()
+        ->condition($entity_type->getKey('id'), $entity->id())
+        ->condition($entity_type->getKey('revision'), $revisions_ids, 'IN')
+        ->condition($entity_type->getKey('langcode'), $langcode)
+        ->condition($entity_type->getKey('revision_translation_affected'), 1, '=', $langcode)
+        ->sort($entity_type->getKey('revision'))
+        ->accessCheck(FALSE)
+        ->execute();
+      $revisions_ids = array_keys($result);
     }
 
     $build = [

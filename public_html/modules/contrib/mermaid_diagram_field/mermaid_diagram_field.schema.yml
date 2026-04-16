@@ -1,0 +1,11 @@
+# Schema for the Mermaid Diagram field formatter.
+field.formatter.settings.mermaid_diagram_formatter:
+  type: mapping
+  label: 'Mermaid Diagram Formatter Settings'
+  mapping:
+    display_in_modal:
+      type: boolean
+      label: 'Display in modal'
+    modal_link_text:
+      type: label
+      label: 'Modal link text'

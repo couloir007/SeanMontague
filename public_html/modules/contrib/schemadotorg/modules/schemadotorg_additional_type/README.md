@@ -31,6 +31,8 @@ Features
 - Alters the node add/edit form to require that a node's additional type be defined
   before a form is built and altered.
 - Alters node add links to prompt for additional type to be defined.
+- Handles field access control for additional type fields as well as 
+  field access by entity, roles, and permissions.
 
 
 Configuration
@@ -43,7 +45,10 @@ Configuration
 - Enter Schema.org types and bundles whose additional type field should be required.
 - Enter Schema.org additional types that should be ignored.
 - Enter default additional type allowed values for Schema.org types.
-
+- Enter rules to control field access for entity types and bundles based on 
+  additional types, roles, and permissions.
+- Enter @type and https://schema.org/additionalType values for JSON-LD.
+- Check/uncheck use snake case for additional type values.
 
 References
 ----------

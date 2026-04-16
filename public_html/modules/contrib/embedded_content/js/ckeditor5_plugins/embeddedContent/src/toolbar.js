@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-unresolved
-import { Plugin, icons } from 'ckeditor5/src/core';
+import { Plugin } from 'ckeditor5/src/core';
+import { IconPencil } from '@ckeditor/ckeditor5-icons';
 // eslint-disable-next-line import/no-unresolved
 import { isWidget, WidgetToolbarRepository } from 'ckeditor5/src/widget';
 // eslint-disable-next-line import/no-unresolved
@@ -26,7 +27,7 @@ export default class EmbeddedContentToolbar extends Plugin {
 
       buttonView.set({
         label: editor.t('Edit'),
-        icon: icons.pencil,
+        icon: IconPencil,
         tooltip: true,
         class: 'ck-button_embedded-content__edit',
       });

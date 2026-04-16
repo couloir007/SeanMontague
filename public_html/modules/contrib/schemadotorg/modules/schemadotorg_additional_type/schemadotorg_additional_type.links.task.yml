@@ -1,0 +1,5 @@
+schemadotorg_additional_type.types.report:
+  title: Additional types
+  route_name: schemadotorg_additional_type.report
+  parent_id: schemadotorg_report.types
+  weight: 20

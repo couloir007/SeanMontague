@@ -94,6 +94,12 @@ class SchemaDotOrgSchemaTypeManagerKernelTest extends SchemaDotOrgKernelTestBase
     $this->assertFalse($this->schemaTypeManager->isEnumerationValue('Thing'));
     $this->assertTrue($this->schemaTypeManager->isEnumerationValue('Male'));
 
+    // Check determining if an enumeration value is a member of an enumeration type.
+    $this->assertTrue($this->schemaTypeManager->isEnumerationMemberOf('DiabeticDiet', 'RestrictedDiet'));
+    $this->assertFalse($this->schemaTypeManager->isEnumerationMemberOf('NotValidDiet', 'RestrictedDiet'));
+    $this->assertFalse($this->schemaTypeManager->isEnumerationMemberOf('DiabeticDiet', 'Enumeration'));
+    $this->assertFalse($this->schemaTypeManager->isEnumerationMemberOf('DiabeticDiet', 'DiabeticDiet'));
+
     // Check determining ID is a Schema.org property.
     $this->assertTrue($this->schemaTypeManager->isProperty('name'));
     $this->assertFalse($this->schemaTypeManager->isProperty('Thing'));
@@ -435,14 +441,16 @@ class SchemaDotOrgSchemaTypeManagerKernelTest extends SchemaDotOrgKernelTestBase
     // Check getting setting from an associative array by type and property.
     $settings = [
       'Recipe--isFamilyFriendly' => 'Recipe is family friendly',
-      'CreativeWork--additionalType' => 'Creative work has additional type',
+      'CreativeWork--additionalType' => 'Creative work has an additional type',
       'medical_study--ResearchProject' => 'Medical studies are also research projects.',
       'Place' => 'This is a place.',
-      'Thing' => 'This is thing',
+      'Thing' => 'This is a thing',
       'name' => 'A name',
+      'provider' => 'The service provider',
       '!recipe' => 'Negated recipe (not returned)',
     ];
 
+    // Check getting settings for a Schema.org type and property.
     $parts = [
       'schema_type' => 'Recipe',
       'schema_property' => 'isFamilyFriendly',
@@ -452,18 +460,21 @@ class SchemaDotOrgSchemaTypeManagerKernelTest extends SchemaDotOrgKernelTestBase
       $this->schemaTypeManager->getSetting($settings, $parts)
     );
 
+    // Check getting settings for a Schema.org type and property with
+    // and without parents.
     $parts = [
       'schema_type' => 'Recipe',
       'schema_property' => 'additionalType',
     ];
     $this->assertEquals(
-      'Creative work has additional type',
+      'Creative work has an additional type',
       $this->schemaTypeManager->getSetting($settings, $parts)
     );
     $this->assertNull(
       $this->schemaTypeManager->getSetting($settings, $parts, ['parents' => FALSE])
     );
 
+    // Check getting settings for a Schema.org type and property with parents.
     $parts = [
       'schema_type' => 'Recipe',
       'schema_property' => 'name',
@@ -480,6 +491,8 @@ class SchemaDotOrgSchemaTypeManagerKernelTest extends SchemaDotOrgKernelTestBase
       'A name',
       $this->schemaTypeManager->getSetting($settings, $parts)
     );
+
+    // Check getting settings from bundle and Schema.org type.
     $parts = [
       'bundle' => 'medical_study',
       'schema_type' => 'ResearchProject',
@@ -489,6 +502,14 @@ class SchemaDotOrgSchemaTypeManagerKernelTest extends SchemaDotOrgKernelTestBase
       $this->schemaTypeManager->getSetting($settings, $parts)
     );
 
+    // Check getting settings for a single value.
+    $this->assertNull($this->schemaTypeManager->getSetting($settings, ['entity_type_id' => 'node']));
+    $this->assertNull($this->schemaTypeManager->getSetting($settings, ['entity_type_id' => 'node', 'bundle' => 'provider', 'schema_property' => 'description']));
+    $this->assertNull($this->schemaTypeManager->getSetting($settings, ['entity_type_id' => 'node', 'schema_type' => 'provider', 'schema_property' => 'description']));
+    $this->assertNotNull($this->schemaTypeManager->getSetting($settings, ['entity_type_id' => 'node', 'schema_property' => 'provider']));
+    $this->assertNotNull($this->schemaTypeManager->getSetting($settings, ['entity_type_id' => 'node', 'field_name' => 'provider']));
+
+    // Check getting settings for a Schema.org type.
     $parts = [
       'schema_type' => 'Place',
     ];
@@ -496,22 +517,24 @@ class SchemaDotOrgSchemaTypeManagerKernelTest extends SchemaDotOrgKernelTestBase
       'This is a place.',
       $this->schemaTypeManager->getSetting($settings, $parts)
     );
+
+    // Check getting multiple settings for a Schema.org type.
     $this->assertEquals(
       [
         'Place' => 'This is a place.',
-        'Thing' => 'This is thing',
+        'Thing' => 'This is a thing',
       ],
       $this->schemaTypeManager->getSetting($settings, $parts, ['multiple' => TRUE])
     );
 
+    // Check getting multiple settings for a Schema.org type, property,
+    // and bundle.
     $parts = [
+      'bundle' => 'recipe',
       'schema_type' => 'Recipe',
       'schema_property' => 'name',
-      'bundle' => 'recipe',
     ];
-    $this->assertNull(
-      $this->schemaTypeManager->getSetting($settings, $parts)
-    );
+    $this->assertEquals('A name', $this->schemaTypeManager->getSetting($settings, $parts));
 
     // Check getting setting from an indexed array by type and property.
     $settings = ['name'];
@@ -520,6 +543,17 @@ class SchemaDotOrgSchemaTypeManagerKernelTest extends SchemaDotOrgKernelTestBase
     );
     $this->assertNull(
       $this->schemaTypeManager->getSetting($settings, ['schema_property' => 'not_name'])
+    );
+
+    // Check custom return value.
+    $this->assertNUll(
+      $this->schemaTypeManager->getSetting([], [])
+    );
+    $this->assertFalse(
+      $this->schemaTypeManager->getSetting([], [], ['return' => FALSE])
+    );
+    $this->assertEquals(
+      0, $this->schemaTypeManager->getSetting([], [], ['return' => 0])
     );
   }
 

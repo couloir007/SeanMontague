@@ -18,7 +18,7 @@ use Drupal\field\FieldConfigInterface;
 use Drupal\schemadotorg\Entity\SchemaDotOrgMapping;
 use Drupal\schemadotorg\SchemaDotOrgSchemaTypeBuilderInterface;
 use Drupal\schemadotorg\SchemaDotOrgSchemaTypeManagerInterface;
-use Drupal\schemadotorg_descriptions\Config\SchemaDotOrgDescriptionConfigFactoryOverrideInterface;
+use Drupal\schemadotorg_descriptions\Config\SchemaDotOrgDescriptionsConfigFactoryOverrideInterface;
 use Drupal\schemadotorg_ui\Form\SchemaDotOrgUiMappingForm;
 
 /**
@@ -42,7 +42,7 @@ class SchemaDotOrgDescriptionsManager implements SchemaDotOrgDescriptionsManager
    *   The Schema.org schema type manager.
    * @param \Drupal\schemadotorg\SchemaDotOrgSchemaTypeBuilderInterface $schemaTypeBuilder
    *   The Schema.org type builder.
-   * @param \Drupal\schemadotorg_descriptions\Config\SchemaDotOrgDescriptionConfigFactoryOverrideInterface $configFactoryOverride
+   * @param \Drupal\schemadotorg_descriptions\Config\SchemaDotOrgDescriptionsConfigFactoryOverrideInterface $configFactoryOverride
    *   The Schema.org descriptions overrides for the configuration factory.
    */
   public function __construct(
@@ -52,7 +52,7 @@ class SchemaDotOrgDescriptionsManager implements SchemaDotOrgDescriptionsManager
     protected EntityTypeManagerInterface $entityTypeManager,
     protected SchemaDotOrgSchemaTypeManagerInterface $schemaTypeManager,
     protected SchemaDotOrgSchemaTypeBuilderInterface $schemaTypeBuilder,
-    protected SchemaDotOrgDescriptionConfigFactoryOverrideInterface $configFactoryOverride,
+    protected SchemaDotOrgDescriptionsConfigFactoryOverrideInterface $configFactoryOverride,
   ) {}
 
   /**
@@ -82,8 +82,11 @@ class SchemaDotOrgDescriptionsManager implements SchemaDotOrgDescriptionsManager
         continue;
       }
 
-      $schema_type = $mapping->getSchemaType();
-      $custom_description = $this->getSchemaCustomDescription($schema_type);
+      $custom_description = $this->getSchemaCustomDescription([
+        'schema_type' => $mapping->getSchemaType(),
+        'entity_type_id' => $target_entity_type_id,
+        'bundle' => $target_bundle,
+      ]);
       if ($custom_description) {
         $entity->set('description', $custom_description);
       }
@@ -127,13 +130,19 @@ class SchemaDotOrgDescriptionsManager implements SchemaDotOrgDescriptionsManager
       return;
     }
 
-    $schema_type = $mapping->getSchemaType();
-    $schema_property = $mapping->getSchemaPropertyMapping('title');
+    $field_name = 'title';
+    $schema_property = $mapping->getSchemaPropertyMapping($field_name);
     if (!$schema_property) {
       return;
     }
 
-    $custom_description = $this->getSchemaCustomDescription($schema_type, $schema_property);
+    $custom_description = $this->getSchemaCustomDescription([
+      'schema_type' => $mapping->getSchemaType(),
+      'entity_type_id' => $mapping->getTargetEntityTypeId(),
+      'bundle' => $mapping->bundle(),
+      'schema_property' => $schema_property,
+      'field_name' => $field_name,
+    ]);
     $form['title']['widget'][0]['value']['#description'] = $custom_description;
   }
 
@@ -181,9 +190,17 @@ class SchemaDotOrgDescriptionsManager implements SchemaDotOrgDescriptionsManager
 
     // Unset each property/field's default value and append a note to the description.
     if (isset($form['mapping']['properties'])) {
+      $parts = [
+        'entity_type_id' => $mapping->getTargetEntityTypeId(),
+        'schema_type' => $schema_type,
+        'bundle' => $mapping->bundle(),
+      ];
       foreach ($form['mapping']['properties'] as $schema_property => &$element) {
         // Apply the Schema.org type's custom description to the comment.
-        $custom_description = $this->getSchemaCustomDescription($schema_type, $schema_property, FALSE);
+        $custom_description = $this->getSchemaCustomDescription(
+          $parts + ['schema_property' => $schema_property],
+          FALSE,
+        );
         if ($custom_description && isset($element['property']['comment']['#markup'])) {
           $element['property']['comment']['#markup'] = $custom_description;
         }
@@ -352,10 +369,14 @@ class SchemaDotOrgDescriptionsManager implements SchemaDotOrgDescriptionsManager
    * NOTE: A Schema.org type/property custom descriptions can be set to NULL
    * which indicates the description should not be set.
    *
-   * @param string|null $schema_type
-   *   A Schema.org type.
-   * @param string|null $schema_property
-   *   A Schema.org property.
+   * @param array $parts
+   *   A Schema.org mapping or an associative array of setting name parts
+   *   which includes.
+   *   - schema_type: The Schema.org type.
+   *   - entity_type_id: The entity type id.
+   *   - bundle: The entity bundle.
+   *   - schema_property: The Schema.org property.
+   *   - field_name: The field name.
    * @param bool $default
    *   Use the Schema.org type/property's default description.
    *
@@ -365,33 +386,21 @@ class SchemaDotOrgDescriptionsManager implements SchemaDotOrgDescriptionsManager
    * @throws \Exception
    *   If a Schema.org type or property is missing.
    */
-  protected function getSchemaCustomDescription(?string $schema_type = NULL, ?string $schema_property = NULL, bool $default = TRUE): ?string {
+  protected function getSchemaCustomDescription(array $parts = [], bool $default = TRUE): ?string {
     $custom_descriptions = $this->getCustomDescriptions();
 
+    $custom_description = $this->schemaTypeManager->getSetting($custom_descriptions, $parts, ['parents' => FALSE, 'return' => FALSE]);
+    if (!$default || $custom_description !== FALSE) {
+      return $custom_description ?: NULL;
+    }
+
+    $schema_type = $parts['schema_type'] ?? NULL;
+    $schema_property = $parts['schema_property'] ?? NULL;
     if ($schema_property) {
-      if (array_key_exists("$schema_type--$schema_property", $custom_descriptions)) {
-        return $custom_descriptions["$schema_type--$schema_property"];
-      }
-      elseif (array_key_exists($schema_property, $custom_descriptions)) {
-        return $custom_descriptions[$schema_property];
-      }
-      elseif ($default) {
-        return $this->getSchemaDefaultDescription(SchemaDotOrgSchemaTypeManagerInterface::SCHEMA_PROPERTIES, $schema_property);
-      }
-      else {
-        return NULL;
-      }
+      return $this->getSchemaDefaultDescription(SchemaDotOrgSchemaTypeManagerInterface::SCHEMA_PROPERTIES, $schema_property);
     }
     elseif ($schema_type) {
-      if (array_key_exists($schema_type, $custom_descriptions)) {
-        return $custom_descriptions[$schema_type];
-      }
-      elseif ($default) {
-        return $this->getSchemaDefaultDescription(SchemaDotOrgSchemaTypeManagerInterface::SCHEMA_TYPES, $schema_type);
-      }
-      else {
-        return NULL;
-      }
+      return $this->getSchemaDefaultDescription(SchemaDotOrgSchemaTypeManagerInterface::SCHEMA_TYPES, $schema_type);
     }
     else {
       throw new \Exception('A Schema.org type or property is missing.');

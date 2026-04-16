@@ -13,9 +13,14 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
+use Drupal\Core\Routing\TrustedRedirectResponse;
+use Drupal\Core\Url;
 use Drupal\trash\TrashManagerInterface;
+use Drupal\trash\TrashViewBuilder;
 use Drupal\user\EntityOwnerInterface;
+use Drupal\views\Views;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -27,6 +32,7 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
     protected TrashManagerInterface $trashManager,
     protected EntityTypeBundleInfoInterface $bundleInfo,
     protected DateFormatterInterface $dateFormatter,
+    protected TrashViewBuilder $viewBuilder,
   ) {}
 
   /**
@@ -36,7 +42,8 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
     return new static(
       $container->get('trash.manager'),
       $container->get('entity_type.bundle.info'),
-      $container->get('date.formatter')
+      $container->get('date.formatter'),
+      $container->get(TrashViewBuilder::class),
     );
   }
 
@@ -49,21 +56,25 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
    * @return array
    *   A render array.
    */
-  public function listing(?string $entity_type_id = NULL) : array {
+  public function listing(?string $entity_type_id = NULL): array|RedirectResponse {
     $enabled_entity_types = $this->trashManager->getEnabledEntityTypes();
     if (empty($enabled_entity_types)) {
       throw new NotFoundHttpException();
     }
 
     $default_entity_type = in_array('node', $enabled_entity_types, TRUE) ? 'node' : reset($enabled_entity_types);
+
+    // Redirect to the main trash overview route for the default entity type.
+    if ($entity_type_id === $default_entity_type) {
+      return new TrustedRedirectResponse(Url::fromRoute('trash.admin_content_trash')->toString());
+    }
+
     $entity_type_id = $entity_type_id ?: $default_entity_type;
     if (!in_array($entity_type_id, $enabled_entity_types, TRUE)) {
       throw new NotFoundHttpException();
     }
 
-    $build = $this->trashManager->executeInTrashContext('inactive', function () use ($entity_type_id) {
-      return $this->render($entity_type_id);
-    });
+    $build = $this->render($entity_type_id);
     $build['#cache']['tags'][] = 'config:trash.settings';
 
     return $build;
@@ -96,7 +107,67 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
       '#access' => (bool) $this->config('trash.settings')->get('compact_overview'),
     ];
 
+    // Use Views if possible.
     $entity_type = $this->entityTypeManager()->getDefinition($entity_type_id);
+    if ($this->moduleHandler()->moduleExists('views')
+      && $entity_type->hasHandlerClass('views_data')) {
+      $build += $this->renderView($entity_type);
+    }
+    else {
+      // Otherwise fall back to the table implementation.
+      $build += $this->renderFallbackTable($entity_type);
+    }
+    $build['#attached']['library'][] = 'trash/trash.admin';
+
+    return $build;
+  }
+
+  /**
+   * Renders the trash listing using a dynamically built View.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type.
+   *
+   * @return array
+   *   A render array.
+   */
+  protected function renderView(EntityTypeInterface $entity_type): array {
+    // Check if a saved view with this ID already exists.
+    $view_name = 'trash_' . $entity_type->id();
+    if (Views::getView($view_name)) {
+      return [
+        'view' => [
+          '#type' => 'view',
+          '#name' => $view_name,
+          '#display_id' => 'default',
+          '#arguments' => [],
+        ],
+      ];
+    }
+
+    $executable = $this->viewBuilder->buildView($entity_type);
+    $renderable = $executable->buildRenderable();
+
+    // Use embed mode to skip contextual links, since the View isn't persisted.
+    $renderable['#embed'] = TRUE;
+
+    return [
+      'view' => $renderable,
+    ];
+  }
+
+  /**
+   * Renders the trash listing using a fallback table implementation.
+   *
+   * This method is used for entity types that do not have a views_data handler.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type.
+   *
+   * @return array
+   *   A render array.
+   */
+  protected function renderFallbackTable(EntityTypeInterface $entity_type): array {
     $header = $this->buildHeader($entity_type);
     $build['table'] = [
       '#type' => 'table',
@@ -117,7 +188,6 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
     $build['pager'] = [
       '#type' => 'pager',
     ];
-    $build['#attached']['library'][] = 'trash/trash.admin';
 
     return $build;
   }
@@ -138,6 +208,7 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
     $storage = $this->entityTypeManager()->getStorage($entity_type->id());
     $entity_ids = $storage->getQuery()
       ->accessCheck(TRUE)
+      ->exists('deleted')
       ->tableSort($header)
       ->pager(50)
       ->execute();

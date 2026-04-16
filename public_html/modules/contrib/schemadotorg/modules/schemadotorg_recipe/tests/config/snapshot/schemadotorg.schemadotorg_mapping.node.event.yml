@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.event.body
+    - field.field.node.event.schema_event_schedule
+    - node.type.event
+  module:
+    - node
+id: node.event
+target_entity_type_id: node
+target_bundle: event
+schema_type: Event
+schema_properties:
+  body: description
+  schema_event_schedule: eventSchedule
+  langcode: inLanguage
+  title: name
+additional_mappings: {  }

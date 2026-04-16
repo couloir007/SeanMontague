@@ -96,7 +96,7 @@ class VisualDiffThemeNegotiatorTest extends UnitTestCase {
   /**
    * Provides test data to ::testApplies().
    */
-  public function providerTestApplies(): array {
+  public static function providerTestApplies(): array {
     $data = [];
     $data[] = [
       'unexpected_filter_parameter',

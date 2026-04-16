@@ -398,7 +398,13 @@ class SchemaDotOrgReportRelationshipsController extends ControllerBase {
 
         foreach ($items as $field_name => $schema_property) {
           $field_definition = $field_definitions[$field_name];
-          $has_role = ($field_definition->getType() === 'entity_reference_override');
+          $field_type = $field_definition->getType();
+
+          $has_role = match ($field_type) {
+            'custom' => isset($field_definition->getSetting('columns')['role_name']),
+            'entity_reference_override' => TRUE,
+            default => FALSE,
+          };
           $target_bundles = array_keys($this->getTargets($field_definition));
           foreach ($target_bundles as $target_bundle) {
             $target_field_definitions = $this->entityFieldManager
@@ -595,7 +601,10 @@ class SchemaDotOrgReportRelationshipsController extends ControllerBase {
    */
   protected function getTargets(FieldDefinitionInterface $field_definition): array {
     $settings = $field_definition->getSettings();
-    $target_bundles = NestedArray::getValue($settings, ['handler_settings', 'target_bundles']);
+    // Check custom field `target_id` and then entity reference `target_id`.
+    $target_bundles = NestedArray::getValue($settings, ['field_settings', 'target_id', 'widget_settings', 'settings', 'handler_settings', 'target_bundles'])
+      ?? NestedArray::getValue($settings, ['handler_settings', 'target_bundles'])
+      ?? [];
     if (!$target_bundles) {
       return [];
     }

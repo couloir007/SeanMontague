@@ -81,7 +81,7 @@ content:
       timezone_override: ''
       format_type: medium
     third_party_settings: {  }
-    weight: 15
+    weight: 16
     region: content
   schema_has_part:
     type: entity_reference_label
@@ -110,6 +110,6 @@ content:
       timezone_override: ''
       format_type: medium
     third_party_settings: {  }
-    weight: 14
+    weight: 15
     region: content
 hidden: {  }

@@ -14,6 +14,7 @@ This module adds two things to a Drupal site.
       - Show code - checking this box will cause the code of the mermaid and key
         to be output into a description box for copy and pasting.
   - A twig template for rendering mermaid diagrams in code.
+    ```php
      [
         '#theme' => 'mermaid_diagram',
         '#preface' => (optional) Anything to be rendered beforehand.
@@ -26,6 +27,7 @@ This module adds two things to a Drupal site.
         and pasting a diagram.
         '#attached' => ['library' => ['mermaid_diagram_field/diagram']],
       ],
+      ```
 
 ## Similar projects
    - [Workflows field diagram](https://www.drupal.org/project/workflows_field_diagram)
@@ -61,3 +63,6 @@ subgraph "Entity types"
   rectangle["Taxonomy term"]
   end
   ```
+### Can the Mermaid diagram be rendered in a modal?
+Yes it can.  On the "Manage Display" tab the field has a setting to make it use a modal.
+If this is enabled, the content will be rendered as a link, that when clicked, will open the modal and display the diagram.

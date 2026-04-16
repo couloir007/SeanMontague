@@ -82,6 +82,11 @@ class SchemaDotOrgReportTableController extends ControllerBase {
       case 'schemadotorg_report.properties.identifier':
         $base_query->condition('sub_property_of', 'https://schema.org/identifier');
         break;
+
+      case 'schemadotorg_report.properties.ignored':
+        $ignored_properties = $this->config('schemadotorg.settings')->get('schema_properties.ignored_properties');
+        $base_query->condition('label', $ignored_properties, 'IN');
+        break;
     }
 
     // Total.

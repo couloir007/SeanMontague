@@ -11,6 +11,7 @@ use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\paragraphs\ParagraphsTypeInterface;
 use Drupal\schemadotorg\SchemaDotOrgEntityFieldManagerInterface;
@@ -105,6 +106,9 @@ class SchemaDotOrgLayoutParagraphsManager implements SchemaDotOrgLayoutParagraph
       $name = '';
     }
 
+    // Note: The mainEntity property will be included in both the main and
+    // additional mappings, which will create the layout paragraphs field,
+    // but it may not map to a Schema.org mainEntity property.
     $defaults['properties'][static::PROPERTY_NAME]['name'] = $name;
     $defaults['properties'][static::PROPERTY_NAME]['type'] = 'field_ui:entity_reference_revisions:paragraph';
     $defaults['properties'][static::PROPERTY_NAME]['label'] = (string) $this->t('Layout');
@@ -232,6 +236,50 @@ class SchemaDotOrgLayoutParagraphsManager implements SchemaDotOrgLayoutParagraph
       $form['mapping'][static::PROPERTY_NAME][$add_field],
       ['mapping', 'properties', static::PROPERTY_NAME, 'field', $add_field]
     );
+
+    // Unset the mainEntity property from additional mappings Schema.org properties and set via form validation.
+    if (isset($form['mapping']['additional_mappings'])) {
+      $additional_mappings_parents = [];
+      foreach (Element::children($form['mapping']['additional_mappings']) as $additional_mapping_schema_type) {
+        $schema_properties_parents = ['mapping', 'additional_mappings', $additional_mapping_schema_type, 'schema_properties'];
+        $options_parents = array_merge($schema_properties_parents, ['#options', static::PROPERTY_NAME]);
+        if (NestedArray::keyExists($form, $options_parents)) {
+          NestedArray::unsetValue($form, $options_parents);
+          $additional_mappings_parents[] = $schema_properties_parents;
+        }
+      }
+      $form_state->set('layout_paragraphs_additional_mappings_parents', $additional_mappings_parents);
+      $form['#validate'][] = [static::class, 'validateAdditionalMappings'];
+    }
+  }
+
+  /**
+   * Validates and updates additional mapping properties within the form state.
+   *
+   * This method ensures that the `mainEntity` property is correctly propagated
+   * to all additional mappings that support it. If the `mainEntity` field is
+   * not being added, the method exits without making any changes.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   */
+  public static function validateAdditionalMappings(array &$form, FormStateInterface $form_state): void {
+    $values = $form_state->getValues();
+
+    // Check that the mainEntity field is being added, if not exit.
+    if ($values['mapping']['properties'][static::PROPERTY_NAME]['field']['name'] !== '_add_') {
+      return;
+    }
+
+    // Set the mainEntity property to all additional mappings that support it..
+    $additional_mappings_parents = $form_state->get('layout_paragraphs_additional_mappings_parents');
+    foreach ($additional_mappings_parents as $additional_mapping_parents) {
+      $additional_mapping_schema_properties = &NestedArray::getValue($values, $additional_mapping_parents);
+      $additional_mapping_schema_properties[static::PROPERTY_NAME] = static::PROPERTY_NAME;
+    }
+    $form_state->setValues($values);
   }
 
   /**
@@ -313,7 +361,6 @@ class SchemaDotOrgLayoutParagraphsManager implements SchemaDotOrgLayoutParagraph
       $formatter_settings['label'] = 'hidden';
       $formatter_settings['empty_message'] = $formatter_settings['empty_message'] ?? $widget_settings['empty_message'];
     }
-
   }
 
   /**

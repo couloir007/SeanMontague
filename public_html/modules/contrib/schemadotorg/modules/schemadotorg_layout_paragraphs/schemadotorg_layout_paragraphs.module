@@ -110,8 +110,6 @@ function schemadotorg_layout_paragraphs_form_schemadotorg_types_settings_form_al
     '#example' => "
 - SchemaType
 - bundle
-- '!SchemaType'
-- '!bundle'
 ",
   ];
   $form['schemadotorg_layout_paragraphs']['default_paragraph_types'] = [

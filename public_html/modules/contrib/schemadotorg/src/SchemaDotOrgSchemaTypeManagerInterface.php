@@ -150,6 +150,19 @@ interface SchemaDotOrgSchemaTypeManagerInterface {
   public function isEnumerationValue(string $id): bool;
 
   /**
+   * Determines if an enumeration value is a member of an enumeration type.
+   *
+   * @param string $value
+   *   The enumeration type.
+   * @param string $type
+   *   The enumeration value.
+   *
+   * @return bool
+   *   TRUE if an enumeration value is a member of an enumeration type.
+   */
+  public function isEnumerationMemberOf(string $value, string $type): bool;
+
+  /**
    * Determine if an ID is a Schema.org property.
    *
    * @param string $id
@@ -499,6 +512,8 @@ interface SchemaDotOrgSchemaTypeManagerInterface {
    *   - negate (bool)
    *     Checks for settings that should not being applied. Defaults to TRUE.
    *     (i.e., starts with a minus (-))
+   *   - return (mixed)
+   *     Return value if no setting is found. Defaults to NULL.
    * @param array|null $patterns
    *   Optional. The patterns to match against the settings array.
    *   Defaults to NULL.

@@ -31,6 +31,21 @@ interface TrashHandlerInterface {
   public function postTrashDelete(EntityInterface $entity): void;
 
   /**
+   * Validates that an entity can be restored.
+   *
+   * This method performs validation checks (e.g., unique field violations,
+   * conflicting aliases) without modifying the entity. It can be called
+   * during form validation to provide early feedback to users.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to validate.
+   *
+   * @throws \Drupal\trash\Exception\UnrestorableEntityException
+   *   Thrown when the entity cannot be restored.
+   */
+  public function validateRestore(EntityInterface $entity): void;
+
+  /**
    * Acts before an entity is restored.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity

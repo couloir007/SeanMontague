@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Drupal\schemadotorg_mercury_editor;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
-use Drupal\schemadotorg_layout_paragraphs\SchemaDotOrgLayoutParagraphsManager;
 use Drupal\schemadotorg_layout_paragraphs\SchemaDotOrgLayoutParagraphsManagerInterface;
 
 /**
@@ -25,12 +25,15 @@ class SchemaDotOrgMercuryEditorManager implements SchemaDotOrgMercuryEditorManag
    *   The configuration factory.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
    * @param \Drupal\schemadotorg_layout_paragraphs\SchemaDotOrgLayoutParagraphsManagerInterface $schemaLayoutParagraphsManager
    *   The Schema.org layout paragraphs manager.
    */
   public function __construct(
     protected ConfigFactoryInterface $configFactory,
     protected ModuleHandlerInterface $moduleHandler,
+    protected EntityTypeManagerInterface $entityTypeManager,
     protected SchemaDotOrgLayoutParagraphsManagerInterface $schemaLayoutParagraphsManager,
   ) {}
 
@@ -76,27 +79,35 @@ class SchemaDotOrgMercuryEditorManager implements SchemaDotOrgMercuryEditorManag
       return;
     }
 
-    // Check if the layout paragraphs property name is defined, and then enable
-    // mercury editor.
-    $property_name = SchemaDotOrgLayoutParagraphsManager::PROPERTY_NAME;
-    if ($mapping->getTargetEntityTypeId() === 'node'
-      && $mapping->hasSchemaPropertyMapping($property_name)) {
-      $target_bundle = $mapping->getTargetBundle();
-      $this->configFactory->getEditable('mercury_editor.settings')
-        ->set("bundles.node.$target_bundle", $target_bundle)
-        ->save();
-
-      // phpcs:disable
-      // Create dedicated 'mercury_editor" form display for Mercury Editor task.
-      if ($this->moduleHandler->moduleExists('mercury_editor_task')) {
-        /** @var \Drupal\mercury_editor_task\MercuryEditorTaskFormDisplayBuilderInterface $form_display_builder */
-        // @phpstan-ignore-next-line \Drupal calls should be avoided in classes.
-        $form_display_builder = \Drupal::service('mercury_editor_task.form_display_builder');
-        // @phpstan-ignore-next-line Call to method update() on an unknown class.
-        $form_display_builder->updateContentType($target_bundle, TRUE);
-      }
-      // phpcs:enabled
+    // Ensure that the mapping is targeting a node.
+    if ($mapping->getTargetEntityTypeId() !== 'node') {
+      return;
     }
+
+    // Ensure that the target bundle has a layout field.
+    $target_bundle = $mapping->getTargetBundle();
+    $field_name = $this->schemaLayoutParagraphsManager->getFieldName();
+    $has_layout_field = (bool) $this->entityTypeManager
+      ->getStorage('field_config')
+      ->load("node.$target_bundle.$field_name");
+    if (!$has_layout_field) {
+      return;
+    }
+
+    $this->configFactory->getEditable('mercury_editor.settings')
+      ->set("bundles.node.$target_bundle", $target_bundle)
+      ->save();
+
+    // phpcs:disable
+    // Create dedicated 'mercury_editor" form display for Mercury Editor task.
+    if ($this->moduleHandler->moduleExists('mercury_editor_task')) {
+      /** @var \Drupal\mercury_editor_task\MercuryEditorTaskFormDisplayBuilderInterface $form_display_builder */
+      // @phpstan-ignore-next-line \Drupal calls should be avoided in classes.
+      $form_display_builder = \Drupal::service('mercury_editor_task.form_display_builder');
+      // @phpstan-ignore-next-line Call to method update() on an unknown class.
+      $form_display_builder->updateContentType($target_bundle, TRUE);
+    }
+    // phpcs:enabled
   }
 
   /**

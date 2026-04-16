@@ -30,6 +30,8 @@ default_additional_mappings:
     - WebPage
   paragraph--Quotation:
     - Person
+  paragraph--Person:
+    - Role
 default_properties:
   CreativeWork:
     - citation
@@ -86,3 +88,5 @@ default_properties:
     - name
     - jobTitle
     - image
+  Person--Role:
+    - roleName

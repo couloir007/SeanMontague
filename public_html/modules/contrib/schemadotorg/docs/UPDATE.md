@@ -1,6 +1,7 @@
 Schema.org Blueprints: Updating
 -------------------------------
 
+- [ ] Diff changes via https://github.com/schemaorg/schemaorg/compare/v29.1-release...v29.4-release
 - [ ] Update `\Drupal\schemadotorg\SchemaDotOrgInstaller::VERSION`
 - [ ] Update `data/[VERSION]`
 - [ ] Run `ddev drush -y schemadotorg:download-schema`

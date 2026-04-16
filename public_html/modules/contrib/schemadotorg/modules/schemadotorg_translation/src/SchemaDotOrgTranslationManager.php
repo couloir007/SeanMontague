@@ -102,11 +102,7 @@ class SchemaDotOrgTranslationManager implements SchemaDotOrgTranslationManagerIn
   public function fieldConfigPresave(FieldConfigInterface $field_config): void {
     // Check that field is associated with Schema.org type mapping.
     // @see \Drupal\schemadotorg\SchemaDotOrgEntityTypeBuilder::addFieldToEntity
-    $target_entity_type_id = $field_config->getTargetEntityTypeId();
-    $target_bundle = $field_config->getTargetBundle();
-
-    if (empty($field_config->schemaDotOrgType)
-      && !$this->loadMapping($target_entity_type_id, $target_bundle)) {
+    if (empty($field_config->schemaDotOrgType)) {
       return;
     }
 

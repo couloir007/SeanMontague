@@ -137,6 +137,7 @@ class SchemaDotOrgTranslationManagerKernelTest extends SchemaDotOrgEntityKernelT
       'entity_type' => 'node',
       'bundle' => 'place',
       'field_name' => 'field_excluded',
+      'translatable' => FALSE,
     ])->save();
     $field_definitions = $this->fieldManager->getFieldDefinitions('node', 'place');
     $this->assertFalse($field_definitions['field_excluded']->isTranslatable());

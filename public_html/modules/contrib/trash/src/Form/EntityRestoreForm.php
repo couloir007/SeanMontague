@@ -9,7 +9,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Url;
 use Drupal\trash\Exception\UnrestorableEntityException;
-use Drupal\trash\TrashManager;
+use Drupal\trash\TrashManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -20,7 +20,7 @@ class EntityRestoreForm extends ContentEntityConfirmFormBase implements Workspac
   /**
    * The trash manager.
    */
-  protected TrashManager $trashManager;
+  protected TrashManagerInterface $trashManager;
 
   /**
    * {@inheritdoc}
@@ -70,6 +70,26 @@ class EntityRestoreForm extends ContentEntityConfirmFormBase implements Workspac
   /**
    * {@inheritdoc}
    */
+  public function validateForm(array &$form, FormStateInterface $form_state): array {
+    parent::validateForm($form, $form_state);
+
+    $entity = $this->getEntity();
+
+    // Use the handler's validateRestore() to check for conflicts. This also
+    // sets a flag so that preTrashRestore() skips duplicate validation.
+    try {
+      $this->trashManager->getHandler($entity->getEntityTypeId())?->validateRestore($entity);
+    }
+    catch (UnrestorableEntityException $e) {
+      $form_state->setError($form, $e->getMessage());
+    }
+
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->getEntity();
@@ -91,8 +111,6 @@ class EntityRestoreForm extends ContentEntityConfirmFormBase implements Workspac
       return;
     }
 
-    // Ensure that the redirect URL doesn't have any Trash context.
-    $this->getRequest()->query->remove('in_trash');
     $form_state->setRedirectUrl($this->getRedirectUrl());
 
     $this->messenger()->addStatus($this->t('The @entity-type %label has been restored from trash.', $args));

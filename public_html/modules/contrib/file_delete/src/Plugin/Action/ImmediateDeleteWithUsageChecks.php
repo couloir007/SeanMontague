@@ -17,7 +17,7 @@ use Drupal\file\FileUsage\FileUsageInterface;
  * Immediately deletes a file after usage checks passed.
  */
 #[Action(
-  id: 'immediate_delete',
+  id: 'file_delete_immediately',
   label: new TranslatableMarkup('Immediately delete (with usage checks)'),
   type: 'file'
 )]

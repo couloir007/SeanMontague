@@ -2,11 +2,62 @@
 
 /* Default mermaid elements to hidden, then show with JS to prevent FOUC. */
 .mermaid {
-  /* opacity: 0;  @todo Fix that JS is not unhiding this.*/
+  /* opacity: 0;  @todo Fix that JS is not unhiding this. */
+
+  width: 100%;
+  aspect-ratio: 5 / 2;
+  min-height: 40em;
+  border: 1px solid #000;
+}
+
+.mermaid.key {
+  width: 60%;
+  aspect-ratio: 3 / 1;
+  min-height: 6em;
+  max-height: 10em;
+}
+
+.mermaid-diagram svg {
+  display: block;
+  width: 100%;
+  min-width: 100%;
+  height: 100%;
+  margin: auto;
+}
+
+.mermaid-diagram svg a:hover {
+  outline: 4px dashed currentColor;
 }
 
 .mermaid-diagram svg a:focus {
+  outline-width: 4px;
   outline-color: currentColor;
   outline-color: var(--color-focus);
-  outline-width: 4px;
+}
+
+/* Modal display */
+.ui-dialog .ui-dialog-content .mermaid-diagram {
+  display: flex;
+  flex-direction: column;
+  height: 70vh;
+}
+
+.ui-dialog .ui-dialog-content .mermaid-diagram > * {
+  width: 100%;
+}
+
+.ui-dialog .ui-dialog-content .mermaid {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ui-dialog .ui-dialog-content .mermaid svg {
+  display: block;
+  flex: 1;
+  width: 100%;
+  max-width: 100% !important;
+  height: 100%;
+  min-height: 0;
 }

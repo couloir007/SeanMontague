@@ -1,12 +1,12 @@
 <?php
 
-use Drupal\Component\Utility\Html;
-use Drupal\Core\Routing\RouteMatchInterface;
-
 /**
  * @file
  * Drupal hooks for supporting Mermaid Diagram field.
  */
+
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
  * Implements hook_theme().
@@ -25,10 +25,43 @@ function mermaid_diagram_field_theme() {
         'caption' => '',
         'key' => '',
         'show_code' => '',
+        'allow_download' => '',
         'postface' => '',
+        'field_name' => '',
+        'entity_type' => '',
+        'bundle' => '',
       ],
     ],
   ];
+}
+
+/**
+ * Implements hook_theme_suggestions().
+ */
+function mermaid_diagram_field_theme_suggestions_mermaid_diagram(array $variables) {
+  $suggestions = [];
+
+  $sanitize = function ($string) {
+    $string = strtolower((string) $string);
+    $string = preg_replace('/[^a-z0-9_]+/', '_', $string);
+    return trim($string, '_');
+  };
+
+  $field_name = isset($variables['field_name']) ? $sanitize($variables['field_name']) : '';
+  $entity_type = isset($variables['entity_type']) ? $sanitize($variables['entity_type']) : '';
+  $bundle = isset($variables['bundle']) ? $sanitize($variables['bundle']) : '';
+
+  if ($field_name && $entity_type && $bundle) {
+    $suggestions[] = "mermaid_diagram__{$entity_type}__{$bundle}__{$field_name}";
+  }
+  if ($field_name && $entity_type) {
+    $suggestions[] = "mermaid_diagram__{$entity_type}__{$field_name}";
+  }
+  if ($field_name) {
+    $suggestions[] = "mermaid_diagram__{$field_name}";
+  }
+
+  return $suggestions;
 }
 
 /**

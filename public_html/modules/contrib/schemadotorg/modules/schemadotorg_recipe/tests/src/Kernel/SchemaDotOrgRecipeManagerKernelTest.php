@@ -44,7 +44,7 @@ class SchemaDotOrgRecipeManagerKernelTest extends SchemaDotOrgEntityKernelTestBa
    */
   public function testManager(): void {
     $root = $this->container->getParameter('app.root');
-    $module_path = $this->getModulePath('schemadotorg');
+    $module_path = $this->getModulePath('schemadotorg_recipe');
 
     // Check determining if Schema.org Blueprints Recipe exists.
     $this->assertFalse($this->schemaRecipeManager->isRecipe('missing_recipe'));

@@ -104,6 +104,15 @@ schemadotorg_report.properties.identifier:
   requirements:
     _permission: 'access site reports'
 
+schemadotorg_report.properties.ignored:
+  path: '/admin/reports/schemadotorg/docs/ignored'
+  defaults:
+    _title: 'Schema.org: Ignored properties'
+    _controller: '\Drupal\schemadotorg_report\Controller\SchemaDotOrgReportTableController::index'
+    table: 'properties'
+  requirements:
+    _permission: 'access site reports'
+
 # Relationships
 
 schemadotorg_report.relationships:

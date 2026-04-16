@@ -266,16 +266,31 @@ class SchemaDotOrgJsonLdManager implements SchemaDotOrgJsonLdManagerInterface {
     $schema_property_schema_type = ($range_includes)
       ? reset($range_includes)
       : $this->schemaTypeManager->getPropertyDefaultType($schema_property);
-    if (!$schema_property_schema_type
-      || $this->schemaTypeManager->isDataType($schema_property_schema_type)) {
+    // If there is no target Schema.org, return the value.
+    if (!$schema_property_schema_type) {
       return $value;
     }
 
+    // If the target is a data type, return the value.
+    if ($this->schemaTypeManager->isDataType($schema_property_schema_type)) {
+      return $value;
+    }
+
+    // If the target is an enumeration, return the value prefixed
+    // with https://schema.org/.
+    if ($this->schemaTypeManager->isEnumerationType($schema_property_schema_type)) {
+      return ($this->schemaTypeManager->isEnumerationValue($value))
+        ? 'https://schema.org/' . $value
+        : $value;
+    }
+
+    // If there is no main property, return the value.
     $main_property = $this->getSchemaTypeMainProperty($schema_property_schema_type);
     if (!$main_property) {
       return $value;
     }
 
+    // Finally, return the value with the @type and default values.
     return [
       '@type' => $schema_property_schema_type,
       $main_property => $value,

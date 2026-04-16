@@ -379,16 +379,16 @@ schema_property_allowed_values_remove:
   itemCondition: Condition
   hasHealthAspect: 'Health Aspect'
   suitableForDiet: Diet
-allowed_value_text:
-  - bodyType
-  - courseMode
-  - dosageForm
-  - employmentType
-  - frequency
-  - typeOfBed
-allowed_value_uris:
+allowed_value_aliases:
+  eventAttendanceMode--MixedEventAttendanceMode: mixed
+  eventAttendanceMode--OfflineEventAttendanceMode: offline
+  eventAttendanceMode--OnlineEventAttendanceMode: online
+jsonld_text:
+  - Thing
+jsonld_uris:
   condition: 'https://www.wikidata.org/wiki/Q813912'
   emergency: 'https://www.wikidata.org/wiki/Q5070802'
   error: 'https://www.wikidata.org/wiki/Q29485'
   information: 'https://www.wikidata.org/wiki/Q11028'
   warning: 'https://www.wikidata.org/wiki/Q1759104'
+use_snake_case: true

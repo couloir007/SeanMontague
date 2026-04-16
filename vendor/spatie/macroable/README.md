@@ -1,3 +1,6 @@
+
+[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/support-ukraine.svg?t=1" />](https://supportukrainenow.org)
+
 # A trait to dynamically add methods to a class
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/macroable.svg?style=flat-square)](https://packagist.org/packages/spatie/macroable)
@@ -20,7 +23,7 @@ $myClass::macro('concatenate', function(... $strings) {
 $myClass->concatenate('one', 'two', 'three'); // returns 'one-two-three'
 ```
 
-The idea of a macroable trait and the implementation is taken from [the `macroable` trait](https://github.com/laravel/framework/blob/master/src/Illuminate/Support/Traits/Macroable.php) of the [Laravel framework](https://laravel.com).
+The idea of a macroable trait and the implementation is taken from [the `macroable` trait](https://github.com/laravel/framework/blob/master/src/Illuminate/Macroable/Traits/Macroable.php) of the [Laravel framework](https://laravel.com).
 
 ## Support us
 
@@ -49,7 +52,7 @@ $macroableClass = new class() {
 
 $macroableClass::macro('concatenate', function(... $strings) {
    return implode('-', $strings);
-};
+});
 
 $macroableClass->concatenate('one', 'two', 'three'); // returns 'one-two-three'
 ```
@@ -109,11 +112,11 @@ composer test
 
 ## Contributing
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+Please see [CONTRIBUTING](https://github.com/spatie/.github/blob/main/CONTRIBUTING.md) for details.
 
 ## Security
 
-If you discover any security related issues, please email freek@spatie.be instead of using the issue tracker.
+If you've found a bug regarding security please mail [security@spatie.be](mailto:security@spatie.be) instead of using the issue tracker.
 
 ## Postcardware
 

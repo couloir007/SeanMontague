@@ -120,6 +120,11 @@ class ItemListElement extends PropertyTypeBase {
         $view->setDisplay($display_id);
       }
       else {
+        $request = \Drupal::request();
+        $view_id = $request->attributes->get('view_id');
+        if ($view_id) {
+         $view = Views::getView($view_id);
+       }
         $view->initDisplay();
       }
 

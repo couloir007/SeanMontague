@@ -23,6 +23,8 @@ Features
 - Appends units field suffix to custom_field widget edit forms and
   custom_field view displays.
 - Appends units to custom_field JSON-LD data.
+- Supports [Schema.org: Role](https://schema.org/Role) by automatically adding a
+  target entity reference to a custom field that includes a `roleName` property.
 
 
 Requirements

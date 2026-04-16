@@ -8,7 +8,7 @@ use Drupal\schemadotorg\SchemaDotOrgEntityFieldManagerInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * Trait to help export Schema.org data..
+ * Trait to help export Schema.org data.
  */
 trait SchemaDotOrgExportTrait {
 

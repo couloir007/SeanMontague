@@ -15,7 +15,7 @@ function schemadotorg_additional_type_install(bool $is_syncing): void {
     return;
   }
 
-  // Setting weight to 1 so that the Schema.org Additional TYpe
+  // Setting weight to 1 so that the Schema.org Additional Type
   // hooks are triggered after the Navigation module.
   module_set_weight('schemadotorg_additional_type', 1);
 }
@@ -44,7 +44,7 @@ function schemadotorg_additional_type_update_10001(): void {
  * Issue #3527491: Schema.org Additional Type content create dialog not working with core navigation links.
  */
 function schemadotorg_additional_type_update_10002(): void {
-  // Setting weight to 1 so that the Schema.org Additional TYpe
+  // Setting weight to 1 so that the Schema.org Additional Type
   // hooks are triggered after the Navigation module.
   module_set_weight('schemadotorg_additional_type', 1);
 }
@@ -56,5 +56,35 @@ function schemadotorg_additional_type_update_10003(): void {
   \Drupal::configFactory()
     ->getEditable('schemadotorg_additional_type.settings')
     ->set('ignored_types', ['Default', 'default', 'Other', 'other'])
+    ->save();
+}
+
+/**
+ * Issue #3548302: Improve additional type JSON-LD handling.
+ */
+function schemadotorg_additional_type_update_10004(): void {
+  \Drupal::configFactory()
+    ->getEditable('schemadotorg_additional_type.settings')
+    ->set('jsonld_values', [])
+    ->save();
+}
+
+/**
+ * Issue #3554079: Set default values for entity additional types.
+ */
+function schemadotorg_additional_type_update_10005(): void {
+  \Drupal::configFactory()
+    ->getEditable('schemadotorg_additional_type.settings')
+    ->set('default_field_values', [])
+    ->save();
+}
+
+/**
+ * Issue #3560449: Add support to manage field access based on additional types.
+ */
+function schemadotorg_additional_type_update_10006(): void {
+  \Drupal::configFactory()
+    ->getEditable('schemadotorg_additional_type.settings')
+    ->set('field_access', [])
     ->save();
 }

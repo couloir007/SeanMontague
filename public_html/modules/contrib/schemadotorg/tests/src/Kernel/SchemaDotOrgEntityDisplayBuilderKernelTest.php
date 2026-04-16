@@ -38,10 +38,10 @@ class SchemaDotOrgEntityDisplayBuilderKernelTest extends SchemaDotOrgEntityKerne
 
     // Check getting default field weights.
     $default_field_weights = $this->schemaEntityDisplayBuilder->getDefaultFieldWeights();
-    $this->assertEquals(2, $default_field_weights['name']);
-    $this->assertEquals(3, $default_field_weights['title']);
-    $this->assertEquals(5, $default_field_weights['alternateName']);
-    $this->assertEquals(17, $default_field_weights['description']);
+    $this->assertEquals(3, $default_field_weights['name']);
+    $this->assertEquals(4, $default_field_weights['title']);
+    $this->assertEquals(6, $default_field_weights['alternateName']);
+    $this->assertEquals(18, $default_field_weights['description']);
 
     // Check default field weights that exceed the 200 thresholds.
     $original_default_field_weights = $this->config('schemadotorg.settings')
@@ -85,7 +85,7 @@ class SchemaDotOrgEntityDisplayBuilderKernelTest extends SchemaDotOrgEntityKerne
     $expected_value = [
       'settings' => [],
       'third_party_settings' => [],
-      'weight' => 2,
+      'weight' => 3,
       'region' => 'content',
     ];
     $this->assertEquals($expected_value, $entity_view_display->getComponent('name'));

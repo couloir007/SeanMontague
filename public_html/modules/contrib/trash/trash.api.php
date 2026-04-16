@@ -115,5 +115,60 @@ function hook_ENTITY_TYPE_trash_restore(\Drupal\Core\Entity\EntityInterface $ent
 }
 
 /**
+ * Alter the dynamically built Trash view for an entity type.
+ *
+ * @param \Drupal\views\ViewExecutable $view
+ *   The View executable being built.
+ * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+ *   The entity type for which the Trash view is being built.
+ * @param bool $export
+ *   Whether the generated view will be exported as an entity.
+ *
+ * @see \Drupal\trash\TrashViewBuilder
+ */
+function hook_trash_views_build(\Drupal\views\ViewExecutable $view, \Drupal\Core\Entity\EntityTypeInterface $entity_type, bool $export) {
+  // ID field.
+  $id_key = $entity_type->getKey('id');
+  if ($id_key) {
+    $base_table = $entity_type->getDataTable() ?: $entity_type->getBaseTable();
+    $view->addHandler('default', 'field', $base_table, $id_key);
+
+    $label_key = $entity_type->getKey('label');
+    if ($label_key) {
+      $label_field = $view->getHandler('default', 'field', $label_key);
+      if ($label_field) {
+        // Don't show the entity ID since it is now a dedicated column.
+        $label_field['settings']['show_entity_id'] = FALSE;
+        $view->setHandler('default', 'field', $label_key, $label_field);
+      }
+    }
+
+    $display = $view->getDisplay();
+    $fields = $display->getOption('fields');
+
+    // Add the ID field before the label column.
+    if ($label_key) {
+      $index = (int) array_search($label_key, array_keys($fields), TRUE);
+    }
+    else {
+      $index = isset($fields[$entity_type->id() . '_bulk_form']) ? 1 : 0;
+    }
+    $fields = array_merge(array_slice($fields, 0, $index), [
+      $id_key => $fields[$id_key],
+    ], array_slice($fields, $index));
+    $display->setOption('fields', $fields);
+
+    // Make the ID field sortable.
+    $style = $display->getOption('style');
+    $style['options']['columns'][$id_key] = $id_key;
+    $style['options']['info'][$id_key] = [
+      'sortable' => TRUE,
+      'default_sort_order' => 'asc',
+    ];
+    $display->setOption('style', $style);
+  }
+}
+
+/**
  * @} End of "addtogroup hooks".
  */

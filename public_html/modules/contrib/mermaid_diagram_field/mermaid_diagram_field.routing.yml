@@ -1,0 +1,8 @@
+# mermaid_diagram_field.routing.yml
+mermaid_diagram_field.modal:
+  path: '/mermaid-diagram/modal/{entity_type}/{entity_id}/{field_name}/{delta}'
+  defaults:
+    _controller: '\Drupal\mermaid_diagram_field\Controller\MermaidModalController::view'
+    _title: 'Diagram'
+  requirements:
+    _permission: 'access content'

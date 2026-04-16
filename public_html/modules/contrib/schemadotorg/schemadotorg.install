@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 use Drupal\Component\Serialization\Yaml;
+use Drupal\schemadotorg\Utility\SchemaDotOrgArrayHelper;
 
 /**
  * Implements hook_requirements().
@@ -255,4 +256,35 @@ function schemadotorg_update_10017(): void {
     ->getEditable('schemadotorg.settings')
     ->set('schema_properties.disable_entity_display', [])
     ->save();
+}
+
+/**
+ * Issue #3561825: Improve https://schema.org/Role support via additional mappings.
+ */
+function schemadotorg_update_10018(): void {
+  $config = \Drupal::configFactory()
+    ->getEditable('schemadotorg.settings');
+
+  // Set roleName rangeIncludes to Text.
+  if (empty($config->get('schema_properties.range_includes.roleName'))) {
+    $config->set('schema_properties.range_includes.roleName', ['Text']);
+  }
+
+  // Move roleName to the beginning of the default field weights.
+  $default_field_weights = $config->get('schema_properties.default_field_weights');
+  SchemaDotOrgArrayHelper::removeValue($default_field_weights, 'roleName');
+
+  array_unshift($default_field_weights, 'roleName');
+  $config->set('schema_properties.default_field_weights', $default_field_weights);
+
+  $config->save();
+}
+
+/**
+ * Update to Schema.org v29.4.
+ */
+function schemadotorg_update_10019(): void {
+  /** @var \Drupal\schemadotorg\SchemaDotOrgInstallerInterface $installer */
+  $installer = \Drupal::service('schemadotorg.installer');
+  $installer->install();
 }

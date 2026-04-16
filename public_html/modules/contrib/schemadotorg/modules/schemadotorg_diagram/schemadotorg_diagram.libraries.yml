@@ -3,4 +3,8 @@ schemadotorg_diagram:
     component:
       css/schemadotorg_diagram.css: {  }
   dependencies:
+    - schemadotorg/schemadotorg.dialog
     - schemadotorg/schemadotorg.details
+    - schemadotorg/schemadotorg.mermaid
+    # Excluding svg-pan-zoom because small but tall diagrams are being cut-off.
+    # - schemadotorg/svg-pan-zoom

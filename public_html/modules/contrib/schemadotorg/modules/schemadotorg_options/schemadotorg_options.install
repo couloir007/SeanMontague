@@ -13,12 +13,15 @@ use Drupal\Component\Serialization\Yaml;
  * Issue #3421199: Improve SpecialAnnouncement category support.
  */
 function schemadotorg_options_update_10000(): void {
-  $module_path = \Drupal::service('extension.list.module')->getPath('schemadotorg_options');
-  $data = Yaml::decode(file_get_contents($module_path . '/config/install/schemadotorg_options.settings.yml'));
   \Drupal::configFactory()
     ->getEditable('schemadotorg_options.settings')
-    ->set('schema_property_allowed_values.SpecialAnnouncement--category', $data['schema_property_allowed_values']['SpecialAnnouncement--category'])
-    ->set('allowed_value_uris', $data['allowed_value_uris'])
+    ->set('schema_property_allowed_values.SpecialAnnouncement--category', [
+      'information' => 'Information',
+      'condition' => 'Condition',
+      'warning' => 'Warning',
+      'emergency' => 'Emergency',
+      'error' => 'Error',
+    ])
     ->save();
 }
 
@@ -41,11 +44,6 @@ function schemadotorg_options_update_10001(): void {
     $schema_property_allowed_values[$index] = $allowed_values;
   }
   $config->set('schema_property_allowed_values', $schema_property_allowed_values);
-
-  // Add allowed value text.
-  $module_path = \Drupal::service('extension.list.module')->getPath('schemadotorg_options');
-  $data = Yaml::decode(file_get_contents($module_path . '/config/install/schemadotorg_options.settings.yml'));
-  $config->set('allowed_value_text', $data['allowed_value_text']);
 
   $config->save();
 }
@@ -74,5 +72,54 @@ function schemadotorg_options_update_10003(): void {
   $allowed_values = $config->get('schema_property_allowed_values') + $default_allowed_values;
   ksort($allowed_values);
   $config->set('schema_property_allowed_values', $allowed_values);
+  $config->save();
+}
+
+/**
+ * Issue #3547706: Add support for options aliases.
+ */
+function schemadotorg_options_update_10004(): void {
+  \Drupal::configFactory()
+    ->getEditable('schemadotorg_options.settings')
+    ->set('allowed_value_aliases', [])
+    ->set('use_snake_case', TRUE)
+    ->save();
+}
+
+/**
+ * Issues #3548367: Improve options JSON-LD handling.
+ */
+function schemadotorg_options_update_10005(): void {
+  $config = \Drupal::configFactory()
+    ->getEditable('schemadotorg_options.settings');
+
+  // Make sure 'jsonld_text' is set.
+  $config->set('jsonld_text',
+    $config->get('jsonld_text')
+    ?? $config->get('allowed_value_text')
+    ?? []);
+  $config->clear('allowed_value_text');
+
+  // Make sure 'jsonld_uris' is set.
+  $config->set('jsonld_uris',
+    $config->get('jsonld__uris')
+    ?? $config->get('allowed_value_uris')
+    ?? [
+      'condition' => 'https://www.wikidata.org/wiki/Q813912',
+      'emergency' => 'https://www.wikidata.org/wiki/Q5070802',
+      'error' => 'https://www.wikidata.org/wiki/Q29485',
+      'information' => 'https://www.wikidata.org/wiki/Q11028',
+      'warning' => 'https://www.wikidata.org/wiki/Q1759104',
+    ]
+  );
+  $config->clear('allowed_value_uris');
+
+  // Make sure 'use_snake_case' is set.
+  $config->set('use_snake_case',
+    $config->get('use_snake_case')
+    ?? $config->get('allowed_value_snake_case')
+    ?? TRUE);
+  $config->clear('allowed_value_snake_case');
+
   $config->save();
 }

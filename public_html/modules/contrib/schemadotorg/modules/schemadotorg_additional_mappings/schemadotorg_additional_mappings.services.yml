@@ -9,4 +9,3 @@ services:
   schemadotorg_additional_mappings.jsonld_manager:
     class: Drupal\schemadotorg_additional_mappings\SchemaDotOrgAdditionalMappingsJsonLdManager
   Drupal\schemadotorg_additional_mappings\SchemaDotOrgAdditionalMappingsJsonLdManagerInterface: '@schemadotorg_additional_mappings.jsonld_manager'
-

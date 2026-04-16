@@ -17,15 +17,24 @@ schemadotorg_options.settings:
       sequence:
         type: text
         label: 'Schema.org property allowed values remove prefix/suffix'
-    allowed_value_text:
+    allowed_value_aliases:
       type: sequence
-      label: 'Allowed value text'
+      label: 'Allowed value aliases'
+      sequence:
+        type: text
+        label: 'Allowed value alias'
+    jsonld_text:
+      type: sequence
+      label: 'JSON-LD text'
       sequence:
         type: string
-        label: 'Allowed values text'
-    allowed_value_uris:
+        label: 'JSON-LD text'
+    jsonld_uris:
       type: sequence
-      label: 'Allowed value URIs'
+      label: 'JSON-LD URIs'
       sequence:
         type: uri
-        label: 'Allowed values URI'
+        label: 'JSON-LD URI'
+    use_snake_case:
+      type: boolean
+      label: 'Use snake case for allowed (enumeration) values'

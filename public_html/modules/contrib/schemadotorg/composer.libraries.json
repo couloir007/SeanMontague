@@ -77,9 +77,6 @@
         "Issue #3012432: Broken views exposed form in modals": "https://www.drupal.org/files/issues/2020-04-29/3012432-4_remove_enctype_on_views_widget.patch",
         "Issue #2946829: Make submit button on modal always visible": "https://www.drupal.org/files/issues/2020-10-19/2946829-submit-button-always-visible-on-modals-4.patch"
       },
-      "drupal/field_validation": {
-        "Issue #3491233: Fix Drupal 10.4 RC1 error with field_ui.js": "https://www.drupal.org/files/issues/2025-06-17/field_validation-issue-3524477-mr-15.patch"
-      },
       "drupal/jsonapi_extras": {
         "Issue #3524477: Breaking errors in D11.2 or D11.x": "https://www.drupal.org/files/issues/2020-02-08/3031524-8.patch"
       },

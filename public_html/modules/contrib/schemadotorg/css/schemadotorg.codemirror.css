@@ -21,6 +21,7 @@ pre.schemadotorg-codemirror-mode {
   padding: 1em;
   border: 1px solid #999;
   background-color: #f7f7f7;
+  font-size: 0.8em;
 }
 
 details pre.schemadotorg-codemirror-mode {

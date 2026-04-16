@@ -45,16 +45,28 @@ class SchemaDotOrgAllowedFormatsManager implements SchemaDotOrgAllowedFormatsMan
     $config = $this->configFactory->get('schemadotorg_allowed_formats.settings');
 
     // Set default allowed formats.
-    $default_allowed_formats = $config->get('default_allowed_formats');
-    $parts = [
-      'entity_type_id' => $field_values['entity_type'],
-      'bundle' => $field_values['bundle'],
-      'schema_type' => $schema_type,
-      'schema_property' => $schema_property,
-    ];
-    $allowed_formats = $this->schemaTypeManager->getSetting($default_allowed_formats, $parts);
-    if ($allowed_formats) {
-      $field_values['settings']['allowed_formats'] = $allowed_formats;
+    if (empty($field_values['settings']['allowed_formats'])) {
+      $default_allowed_formats = $config->get('default_allowed_formats');
+      $schema_property_parts = [
+        'entity_type_id' => $field_values['entity_type'],
+        'bundle' => $field_values['bundle'],
+        'schema_type' => $schema_type,
+        'field_name' => $field_values['field_name'],
+        'schema_property' => $schema_property,
+      ];
+      $allowed_formats = $this->schemaTypeManager->getSetting($default_allowed_formats, $schema_property_parts);
+      if (empty($allowed_formats)) {
+        $schema_type_parts = [
+          'entity_type_id' => $field_values['entity_type'],
+          'bundle' => $field_values['bundle'],
+          'schema_type' => $schema_type,
+        ];
+        $allowed_formats = $this->schemaTypeManager->getSetting($default_allowed_formats, $schema_type_parts);
+      }
+
+      if ($allowed_formats) {
+        $field_values['settings']['allowed_formats'] = $allowed_formats;
+      }
     }
 
     // Set default hide help.

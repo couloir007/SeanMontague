@@ -22,7 +22,7 @@ content:
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 18
+    weight: 19
     region: content
   links:
     settings: {  }
@@ -38,7 +38,7 @@ content:
       image_loading:
         attribute: lazy
     third_party_settings: {  }
-    weight: 10
+    weight: 11
     region: content
   schema_related_link:
     type: link

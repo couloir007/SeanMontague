@@ -23,6 +23,6 @@ rules:
   serialNumber:
     pattern: '/^[a-zA-Z0-9]+$/'
     message: 'Serial number must an alphanumeric string;'
-  schema_identifier_npi:
+  usNPI:
     pattern: '/^\d{10}$/'
     message: 'National Provider Identifier (NPI) must be a 10-digit number.'

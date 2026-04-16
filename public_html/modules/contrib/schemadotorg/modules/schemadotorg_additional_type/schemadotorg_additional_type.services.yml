@@ -7,6 +7,10 @@ services:
     class: Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeManager
   Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeManagerInterface: '@schemadotorg_additional_type.manager'
 
+  schemadotorg_additional_type.field_access_handler:
+    class: Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeFieldAccessHandler
+  Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeFieldAccessHandlerInterface: '@schemadotorg_additional_type.field_access_handler'
+
   schemadotorg_additional_type.jsonld_manager:
     class: Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeJsonLdManager
   Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeJsonLdManagerInterface: '@schemadotorg_additional_type.jsonld_manager'
@@ -22,3 +26,4 @@ services:
     class: Drupal\schemadotorg_additional_type\Controller\SchemaDotOrgAdditionalTypeHtmlEntityFormController
     public: false
     arguments: ['@schemadotorg_additional_type.controller.entity_form.inner', '@config.factory', '@entity_type.manager', '@schemadotorg.schema_type_manager']
+

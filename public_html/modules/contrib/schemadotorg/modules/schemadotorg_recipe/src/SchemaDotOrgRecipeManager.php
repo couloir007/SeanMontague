@@ -88,7 +88,6 @@ class SchemaDotOrgRecipeManager implements SchemaDotOrgRecipeManagerInterface {
           $recipe_files += $this->fileSystem->scanDirectory($root . '/' . $recipe_directory, '#^recipe\.yml$#');
         }
       }
-
       $this->recipes = [];
       foreach (array_keys($recipe_files) as $recipe_path) {
         $recipe_directory = dirname($recipe_path);

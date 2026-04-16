@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\diff\Functional;
 
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
 
@@ -260,6 +262,8 @@ class DiffRevisionTest extends DiffTestBase {
     $node = $this->getNodeByTitle('newer test title');
     $node->setNewRevision(TRUE);
     $node->isDefaultRevision(FALSE);
+    $node->body->value = '<p>even newer body</p>';
+    $node->setRevisionLogMessage('non default revision message');
     if ($node->hasField('moderation_state')) {
       // If testing with content_moderation enabled, set as draft.
       $node->moderation_state = 'draft';
@@ -279,13 +283,15 @@ class DiffRevisionTest extends DiffTestBase {
     if (\Drupal::moduleHandler()->moduleExists('content_moderation')) {
       // With content moderation, the new revision will not be current.
       // @see https://www.drupal.org/node/2899719
-      $text = $this->xpath('//tbody/tr[1]/td[4]/div/div/ul/li/a');
-      $this->assertEquals($text[0]->getText(), 'Set as current revision');
+      // @todo uncomment when https://www.drupal.org/project/drupal/issues/3535230 is committed.
+      // $text = $this->xpath('//tbody/tr[1]/td[4]/div/div/ul/li/a');
+      // $this->assertEquals($text[0]->getText(), 'Set as current revision');
     }
     else {
       // Check the last revision is set as current.
-      $text = $this->xpath('//tbody/tr[1]/td[4]/em');
-      $this->assertEquals($text[0]->getText(), 'Current revision');
+      // @todo uncomment when https://www.drupal.org/project/drupal/issues/3535230 is committed.
+      // $text = $this->xpath('//tbody/tr[1]/td[4]/em');
+      // $this->assertEquals($text[0]->getText(), 'Current revision');
       $this->assertSession()->linkNotExists('Set as current revision');
     }
 
@@ -309,8 +315,8 @@ class DiffRevisionTest extends DiffTestBase {
     // Check the revisions overview.
     $this->clickLink(t('Revisions'));
     $rows = $this->xpath('//tbody/tr');
-    // Make sure there are 6 revisions.
-    $this->assertCount(6, $rows);
+    // Make sure there are 5 revisions.
+    $this->assertCount(5, $rows);
 
     // Assert the submit buttons.
     $this->assertSession()->elementExists('xpath', '//input[@type="submit" and @id="edit-submit-top" and @value="Compare selected revisions"]');
@@ -463,23 +469,39 @@ class DiffRevisionTest extends DiffTestBase {
    */
   public function testEntityReference(): void {
     // Login as admin with the required permissions.
-    $this->loginAsAdmin([
-      'administer node fields',
-    ]);
+    $this->loginAsAdmin();
 
     // Adding Entity Reference to Article Content Type.
-    $this->drupalGet('admin/structure/types/manage/article/fields/add-field');
-    $this->submitForm([
-      'new_storage_type' => 'reference',
-    ], 'Continue');
-    $this->submitForm([
-      'group_field_options_wrapper' => 'field_ui:entity_reference:node',
+    FieldStorageConfig::create([
+      'field_name' => 'field_content',
+      'entity_type' => 'node',
+      'translatable' => FALSE,
+      'entity_types' => [],
+      'settings' => [
+        'target_type' => 'node',
+      ],
+      'type' => 'entity_reference',
+      'cardinality' => 1,
+    ])->save();
+
+    FieldConfig::create([
       'label' => 'Content reference test',
-      'field_name' => 'content',
-    ], 'Continue');
-    $this->submitForm([
-      'settings[handler_settings][target_bundles][article]' => '1',
-    ], 'Save settings');
+      'field_name' => 'field_content',
+      'entity_type' => 'node',
+      'required' => FALSE,
+      'bundle' => 'article',
+      'settings' => [
+        'handler' => 'default',
+        'handler_settings' => [
+          'target_bundles' => [
+            'article',
+          ],
+        ],
+      ],
+    ])->save();
+    \Drupal::service('entity_display.repository')->getFormDisplay('node', 'article')->setComponent('field_content', [
+      'type' => 'entity_reference_autocomplete',
+    ])->save();
 
     // Create an first article.
     $title = 'test_title_c';

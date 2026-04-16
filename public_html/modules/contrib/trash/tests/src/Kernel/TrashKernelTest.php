@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\trash\Kernel;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\ContentEntityStorageInterface;
 use Drupal\node\Entity\Node;
 use Drupal\trash_test\Entity\TrashTestEntity;
 use Drupal\user\Entity\User;
@@ -62,6 +65,67 @@ class TrashKernelTest extends TrashKernelTestBase {
   }
 
   /**
+   * Test prevention of stale entities in the caches.
+   */
+  public function testPersistentCache(): void {
+    $live_node = $this->createNode(['type' => 'article']);
+    $live_node->save();
+
+    /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
+    $storage = $this->entityTypeManager->getStorage('node');
+    $nid = $live_node->id();
+    $loaded = $storage->load($nid);
+
+    // Sanity checks that caches work.
+    $this->assertNotNull($loaded);
+    $this->assertSame(1, $storage->getLatestRevisionId($nid));
+    $this->assertEquals(1, $storage->getLatestTranslationAffectedRevisionId($nid, 'en'));
+
+    $loaded->delete();
+
+    // Deleting an entity should reset the in-memory and persistent entity
+    // caches per ids [and revisions in D11].
+    $loaded = $storage->load($nid);
+    $this->assertNull($loaded);
+    $this->assertNull($storage->getLatestRevisionId($nid));
+    // @todo This returns the pre-deleted revision, looks like a bug.
+    $this->assertSame(1, $storage->getLatestTranslationAffectedRevisionId($nid, 'en'));
+
+    // Deactivate the Trash context and fill the caches.
+    $this->getTrashManager()->setTrashContext('inactive');
+    $loaded = $storage->load($nid);
+    $this->assertNotNull($loaded);
+    $this->assertSame(2, $storage->getLatestRevisionId($nid));
+    $this->assertSame(2, $storage->getLatestTranslationAffectedRevisionId($nid, 'en'));
+
+    // Re-activate the caches and ensure the caches have been cleared.
+    $this->getTrashManager()->setTrashContext('active');
+    $loaded = $storage->load($nid);
+    $this->assertNull($loaded);
+    $this->assertNull($storage->getLatestRevisionId($nid));
+    // @todo This returns the pre-deleted revision, looks like a bug.
+    $this->assertSame(1, $storage->getLatestTranslationAffectedRevisionId($nid, 'en'));
+
+    // Repeat the above with executeInTrashContext().
+    $this->getTrashManager()->executeInTrashContext('inactive', function () use ($storage, $nid) {
+      $loaded = $storage->load($nid);
+      $this->assertNotNull($loaded);
+      $this->assertSame(2, $storage->getLatestRevisionId($nid));
+      $this->assertSame(
+        2,
+        $storage->getLatestTranslationAffectedRevisionId($nid, 'en')
+      );
+    });
+
+    // Re-activate the caches and ensure the caches have been cleared.
+    $loaded = $storage->load($nid);
+    $this->assertNull($loaded);
+    $this->assertNull($storage->getLatestRevisionId($nid));
+    // @todo This returns the pre-deleted revision, looks like a bug.
+    $this->assertSame(1, $storage->getLatestTranslationAffectedRevisionId($nid, 'en'));
+  }
+
+  /**
    * @covers ::trash_entity_is_deleted
    */
   public function testDisabledEntityType(): void {
@@ -111,6 +175,166 @@ class TrashKernelTest extends TrashKernelTestBase {
       ['media', NULL, FALSE],
       ['media', 'random_bundle_id', FALSE],
     ];
+  }
+
+  /**
+   * Tests that the trash context is appropriately switched based on the user.
+   */
+  public function testTrashContextSwitching(): void {
+    /** @var \Drupal\Core\Session\AccountSwitcherInterface $account_switcher */
+    $account_switcher = $this->container->get('account_switcher');
+    $administer_trash_user = $this->createUser(['administer trash']);
+    $access_trash_user = $this->createUser(['access trash']);
+    $view_deleted_trash_user = $this->createUser(['view deleted entities']);
+    $normal_user = $this->createUser();
+
+    // The trash context should be 'active' by default.
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    // The trash context should stay the same.
+    $account_switcher->switchTo($administer_trash_user);
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    // The trash context should stay the same.
+    $account_switcher->switchTo($access_trash_user);
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    // The trash context should stay the same.
+    $account_switcher->switchTo($view_deleted_trash_user);
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    // The trash context should be switched if the "in_trash" query string is
+    // set.
+    \Drupal::request()->query->set('in_trash', '1');
+    $account_switcher->switchTo($administer_trash_user);
+    static::assertEquals('ignore', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    // The trash context should switch back to the 'active' state.
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    $account_switcher->switchTo($access_trash_user);
+    static::assertEquals('ignore', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    // The trash context should switch back to the 'active' state.
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    $account_switcher->switchTo($view_deleted_trash_user);
+    static::assertEquals('ignore', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    // The trash context should switch back to the 'active' state.
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    // The state should still be active as the user does not have the necessary
+    // permissions.
+    $account_switcher->switchTo($normal_user);
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    // Assert that if the trash context is switched to 'ignore' even if it was
+    // previously 'inactive' as the "in_trash" query string takes precedence.
+    $this->getTrashManager()->setTrashContext('inactive');
+    $account_switcher->switchTo($administer_trash_user);
+    static::assertEquals('ignore', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    // The trash context should switch back to the 'active' state.
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    // Assert that the trash context is now 'active' even if it was previously
+    // 'inactive'.
+    $this->getTrashManager()->setTrashContext('inactive');
+    $account_switcher->switchTo($normal_user);
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    // Should now be active.
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+  }
+
+  /**
+   * Tests that deleted entities are not stored in cache.
+   */
+  public function testDeletedEntitiesNotInCache(): void {
+    $entity = TrashTestEntity::create();
+    $entity->save();
+    $entity_id = $entity->id();
+
+    // Load the entity to ensure it gets cached.
+    $storage = $this->getEntityTypeManager()->getStorage('trash_test_entity');
+    $storage->resetCache();
+    TrashTestEntity::load($entity_id);
+
+    // Verify the entity is in the persistent cache.
+    $persistent_cache = \Drupal::cache('entity');
+    $cid = "values:trash_test_entity:$entity_id";
+    $this->assertNotNull($persistent_cache->get($cid));
+
+    // Verify the entity is in the memory cache.
+    $memory_cache = \Drupal::service('entity.memory_cache');
+    $this->assertNotNull($memory_cache->get($cid));
+
+    // Delete the entity (soft-delete).
+    $entity->delete();
+
+    // The cache entries should be deleted after the entity is soft-deleted.
+    $this->assertFalse($persistent_cache->get($cid));
+    $this->assertFalse($memory_cache->get($cid));
+
+    // Load the deleted entity in the 'ignore' trash context and verify caches
+    // while still inside the context.
+    $this->getTrashManager()->executeInTrashContext('ignore', function () use ($entity_id, $persistent_cache, $memory_cache, $cid) {
+      TrashTestEntity::load($entity_id);
+
+      // Verify the deleted entity is not in the persistent cache.
+      $this->assertFalse($persistent_cache->get($cid));
+
+      // Verify the deleted entity is not in the memory cache.
+      $this->assertFalse($memory_cache->get($cid));
+    });
+  }
+
+  /**
+   * Tests getting the latest revision ID while switching trash contexts.
+   */
+  public function testGetLatestRevisionId(): void {
+    $storage = $this->getEntityTypeManager()->getStorage('trash_test_entity');
+    assert($storage instanceof ContentEntityStorageInterface);
+
+    // Create a test entity (revision 1).
+    $entity = $storage->create(['label' => 'Test entity']);
+    assert($entity instanceof ContentEntityInterface);
+    $entity->save();
+    $default_revision_id = $entity->getRevisionId();
+
+    // Create a pending revision (revision 2).
+    $entity->setNewRevision(TRUE);
+    $entity->isDefaultRevision(FALSE);
+    $entity->save();
+    $pending_revision_id = $entity->getRevisionId();
+
+    // Soft-delete the entity (revision 3).
+    $storage->delete([$entity]);
+    $deleted_revision_id = $entity->getRevisionId();
+
+    // Verify we have 3 distinct revisions.
+    $this->assertEquals([1, 2, 3], [$default_revision_id, $pending_revision_id, $deleted_revision_id]);
+
+    // Verify the correct value in the 'active' context after deletion.
+    $this->assertEquals('active', $this->getTrashManager()->getTrashContext());
+    $this->assertNull($storage->getLatestRevisionId($entity->id()));
+
+    // Switch to the 'ignore' context and call getLatestRevisionId().
+    $this->getTrashManager()->setTrashContext('ignore');
+    $this->assertEquals($deleted_revision_id, $storage->getLatestRevisionId($entity->id()));
+
+    // Switch back to the 'active' context.
+    $this->getTrashManager()->setTrashContext('active');
+    $this->assertNull($storage->getLatestRevisionId($entity->id()));
   }
 
 }

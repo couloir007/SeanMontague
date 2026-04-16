@@ -12,6 +12,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
 use Drupal\schemadotorg\SchemaDotOrgNamesInterface;
 use Drupal\schemadotorg\SchemaDotOrgSchemaTypeManagerInterface;
+use Drupal\type_tray\Controller\TypeTrayController;
 
 /**
  * Schema.org type tray manager.
@@ -67,7 +68,9 @@ class SchemaDotOrgTypeTrayManager implements SchemaDotOrgTypeTrayManagerInterfac
       $type_weight = -20;
       foreach ($category_definition['types'] as $category_type) {
         $settings[$category_type] = [
-          'type_category' => $category_name,
+          'type_category' => ($category_name === 'other')
+            ? TypeTrayController::UNCATEGORIZED_KEY
+            : $category_name,
           'type_weight' => (string) $type_weight,
         ];
         $type_weight++;
@@ -103,6 +106,10 @@ class SchemaDotOrgTypeTrayManager implements SchemaDotOrgTypeTrayManagerInterfac
     $schema_type_categories = $this->configFactory->get('schemadotorg.settings')
       ->get('schema_types.categories');
     foreach ($schema_type_categories as $category_name => $category_definition) {
+      if ($category_name === 'other') {
+        continue;
+      }
+
       $categories[$category_name] = $existing_categories[$category_name]
         ?? $category_definition['label'];
     }

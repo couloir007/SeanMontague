@@ -66,6 +66,36 @@ class RouteSubscriber extends RouteSubscriberBase {
           ->setOption('_trash_route', TRUE);
         $collection->add("entity.$entity_type_id.purge", $route);
 
+        // Add a route for the restore multiple form.
+        if ($entity_type->hasLinkTemplate('restore-multiple-form') && $entity_type->hasHandlerClass('form', 'restore-multiple-confirm')) {
+          $route = new Route($entity_type->getLinkTemplate('restore-multiple-form'));
+          $route
+            ->addDefaults([
+              '_form' => $entity_type->getFormClass('restore-multiple-confirm'),
+              '_title' => 'Restore from trash',
+              'entity_type_id' => $entity_type_id,
+            ])
+            ->setRequirement('_permission', 'access trash')
+            ->setOption('_admin_route', TRUE)
+            ->setOption('_trash_route', TRUE);
+          $collection->add("entity.$entity_type_id.restore_multiple", $route);
+        }
+
+        // Add a route for the purge multiple form.
+        if ($entity_type->hasLinkTemplate('purge-multiple-form') && $entity_type->hasHandlerClass('form', 'purge-multiple-confirm')) {
+          $route = new Route($entity_type->getLinkTemplate('purge-multiple-form'));
+          $route
+            ->addDefaults([
+              '_form' => $entity_type->getFormClass('purge-multiple-confirm'),
+              '_title' => 'Permanently delete',
+              'entity_type_id' => $entity_type_id,
+            ])
+            ->setRequirement('_permission', 'access trash')
+            ->setOption('_admin_route', TRUE)
+            ->setOption('_trash_route', TRUE);
+          $collection->add("entity.$entity_type_id.purge_multiple", $route);
+        }
+
         // Ensure that entity delete forms never load the latest revision.
         if ($route = $collection->get("entity.$entity_type_id.delete_form")) {
           $parameters = $route->getOption('parameters') ?? [];

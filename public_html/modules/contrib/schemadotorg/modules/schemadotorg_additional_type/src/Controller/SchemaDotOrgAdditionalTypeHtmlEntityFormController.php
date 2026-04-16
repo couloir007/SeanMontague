@@ -15,6 +15,7 @@ use Drupal\node\NodeTypeInterface;
 use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
 use Drupal\schemadotorg\SchemaDotOrgSchemaTypeManagerInterface;
 use Drupal\schemadotorg\Traits\SchemaDotOrgMappingStorageTrait;
+use Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -36,12 +37,15 @@ class SchemaDotOrgAdditionalTypeHtmlEntityFormController extends FormController 
    *   The entity type manager.
    * @param \Drupal\schemadotorg\SchemaDotOrgSchemaTypeManagerInterface $schemaTypeManager
    *   The Schema.org schema type manager.
+   * @param \Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeManagerInterface $additionalTypeManager
+   *   The Schema.org additional type manager.
    */
   public function __construct(
     protected FormController $entityFormController,
     protected ConfigFactoryInterface $configFactory,
     protected EntityTypeManagerInterface $entityTypeManager,
     protected SchemaDotOrgSchemaTypeManagerInterface $schemaTypeManager,
+    protected SchemaDotOrgAdditionalTypeManagerInterface $additionalTypeManager,
   ) {}
 
   /**
@@ -56,6 +60,13 @@ class SchemaDotOrgAdditionalTypeHtmlEntityFormController extends FormController 
    *   The render array that results from invoking the controller or a response.
    */
   public function getContentResult(Request $request, RouteMatchInterface $route_match): array|Response {
+    $mapping = $this->getMappingFromRouteMatch($route_match);
+    if (!$mapping
+      || !$this->additionalTypeManager->isNodeTypeAdditionalTypeRequired($mapping->getTargetBundle())
+      || !$this->additionalTypeManager->getMappingAdditionalTypeAllowedValues($mapping)) {
+      return $this->entityFormController->getContentResult($request, $route_match);
+    }
+
     switch ($route_match->getRouteName()) {
       case 'node.add':
       case 'entity.node.edit_form':
@@ -81,15 +92,7 @@ class SchemaDotOrgAdditionalTypeHtmlEntityFormController extends FormController 
    */
   protected function buildTypeSelect(Request $request, RouteMatchInterface $route_match): ?array {
     $mapping = $this->getMappingFromRouteMatch($route_match);
-    if (!$mapping || !$this->isAdditionalTypeRequired($mapping)) {
-      return NULL;
-    }
-
-    $allowed_values = $this->getMappingAdditionalTypeAllowedValues($mapping);
-    if (!$allowed_values) {
-      return NULL;
-    }
-
+    $allowed_values = $this->additionalTypeManager->getMappingAdditionalTypeAllowedValues($mapping);
     $field_name = $mapping->getSchemaPropertyFieldName('additionalType');
     $value = $request->query->get($field_name);
 
@@ -147,24 +150,14 @@ class SchemaDotOrgAdditionalTypeHtmlEntityFormController extends FormController 
    *   A renderable array containing the node add/edit form or a response
    */
   protected function buildNodeForm(Request $request, RouteMatchInterface $route_match): array|Response {
-    /** @var array|\Symfony\Component\HttpFoundation\Response $result */
-    $result = $this->entityFormController->getContentResult($request, $route_match);
-    if ($result instanceof Response) {
-      return $result;
+    /** @var array|\Symfony\Component\HttpFoundation\Response $form */
+    $form = $this->entityFormController->getContentResult($request, $route_match);
+    if ($form instanceof Response) {
+      return $form;
     }
-
-    $form = $result;
 
     $mapping = $this->getMappingFromRouteMatch($route_match);
-    if (!$mapping || !$this->isAdditionalTypeRequired($mapping)) {
-      return $form;
-    }
-
-    $allowed_values = $this->getMappingAdditionalTypeAllowedValues($mapping);
-    if (!$allowed_values) {
-      return $form;
-    }
-
+    $allowed_values = $this->additionalTypeManager->getMappingAdditionalTypeAllowedValues($mapping);
     $field_name = $mapping->getSchemaPropertyFieldName('additionalType');
     $value = ($route_match->getRouteName() === 'node.add')
       ? $request->query->get($field_name)
@@ -238,48 +231,6 @@ class SchemaDotOrgAdditionalTypeHtmlEntityFormController extends FormController 
     }
 
     return $this->getMappingStorage()->loadByBundle('node', $bundle);
-  }
-
-  /**
-   * Check if additional type is required for a given Schema.org mapping.
-   *
-   * @param \Drupal\schemadotorg\SchemaDotOrgMappingInterface $mapping
-   *   The Schema.org mapping.
-   *
-   * @return bool
-   *   Returns TRUE if additional type is required, FALSE otherwise.
-   */
-  protected function isAdditionalTypeRequired(SchemaDotOrgMappingInterface $mapping): bool {
-    $required_types = $this->configFactory
-      ->get('schemadotorg_additional_type.settings')
-      ->get('required_types');
-    return (bool) $this->schemaTypeManager->getSetting($required_types, $mapping);
-  }
-
-  /**
-   * Get the allowed values for the additional type field of a Schema.org mapping.
-   *
-   * @param \Drupal\schemadotorg\SchemaDotOrgMappingInterface $mapping
-   *   The Schema.org mapping object.
-   *
-   * @return array|null
-   *   An array of allowed values for the additional type field,
-   *   or NULL if the field is not found.
-   */
-  protected function getMappingAdditionalTypeAllowedValues(SchemaDotOrgMappingInterface $mapping): ?array {
-    $field_name = $mapping->getSchemaPropertyFieldName('additionalType');
-    if (!$field_name) {
-      return NULL;
-    }
-
-    /** @var \Drupal\field\FieldStorageConfigInterface|null $field_storage_config */
-    $field_storage_config = $this->entityTypeManager->getStorage('field_storage_config')
-      ->load("node.$field_name");
-    if (!$field_storage_config) {
-      return NULL;
-    }
-
-    return options_allowed_values($field_storage_config) ?: NULL;
   }
 
   /**

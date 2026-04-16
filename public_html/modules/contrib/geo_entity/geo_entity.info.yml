@@ -13,7 +13,7 @@ dependencies:
   - token:token
 configure: entity.geo_entity_type.collection
 
-# Information added by Drupal.org packaging script on 2025-07-07
-version: '1.1.1'
+# Information added by Drupal.org packaging script on 2026-04-03
+version: '1.1.2'
 project: 'geo_entity'
-datestamp: 1751892681
+datestamp: 1775224426

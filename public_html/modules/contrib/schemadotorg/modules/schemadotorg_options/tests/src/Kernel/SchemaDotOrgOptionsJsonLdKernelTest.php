@@ -36,6 +36,8 @@ class SchemaDotOrgOptionsJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBa
   public function testOptions(): void {
     \Drupal::currentUser()->setAccount($this->createUser(['access content']));
 
+    /* ********************************************************************** */
+
     $this->createSchemaEntity('node', 'SpecialAnnouncement');
 
     $node = Node::create([
@@ -44,8 +46,6 @@ class SchemaDotOrgOptionsJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBa
       'schema_category' => 'emergency',
     ]);
     $node->save();
-
-    /* ********************************************************************** */
 
     // Check that the JSON-LD for a category list element displays
     // the WikiData URI.
@@ -56,12 +56,43 @@ class SchemaDotOrgOptionsJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBa
     // Check that the JSON-LD for a category list element displays
     // the option text.
     $this->config('schemadotorg_options.settings')
-      ->set('allowed_value_text', ['SpecialAnnouncement--category'])
+      ->set('jsonld_uris', [])
+      ->set('jsonld_text', ['SpecialAnnouncement--category'])
       ->save();
     $jsonld = $this->builder->buildEntity($node);
     $this->assertEquals('SpecialAnnouncement', $jsonld['@type']);
     $this->assertEquals('Emergency', $jsonld['category']);
 
+    /* ********************************************************************** */
+
+    $this->createSchemaEntity('node', 'Recipe');
+
+    $node = Node::create([
+      'type' => 'recipe',
+      'title' => 'Some recipe',
+      'schema_suitable_for_diet' => 'diabetic_diet',
+    ]);
+    $node->save();
+
+    // Check that the snake case enumeration value is converted back to camel case.
+    $jsonld = $this->builder->buildEntity($node);
+    $this->assertEquals(['https://schema.org/DiabeticDiet'], $jsonld['suitableForDiet']);
+
+    /* ********************************************************************** */
+
+    $this->appendSchemaTypeDefaultProperties('Event', ['eventAttendanceMode']);
+    $this->createSchemaEntity('node', 'Event');
+
+    $node = Node::create([
+      'type' => 'event',
+      'title' => 'Some event',
+      'schema_event_attendance_mode' => 'mixed',
+    ]);
+    $node->save();
+
+    // Check that the alias value is converted to an enumeration value.
+    $jsonld = $this->builder->buildEntity($node);
+    $this->assertEquals('https://schema.org/MixedEventAttendanceMode', $jsonld['eventAttendanceMode']);
   }
 
 }

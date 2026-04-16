@@ -140,6 +140,7 @@ function schemadotorg_identifier_form_schemadotorg_properties_settings_form_alte
 field_name:
   property_id: ID
   field_name: name
+  type: string
   label: Label
   description: Some description
   required: true

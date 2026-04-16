@@ -94,29 +94,56 @@ SchemaType--propertyName:
     '#description_link' => 'properties',
     '#example' => 'propertyName: suffix',
   ];
-  $form['schemadotorg_options']['allowed_value_text'] = [
+  $form['schemadotorg_options']['allowed_value_aliases'] = [
     '#type' => 'schemadotorg_settings',
-    '#title' => t('Allowed value text'),
-    '#description' => t('Enter the Schema.org properties that should return the text for an allowed value in the Schema.org JSON-LD.'),
+    '#title' => t('Allowed value (enumeration) aliases'),
+    '#description' => t('Enter Schema.org Enumeration followed by its aliases for the Schema.org JSON-LD. This allows for more readable values (i.e. snake_case values) for Enumeration values.'),
     '#description_link' => 'properties',
     '#example' => "
-- propertyName
-- SchemaType--propertyName
+MixedEventAttendanceMode: mixes
+eventAttendanceMode--OfflineEventAttendanceMode: offline
+Event--eventAttendanceMode--OnlineEventAttendanceMode: online
 ",
   ];
-  $form['schemadotorg_options']['allowed_value_uris'] = [
+  $form['schemadotorg_options']['jsonld_text'] = [
     '#type' => 'schemadotorg_settings',
-    '#title' => t('Allowed value URIs'),
-    '#description' => t('Enter URIs to be used in the Schema.org JSON-LD for an allowed value.')
-      . ' ' . t('The allowed value URIs allows internal option machine names to mapped to a well known URL from Wikipedia or Wikidata'),
+    '#title' => t('Schema.org properties that display allowed value text in the Schema.org JSON-LD'),
+    '#description' => t('Enter the Schema.org properties that should return the (translated) text for an allowed value in the Schema.org JSON-LD.')
+      . ' '
+      . t("Enter '- Thing' to convert all Schema.org properties to use the (translated) text for an allowed value in the Schema.org JSON-LD."),
     '#description_link' => 'properties',
     '#example' => "
+- SchemaType--propertyName
+- SchemaType
+- propertyName
+",
+    '#access' => \Drupal::moduleHandler()->moduleExists('schemadotorg_jsonld'),
+  ];
+  $form['schemadotorg_options']['jsonld_uris'] = [
+    '#type' => 'schemadotorg_settings',
+    '#title' => t('URIs for allowed values in the Schema.org JSON-LD'),
+    '#description' => t('Enter URIs to be used in the Schema.org JSON-LD for an allowed value.')
+      .
+      ' ' . t('The JSON-LD URIs allows internal option machine names to mapped to a well known URL from Wikipedia or Wikidata'),
+    '#description_link' => 'properties',
+    '#example' => "
+# Patterns
+SchemaType--propertyName--allowed_value: 'https://www.wikidata.org/wiki/Q0000'
+propertyName--allowed_value: 'https://www.wikidata.org/wiki/Q0000'
+allowed_value: 'https://www.wikidata.org/wiki/Q0000'
+# Examples
 warning: 'https://www.wikidata.org/wiki/Q1759104'
 emergency: 'https://www.wikidata.org/wiki/Q5070802'
 error: 'https://www.wikidata.org/wiki/Q29485'
 information: 'https://www.wikidata.org/wiki/Q11028'
 condition: 'https://www.wikidata.org/wiki/Q813912'
 ",
+    '#access' => \Drupal::moduleHandler()->moduleExists('schemadotorg_jsonld'),
+  ];
+  $form['schemadotorg_options']['use_snake_case'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Use snake case for allowed (enumeration) values'),
+    '#description' => t('If checked, allowed (enumeration) values will automatically be converted to snake_case.'),
   ];
 }
 

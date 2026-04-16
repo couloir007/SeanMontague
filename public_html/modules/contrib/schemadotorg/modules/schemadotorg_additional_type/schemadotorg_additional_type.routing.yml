@@ -1,0 +1,14 @@
+schemadotorg_additional_type.report:
+  path: '/admin/reports/schemadotorg/docs/additional-types'
+  defaults:
+    _title: 'Schema.org: Additional Types'
+    _controller: '\Drupal\schemadotorg_additional_type\Controller\SchemaDotOrgAdditionalTypeReportController::index'
+  requirements:
+    _permission: 'access site reports'
+
+schemadotorg_additional_type.report.download:
+  path: '/admin/reports/schemadotorg/docs/additional-types/download'
+  defaults:
+    _controller: '\Drupal\schemadotorg_additional_type\Controller\SchemaDotOrgAdditionalTypeReportController::download'
+  requirements:
+    _permission: 'access site reports'

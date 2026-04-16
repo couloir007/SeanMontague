@@ -1,36 +1,56 @@
+{% set button_attributes = (button_attributes|default(create_attribute())).addClass(button_classes) %}
+
 {{ preface }}
 {% if mermaid %}
-  <figure class="mermaid-diagram">
-    <h2>{{ title }}</h2>
-    <div class="mermaid">
-      {{ mermaid }}
-    </div>
-    {% if caption %}
-      <figcaption>{{ caption }}</figcaption>
-    {% endif %}
-
-    {% if key %}
-      <h3>Key</h3>
+  {% block mermaid %}
+    <figure class="mermaid-diagram">
+      {% if title %}
+        <h2>{{ title }}</h2>
+      {% endif %}
       <div class="mermaid">
-        {{ key }}
+        {{ mermaid }}
       </div>
-    {% endif %}
-  </figure>
+      {% if caption %}
+        <figcaption>{{ caption }}</figcaption>
+      {% endif %}
+
+      {% if key %}
+        <h3>{{ 'Key'|t }}</h3>
+        <div class="mermaid key">
+          {{ key }}
+        </div>
+      {% endif %}
+    </figure>
+  {% endblock %}
 {% endif %}
 
 {% if show_code and mermaid %}
-  <details class="mermaid-code">
-    <summary role="button">Mermaid code</summary>
-    <pre>
-      <code>
-        ## Diagram code ##
-{{ mermaid }}
+  {% block show_code %}
+    <details class="mermaid-code">
+      <summary role="button">{{ 'Mermaid code'|t }}</summary>
+      <pre>
+        <code>
+          ## {{ 'Diagram code'|t }} ##
+          {{ mermaid }}
 
-        ## Key code ##
-{{ key }}
+          ## {{ 'Key code'|t }} ##
+          {{ key }}
+        </code>
+      </pre>
+    </details>
+  {% endblock %}
+{% endif %}
 
-      </code>
-    </pre>
-  </details>
+{% if allow_download and mermaid %}
+  {% block download_button %}
+    <button {{ button_attributes.addClass('mermaid-download-button') }}
+      type="button"
+      data-mermaid="{{ mermaid|e('html_attr') }}"
+      {% if title %}data-title="{{ title|e('html_attr') }}"{% endif %}
+      aria-label="{{ 'Download Mermaid diagram'|t }}{% if title %}: {{ title }}{% endif %}"
+    >
+      {{ 'Download diagram'|t }}
+    </button>
+  {% endblock %}
 {% endif %}
 {{ postface }}

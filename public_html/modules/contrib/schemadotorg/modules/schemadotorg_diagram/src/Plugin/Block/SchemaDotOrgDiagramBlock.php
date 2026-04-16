@@ -78,7 +78,6 @@ class SchemaDotOrgDiagramBlock extends BlockBase implements ContainerFactoryPlug
           'id' => 'schemadotorg-diagram',
           'data-schemadotorg-details-key' => 'schemadotorg-diagram',
         ],
-        '#attached' => ['library' => ['schemadotorg_diagram/schemadotorg_diagram']],
       ] + $diagrams,
     ];
   }

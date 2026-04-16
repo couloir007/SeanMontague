@@ -1,0 +1,61 @@
+<?php
+
+/**
+ * @file
+ * Install and update hooks for the mermaid_diagram_field module.
+ */
+
+/**
+ * Add allow_download column to existing field tables.
+ */
+function mermaid_diagram_field_update_9001() {
+  $storages = \Drupal::entityTypeManager()
+    ->getStorage('field_storage_config')
+    ->loadByProperties(['type' => 'mermaid_diagram']);
+
+  $schema = \Drupal::database()->schema();
+  $tables_changed = [];
+
+  $spec = [
+    'type' => 'int',
+    'size' => 'tiny',
+    'not null' => FALSE,
+    'default' => NULL,
+  ];
+
+  foreach ($storages as $storage) {
+    $field_name = $storage->getName();
+    $entity_type = $storage->getTargetEntityTypeId();
+
+    $table = $entity_type . '__' . $field_name;
+    $column = $field_name . '_allow_download';
+    if ($schema->tableExists($table) && !$schema->fieldExists($table, $column)) {
+      $schema->addField($table, $column, $spec);
+      $tables_changed[] = $table;
+    }
+
+    $rev_table = $entity_type . '_revision__' . $field_name;
+    $rev_column = $field_name . '_allow_download';
+    if ($schema->tableExists($rev_table) && !$schema->fieldExists($rev_table, $rev_column)) {
+      $schema->addField($rev_table, $rev_column, $spec);
+      $tables_changed[] = $rev_table;
+    }
+  }
+
+  $tables_changed = array_unique($tables_changed);
+  return !empty($tables_changed) ? 'Added columns to tables: ' . implode(', ', $tables_changed) : 'No changes needed.';
+}
+
+/**
+ * Same as 9001 but running a second time.
+ */
+function mermaid_diagram_field_update_9002(): string {
+  $storages = \Drupal::entityTypeManager()
+    ->getStorage('field_storage_config')
+    ->loadByProperties(['type' => 'mermaid_diagram']);
+
+  foreach ($storages as $storage) {
+    \Drupal::entityDefinitionUpdateManager()->updateFieldStorageDefinition($storage);
+  }
+  return "Add allow_download column to existing field tables, again.";
+}

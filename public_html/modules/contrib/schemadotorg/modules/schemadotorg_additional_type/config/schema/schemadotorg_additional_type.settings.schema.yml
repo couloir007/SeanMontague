@@ -32,3 +32,115 @@ schemadotorg_additional_type.settings:
         sequence:
           type: string
           label: 'Schema.org default additional type allowed value'
+    default_field_values:
+      type: sequence
+      label: 'Schema.org additional types default field values'
+      sequence:
+        type: ignore
+        label: 'Schema.org additional types default fields values'
+        sequence:
+          type: ignore
+          label: 'Schema.org additional types default field value'
+    field_access:
+      type: sequence
+      label: 'Field access'
+      sequence:
+        type: sequence
+        label: 'Entity type'
+        sequence:
+          type: sequence
+          label: 'Field name'
+          sequence:
+            type: mapping
+            label: 'Operation/Conditions'
+            mapping:
+              operator:
+                type: string
+                label: Operator
+              additional_types:
+                type: sequence
+                label: 'Additional types'
+                sequence:
+                  type: string
+                  label: 'Additional type'
+              bundles:
+                type: sequence
+                label: Bundles
+                sequence:
+                  type: string
+                  label: Bundle
+              entity_access:
+                type: sequence
+                label: 'Entity access'
+                sequence:
+                  type: string
+                  label: 'Entity access operation'
+              permissions:
+                type: sequence
+                label: Permissions
+                sequence:
+                  type: string
+                  label: Permission
+              roles:
+                type: sequence
+                label: Roles
+                sequence:
+                  type: string
+                  label: Role
+              schema_types:
+                type: sequence
+                label: 'Schema.org types'
+                sequence:
+                  type: string
+                  label: 'Schema.org type'
+
+              '!additional_types':
+                type: sequence
+                label: 'Additional types'
+                sequence:
+                  type: string
+                  label: 'Additional type'
+              '!bundles':
+                type: sequence
+                label: Bundles
+                sequence:
+                  type: string
+                  label: Bundle
+              '!entity_access':
+                type: sequence
+                label: 'Entity access'
+                sequence:
+                  type: string
+                  label: 'Entity operation'
+              '!permissions':
+                type: sequence
+                label: Permissions
+                sequence:
+                  type: string
+                  label: Permission
+              '!roles':
+                type: sequence
+                label: Roles
+                sequence:
+                  type: string
+                  label: Role
+              '!schema_types':
+                type: sequence
+                label: 'Schema.org types'
+                sequence:
+                  type: string
+                  label: 'Schema.org type'
+
+    jsonld_values:
+      type: sequence
+      label: 'JSON-LD values'
+      sequence:
+        type: mapping
+        label: 'JSON-LD value'
+        mapping:
+          type:
+            type: string
+            label: Type
+          additional_type:
+            type: string
+            label: 'Additional type'

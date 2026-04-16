@@ -7,15 +7,21 @@ diagram:
     js/diagram.js: {}
   dependencies:
     - core/drupal
-    - core/jquery
+    - core/drupalSettings
     - mermaid_diagram_field/mermaid
+    - mermaid_diagram_field/svg_pan_zoom
 
 mermaid:
-  version: 9.1.3
+  version: 11.11.0
   remote: https://github.com/mermaid-js/mermaid
   license:
     name: MIT
     gpl-compatible: false
   js:
-    https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js: { type: external, minified: true }
+    https://cdn.jsdelivr.net/npm/mermaid@11.11.0/dist/mermaid.min.js: { type: external, minified: true }
     # /libraries/mermaid/mermaid.min.js: { minified: true }
+
+svg_pan_zoom:
+  version: 3.6.2
+  js:
+    https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.2/dist/svg-pan-zoom.min.js: { type: external, minified: true }

@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Drupal\trash\Handler;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\trash\Exception\UnrestorableEntityException;
 use Drupal\trash\PathAlias\PathAliasIntegrationTrait;
 use Drupal\trash\TrashManagerInterface;
+use Drupal\trash\Validation\TrashAwareUniqueFieldValueValidator;
 
 /**
  * Provides the default trash handler.
@@ -35,9 +38,23 @@ class DefaultTrashHandler implements TrashHandlerInterface {
   protected TrashManagerInterface $trashManager;
 
   /**
+   * Tracks whether validation has already been performed for an entity.
+   *
+   * This prevents duplicate validation when validateRestore() is called
+   * explicitly (e.g., from form validation) before preTrashRestore().
+   *
+   * @var array<string, bool>
+   */
+  protected array $validatedEntities = [];
+
+  /**
    * {@inheritdoc}
    */
-  public function preTrashDelete(EntityInterface $entity): void {}
+  public function preTrashDelete(EntityInterface $entity): void {
+    // Ensure that Pathauto doesn't try to auto-create aliases when deleting an
+    // entity.
+    $this->skipPathauto($entity);
+  }
 
   /**
    * {@inheritdoc}
@@ -50,7 +67,36 @@ class DefaultTrashHandler implements TrashHandlerInterface {
   /**
    * {@inheritdoc}
    */
-  public function preTrashRestore(EntityInterface $entity): void {}
+  public function validateRestore(EntityInterface $entity): void {
+    $entity_key = $entity->getEntityTypeId() . ':' . $entity->id();
+    $this->validatedEntities[$entity_key] = TRUE;
+
+    // Run entity validation for fieldable entities to check for conflicts.
+    if ($entity instanceof FieldableEntityInterface) {
+      $violations = $entity->validate();
+
+      // Find only violations from constraints validated by
+      // TrashAwareUniqueFieldValueValidator. This catches any constraint whose
+      // validatedBy() returns TrashAwareUniqueFieldValueValidator itself or a
+      // parent class (e.g., UniqueFieldValueValidator, which is aliased to it
+      // via the service container).
+      foreach ($violations as $violation) {
+        $validator_class = ltrim($violation->getConstraint()->validatedBy(), '\\');
+        if (is_a(TrashAwareUniqueFieldValueValidator::class, $validator_class, TRUE)) {
+          throw new UnrestorableEntityException((string) $violation->getMessage());
+        }
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preTrashRestore(EntityInterface $entity): void {
+    // Ensure that Pathauto doesn't try to auto-create aliases when restoring an
+    // entity.
+    $this->skipPathauto($entity);
+  }
 
   /**
    * {@inheritdoc}

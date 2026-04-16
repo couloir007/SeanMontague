@@ -125,23 +125,6 @@ class FileDeleteForm extends ContentEntityConfirmFormBase {
       $usage_override = $form_state->getValue('force_delete') && $this->account->hasPermission('delete files override usage');
       $instant_delete = $form_state->getValue('instant_delete') && $this->account->hasPermission('delete files immediately');
 
-      if (isset($usages['file'])) {
-        foreach ($usages['file'] as $type => $entities) {
-          foreach ($entities as $id => $usage_count) {
-            $ref_entity = $this->entityTypeManager->getStorage($type)->load($id);
-            if (!empty($ref_entity)) {
-              $ref_entity->delete();
-
-              $this->messenger()
-                ->addMessage($this->t('The reference from entity type %ref_type for file %file_name has been deleted.', [
-                  '%ref_type' => $ref_entity->getEntityType()->id(),
-                  '%file_name' => $this->entity->getFilename(),
-                ]));
-            }
-          }
-        }
-      }
-
       // If the file is in use, and we don't want to force delete, cancel the
       // deletion and set error message.
       if ($usages && !$usage_override) {
@@ -166,6 +149,24 @@ class FileDeleteForm extends ContentEntityConfirmFormBase {
           ]));
 
         return;
+      }
+
+      // Remove existing usage for the file.
+      if (isset($usages['file'])) {
+        foreach ($usages['file'] as $type => $entities) {
+          foreach ($entities as $id => $usage_count) {
+            $ref_entity = $this->entityTypeManager->getStorage($type)->load($id);
+            if (!empty($ref_entity)) {
+              $ref_entity->delete();
+
+              $this->messenger()
+                ->addMessage($this->t('The reference from entity type %ref_type for file %file_name has been deleted.', [
+                  '%ref_type' => $ref_entity->getEntityType()->id(),
+                  '%file_name' => $this->entity->getFilename(),
+                ]));
+            }
+          }
+        }
       }
 
       $form_state->setRedirect('view.files.page_1');

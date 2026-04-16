@@ -26,57 +26,78 @@ class SchemaDotOrgSchemaTypeManager implements SchemaDotOrgSchemaTypeManagerInte
   protected array $typePropertiesCache = [];
 
   /**
-   * Pattern used to match settings.
+   * Pattern used to match Schema.org type settings.
    *
    * @see \Drupal\schemadotorg\SchemaDotOrgSchemaTypeManager::getSetting
    */
-  protected array $settingPatterns = [
+  protected array $schemaTypePatterns = [
+    // Entity type.
+    ['entity_type_id', 'bundle', 'schema_type'],
+    ['entity_type_id', 'bundle'],
+
+    // Entity type + Schema.org type.
+    ['entity_type_id', 'schema_type', 'bundle'],
+    ['entity_type_id', 'schema_type'],
+
+    // Bundle + Schema.org type.
+    ['bundle', 'schema_type'],
+    ['schema_type', 'bundle'],
+
+    // Other.
+    ['bundle'],
+    ['schema_type'],
+    ['entity_type_id'],
+  ];
+
+  /**
+   * Pattern used to match Schema.org additionalType settings.
+   *
+   * @see \Drupal\schemadotorg\SchemaDotOrgSchemaTypeManager::getSetting
+   */
+  protected array $schemaAdditionalTypePatterns = [
+    ['entity_type_id', 'schema_type', 'additional_type'],
+    ['entity_type_id', 'bundle', 'additional_type'],
+    ['bundle', 'additional_type'],
+    ['schema_type', 'additional_type'],
+    ['additional_type'],
+  ];
+
+  /**
+   * Pattern used to match Schema.org property settings.
+   *
+   * @see \Drupal\schemadotorg\SchemaDotOrgSchemaTypeManager::getSetting
+   */
+  protected array $schemaPropertyPatterns = [
     // Entity type.
     ['entity_type_id', 'bundle', 'field_name'],
-    ['entity_type_id', 'bundle'],
     ['entity_type_id', 'field_name'],
 
     // Entity type + Schema.org type.
     ['entity_type_id', 'schema_type', 'bundle', 'schema_property'],
     ['entity_type_id', 'schema_type', 'bundle', 'field_name'],
-    ['entity_type_id', 'schema_type', 'bundle'],
     ['entity_type_id', 'schema_type', 'schema_property'],
     ['entity_type_id', 'schema_type', 'field_name'],
 
     // Entity type + bundle.
     ['entity_type_id', 'bundle', 'schema_type', 'schema_property'],
     ['entity_type_id', 'bundle', 'schema_type', 'field_name'],
-    ['entity_type_id', 'bundle', 'schema_type'],
     ['entity_type_id', 'bundle', 'schema_property'],
     ['entity_type_id', 'bundle', 'field_name'],
 
     // Entity type + Schema.org type and property.
-    ['entity_type_id', 'schema_type'],
     ['entity_type_id', 'schema_property'],
 
     // Bundle.
-    ['bundle', 'schema_type'],
     ['bundle', 'field_name'],
     ['bundle', 'schema_property'],
 
     // Schema.org type.
-    ['schema_type', 'bundle'],
     ['schema_type', 'field_name'],
     ['schema_type', 'schema_property'],
 
-    // Schema.org/additional_type.
-    ['entity_type_id', 'schema_type', 'additional_type'],
-    ['entity_type_id', 'bundle', 'additional_type'],
-    ['bundle', 'additional_type'],
-    ['schema_type', 'additional_type'],
-
     // Other.
-    ['bundle'],
-    ['schema_type'],
-    ['additional_type'],
     ['field_name'],
     ['schema_property'],
-    ['entity_type_id'],
   ];
 
   /**
@@ -226,6 +247,23 @@ class SchemaDotOrgSchemaTypeManager implements SchemaDotOrgSchemaTypeManagerInte
   public function isEnumerationValue(string $id): bool {
     $item = $this->getItem(static::SCHEMA_TYPES, $id);
     return (!empty($item['enumerationtype']));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isEnumerationMemberOf(string $value, string $type): bool {
+    $enumeration_type = $this->database->select('schemadotorg_types', 'types')
+      ->fields('types', ['enumerationtype'])
+      ->condition('label', $value)
+      ->execute()
+      ->fetchField();
+    if (empty($enumeration_type)) {
+      return FALSE;
+    }
+
+    $enumeration_type = str_replace(static::URI, '', $enumeration_type);
+    return ($type === $enumeration_type);
   }
 
   /**
@@ -756,17 +794,18 @@ class SchemaDotOrgSchemaTypeManager implements SchemaDotOrgSchemaTypeManagerInte
    * {@inheritdoc}
    */
   public function getSetting(array $settings, SchemaDotOrgMappingInterface|array $parts, array $options = [], ?array $patterns = NULL): mixed {
-    // Check for empty settings and immediately return NULL.
-    if (empty($settings)) {
-      return NULL;
-    }
-
     // Set options defaults.
     $options += [
       'multiple' => FALSE,
       'parents' => TRUE,
       'negate' => TRUE,
+      'return' => NULL,
     ];
+
+    // Check for empty settings and return NULL immediately.
+    if (empty($settings)) {
+      return $options['return'];
+    }
 
     // Get the parts from a Schema.org mapping.
     if ($parts instanceof SchemaDotOrgMappingInterface) {
@@ -780,8 +819,20 @@ class SchemaDotOrgSchemaTypeManager implements SchemaDotOrgSchemaTypeManagerInte
     // Ignore empty parts.
     $parts = array_filter($parts);
 
-    // Set patterns.
-    $patterns = $patterns ?? $this->settingPatterns;
+    // Set patterns for Schema.org type or property settings based on the
+    // passed parts.
+    if (empty($patterns)) {
+      if (!empty($parts['schema_property']) || !empty($parts['field_name'])) {
+        $patterns = $this->schemaPropertyPatterns;
+      }
+      elseif (!empty($parts['additional_type'])) {
+        // Additional type patterns are applied before the more general patterns.
+        $patterns = array_merge($this->schemaAdditionalTypePatterns, $this->schemaTypePatterns);
+      }
+      else {
+        $patterns = $this->schemaTypePatterns;
+      }
+    }
 
     // Handle settings that are a simple indexed array.
     if (array_is_list($settings)) {
@@ -789,7 +840,8 @@ class SchemaDotOrgSchemaTypeManager implements SchemaDotOrgSchemaTypeManagerInte
       $settings = array_fill_keys(array_keys($settings), TRUE);
     }
 
-    // If negate settings are passed we need to find them and return NULL.
+    // If the negate settings option is passed, we need to find them
+    // and return NULL.
     if (!empty($options['negate'])) {
       $negate_settings = [];
       foreach ($settings as $key => $value) {
@@ -850,7 +902,7 @@ class SchemaDotOrgSchemaTypeManager implements SchemaDotOrgSchemaTypeManagerInte
       }
     }
 
-    return $multiple_settings ?: NULL;
+    return $multiple_settings ?: $options['return'];
   }
 
   /**

@@ -77,8 +77,11 @@ trait SchemaDotOrgDevelGenerateTrait {
 
       $devel_generate_plugin_id = $commands[$entity_type][0];
       foreach ($bundles as $bundle) {
-        // Args which are [num] and [max_comments].
-        $args = [(string) $num, 0];
+        // Args.
+        $args = [
+          'num' => (string) $num,
+          'max_comments' => 0,
+        ];
         // Options.
         $options = $commands[$entity_type][1] ?? [];
         $options += [

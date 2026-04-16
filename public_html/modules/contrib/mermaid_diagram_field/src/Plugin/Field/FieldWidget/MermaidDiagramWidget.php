@@ -2,21 +2,20 @@
 
 namespace Drupal\mermaid_diagram_field\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * A Mermaid diagram widget.
- *
- * @FieldWidget(
- *   id = "mermaid_diagram_widget",
- *   label = @Translation("Mermaid diagram widget"),
- *   field_types = {
- *     "mermaid_diagram",
- *   }
- * )
  */
+#[FieldWidget(
+  id: 'mermaid_diagram_widget',
+  label: new TranslatableMarkup('Mermaid diagram widget'),
+  field_types: ['mermaid_diagram'],
+)]
 class MermaidDiagramWidget extends WidgetBase {
 
   /**
@@ -30,17 +29,17 @@ class MermaidDiagramWidget extends WidgetBase {
       '#default_value' => $items[$delta]->title ?? NULL,
 
     ];
-//@todo workout required states.
+    // @todo work out required states.
     $element['diagram'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Mermaid code'),
-      '#description' => t('Must be valid Mermaid code. <a href="@mermaid-live" target="_blank">Mermaid Live editor (opens in new tab)</a>.', array('@mermaid-live' => 'https://mermaid.live/')),
+      '#description' => t('Must be valid Mermaid code. <a href="@mermaid-live" target="_blank">Mermaid Live editor (opens in new tab)</a>.', ['@mermaid-live' => 'https://mermaid.live/']),
       '#default_value' => $items[$delta]->diagram ?? NULL,
     ];
     $element['key'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Key'),
-      '#description' => t('Must be valid Mermaid code. <a href="@mermaid-live" target="_blank">Mermaid Live editor (opens in new tab)</a>.', array('@mermaid-live' => 'https://mermaid.live/')),
+      '#description' => t('Must be valid Mermaid code. <a href="@mermaid-live" target="_blank">Mermaid Live editor (opens in new tab)</a>.', ['@mermaid-live' => 'https://mermaid.live/']),
       '#default_value' => $items[$delta]->key ?? NULL,
     ];
     $element['caption'] = [
@@ -53,6 +52,13 @@ class MermaidDiagramWidget extends WidgetBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Show the raw Mermaid code.'),
       '#default_value' => $items[$delta]->show_code ?? NULL,
+    ];
+
+    $element['allow_download'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Allow download as .mermaid file.'),
+      '#description' => $this->t('If checked, a download button will be shown below the diagram.'),
+      '#default_value' => $items[$delta]->allow_download ?? NULL,
     ];
 
     return $element;

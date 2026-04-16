@@ -2,20 +2,23 @@
 
 namespace Drupal\mermaid_diagram_field\Plugin\Field\FieldType;
 
+use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 
 /**
- * Provides a field type of MermaidDiagram.
- *
- * @FieldType(
- *   id = "mermaid_diagram",
- *   label = @Translation("Mermaid diagram"),
- *   default_formatter = "mermaid_diagram_formatter",
- *   default_widget = "mermaid_diagram_widget",
- * )
+ * Defines the field type of MermaidDiagram.
  */
+#[FieldType(
+  id: "mermaid_diagram",
+  label: new TranslatableMarkup('Mermaid diagram'),
+  description: new TranslatableMarkup('A field for adding and rendering Mermaid diagrams.'),
+  category: 'general',
+  default_widget: 'mermaid_diagram_widget',
+  default_formatter: 'mermaid_diagram_formatter'
+)]
 class MermaidDiagramItem extends FieldItemBase {
 
   /**
@@ -51,6 +54,11 @@ class MermaidDiagramItem extends FieldItemBase {
           'size' => 'tiny',
           'not null' => FALSE,
         ],
+        'allow_download' => [
+          'type' => 'int',
+          'size' => 'tiny',
+          'not null' => FALSE,
+        ],
       ],
     ];
   }
@@ -70,8 +78,14 @@ class MermaidDiagramItem extends FieldItemBase {
     $properties['diagram'] = DataDefinition::create('string')
       ->setLabel(t('Mermaid code'))
       ->setRequired(TRUE);
+    $properties['key'] = DataDefinition::create('string')
+      ->setLabel(t('Key code'))
+      ->setRequired(FALSE);
     $properties['show_code'] = DataDefinition::create('string')
       ->setLabel(t('Expose the code'))
+      ->setRequired(FALSE);
+    $properties['allow_download'] = DataDefinition::create('string')
+      ->setLabel(t('Allow download as .mermaid'))
       ->setRequired(FALSE);
 
     return $properties;

@@ -16,6 +16,7 @@ use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
 use Drupal\schemadotorg\SchemaDotOrgNamesInterface;
 use Drupal\schemadotorg\SchemaDotOrgSchemaTypeManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\String\Inflector\EnglishInflector;
 
 /**
  * Schema.org Custom Field manager.
@@ -175,7 +176,34 @@ class SchemaDotOrgCustomFieldManager implements SchemaDotOrgCustomFieldManagerIn
     }
 
     $custom_field_schema_type = $default_schema_properties['schema_type'] ?? '';
+    $custom_field_schema_role = $default_schema_properties['schema_role'] ?? '';
     $custom_field_schema_properties = $default_schema_properties['schema_properties'] ?? [];
+
+    if ($custom_field_schema_role
+      && !isset($custom_field_schema_properties['target_id'])) {
+      $custom_field_schema_role_properties = array_keys($this->schemaTypeManager->getTypeProperties($custom_field_schema_role));
+      $custom_field_schema_role_properties = array_combine($custom_field_schema_role_properties, $custom_field_schema_role_properties);
+      $has_only_role_schema_properties = !array_diff_key($custom_field_schema_properties, $custom_field_schema_role_properties);
+      if ($has_only_role_schema_properties) {
+        // Prepend target_id to the list of custom subfields.
+        $inflector = new EnglishInflector();
+        $singular = $inflector->singularize($field_values['label']);
+        $label = $singular[0] ?? $field_values['label'];
+        $target_id = [
+          'data_type' => 'entity_reference',
+          'label' => $label,
+          'target_type' => 'node',
+          'check_empty' => TRUE,
+          // Handler settings are applied to the widget settings at build time.
+          'handler' => 'schemadotorg:node',
+          'handler_settings' => [
+            'target_type' => 'node',
+            'schema_types' => [$custom_field_schema_type],
+          ],
+        ];
+        $custom_field_schema_properties = ['target_id' => $target_id] + $custom_field_schema_properties;
+      }
+    }
 
     $weight = 0;
 
@@ -215,7 +243,7 @@ class SchemaDotOrgCustomFieldManager implements SchemaDotOrgCustomFieldManagerIn
             'description' => $description,
           ] + $default_widget_settings['settings'],
         ],
-        'check_empty' => FALSE,
+        'check_empty' => $settings['check_empty'] ?? FALSE,
         'weight' => $weight,
       ];
 
@@ -232,9 +260,12 @@ class SchemaDotOrgCustomFieldManager implements SchemaDotOrgCustomFieldManagerIn
         + $field_storage_columns[$name];
 
       // Apply custom settings for widget settings.
-      $field_settings[$name]['widget_settings'] = array_intersect_key($settings, $field_settings[$name]['widget_settings'])
+      $settings += ['widget_settings' => []];
+      $field_settings[$name]['widget_settings'] = array_intersect_key($settings['widget_settings'], $field_settings[$name]['widget_settings'])
+        + array_intersect_key($settings, $field_settings[$name]['widget_settings'])
         + $field_settings[$name]['widget_settings'];
-      $field_settings[$name]['widget_settings']['settings'] = array_intersect_key($settings, $field_settings[$name]['widget_settings']['settings'])
+      $field_settings[$name]['widget_settings']['settings'] = array_intersect_key($settings['widget_settings'], $field_settings[$name]['widget_settings']['settings'])
+        + array_intersect_key($settings, $field_settings[$name]['widget_settings']['settings'])
         + $field_settings[$name]['widget_settings']['settings'];
 
       // Display prefix/suffix.

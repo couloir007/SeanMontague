@@ -1,0 +1,18 @@
+{
+  "name": "drupal/mermaid_diagram_field",
+  "type": "drupal-module",
+  "description": "Provides a Mermaid diagram field capable of rendering Mermaid diagrams.",
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://www.drupal.org/project/mermaid_diagram_field",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "http://drupal.org/project/issues/mermaid_diagram_field",
+    "source": "http://cgit.drupalcode.org/mermaid_diagram_field"
+  },
+  "repositories": {
+    "drupal": {
+      "type": "composer",
+      "url": "https://packages.drupal.org/8"
+    }
+  }
+}

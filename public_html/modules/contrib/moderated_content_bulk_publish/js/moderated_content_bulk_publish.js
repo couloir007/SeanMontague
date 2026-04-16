@@ -3,12 +3,11 @@
     attach: function (context, settings) {
       if (context == document) {
         if ($('body').hasClass('user-logged-in') && typeof settings.moderated_content_bulk_publish !== 'undefined') {
+          // In the admin/content listing, add a confirmation dialog to all bulk operations.
           if (settings.moderated_content_bulk_publish.enable_dialog_admin_content) {
-            // In the admin/content listing, add a confirmation dialog to all bulk operations.
-            //using id contains selector id*= because id sometimes has a --2 atatched to end (edit-node-bulk-form--2)
+            // Using id contains selector id*= because id sometimes has a --2 attached.
             $('.view-content div[id*="edit-node-bulk-form"] .js-form-submit, .view-content form[id*="views-form-moderated-content-moderated-content"] input#edit-submit').bind('click.moderated_content_bulk_publish',function(e) {
               // For automated testing purposes you can unbind this click event as follows:
-              // jQuery('*').unbind('click.moderated_content_bulk_publish'); // Disables confirm dialog.
               var titles = [];
               $('.views-table tbody .form-checkbox:checked').each(function() {
                 titles.push($(this).closest('tr').find('.views-field-title a').text());
@@ -22,7 +21,7 @@
               if (cnt > 1) {
                 prompt += "<br/><br/>+ " + (cnt-1) + ' more';
               }
-              // build a Drupal modal dialog window
+              // Build a Drupal modal dialog window.
               var content  = '<div><p id="version-confirm-form-text">' + prompt + '</p></div>';
               var modalwindowtitle = action + "?";
               confirmationDialog = Drupal.dialog(content, {
@@ -193,6 +192,8 @@
                     confirmationDialog_publish.close();
                     $(event.target).parent().parent().find('.ui-widget-overlay').remove();
                     $(event.target).remove();
+                    // Clear the dialog open flag so the modal can be reopened.
+                    window.mcbpDialogOpen = false;
                   }
                 });
 

@@ -122,6 +122,34 @@ class TrashPathAliasTest extends TrashKernelTestBase {
   }
 
   /**
+   * Tests restoring a node when its path alias conflicts with an existing one.
+   */
+  public function testNodeRestoreWithConflictingPathAlias(): void {
+    [$node1, $path_alias1] = $this->createNodeWithPathAlias([], '/test');
+    $node1_id = $node1->id();
+    $alias1_id = $path_alias1->id();
+
+    // Trash the first node (also trashes its path alias).
+    $node1->delete();
+
+    // Create a second node with the same alias.
+    $this->createNodeWithPathAlias([], '/test');
+
+    // Attempt to restore the first node.
+    try {
+      $this->nodeStorage->restoreFromTrash([$node1]);
+      $this->fail('Expected exception was not thrown.');
+    }
+    catch (\Exception $e) {
+      $this->assertStringContainsString('Cannot restore path alias', $e->getMessage());
+    }
+
+    // The node should not be restored if the path alias could not be restored.
+    $this->assertEmpty(Node::load($node1_id));
+    $this->assertEmpty(PathAlias::load($alias1_id));
+  }
+
+  /**
    * Tests handling of multiple path aliases for a single node.
    */
   public function testMultiplePathAliasesHandled(): void {
@@ -194,44 +222,43 @@ class TrashPathAliasTest extends TrashKernelTestBase {
    * Tests that only aliases matching the entity's path are restored.
    */
   public function testPathFilteringOnRestore(): void {
-    $node1 = $this->createNode(['type' => 'article', 'title' => 'Node 1']);
-    $node2 = $this->createNode(['type' => 'article', 'title' => 'Node 2']);
+    $nodes = $aliases = [];
+    // Create ten nodes so that we can test that restoring the alias for
+    // /node/1 does not restore the alias for /node/10.
+    for ($i = 1; $i <= 10; $i++) {
+      $nodes[$i] = $this->createNode(['type' => 'article', 'title' => 'Node ' . $i]);
+      $aliases[$i] = PathAlias::create([
+        'path' => '/' . $nodes[$i]->toUrl()->getInternalPath(),
+        'alias' => '/filtered-alias-' . $i,
+        'langcode' => 'en',
+      ]);
+      $aliases[$i]->save();
+    }
 
-    // Create aliases for both nodes.
-    $alias1 = PathAlias::create([
-      'path' => '/node/' . $node1->id(),
-      'alias' => '/filtered-alias-1',
-      'langcode' => 'en',
-    ]);
-    $alias1->save();
+    $node1 = $nodes[1];
+    $node10 = $nodes[10];
+    $alias1 = $aliases[1];
+    $alias10 = $aliases[10];
 
-    $alias2 = PathAlias::create([
-      'path' => '/node/' . $node2->id(),
-      'alias' => '/filtered-alias-2',
-      'langcode' => 'en',
-    ]);
-    $alias2->save();
-
-    // Delete both nodes to get the same deletion timestamp.
-    $node1->delete();
-    $node2->delete();
+    // Delete all nodes to get the same deletion timestamp.
+    $this->entityTypeManager->getStorage('node')->delete($nodes);
 
     // Verify both nodes and aliases are deleted.
-    $this->assertNull(Node::load($node1->id()));
-    $this->assertNull(Node::load($node2->id()));
-    $this->assertNull(PathAlias::load($alias1->id()));
-    $this->assertNull(PathAlias::load($alias2->id()));
+    $this->assertEmpty(Node::load($node1->id()));
+    $this->assertEmpty(Node::load($node10->id()));
+    $this->assertEmpty(PathAlias::load($alias1->id()));
+    $this->assertEmpty(PathAlias::load($alias10->id()));
 
     // Restore only node1.
     $this->nodeStorage->restoreFromTrash([$node1]);
 
     // Verify that only node1 and its alias are restored.
-    $this->assertNotNull(Node::load($node1->id()));
-    $this->assertNotNull(PathAlias::load($alias1->id()));
+    $this->assertNotEmpty(Node::load($node1->id()));
+    $this->assertNotEmpty(PathAlias::load($alias1->id()));
 
     // Node2 and its alias should still be deleted.
-    $this->assertNull(Node::load($node2->id()));
-    $this->assertNull(PathAlias::load($alias2->id()));
+    $this->assertEmpty(Node::load($node10->id()));
+    $this->assertEmpty(PathAlias::load($alias10->id()));
   }
 
 }

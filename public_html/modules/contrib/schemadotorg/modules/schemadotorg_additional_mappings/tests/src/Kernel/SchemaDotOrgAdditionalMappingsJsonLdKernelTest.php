@@ -35,7 +35,10 @@ class SchemaDotOrgAdditionalMappingsJsonLdKernelTest extends SchemaDotOrgJsonLdK
     $this->installSchema('file', ['file_usage']);
     $this->installEntitySchema('file');
 
-    $this->installConfig(['schemadotorg_additional_mappings', 'schemadotorg_jsonld_custom']);
+    $this->installConfig([
+      'schemadotorg_additional_mappings',
+      'schemadotorg_jsonld_custom',
+    ]);
     $this->manager = $this->container->get('schemadotorg_jsonld.manager');
     $this->builder = $this->container->get('schemadotorg_jsonld.builder');
 
@@ -44,12 +47,16 @@ class SchemaDotOrgAdditionalMappingsJsonLdKernelTest extends SchemaDotOrgJsonLdK
   }
 
   /**
-   * Test Schema.org WebPage.
+   * Test Schema.org WebPage JSON-LD support.
    */
-  public function testJsonLd(): void {
+  public function testWebPageJsonLd(): void {
     \Drupal::currentUser()->setAccount($this->createUser(['access content']));
 
-    $this->appendSchemaTypeDefaultProperties('WebPage', ['isPartOf', '!dateCreated', '!dateModified']);
+    $this->appendSchemaTypeDefaultProperties('WebPage', [
+      'isPartOf',
+      '!dateCreated',
+      '!dateModified',
+    ]);
     $this->config('schemadotorg.settings')
       ->set('schema_properties.default_fields.isPartOf.type', 'field_ui:entity_reference:node')
       ->save();
@@ -96,7 +103,10 @@ class SchemaDotOrgAdditionalMappingsJsonLdKernelTest extends SchemaDotOrgJsonLdK
     $route_match = $this->manager->getEntityRouteMatch($study_node);
     $jsonld = $this->builder->build($route_match);
     $this->assertEquals('MedicalWebPage', $jsonld['@type']);
-    $this->assertEquals(['MedicalStudy', 'ResearchProject'], $jsonld['mainEntity']['@type']);
+    $this->assertEquals([
+      'MedicalStudy',
+      'ResearchProject',
+    ], $jsonld['mainEntity']['@type']);
 
     /* ********************************************************************** */
     // PronounceableText.
@@ -166,7 +176,10 @@ class SchemaDotOrgAdditionalMappingsJsonLdKernelTest extends SchemaDotOrgJsonLdK
     $this->createSchemaEntity('node', 'WebPage');
 
     // Create an organization node.
-    $organization_node = Node::create(['type' => 'organization', 'title' => 'Organization']);
+    $organization_node = Node::create([
+      'type' => 'organization',
+      'title' => 'Organization',
+    ]);
     $organization_node->save();
 
     // Create a page node that has organization is part of.
@@ -190,6 +203,76 @@ class SchemaDotOrgAdditionalMappingsJsonLdKernelTest extends SchemaDotOrgJsonLdK
         '@type' => 'WebPage',
         'name' => 'Organization',
         '@url' => $organization_node->toUrl()->setAbsolute()->toString(),
+      ],
+    ];
+    $this->assertEquals($expected_jsonld, $jsonld);
+  }
+
+  /**
+   * Test Schema.org Role JSON-LD support.
+   */
+  public function testRoleJsonLd(): void {
+    \Drupal::currentUser()->setAccount($this->createUser(['access content']));
+
+    $this->appendSchemaTypeDefaultProperties('Event', ['actor']);
+    $this->createSchemaEntity('paragraph', 'Person');
+    $this->createSchemaEntity('node', 'Event');
+
+    $person_paragraph = Paragraph::create([
+      'type' => 'person',
+      'schema_given_name' => 'John',
+      'schema_family_name' => 'Smith',
+      'schema_role_name' => 'Juggler',
+    ]);
+    $event_node = Node::create([
+      'type' => 'event',
+      'title' => 'Some event',
+      'schema_actor' => [$person_paragraph],
+    ]);
+    $event_node->save();
+
+    // Check that the actor Role is included in the JSON-LD.
+    $jsonld = $this->builder->buildEntity($event_node);
+    $expected_jsonld = [
+      '@type' => 'Event',
+      '@url' => $event_node->toUrl()->setAbsolute()->toString(),
+      'inLanguage' => 'en',
+      'name' => 'Some event',
+      'actor' => [
+        [
+          '@type' => 'Role',
+          'roleName' => 'Juggler',
+          'actor' => [
+            '@type' => 'Person',
+            'givenName' => 'John',
+            'familyName' => 'Smith',
+          ],
+        ],
+      ],
+    ];
+    $this->assertEquals($expected_jsonld, $jsonld);
+
+    // Check that the Role does not appear if the role name is empty.
+    $person_paragraph = Paragraph::create([
+      'type' => 'person',
+      'schema_given_name' => 'John',
+      'schema_family_name' => 'Smith',
+    ]);
+    $event_node->set('schema_actor', $person_paragraph);
+    $event_node->save();
+
+    $jsonld = $this->builder->buildEntity($event_node);
+    $expected_jsonld = [
+      '@type' => 'Event',
+      '@url' => $event_node->toUrl()->setAbsolute()->toString(),
+      'inLanguage' => 'en',
+      'name' => 'Some event',
+      'actor' => [
+        [
+          '@type' => 'Person',
+          'givenName' => 'John',
+          'familyName' => 'Smith',
+        ],
       ],
     ];
     $this->assertEquals($expected_jsonld, $jsonld);

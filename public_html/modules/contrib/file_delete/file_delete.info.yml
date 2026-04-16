@@ -6,7 +6,7 @@ package: 'Administration'
 dependencies:
   - drupal:file
 
-# Information added by Drupal.org packaging script on 2025-01-03
-version: '3.0.0'
+# Information added by Drupal.org packaging script on 2026-01-28
+version: '3.0.2'
 project: 'file_delete'
-datestamp: 1735917791
+datestamp: 1769620253

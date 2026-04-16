@@ -1,0 +1,5 @@
+langcode: en
+custom_descriptions:
+  Event: 'This is a custom description for Event.'
+  eventSchedule: 'This is a custom description for Event.'
+help_descriptions: true

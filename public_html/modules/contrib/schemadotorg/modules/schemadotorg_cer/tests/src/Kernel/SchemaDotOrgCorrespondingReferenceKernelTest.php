@@ -41,7 +41,6 @@ class SchemaDotOrgCorrespondingReferenceKernelTest extends SchemaDotOrgEntityKer
   protected function setUp(): void {
     parent::setUp();
 
-    $this->installEntitySchema('node');
     $this->installConfig(self::$modules);
 
     \Drupal::moduleHandler()->loadInclude('schemadotorg_cer', 'install');

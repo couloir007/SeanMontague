@@ -6,5 +6,5 @@ dependencies:
 id: mark_file_for_deletion
 label: 'Mark file for deletion'
 type: file
-plugin: mark_file_for_deletion
+plugin: file_delete_mark_temporary
 configuration: {  }

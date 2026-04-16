@@ -60,9 +60,11 @@
 
           // @see https://github.com/ariutta/svg-pan-zoom
           if (window.svgPanZoom) {
-            svgPanZoom('.mermaid svg, .language-mermaid svg', {
-              controlIconsEnabled: true,
-            });
+            document
+              .querySelectorAll('.mermaid svg, .language-mermaid svg')
+              .forEach(function svgPanZoom(svg) {
+                svgPanZoom(svg, { controlIconsEnabled: true });
+              });
           }
         },
       });

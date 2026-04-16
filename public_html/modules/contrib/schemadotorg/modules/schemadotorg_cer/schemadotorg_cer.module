@@ -8,8 +8,20 @@
 declare(strict_types=1);
 
 use Drupal\cer\Form\CorrespondingReferenceForm;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
+
+/**
+ * Implements hook_entity_type_alter().
+ *
+ * @see https://www.drupal.org/project/drupal/issues/2924796
+ * @see \Drupal\cer\Entity\CorrespondingReference::synchronizeCorrespondingField;
+ */
+function schemadotorg_cer_entity_type_alter(array &$entity_types): void {
+  $entity_types['corresponding_reference']->setClass('\Drupal\schemadotorg_cer\Entity\SchemaDotOrgCorrespondingReference');
+}
 
 /**
  * Implements hook_schemadotorg_mapping_defaults_alter().
@@ -58,7 +70,23 @@ function schemadotorg_cer_form_alter(array &$form, FormStateInterface $form_stat
 
   /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager */
   $field_manager = \Drupal::service('entity_field.manager');
-  $entity_reference_fields = $field_manager->getFieldMapByFieldType('entity_reference');
+  $entity_reference_fields = array_merge(
+    $field_manager->getFieldMapByFieldType('entity_reference'),
+    $field_manager->getFieldMapByFieldType('entity_reference_override')
+  );
+
+  // Add custom fields with a target_id of entity_reference to the list.
+  $custom_fields = $field_manager->getFieldMapByFieldType('custom');
+  foreach ($custom_fields as $entity_type_id => $fields) {
+    foreach ($fields as $field_name => $field) {
+      $field_config = FieldStorageConfig::load("$entity_type_id.$field_name");
+      $settings = $field_config->getSettings();
+      if (NestedArray::getValue($settings, ['columns', 'target_id', 'type']) === 'entity_reference'
+        && NestedArray::getValue($settings, ['columns', 'target_id', 'target_type']) === 'node') {
+        $entity_reference_fields[$entity_type_id][$field_name] = $field;
+      }
+    }
+  }
 
   /* ************************************************************************ */
   // Add schema_* fields to first and second field options.

@@ -121,7 +121,9 @@ class AdminHelper {
     if (count($latestRevisionResult)) {
       $node_revision_id = key($latestRevisionResult);
       $vid = $node_revision_id;
-      $latestRevision = \Drupal::entityTypeManager()->getStorage($entity_type)->loadRevision($node_revision_id);
+      /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+      $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
+      $latestRevision = $storage->loadRevision($node_revision_id);
       if ($latestRevision->hasTranslation($lang) && $latestRevision->language()->getId() != $lang) {
         $latestRevision = $latestRevision->getTranslation($lang);
       }

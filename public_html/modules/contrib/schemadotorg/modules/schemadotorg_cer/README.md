@@ -26,6 +26,8 @@ Features
 - Alters the CorrespondingReferenceForm to exposes 'schema_*' fields to 
   corresponding entity reference entities.  
   @see  [Issue #2998138 Could support Remove field name prefix module?](https://www.drupal.org/project/cer/issues/2998138)
+- Override the 'corresponding_reference' entity to support custom fields that
+  use target_id entity references.
 
 
 Requirements

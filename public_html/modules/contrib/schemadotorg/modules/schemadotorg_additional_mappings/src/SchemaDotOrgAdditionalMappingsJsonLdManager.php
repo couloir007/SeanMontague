@@ -160,9 +160,10 @@ class SchemaDotOrgAdditionalMappingsJsonLdManager implements SchemaDotOrgAdditio
     $target_schema_types = (array) $value['@type'];
     if ($target_additional_mappings) {
       $target_schema_types = array_merge($target_schema_types, array_keys($target_additional_mappings));
+      $target_schema_types = array_unique($target_schema_types);
     }
 
-    // Remove target Schema.org types are not subtype of
+    // Remove target Schema.org types that are not subtype of
     // the Schema.org property's range includes.
     $source_range_includes = $this->schemaTypeManager->getPropertyRangeIncludes($source_schema_property);
     foreach ($target_schema_types as $index => $target_schema_type) {
@@ -175,8 +176,9 @@ class SchemaDotOrgAdditionalMappingsJsonLdManager implements SchemaDotOrgAdditio
     // Update the @type to include the updated target Schema.org types.
     switch (count($target_schema_types)) {
       case 0:
+        // If no target Schema.org type is found, set value to NULL and return.
         $value = NULL;
-        break;
+        return;
 
       case 1:
         $value['@type'] = reset($target_schema_types);
@@ -185,6 +187,37 @@ class SchemaDotOrgAdditionalMappingsJsonLdManager implements SchemaDotOrgAdditio
       default:
         $value['@type'] = $target_schema_types;
         break;
+    }
+
+    // Capture the Role JSON-LD which is added at the very end.
+    $role_jsonld = [];
+    if (isset($target_additional_mappings['Role'])) {
+      $role_jsonld = ['@type' => 'Role'];
+      $role_mapping = $target_additional_mappings['Role'];
+      foreach ($role_mapping['schema_properties'] as $schema_property) {
+        if (isset($value[$schema_property])) {
+          $role_jsonld[$schema_property] = $value[$schema_property];
+        }
+      }
+    }
+
+    // Remove invalid properties that include https://schema.org/roleName.
+    $allowed_properties = [
+      '@type' => '@type',
+      '@url' => '@url',
+    ];
+    $types = (array) $value['@type'];
+    foreach ($types as $type) {
+      $type_properties = array_keys($this->schemaTypeManager->getTypeProperties($type));
+      $allowed_properties += array_combine($type_properties, $type_properties);
+    }
+    $value = array_intersect_key($value, $allowed_properties);
+
+    // Add the Role JSON-LD.
+    if (count($role_jsonld) > 1) {
+      $value = $role_jsonld + [
+        $source_schema_property => $value,
+      ];
     }
   }
 

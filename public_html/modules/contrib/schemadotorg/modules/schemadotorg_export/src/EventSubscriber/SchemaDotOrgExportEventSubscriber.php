@@ -57,7 +57,7 @@ class SchemaDotOrgExportEventSubscriber extends ServiceProviderBase implements E
     }
 
     $route_name = $this->routeMatch->getRouteName();
-    if (!str_contains($route_name, 'schemadotorg')) {
+    if (empty($route_name) || !str_contains($route_name, 'schemadotorg')) {
       return;
     }
 

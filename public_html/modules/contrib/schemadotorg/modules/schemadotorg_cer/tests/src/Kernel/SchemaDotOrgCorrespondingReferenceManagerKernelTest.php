@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\schemadotorg_cer\Kernel;
 
-use Drupal\cer\Entity\CorrespondingReference;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\schemadotorg\SchemaDotOrgMappingManagerInterface;
+use Drupal\schemadotorg_cer\Entity\SchemaDotOrgCorrespondingReference;
 use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 
 /**
@@ -69,7 +69,7 @@ class SchemaDotOrgCorrespondingReferenceManagerKernelTest extends SchemaDotOrgEn
     // Create node:Person.
     $this->createSchemaEntity('node', 'Person');
 
-    $this->assertCount(0, CorrespondingReference::loadMultiple());
+    $this->assertCount(0, SchemaDotOrgCorrespondingReference::loadMultiple());
 
     $mapping_defaults = $this->mappingManager->getMappingDefaults(
       entity_type_id: 'node',
@@ -84,10 +84,10 @@ class SchemaDotOrgCorrespondingReferenceManagerKernelTest extends SchemaDotOrgEn
 
     // Check adding corresponding entity references when a mapping is
     // inserted or updated.
-    $this->assertCount(4, CorrespondingReference::loadMultiple());
+    $this->assertCount(4, SchemaDotOrgCorrespondingReference::loadMultiple());
 
     /** @var \Drupal\cer\Entity\CorrespondingReferenceInterface $corresponding_reference */
-    $corresponding_reference = CorrespondingReference::load('schema_subject_of');
+    $corresponding_reference = SchemaDotOrgCorrespondingReference::load('schema_subject_of');
     $this->assertEquals('Schema.org: Subject of ↔ About', $corresponding_reference->label());
     $this->assertTrue($corresponding_reference->isEnabled());
     $this->assertEquals('schema_subject_of', $corresponding_reference->getFirstField());

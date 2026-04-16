@@ -135,6 +135,18 @@ class SchemaDotOrgJsonLdManagerKernelTest extends SchemaDotOrgJsonLdKernelTestBa
     $actual_value = $this->manager->getSchemaPropertyValue($place_node->created->get(0));
     $this->assertEquals(1, preg_match('/^\d\d\d\d-\d\d-\d\d/', $actual_value));
 
+    // Check that a simple data type is returned as a value.
+    $this->assertEquals(
+      'some value',
+      $this->manager->getSchemaPropertyValueDefaultSchemaType('Event', 'name', 'some value')
+    );
+
+    // Check that an enumeration is returned as a value,.
+    $this->assertEquals(
+      'https://schema.org/MixedEventAttendanceMode',
+      $this->manager->getSchemaPropertyValueDefaultSchemaType('Event', 'eventAttendanceMode', 'MixedEventAttendanceMode')
+    );
+
     // Check getting a Schema.org property's value converted to
     // the default Schema.org type.
     $this->assertEquals(

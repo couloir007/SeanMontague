@@ -1,0 +1,13 @@
+field.formatter.settings.mermaid_diagram_formatter:
+  type: mapping
+  label: 'Mermaid diagram field settings'
+  mapping:
+    display_in_modal:
+      type: boolean
+      label: 'Display in modal'
+    modal_link_text:
+      type: string
+      label: 'Modal link text'
+    extra_settings:
+      type: string
+      label: 'Extra settings'

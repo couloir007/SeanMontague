@@ -65,11 +65,19 @@
 
       // eslint-disable-next-line
       once('schemadotorg-details-toggle', 'body form', context).forEach(() => {
+        // Make sure there are at least two details widgets on the page.
+        if (
+          document.querySelectorAll('details:not(.field-group-tab)').length < 2
+        ) {
+          return;
+        }
+
         // Region can either be the Mercury Editor node form (.me-node-form),
         // Content Model Documentation (.field--name-schema-cm-documentation)
         // or the help region (.region-help).
         const region =
           document.querySelector('.me-node-form') ||
+          document.querySelector('.me-form.node-form') ||
           document.querySelector('.field--name-schema-cm-documentation') ||
           document.querySelector('.region-help');
 
@@ -78,13 +86,20 @@
           return;
         }
 
+        const isMercuryEditor = !!document.querySelector('.me-form');
+
         // Build the toggle details button.
         const button = document.createElement('button');
         button.setAttribute('type', 'button');
         // eslint-disable-next-line
         button.setAttribute('class', 'schemadotorg-details-toggle button button-small button--extrasmall');
-        // eslint-disable-next-line
-        button.setAttribute('style', 'float: right; margin: 0; min-width: 7rem');
+        if (isMercuryEditor) {
+          // eslint-disable-next-line
+          button.setAttribute('style', 'margin: 1rem ; min-width: 7rem');
+        } else {
+          // eslint-disable-next-line
+          button.setAttribute('style', 'float: right; margin: 0; min-width: 7rem');
+        }
         // eslint-disable-next-line
         button.setAttribute('title', Drupal.t('Toggle details widget state.'));
 

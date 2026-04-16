@@ -25,7 +25,7 @@ content:
     settings:
       trim_length: 600
     third_party_settings: {  }
-    weight: 17
+    weight: 18
     region: content
   links:
     settings: {  }

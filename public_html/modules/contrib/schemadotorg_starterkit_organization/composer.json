@@ -16,7 +16,7 @@
         "drupal/auto_entitylabel": "^3.0",
         "drupal/cer": "^5.0",
         "drupal/config_rewrite": "^1.0",
-        "drupal/custom_field": "^3.0",
+        "drupal/custom_field": "^3.0 || ^4.0",
         "drupal/entity_reference_override": "^2.0",
         "drupal/epp": "^1.0",
         "drupal/pathauto": "^1.0",

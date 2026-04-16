@@ -1,5 +1,13 @@
 # Changelog
 
+### 3.2.1 2026-03-28
+
+* Allow Symfony 8 and add Symfony version matrix to CI (#73)
+
+### 3.2.0 2025-11-14
+
+* PHP 8.5
+
 ### 3.1.1 2025-07-07
 
 * Support symfony/event-dispatcher v6 (#69)

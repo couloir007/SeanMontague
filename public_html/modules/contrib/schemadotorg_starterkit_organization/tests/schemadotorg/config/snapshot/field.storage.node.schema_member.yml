@@ -2,15 +2,23 @@ langcode: en
 status: true
 dependencies:
   module:
-    - entity_reference_override
+    - custom_field
     - node
 id: node.schema_member
 field_name: schema_member
 entity_type: node
-type: entity_reference_override
+type: custom
 settings:
-  target_type: node
-module: entity_reference_override
+  columns:
+    target_id:
+      name: target_id
+      type: entity_reference
+      target_type: node
+    role_name:
+      name: role_name
+      type: string
+      length: 255
+module: custom_field
 locked: false
 cardinality: -1
 translatable: true

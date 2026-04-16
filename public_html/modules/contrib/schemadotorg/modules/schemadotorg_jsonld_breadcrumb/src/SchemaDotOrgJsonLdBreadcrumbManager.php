@@ -112,12 +112,14 @@ class SchemaDotOrgJsonLdBreadcrumbManager implements SchemaDotOrgJsonLdBreadcrum
     // Move the breadcrumb's JSON-LD to the first https://schema.org/WebPage
     // that supports the https://schema.org/breacrumb property.
     foreach ($data as &$jsonld) {
-      $schema_type = $jsonld['@type'] ?? NULL;
-      if ($schema_type
-        && $this->schemaTypeManager->hasProperty($schema_type, 'breadcrumb')) {
-        $jsonld['breadcrumb'] = $data['schemadotorg_jsonld_breadcrumb_schemadotorg_jsonld'];
-        unset($data['schemadotorg_jsonld_breadcrumb_schemadotorg_jsonld']);
-        return;
+      $schema_types = (array) ($jsonld['@type'] ?? []);
+      foreach ($schema_types as $schema_type) {
+        if ($schema_type
+          && $this->schemaTypeManager->hasProperty($schema_type, 'breadcrumb')) {
+          $jsonld['breadcrumb'] = $data['schemadotorg_jsonld_breadcrumb_schemadotorg_jsonld'];
+          unset($data['schemadotorg_jsonld_breadcrumb_schemadotorg_jsonld']);
+          return;
+        }
       }
     }
   }
