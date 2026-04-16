@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>First Ride at Kingdom Trails — Sean Montague</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #f7f6f2;
+  --surface:  #ffffff;
+  --surface2: #f0ede6;
+  --border:   #e0dbd1;
+  --muted:    #736e62;
+  --text:     #2c2a25;
+  --bright:   #161410;
+  --forest:   #3a5a40;
+  --trail:    #7a3410;
+  --sky:      #4a7c9e;
+  --amber:    #a05a00;
+  --amber-bg: #fff3e0;
+  --amber-border: #f0d090;
+  --mono:     'DM Mono', monospace;
+  --serif:    'Cormorant Garamond', serif;
+  --display:  'Bebas Neue', sans-serif;
+  --content-width: 720px;
+  --wide-width: 1100px;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+
+/* ── READING PROGRESS ── */
+#reading-progress {
+  position: fixed; top: 0; left: 0; z-index: 300;
+  height: 2px; width: 0%; background: var(--forest);
+  transition: width 0.1s linear;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 48px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em;
+  color: var(--bright); text-decoration: none;
+}
+.nav-logo span { color: var(--forest); }
+.nav-back {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--muted); text-decoration: none;
+  display: flex; align-items: center; gap: 8px;
+  transition: color 0.2s;
+}
+.nav-back:hover { color: var(--bright); }
+.nav-back::before { content: '←'; }
+
+/* ── ARTICLE HEADER ── */
+.article-header {
+  padding: 120px 48px 0;
+  max-width: var(--wide-width);
+  margin: 0 auto;
+}
+.article-meta-top {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 24px;
+}
+.article-category {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.25em;
+  text-transform: uppercase; color: var(--forest);
+  border: 1px solid rgba(58,90,64,0.3);
+  padding: 4px 10px; background: rgba(58,90,64,0.06);
+}
+.article-date {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.15em; color: var(--muted);
+}
+/* Difficulty badge now uses proper design-system token */
+.article-difficulty {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em;
+  text-transform: uppercase; padding: 4px 10px;
+  background: var(--amber-bg); color: var(--amber);
+  border: 1px solid var(--amber-border);
+}
+
+.article-title {
+  font-family: var(--display);
+  font-size: clamp(40px, 6vw, 80px);
+  line-height: 0.95; letter-spacing: 0.02em;
+  color: var(--bright); margin-bottom: 24px;
+}
+
+.article-subtitle {
+  font-family: var(--serif); font-size: 22px;
+  font-weight: 300; font-style: italic;
+  color: var(--muted); line-height: 1.5;
+  max-width: var(--content-width);
+  margin-bottom: 40px;
+}
+
+/* ── STATS BAR — all values consistent via Bebas Neue ── */
+.stats-bar {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  margin-bottom: 0;
+}
+.stat-item {
+  padding: 20px 24px;
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.stat-item:last-child { border-right: none; }
+.stat-label {
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted);
+}
+.stat-value {
+  font-family: var(--display); font-size: 28px;
+  color: var(--bright); line-height: 1;
+}
+/* Consistent sizing for text-based stats — still Bebas, just slightly smaller */
+.stat-value-text {
+  font-family: var(--display); font-size: 22px;
+  color: var(--bright); line-height: 1; padding-top: 3px;
+}
+.stat-unit {
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: 0.1em; color: var(--muted);
+}
+
+/* ── MAP (full width) ── */
+#article-map {
+  width: 100%; height: 480px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── ARTICLE BODY ── */
+.article-body-wrap {
+  max-width: var(--wide-width);
+  margin: 0 auto;
+  padding: 64px 48px;
+  display: grid;
+  grid-template-columns: var(--content-width) 1fr;
+  gap: 64px;
+  align-items: start;
+}
+
+.article-body { min-width: 0; }
+
+/* ── DROP CAP on first paragraph ── */
+.article-body > h2:first-child + p::first-letter,
+.drop-cap::first-letter {
+  font-family: var(--display);
+  font-size: 4.2em;
+  line-height: 0.78;
+  float: left;
+  margin-right: 8px;
+  margin-top: 6px;
+  color: var(--bright);
+}
+
+.article-body p {
+  margin-bottom: 28px;
+  font-size: 19px; line-height: 1.8;
+  color: var(--text); font-weight: 300;
+}
+.article-body p:last-child { margin-bottom: 0; }
+
+.article-body h2 {
+  font-family: var(--serif); font-weight: 400;
+  font-size: 32px; color: var(--bright);
+  line-height: 1.2; margin: 48px 0 20px;
+  padding-top: 48px; border-top: 1px solid var(--border);
+}
+.article-body h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+.article-body h3 {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--forest); margin: 32px 0 12px;
+}
+
+.article-body ul {
+  list-style: none; margin-bottom: 28px;
+}
+.article-body ul li {
+  font-size: 17px; line-height: 1.75;
+  color: var(--muted); font-weight: 300;
+  padding: 6px 0 6px 20px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.article-body ul li::before {
+  content: '—'; color: var(--forest);
+  position: absolute; left: 0;
+}
+
+/* Refined blockquote with background tint */
+.article-body blockquote {
+  border-left: 3px solid var(--forest);
+  padding: 16px 24px;
+  margin: 32px 0;
+  background: rgba(58,90,64,0.04);
+}
+.article-body blockquote p {
+  font-size: 22px; font-style: italic;
+  color: var(--bright); font-weight: 300;
+  margin-bottom: 10px;
+}
+.article-body blockquote cite {
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
+}
+
+/* ── SIDEBAR ── */
+.article-sidebar { position: sticky; top: 80px; }
+
+.sidebar-card {
+  background: var(--surface); border: 1px solid var(--border);
+  margin-bottom: 16px; overflow: hidden;
+  transition: background 0.2s, border-left-width 0.2s, border-left-color 0.2s;
+}
+.sidebar-card:hover { background: var(--bg); border-left: 3px solid var(--forest); }
+
+.sidebar-card-header {
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted);
+  background: var(--surface2);
+}
+.sidebar-card-body { padding: 18px; }
+
+.trail-list { list-style: none; }
+.trail-list li {
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: baseline;
+}
+.trail-list li:last-child { border-bottom: none; padding-bottom: 0; }
+.trail-name { font-family: var(--serif); font-size: 16px; color: var(--bright); }
+.trail-rating {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em;
+  text-transform: uppercase; padding: 2px 7px;
+}
+.rating-blue  { background: #ddeeff; color: #336699; border: 1px solid #bbddff; }
+.rating-black { background: #222; color: #fff; }
+.rating-green { background: #e6f2e8; color: var(--forest); border: 1px solid #c8ddc8; }
+
+.conditions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.condition-label {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 2px;
+}
+.condition-value { font-family: var(--serif); font-size: 17px; color: var(--bright); }
+
+.sidebar-links { list-style: none; }
+.sidebar-links li a {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+  text-decoration: none; color: var(--muted); transition: color 0.2s;
+}
+.sidebar-links li:last-child a { border-bottom: none; }
+.sidebar-links li a:hover { color: var(--bright); }
+.sidebar-links li a::after { content: '→'; color: var(--muted); }
+
+/* ── PHOTO PLACEHOLDER ── */
+.article-image {
+  width: 100%; background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  margin: 32px 0; color: var(--muted);
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em;
+  gap: 8px;
+}
+.article-image.tall   { height: 360px; }
+.article-image.medium { height: 260px; }
+.article-image-caption {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em;
+  color: var(--muted); margin-top: -20px; margin-bottom: 32px;
+  padding-left: 2px;
+}
+
+/* ── NEXT/PREV ── */
+.article-nav {
+  border-top: 1px solid var(--border);
+  display: grid; grid-template-columns: 1fr 1fr;
+}
+.article-nav-item {
+  padding: 32px 48px; text-decoration: none; color: inherit;
+  transition: background 0.2s, border-color 0.2s;
+  display: flex; flex-direction: column; gap: 8px;
+  border-left: 3px solid transparent;
+}
+.article-nav-item:first-child {
+  border-right: 1px solid var(--border);
+}
+.article-nav-item:last-child {
+  text-align: right;
+  border-right: 3px solid transparent;
+  border-left: none;
+}
+.article-nav-item:hover { background: var(--surface); }
+.article-nav-item:first-child:hover { border-left-color: var(--forest); }
+.article-nav-item:last-child:hover  { border-right-color: var(--forest); }
+.article-nav-label {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--muted);
+}
+.article-nav-title {
+  font-family: var(--serif); font-size: 20px;
+  color: var(--bright); line-height: 1.2;
+}
+
+/* ── FOOTER ── */
+footer {
+  background: var(--bright);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 24px 48px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.footer-brand { font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,0.3); }
+.footer-copy  { font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.2); }
+.footer-links { display: flex; gap: 24px; list-style: none; }
+.footer-links a {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(255,255,255,0.3);
+  text-decoration: none; transition: color 0.2s;
+}
+.footer-links a:hover { color: rgba(255,255,255,0.7); }
+
+/* ── ELEVATION PROFILE ── */
+.elevation-wrap {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.elevation-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+.elevation-header-label {
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: 0.28em; text-transform: uppercase; color: var(--muted);
+}
+.elevation-header-stats { display: flex; gap: 32px; }
+.elev-stat { display: flex; align-items: baseline; gap: 5px; }
+.elev-stat-val { font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em; color: var(--bright); }
+.elev-stat-unit { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--muted); }
+#elevation-chart { display: block; width: 100%; height: 140px; cursor: crosshair; }
+.elev-tooltip {
+  position: absolute; pointer-events: none;
+  background: var(--bright); color: #fff;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+  padding: 5px 10px; white-space: nowrap;
+  opacity: 0; transition: opacity 0.15s;
+  z-index: 10;
+}
+
+/* Leaflet */
+.leaflet-control-attribution { background-color: rgba(255,255,255,0.95) !important; font-size: 9px !important; }
+.leaflet-control-attribution a { text-decoration: underline !important; }
+.leaflet-popup-content-wrapper {
+  border-radius: 0 !important; font-family: var(--mono) !important;
+  font-size: 11px !important; box-shadow: 0 2px 10px rgba(0,0,0,0.12) !important;
+}
+.leaflet-popup-tip { display: none !important; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1000px) {
+  .article-body-wrap { grid-template-columns: 1fr; gap: 40px; }
+  .article-sidebar { position: static; }
+  .stats-bar { grid-template-columns: repeat(3, 1fr); }
+  .stats-bar .stat-item:nth-child(3) { border-right: none; }
+  .stats-bar .stat-item:nth-child(4),
+  .stats-bar .stat-item:nth-child(5) { border-top: 1px solid var(--border); }
+  .stats-bar .stat-item:nth-child(5) { border-right: none; }
+}
+@media (max-width: 640px) {
+  nav { padding: 18px 24px; }
+  .article-header { padding: 100px 24px 0; }
+  .article-body-wrap { padding: 40px 24px; }
+  .stats-bar { grid-template-columns: 1fr 1fr; }
+  .article-nav { grid-template-columns: 1fr; }
+  .article-nav-item:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+  .article-nav-item:last-child { text-align: left; }
+  footer { flex-direction: column; gap: 14px; text-align: center; padding: 24px; }
+  .elevation-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .elevation-header-stats { flex-wrap: wrap; gap: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div id="reading-progress"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="seanmontague.html" class="nav-logo">Sean Montague <span>/ Burke, VT</span></a>
+  <a href="seanmontague.html#writing" class="nav-back">All Writing</a>
+</nav>
+
+<!-- ARTICLE HEADER -->
+<div class="article-header">
+  <div class="article-meta-top">
+    <span class="article-category">Kingdom Trails</span>
+    <span class="article-difficulty">Intermediate</span>
+    <span class="article-date">March 12, 2025</span>
+  </div>
+  <h1 class="article-title">First Ride at<br>Kingdom Trails</h1>
+  <p class="article-subtitle">A suggested intermediate loop with moderate climbing — what to expect, where to start, and why you'll be back before the week is out.</p>
+
+  <!-- STATS BAR — all values use Bebas Neue, consistent sizing -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-label">Distance</span>
+      <span class="stat-value">12.7</span>
+      <span class="stat-unit">miles</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Elevation</span>
+      <span class="stat-value">2,600</span>
+      <span class="stat-unit">ft gain</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Est. Time</span>
+      <span class="stat-value">2.5–3</span>
+      <span class="stat-unit">hours</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Difficulty</span>
+      <span class="stat-value-text">Intermediate</span>
+      <span class="stat-unit">blue / some black</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Season</span>
+      <span class="stat-value-text">May–Oct</span>
+      <span class="stat-unit">check conditions</span>
+    </div>
+  </div>
+</div>
+
+<!-- FULL-WIDTH MAP -->
+<div id="article-map"></div>
+
+<!-- ELEVATION PROFILE -->
+<div class="elevation-wrap">
+  <div class="elevation-header">
+    <span class="elevation-header-label">Elevation Profile</span>
+    <div class="elevation-header-stats">
+      <div class="elev-stat"><span class="elev-stat-val">2,600</span><span class="elev-stat-unit">ft gain</span></div>
+      <div class="elev-stat"><span class="elev-stat-val">2,596</span><span class="elev-stat-unit">ft loss</span></div>
+      <div class="elev-stat"><span class="elev-stat-val">811</span><span class="elev-stat-unit">ft min</span></div>
+      <div class="elev-stat"><span class="elev-stat-val">1,595</span><span class="elev-stat-unit">ft max</span></div>
+    </div>
+  </div>
+  <canvas id="elevation-chart"></canvas>
+  <div class="elev-tooltip" id="elev-tooltip"></div>
+</div>
+
+<!-- ARTICLE BODY + SIDEBAR -->
+<div class="article-body-wrap">
+
+  <article class="article-body">
+
+    <h2>Getting There</h2>
+    <p class="drop-cap">Kingdom Trails is headquartered in East Burke, Vermont — a small village about ten miles east of I-91 off Exit 23. The main trailhead and welcome center is on Route 114, hard to miss. Day passes are purchased here; the network runs on a pay-to-ride model that funds the trail maintenance, and it shows. These trails are impeccably built and cared for.</p>
+    <p>Parking fills up fast on summer weekends. Get there before 9am or be prepared to park along the road and walk in. Weekdays are a different universe.</p>
+
+    <div class="article-image tall">[ Photo: Welcome center and trailhead, East Burke ]</div>
+    <p class="article-image-caption">Welcome center · East Burke, VT</p>
+
+    <h2>The Loop</h2>
+    <p>There's no single "right" first ride at KT, but this loop threads together what I'd consider the essential character of the network — some sustained climbing on Darling Hill Road, a long rolling ridgeline, and a descent that will make you immediately want to ride it again.</p>
+
+    <h3>Starting out</h3>
+    <p>From the trailhead, pick up <strong>Sidewinder</strong> almost immediately — it's a flowing green that eases you into the trail surface and gives your legs a warmup without demanding much. From there, transition onto <strong>East Branch</strong>, which follows the river drainage and stays relatively flat. It's not flashy but it sets the rhythm.</p>
+    <p>The climbing begins in earnest once you turn onto <strong>Coronary Bypass</strong>. Don't let the name fool you — it's a steady grind up Darling Hill, and this is where intermediate fitness earns its keep. The surface is excellent, the gradient is manageable, and the canopy is thick enough to keep you cool in July.</p>
+
+    <blockquote>
+      <p>"There's a moment on the Darling Hill climb where the trees open up and you can see the whole ridge ahead of you. That's when it clicks — you understand why people come back to this place every year."</p>
+      <cite>— personal notes, first visit</cite>
+    </blockquote>
+
+    <h2>The Ridgeline</h2>
+    <p>Once on the ridge, <strong>Kitchel</strong> is the reward. A long, rolling stretch of natural surface singletrack with just enough technical variation to keep you focused. Some rooty sections, a few short punchy climbs, tight switchbacks through mature hardwoods. This is Kingdom Trails doing what it does best.</p>
+    <p>The views through the trees toward Burke Mountain come and go. In mud season they're better — bare branches, long sight lines. In full summer leaf it's close and green and fast. Both are good.</p>
+
+    <div class="article-image medium">[ Photo: Kitchel trail, looking south toward Burke Mountain ]</div>
+    <p class="article-image-caption">Kitchel · looking south</p>
+
+    <h3>The descent</h3>
+    <p>The back half of the loop runs <strong>Burnham</strong> and <strong>Sidewinder</strong> back toward the valley. Burnham is where the black diamond sections live — there are two or three spots with chunky technical features you can either roll carefully or send confidently, depending on the day. Nothing mandatory if you're not feeling it. Take your line and move on.</p>
+    <p>Sidewinder back toward the trailhead is a long, earned, flowing descent that feels like the trail is giving something back after all that climbing. It's the kind of finish that puts a grin on your face before you've even stopped pedaling.</p>
+
+    <h2>Practical Notes</h2>
+
+    <ul>
+      <li>Day passes run about $25 for adults. Worth every cent, and then some.</li>
+      <li>Rentals are available in East Burke if you don't have a bike with you.</li>
+      <li>Conditions are posted on the Kingdom Trails website and updated regularly. Don't ride in wet conditions — the trails are too good to ruin.</li>
+      <li>Carry water. The climbing adds up faster than you expect.</li>
+      <li>The Burke Mountain Hotel has a decent post-ride burger if you need one.</li>
+    </ul>
+
+    <h2>What Comes Next</h2>
+    <p>This loop is a starting point, not a destination. Once you know the network's character — the way climbs connect to ridgelines connect to descents — you'll start building your own routes. The trail map rewards exploration. Take a wrong turn and you usually end up somewhere interesting.</p>
+    <p>Come back in the fall. The foliage on Darling Hill is not subtle.</p>
+
+  </article>
+
+  <!-- SIDEBAR -->
+  <aside class="article-sidebar">
+
+    <div class="sidebar-card">
+      <div class="sidebar-card-header">Trails on This Route</div>
+      <div class="sidebar-card-body">
+        <ul class="trail-list">
+          <li><span class="trail-name">Sidewinder</span><span class="trail-rating rating-green">Green</span></li>
+          <li><span class="trail-name">East Branch</span><span class="trail-rating rating-green">Green</span></li>
+          <li><span class="trail-name">Coronary Bypass</span><span class="trail-rating rating-blue">Blue</span></li>
+          <li><span class="trail-name">Kitchel</span><span class="trail-rating rating-blue">Blue</span></li>
+          <li><span class="trail-name">Burnham</span><span class="trail-rating rating-black">Black</span></li>
+          <li><span class="trail-name">Sidewinder (return)</span><span class="trail-rating rating-green">Green</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-card-header">Conditions</div>
+      <div class="sidebar-card-body">
+        <div class="conditions-grid">
+          <div><div class="condition-label">Surface</div><div class="condition-value">Natural</div></div>
+          <div><div class="condition-label">Best in</div><div class="condition-value">Summer</div></div>
+          <div><div class="condition-label">Mud Risk</div><div class="condition-value">High Spring</div></div>
+          <div><div class="condition-label">Dogs</div><div class="condition-value">Allowed</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-card-header">Useful Links</div>
+      <div class="sidebar-card-body">
+        <ul class="sidebar-links">
+          <li><a href="https://kingdomtrails.org" target="_blank">Kingdom Trails Website</a></li>
+          <li><a href="#" target="_blank">Trail Conditions (KT)</a></li>
+          <li><a href="#" target="_blank">Burke Mountain Resort</a></li>
+          <li><a href="#" target="_blank">Full Map (this route)</a></li>
+        </ul>
+      </div>
+    </div>
+
+  </aside>
+
+</div>
+
+<!-- NEXT / PREV NAV -->
+<nav class="article-nav">
+  <a href="#" class="article-nav-item">
+    <span class="article-nav-label">Previous</span>
+    <span class="article-nav-title">Sheet Mulching on a Slope: Lessons from the NEK</span>
+  </a>
+  <a href="#" class="article-nav-item">
+    <span class="article-nav-label">Next</span>
+    <span class="article-nav-title">A Season of Skiing Burke: Notes from a Local</span>
+  </a>
+</nav>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">Sean Montague · Burke, VT</div>
+  <p class="footer-copy">© 2025 Sean Montague</p>
+  <ul class="footer-links">
+    <li><a href="#">GitHub</a></li>
+    <li><a href="#">Drupal.org</a></li>
+    <li><a href="#">LinkedIn</a></li>
+  </ul>
+</footer>
+
+<script>
+// ── Reading progress bar ──
+const progress = document.getElementById('reading-progress');
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  progress.style.width = pct + '%';
+});
+
+const routeCoords = [
+  [-71.945434,44.588812],[-71.945209,44.588583],[-71.944501,44.588152],
+  [-71.943888,44.587773],[-71.944106,44.587494],[-71.943847,44.586735],
+  [-71.943663,44.586868],[-71.943673,44.586744],[-71.943797,44.586582],
+  [-71.943679,44.586652],[-71.943671,44.586545],[-71.943643,44.58653],
+  [-71.94344,44.58665],[-71.943314,44.587045],[-71.943161,44.586972],
+  [-71.943165,44.586711],[-71.943071,44.586749],[-71.942964,44.586746],
+  [-71.942781,44.586703],[-71.942463,44.586926],[-71.942112,44.586838],
+  [-71.941699,44.586712],[-71.941257,44.586494],[-71.940448,44.586085],
+  [-71.940517,44.585832],[-71.940662,44.585436],[-71.940845,44.585315],
+  [-71.940944,44.584922],[-71.94141,44.584469],[-71.941433,44.584181],
+  [-71.941457,44.583667],[-71.941283,44.583311],[-71.941454,44.583256],
+  [-71.941397,44.583255],[-71.941662,44.583067],[-71.941871,44.582768],
+  [-71.942008,44.582111],[-71.941649,44.581865],[-71.94156,44.581669],
+  [-71.941391,44.581637],[-71.941251,44.581697],[-71.94119,44.58165],
+  [-71.941087,44.58164],[-71.940884,44.581641],[-71.940781,44.58164],
+  [-71.94073,44.581649],[-71.940704,44.581656],[-71.940736,44.581668],
+  [-71.940711,44.581712],[-71.940542,44.581781],[-71.940463,44.581841],
+  [-71.940285,44.581722],[-71.940174,44.581638],[-71.94012,44.581772],
+  [-71.939923,44.581794],[-71.939846,44.581797],[-71.939716,44.581859],
+  [-71.939412,44.581908],[-71.93917,44.581918],[-71.93909,44.581971],
+  [-71.939057,44.582051],[-71.938895,44.58214],[-71.93865,44.582299],
+  [-71.938463,44.582613],[-71.938458,44.582698],[-71.938115,44.582828],
+  [-71.938323,44.58298],[-71.938328,44.583237],[-71.938034,44.583516],
+  [-71.937673,44.583745],[-71.937534,44.584033],[-71.937399,44.58418],
+  [-71.937286,44.583938],[-71.937321,44.583548],[-71.936417,44.583187],
+  [-71.936267,44.582438],[-71.936457,44.582164],[-71.936356,44.58195],
+  [-71.936055,44.581799],[-71.935387,44.581509],[-71.934908,44.581062],
+  [-71.934322,44.580747],[-71.933466,44.580684],[-71.932067,44.580684],
+  [-71.931823,44.58017],[-71.931716,44.579761],[-71.931914,44.578712],
+  [-71.932852,44.575157],[-71.933055,44.574091],[-71.933068,44.573231],
+  [-71.933098,44.572144],[-71.932654,44.570257],[-71.932404,44.570021],
+  [-71.931923,44.570527],[-71.931295,44.571081],[-71.931177,44.571648],
+  [-71.931158,44.572433],[-71.930868,44.572652],[-71.930667,44.573086],
+  [-71.930321,44.573876],[-71.930147,44.574315],[-71.929853,44.574386],
+  [-71.92913,44.574524],[-71.928336,44.574501],[-71.927037,44.574366],
+  [-71.926816,44.573805],[-71.926747,44.573127],[-71.926202,44.57297],
+  [-71.92574,44.572426],[-71.925361,44.572178],[-71.924831,44.57214],
+  [-71.924414,44.571877],[-71.924145,44.571734],[-71.923387,44.571997],
+  [-71.922376,44.572501],[-71.922305,44.572785],[-71.921743,44.573015],
+  [-71.921195,44.573389],[-71.920849,44.573948],[-71.920259,44.574685],
+  [-71.920179,44.575183],[-71.919671,44.575795],[-71.919164,44.57641],
+  [-71.918545,44.576913],[-71.918175,44.576854],[-71.917904,44.57677],
+  [-71.91756,44.576733],[-71.917283,44.577496],[-71.917258,44.578065],
+  [-71.916902,44.578351],[-71.91698,44.578626],[-71.916236,44.579275],
+  [-71.916674,44.579525],[-71.916693,44.579732],[-71.916569,44.580259],
+  [-71.916378,44.580701],[-71.916413,44.581193],[-71.915951,44.581814],
+  [-71.915766,44.582143],[-71.915748,44.582744],[-71.915522,44.583102],
+  [-71.914641,44.583571],[-71.914555,44.583797],[-71.914941,44.584069],
+  [-71.914816,44.584412],[-71.914471,44.584849],[-71.914432,44.584984],
+  [-71.914589,44.585394],[-71.914485,44.585585],[-71.914345,44.586249],
+  [-71.914226,44.586436],[-71.914509,44.586561],[-71.91462,44.586708],
+  [-71.914657,44.586905],[-71.914922,44.586904],[-71.915193,44.586823],
+  [-71.915528,44.586945],[-71.915753,44.587315],[-71.915575,44.587613],
+  [-71.915697,44.58791],[-71.915219,44.588097],[-71.915092,44.588354],
+  [-71.915517,44.588897],[-71.916046,44.58915],[-71.916266,44.589439],
+  [-71.91626,44.589813],[-71.915608,44.589876],[-71.915186,44.589784],
+  [-71.914932,44.589779],[-71.915149,44.590058],[-71.915392,44.590268],
+  [-71.915467,44.590564],[-71.915406,44.590743],[-71.915508,44.591063],
+  [-71.915663,44.591412],[-71.914886,44.591789],[-71.913922,44.592234],
+  [-71.91429,44.592648],[-71.914305,44.592743],[-71.913957,44.593078],
+  [-71.913755,44.593269],[-71.91362,44.593439],[-71.912701,44.594406],
+  [-71.91253,44.594692],[-71.912479,44.595286],[-71.912353,44.595798],
+  [-71.912251,44.596084],[-71.912009,44.596592],[-71.911533,44.596909],
+  [-71.911139,44.597027],[-71.910222,44.596975],[-71.909804,44.597027],
+  [-71.908795,44.597201],[-71.907184,44.597095],[-71.905995,44.597011],
+  [-71.904458,44.597108],[-71.903983,44.597221],[-71.903503,44.597586],
+  [-71.902841,44.597441],[-71.902638,44.597272],[-71.902523,44.596878],
+  [-71.902242,44.596792],[-71.901672,44.596808],[-71.901117,44.596692],
+  [-71.9008,44.596688],[-71.900004,44.59678],[-71.899624,44.596664],
+  [-71.899264,44.596483],[-71.899002,44.596509],[-71.898747,44.596662],
+  [-71.898362,44.597125],[-71.897989,44.59751],[-71.897564,44.597568],
+  [-71.897163,44.597661],[-71.89676,44.597987],[-71.896418,44.598081],
+  [-71.895989,44.598322],[-71.895641,44.598423],[-71.894246,44.598431],
+  [-71.893527,44.598589],[-71.892544,44.598683],[-71.892119,44.598847],
+  [-71.891132,44.599416],[-71.89047,44.600035],[-71.890228,44.600398],
+  [-71.891499,44.601195],[-71.892469,44.601763],[-71.891717,44.602232],
+  [-71.891067,44.602836],[-71.890834,44.60369],[-71.891818,44.604755],
+  [-71.892856,44.605352],[-71.893558,44.605599],[-71.894594,44.606114],
+  [-71.894968,44.605698],[-71.895278,44.605443],[-71.895801,44.605012],
+  [-71.896261,44.604682],[-71.896606,44.604488],[-71.896961,44.604291],
+  [-71.897003,44.603951],[-71.896826,44.603594],[-71.89611,44.604044],
+  [-71.895648,44.604647],[-71.894717,44.606008],[-71.894536,44.606334],
+  [-71.894518,44.606464],[-71.894453,44.606655],[-71.894035,44.607057],
+  [-71.893715,44.607392],[-71.893419,44.607766],[-71.893158,44.608095],
+  [-71.893238,44.608614],[-71.893217,44.608913],[-71.893287,44.609568],
+  [-71.893548,44.609934],[-71.893663,44.610117],[-71.893904,44.61035],
+  [-71.893986,44.610454],[-71.893811,44.610484],[-71.893828,44.610538],
+  [-71.89404,44.610524],[-71.894327,44.610698],[-71.894677,44.61078],
+  [-71.894979,44.610773],[-71.895145,44.610854],[-71.895055,44.610967],
+  [-71.894942,44.610976],[-71.895113,44.611078],[-71.895006,44.611217],
+  [-71.894681,44.61125],[-71.894373,44.611334],[-71.89419,44.611414],
+  [-71.894091,44.611329],[-71.894153,44.611425],[-71.894116,44.611444],
+  [-71.894233,44.611538],[-71.894613,44.611688],[-71.894956,44.611732],
+  [-71.89516,44.611811],[-71.895304,44.611991],[-71.895602,44.612047],
+  [-71.896062,44.611934],[-71.896479,44.61185],[-71.896749,44.611882],
+  [-71.896884,44.611974],[-71.896802,44.612154],[-71.89674,44.612343],
+  [-71.896779,44.612422],[-71.897016,44.612429],[-71.89717,44.612515],
+  [-71.89731,44.612438],[-71.897396,44.612413],[-71.897598,44.612376],
+  [-71.897805,44.612338],[-71.898011,44.612291],[-71.898296,44.612228],
+  [-71.898621,44.612304],[-71.89881,44.612504],[-71.898668,44.612866],
+  [-71.898428,44.613136],[-71.898313,44.613251],[-71.898231,44.613396],
+  [-71.898393,44.613424],[-71.898656,44.613299],[-71.899203,44.613095],
+  [-71.89956,44.612806],[-71.899863,44.612518],[-71.900142,44.612231],
+  [-71.90028,44.611964],[-71.900681,44.611643],[-71.900842,44.611535],
+  [-71.901174,44.611311],[-71.901326,44.611149],[-71.901682,44.610878],
+  [-71.902169,44.610751],[-71.90235,44.610647],[-71.90263,44.610769],
+  [-71.902959,44.611058],[-71.903171,44.61111],[-71.90361,44.61082],
+  [-71.903687,44.610663],[-71.903574,44.610469],[-71.903494,44.610063],
+  [-71.903924,44.609738],[-71.904241,44.610025],[-71.904488,44.610047],
+  [-71.904771,44.609808],[-71.904978,44.610117],[-71.904932,44.610471],
+  [-71.905035,44.610843],[-71.905292,44.610956],[-71.905661,44.61096],
+  [-71.905623,44.611215],[-71.905538,44.611321],[-71.905643,44.611627],
+  [-71.906,44.611772],[-71.906237,44.611891],[-71.906443,44.611833],
+  [-71.906797,44.611582],[-71.907434,44.611467],[-71.908251,44.611247],
+  [-71.909513,44.610642],[-71.909815,44.610655],[-71.910559,44.610572],
+  [-71.910874,44.610377],[-71.911217,44.610077],[-71.911756,44.609694],
+  [-71.911765,44.609391],[-71.911684,44.609132],[-71.912233,44.608653],
+  [-71.912334,44.608535],[-71.912709,44.608252],[-71.913216,44.608124],
+  [-71.913836,44.608245],[-71.914133,44.608507],[-71.914272,44.608616],
+  [-71.915139,44.609018],[-71.915937,44.609274],[-71.916196,44.609358],
+  [-71.916501,44.609231],[-71.91686,44.609078],[-71.917136,44.608842],
+  [-71.917588,44.608217],[-71.91833,44.607693],[-71.919045,44.607093],
+  [-71.919445,44.606849],[-71.920129,44.606439],[-71.920658,44.606213],
+  [-71.921293,44.6064],[-71.921591,44.606388],[-71.922261,44.606695],
+  [-71.922619,44.606716],[-71.922974,44.606552],[-71.923495,44.606374],
+  [-71.923897,44.606314],[-71.924411,44.606124],[-71.92481,44.605709],
+  [-71.924797,44.605656],[-71.924739,44.60554],[-71.92433,44.605015],
+  [-71.924305,44.604312],[-71.925174,44.603575],[-71.925825,44.603221],
+  [-71.926276,44.602705],[-71.926938,44.602485],[-71.927593,44.602557],
+  [-71.928047,44.602498],[-71.928778,44.601969],[-71.930098,44.600728],
+  [-71.932448,44.598809],[-71.934241,44.596958],[-71.934318,44.596671],
+  [-71.934163,44.596197],[-71.93357,44.59601],[-71.932698,44.595672],
+  [-71.932502,44.595411],[-71.933106,44.594757],[-71.933978,44.593703],
+  [-71.934251,44.59339],[-71.935072,44.592662],[-71.935598,44.59211],
+  [-71.936109,44.591849],[-71.936825,44.59203],[-71.938364,44.592835],
+  [-71.938552,44.592778],[-71.939001,44.592789],[-71.939345,44.592535],
+  [-71.939666,44.592303],[-71.940848,44.591464],[-71.941647,44.590857],
+  [-71.942466,44.590219],[-71.94348,44.589641],[-71.943972,44.589613],
+  [-71.944635,44.589589],[-71.945274,44.589199],[-71.945398,44.588828],
+  [-71.945352,44.588748]
+];
+
+const elevData = [
+  [-71.945434,44.588812,812],[-71.943847,44.586735,870],
+  [-71.943671,44.586545,870],[-71.943165,44.586711,888],
+  [-71.942112,44.586838,907],[-71.940662,44.585436,949],
+  [-71.941457,44.583667,967],[-71.941871,44.582768,976],
+  [-71.941251,44.581697,1009],[-71.94073,44.581649,1035],
+  [-71.940463,44.581841,1044],[-71.939846,44.581797,1068],
+  [-71.939057,44.582051,1065],[-71.938115,44.582828,1100],
+  [-71.937534,44.584033,1125],[-71.936267,44.582438,1117],
+  [-71.934908,44.581062,1138],[-71.931716,44.579761,1198],
+  [-71.933098,44.572144,1274],[-71.931177,44.571648,1287],
+  [-71.930147,44.574315,1312],[-71.926816,44.573805,1375],
+  [-71.924831,44.57214,1396],[-71.922305,44.572785,1456],
+  [-71.920179,44.575183,1478],[-71.917904,44.57677,1525],
+  [-71.91698,44.578626,1528],[-71.916378,44.580701,1483],
+  [-71.915522,44.583102,1422],[-71.914471,44.584849,1375],
+  [-71.914226,44.586436,1280],[-71.915193,44.586823,1259],
+  [-71.915219,44.588097,1221],[-71.91626,44.589813,1155],
+  [-71.915392,44.590268,1172],[-71.914886,44.591789,1154],
+  [-71.913755,44.593269,1147],[-71.912353,44.595798,1209],
+  [-71.910222,44.596975,1217],[-71.904458,44.597108,1290],
+  [-71.902523,44.596878,1344],[-71.900004,44.59678,1365],
+  [-71.898362,44.597125,1392],[-71.896418,44.598081,1405],
+  [-71.892544,44.598683,1411],[-71.891499,44.601195,1476],
+  [-71.891818,44.604755,1549],[-71.895278,44.605443,1562],
+  [-71.897003,44.603951,1516],[-71.894536,44.606334,1575],
+  [-71.893419,44.607766,1595],[-71.893548,44.609934,1554],
+  [-71.893828,44.610538,1513],[-71.895145,44.610854,1498],
+  [-71.894681,44.61125,1477],[-71.894116,44.611444,1459],
+  [-71.895304,44.611991,1423],[-71.896884,44.611974,1417],
+  [-71.89717,44.612515,1360],[-71.898011,44.612291,1348],
+  [-71.898428,44.613136,1302],[-71.899203,44.613095,1273],
+  [-71.900681,44.611643,1287],[-71.902169,44.610751,1259],
+  [-71.90361,44.61082,1223],[-71.904241,44.610025,1205],
+  [-71.905035,44.610843,1136],[-71.905643,44.611627,1104],
+  [-71.907434,44.611467,1039],[-71.910874,44.610377,952],
+  [-71.912233,44.608653,999],[-71.914133,44.608507,892],
+  [-71.916501,44.609231,907],[-71.919045,44.607093,883],
+  [-71.921591,44.606388,886],[-71.923897,44.606314,874],
+  [-71.92433,44.605015,873],[-71.926938,44.602485,875],
+  [-71.932448,44.598809,843],[-71.932698,44.595672,864],
+  [-71.935072,44.592662,883],[-71.938552,44.592778,857],
+  [-71.941647,44.590857,854],[-71.945274,44.589199,814],
+  [-71.945352,44.588748,816]
+];
+
+function pin(color) {
+  return L.divIcon({
+    html: `<div style="width:10px;height:10px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,0.3)"></div>`,
+    iconSize: [10,10], iconAnchor: [5,5], className: ''
+  });
+}
+
+function dist2d(a, b) {
+  const dx = (b[0]-a[0]) * Math.cos((a[1]+b[1])/2 * Math.PI/180) * 69.0;
+  const dy = (b[1]-a[1]) * 69.0;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+const map = L.map('article-map', { center: [44.5917,-71.9178], zoom: 13, scrollWheelZoom: false });
+L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+  maxZoom: 17,
+  attribution: '© <a href="https://opentopomap.org">OpenTopoMap</a> © <a href="https://openstreetmap.org">OSM</a>'
+}).addTo(map);
+
+L.geoJSON({ type:'Feature', geometry:{ type:'LineString', coordinates: routeCoords } },
+  { style: { color:'#3a5a40', weight:3, opacity:0.9 } }).addTo(map);
+
+[
+  { latlng:[44.588812,-71.945434], label:'<strong>Start / Finish</strong><br>812 ft', color:'#3a5a40' },
+  { latlng:[44.607766,-71.893419], label:'<strong>High Point</strong><br>1,595 ft',  color:'#7a3410' },
+  { latlng:[44.613136,-71.898428], label:'<strong>Ridge</strong><br>1,302 ft',        color:'#4a7c9e' },
+].forEach(wp => L.marker(wp.latlng, {icon:pin(wp.color)}).addTo(map).bindPopup(wp.label));
+
+let cumDist = [0];
+for (let i = 1; i < elevData.length; i++) {
+  cumDist.push(cumDist[i-1] + dist2d(elevData[i-1], elevData[i]));
+}
+const totalDist = cumDist[cumDist.length-1];
+
+const canvas  = document.getElementById('elevation-chart');
+const tooltip = document.getElementById('elev-tooltip');
+
+const scrubMarker = L.circleMarker([elevData[0][1], elevData[0][0]], {
+  radius:7, color:'#fff', weight:2, fillColor:'#3a5a40', fillOpacity:1,
+  interactive: false
+}).addTo(map);
+
+function drawChart(hoverFraction) {
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+  canvas.width  = W * devicePixelRatio;
+  canvas.height = H * devicePixelRatio;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+
+  const PAD = { top:16, right:20, bottom:28, left:52 };
+  const w = W - PAD.left - PAD.right;
+  const h = H - PAD.top  - PAD.bottom;
+  const elevs = elevData.map(d => d[2]);
+  const minE = Math.min(...elevs) - 60;
+  const maxE = Math.max(...elevs) + 80;
+  const xS = d => PAD.left + (d/totalDist)*w;
+  const yS = e => PAD.top  + h - ((e-minE)/(maxE-minE))*h;
+
+  ctx.strokeStyle = '#e8e4dd'; ctx.lineWidth = 1;
+  ctx.font = "9px 'DM Mono',monospace"; ctx.fillStyle = '#a09890'; ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) {
+    const e = minE + (maxE-minE)*(i/4), y = yS(e);
+    ctx.beginPath(); ctx.moveTo(PAD.left,y); ctx.lineTo(PAD.left+w,y); ctx.stroke();
+    ctx.fillText(Math.round(e)+' ft', PAD.left-6, y+3);
+  }
+  ctx.textAlign = 'center'; ctx.fillStyle = '#a09890';
+  for (let i = 0; i <= 6; i++) {
+    const d = (totalDist/6)*i;
+    ctx.fillText(d.toFixed(1)+' mi', xS(d), H-PAD.bottom+14);
+  }
+
+  const grad = ctx.createLinearGradient(0, PAD.top, 0, PAD.top+h);
+  grad.addColorStop(0, 'rgba(58,90,64,0.22)');
+  grad.addColorStop(1, 'rgba(58,90,64,0.02)');
+  ctx.beginPath();
+  ctx.moveTo(xS(cumDist[0]), yS(elevData[0][2]));
+  for (let i = 1; i < elevData.length; i++) {
+    const cx = (xS(cumDist[i-1])+xS(cumDist[i]))/2;
+    ctx.bezierCurveTo(cx, yS(elevData[i-1][2]), cx, yS(elevData[i][2]), xS(cumDist[i]), yS(elevData[i][2]));
+  }
+  ctx.lineTo(xS(totalDist), PAD.top+h);
+  ctx.lineTo(xS(0), PAD.top+h);
+  ctx.closePath();
+  ctx.fillStyle = grad; ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(xS(cumDist[0]), yS(elevData[0][2]));
+  for (let i = 1; i < elevData.length; i++) {
+    const cx = (xS(cumDist[i-1])+xS(cumDist[i]))/2;
+    ctx.bezierCurveTo(cx, yS(elevData[i-1][2]), cx, yS(elevData[i][2]), xS(cumDist[i]), yS(elevData[i][2]));
+  }
+  ctx.strokeStyle = '#3a5a40'; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.stroke();
+
+  ctx.font = "9px 'DM Mono',monospace"; ctx.fillStyle = '#7a7568'; ctx.textAlign = 'center';
+  [{idx:0,text:'Start'},{idx:42,text:'High Pt'},{idx:84,text:'Finish'}].forEach(l => {
+    if (l.idx >= elevData.length) return;
+    const x = xS(cumDist[l.idx]), y = yS(elevData[l.idx][2]);
+    ctx.strokeStyle='#c0b8b0'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x,y-2); ctx.lineTo(x,y-8); ctx.stroke();
+    ctx.fillText(l.text, x, y-12);
+  });
+
+  if (hoverFraction !== undefined) {
+    const sx = PAD.left + hoverFraction * w;
+    const hd = hoverFraction * totalDist;
+    let idx = 0;
+    for (let i = 0; i < cumDist.length-1; i++) {
+      if (hd >= cumDist[i] && hd <= cumDist[i+1]) { idx = i; break; }
+    }
+    const t = cumDist[idx+1] > cumDist[idx] ? (hd-cumDist[idx])/(cumDist[idx+1]-cumDist[idx]) : 0;
+    const elev = elevData[idx][2] + t*(elevData[Math.min(idx+1,elevData.length-1)][2]-elevData[idx][2]);
+    const sy = yS(elev);
+
+    ctx.beginPath(); ctx.moveTo(sx, PAD.top); ctx.lineTo(sx, PAD.top+h);
+    ctx.strokeStyle = 'rgba(58,90,64,0.45)'; ctx.lineWidth = 1;
+    ctx.setLineDash([3,3]); ctx.stroke(); ctx.setLineDash([]);
+
+    ctx.beginPath(); ctx.arc(sx, sy, 4, 0, Math.PI*2);
+    ctx.fillStyle = '#3a5a40'; ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+  }
+}
+
+drawChart();
+window.addEventListener('resize', () => drawChart());
+
+canvas.addEventListener('mousemove', e => {
+  const rect = canvas.getBoundingClientRect();
+  const PAD_L = 52, PAD_R = 20;
+  const fraction = Math.max(0, Math.min(1, (e.clientX-rect.left-PAD_L) / (canvas.offsetWidth-PAD_L-PAD_R)));
+  const hd = fraction * totalDist;
+  let idx = 0;
+  for (let i = 0; i < cumDist.length-1; i++) {
+    if (hd >= cumDist[i] && hd <= cumDist[i+1]) { idx = i; break; }
+  }
+  const t = cumDist[idx+1] > cumDist[idx] ? (hd-cumDist[idx])/(cumDist[idx+1]-cumDist[idx]) : 0;
+  const elev = elevData[idx][2] + t*(elevData[Math.min(idx+1,elevData.length-1)][2]-elevData[idx][2]);
+  const lat  = elevData[idx][1] + t*(elevData[Math.min(idx+1,elevData.length-1)][1]-elevData[idx][1]);
+  const lon  = elevData[idx][0] + t*(elevData[Math.min(idx+1,elevData.length-1)][0]-elevData[idx][0]);
+
+  tooltip.style.opacity = '1';
+  tooltip.style.left = (e.clientX - rect.left + 12) + 'px';
+  tooltip.style.top  = (e.clientY - rect.top  - 36) + 'px';
+  tooltip.textContent = hd.toFixed(1) + ' mi  ·  ' + Math.round(elev) + ' ft';
+
+  scrubMarker.setLatLng([lat, lon]);
+  drawChart(fraction);
+});
+
+canvas.addEventListener('mouseleave', () => {
+  tooltip.style.opacity = '0';
+  scrubMarker.setLatLng([elevData[0][1], elevData[0][0]]);
+  drawChart();
+});
+</script>
+</body>
+</html>

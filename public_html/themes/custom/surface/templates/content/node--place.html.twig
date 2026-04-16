@@ -5,11 +5,11 @@
   <div class="place-sidebar">
     {% include '@components/map/map.twig' with {
       'map_id': 'place-map-' ~ node.id,
-      'center': node.schema_geo.value.lat ~ ',' ~ node.schema_geo.value.lon,
+      'center': node.schema_latitude.value ~ ',' ~ node.schema_longitude.value,
       'zoom': 13,
       'markers': [{
-        'lat': node.schema_geo.value.lat,
-        'lon': node.schema_geo.value.lon,
+        'lat': node.schema_latitude.value,
+        'lon': node.schema_longitude.value,
         'label': '<strong>' ~ node.label ~ '</strong>'
       }]
     } only %}
