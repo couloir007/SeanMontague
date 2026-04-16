@@ -1,0 +1,12 @@
+uuid: ff907fe5-198f-d9e2-c453-aba0b3497473
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.category
+name: Writing
+vid: category
+description: ''
+weight: 0
+changed: 0
+default_langcode: true

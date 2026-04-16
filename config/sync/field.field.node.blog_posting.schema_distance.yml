@@ -1,0 +1,23 @@
+uuid: b0c1d2e3-f4a5-6789-bcde-890123456789
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_distance
+    - node.type.blog_posting
+id: node.blog_posting.schema_distance
+field_name: schema_distance
+entity_type: node
+bundle: blog_posting
+label: Distance
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

@@ -1,0 +1,25 @@
+uuid: b6c7d8e9-f0a1-2345-bcde-456789012345
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_gpx
+    - node.type.blog_posting
+id: node.blog_posting.schema_gpx
+field_name: schema_gpx
+entity_type: node
+bundle: blog_posting
+label: 'GPX File'
+description: 'Upload a GPX track file for this ride or hike.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: default
+  handler_settings: {  }
+  file_directory: 'gpx/[date:custom:Y]-[date:custom:m]'
+  file_extensions: gpx
+  max_filesize: ''
+  description_field: false
+field_type: file

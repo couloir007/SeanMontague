@@ -1,0 +1,32 @@
+uuid: e1f2a3b4-c5d6-7890-efab-901234567890
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.schema_difficulty
+field_name: schema_difficulty
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: easy
+      label: Easy
+    -
+      value: intermediate
+      label: Intermediate
+    -
+      value: hard
+      label: Hard
+    -
+      value: expert
+      label: Expert
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

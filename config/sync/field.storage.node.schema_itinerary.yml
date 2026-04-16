@@ -1,0 +1,19 @@
+uuid: b4c5d6e7-f8a9-0123-bcde-234567890123
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.schema_itinerary
+field_name: schema_itinerary
+entity_type: node
+type: entity_reference
+settings:
+  target_type: node
+module: core
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

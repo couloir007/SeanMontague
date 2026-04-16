@@ -1,0 +1,12 @@
+uuid: 7b89848f-0a0a-edea-1529-41a23489d56c
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.category
+name: Tech
+vid: category
+description: ''
+weight: 0
+changed: 0
+default_langcode: true
