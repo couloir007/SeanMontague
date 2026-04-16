@@ -1,4 +1,8 @@
-# Surface Theme — Claude Code Project Memory
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+# Surface Theme
 
 ## Project Overview
 
@@ -15,23 +19,27 @@ This is a personal outlet — not a portfolio or consulting site.
 ```
 surface/
 ├── source/
-│   ├── assets/            # CSS,
-│   │   └── images/        # SVGs,
+│   ├── assets/            # Static assets (SVGs, images)
 │   ├── props/             # Design tokens (CSS custom properties)
 │   │   └── nek.css        # NEK palette and font stacks
 │   └── patterns/
-│       ├── base/          # Global CSS, reset, typography, utilities
+│       ├── base/          # Global CSS, reset, typography, utilities,
+│       │                  # animations, aspects, borders, brand, shadows
 │       ├── elements/      # Atomic pieces: button, byline, date, eyebrow,
 │       │                  # images, links, list, pager, quote, readtime,
 │       │                  # skip-link, text, title, video
 │       ├── components/    # Composed from elements: nav, hero, marquee,
 │       │                  # map, card, places-card, about, contact,
 │       │                  # footer, stats-bar, elevation-profile
+│       │                  # Form: checkbox, checkbox-toggle, datetime,
+│       │                  # details, fieldset, form-item, form-item-label,
+│       │                  # input, search-form, user-login-form, user-pass-form
 │       ├── collections/   # Composed from components: article,
 │       │                  # article-header, article-map-section, map-section
-│       ├── layouts/       # Drupal region wrappers: block, site-container,
-│       │                  # site-header, site-footer, site-navigation,
-│       │                  # site-homepage
+│       ├── layouts/       # Drupal region wrappers: block, content-edit,
+│       │                  # layout-container, main, media, region,
+│       │                  # site-container, site-footer, site-header,
+│       │                  # site-homepage, site-navigation
 │       ├── pages/         # Full page Storybook demos
 │       └── theme/         # Drupal admin UI overrides only
 ├── templates/             # Drupal .html.twig template suggestions
@@ -584,11 +592,15 @@ article-map-section:
 ## Common Commands
 
 ```bash
-# Build Storybook assets (from theme directory)
-lando npm run build
-
-# Watch mode (Storybook + Vite)
-lando npm run watch
+# From theme directory: public_html/themes/custom/surface/
+lando npm run build           # full production build (lint + format + stylelint + vite)
+lando npm run watch           # dev mode: Vite + Storybook on localhost:6007
+lando npm run lint:fix        # Biome JS/TS auto-fix
+lando npm run lint:check      # Biome check (no write)
+lando npm run stylelint:fix   # CSS auto-fix
+lando npm run stylelint:check # CSS check (no write)
+lando npm run format:write    # Biome format auto-fix
+lando npm run storybook:build # build static Storybook to /storybook
 
 # Schema.org content type creation — always in this dependency order
 lando drush schemadotorg:create-type taxonomy_term:DefinedTerm
@@ -728,71 +740,14 @@ The theme has these foundations already in place:
 
 ---
 
-## Local Development Environment
+## Storybook
 
-- **Local:** Lando with Pantheon recipe
-- **Hosting:** Pantheon
-- **Workflow:** Git-based, Terminus for database/file syncing
+Storybook runs at `http://localhost:6007` via `lando npm run watch`. It uses:
+- `@storybook/html-vite` framework with Twig template rendering
+- Addons: `a11y` (accessibility panel), `themes`, `docs`, `links`
+- Custom viewports and a Drupal behaviors shim (`drupal.js`, `once.js`)
+- Google Fonts, FontAwesome, and Leaflet loaded in `preview-head.html`
 
-### Command Rules — Always Use Lando Prefixes
+Each pattern's `.stories.js` file drives Storybook. Use `lando npm run storybook:build` to generate a static build in `/storybook`.
 
-Never run `drush`, `composer`, `npm`, or `terminus` directly on the host.
-Always prefix with `lando`:
-
-```bash
-# Drupal
-lando drush cr                    # clear cache
-lando drush cim                   # config import
-lando drush csex                  # config export
-lando drush schemadotorg:create-type node:Place
-
-# Composer
-lando composer require drupal/schemadotorg
-lando composer install
-
-# Frontend (from theme directory)
-lando npm run build
-lando npm run watch
-
-# Pantheon
-lando terminus env:deploy my-site.dev
-lando terminus drush my-site.dev -- cr
-```
-
-### File Structure
-
-- **Web root:** `/public_html`
-- **Custom theme:** `/public_html/themes/custom/surface`
-- **Custom modules:** `/public_html/modules/custom`
-- **Config sync:** `/config/sync`
-
-### Settings
-
-- Do not edit `settings.php` directly
-- Local overrides go in `settings.lando.php`
-- Lando/Pantheon recipe handles DB credentials automatically
-
-### Git Workflow
-
-- Atomic commits referencing ticket numbers
-- Do not commit: `public_html/core`, `public_html/modules/contrib`,
-  `public_html/themes/contrib`
-- Config changes (`/config/sync`) should be committed with the feature
-  that requires them — never separately unless a config-only change
-
-### Config Management
-
-Always export after UI changes before committing:
-
-```bash
-lando drush csex
-git add config/sync
-git commit -m "TICKET-123: Export config for [feature]"
-```
-
-Always import on environment setup or after pulling:
-
-```bash
-lando drush cim
-lando drush cr
-```
+See root `CLAUDE.md` for Drupal commands, git workflow, config management, and environment setup.
