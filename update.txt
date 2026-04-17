@@ -5,3 +5,41 @@ lando composer update "drupal/core-*" -W
 ../vendor/drush/drush/drush sql-drop
 ../vendor/drush/drush/drush sql-cli < ../private/backup
 PHP OPcode caching
+
+
+
+
+# Export
+lando ssh -s database -c "pg_dump -h us17.acugis-dns.com -U roundybr -d roundybr_drupal --no-owner --no-privileges --format=p" > production_dump.sql
+
+# Import
+lando db-import production_dump.sql
+
+
+
+
+# 1. Backup
+lando ssh -s database -c "pg_dump -h us17.acugis-dns.com -U roundybr -d roundybr_drupal --no-owner --no-privileges --format=p > production_backup.sql"
+
+# 2. Maintenance mode
+drush sset system.maintenance_mode 1 -y
+drush cr
+
+# 3. Deploy code manually or via git/rsync
+
+# 4. Import DB if needed
+lando ssh -s database -c "psql -h us17.acugis-dns.com -U roundybr -d roundybr_drupal < snapshot-local.sql.gz"
+
+# 5. Import config
+ssh roundybr@137.184.139.220
+drush cim -y
+
+# 6. Run updates
+drush updb -y
+
+# 7. Clear caches
+drush cr
+
+# 8. Disable maintenance mode
+drush sset system.maintenance_mode 0 -y
+drush cr
