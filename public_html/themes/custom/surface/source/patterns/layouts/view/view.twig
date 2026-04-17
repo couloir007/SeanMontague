@@ -1,0 +1,49 @@
+{{ attach_library('surface/view') }}
+
+<div{{ attributes.addClass('view') }}>
+
+  {{ title_prefix }}
+  {% if title %}
+    <div class="view__title">{{ title }}</div>
+  {% endif %}
+  {{ title_suffix }}
+
+  {% if header %}
+    <div class="view__header">{{ header }}</div>
+  {% endif %}
+
+  {% if exposed %}
+    <div class="view__filters">{{ exposed }}</div>
+  {% endif %}
+
+  {% if attachment_before %}
+    <div class="view__attachment view__attachment--before">{{ attachment_before }}</div>
+  {% endif %}
+
+  {% if rows %}
+    <div class="view__content">{{ rows }}</div>
+  {% elseif empty %}
+    <div class="view__empty">{{ empty }}</div>
+  {% endif %}
+
+  {% if pager %}
+    <div class="view__pager">{{ pager }}</div>
+  {% endif %}
+
+  {% if attachment_after %}
+    <div class="view__attachment view__attachment--after">{{ attachment_after }}</div>
+  {% endif %}
+
+  {% if more %}
+    <div class="view__more">{{ more }}</div>
+  {% endif %}
+
+  {% if footer %}
+    <div class="view__footer">{{ footer }}</div>
+  {% endif %}
+
+  {% if feed_icons %}
+    <div class="view__feed-icons">{{ feed_icons }}</div>
+  {% endif %}
+
+</div>

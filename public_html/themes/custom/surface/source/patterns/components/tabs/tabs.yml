@@ -1,0 +1,6 @@
+id: 'primary-tabs-title'
+heading: 'Primary tabs'
+aria: 'primary-tabs-title'
+data: 'data-drupal-nav-primary-tabs'
+modifier: 'tabs--primary'
+tabs: ''

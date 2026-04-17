@@ -48,6 +48,7 @@
         "drupal/flags": "^1.0@beta",
         "drupal/focal_point": "^2.1",
         "drupal/geo_entity": "^1.1",
+        "drupal/geocoder": "^4.33",
         "drupal/geofield": "^1.64",
         "drupal/geofield_map": "^11.0",
         "drupal/gin": "^4.0",

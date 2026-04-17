@@ -48,7 +48,17 @@ site-header:
   js:
     dist/js/site-header.js: {}
 
+view:
+  css:
+    layout:
+      dist/css/view.css: {}
+
 # Component Libraries
+feed-icon:
+  css:
+    component:
+      dist/css/feed-icon.css: {}
+
 accordion:
   css:
     component:

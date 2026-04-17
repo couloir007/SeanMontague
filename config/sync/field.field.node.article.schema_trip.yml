@@ -1,0 +1,28 @@
+uuid: 4436bc13-db03-4f2c-b1ef-7fa369081024
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_trip
+    - node.type.article
+    - node.type.tourist_trip
+id: node.article.schema_trip
+field_name: schema_trip
+entity_type: node
+bundle: article
+label: Trip
+description: 'The trip this post is part of (schema:isPartOf).'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      tourist_trip: tourist_trip
+    sort:
+      field: title
+      direction: asc
+    auto_create: false
+field_type: entity_reference

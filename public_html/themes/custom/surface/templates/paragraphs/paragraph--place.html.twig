@@ -1,13 +1,22 @@
-{# Place — rendered as a places-card #}
+{#
+/**
+ * @file
+ * Place paragraph — renders as a places-card.
+ * {{ attributes }} required for Layout Paragraphs edit controls.
+ */
+#}
 {{ attach_library('surface/places-card') }}
 
-{% set geo = paragraph.field_geo is defined and paragraph.field_geo.lat is not empty %}
+{% set lat = paragraph.schema_latitude.value %}
+{% set lon = paragraph.schema_longitude.value %}
+{% set has_geo = lat is not empty %}
 
-{% include '@components/places-card/places-card.twig' with {
-  'attributes': attributes.addClass('paragraph', 'paragraph--type--place'),
-  'name':       label,
-  'subtitle':   content.field_address|field_value,
-  'coords':     geo ? paragraph.field_geo.lat|round(4) ~ '° N, ' ~ paragraph.field_geo.lon|abs|round(4) ~ '° W',
-  'desc':       content.field_body|field_value,
-  'tags':       content.field_tags|field_value,
-} only %}
+<div{{ attributes.addClass('paragraph', 'paragraph--type--place') }}>
+  {% include '@components/places-card/places-card.twig' with {
+    'name':     paragraph.label,
+    'subtitle': content.schema_address|field_value,
+    'coords':   has_geo ? lat|round(4) ~ '° N, ' ~ lon|abs|round(4) ~ '° W',
+    'desc':     content.body|field_value,
+    'tags':     content.schema_tags|field_value,
+  } only %}
+</div>

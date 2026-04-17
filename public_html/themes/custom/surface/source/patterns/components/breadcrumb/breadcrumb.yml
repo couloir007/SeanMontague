@@ -1,0 +1,7 @@
+breadcrumb:
+  - text: Home
+    url: /
+  - text: Trails
+    url: /trails
+  - text: First Ride at Kingdom Trails
+    url: ''

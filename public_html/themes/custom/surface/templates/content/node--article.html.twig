@@ -1,9 +1,34 @@
+{% set place = node.schema_place.entity %}
+{% set map_center = place
+  ? place.schema_latitude.value ~ ',' ~ place.schema_longitude.value
+  : null %}
+
+{% set has_stats = node.schema_distance.value is not empty %}
+
+{% set header = {
+  'title':        node.label,
+  'date':         node.schema_date_published.value|date('F j, Y'),
+  'category':     node.schema_category.entity.label,
+  'category_key': node.schema_category.entity.field_key.value,
+} %}
+
+{% if has_stats %}
+  {% set header = header|merge({
+    'difficulty': node.schema_difficulty.value,
+    'stats': [
+      { 'label': 'Distance',  'value': node.schema_distance.value,  'unit': 'miles' },
+      { 'label': 'Gain',      'value': node.schema_elev_gain.value, 'unit': 'ft' },
+      { 'label': 'Loss',      'value': node.schema_elev_loss.value, 'unit': 'ft' },
+      { 'label': 'Min Elev',  'value': node.schema_elev_min.value,  'unit': 'ft' },
+      { 'label': 'Max Elev',  'value': node.schema_elev_max.value,  'unit': 'ft' },
+    ],
+  }) %}
+{% endif %}
+
 {% include '@collections/article/article.twig' with {
-  'header': {
-    'title':        node.label,
-    'date':         node.schema_date_published.value|date('F j, Y'),
-    'category':     node.schema_category.entity.label,
-    'category_key': node.schema_category.entity.field_key.value,
-  },
-  'body': content.body|field_value|render,
+  'header':     header,
+  'map_id':     has_stats ? 'article-map-' ~ node.id : null,
+  'map_center': has_stats ? map_center : null,
+  'map_zoom':   13,
+  'body':       content.body|field_value|render,
 } only %}

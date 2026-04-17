@@ -1,0 +1,16 @@
+{{ attach_library('surface/taxonomy-term') }}
+
+<article{{ attributes }}>
+  {{ title_prefix }}
+  {% if not page %}
+    <h2 class="taxonomy-term__name">
+      <a href="{{ url }}">{{ name }}</a>
+    </h2>
+  {% endif %}
+  {{ title_suffix }}
+  {% if content %}
+    <div class="taxonomy-term__content">
+      {{ content }}
+    </div>
+  {% endif %}
+</article>

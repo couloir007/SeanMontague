@@ -1,0 +1,21 @@
+{{ attach_library('surface/search-form') }}
+
+<form class="search-block-form" action="{{ action|default('/search') }}" method="get" role="search">
+  <label class="visually-hidden" for="search-block-input">{{ 'Search'|t }}</label>
+  <div class="search-block-form__inner">
+    <input
+      id="search-block-input"
+      class="search-block-form__input"
+      type="search"
+      name="keys"
+      placeholder="{{ 'Search…'|t }}"
+      autocomplete="off"
+    >
+    <button class="search-block-form__submit" type="submit">
+      <span class="visually-hidden">{{ 'Search'|t }}</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+</form>

@@ -1,0 +1,9 @@
+{{ attach_library('surface/page-title') }}
+
+<div class="page-title">
+  {{ title_prefix }}
+  {% if title %}
+    <h1 class="page-title__heading">{{ title }}</h1>
+  {% endif %}
+  {{ title_suffix }}
+</div>

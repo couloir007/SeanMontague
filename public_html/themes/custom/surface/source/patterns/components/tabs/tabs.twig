@@ -1,0 +1,8 @@
+{{ attach_library('surface/tabs') }}
+
+<nav class="tabs{{ modifier ? ' ' ~ modifier }}" aria-labelledby="{{ id }}">
+  <h2 id="{{ id }}" class="visually-hidden">{{ heading }}</h2>
+  <ul class="tabs__list" {{ data }}>
+    {{ tabs }}
+  </ul>
+</nav>

@@ -1,0 +1,6 @@
+modifier: ''
+links:
+  - text: 'Edit'
+    link: '<a href="#">Edit</a>'
+  - text: 'Delete'
+    link: '<a href="#">Delete</a>'

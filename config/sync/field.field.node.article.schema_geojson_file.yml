@@ -1,0 +1,27 @@
+uuid: e13fdd13-0457-40c9-9e62-a3ed1cadc98d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_geojson_file
+    - node.type.article
+  module:
+    - file
+id: node.article.schema_geojson_file
+field_name: schema_geojson_file
+entity_type: node
+bundle: article
+label: 'GeoJson File'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: 'geojson/[date:custom:Y]-[date:custom:m]'
+  file_extensions: geojson
+  max_filesize: ''
+  description_field: false
+field_type: file

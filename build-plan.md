@@ -3,7 +3,7 @@
 ## Current State
 
 **What exists in Drupal (config):**
-- `blog_posting` content type — rename to `article` or use as-is
+- `article` content type — rename to `article` or use as-is
 - `place`, `tourist_trip`, `event`, `event_series`, `person`, `web_site`
 - Taxonomy: only `tags` — no `category`
 - NO `trail_report` — not needed, dropped from model
@@ -22,7 +22,7 @@
 ## Content Model
 
 ```
-article (BlogPosting)
+article (Article)
   ├── body
   ├── schema_date_published    datetime
   ├── schema_category          entity ref → category taxonomy
@@ -44,8 +44,8 @@ article (BlogPosting)
 
 ## Step 2 — Drupal UI Work
 
-**2a — Add fields to blog_posting**
-`/admin/structure/types/blog_posting/fields`
+**2a — Add fields to article**
+`/admin/structure/types/article/fields`
 - `schema_date_published` — datetime
 - `schema_category` — entity reference → category taxonomy
 - `schema_place` — entity reference → place node (optional)
@@ -65,7 +65,7 @@ Install Field Group module if not present:
 lando composer require drupal/field_group
 lando drush en field_group
 ```
-On blog_posting form display, create a collapsible group called
+On article form display, create a collapsible group called
 "Trail Stats" containing the schema_distance, schema_elev_* ,
 schema_difficulty, schema_gpx fields.
 
@@ -74,7 +74,7 @@ schema_difficulty, schema_gpx fields.
 - `body` — text_with_summary
 - `schema_date_published` — datetime
 - `schema_destination` — entity reference → place (unlimited)
-- `schema_itinerary` — entity reference → blog_posting (unlimited)
+- `schema_itinerary` — entity reference → article (unlimited)
 
 **2d — Create category taxonomy**
 `/admin/structure/taxonomy/add`
@@ -89,11 +89,11 @@ Add terms at `/admin/structure/taxonomy/manage/category/add`:
 - Tech
 
 **2e — Delete node--trail-report.html.twig**
-No longer needed — `blog_posting` handles all article types.
+No longer needed — `article` handles all article types.
 
 **2f — Export config**
 ```bash
-lando drush csex
+lando drush cex
 git add config/sync
 git commit -m "Single article content type with trail stats, category taxonomy"
 ```
@@ -108,7 +108,7 @@ git commit -m "Single article content type with trail stats, category taxonomy"
 
 ```
 Read CLAUDE.md. Update templates/content/node--article.html.twig for the
-blog_posting content type. It handles all article types — writing, trails,
+article content type. It handles all article types — writing, trails,
 travel, permaculture — determined by schema_category.
 
 Use @collections/article/article.twig as the base include.
@@ -136,7 +136,7 @@ Show the corrected file before writing.
 
 ```
 Read CLAUDE.md. Create templates/content/node--blog-posting--card.html.twig
-that renders a blog_posting node in card view mode using
+that renders a article node in card view mode using
 @components/card/card.twig.
 
 Fields:

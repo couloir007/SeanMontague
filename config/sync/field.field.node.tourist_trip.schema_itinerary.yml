@@ -5,7 +5,7 @@ dependencies:
   config:
     - field.storage.node.schema_itinerary
     - node.type.tourist_trip
-    - node.type.blog_posting
+    - node.type.article
 id: node.tourist_trip.schema_itinerary
 field_name: schema_itinerary
 entity_type: node
@@ -20,7 +20,7 @@ settings:
   handler: 'default:node'
   handler_settings:
     target_bundles:
-      blog_posting: blog_posting
+      article: article
     sort:
       field: title
       direction: asc

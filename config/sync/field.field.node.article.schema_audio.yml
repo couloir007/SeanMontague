@@ -1,0 +1,28 @@
+uuid: df1c4a63-d3d8-45e6-9f8b-1c7b23604972
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_audio
+    - media.type.audio
+    - node.type.article
+id: node.article.schema_audio
+field_name: schema_audio
+entity_type: node
+bundle: article
+label: Audio
+description: 'ElevenLabs generated audio for this post.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      audio: audio
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+field_type: entity_reference

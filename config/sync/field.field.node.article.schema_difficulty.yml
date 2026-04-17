@@ -1,0 +1,19 @@
+uuid: a2d035a1-d0be-4446-840e-509f9ebd48a7
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_difficulty
+    - node.type.article
+id: node.article.schema_difficulty
+field_name: schema_difficulty
+entity_type: node
+bundle: article
+label: Difficulty
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

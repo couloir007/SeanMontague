@@ -1,0 +1,22 @@
+.taxonomy-term__name {
+  color: var(--bright);
+  font-family: var(--font-serif-nek);
+  font-size: 28px;
+  font-weight: 400;
+  margin-bottom: 16px;
+}
+
+.taxonomy-term__name a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.taxonomy-term__name a:hover {
+  color: var(--forest);
+}
+
+.taxonomy-term__content {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.8;
+}

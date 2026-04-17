@@ -1,0 +1,23 @@
+uuid: 105d109a-c6ff-41e4-be90-c59828914275
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_elev_max
+    - node.type.article
+id: node.article.schema_elev_max
+field_name: schema_elev_max
+entity_type: node
+bundle: article
+label: 'Elev Max'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

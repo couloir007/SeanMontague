@@ -7,9 +7,23 @@ dependencies:
     - field.field.node.article.body
     - field.field.node.article.field_editorial
     - field.field.node.article.field_metatag
+    - field.field.node.article.schema_audio
+    - field.field.node.article.schema_category
+    - field.field.node.article.schema_date_published
+    - field.field.node.article.schema_difficulty
+    - field.field.node.article.schema_distance
+    - field.field.node.article.schema_elev_gain
+    - field.field.node.article.schema_elev_loss
+    - field.field.node.article.schema_elev_max
+    - field.field.node.article.schema_elev_min
+    - field.field.node.article.schema_geo
+    - field.field.node.article.schema_geojson_file
+    - field.field.node.article.schema_gpx
+    - field.field.node.article.schema_place
     - field.field.node.article.schema_related_link
     - field.field.node.article.schema_significant_link
     - field.field.node.article.schema_topic
+    - field.field.node.article.schema_trip
     - node.type.article
   module:
     - user
@@ -28,6 +42,20 @@ hidden:
   field_editorial: true
   field_metatag: true
   langcode: true
+  schema_audio: true
+  schema_category: true
+  schema_date_published: true
+  schema_difficulty: true
+  schema_distance: true
+  schema_elev_gain: true
+  schema_elev_loss: true
+  schema_elev_max: true
+  schema_elev_min: true
+  schema_geo: true
+  schema_geojson_file: true
+  schema_gpx: true
+  schema_place: true
   schema_related_link: true
   schema_significant_link: true
   schema_topic: true
+  schema_trip: true

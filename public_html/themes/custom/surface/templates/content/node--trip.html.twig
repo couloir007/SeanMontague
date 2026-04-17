@@ -1,24 +1,39 @@
+{#
+/**
+ * @file
+ * Trip (TouristTrip) node template.
+ * Builds a multi-marker map from schema_destination Place nodes,
+ * renders article-header, map, and body.
+ */
+#}
+
 {% set markers = [] %}
 {% for item in node.schema_destination %}
   {% set place = item.entity %}
-  {% if place and place.schema_geo.value %}
-    {% set geo = place.schema_geo.value %}
+  {% if place and place.schema_latitude.value %}
     {% set markers = markers|merge([{
-      'lat':   geo.lat,
-      'lon':   geo.lon,
+      'lat':   place.schema_latitude.value,
+      'lon':   place.schema_longitude.value,
       'color': '#3a5a40',
       'label': '<strong>' ~ place.label ~ '</strong>',
     }]) %}
   {% endif %}
 {% endfor %}
 
-{% include '@components/map/map.twig' with {
-  'map_id':      'trip-map-' ~ node.id,
-  'center':      markers[0] ? markers[0].lat ~ ',' ~ markers[0].lon : '44.593,-71.918',
-  'zoom':        8,
-  'interactive': 'true',
-  'markers':     markers,
+{% include '@collections/article-header/article-header.twig' with {
+  'title': node.label,
+  'date':  node.schema_date_published.value|date('F j, Y'),
 } only %}
+
+{% if markers %}
+  {% include '@components/map/map.twig' with {
+    'map_id':      'trip-map-' ~ node.id,
+    'center':      markers[0].lat ~ ',' ~ markers[0].lon,
+    'zoom':        8,
+    'interactive': 'true',
+    'markers':     markers,
+  } only %}
+{% endif %}
 
 <div class="prose">
   {{ content.body|field_value }}

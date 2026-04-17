@@ -59,6 +59,10 @@ module:
   file_delete: 0
   filter: 0
   focal_point: 0
+  geocoder: 0
+  geocoder_field: 0
+  geocoder_geofield: 0
+  geofield: 0
   gin_login: 0
   gin_moderation_sidebar: 0
   gin_toolbar: 0
@@ -75,6 +79,9 @@ module:
   layout_builder: 0
   layout_discovery: 0
   layout_paragraphs: 0
+  leaflet: 0
+  leaflet_more_maps: 0
+  leaflet_views: 0
   link: 0
   linkit: 0
   locale: 0

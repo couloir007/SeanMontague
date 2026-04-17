@@ -1,0 +1,4 @@
+type: status
+heading: 'Status message'
+messages:
+  - 'Your changes have been saved.'

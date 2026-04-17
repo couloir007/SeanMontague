@@ -27,7 +27,7 @@ lando info                    # show URLs and credentials
 # Drupal
 lando drush cr                # clear cache
 lando drush cim               # import config
-lando drush csex              # export config
+lando drush cex              # export config
 
 # Composer
 lando composer install
@@ -94,7 +94,7 @@ lando drush schemadotorg:create-type node:Event
 Always export after UI changes before committing:
 
 ```bash
-lando drush csex
+lando drush cex
 git add config/sync
 git commit -m "Export config for [feature]"
 ```

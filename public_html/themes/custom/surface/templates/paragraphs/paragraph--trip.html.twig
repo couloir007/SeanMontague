@@ -1,37 +1,47 @@
-{# Trip — travel post with multi-destination map #}
+{#
+/**
+ * @file
+ * Trip paragraph — article-header + multi-destination map + body.
+ * {{ attributes }} required for Layout Paragraphs edit controls.
+ */
+#}
 {{ attach_library('surface/article') }}
 {{ attach_library('surface/article-header') }}
 {{ attach_library('surface/map') }}
 
-{% include '@collections/article-header/article-header.twig' with {
-  'attributes': attributes.addClass('paragraph', 'paragraph--type--trip'),
-  'title':      label,
-  'date':       content.field_date_published|field_value,
-  'subtitle':   content.field_subtitle|field_value is not empty ? content.field_subtitle|field_value,
-} only %}
-
-{# Build markers array from all referenced destination Place nodes #}
+{# Build markers from referenced Place nodes #}
 {% set markers = [] %}
-{% for item in content.field_destination['#items'] %}
+{% for item in paragraph.schema_destination %}
   {% set place = item.entity %}
-  {% if place and place.field_geo is defined %}
+  {% if place and place.schema_latitude.value %}
     {% set markers = markers|merge([{
-      'lat':   place.field_geo.lat,
-      'lon':   place.field_geo.lon,
+      'lat':   place.schema_latitude.value,
+      'lon':   place.schema_longitude.value,
       'color': '#3a5a40',
       'label': '<strong>' ~ place.label ~ '</strong>',
     }]) %}
   {% endif %}
 {% endfor %}
 
-{% include '@components/map/map.twig' with {
-  'map_id':      'trip-map-' ~ paragraph.id(),
-  'zoom':        8,
-  'interactive': 'true',
-  'markers':     markers,
-  'modifier':    'map--standalone',
-} only %}
-
 <div{{ attributes.addClass('paragraph', 'paragraph--type--trip') }}>
-  {{ content.field_body|field_value }}
+
+  {% include '@collections/article-header/article-header.twig' with {
+    'title': paragraph.label,
+    'date':  content.schema_date_published|field_value,
+  } only %}
+
+  {% if markers %}
+    {% include '@components/map/map.twig' with {
+      'map_id':      'trip-map-' ~ paragraph.id(),
+      'center':      markers[0].lat ~ ',' ~ markers[0].lon,
+      'zoom':        8,
+      'interactive': 'true',
+      'markers':     markers,
+    } only %}
+  {% endif %}
+
+  <div class="prose">
+    {{ content.body|field_value }}
+  </div>
+
 </div>

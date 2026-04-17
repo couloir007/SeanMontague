@@ -6,13 +6,29 @@ dependencies:
     - field.field.node.article.body
     - field.field.node.article.field_editorial
     - field.field.node.article.field_metatag
+    - field.field.node.article.schema_audio
+    - field.field.node.article.schema_category
+    - field.field.node.article.schema_date_published
+    - field.field.node.article.schema_difficulty
+    - field.field.node.article.schema_distance
+    - field.field.node.article.schema_elev_gain
+    - field.field.node.article.schema_elev_loss
+    - field.field.node.article.schema_elev_max
+    - field.field.node.article.schema_elev_min
+    - field.field.node.article.schema_geo
+    - field.field.node.article.schema_geojson_file
+    - field.field.node.article.schema_gpx
+    - field.field.node.article.schema_place
     - field.field.node.article.schema_related_link
     - field.field.node.article.schema_significant_link
     - field.field.node.article.schema_topic
+    - field.field.node.article.schema_trip
     - node.type.article
   module:
     - entity_reference_revisions
     - field_group
+    - file
+    - leaflet
     - link
     - text
     - user
@@ -20,12 +36,11 @@ third_party_settings:
   field_group:
     group_general:
       children:
-        2: body
-        3: title
+        - body
       label: General
       parent_name: ''
       region: content
-      weight: -20
+      weight: 1
       format_type: fieldset
       format_settings: {  }
     group_editorial:
@@ -34,7 +49,7 @@ third_party_settings:
       label: 'Editorial information'
       parent_name: ''
       region: content
-      weight: 220
+      weight: 3
       format_type: details
       format_settings: {  }
     group_links:
@@ -44,7 +59,7 @@ third_party_settings:
       label: Links
       parent_name: ''
       region: content
-      weight: 20
+      weight: 2
       format_type: fieldset
       format_settings: {  }
 id: node.article.default
@@ -68,10 +83,114 @@ content:
     third_party_settings: {  }
     weight: 24
     region: content
-  links:
-    settings: {  }
+  schema_geo:
+    type: leaflet_formatter_default
+    label: hidden
+    settings:
+      multiple_map: false
+      leaflet_map: 'OSM Mapnik'
+      height: 400
+      height_unit: px
+      hide_empty_map: false
+      disable_wheel: false
+      gesture_handling: false
+      fitbounds_options: '{"padding":[0,0]}'
+      reset_map:
+        control: false
+        options: '{"position":"topleft","title":"Reset View"}'
+      map_scale:
+        control: false
+        options: '{"position":"bottomright","maxWidth":100,"metric":true,"imperial":false,"updateWhenIdle":false}'
+      locate:
+        control: false
+        options: '{"position":"topright","setView":"untilPanOrZoom","returnToPrevBounds":true,"keepCurrentZoomLevel":true,"strings":{"title":"Locate my position"}}'
+        automatic: false
+      leaflet_tooltip:
+        value: ''
+        options: '{"permanent":false,"direction":"center"}'
+      popup: false
+      popup_content: ''
+      leaflet_popup:
+        control: '0'
+        content: ''
+        options: '{"maxWidth":"300","minWidth":"50","autoPan":true}'
+      map_position:
+        force: false
+        center:
+          lat: 0.0
+          lon: 0.0
+        zoomControlPosition: topleft
+        zoom: 5
+        minZoom: 1
+        maxZoom: 18
+        zoomFiner: 0
+      weight: '0'
+      icon:
+        iconType: marker
+        iconUrl: ''
+        shadowUrl: ''
+        className: ''
+        iconSize:
+          x: ''
+          'y': ''
+        iconAnchor:
+          x: ''
+          'y': ''
+        shadowSize:
+          x: ''
+          'y': ''
+        shadowAnchor:
+          x: ''
+          'y': ''
+        popupAnchor:
+          x: ''
+          'y': ''
+        html: '<div></div>'
+        html_class: leaflet-map-divicon
+        circle_marker_options: '{"radius":100,"color":"red","fillColor":"#f03","fillOpacity":0.5}'
+      leaflet_markercluster:
+        control: false
+        options: '{"spiderfyOnMaxZoom":true,"showCoverageOnHover":true,"removeOutsideVisibleBounds": false}'
+        include_path: false
+        excluded: false
+      fullscreen:
+        control: false
+        options: '{"position":"topleft","pseudoFullscreen":false}'
+      path: '{"color":"#3388ff","opacity":"1.0","stroke":true,"weight":3,"fill":"depends","fillColor":"*","fillOpacity":"0.2","radius":"6"}'
+      feature_properties:
+        values: ''
+      geocoder:
+        control: false
+        settings:
+          popup: false
+          autocomplete:
+            placeholder: 'Search Address'
+            title: 'Search an Address on the Map'
+          position: topright
+          input_size: 20
+          providers:
+            gpx_file:
+              weight: 0
+              checked: false
+            geojson_file:
+              weight: 0
+              checked: false
+          min_terms: 4
+          delay: 800
+          zoom: 16
+          options: ''
+      map_lazy_load:
+        lazy_load: false
     third_party_settings: {  }
-    weight: -100
+    weight: 0
+    region: content
+  schema_geojson_file:
+    type: file_default
+    label: above
+    settings:
+      use_description_as_link_text: true
+    third_party_settings: {  }
+    weight: 25
     region: content
   schema_related_link:
     type: link
@@ -103,8 +222,21 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 221
+    weight: 4
     region: content
 hidden:
   field_metatag: true
   langcode: true
+  links: true
+  schema_audio: true
+  schema_category: true
+  schema_date_published: true
+  schema_difficulty: true
+  schema_distance: true
+  schema_elev_gain: true
+  schema_elev_loss: true
+  schema_elev_max: true
+  schema_elev_min: true
+  schema_gpx: true
+  schema_place: true
+  schema_trip: true

@@ -1,0 +1,10 @@
+rows: '<div class="view__content">(view rows would render here)</div>'
+empty: 'No results found.'
+pager: null
+header: null
+footer: null
+exposed: null
+attachment_before: null
+attachment_after: null
+more: null
+feed_icons: null
