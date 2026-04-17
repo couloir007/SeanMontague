@@ -44,7 +44,10 @@
         (window._surfaceMaps && window._surfaceMaps[mapId]) || window._surfaceMapInstance;
 
       if (mapInst) {
-        scrubMarker = L.circleMarker([elevData[0][1], elevData[0][0]], {
+        const firstLat = elevData[0]?.[1];
+        const firstLon = elevData[0]?.[0];
+        if (!isFinite(firstLat) || !isFinite(firstLon)) return;
+        scrubMarker = L.circleMarker([firstLat, firstLon], {
           radius: 7,
           color: '#fff',
           weight: 2,
@@ -225,13 +228,15 @@
       tooltip.textContent = hd.toFixed(1) + ' mi  ·  ' + Math.round(elev) + ' ft';
 
       tryConnectMap();
-      if (scrubMarker) scrubMarker.setLatLng([lat, lon]);
+      if (scrubMarker && isFinite(lat) && isFinite(lon)) scrubMarker.setLatLng([lat, lon]);
       drawChart(frac);
     });
 
     canvas.addEventListener('mouseleave', () => {
       tooltip.style.opacity = '0';
-      if (scrubMarker) scrubMarker.setLatLng([elevData[0][1], elevData[0][0]]);
+      if (scrubMarker && isFinite(elevData[0]?.[1]) && isFinite(elevData[0]?.[0])) {
+        scrubMarker.setLatLng([elevData[0][1], elevData[0][0]]);
+      }
       drawChart();
     });
   }

@@ -24,8 +24,8 @@
  *   'surface-map-ready' event      — dispatched with { map_id, map, coords }
  */
 
-/* jshint esversion: 6 */
-/* global L, Drupal */
+/* jshint esversion: 11 */
+/* global L, Drupal, console */
 
 (() => {
   "use strict";
@@ -218,7 +218,9 @@
 
       const bounds = trackLayer.getBounds();
       markerLatLngs.forEach((ll) => bounds.extend(ll));
-      map.fitBounds(bounds, { padding: [32, 32] });
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [32, 32] });
+      }
 
       // Flatten all LineString/MultiLineString coords for elevation profile + stats
       coords = flattenCoords(geojson);
