@@ -1,12 +1,12 @@
-uuid: feca5461-f98c-4992-84f1-6eefb0ffc068
+uuid: 942b8f29-9f42-408c-9279-f2c9eb7a3dce
 langcode: en
 status: true
 dependencies:
   module:
     - file
     - node
-id: node.schema_geojson_file
-field_name: schema_geojson_file
+id: node.schema_geoshape
+field_name: schema_geoshape
 entity_type: node
 type: file
 settings:

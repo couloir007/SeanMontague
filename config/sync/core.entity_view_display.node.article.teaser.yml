@@ -17,8 +17,7 @@ dependencies:
     - field.field.node.article.schema_elev_max
     - field.field.node.article.schema_elev_min
     - field.field.node.article.schema_geo
-    - field.field.node.article.schema_geojson_file
-    - field.field.node.article.schema_gpx
+    - field.field.node.article.schema_geoshape
     - field.field.node.article.schema_place
     - field.field.node.article.schema_related_link
     - field.field.node.article.schema_significant_link
@@ -52,8 +51,7 @@ hidden:
   schema_elev_max: true
   schema_elev_min: true
   schema_geo: true
-  schema_geojson_file: true
-  schema_gpx: true
+  schema_geoshape: true
   schema_place: true
   schema_related_link: true
   schema_significant_link: true

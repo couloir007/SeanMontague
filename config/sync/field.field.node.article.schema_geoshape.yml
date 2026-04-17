@@ -1,17 +1,17 @@
-uuid: e13fdd13-0457-40c9-9e62-a3ed1cadc98d
+uuid: 24a58d2a-186a-4c6b-ab91-eb86c506bfba
 langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.node.schema_geojson_file
+    - field.storage.node.schema_geoshape
     - node.type.article
   module:
     - file
-id: node.article.schema_geojson_file
-field_name: schema_geojson_file
+id: node.article.schema_geoshape
+field_name: schema_geoshape
 entity_type: node
 bundle: article
-label: 'GeoJson File'
+label: GeoShape
 description: ''
 required: false
 translatable: false
@@ -20,8 +20,8 @@ default_value_callback: ''
 settings:
   handler: 'default:file'
   handler_settings: {  }
-  file_directory: 'geojson/[date:custom:Y]-[date:custom:m]'
-  file_extensions: geojson
+  file_directory: 'geoshape/[date:custom:Y]-[date:custom:m]'
+  file_extensions: 'geojson gpx'
   max_filesize: ''
   description_field: false
 field_type: file

@@ -1,34 +1,54 @@
-{% set place = node.schema_place.entity %}
-{% set map_center = place
-  ? place.schema_latitude.value ~ ',' ~ place.schema_longitude.value
-  : null %}
+{#
+/**
+ * @file
+ * Article node template — handles all post types (writing, trails,
+ * travel, permaculture) via schema_category.
+ *
+ * Conditionally renders:
+ * - Stats bar (when schema_distance is set)
+ * - Map + elevation profile (when schema_place or schema_distance is set)
+ */
+#}
 
+{# ── Geo — pull from referenced Place node ── #}
+{% set place = node.schema_place.entity %}
+{% set has_place = place and place.schema_latitude.value %}
+{% set map_center = has_place
+  ? place.schema_latitude.value ~ ',' ~ place.schema_longitude.value
+  : '44.593,-71.918' %}
+
+{# ── Trail stats — only when distance is set ── #}
 {% set has_stats = node.schema_distance.value is not empty %}
 
-{% set header = {
-  'title':        node.label,
-  'date':         node.schema_date_published.value|date('F j, Y'),
-  'category':     node.schema_category.entity.label,
-  'category_key': node.schema_category.entity.field_key.value,
-} %}
-
-{% if has_stats %}
-  {% set header = header|merge({
-    'difficulty': node.schema_difficulty.value,
-    'stats': [
-      { 'label': 'Distance',  'value': node.schema_distance.value,  'unit': 'miles' },
-      { 'label': 'Gain',      'value': node.schema_elev_gain.value, 'unit': 'ft' },
-      { 'label': 'Loss',      'value': node.schema_elev_loss.value, 'unit': 'ft' },
-      { 'label': 'Min Elev',  'value': node.schema_elev_min.value,  'unit': 'ft' },
-      { 'label': 'Max Elev',  'value': node.schema_elev_max.value,  'unit': 'ft' },
-    ],
-  }) %}
-{% endif %}
+{% set stats = has_stats ? [
+  { 'label': 'Distance',  'value': node.schema_distance.value,  'unit': 'miles' },
+  { 'label': 'Elevation', 'value': node.schema_elev_gain.value, 'unit': 'ft gain' },
+  { 'label': 'Loss',      'value': node.schema_elev_loss.value, 'unit': 'ft loss' },
+  { 'label': 'Min Elev',  'value': node.schema_elev_min.value,  'unit': 'ft' },
+  { 'label': 'Max Elev',  'value': node.schema_elev_max.value,  'unit': 'ft' },
+] : [] %}
 
 {% include '@collections/article/article.twig' with {
-  'header':     header,
-  'map_id':     has_stats ? 'article-map-' ~ node.id : null,
-  'map_center': has_stats ? map_center : null,
-  'map_zoom':   13,
-  'body':       content.body|field_value|render,
+  'header': {
+    'title':        node.label,
+    'date':         node.schema_date_published.value|date('F j, Y'),
+    'category':     node.schema_category.entity.label,
+    'category_key': node.schema_category.entity.field_key.value,
+    'difficulty':   has_stats ? node.schema_difficulty.value,
+    'stats':        stats,
+  },
+  'map_id':      has_place or has_stats ? 'article-map-' ~ node.id,
+  'map_center':  map_center,
+  'map_zoom':    13,
+  'map_markers': has_place ? [{
+    'lat':   place.schema_latitude.value,
+    'lon':   place.schema_longitude.value,
+    'color': '#3a5a40',
+    'label': '<strong>' ~ place.label ~ '</strong>',
+  }],
+  'elev_gain':   has_stats ? node.schema_elev_gain.value,
+  'elev_loss':   has_stats ? node.schema_elev_loss.value,
+  'elev_min':    has_stats ? node.schema_elev_min.value,
+  'elev_max':    has_stats ? node.schema_elev_max.value,
+  'body':        content.body|field_value|render,
 } only %}

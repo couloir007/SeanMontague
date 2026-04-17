@@ -55,3 +55,210 @@
 //    }
 //  }
 //}
+
+
+/**
+ * @file
+ * GeoShape conversion hook for trail_mapper module.
+ *
+ * Add to: public_html/modules/custom/trail_mapper/trail_mapper.module
+ *
+ * On node presave, detects whether schema_geoshape contains a GPX or GeoJSON
+ * file, converts GPX to GeoJSON preserving Z values (elevation in feet),
+ * and stores the result in schema_geojson as a managed file.
+ */
+
+use Drupal\file\Entity\File;
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_entity_presave().
+ */
+function trail_mapper_entity_presave(\Drupal\Core\Entity\EntityInterface $entity) {
+  if (!$entity instanceof NodeInterface) {
+    return;
+  }
+  if (!$entity->hasField('schema_geoshape') || $entity->schema_geoshape->isEmpty()) {
+    return;
+  }
+
+  /** @var \Drupal\file\Entity\File $file */
+  $file = $entity->schema_geoshape->entity;
+  if (!$file) {
+    return;
+  }
+
+  $uri = $file->getFileUri();
+  $extension = strtolower(pathinfo($uri, PATHINFO_EXTENSION));
+
+  if ($extension === 'gpx') {
+    $geojson = _trail_mapper_gpx_to_geojson($uri);
+  }
+  elseif ($extension === 'geojson' || $extension === 'json') {
+    $geojson = _trail_mapper_normalize_geojson($uri);
+  }
+  else {
+    return;
+  }
+
+  if (!$geojson) {
+    return;
+  }
+
+  _trail_mapper_store_geojson($entity, $geojson, $file->getFilename());
+}
+
+/**
+ * Converts a GPX file to GeoJSON with elevation in feet.
+ *
+ * Preserves Z values as feet (GPX stores meters, multiply by 3.28084).
+ * Output: FeatureCollection with LineString features per track segment.
+ *
+ * @param string $uri
+ *   Drupal stream wrapper URI to the GPX file.
+ *
+ * @return string|null
+ *   JSON-encoded GeoJSON string, or NULL on failure.
+ */
+function _trail_mapper_gpx_to_geojson(string $uri): ?string {
+  $path = \Drupal::service('file_system')->realpath($uri);
+  if (!$path || !file_exists($path)) {
+    return NULL;
+  }
+
+  libxml_use_internal_errors(TRUE);
+  $gpx = simplexml_load_file($path);
+  if (!$gpx) {
+    return NULL;
+  }
+
+  $features = [];
+
+  foreach ($gpx->trk as $trk) {
+    $name = (string) $trk->name ?: 'Track';
+    foreach ($trk->trkseg as $seg) {
+      $coordinates = [];
+      foreach ($seg->trkpt as $pt) {
+        $lon = (float) $pt['lon'];
+        $lat = (float) $pt['lat'];
+        // GPX elevation is in meters — convert to feet for consistency
+        // with manual schema_elev_* fields.
+        $ele = isset($pt->ele) ? round((float) $pt->ele * 3.28084, 1) : NULL;
+        $coordinates[] = $ele !== NULL
+          ? [$lon, $lat, $ele]
+          : [$lon, $lat];
+      }
+
+      if (empty($coordinates)) {
+        continue;
+      }
+
+      $features[] = [
+        'type' => 'Feature',
+        'geometry' => [
+          'type' => 'LineString',
+          'coordinates' => $coordinates,
+        ],
+        'properties' => [
+          'name' => $name,
+          'source' => 'gpx',
+        ],
+      ];
+    }
+  }
+
+  if (empty($features)) {
+    return NULL;
+  }
+
+  return json_encode([
+    'type' => 'FeatureCollection',
+    'features' => $features,
+  ], JSON_PRETTY_PRINT);
+}
+
+/**
+ * Normalizes an uploaded GeoJSON file.
+ *
+ * Validates structure and returns as-is if already valid.
+ * Future: could enforce Z values in feet here.
+ *
+ * @param string $uri
+ *   Drupal stream wrapper URI to the GeoJSON file.
+ *
+ * @return string|null
+ *   JSON-encoded GeoJSON string, or NULL on failure.
+ */
+function _trail_mapper_normalize_geojson(string $uri): ?string {
+  $path = \Drupal::service('file_system')->realpath($uri);
+  if (!$path || !file_exists($path)) {
+    return NULL;
+  }
+
+  $content = file_get_contents($path);
+  if (!$content) {
+    return NULL;
+  }
+
+  $data = json_decode($content, TRUE);
+  if (!$data || !isset($data['type'])) {
+    return NULL;
+  }
+
+  // Return normalized JSON.
+  return json_encode($data, JSON_PRETTY_PRINT);
+}
+
+/**
+ * Stores a GeoJSON string as a managed file and attaches to schema_geojson.
+ *
+ * @param \Drupal\node\NodeInterface $entity
+ *   The node being saved.
+ * @param string $geojson
+ *   The GeoJSON string to store.
+ * @param string $source_filename
+ *   Original filename (used to derive the .geojson filename).
+ */
+function _trail_mapper_store_geojson(
+  NodeInterface $entity,
+  string $geojson,
+  string $source_filename
+): void {
+  $fs = \Drupal::service('file_system');
+  $dir = 'public://geojson';
+
+  if (!$fs->prepareDirectory($dir, $fs::CREATE_DIRECTORY | $fs::MODIFY_PERMISSIONS)) {
+    \Drupal::logger('trail_mapper')->error('Could not create geojson directory.');
+    return;
+  }
+
+  // Derive filename: track.gpx → track.geojson
+  $basename = pathinfo($source_filename, PATHINFO_FILENAME);
+  $destination = $dir . '/' . $basename . '.geojson';
+
+  $path = $fs->saveData($geojson, $destination, $fs::EXISTS_REPLACE);
+  if (!$path) {
+    \Drupal::logger('trail_mapper')->error('Could not save GeoJSON file.');
+    return;
+  }
+
+  // Create or update the managed file entity.
+  $existing = $entity->schema_geojson->entity ?? NULL;
+  if ($existing) {
+    // Update existing file entity.
+    $existing->setFileUri($path);
+    $existing->setFilename(basename($path));
+    $existing->save();
+    $file = $existing;
+  }
+  else {
+    $file = File::create([
+      'uri' => $path,
+      'filename' => basename($path),
+      'status' => 1,
+    ]);
+    $file->save();
+  }
+
+  $entity->schema_geojson = ['target_id' => $file->id()];
+}

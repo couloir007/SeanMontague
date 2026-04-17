@@ -12,7 +12,7 @@ third_party_settings:
   geocoder_field:
     method: geocode
     weight: 0
-    field: schema_geojson_file
+    field: schema_geoshape
     skip_not_empty_value: false
     disabled: false
     hidden: false

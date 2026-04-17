@@ -16,8 +16,7 @@ dependencies:
     - field.field.node.article.schema_elev_max
     - field.field.node.article.schema_elev_min
     - field.field.node.article.schema_geo
-    - field.field.node.article.schema_geojson_file
-    - field.field.node.article.schema_gpx
+    - field.field.node.article.schema_geoshape
     - field.field.node.article.schema_place
     - field.field.node.article.schema_related_link
     - field.field.node.article.schema_significant_link
@@ -65,15 +64,14 @@ third_party_settings:
         description: 'Optional — link to a Place or Trip node.'
     group_trail_stats:
       children:
-        - schema_difficulty
-        - schema_distance
-        - schema_elev_gain
-        - schema_elev_loss
-        - schema_elev_min
-        - schema_elev_max
-        - schema_gpx
-        - schema_geojson_file
-        - schema_geo
+        0: schema_difficulty
+        1: schema_distance
+        2: schema_elev_gain
+        3: schema_elev_loss
+        4: schema_elev_min
+        5: schema_elev_max
+        8: schema_geoshape
+        9: schema_geo
       label: 'Trail Stats'
       region: content
       parent_name: ''
@@ -156,7 +154,7 @@ content:
     third_party_settings: {  }
   field_metatag:
     type: metatag_firehose
-    weight: 8
+    weight: 9
     region: content
     settings:
       sidebar: true
@@ -171,7 +169,7 @@ content:
     third_party_settings: {  }
   path:
     type: path
-    weight: 8
+    weight: 9
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -252,7 +250,7 @@ content:
     third_party_settings: {  }
   schema_geo:
     type: leaflet_widget_default
-    weight: 9
+    weight: 10
     region: content
     settings:
       geometry_validation: false
@@ -321,16 +319,9 @@ content:
         path: '{"color":"#f71ed3","opacity":"0.7","stroke":true,"weight":2,"fillColor":"#ffddfe","fillOpacity":"0.1","radius":3,"dashArray":"5, 5"}'
         snapping: true
     third_party_settings: {  }
-  schema_geojson_file:
+  schema_geoshape:
     type: file_generic
-    weight: 8
-    region: content
-    settings:
-      progress_indicator: throbber
-    third_party_settings: {  }
-  schema_gpx:
-    type: file_generic
-    weight: 7
+    weight: 9
     region: content
     settings:
       progress_indicator: throbber
@@ -347,7 +338,7 @@ content:
     third_party_settings: {  }
   schema_related_link:
     type: linkit
-    weight: 6
+    weight: 7
     region: content
     settings:
       placeholder_url: ''
@@ -357,7 +348,7 @@ content:
     third_party_settings: {  }
   schema_significant_link:
     type: linkit
-    weight: 7
+    weight: 8
     region: content
     settings:
       placeholder_url: ''
@@ -392,7 +383,7 @@ content:
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 9
+    weight: 10
     region: content
     settings:
       display_label: true
