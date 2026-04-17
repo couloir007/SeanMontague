@@ -5,3 +5,11 @@ trail_mapper.generate_geojson:
     _title: 'Generate GeoJSON'
   requirements:
     _permission: 'access content'
+
+trail_mapper.settings:
+  path: '/admin/config/trail-mapper'
+  defaults:
+    _form: '\Drupal\trail_mapper\Form\TrailMapperSettingsForm'
+    _title: 'Trail Mapper Settings'
+  requirements:
+    _permission: 'administer site configuration'

@@ -16,31 +16,44 @@ class TrailMapperSettingsForm extends ConfigFormBase {
   /**
    * Built-in tile sets.
    */
+  protected const TILE_ATTR_USGS = 'Tiles &copy; <a href="https://usgs.gov">USGS</a> The National Map';
+
   protected const TILE_SETS = [
     'usgs-topo' => [
-      'label' => 'USGS Topo (default)',
+      'label' => 'USGS Topo (default) — contours, hydrography, transportation',
       'url' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',
-      'attribution' => 'Tiles &copy; <a href="https://usgs.gov">USGS</a> The National Map',
+      'attribution' => self::TILE_ATTR_USGS,
+      'maxZoom' => 16,
     ],
     'usgs-imagery' => [
-      'label' => 'USGS Imagery',
+      'label' => 'USGS Imagery — aerial only, no labels',
       'url' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}',
-      'attribution' => 'Tiles &copy; <a href="https://usgs.gov">USGS</a> The National Map',
+      'attribution' => self::TILE_ATTR_USGS,
+      'maxZoom' => 16,
+    ],
+    'usgs-imagery-topo' => [
+      'label' => 'USGS Imagery + Topo — aerial with contour overlay',
+      'url' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryTopo/MapServer/tile/{z}/{y}/{x}',
+      'attribution' => self::TILE_ATTR_USGS,
+      'maxZoom' => 16,
     ],
     'usgs-shaded' => [
-      'label' => 'USGS Shaded Relief',
+      'label' => 'USGS Shaded Relief — hillshade only, no labels',
       'url' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSShadedReliefOnly/MapServer/tile/{z}/{y}/{x}',
-      'attribution' => 'Tiles &copy; <a href="https://usgs.gov">USGS</a> The National Map',
+      'attribution' => self::TILE_ATTR_USGS,
+      'maxZoom' => 16,
     ],
     'osm' => [
-      'label' => 'OpenStreetMap',
+      'label' => 'OpenStreetMap — global fallback',
       'url' => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       'attribution' => '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      'maxZoom' => 19,
     ],
     'custom' => [
       'label' => 'Custom URL',
       'url' => '',
       'attribution' => '',
+      'maxZoom' => 18,
     ],
   ];
 
@@ -156,6 +169,7 @@ class TrailMapperSettingsForm extends ConfigFormBase {
         'key' => 'custom',
         'url' => $config->get('tile_url') ?: self::TILE_SETS['usgs-topo']['url'],
         'attribution' => $config->get('tile_attribution') ?: '',
+        'maxZoom' => 18,
       ];
     }
 
@@ -164,6 +178,7 @@ class TrailMapperSettingsForm extends ConfigFormBase {
       'key' => $key,
       'url' => $tile['url'],
       'attribution' => $tile['attribution'],
+      'maxZoom' => $tile['maxZoom'] ?? 16,
     ];
   }
 
