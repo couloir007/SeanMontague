@@ -6,7 +6,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\file\Entity\File;
-use Drupal\file\FileRepositoryInterface;
 use Drupal\node\NodeInterface;
 
 /**
@@ -24,7 +23,6 @@ class GeoShapeConverter {
 
   public function __construct(
     protected readonly FileSystemInterface $fileSystem,
-    protected readonly FileRepositoryInterface $fileRepository,
     protected readonly LoggerChannelFactoryInterface $loggerFactory,
   ) {}
 

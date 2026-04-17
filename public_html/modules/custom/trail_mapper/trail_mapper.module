@@ -23,20 +23,6 @@
  * If a file uses feet, pre-convert before uploading.
  */
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\trail_mapper\Form\TrailMapperSettingsForm;
-
-/**
- * Implements hook_page_attachments().
- * Passes tile config to map.js via drupalSettings.trailMapper.
- */
-function trail_mapper_page_attachments(array &$attachments): void {
-  $tile = TrailMapperSettingsForm::resolvedTile();
-  $attachments['#attached']['drupalSettings']['trailMapper'] = [
-    'tileKey'         => $tile['key'],
-    'tileUrl'         => $tile['url'],
-    'tileAttribution' => $tile['attribution'],
-  ];
-}
 
 /**
  * Implements hook_entity_presave().
