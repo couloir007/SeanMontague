@@ -442,6 +442,8 @@ stats-bar:
   css:
     component:
       dist/css/stats-bar.css: {}
+  js:
+    dist/js/stats-bar.js: {}
 
 links:
   css:
@@ -672,3 +674,4 @@ ui-menu:
   css:
     theme:
       dist/css/ui-menu.css: {}
+

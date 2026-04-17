@@ -64,6 +64,7 @@
     'category_key': node.schema_category.entity.field_key.value,
     'difficulty':   node.schema_difficulty.value,
     'stats':        stats,
+    'map_id':       has_map ? 'article-map-' ~ node.id,
   },
   'map_id':              has_map ? 'article-map-' ~ node.id,
   'map_center':          map_center,

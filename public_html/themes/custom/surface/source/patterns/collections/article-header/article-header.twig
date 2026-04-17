@@ -20,9 +20,10 @@
   {% if subtitle %}
     <p class="article-header__subtitle">{{ subtitle }}</p>
   {% endif %}
-  {% if stats %}
+  {% if stats or map_id %}
     {% include '@components/stats-bar/stats-bar.twig' with {
-      'stats': stats
+      'stats':  stats,
+      'map_id': map_id,
     } only %}
   {% endif %}
 </div>

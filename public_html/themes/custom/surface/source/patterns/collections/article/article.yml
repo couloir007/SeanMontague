@@ -75,6 +75,9 @@ track: &track
 map_id: 'article-map-demo'
 map_center: '44.593,-71.918'
 map_zoom: 13
+tiles: 'usgs-topo'
+geojson_url: null
+drupal_geo_rendered: null
 map_markers:
   - lat: 44.5877777
     lon: -71.9447325

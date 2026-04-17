@@ -1,8 +1,8 @@
 {{ attach_library('surface/stats-bar') }}
 
-<div class="stats-bar{{ modifier ? ' ' ~ modifier }}">
+<div class="stats-bar{{ modifier ? ' ' ~ modifier }}"{{ map_id ? ' data-map-id="' ~ map_id ~ '"' }}>
   {% for stat in stats %}
-    <div class="stats-bar__item{{ stat.is_small ? ' stats-bar__item--small-value' }}">
+    <div class="stats-bar__item{{ stat.is_small ? ' stats-bar__item--small-value' }}" data-stat="{{ stat.key|default(loop.index) }}">
       <span class="stats-bar__label">{{ stat.label }}</span>
       <span class="stats-bar__value">{{ stat.value }}</span>
       {% if stat.unit %}
