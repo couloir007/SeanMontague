@@ -1,4 +1,4 @@
-/* jshint esversion: 11 */
+/* jshint esversion: 6 */
 /* eslint-disable no-param-reassign */
 /* eslint-disable func-names */
 /* jshint camelcase:false */

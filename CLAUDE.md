@@ -70,7 +70,7 @@ php tests/Unit/SomeTest.php                              # standalone test scrip
 
 - **Drupal:** [Drupal Coding Standards](https://www.drupal.org/docs/develop/standards)
 - **CSS:** BEM (Block Element Modifier)
-- **JavaScript:** ES6+
+- **JavaScript:** ES6+; all JS files must include `/* jshint esversion: 6 */` header
 - **Theme:** Modified Atomic Design — Base → Elements → Components → Collections → Layouts → Pages
 - **Twig:** Use namespaces (`@components`, `@elements`, etc.) for all includes; never `@components/surface/`
 

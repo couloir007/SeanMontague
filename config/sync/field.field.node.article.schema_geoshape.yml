@@ -11,8 +11,8 @@ id: node.article.schema_geoshape
 field_name: schema_geoshape
 entity_type: node
 bundle: article
-label: GeoShape
-description: ''
+label: 'Track File (GPX or GeoJSON)'
+description: 'Upload a GPX or GeoJSON file containing the route track. ⚠️ Elevation values must be in meters. Files from Strava, Garmin, Gaia GPS, and Komoot are always in meters and work without modification. If your file stores elevation in feet, convert it before uploading. The system will automatically convert meters to feet for display.'
 required: false
 translatable: false
 default_value: {  }
@@ -20,7 +20,7 @@ default_value_callback: ''
 settings:
   handler: 'default:file'
   handler_settings: {  }
-  file_directory: 'geoshape/[date:custom:Y]-[date:custom:m]'
+  file_directory: geoshape
   file_extensions: 'geojson gpx'
   max_filesize: ''
   description_field: false

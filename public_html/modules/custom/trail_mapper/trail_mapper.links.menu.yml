@@ -1,0 +1,6 @@
+trail_mapper.settings:
+  title: 'Trail Mapper'
+  description: 'Configure tile layers and map defaults.'
+  parent: system.admin_config_development
+  route_name: trail_mapper.settings
+  weight: 10

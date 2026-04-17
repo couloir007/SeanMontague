@@ -1,25 +1,53 @@
 {#
 /**
  * @file
- * Article node template — handles all post types (writing, trails,
- * travel, permaculture) via schema_category.
+ * Article node template — handles all post types via schema_category.
  *
- * Conditionally renders:
- * - Stats bar (when schema_distance is set)
- * - Map + elevation profile (when schema_place or schema_distance is set)
+ * Map sources (any combination):
+ * - schema_geoshape (file)    → GeoJSON track + elevation profile
+ *                               Stats (distance, gain, loss, min, max)
+ *                               computed from GeoJSON Z values by map.js
+ * - schema_geo (geofield)     → map center fallback only, no marker
+ * - schema_place (entity ref) → marker with entity info for JS events
+ *
+ * Manual stat fields (schema_distance etc.) used as display fallback
+ * when schema_geoshape is not set.
  */
 #}
 
-{# ── Geo — pull from referenced Place node ── #}
-{% set place = node.schema_place.entity %}
-{% set has_place = place and place.schema_latitude.value %}
-{% set map_center = has_place
-  ? place.schema_latitude.value ~ ',' ~ place.schema_longitude.value
-  : '44.593,-71.918' %}
+{# ── Geo sources ── #}
+{% set has_geoshape = node.schema_geoshape.entity is not empty %}
+{% set has_geo      = node.schema_geo.value.lat is not empty %}
+{% set place        = node.schema_place.entity %}
+{% set has_place    = place and place.schema_geo.value.lat is not empty %}
+{% set has_map      = has_geoshape or has_geo or has_place %}
 
-{# ── Trail stats — only when distance is set ── #}
-{% set has_stats = node.schema_distance.value is not empty %}
+{# ── Manual stats — fallback when no geoshape file ── #}
+{% set has_stats = not has_geoshape and node.schema_distance.value is not empty %}
 
+{# ── Map center fallback — overridden by fitBounds when geojson present ── #}
+{% if has_geo %}
+  {% set map_center = node.schema_geo.value.lat ~ ',' ~ node.schema_geo.value.lon %}
+{% elseif has_place %}
+  {% set map_center = place.schema_geo.value.lat ~ ',' ~ place.schema_geo.value.lon %}
+{% else %}
+  {% set map_center = '44.593,-71.918' %}
+{% endif %}
+
+{# ── Markers — schema_place only; schema_geo is center, not a marker ── #}
+{% set map_markers = [] %}
+{% if has_place %}
+  {% set map_markers = map_markers|merge([{
+    'lat':         place.schema_geo.value.lat,
+    'lon':         place.schema_geo.value.lon,
+    'color':       '#3a5a40',
+    'label':       '<strong>' ~ place.label ~ '</strong>',
+    'entity_type': 'node',
+    'entity_id':   place.id,
+  }]) %}
+{% endif %}
+
+{# ── Stats — manual fields only when no geoshape ── #}
 {% set stats = has_stats ? [
   { 'label': 'Distance',  'value': node.schema_distance.value,  'unit': 'miles' },
   { 'label': 'Elevation', 'value': node.schema_elev_gain.value, 'unit': 'ft gain' },
@@ -34,21 +62,18 @@
     'date':         node.schema_date_published.value|date('F j, Y'),
     'category':     node.schema_category.entity.label,
     'category_key': node.schema_category.entity.field_key.value,
-    'difficulty':   has_stats ? node.schema_difficulty.value,
+    'difficulty':   node.schema_difficulty.value,
     'stats':        stats,
   },
-  'map_id':      has_place or has_stats ? 'article-map-' ~ node.id,
-  'map_center':  map_center,
-  'map_zoom':    13,
-  'map_markers': has_place ? [{
-    'lat':   place.schema_latitude.value,
-    'lon':   place.schema_longitude.value,
-    'color': '#3a5a40',
-    'label': '<strong>' ~ place.label ~ '</strong>',
-  }],
-  'elev_gain':   has_stats ? node.schema_elev_gain.value,
-  'elev_loss':   has_stats ? node.schema_elev_loss.value,
-  'elev_min':    has_stats ? node.schema_elev_min.value,
-  'elev_max':    has_stats ? node.schema_elev_max.value,
-  'body':        content.body|field_value|render,
+  'map_id':              has_map ? 'article-map-' ~ node.id,
+  'map_center':          map_center,
+  'map_zoom':            13,
+  'map_markers':         map_markers,
+  'drupal_geo_rendered': null,
+  'geojson_url':         has_geoshape ? node.schema_geoshape.entity.uri.value|file_url,
+  'elev_gain':           has_stats ? node.schema_elev_gain.value,
+  'elev_loss':           has_stats ? node.schema_elev_loss.value,
+  'elev_min':            has_stats ? node.schema_elev_min.value,
+  'elev_max':            has_stats ? node.schema_elev_max.value,
+  'body':                content.body|field_value|render,
 } only %}

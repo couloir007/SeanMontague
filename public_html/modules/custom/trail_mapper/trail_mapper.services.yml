@@ -1,7 +1,7 @@
 services:
-  trail_mapper.geojson_generator:
-    class: Drupal\trail_mapper\GeoJsonGenerator
+  trail_mapper.geo_shape_converter:
+    class: Drupal\trail_mapper\Service\GeoShapeConverter
     arguments:
-      - '@external_pg.service'
-      - '@extension.list.module'
-      - '@messenger'
+      - '@file_system'
+      - '@file.repository'
+      - '@logger.factory'

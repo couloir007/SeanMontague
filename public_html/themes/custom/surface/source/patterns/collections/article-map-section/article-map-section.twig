@@ -2,26 +2,33 @@
 
 <div class="article-map-section">
   <div class="article-map-section__map-container">
-    {% include '@components/map/map.twig' with {
-      'map_id':      map_id|default('article-map'),
-      'center':      map_center,
-      'zoom':        map_zoom|default(13),
-      'interactive': 'true',
-      'markers':     map_markers,
-      'lines':       map_lines,
-    } only %}
+    {% if drupal_geo_rendered %}
+      {{ drupal_geo_rendered }}
+    {% elseif map_id %}
+      {% include '@components/map/map.twig' with {
+        'map_id':      map_id,
+        'center':      map_center,
+        'zoom':        map_zoom|default(13),
+        'interactive': 'true',
+        'markers':     map_markers,
+        'lines':       map_lines,
+        'geojson_url': geojson_url,
+        'tiles':       tiles|default('usgs-topo'),
+      } only %}
+    {% endif %}
   </div>
 
-  {% if elev_gain or elev_data %}
+  {% if elev_gain or geojson_url %}
     <div class="article-map-section__elevation-container">
       {% include '@components/elevation-profile/elevation-profile.twig' with {
-        'gain':      elev_gain,
-        'loss':      elev_loss,
-        'min_elev':  elev_min,
-        'max_elev':  elev_max,
-        'elev_data': elev_data,
-        'canvas_id': (map_id|default('article-map')) ~ '-elevation',
-        'map_id':    map_id|default('article-map'),
+        'gain':        elev_gain,
+        'loss':        elev_loss,
+        'min_elev':    elev_min,
+        'max_elev':    elev_max,
+        'elev_data':   elev_data,
+        'geojson_url': geojson_url,
+        'canvas_id':   (map_id|default('article-map')) ~ '-elevation',
+        'map_id':      map_id|default('article-map'),
       } only %}
     </div>
   {% endif %}

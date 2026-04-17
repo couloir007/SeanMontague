@@ -1,3 +1,4 @@
+/* jshint esversion: 6 */
 document.addEventListener('DOMContentLoaded', () => {
   const header = document.getElementById('header');
 

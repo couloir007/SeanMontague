@@ -2,10 +2,15 @@
  * elevation-profile.js
  *
  * Canvas elevation chart with hover scrub + map marker sync.
- * Reads elevation data from data-elev attribute as JSON array of [lon, lat, ft].
+ * Data sources (priority order):
+ *   1. window._surfaceTracks[map_id]  — map.js already fetched, reuse coords
+ *   2. 'surface-map-ready' event      — map.js fetches concurrently, wait for it
+ *   3. data-geojson-url               — fetch directly (no map present)
+ *   4. data-elev                      — inline JSON array (Storybook)
+ * All formats: [lon, lat, elevation_ft]
  * Works in Drupal (via Drupal.behaviors) and Storybook (via DOMContentLoaded).
  */
-/* jshint esversion: 6, browser: true */
+/* jshint esversion: 6 */
 /* global L, Drupal */
 
 (() => {
@@ -15,20 +20,7 @@
     return Math.sqrt(dx * dx + dy * dy);
   }
 
-  function initProfile(el) {
-    if (el._elevProfileInit) return;
-    el._elevProfileInit = true;
-
-    const raw = el.dataset.elev;
-    if (!raw) return;
-
-    let elevData;
-    try {
-      elevData = JSON.parse(raw);
-    } catch (e) {
-      return;
-    }
-
+  function renderProfile(el, elevData) {
     const canvas = el.querySelector('.elevation-profile__canvas');
     const tooltip = el.querySelector('.elevation-profile__tooltip');
     if (!canvas || !tooltip) return;
@@ -242,6 +234,64 @@
       if (scrubMarker) scrubMarker.setLatLng([elevData[0][1], elevData[0][0]]);
       drawChart();
     });
+  }
+
+  function initProfile(el) {
+    if (el._elevProfileInit) return;
+    el._elevProfileInit = true;
+
+    const mapId = el.dataset.mapId;
+
+    // 1. map.js already fetched — reuse coords synchronously
+    if (mapId && window._surfaceTracks && window._surfaceTracks[mapId]) {
+      renderProfile(el, window._surfaceTracks[mapId]);
+      return;
+    }
+
+    // 2. Listen for map.js to finish fetching (Drupal — map has geojson_url)
+    if (mapId) {
+      const onReady = (e) => {
+        if (e.detail.map_id !== mapId) return;
+        window.removeEventListener('surface-map-ready', onReady);
+        if (e.detail.coords && e.detail.coords.length) {
+          renderProfile(el, e.detail.coords);
+          return;
+        }
+        tryFallback();
+      };
+      window.addEventListener('surface-map-ready', onReady);
+    }
+
+    // 3 & 4. Fallback: fetch geojson-url or parse inline elev.
+    // Called immediately — handles Storybook (data-elev) and the case
+    // where elevation-profile is present without a map (no surface-map-ready).
+    function tryFallback() {
+      const geojsonUrl = el.dataset.geojsonUrl;
+      if (geojsonUrl) {
+        fetch(geojsonUrl)
+          .then((r) => {
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            return r.json();
+          })
+          .then((geojson) => renderProfile(el, geojson.features[0].geometry.coordinates))
+          .catch((err) => console.warn('elevation-profile: fetch failed', geojsonUrl, err));
+        return;
+      }
+
+      const raw = el.dataset.elev;
+      if (!raw) return;
+      let elevData;
+      try {
+        elevData = JSON.parse(raw);
+      } catch (e) {
+        return;
+      }
+      renderProfile(el, elevData);
+    }
+
+    // Run immediately for Storybook / no-map context.
+    tryFallback();
+
   }
 
   function initAll(context) {

@@ -2,6 +2,7 @@
 
 <div class="elevation-profile{{ modifier ? ' ' ~ modifier }}"
      {% if map_id %}data-map-id="{{ map_id }}"{% endif %}
+     {% if geojson_url %}data-geojson-url="{{ geojson_url }}"{% endif %}
      {% if elev_data %}data-elev='{{ elev_data|json_encode }}'{% endif %}>
   <div class="elevation-profile__header">
     <span class="elevation-profile__header-label">Elevation Profile</span>

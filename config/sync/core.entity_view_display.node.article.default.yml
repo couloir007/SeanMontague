@@ -26,7 +26,7 @@ dependencies:
   module:
     - datetime
     - entity_reference_revisions
-    - file
+    - leaflet
     - options
     - text
     - user
@@ -40,7 +40,7 @@ content:
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    weight: 1
+    weight: 0
     region: content
   field_editorial:
     type: entity_reference_revisions_entity_view
@@ -49,7 +49,7 @@ content:
       view_mode: default
       link: ''
     third_party_settings: {  }
-    weight: 20
+    weight: 12
     region: content
   schema_audio:
     type: entity_reference_label
@@ -57,7 +57,7 @@ content:
     settings:
       link: false
     third_party_settings: {  }
-    weight: 13
+    weight: 11
     region: content
   schema_category:
     type: entity_reference_label
@@ -65,7 +65,7 @@ content:
     settings:
       link: false
     third_party_settings: {  }
-    weight: 3
+    weight: 2
     region: content
   schema_date_published:
     type: datetime_default
@@ -74,14 +74,14 @@ content:
       timezone_override: ''
       format_type: medium
     third_party_settings: {  }
-    weight: 2
+    weight: 1
     region: content
   schema_difficulty:
     type: list_default
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    weight: 6
+    weight: 5
     region: content
   schema_distance:
     type: number_decimal
@@ -92,7 +92,7 @@ content:
       scale: 1
       prefix_suffix: true
     third_party_settings: {  }
-    weight: 7
+    weight: 6
     region: content
   schema_elev_gain:
     type: number_integer
@@ -101,7 +101,7 @@ content:
       thousand_separator: ','
       prefix_suffix: true
     third_party_settings: {  }
-    weight: 8
+    weight: 7
     region: content
   schema_elev_loss:
     type: number_integer
@@ -110,7 +110,7 @@ content:
       thousand_separator: ','
       prefix_suffix: true
     third_party_settings: {  }
-    weight: 9
+    weight: 8
     region: content
   schema_elev_max:
     type: number_integer
@@ -119,7 +119,7 @@ content:
       thousand_separator: ','
       prefix_suffix: true
     third_party_settings: {  }
-    weight: 11
+    weight: 10
     region: content
   schema_elev_min:
     type: number_integer
@@ -128,15 +128,108 @@ content:
       thousand_separator: ','
       prefix_suffix: true
     third_party_settings: {  }
-    weight: 10
+    weight: 9
     region: content
-  schema_geoshape:
-    type: file_default
-    label: above
+  schema_geo:
+    type: leaflet_formatter_default
+    label: hidden
     settings:
-      use_description_as_link_text: true
+      multiple_map: false
+      leaflet_map: 'OSM Mapnik'
+      height: 440
+      height_unit: px
+      hide_empty_map: false
+      disable_wheel: false
+      gesture_handling: true
+      fitbounds_options: '{"padding":[0,0]}'
+      reset_map:
+        control: false
+        options: '{"position":"topleft","title":"Reset View"}'
+      map_scale:
+        control: false
+        options: '{"position":"bottomright","maxWidth":100,"metric":true,"imperial":false,"updateWhenIdle":false}'
+      locate:
+        control: false
+        options: '{"position":"topright","setView":"untilPanOrZoom","returnToPrevBounds":true,"keepCurrentZoomLevel":true,"strings":{"title":"Locate my position"}}'
+        automatic: false
+      leaflet_tooltip:
+        value: ''
+        options: '{"permanent":false,"direction":"center"}'
+      popup: false
+      popup_content: ''
+      leaflet_popup:
+        control: '0'
+        content: ''
+        options: '{"maxWidth":"300","minWidth":"50","autoPan":true}'
+      map_position:
+        force: false
+        center:
+          lat: 0.0
+          lon: 0.0
+        zoomControlPosition: topleft
+        zoom: 15
+        minZoom: 1
+        maxZoom: 18
+        zoomFiner: 0
+      weight: '0'
+      icon:
+        iconType: marker
+        iconUrl: ''
+        shadowUrl: ''
+        className: ''
+        iconSize:
+          x: ''
+          'y': ''
+        iconAnchor:
+          x: ''
+          'y': ''
+        shadowSize:
+          x: ''
+          'y': ''
+        shadowAnchor:
+          x: ''
+          'y': ''
+        popupAnchor:
+          x: ''
+          'y': ''
+        html: '<div></div>'
+        html_class: leaflet-map-divicon
+        circle_marker_options: '{"radius":100,"color":"red","fillColor":"#f03","fillOpacity":0.5}'
+      leaflet_markercluster:
+        control: false
+        options: '{"spiderfyOnMaxZoom":true,"showCoverageOnHover":true,"removeOutsideVisibleBounds": false}'
+        include_path: false
+        excluded: false
+      fullscreen:
+        control: false
+        options: '{"position":"topleft","pseudoFullscreen":false}'
+      path: '{"color":"#3388ff","opacity":"1.0","stroke":true,"weight":3,"fill":"depends","fillColor":"*","fillOpacity":"0.2","radius":"6"}'
+      feature_properties:
+        values: ''
+      geocoder:
+        control: false
+        settings:
+          popup: false
+          autocomplete:
+            placeholder: 'Search Address'
+            title: 'Search an Address on the Map'
+          position: topright
+          input_size: 20
+          providers:
+            gpx_file:
+              weight: 0
+              checked: false
+            geojson_file:
+              weight: 0
+              checked: false
+          min_terms: 4
+          delay: 800
+          zoom: 16
+          options: ''
+      map_lazy_load:
+        lazy_load: false
     third_party_settings: {  }
-    weight: 21
+    weight: 13
     region: content
   schema_place:
     type: entity_reference_label
@@ -144,7 +237,7 @@ content:
     settings:
       link: false
     third_party_settings: {  }
-    weight: 4
+    weight: 3
     region: content
   schema_trip:
     type: entity_reference_label
@@ -152,13 +245,13 @@ content:
     settings:
       link: false
     third_party_settings: {  }
-    weight: 5
+    weight: 4
     region: content
 hidden:
   field_metatag: true
   langcode: true
   links: true
-  schema_geo: true
+  schema_geoshape: true
   schema_related_link: true
   schema_significant_link: true
   schema_topic: true

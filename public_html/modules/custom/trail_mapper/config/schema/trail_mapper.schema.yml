@@ -1,0 +1,13 @@
+trail_mapper.settings:
+  type: config_object
+  label: 'Trail Mapper settings'
+  mapping:
+    tile_key:
+      type: string
+      label: 'Tile set'
+    tile_url:
+      type: string
+      label: 'Custom tile URL'
+    tile_attribution:
+      type: string
+      label: 'Custom tile attribution'
