@@ -42,6 +42,7 @@ third_party_settings:
         - title
         - schema_date_published
         - schema_category
+        - schema_activity_type
         - body
       label: Content
       region: content
