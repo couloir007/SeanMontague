@@ -85,10 +85,14 @@ function trail_mapper_pathauto_pattern_alter(\Drupal\pathauto\PathautoPatternInt
     return;
   }
 
-  // 2. article + schema_trip → /trips/[trip title]/[node:title]
+  // 2. article + schema_trip → /trips/{resolved-slug}/[node:title]
   if (!$node->get('schema_trip')->isEmpty()) {
-    $pattern->setPattern('/trips/[node:schema_trip:entity:title]/[node:title]');
-    return;
+    $trip = $node->get('schema_trip')->entity;
+    if ($trip) {
+      $slug = \Drupal::service('pathauto.alias_cleaner')->cleanString($trip->label());
+      $pattern->setPattern('/trips/' . $slug . '/[node:title]');
+      return;
+    }
   }
 
   // 3. article + schema_activity_type → /trails/FIELD_KEY/[node:title]
