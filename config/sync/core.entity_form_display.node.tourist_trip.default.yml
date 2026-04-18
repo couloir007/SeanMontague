@@ -8,6 +8,7 @@ dependencies:
     - field.field.node.tourist_trip.field_metatag
     - field.field.node.tourist_trip.schema_date_published
     - field.field.node.tourist_trip.schema_destination
+    - field.field.node.tourist_trip.schema_event_schedule
     - field.field.node.tourist_trip.schema_image
     - field.field.node.tourist_trip.schema_itinerary
     - field.field.node.tourist_trip.schema_related_link
@@ -28,6 +29,7 @@ third_party_settings:
       children:
         - title
         - schema_date_published
+        - schema_event_schedule
         - schema_image
         - body
       label: Content
@@ -160,6 +162,20 @@ content:
       match_limit: 10
       size: 60
       placeholder: ''
+    third_party_settings: {  }
+  schema_event_schedule:
+    type: smartdate_default
+    weight: 2
+    region: content
+    settings:
+      modal: false
+      default_duration: 60
+      default_duration_increments: "60\r\n360\r\n1440\r\nAllDay\r\nCustom"
+      default_tz: ''
+      add_abbreviations: ''
+      remove_button_label: Remove
+      add_more_label: 'Add more'
+      default_full_day: 0
     third_party_settings: {  }
   schema_image:
     type: entity_reference_autocomplete

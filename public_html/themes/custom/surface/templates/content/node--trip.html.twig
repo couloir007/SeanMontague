@@ -20,9 +20,19 @@
   {% endif %}
 {% endfor %}
 
+{% set trip_start = node.schema_event_schedule.value %}
+{% set trip_end   = node.schema_event_schedule.end_value %}
+{% if trip_start %}
+  {% set date_display = trip_start|date('F j') ~ '–' ~ trip_end|date('F j, Y') %}
+{% elseif node.schema_date_published.value %}
+  {% set date_display = node.schema_date_published.value|date('F j, Y') %}
+{% else %}
+  {% set date_display = '' %}
+{% endif %}
+
 {% include '@collections/article-header/article-header.twig' with {
   'title': node.label,
-  'date':  node.schema_date_published.value|date('F j, Y'),
+  'date':  date_display,
 } only %}
 
 {% if markers %}
