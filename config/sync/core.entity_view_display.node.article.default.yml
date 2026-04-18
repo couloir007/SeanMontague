@@ -6,6 +6,7 @@ dependencies:
     - field.field.node.article.body
     - field.field.node.article.field_editorial
     - field.field.node.article.field_metatag
+    - field.field.node.article.schema_activity_type
     - field.field.node.article.schema_audio
     - field.field.node.article.schema_category
     - field.field.node.article.schema_date_published
@@ -50,6 +51,14 @@ content:
       link: ''
     third_party_settings: {  }
     weight: 12
+    region: content
+  schema_activity_type:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 14
     region: content
   schema_audio:
     type: entity_reference_label
