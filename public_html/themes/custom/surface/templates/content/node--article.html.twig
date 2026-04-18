@@ -19,7 +19,7 @@
 {% set has_geoshape = node.schema_geoshape.target_id is not empty %}
 {% set has_geo      = not node.schema_geo.isEmpty() %}
 {% set place        = node.schema_place.entity %}
-{% set has_place    = place and place.schema_geo.value.lat is not empty %}
+{% set has_place    = place and place.schema_latitude.value is not empty %}
 {% set has_map      = has_geoshape or has_geo or has_place %}
 
 {# ── Manual stats — fallback when no geoshape file ── #}
@@ -29,7 +29,7 @@
 {% if has_geo %}
   {% set map_center = node.schema_geo.lat ~ ',' ~ node.schema_geo.lon %}
 {% elseif has_place %}
-  {% set map_center = place.schema_geo.value.lon ~ ',' ~ place.schema_geo.value.lat %}
+  {% set map_center = place.schema_latitude.value ~ ',' ~ place.schema_longitude.value %}
 {% else %}
   {% set map_center = '44.593,-71.918' %}
 {% endif %}
