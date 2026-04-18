@@ -6,6 +6,7 @@ dependencies:
     - core.entity_view_mode.node.teaser
     - field.field.node.article.body
     - field.field.node.article.field_editorial
+    - field.field.node.article.field_image
     - field.field.node.article.field_metatag
     - field.field.node.article.schema_activity_type
     - field.field.node.article.schema_audio
@@ -24,9 +25,12 @@ dependencies:
     - field.field.node.article.schema_significant_link
     - field.field.node.article.schema_topic
     - field.field.node.article.schema_trip
+    - image.style.medium
     - node.type.article
   module:
     - datetime
+    - image
+    - media
     - options
     - text
     - user
@@ -42,6 +46,17 @@ content:
       trim_length: 180
     third_party_settings: {  }
     weight: 4
+    region: content
+  field_image:
+    type: media_thumbnail
+    label: hidden
+    settings:
+      image_link: content
+      image_style: medium
+      image_loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: 0
     region: content
   links:
     settings: {  }

@@ -12,11 +12,12 @@ dependencies:
     - field.field.node.event_series.schema_related_link
     - field.field.node.event_series.schema_significant_link
     - field.field.node.event_series.schema_subject_of
+    - image.style.large
     - node.type.event_series
   module:
-    - entity_reference_revisions
     - field_group
-    - link
+    - image
+    - media
     - smart_date
     - text
     - user
@@ -78,32 +79,10 @@ mode: default
 content:
   body:
     type: text_default
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    weight: 18
-    region: content
-  field_editorial:
-    type: entity_reference_revisions_entity_view
     label: hidden
-    settings:
-      view_mode: default
-      link: ''
-    third_party_settings: {  }
-    weight: 23
-    region: content
-  links:
     settings: {  }
     third_party_settings: {  }
-    weight: -100
-    region: content
-  schema_about:
-    type: entity_reference_label
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    weight: 0
+    weight: 2
     region: content
   schema_event_schedule:
     type: smartdate_default
@@ -125,49 +104,25 @@ content:
         decimals: 2
         suffix: h
     third_party_settings: {  }
-    weight: 0
+    weight: 1
     region: content
   schema_image:
-    type: entity_reference_entity_view
+    type: media_thumbnail
     label: hidden
     settings:
-      view_mode: default
-      link: false
-    third_party_settings: {  }
-    weight: 25
-    region: content
-  schema_related_link:
-    type: link
-    label: above
-    settings:
-      trim_length: 80
-      url_only: false
-      url_plain: false
-      rel: ''
-      target: ''
+      image_link: content
+      image_style: large
+      image_loading:
+        attribute: lazy
     third_party_settings: {  }
     weight: 0
     region: content
-  schema_significant_link:
-    type: link
-    label: above
-    settings:
-      trim_length: 80
-      url_only: false
-      url_plain: false
-      rel: ''
-      target: ''
-    third_party_settings: {  }
-    weight: 1
-    region: content
-  schema_subject_of:
-    type: entity_reference_label
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    weight: 1
-    region: content
 hidden:
+  field_editorial: true
   field_metatag: true
   langcode: true
+  links: true
+  schema_about: true
+  schema_related_link: true
+  schema_significant_link: true
+  schema_subject_of: true

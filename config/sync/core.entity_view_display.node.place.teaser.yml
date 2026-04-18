@@ -15,9 +15,12 @@ dependencies:
     - field.field.node.place.schema_significant_link
     - field.field.node.place.schema_subject_of
     - field.field.node.place.schema_telephone
+    - image.style.medium
     - node.type.place
   module:
     - address
+    - image
+    - media
     - text
     - user
 id: node.place.teaser
@@ -29,9 +32,9 @@ content:
     type: text_summary_or_trimmed
     label: hidden
     settings:
-      trim_length: 600
+      trim_length: 120
     third_party_settings: {  }
-    weight: 17
+    weight: 2
     region: content
   links:
     settings: {  }
@@ -39,20 +42,22 @@ content:
     weight: -100
     region: content
   schema_address:
-    type: address_default
+    type: address_plain
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    weight: 150
+    weight: 1
     region: content
   schema_image:
-    type: entity_reference_entity_view
+    type: media_thumbnail
     label: hidden
     settings:
-      view_mode: default
-      link: false
+      image_link: content
+      image_style: medium
+      image_loading:
+        attribute: lazy
     third_party_settings: {  }
-    weight: 8
+    weight: 0
     region: content
 hidden:
   field_editorial: true

@@ -3,49 +3,49 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.node.tourist_trip.body
     - field.field.node.tourist_trip.field_editorial
     - field.field.node.tourist_trip.field_metatag
+    - field.field.node.tourist_trip.schema_date_published
+    - field.field.node.tourist_trip.schema_destination
     - field.field.node.tourist_trip.schema_image
+    - field.field.node.tourist_trip.schema_itinerary
     - field.field.node.tourist_trip.schema_related_link
     - field.field.node.tourist_trip.schema_significant_link
     - field.field.node.tourist_trip.schema_subject_of
     - node.type.tourist_trip
   module:
+    - datetime
     - field_group
     - inline_entity_form
     - linkit
     - metatag
     - path
+    - text
 third_party_settings:
   field_group:
-    group_references:
+    group_content:
       children:
-        - schema_subject_of
-      label: References
+        - title
+        - schema_date_published
+        - schema_image
+        - body
+      label: Content
       region: content
       parent_name: ''
-      weight: 22
+      weight: 0
       format_type: details
       format_settings:
         open: true
         description: ''
-    group_editorial:
+    group_destinations:
       children:
-        - field_editorial
-      label: 'Editorial information'
+        - schema_destination
+        - schema_itinerary
+      label: 'Destinations & Itinerary'
       region: content
       parent_name: ''
-      weight: 220
-      format_type: details_sidebar
-      format_settings:
-        description: 'Track the editorial decisions and status of a document.'
-    group_general:
-      children:
-        - schema_image
-      label: General
-      region: content
-      parent_name: ''
-      weight: -20
+      weight: 1
       format_type: details
       format_settings:
         open: true
@@ -57,16 +57,47 @@ third_party_settings:
       label: Links
       region: content
       parent_name: ''
-      weight: 20
+      weight: 2
       format_type: details
       format_settings:
-        open: true
+        open: false
         description: ''
+    group_references:
+      children:
+        - schema_subject_of
+      label: References
+      region: content
+      parent_name: ''
+      weight: 3
+      format_type: details
+      format_settings:
+        open: false
+        description: ''
+    group_editorial:
+      children:
+        - field_editorial
+      label: 'Editorial information'
+      region: content
+      parent_name: ''
+      weight: 220
+      format_type: details_sidebar
+      format_settings:
+        description: 'Track the editorial decisions and status of a document.'
 id: node.tourist_trip.default
 targetEntityType: node
 bundle: tourist_trip
 mode: default
 content:
+  body:
+    type: text_textarea_with_summary
+    weight: 3
+    region: content
+    settings:
+      rows: 12
+      summary_rows: 3
+      placeholder: ''
+      show_summary: false
+    third_party_settings: {  }
   created:
     type: datetime_timestamp
     weight: 200
@@ -114,9 +145,35 @@ content:
     settings:
       display_label: true
     third_party_settings: {  }
+  schema_date_published:
+    type: datetime_default
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  schema_destination:
+    type: entity_reference_autocomplete
+    weight: 0
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   schema_image:
     type: entity_reference_autocomplete
-    weight: 25
+    weight: 2
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  schema_itinerary:
+    type: entity_reference_autocomplete
+    weight: 1
     region: content
     settings:
       match_operator: CONTAINS

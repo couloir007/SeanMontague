@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.field.node.article.body
     - field.field.node.article.field_editorial
+    - field.field.node.article.field_image
     - field.field.node.article.field_metatag
     - field.field.node.article.schema_activity_type
     - field.field.node.article.schema_audio
@@ -25,10 +26,6 @@ dependencies:
     - field.field.node.article.schema_trip
     - node.type.article
   module:
-    - datetime
-    - entity_reference_revisions
-    - leaflet
-    - options
     - text
     - user
 id: node.article.default
@@ -42,6 +39,14 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 0
+    region: content
+  field_image:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 1
     region: content
 hidden:
   field_editorial: true

@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.field.node.article.body
     - field.field.node.article.field_editorial
+    - field.field.node.article.field_image
     - field.field.node.article.field_metatag
     - field.field.node.article.schema_activity_type
     - field.field.node.article.schema_audio
@@ -153,6 +154,16 @@ content:
       collapsible: false
       collapsed: false
       revision: false
+    third_party_settings: {  }
+  field_image:
+    type: entity_reference_autocomplete
+    weight: 27
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
   field_metatag:
     type: metatag_firehose

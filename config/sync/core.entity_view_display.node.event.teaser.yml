@@ -14,8 +14,12 @@ dependencies:
     - field.field.node.event.schema_related_link
     - field.field.node.event.schema_significant_link
     - field.field.node.event.schema_subject_of
+    - image.style.medium
     - node.type.event
   module:
+    - image
+    - media
+    - options
     - smart_date
     - text
     - user
@@ -28,9 +32,9 @@ content:
     type: text_summary_or_trimmed
     label: hidden
     settings:
-      trim_length: 600
+      trim_length: 120
     third_party_settings: {  }
-    weight: 17
+    weight: 3
     region: content
   links:
     settings: {  }
@@ -39,7 +43,7 @@ content:
     region: content
   schema_event_schedule:
     type: smartdate_default
-    label: above
+    label: hidden
     settings:
       timezone_override: ''
       format_type: medium
@@ -57,15 +61,31 @@ content:
         decimals: 2
         suffix: h
     third_party_settings: {  }
-    weight: 13
+    weight: 2
+    region: content
+  schema_event_type:
+    type: list_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  schema_image:
+    type: media_thumbnail
+    label: hidden
+    settings:
+      image_link: content
+      image_style: medium
+      image_loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: 0
     region: content
 hidden:
   field_editorial: true
   field_metatag: true
   langcode: true
   schema_about: true
-  schema_event_type: true
-  schema_image: true
   schema_related_link: true
   schema_significant_link: true
   schema_subject_of: true

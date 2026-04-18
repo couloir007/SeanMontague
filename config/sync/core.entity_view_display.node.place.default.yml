@@ -82,102 +82,21 @@ mode: default
 content:
   body:
     type: text_default
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    weight: 18
-    region: content
-  field_editorial:
-    type: entity_reference_revisions_entity_view
-    label: hidden
-    settings:
-      view_mode: default
-      link: ''
-    third_party_settings: {  }
-    weight: 24
-    region: content
-  links:
-    settings: {  }
-    third_party_settings: {  }
-    weight: -100
-    region: content
-  schema_address:
-    type: address_default
     label: hidden
     settings: {  }
     third_party_settings: {  }
     weight: 0
-    region: content
-  schema_image:
-    type: entity_reference_entity_view
-    label: hidden
-    settings:
-      view_mode: default
-      link: false
-    third_party_settings: {  }
-    weight: 23
-    region: content
-  schema_latitude:
-    type: number_decimal
-    label: above
-    settings:
-      thousand_separator: ''
-      decimal_separator: .
-      scale: 2
-      prefix_suffix: true
-    third_party_settings: {  }
-    weight: 3
-    region: content
-  schema_longitude:
-    type: number_decimal
-    label: above
-    settings:
-      thousand_separator: ''
-      decimal_separator: .
-      scale: 2
-      prefix_suffix: true
-    third_party_settings: {  }
-    weight: 2
-    region: content
-  schema_related_link:
-    type: link
-    label: above
-    settings:
-      trim_length: 80
-      url_only: false
-      url_plain: false
-      rel: ''
-      target: ''
-    third_party_settings: {  }
-    weight: 0
-    region: content
-  schema_significant_link:
-    type: link
-    label: above
-    settings:
-      trim_length: 80
-      url_only: false
-      url_plain: false
-      rel: ''
-      target: ''
-    third_party_settings: {  }
-    weight: 1
-    region: content
-  schema_subject_of:
-    type: entity_reference_label
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    weight: 1
-    region: content
-  schema_telephone:
-    type: basic_string
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    weight: 4
     region: content
 hidden:
+  field_editorial: true
   field_metatag: true
   langcode: true
+  links: true
+  schema_address: true
+  schema_image: true
+  schema_latitude: true
+  schema_longitude: true
+  schema_related_link: true
+  schema_significant_link: true
+  schema_subject_of: true
+  schema_telephone: true
