@@ -54,6 +54,7 @@ third_party_settings:
     group_location:
       children:
         - schema_place
+        - schema_geo
         - schema_trip
       label: 'Location & Trip'
       region: content
@@ -65,14 +66,13 @@ third_party_settings:
         description: 'Optional — link to a Place or Trip node.'
     group_trail_stats:
       children:
-        0: schema_difficulty
-        1: schema_distance
-        2: schema_elev_gain
-        3: schema_elev_loss
-        4: schema_elev_min
-        5: schema_elev_max
-        8: schema_geoshape
-        9: schema_geo
+        - schema_difficulty
+        - schema_geoshape
+        - schema_distance
+        - schema_elev_gain
+        - schema_elev_loss
+        - schema_elev_min
+        - schema_elev_max
       label: 'Trail Stats'
       region: content
       parent_name: ''
@@ -80,7 +80,7 @@ third_party_settings:
       format_type: details
       format_settings:
         open: false
-        description: 'Fill in for trail reports and ride posts. Leave empty for writing posts.'
+        description: 'Fill in for trail and ski reports. Leave empty for writing posts.'
     group_audio:
       children:
         - schema_audio

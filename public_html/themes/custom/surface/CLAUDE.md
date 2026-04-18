@@ -169,19 +169,13 @@ person:
 
 | Bundle | Schema.org type | Purpose |
 |---|---|---|
-| `article` | `BlogPosting` | Writing, Drupal, permaculture posts |
-| `trail_report` | `BlogPosting` | Ride/ski reports with stats + map |
+| `article` | `BlogPosting` | Writing, trail/ski reports, Drupal, permaculture posts |
 | `trip` | `TouristTrip` | Multi-destination travel posts |
 | `place` | `Place` | Locations referenced by other types |
 | `event` | `Event` | Kingdom Trails events, group rides, clinics |
 | `event_series` | `EventSeries` | Recurring events e.g. weekly group rides |
 | `web_page` | `WebPage` | Static pages (About, Contact) |
 | `web_site` | `WebSite` | Site-level structured data, authorship anchor |
-
-**Why two BlogPosting bundles (`article` + `trail_report`):**
-Navigation is handled by menus, not path patterns. Bundles are split purely
-for editorial UX — trail reports need stat fields that would clutter the
-writing post edit form. Schema.org output is identical (`@type: BlogPosting`).
 
 ### Taxonomy
 
@@ -213,24 +207,31 @@ Templates conditionally render an audio player when `schema_audio` is set.
 ### Key Field Relationships
 
 ```
-article (Article)
+article (BlogPosting)
+  ├── title               → headline
   ├── body                → articleBody
-  ├── schema_category     → DefinedTerm (trails/garden/maps/tech)
   ├── schema_date_published → datePublished
-  ├── field_image         → ImageObject
-  ├── schema_audio        → AudioObject (optional, ElevenLabs)
+  ├── schema_category     → DefinedTerm (category vocabulary)
+  ├── schema_activity_type → DefinedTerm (activity_type vocabulary)
+  ├── schema_trip         → TouristTrip (parent trip, optional)
   ├── schema_place        → Place (optional, geo-tagged writing)
   ├── schema_geo          → Geofield (lat/lon — map center fallback)
   ├── schema_geoshape     → file (GPX or GeoJSON upload)
   │                         On save: trail_mapper converts to GeoJSON
   │                         with Z values in feet, overwrites in place.
   │                         After save always contains .geojson.
-  ├── schema_difficulty   → list: Easy/Intermediate/Hard/Expert
   ├── schema_distance     → decimal (miles)
   ├── schema_elev_gain    → integer (feet)
   ├── schema_elev_loss    → integer (feet)
   ├── schema_elev_min     → integer (feet)
-  └── schema_elev_max     → integer (feet)
+  ├── schema_elev_max     → integer (feet)
+  ├── schema_difficulty   → list: Easy/Intermediate/Hard/Expert
+  ├── schema_audio        → AudioObject (optional, ElevenLabs)
+  └── field_image         → ImageObject
+
+Stat fields (`schema_distance` through `schema_difficulty`) are optional —
+only relevant for trail/ski articles. The stats bar renders from Twig when
+`schema_distance` is set; stats are never passed through JS events.
 
 trip (TouristTrip)
   ├── body                → description
@@ -238,7 +239,7 @@ trip (TouristTrip)
   ├── field_image         → ImageObject
   ├── schema_audio        → AudioObject (optional)
   ├── schema_destination  → Place[] (multi-value)
-  └── schema_itinerary    → [trail_report|article][] (ordered)
+  └── schema_itinerary    → article[] (ordered)
 
 place (Place)
   ├── body                → description
@@ -363,35 +364,6 @@ paragraph template.
 ---
 
 ## Node Template Patterns
-
-### node--trail-report.html.twig
-
-```twig
-{% set place = node.schema_place.entity %}
-{% set geo = place ? place.schema_geo.value : null %}
-{% set map_center = geo ? geo.lat ~ ',' ~ geo.lon : '44.593,-71.918' %}
-
-{% include '@collections/article/article.twig' with {
-  'header': {
-    'title':      node.label,
-    'date':       node.schema_date_published.value|date('F j, Y'),
-    'category':   node.schema_category.entity.label,
-    'category_key': node.schema_category.entity.field_key.value,
-    'difficulty': node.schema_difficulty.value,
-    'stats': [
-      { 'label': 'Distance',  'value': node.schema_distance.value,  'unit': 'miles' },
-      { 'label': 'Elevation', 'value': node.schema_elev_gain.value, 'unit': 'ft gain' },
-      { 'label': 'Loss',      'value': node.schema_elev_loss.value, 'unit': 'ft loss' },
-      { 'label': 'Min Elev',  'value': node.schema_elev_min.value,  'unit': 'ft' },
-      { 'label': 'Max Elev',  'value': node.schema_elev_max.value,  'unit': 'ft' },
-    ],
-  },
-  'map_id':     'trail-map-' ~ node.id,
-  'map_center': map_center,
-  'map_zoom':   13,
-  'body':       content.body|field_value|render,
-} only %}
-```
 
 ### node--article.html.twig
 
@@ -615,8 +587,11 @@ and Storybook.
 **After init — global state:**
 - `window._surfaceMaps[map_id]` — Leaflet map instance
 - `window._surfaceTracks[map_id]` — raw `[lon, lat, ele_ft]` coordinates
-- `surface-map-ready` CustomEvent — `{ map_id, map, coords }`
+- `surface-map-ready` CustomEvent — `{ map_id, map, coords }` — track coords only; stat fields are **not** dispatched here
 - `surface-map-marker-click` CustomEvent — `{ entity_type, entity_id, map_id, lat, lon }`
+
+Stats (distance, elevation gain/loss/min/max, difficulty) come from Twig
+manual fields only — rendered server-side, never passed through JS events.
 
 **Elevation profile sync:**
 `elevation-profile.js` checks `window._surfaceTracks[map_id]` first

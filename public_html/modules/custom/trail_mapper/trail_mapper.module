@@ -57,6 +57,71 @@ function trail_mapper_page_attachments(array &$attachments): void {
 
 
 /**
+ * Implements hook_pathauto_pattern_alter().
+ *
+ * Overrides alias patterns based on bundle and field values.
+ * Evaluated in priority order; first match wins.
+ *
+ * Requires field_key (plain text) on taxonomy_term bundles category and
+ * activity_type. Rules 3–5 silently fall through to the article fallback
+ * until that field exists and is populated.
+ */
+function trail_mapper_pathauto_pattern_alter(\Drupal\pathauto\PathautoPatternInterface $pattern, array $context): void {
+  if ($context['module'] !== 'node' || empty($context['data']['node'])) {
+    return;
+  }
+
+  /** @var \Drupal\node\NodeInterface $node */
+  $node = $context['data']['node'];
+  $bundle = $node->bundle();
+
+  // 1. tourist_trip → /trips/[node:title]
+  if ($bundle === 'tourist_trip') {
+    $pattern->setPattern('/trips/[node:title]');
+    return;
+  }
+
+  if ($bundle !== 'article') {
+    return;
+  }
+
+  // 2. article + schema_trip → /trips/[trip title]/[node:title]
+  if (!$node->get('schema_trip')->isEmpty()) {
+    $pattern->setPattern('/trips/[node:schema_trip:entity:title]/[node:title]');
+    return;
+  }
+
+  // 3. article + schema_activity_type → /trails/FIELD_KEY/[node:title]
+  if (!$node->get('schema_activity_type')->isEmpty()) {
+    $term = $node->get('schema_activity_type')->entity;
+    if ($term && $term->hasField('field_key') && !$term->get('field_key')->isEmpty()) {
+      $key = $term->get('field_key')->value;
+      $pattern->setPattern('/trails/' . $key . '/[node:title]');
+      return;
+    }
+  }
+
+  // 4–5. article + schema_category with known field_key values.
+  if (!$node->get('schema_category')->isEmpty()) {
+    $term = $node->get('schema_category')->entity;
+    if ($term && $term->hasField('field_key') && !$term->get('field_key')->isEmpty()) {
+      $key = $term->get('field_key')->value;
+      if ($key === 'drupal') {
+        $pattern->setPattern('/drupal/[node:title]');
+        return;
+      }
+      if ($key === 'permaculture') {
+        $pattern->setPattern('/permaculture/[node:title]');
+        return;
+      }
+    }
+  }
+
+  // 6. article fallback → /writing/[node:title]
+  $pattern->setPattern('/writing/[node:title]');
+}
+
+/**
  * Implements theme_preprocess to add variables.
  */
 //function trail_mapper_preprocess(&$variables) {
