@@ -20,8 +20,8 @@
   {% endif %}
 {% endfor %}
 
-{% set trip_start = node.schema_event_schedule.value %}
-{% set trip_end   = node.schema_event_schedule.end_value %}
+{% set trip_start = node.field_trip_dates.value %}
+{% set trip_end   = node.field_trip_dates.end_value %}
 {% if trip_start %}
   {% set date_display = trip_start|date('F j') ~ '–' ~ trip_end|date('F j, Y') %}
 {% elseif node.schema_date_published.value %}

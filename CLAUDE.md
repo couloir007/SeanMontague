@@ -100,6 +100,7 @@ navigation. There is no separate `trail_report` bundle.
 | `schema_trip` | entity_reference → tourist_trip | Parent trip (optional) |
 | `schema_place` | entity_reference → place | Map center fallback (optional) |
 | `schema_geo` | geofield | Direct lat/lon map center fallback (optional) |
+| `field_map_tiles` | list (text) | Per-article tile set override (optional) — for non-US content |
 | `schema_geoshape` | file | GeoJSON/GPX track — drives map + elevation profile |
 | `schema_distance` | decimal | Miles (manual — display fallback when no geoshape) |
 | `schema_elev_gain` | integer | Feet gain (manual) |
@@ -114,35 +115,55 @@ Stat fields (distance, elev_*) are optional — relevant only for trail/ski
 articles. Stats bar renders from Twig manual fields when schema_distance is
 set and schema_geoshape is absent.
 
-### Place geo — IMPORTANT
+### TouristTrip fields
 
-Place uses **separate decimal fields** `schema_latitude` and `schema_longitude`,
-NOT a Geofield. Always access Place coordinates as:
+| Field | Type | Purpose |
+|---|---|---|
+| `body` | text_with_summary | Trip overview |
+| `schema_date_published` | datetime | Fallback date |
+| `field_trip_dates` | Smart Date (cardinality 1) | Trip date range — start + end |
+| `schema_destination` | entity_reference → place[] | Places visited (multi-value, ordered) |
+| `schema_itinerary` | entity_reference → article[] | Articles under this trip |
+| `schema_image` | entity_reference → ImageObject | Hero image |
+| `field_editorial` | entity_reference_revisions | Editorial tracking |
 
+### Place fields
+
+| Field | Type | Purpose |
+|---|---|---|
+| `body` | text_with_summary | Place description |
+| `schema_latitude` | decimal | Latitude — map center |
+| `schema_longitude` | decimal | Longitude — map center |
+| `schema_address` | address | Structured address |
+| `schema_image` | entity_reference → ImageObject | Place photo |
+| `schema_telephone` | string | Phone |
+
+### Geo field access — IMPORTANT
+
+Two different geo patterns are used. Never mix them up:
+
+**Article** — `schema_geo` is a **Geofield**. Access as:
 ```twig
-node.schema_latitude.value   {# decimal #}
-node.schema_longitude.value  {# decimal #}
+{% set has_geo = not node.schema_geo.isEmpty() %}
+{% set map_center = node.schema_geo.lat ~ ',' ~ node.schema_geo.lon %}
 ```
 
-Article has `schema_geo` (geofield) for its own direct coordinates. Access as:
-
+**Place** — uses separate **decimal fields** `schema_latitude` and
+`schema_longitude`. There is no `schema_geo` on Place. Access as:
 ```twig
-node.schema_geo.lat
-node.schema_geo.lon
+node.schema_latitude.value
+node.schema_longitude.value
 ```
 
-When reading Place geo from a referenced Place on an article:
-
+**Reading Place geo from a referenced Place on an article:**
 ```twig
 {% set place = node.schema_place.entity %}
 {% set has_place = place and place.schema_latitude.value is not empty %}
 {% set map_center = place.schema_latitude.value ~ ',' ~ place.schema_longitude.value %}
 ```
 
-### TouristTrip fields
-
-`body`, `schema_date_published`, `schema_destination` (→ Place[]),
-`schema_itinerary` (→ Article[]), `schema_image`, `field_editorial`
+The common mistake is `place.schema_geo.value.lat` — Place has no `schema_geo`,
+so `has_place` silently evaluates false and the map center fallback never works.
 
 ### Taxonomy vocabularies
 
@@ -164,7 +185,9 @@ All Leaflet rendering is handled by `map.js` in the Surface theme.
 - **Never** use the Drupal Leaflet module formatter on article pages —
   `schema_geo` must be **hidden** in the article view display to prevent
   a rogue second map from rendering
-- USGS National Map tiles — no API key required
+- Default tiles: USGS National Map (US only, no API key)
+- Per-article tile override: `field_map_tiles` — use for non-US content
+- Available tile keys: `usgs-topo`, `osm`, `open-topo`, `esri-topo`
 - GeoJSON Z values stored in **meters** by GeoShapeConverter; converted to
   display unit client-side via `drupalSettings.trailMapper.elevationUnit`
 - After init: `window._surfaceMaps[map_id]`, `window._surfaceTracks[map_id]`,
@@ -174,25 +197,18 @@ All Leaflet rendering is handled by `map.js` in the Surface theme.
 
 ## Pending Work
 
-The following items are documented in `claude-code-next-steps.md`:
+See `claude-code-next-steps.md` for full prompts. Remaining items:
 
-### Unblocked — do first
-- **Form display:** Move `schema_geo` from Trail Stats group → Location & Trip;
-  add `schema_activity_type` to Content group
-- **View display default:** Hide `schema_geo` (critical — kills rogue Leaflet map),
-  hide all other fields except `body`
-- **View display teaser:** Build out with image, date, category, difficulty, summary
-- **Template bug:** `node--article.html.twig` references `place.schema_geo.value.lat`
-  — must be updated to `place.schema_latitude.value` / `place.schema_longitude.value`
-
-### Blocked on field_key
-- Add `field_key` (text plain, max 32) to `category` and `activity_type` vocabularies
-- Populate term keys: trails, drupal, permaculture, maps / bike, hike, ski
-- Implement `hook_pathauto_pattern_alter()` for conditional URL aliases
-
-### Configuration gaps
-- `elevation_unit` missing from `trail_mapper.settings.yml` and schema —
-  needs adding to config schema + install config + `hook_page_attachments`
+- **0e** — `field_trip_dates` Smart Date (cardinality 1) on tourist_trip;
+  update `node--trip.html.twig` to render date range
+- **0f** — `field_map_tiles` select field on article; register tile sets
+  in trail_mapper; wire override through `node--article.html.twig` and `map.js`
+- **2** — Add `field_key` (text plain, max 32) to `category` and
+  `activity_type` vocabularies; populate term keys
+- **4** — Add `elevation_unit` to `trail_mapper.settings` schema +
+  install config + `hook_page_attachments`
+- **5** — `hook_pathauto_pattern_alter()` for conditional URL aliases
+  (blocked on step 2)
 
 ---
 
