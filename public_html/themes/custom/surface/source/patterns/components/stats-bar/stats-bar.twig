@@ -1,6 +1,5 @@
 {{ attach_library('surface/stats-bar') }}
-
-<div class="stats-bar{{ modifier ? ' ' ~ modifier }}"{{ map_id ? ' data-map-id="' ~ map_id ~ '"' }}>
+<div class="stats-bar{{ modifier ? ' ' ~ modifier }}"{% if map_id %} data-map-id="{{ map_id }}"{% endif %}>
   {% for stat in stats %}
     <div class="stats-bar__item{{ stat.is_small ? ' stats-bar__item--small-value' }}" data-stat="{{ stat.key|default(loop.index) }}">
       <span class="stats-bar__label">{{ stat.label }}</span>

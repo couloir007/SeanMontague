@@ -51,6 +51,7 @@ function trail_mapper_page_attachments(array &$attachments): void {
     'tileUrl'         => $tile['url'],
     'tileAttribution' => $tile['attribution'],
     'tileMaxZoom'     => $tile['maxZoom'] ?? 16,
+    'elevationUnit'   => TrailMapperSettingsForm::elevationUnit(),
   ];
 }
 

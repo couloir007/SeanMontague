@@ -98,55 +98,6 @@
     return pts;
   };
 
-  const computeTrackStats = (coords) => {
-    // coords = [[lon, lat, ele_ft, ...], ...]
-    if (!coords || coords.length < 2) return null;
-
-    let distance = 0;
-    let gain = 0;
-    let loss = 0;
-    let minElev = Infinity;
-    let maxElev = -Infinity;
-
-    for (let i = 0; i < coords.length; i++) {
-      const ele = coords[i][2];
-      if (ele == null) continue;
-      // Z values from trail_mapper are already in feet.
-      // Raw uploaded GeoJSON may be in meters — trail_mapper normalizes on save.
-      if (ele < minElev) minElev = ele;
-      if (ele > maxElev) maxElev = ele;
-
-      if (i > 0) {
-        // Haversine distance in miles
-        const [lon1, lat1] = coords[i - 1];
-        const [lon2, lat2] = coords[i];
-        const R = 3958.8; // Earth radius in miles
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a =
-          Math.sin(dLat / 2) ** 2 +
-          Math.cos(lat1 * Math.PI / 180) *
-          Math.cos(lat2 * Math.PI / 180) *
-          Math.sin(dLon / 2) ** 2;
-        distance += R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        // Elevation change
-        const prevEle = coords[i - 1][2];
-        const diff = ele - prevEle;
-        if (diff > 0) gain += diff;
-        else loss += Math.abs(diff);
-      }
-    }
-
-    return {
-      distance: Math.round(distance * 10) / 10,
-      elev_gain: Math.round(gain),
-      elev_loss: Math.round(loss),
-      elev_min: minElev === Infinity ? null : Math.round(minElev),
-      elev_max: maxElev === -Infinity ? null : Math.round(maxElev),
-    };
-  };
-
   const initLeaflet = (el, geojson, { lat, lon, zoom, interactive, markers, lines, tile, mapId }) => {
     // Guard against double-init (fetch error catch calling initLeaflet twice)
     if (el._leafletMapInstance) return;
@@ -202,6 +153,7 @@
     // Add the layer to the map first — Leaflet computes correct bounds
     // from the rendered geometry, then fitBounds on track + markers.
     let coords = null;
+    let trackLayer = null;
     if (geojson) {
       // Filter to LineString/MultiLineString only — Point features are app
       // waypoints that crash Leaflet's marker renderer.
@@ -212,27 +164,29 @@
         ),
       };
 
-      const trackLayer = L.geoJSON(trackOnlyGeojson, {
+      trackLayer = L.geoJSON(trackOnlyGeojson, {
         style: () => ({ color: '#3a5a40', weight: 3, opacity: 0.85 }),
       }).addTo(map);
-
-      const bounds = trackLayer.getBounds();
-      markerLatLngs.forEach((ll) => bounds.extend(ll));
-      if (bounds.isValid()) {
-        map.fitBounds(bounds, { padding: [32, 32] });
-      }
 
       // Flatten all LineString/MultiLineString coords for elevation profile + stats
       coords = flattenCoords(geojson);
       window._surfaceTracks = window._surfaceTracks ?? {};
       window._surfaceTracks[mapId] = coords;
-    } else if (markerLatLngs.length > 1) {
-      map.fitBounds(L.latLngBounds(markerLatLngs), { padding: [32, 32] });
     }
 
-    // ── invalidateSize ─────────────────────────────────────────────────────
-    requestAnimationFrame(() => map.invalidateSize());
-    setTimeout(() => map.invalidateSize(), 150);
+    // ── invalidateSize + fitBounds after layout ────────────────────────────
+    const fitToData = () => {
+      if (coords && coords.length) {
+        const bounds = trackLayer.getBounds();
+        markerLatLngs.forEach((ll) => bounds.extend(ll));
+        if (bounds.isValid()) map.fitBounds(bounds, { padding: [32, 32] });
+      } else if (markerLatLngs.length > 1) {
+        map.fitBounds(L.latLngBounds(markerLatLngs), { padding: [32, 32] });
+      }
+    };
+
+    requestAnimationFrame(() => { map.invalidateSize(); fitToData(); });
+    setTimeout(() => { map.invalidateSize(); fitToData(); }, 150);
     setTimeout(() => map.invalidateSize(), 500);
 
     // ── Register ───────────────────────────────────────────────────────────
@@ -240,10 +194,8 @@
     window._surfaceMaps[mapId] = map;
     window._surfaceMapInstance ??= map;
 
-    const stats = coords && coords.length ? computeTrackStats(coords) : null;
-
     window.dispatchEvent(new CustomEvent('surface-map-ready', {
-      detail: { map_id: mapId, map, coords, stats },
+      detail: { map_id: mapId, map, coords },
     }));
 
     // ── Ctrl+scroll / touch gesture hints ─────────────────────────────────

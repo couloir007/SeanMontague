@@ -23,7 +23,7 @@
   {% if stats or map_id %}
     {% include '@components/stats-bar/stats-bar.twig' with {
       'stats':  stats,
-      'map_id': map_id,
+      'map_id': map_id|replace({'"': ''}),
     } only %}
   {% endif %}
 </div>

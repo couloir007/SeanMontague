@@ -11,3 +11,6 @@ trail_mapper.settings:
     tile_attribution:
       type: string
       label: 'Custom tile attribution'
+    elevation_unit:
+      type: string
+      label: 'Elevation display unit'

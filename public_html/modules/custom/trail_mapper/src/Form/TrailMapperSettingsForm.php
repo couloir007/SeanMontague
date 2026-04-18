@@ -6,62 +6,21 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Trail Mapper settings form.
+ * Admin settings form for Trail Mapper.
  *
- * Configures the tile layer used by Surface map.js on all Leaflet maps.
- * Settings are passed to map.js via drupalSettings.trailMapper.
+ * Manages tile set selection and elevation display unit.
+ * Settings are exposed to JS via hook_page_attachments as
+ * drupalSettings.trailMapper.
  */
 class TrailMapperSettingsForm extends ConfigFormBase {
 
-  /**
-   * Built-in tile sets.
-   */
-  protected const TILE_ATTR_USGS = 'Tiles &copy; <a href="https://usgs.gov">USGS</a> The National Map';
-
-  protected const TILE_SETS = [
-    'usgs-topo' => [
-      'label' => 'USGS Topo (default) — contours, hydrography, transportation',
-      'url' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',
-      'attribution' => self::TILE_ATTR_USGS,
-      'maxZoom' => 16,
-    ],
-    'usgs-imagery' => [
-      'label' => 'USGS Imagery — aerial only, no labels',
-      'url' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}',
-      'attribution' => self::TILE_ATTR_USGS,
-      'maxZoom' => 16,
-    ],
-    'usgs-imagery-topo' => [
-      'label' => 'USGS Imagery + Topo — aerial with contour overlay',
-      'url' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryTopo/MapServer/tile/{z}/{y}/{x}',
-      'attribution' => self::TILE_ATTR_USGS,
-      'maxZoom' => 16,
-    ],
-    'usgs-shaded' => [
-      'label' => 'USGS Shaded Relief — hillshade only, no labels',
-      'url' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSShadedReliefOnly/MapServer/tile/{z}/{y}/{x}',
-      'attribution' => self::TILE_ATTR_USGS,
-      'maxZoom' => 16,
-    ],
-    'osm' => [
-      'label' => 'OpenStreetMap — global fallback',
-      'url' => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      'attribution' => '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      'maxZoom' => 19,
-    ],
-    'custom' => [
-      'label' => 'Custom URL',
-      'url' => '',
-      'attribution' => '',
-      'maxZoom' => 18,
-    ],
-  ];
+  const CONFIG_NAME = 'trail_mapper.settings';
 
   /**
    * {@inheritdoc}
    */
   protected function getEditableConfigNames(): array {
-    return ['trail_mapper.settings'];
+    return [self::CONFIG_NAME];
   }
 
   /**
@@ -75,63 +34,50 @@ class TrailMapperSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
-    $config = $this->config('trail_mapper.settings');
-    $current_key = $config->get('tile_key') ?: 'usgs-topo';
-
-    $options = [];
-    foreach (self::TILE_SETS as $key => $tile) {
-      $options[$key] = $tile['label'];
-    }
+    $config = $this->config(self::CONFIG_NAME);
 
     $form['tile_key'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Tile set'),
-      '#description' => $this->t('Background map tiles used on all Leaflet maps.'),
-      '#options' => $options,
-      '#default_value' => $current_key,
-    ];
-
-    $form['custom'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Custom tile settings'),
-      '#open' => $current_key === 'custom',
-      '#states' => [
-        'visible' => [
-          'select[name="tile_key"]' => ['value' => 'custom'],
-        ],
+      '#type'          => 'select',
+      '#title'         => $this->t('Tile set'),
+      '#default_value' => $config->get('tile_key') ?? 'usgs-topo',
+      '#options'       => [
+        'usgs-topo'         => $this->t('USGS Topo'),
+        'usgs-imagery'      => $this->t('USGS Imagery'),
+        'usgs-imagery-topo' => $this->t('USGS Imagery + Topo'),
+        'usgs-shaded'       => $this->t('USGS Shaded Relief'),
+        'osm'               => $this->t('OpenStreetMap'),
+        'custom'            => $this->t('Custom URL'),
       ],
     ];
 
-    $form['custom']['tile_url'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Tile URL template'),
-      '#description' => $this->t('Use {z}, {x}, {y} placeholders. E.g. https://{s}.tile.example.org/{z}/{x}/{y}.png'),
-      '#default_value' => $config->get('tile_url') ?: '',
-      '#maxlength' => 512,
+    $form['tile_url'] = [
+      '#type'          => 'textfield',
+      '#title'         => $this->t('Custom tile URL'),
+      '#default_value' => $config->get('tile_url') ?? '',
+      '#description'   => $this->t('Leaflet tile URL template. Required when Tile set is Custom URL.'),
+      '#states'        => [
+        'visible' => [':input[name="tile_key"]' => ['value' => 'custom']],
+      ],
     ];
 
-    $form['custom']['tile_attribution'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Attribution'),
-      '#description' => $this->t('HTML attribution string shown in the map corner.'),
-      '#default_value' => $config->get('tile_attribution') ?: '',
-      '#maxlength' => 512,
+    $form['tile_attribution'] = [
+      '#type'          => 'textfield',
+      '#title'         => $this->t('Custom tile attribution'),
+      '#default_value' => $config->get('tile_attribution') ?? '',
+      '#states'        => [
+        'visible' => [':input[name="tile_key"]' => ['value' => 'custom']],
+      ],
     ];
 
-    $form['preview'] = [
-      '#type' => 'fieldset',
-      '#title' => $this->t('Built-in tile URLs (reference)'),
-    ];
-
-    $rows = [];
-    foreach (self::TILE_SETS as $key => $tile) {
-      if ($key === 'custom') continue;
-      $rows[] = [$key, $tile['url']];
-    }
-    $form['preview']['table'] = [
-      '#type' => 'table',
-      '#header' => [$this->t('Key'), $this->t('URL')],
-      '#rows' => $rows,
+    $form['elevation_unit'] = [
+      '#type'          => 'select',
+      '#title'         => $this->t('Elevation display unit'),
+      '#default_value' => $config->get('elevation_unit') ?? 'feet',
+      '#options'       => [
+        'feet'   => $this->t('Feet'),
+        'meters' => $this->t('Meters'),
+      ],
+      '#description'   => $this->t('Unit used in the stats bar and elevation profile. GeoJSON is always stored in meters.'),
     ];
 
     return parent::buildForm($form, $form_state);
@@ -141,45 +87,75 @@ class TrailMapperSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
-    $this->config('trail_mapper.settings')
+    $this->config(self::CONFIG_NAME)
       ->set('tile_key', $form_state->getValue('tile_key'))
       ->set('tile_url', $form_state->getValue('tile_url'))
       ->set('tile_attribution', $form_state->getValue('tile_attribution'))
+      ->set('elevation_unit', $form_state->getValue('elevation_unit'))
       ->save();
 
     parent::submitForm($form, $form_state);
   }
 
   /**
-   * Returns the resolved tile URL for the current settings.
+   * Returns resolved tile config for use in hook_page_attachments.
    *
-   * Used by hook_page_attachments to pass to drupalSettings.
-   *
-   * @param string|null $key
-   *   Tile key override, or NULL to use saved config.
-   *
-   * @return array{url: string, attribution: string, key: string}
+   * @return array
+   *   Array with keys: key, url, attribution, maxZoom.
    */
-  public static function resolvedTile(?string $key = NULL): array {
-    $config = \Drupal::config('trail_mapper.settings');
-    $key = $key ?? $config->get('tile_key') ?? 'usgs-topo';
+  public static function resolvedTile(): array {
+    $config = \Drupal::config(self::CONFIG_NAME);
+    $key = $config->get('tile_key') ?? 'usgs-topo';
+
+    $tiles = [
+      'usgs-topo' => [
+        'url'         => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',
+        'attribution' => 'Tiles &copy; <a href="https://usgs.gov">USGS</a> The National Map',
+        'maxZoom'     => 16,
+      ],
+      'usgs-imagery' => [
+        'url'         => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}',
+        'attribution' => 'Tiles &copy; <a href="https://usgs.gov">USGS</a> The National Map',
+        'maxZoom'     => 16,
+      ],
+      'usgs-imagery-topo' => [
+        'url'         => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryTopo/MapServer/tile/{z}/{y}/{x}',
+        'attribution' => 'Tiles &copy; <a href="https://usgs.gov">USGS</a> The National Map',
+        'maxZoom'     => 16,
+      ],
+      'usgs-shaded' => [
+        'url'         => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSShadedReliefOnly/MapServer/tile/{z}/{y}/{x}',
+        'attribution' => 'Tiles &copy; <a href="https://usgs.gov">USGS</a> The National Map',
+        'maxZoom'     => 16,
+      ],
+      'osm' => [
+        'url'         => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'attribution' => '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        'maxZoom'     => 19,
+      ],
+    ];
 
     if ($key === 'custom') {
       return [
-        'key' => 'custom',
-        'url' => $config->get('tile_url') ?: self::TILE_SETS['usgs-topo']['url'],
-        'attribution' => $config->get('tile_attribution') ?: '',
-        'maxZoom' => 18,
+        'key'         => 'custom',
+        'url'         => $config->get('tile_url') ?? '',
+        'attribution' => $config->get('tile_attribution') ?? '',
+        'maxZoom'     => 16,
       ];
     }
 
-    $tile = self::TILE_SETS[$key] ?? self::TILE_SETS['usgs-topo'];
-    return [
-      'key' => $key,
-      'url' => $tile['url'],
-      'attribution' => $tile['attribution'],
-      'maxZoom' => $tile['maxZoom'] ?? 16,
-    ];
+    $tile = $tiles[$key] ?? $tiles['usgs-topo'];
+    return array_merge(['key' => $key], $tile);
+  }
+
+  /**
+   * Returns the configured elevation unit.
+   *
+   * @return string
+   *   'feet' or 'meters'.
+   */
+  public static function elevationUnit(): string {
+    return \Drupal::config(self::CONFIG_NAME)->get('elevation_unit') ?? 'feet';
   }
 
 }

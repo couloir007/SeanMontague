@@ -9,15 +9,13 @@ use Drupal\file\Entity\File;
 use Drupal\node\NodeInterface;
 
 /**
- * Converts GPX and GeoJSON uploads to normalized GeoJSON with Z in feet.
+ * Converts GPX and GeoJSON uploads to normalized GeoJSON with Z in meters.
  *
  * Called from trail_mapper_entity_presave() hook. Injected via service
  * container to keep the hook thin and the logic testable.
  *
- * Elevation unit assumption: all uploaded files store elevation in meters.
- * Strava, Garmin, Gaia GPS, and Komoot all export in meters. Hand-crafted
- * GeoJSON on this site also uses meters by convention.
- * If a file uses feet, pre-convert before uploading.
+ * Elevation is stored in meters in GeoJSON. Conversion to feet (or other
+ * display units) is handled client-side in map.js based on user preference.
  */
 class GeoShapeConverter {
 
@@ -69,7 +67,7 @@ class GeoShapeConverter {
   }
 
   /**
-   * Converts a GPX file to GeoJSON FeatureCollection with Z in feet.
+   * Converts a GPX file to GeoJSON FeatureCollection with Z in meters.
    *
    * @param string $uri
    *   Drupal stream wrapper URI to the GPX file.
@@ -137,13 +135,14 @@ class GeoShapeConverter {
   }
 
   /**
-   * Normalizes a GeoJSON file, converting Z values from meters to feet.
+   * Normalizes a GeoJSON file. Z values are kept in meters; display
+   * unit conversion is handled client-side.
    *
    * @param string $uri
    *   Drupal stream wrapper URI to the GeoJSON file.
    *
    * @return string|null
-   *   JSON-encoded GeoJSON string with Z in feet, or NULL on failure.
+   *   JSON-encoded GeoJSON string with Z in meters, or NULL on failure.
    */
   protected function normalizeGeoJson(string $uri): ?string {
     $path = $this->fileSystem->realpath($uri);
@@ -178,30 +177,9 @@ class GeoShapeConverter {
 
     if (isset($data['features'])) {
       foreach ($data['features'] as &$feature) {
-        $type = $feature['geometry']['type'] ?? '';
-        $coords = &$feature['geometry']['coordinates'];
-
-        if ($type === 'LineString') {
-          foreach ($coords as &$coord) {
-            if (isset($coord[2])) {
-              $coord[2] = round($coord[2] * 3.28084, 1);
-            }
-          }
-          unset($coord);
-        }
-        elseif ($type === 'MultiLineString') {
-          foreach ($coords as &$line) {
-            foreach ($line as &$coord) {
-              if (isset($coord[2])) {
-                $coord[2] = round($coord[2] * 3.28084, 1);
-              }
-            }
-            unset($coord);
-          }
-          unset($line);
-        }
-
-        $feature['properties']['elevation_unit'] = 'feet';
+        // Z values are stored as-is in meters. Conversion to display units
+        // (feet/meters) is handled client-side in map.js.
+        $feature['properties']['elevation_unit'] = 'meters';
         $feature['properties']['source'] = $feature['properties']['source'] ?? 'geojson';
       }
       unset($feature);
@@ -273,22 +251,22 @@ class GeoShapeConverter {
   }
 
   /**
-   * Extracts [lon, lat, elevation_ft] coordinates from GPX point elements.
+   * Extracts [lon, lat, elevation_m] coordinates from GPX point elements.
    *
    * @param \SimpleXMLElement $points
    *   Collection of GPX point elements (trkpt or rtept).
    *
    * @return array
-   *   Array of coordinate arrays [lon, lat] or [lon, lat, ele_ft].
+   *   Array of coordinate arrays [lon, lat] or [lon, lat, ele_m].
    */
   protected function extractCoordinates(\SimpleXMLElement $points): array {
     $coordinates = [];
     foreach ($points as $pt) {
       $lon = (float) $pt['lon'];
       $lat = (float) $pt['lat'];
-      // GPX elevation in meters — convert to feet.
+      // GPX elevation in meters — stored as-is; conversion handled in map.js.
       $ele = isset($pt->ele)
-        ? round((float) $pt->ele * 3.28084, 1)
+        ? round((float) $pt->ele, 4)
         : NULL;
       $coordinates[] = $ele !== NULL
         ? [$lon, $lat, $ele]
@@ -320,7 +298,7 @@ class GeoShapeConverter {
       'properties' => [
         'name' => $name,
         'source' => $source,
-        'elevation_unit' => 'feet',
+        'elevation_unit' => 'meters',
       ],
     ];
   }
