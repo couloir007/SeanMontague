@@ -46,6 +46,8 @@ class TrailMapperSettingsForm extends ConfigFormBase {
         'usgs-imagery-topo' => $this->t('USGS Imagery + Topo'),
         'usgs-shaded'       => $this->t('USGS Shaded Relief'),
         'osm'               => $this->t('OpenStreetMap'),
+        'open-topo'         => $this->t('OpenTopoMap'),
+        'esri-topo'         => $this->t('Esri World Topo'),
         'custom'            => $this->t('Custom URL'),
       ],
     ];
@@ -98,16 +100,13 @@ class TrailMapperSettingsForm extends ConfigFormBase {
   }
 
   /**
-   * Returns resolved tile config for use in hook_page_attachments.
+   * Returns all registered tile set definitions.
    *
    * @return array
-   *   Array with keys: key, url, attribution, maxZoom.
+   *   Keyed by tile set key; each entry has url, attribution, maxZoom.
    */
-  public static function resolvedTile(): array {
-    $config = \Drupal::config(self::CONFIG_NAME);
-    $key = $config->get('tile_key') ?? 'usgs-topo';
-
-    $tiles = [
+  public static function tileSets(): array {
+    return [
       'usgs-topo' => [
         'url'         => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',
         'attribution' => 'Tiles &copy; <a href="https://usgs.gov">USGS</a> The National Map',
@@ -133,7 +132,28 @@ class TrailMapperSettingsForm extends ConfigFormBase {
         'attribution' => '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         'maxZoom'     => 19,
       ],
+      'open-topo' => [
+        'url'         => 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+        'attribution' => '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://opentopomap.org">OpenTopoMap</a>',
+        'maxZoom'     => 17,
+      ],
+      'esri-topo' => [
+        'url'         => 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+        'attribution' => '&copy; <a href="https://www.esri.com">Esri</a>',
+        'maxZoom'     => 18,
+      ],
     ];
+  }
+
+  /**
+   * Returns resolved tile config for use in hook_page_attachments.
+   *
+   * @return array
+   *   Array with keys: key, url, attribution, maxZoom.
+   */
+  public static function resolvedTile(): array {
+    $config = \Drupal::config(self::CONFIG_NAME);
+    $key = $config->get('tile_key') ?? 'usgs-topo';
 
     if ($key === 'custom') {
       return [
@@ -144,6 +164,7 @@ class TrailMapperSettingsForm extends ConfigFormBase {
       ];
     }
 
+    $tiles = self::tileSets();
     $tile = $tiles[$key] ?? $tiles['usgs-topo'];
     return array_merge(['key' => $key], $tile);
   }

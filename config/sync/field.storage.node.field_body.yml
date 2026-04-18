@@ -1,16 +1,16 @@
-uuid: ca546341-a88b-4d03-b88d-8f106dfdfa7e
+uuid: ad9f2394-0116-4e71-8bc3-5d5a889a3270
 langcode: en
 status: true
 dependencies:
   module:
-    - link
-    - media
-id: media.schema_content_url
-field_name: schema_content_url
-entity_type: media
-type: link
+    - node
+    - text
+id: node.field_body
+field_name: field_body
+entity_type: node
+type: text_long
 settings: {  }
-module: link
+module: text
 locked: false
 cardinality: 1
 translatable: true

@@ -4,7 +4,6 @@ status: true
 dependencies:
   config:
     - field.storage.node.field_image
-    - media.type.image
     - node.type.article
 id: node.article.field_image
 field_name: field_image
@@ -19,6 +18,5 @@ default_value_callback: ''
 settings:
   handler: 'default:media'
   handler_settings:
-    target_bundles:
-      image: image
+    target_bundles: {  }
 field_type: entity_reference

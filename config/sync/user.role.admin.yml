@@ -1,0 +1,499 @@
+uuid: f02389b1-db05-4d65-9a79-02fd31936231
+langcode: en
+status: true
+dependencies:
+  config:
+    - dashboard.dashboard.moderation
+    - dashboard.dashboard.overview
+    - media.type.audio
+    - media.type.image
+    - media.type.remote_video
+    - media.type.video
+    - node.type.article
+    - node.type.blog_posting
+    - node.type.event
+    - node.type.event_series
+    - node.type.page
+    - node.type.person
+    - node.type.place
+    - node.type.podcast_episode
+    - node.type.podcast_series
+    - node.type.tourist_trip
+    - node.type.web_site
+    - taxonomy.vocabulary.activity_type
+    - taxonomy.vocabulary.category
+    - taxonomy.vocabulary.tags
+    - user.role.admin
+    - user.role.authenticated
+  module:
+    - auto_entitylabel
+    - backup_migrate
+    - block
+    - block_content
+    - captcha
+    - cer
+    - config
+    - config_translation
+    - content_model_documentation
+    - content_moderation
+    - content_translation
+    - contextual
+    - crop
+    - dashboard
+    - devel
+    - devel_generate
+    - embed
+    - embedded_content
+    - entity_browser
+    - entity_reference_revisions
+    - environment_indicator
+    - field_ui
+    - field_validation
+    - file
+    - file_delete
+    - geocoder
+    - gvp_external_resources
+    - help
+    - honeypot
+    - image
+    - language
+    - layout_builder
+    - leaflet
+    - linkit
+    - locale
+    - login_destination
+    - masquerade
+    - media
+    - media_file_delete
+    - metatag
+    - moderated_content_bulk_publish
+    - moderation_dashboard
+    - moderation_sidebar
+    - module_filter
+    - node
+    - paragraphs
+    - path
+    - pathauto
+    - queue_ui
+    - r4032login
+    - recaptcha
+    - redirect
+    - rest
+    - scheduler
+    - schemadotorg
+    - schemadotorg_devel
+    - schemadotorg_diagram
+    - schemadotorg_jsonld_preview
+    - shortcut
+    - simple_sitemap
+    - smart_date
+    - system
+    - taxonomy
+    - toolbar
+    - trash
+    - type_tray
+    - ultimate_cron
+    - update
+    - views_ui
+    - webform
+    - workflows
+id: admin
+label: Admin
+weight: 2
+is_admin: null
+permissions:
+  - 'access administration pages'
+  - 'access any webform configuration'
+  - 'access backup files'
+  - 'access block library'
+  - 'access content overview'
+  - 'access contextual links'
+  - 'access devel information'
+  - 'access environment indicator'
+  - 'access files overview'
+  - 'access geocoder api endpoints'
+  - 'access help pages'
+  - 'access media overview'
+  - 'access own webform configuration'
+  - 'access shortcuts'
+  - 'access site in maintenance mode'
+  - 'access site reports'
+  - 'access taxonomy overview'
+  - 'access toolbar'
+  - 'access trash'
+  - 'access user profiles'
+  - 'access webform help'
+  - 'access webform overview'
+  - 'access webform submission user'
+  - 'add content model document entities'
+  - 'admin queue_ui'
+  - 'administer CAPTCHA settings'
+  - 'administer account settings'
+  - 'administer actions'
+  - 'administer backup and migrate'
+  - 'administer block content'
+  - 'administer block types'
+  - 'administer block_content display'
+  - 'administer block_content fields'
+  - 'administer block_content form display'
+  - 'administer blocks'
+  - 'administer cer'
+  - 'administer cm_document display'
+  - 'administer cm_document fields'
+  - 'administer cm_document form display'
+  - 'administer content model document entities'
+  - 'administer content model documentation'
+  - 'administer content translation'
+  - 'administer content types'
+  - 'administer crop'
+  - 'administer crop types'
+  - 'administer dashboard'
+  - 'administer devel_generate'
+  - 'administer display modes'
+  - 'administer embed buttons'
+  - 'administer embedded content'
+  - 'administer entity browsers'
+  - 'administer environment indicator settings'
+  - 'administer external resource endpoint entities'
+  - 'administer external resource entities'
+  - 'administer external_resource_endpoint display'
+  - 'administer external_resource_endpoint fields'
+  - 'administer external_resource_endpoint form display'
+  - 'administer field validation rule set'
+  - 'administer gvp_external_resource display'
+  - 'administer gvp_external_resource fields'
+  - 'administer gvp_external_resource form display'
+  - 'administer honeypot'
+  - 'administer image styles'
+  - 'administer languages'
+  - 'administer linkit profiles'
+  - 'administer login destination settings'
+  - 'administer media'
+  - 'administer media display'
+  - 'administer media fields'
+  - 'administer media file delete'
+  - 'administer media form display'
+  - 'administer media types'
+  - 'administer media_type labels'
+  - 'administer menu'
+  - 'administer meta tags'
+  - 'administer moderation sidebar'
+  - 'administer module_filter'
+  - 'administer modules'
+  - 'administer node display'
+  - 'administer node fields'
+  - 'administer node form display'
+  - 'administer nodes'
+  - 'administer paragraph display'
+  - 'administer paragraph fields'
+  - 'administer paragraph form display'
+  - 'administer paragraphs settings'
+  - 'administer paragraphs types'
+  - 'administer paragraphs_type labels'
+  - 'administer pathauto'
+  - 'administer permissions'
+  - 'administer r4032login'
+  - 'administer recaptcha'
+  - 'administer redirect settings'
+  - 'administer redirects'
+  - 'administer rest resources'
+  - 'administer scheduler'
+  - 'administer schemadotorg'
+  - 'administer shortcut_set labels'
+  - 'administer shortcuts'
+  - 'administer site configuration'
+  - 'administer sitemap settings'
+  - 'administer smart date formats'
+  - 'administer software updates'
+  - 'administer taxonomy'
+  - 'administer taxonomy_term display'
+  - 'administer taxonomy_term fields'
+  - 'administer taxonomy_term form display'
+  - 'administer taxonomy_vocabulary labels'
+  - 'administer themes'
+  - 'administer trash'
+  - 'administer type tray'
+  - 'administer ultimate cron'
+  - 'administer url aliases'
+  - 'administer user display'
+  - 'administer user fields'
+  - 'administer user form display'
+  - 'administer users'
+  - 'administer views'
+  - 'administer volcano external resource entities'
+  - 'administer volcano_external_resource display'
+  - 'administer volcano_external_resource fields'
+  - 'administer volcano_external_resource form display'
+  - 'administer webform'
+  - 'administer webform element access'
+  - 'administer webform labels'
+  - 'administer webform overview'
+  - 'administer webform submission'
+  - 'administer workflows'
+  - 'bulk delete aliases'
+  - 'bulk update aliases'
+  - 'bypass honeypot protection'
+  - 'bypass node access'
+  - 'cancel account'
+  - 'change own username'
+  - 'configure any layout'
+  - 'configure leaflet'
+  - 'create and edit custom blocks'
+  - 'create article content'
+  - 'create audio media'
+  - 'create blog_posting content'
+  - 'create content translations'
+  - 'create event content'
+  - 'create event_series content'
+  - 'create image media'
+  - 'create media'
+  - 'create page content'
+  - 'create person content'
+  - 'create place content'
+  - 'create podcast_episode content'
+  - 'create podcast_series content'
+  - 'create remote_video media'
+  - 'create terms in activity_type'
+  - 'create terms in category'
+  - 'create terms in tags'
+  - 'create tourist_trip content'
+  - 'create url aliases'
+  - 'create video media'
+  - 'create web_site content'
+  - 'create webform'
+  - 'customize shortcut links'
+  - 'delete all revisions'
+  - 'delete all taxonomy revisions'
+  - 'delete any article content'
+  - 'delete any audio media'
+  - 'delete any audio media revisions'
+  - 'delete any blog_posting content'
+  - 'delete any event content'
+  - 'delete any event_series content'
+  - 'delete any file'
+  - 'delete any image media'
+  - 'delete any image media revisions'
+  - 'delete any media'
+  - 'delete any page content'
+  - 'delete any person content'
+  - 'delete any place content'
+  - 'delete any podcast_episode content'
+  - 'delete any podcast_series content'
+  - 'delete any remote_video media'
+  - 'delete any remote_video media revisions'
+  - 'delete any tourist_trip content'
+  - 'delete any video media'
+  - 'delete any video media revisions'
+  - 'delete any web_site content'
+  - 'delete any webform'
+  - 'delete any webform submission'
+  - 'delete article revisions'
+  - 'delete blog_posting revisions'
+  - 'delete content model document entities'
+  - 'delete content translations'
+  - 'delete event revisions'
+  - 'delete event_series revisions'
+  - 'delete files immediately'
+  - 'delete files override usage'
+  - 'delete media'
+  - 'delete orphan revisions'
+  - 'delete own article content'
+  - 'delete own audio media'
+  - 'delete own blog_posting content'
+  - 'delete own event content'
+  - 'delete own event_series content'
+  - 'delete own files'
+  - 'delete own image media'
+  - 'delete own page content'
+  - 'delete own person content'
+  - 'delete own place content'
+  - 'delete own podcast_episode content'
+  - 'delete own podcast_series content'
+  - 'delete own remote_video media'
+  - 'delete own tourist_trip content'
+  - 'delete own video media'
+  - 'delete own web_site content'
+  - 'delete own webform'
+  - 'delete own webform submission'
+  - 'delete page revisions'
+  - 'delete person revisions'
+  - 'delete place revisions'
+  - 'delete podcast_episode revisions'
+  - 'delete podcast_series revisions'
+  - 'delete term revisions in activity_type'
+  - 'delete term revisions in category'
+  - 'delete term revisions in tags'
+  - 'delete terms in activity_type'
+  - 'delete terms in category'
+  - 'delete terms in tags'
+  - 'delete tourist_trip revisions'
+  - 'delete web_site revisions'
+  - 'edit any article content'
+  - 'edit any audio media'
+  - 'edit any blog_posting content'
+  - 'edit any event content'
+  - 'edit any event_series content'
+  - 'edit any image media'
+  - 'edit any page content'
+  - 'edit any person content'
+  - 'edit any place content'
+  - 'edit any podcast_episode content'
+  - 'edit any podcast_series content'
+  - 'edit any remote_video media'
+  - 'edit any tourist_trip content'
+  - 'edit any video media'
+  - 'edit any web_site content'
+  - 'edit any webform'
+  - 'edit any webform submission'
+  - 'edit behavior plugin settings'
+  - 'edit content model document entities'
+  - 'edit entity sitemap settings'
+  - 'edit own article content'
+  - 'edit own audio media'
+  - 'edit own blog_posting content'
+  - 'edit own event content'
+  - 'edit own event_series content'
+  - 'edit own image media'
+  - 'edit own page content'
+  - 'edit own person content'
+  - 'edit own place content'
+  - 'edit own podcast_episode content'
+  - 'edit own podcast_series content'
+  - 'edit own remote_video media'
+  - 'edit own tourist_trip content'
+  - 'edit own video media'
+  - 'edit own web_site content'
+  - 'edit own webform'
+  - 'edit own webform submission'
+  - 'edit terms in activity_type'
+  - 'edit terms in category'
+  - 'edit terms in tags'
+  - 'edit webform assets'
+  - 'edit webform source'
+  - 'edit webform twig'
+  - 'edit webform variants'
+  - 'export configuration'
+  - 'generate schemadotorg content'
+  - 'import configuration'
+  - 'link to any page'
+  - 'manage all content model document revisions'
+  - 'masquerade as admin'
+  - 'masquerade as any user'
+  - 'masquerade as authenticated'
+  - 'masquerade as super user'
+  - 'moderated content bulk archive'
+  - 'moderated content bulk pin content'
+  - 'moderated content bulk publish'
+  - 'moderated content bulk unpin content'
+  - 'moderated content bulk unpublish'
+  - 'notify of path changes'
+  - 'perform backup'
+  - 'process entity_reference_revisions_orphan_purger queue'
+  - 'process geocoder_field queue'
+  - 'process locale_translation queue'
+  - 'process media_entity_thumbnail queue'
+  - 'process trash_entity_purge queue'
+  - 'purge node entities'
+  - 'restore from backup'
+  - 'restore node entities'
+  - 'revert all revisions'
+  - 'revert all taxonomy revisions'
+  - 'revert any audio media revisions'
+  - 'revert any image media revisions'
+  - 'revert any remote_video media revisions'
+  - 'revert any video media revisions'
+  - 'revert article revisions'
+  - 'revert blog_posting revisions'
+  - 'revert event revisions'
+  - 'revert event_series revisions'
+  - 'revert page revisions'
+  - 'revert person revisions'
+  - 'revert place revisions'
+  - 'revert podcast_episode revisions'
+  - 'revert podcast_series revisions'
+  - 'revert term revisions in activity_type'
+  - 'revert term revisions in category'
+  - 'revert term revisions in tags'
+  - 'revert tourist_trip revisions'
+  - 'revert web_site revisions'
+  - 'run cron jobs'
+  - 'schedule publishing of media'
+  - 'schedule publishing of nodes'
+  - 'schedule publishing of taxonomy_term'
+  - 'select account cancellation method'
+  - 'skip CAPTCHA'
+  - 'switch shortcut sets'
+  - 'switch users'
+  - 'synchronize configuration'
+  - 'translate any entity'
+  - 'translate article node'
+  - 'translate audio media'
+  - 'translate blog_posting node'
+  - 'translate configuration'
+  - 'translate editable entities'
+  - 'translate event node'
+  - 'translate event_series node'
+  - 'translate image media'
+  - 'translate interface'
+  - 'translate page node'
+  - 'translate person node'
+  - 'translate place node'
+  - 'translate podcast_episode node'
+  - 'translate podcast_series node'
+  - 'translate remote_video media'
+  - 'translate tags taxonomy_term'
+  - 'translate tourist_trip node'
+  - 'translate video media'
+  - 'translate web_site node'
+  - 'update any media'
+  - 'update content translations'
+  - 'update media'
+  - 'use default embedded content button'
+  - 'use moderation dashboard'
+  - 'use moderation sidebar'
+  - 'view all content model document revisions'
+  - 'view all media revisions'
+  - 'view all revisions'
+  - 'view all taxonomy revisions'
+  - 'view any audio media revisions'
+  - 'view any image media revisions'
+  - 'view any moderation dashboard'
+  - 'view any remote_video media revisions'
+  - 'view any unpublished content'
+  - 'view any video media revisions'
+  - 'view any webform submission'
+  - 'view article revisions'
+  - 'view blog_posting revisions'
+  - 'view content model documentation'
+  - 'view content model documentation reports'
+  - 'view cron jobs'
+  - 'view deleted entities'
+  - 'view event revisions'
+  - 'view event_series revisions'
+  - 'view latest version'
+  - 'view moderation dashboard'
+  - 'view overview dashboard'
+  - 'view own unpublished content'
+  - 'view own unpublished media'
+  - 'view own webform submission'
+  - 'view page revisions'
+  - 'view person revisions'
+  - 'view place revisions'
+  - 'view podcast_episode revisions'
+  - 'view podcast_series revisions'
+  - 'view scheduled content'
+  - 'view scheduled media'
+  - 'view scheduled taxonomy_term'
+  - 'view schemadotorg diagram'
+  - 'view schemadotorg jsonld'
+  - 'view term revisions in activity_type'
+  - 'view term revisions in category'
+  - 'view term revisions in tags'
+  - 'view the administration theme'
+  - 'view tourist_trip revisions'
+  - 'view unpublished content model document entities'
+  - 'view unpublished paragraphs'
+  - 'view update notifications'
+  - 'view user email addresses'
+  - 'view vocabulary labels'
+  - 'view web_site revisions'

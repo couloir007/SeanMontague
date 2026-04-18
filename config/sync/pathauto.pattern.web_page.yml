@@ -1,0 +1,23 @@
+uuid: 4eb286f3-d101-4fd8-b3ad-7a2664789ef4
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: web_page
+label: 'Web Page'
+type: 'canonical_entities:node'
+pattern: '[node:menu-link:parents:join-path]/[node:title]'
+selection_criteria:
+  3821e4ef-6a17-481f-8045-7716f29c2533:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: 3821e4ef-6a17-481f-8045-7716f29c2533
+    context_mapping:
+      node: node
+    bundles:
+      page: page
+      tourist_trip: tourist_trip
+selection_logic: and
+weight: -5
+relationships: {  }

@@ -1,0 +1,13 @@
+uuid: 520c2309-05b3-419f-a3ab-810c0dcd47f5
+langcode: en
+status: true
+dependencies: {  }
+id: schema_subject_of
+label: 'Schema.org: Subject of ↔ About'
+enabled: true
+first_field: schema_subject_of
+second_field: schema_about
+add_direction: append
+bundles:
+  node:
+    - '*'

@@ -1,11 +1,13 @@
-uuid: c1ec1135-8e74-4bf5-9033-096808fa4189
+uuid: 300f5509-a7d1-45ec-b606-ced0f87215d2
 langcode: en
 status: true
 dependencies:
   config:
-    - field.field.media.image.schema_image
+    - field.field.media.image.field_media_image
+    - image.style.medium
     - media.type.image
   module:
+    - focal_point
     - path
 id: media.image.default
 targetEntityType: media
@@ -17,6 +19,16 @@ content:
     weight: 200
     region: content
     settings: {  }
+    third_party_settings: {  }
+  field_media_image:
+    type: image_focal_point
+    weight: 0
+    region: content
+    settings:
+      progress_indicator: throbber
+      preview_image_style: medium
+      preview_link: true
+      offsets: '50,50'
     third_party_settings: {  }
   langcode:
     type: language_select
@@ -38,16 +50,6 @@ content:
     weight: 210
     region: content
     settings: {  }
-    third_party_settings: {  }
-  schema_image:
-    type: entity_reference_autocomplete
-    weight: 8
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
     third_party_settings: {  }
   status:
     type: boolean_checkbox

@@ -1,10 +1,12 @@
-uuid: e09e50c1-6034-42bf-9b8b-66dc9000f727
+uuid: c8d9723a-9685-4b0c-8be5-2a6cbed22012
 langcode: en
 status: true
 dependencies:
   config:
+    - field.field.media.video.field_media_oembed_video
     - media.type.video
   module:
+    - media
     - path
 id: media.video.default
 targetEntityType: media
@@ -16,6 +18,14 @@ content:
     weight: 200
     region: content
     settings: {  }
+    third_party_settings: {  }
+  field_media_oembed_video:
+    type: oembed_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
   langcode:
     type: language_select

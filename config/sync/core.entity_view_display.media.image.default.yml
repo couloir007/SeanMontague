@@ -1,23 +1,32 @@
-uuid: 94453740-affb-4ebb-9612-afe58b73f863
+uuid: 345a2df5-c3d8-4655-8cf8-61a805f26b6b
 langcode: en
 status: true
 dependencies:
   config:
-    - field.field.media.image.schema_image
+    - field.field.media.image.field_media_image
+    - image.style.large
     - media.type.image
+  module:
+    - svg_image
 id: media.image.default
 targetEntityType: media
 bundle: image
 mode: default
 content:
-  schema_image:
-    type: entity_reference_entity_view
-    label: hidden
+  field_media_image:
+    type: image
+    label: visually_hidden
     settings:
-      view_mode: default
-      link: false
+      image_link: ''
+      image_style: large
+      image_loading:
+        attribute: lazy
+      svg_attributes:
+        width: null
+        height: null
+      svg_render_as_image: true
     third_party_settings: {  }
-    weight: 8
+    weight: 0
     region: content
 hidden:
   created: true

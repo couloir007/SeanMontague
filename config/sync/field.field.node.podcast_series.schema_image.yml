@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.storage.node.schema_image
+    - media.type.image
     - node.type.podcast_series
   module:
     - epp

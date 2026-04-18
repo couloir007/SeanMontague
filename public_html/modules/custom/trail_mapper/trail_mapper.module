@@ -51,7 +51,8 @@ function trail_mapper_page_attachments(array &$attachments): void {
     'tileUrl'         => $tile['url'],
     'tileAttribution' => $tile['attribution'],
     'tileMaxZoom'     => $tile['maxZoom'] ?? 16,
-    'elevationUnit'   => \Drupal::config('trail_mapper.settings')->get('elevation_unit') ?? 'feet',
+    'tileSets'        => TrailMapperSettingsForm::tileSets(),
+    'elevationUnit'   => Drupal::config('trail_mapper.settings')->get('elevation_unit') ?? 'feet',
   ];
 }
 
@@ -62,68 +63,68 @@ function trail_mapper_page_attachments(array &$attachments): void {
  * Overrides alias patterns based on bundle and field values.
  * Evaluated in priority order; first match wins.
  */
-function trail_mapper_pathauto_pattern_alter(\Drupal\pathauto\PathautoPatternInterface $pattern, array $context): void {
-  if ($context['module'] !== 'node' || empty($context['data']['node'])) {
-    return;
-  }
-
-  /** @var \Drupal\node\NodeInterface $entity */
-  $entity = $context['data']['node'];
-  $bundle = $entity->bundle();
-
-  // 1. tourist_trip → /trips/[node:title]
-  if ($bundle === 'tourist_trip') {
-    $pattern->setPattern('/trips/[node:title]');
-    return;
-  }
-
-  if ($bundle !== 'article') {
-    return;
-  }
-
-  $cleaner = \Drupal::service('pathauto.alias_cleaner');
-
-  // 2. article + schema_trip → /trips/{trip-slug}/[node:title]
-  if (!$entity->get('schema_trip')->isEmpty()) {
-    $trip = $entity->schema_trip->entity;
-    if ($trip) {
-      $slug = $cleaner->cleanString($trip->label());
-      $pattern->setPattern('/trips/' . $slug . '/[node:title]');
-      return;
-    }
-  }
-
-  // 3. article + schema_activity_type → /trails/{field_key}/[node:title]
-  if (!$entity->get('schema_activity_type')->isEmpty()) {
-    $term = $entity->schema_activity_type->entity;
-    if ($term) {
-      $key = $term->field_key?->value;
-      if ($key) {
-        $pattern->setPattern('/trails/' . $key . '/[node:title]');
-        return;
-      }
-    }
-  }
-
-  // 4. article + schema_category with known field_key values
-  if (!$entity->get('schema_category')->isEmpty()) {
-    $term = $entity->schema_category->entity;
-    if ($term) {
-      $key = $term->field_key?->value;
-      if ($key === 'drupal') {
-        $pattern->setPattern('/drupal/[node:title]');
-        return;
-      }
-      if ($key === 'permaculture') {
-        $pattern->setPattern('/permaculture/[node:title]');
-        return;
-      }
-    }
-  }
-
-  // 5. article fallback → /writing/[node:title]
-  $pattern->setPattern('/writing/[node:title]');
-}
+//function trail_mapper_pathauto_pattern_alter(\Drupal\pathauto\PathautoPatternInterface $pattern, array $context): void {
+//  if ($context['module'] !== 'node' || empty($context['data']['node'])) {
+//    return;
+//  }
+//
+//  /** @var \Drupal\node\NodeInterface $entity */
+//  $entity = $context['data']['node'];
+//  $bundle = $entity->bundle();
+//
+//  // 1. tourist_trip → /trips/[node:title]
+//  if ($bundle === 'tourist_trip') {
+//    $pattern->setPattern('/trips/[node:title]');
+//    return;
+//  }
+//
+//  if ($bundle !== 'article') {
+//    return;
+//  }
+//
+//  $cleaner = \Drupal::service('pathauto.alias_cleaner');
+//
+//  // 2. article + schema_trip → /trips/{trip-slug}/[node:title]
+//  if (!$entity->get('schema_trip')->isEmpty()) {
+//    $trip = $entity->schema_trip->entity;
+//    if ($trip) {
+//      $slug = $cleaner->cleanString($trip->label());
+//      $pattern->setPattern('/trips/' . $slug . '/[node:title]');
+//      return;
+//    }
+//  }
+//
+//  // 3. article + schema_activity_type → /trails/{field_key}/[node:title]
+//  if (!$entity->get('schema_activity_type')->isEmpty()) {
+//    $term = $entity->schema_activity_type->entity;
+//    if ($term) {
+//      $key = $term->field_key?->value;
+//      if ($key) {
+//        $pattern->setPattern('/trails/' . $key . '/[node:title]');
+//        return;
+//      }
+//    }
+//  }
+//
+//  // 4. article + schema_category with known field_key values
+//  if (!$entity->get('schema_category')->isEmpty()) {
+//    $term = $entity->schema_category->entity;
+//    if ($term) {
+//      $key = $term->field_key?->value;
+//      if ($key === 'drupal') {
+//        $pattern->setPattern('/drupal/[node:title]');
+//        return;
+//      }
+//      if ($key === 'permaculture') {
+//        $pattern->setPattern('/permaculture/[node:title]');
+//        return;
+//      }
+//    }
+//  }
+//
+//  // 5. article fallback → /writing/[node:title]
+//  $pattern->setPattern('/writing/[node:title]');
+//}
 
 /**
  * Implements theme_preprocess to add variables.

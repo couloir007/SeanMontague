@@ -49,6 +49,8 @@
   { 'label': 'Max Elev',  'value': node.schema_elev_max.value|number_format(0, '.', ','),  'unit': 'ft' },
 ] : [] %}
 
+{% set tiles = node.field_map_tiles.value %}
+
 {% set category      = node.schema_category.entity %}
 {% set category_key  = category and category.field_key.value ? category.field_key.value : 'default' %}
 {% set category_name = category ? category.label : '' %}
@@ -67,6 +69,7 @@
   'map_center':          map_center,
   'map_zoom':            13,
   'map_markers':         map_markers,
+  'tiles':               tiles,
   'drupal_geo_rendered': null,
   'geojson_url':         has_geoshape ? node.schema_geoshape.entity.uri.value|file_url,
   'elev_gain':           has_stats ? node.schema_elev_gain.value,

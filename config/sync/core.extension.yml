@@ -78,7 +78,6 @@ module:
   language: 0
   layout_builder: 0
   layout_discovery: 0
-  layout_paragraphs: 0
   leaflet: 0
   leaflet_views: 0
   link: 0
@@ -200,7 +199,6 @@ module:
   views: 10
   paragraphs: 11
   schemadotorg_jsonld_breadcrumb: 11
-  schemadotorg_layout_paragraphs: 11
   schemadotorg_descriptions: 20
   minimal: 1000
 theme:

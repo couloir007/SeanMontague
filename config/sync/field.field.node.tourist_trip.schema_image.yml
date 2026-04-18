@@ -10,6 +10,7 @@ dependencies:
 third_party_settings:
   epp:
     value: 'target_id: [current-page:query:primary_image_of_page]'
+    on_update: 0
 id: node.tourist_trip.schema_image
 field_name: schema_image
 entity_type: node

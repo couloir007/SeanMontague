@@ -1,28 +1,27 @@
-uuid: 53897ade-76fc-4e43-87a3-7051ba66c864
+uuid: 673657fc-1303-4f63-860b-a76054cfa5d6
 langcode: en
 status: true
 dependencies:
   config:
-    - field.field.media.audio.schema_content_url
+    - field.field.media.audio.field_media_audio_file
     - media.type.audio
   module:
-    - link
+    - file
 id: media.audio.default
 targetEntityType: media
 bundle: audio
 mode: default
 content:
-  schema_content_url:
-    type: link
-    label: above
+  field_media_audio_file:
+    type: file_audio
+    label: visually_hidden
     settings:
-      trim_length: 80
-      url_only: false
-      url_plain: false
-      rel: ''
-      target: ''
+      controls: true
+      autoplay: false
+      loop: false
+      multiple_file_display_type: tags
     third_party_settings: {  }
-    weight: 12
+    weight: 0
     region: content
 hidden:
   created: true

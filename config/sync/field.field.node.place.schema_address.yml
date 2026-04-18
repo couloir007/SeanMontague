@@ -7,6 +7,24 @@ dependencies:
     - node.type.place
   module:
     - address
+    - content_translation
+third_party_settings:
+  content_translation:
+    translation_sync:
+      langcode: langcode
+      country_code: country_code
+      administrative_area: administrative_area
+      locality: locality
+      dependent_locality: dependent_locality
+      postal_code: postal_code
+      sorting_code: sorting_code
+      address_line1: address_line1
+      address_line2: address_line2
+      address_line3: address_line3
+      organization: organization
+      given_name: given_name
+      additional_name: additional_name
+      family_name: family_name
 id: node.place.schema_address
 field_name: schema_address
 entity_type: node
@@ -19,7 +37,7 @@ default_value: {  }
 default_value_callback: ''
 settings:
   available_countries: {  }
-  langcode_override: null
+  langcode_override: ''
   field_overrides:
     givenName:
       override: optional
@@ -28,6 +46,22 @@ settings:
     familyName:
       override: optional
     organization:
+      override: optional
+    addressLine1:
+      override: optional
+    addressLine2:
+      override: optional
+    addressLine3:
+      override: optional
+    postalCode:
+      override: optional
+    sortingCode:
+      override: optional
+    dependentLocality:
+      override: optional
+    locality:
+      override: optional
+    administrativeArea:
       override: optional
   fields: {  }
 field_type: address

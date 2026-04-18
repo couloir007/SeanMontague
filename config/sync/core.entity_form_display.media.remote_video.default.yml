@@ -1,10 +1,12 @@
-uuid: 42b5c5cc-8343-4ca2-b91c-2e4b1f71e4ac
+uuid: cccad8b7-c30b-4f74-8589-47cd0f6a580a
 langcode: en
 status: true
 dependencies:
   config:
+    - field.field.media.remote_video.field_media_oembed_video
     - media.type.remote_video
   module:
+    - media
     - path
 id: media.remote_video.default
 targetEntityType: media
@@ -16,6 +18,14 @@ content:
     weight: 200
     region: content
     settings: {  }
+    third_party_settings: {  }
+  field_media_oembed_video:
+    type: oembed_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
   langcode:
     type: language_select

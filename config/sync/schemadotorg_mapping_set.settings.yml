@@ -8,6 +8,12 @@ sets:
       - 'media:ImageObject'
       - 'taxonomy_term:DefinedTerm'
       - 'node:Person'
+  media:
+    label: Media
+    types:
+      - 'media:AudioObject'
+      - 'media:ImageObject'
+      - 'media:VideoObject'
   website:
     label: 'Web Site'
     types:

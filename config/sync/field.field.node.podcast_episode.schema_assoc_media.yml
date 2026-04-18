@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.storage.node.schema_assoc_media
+    - media.type.audio
     - node.type.podcast_episode
   module:
     - epp

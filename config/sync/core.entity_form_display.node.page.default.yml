@@ -18,9 +18,9 @@ dependencies:
     - node.type.page
   module:
     - allowed_formats
+    - entity_reference_revisions
     - field_group
     - inline_entity_form
-    - layout_paragraphs
     - linkit
     - metatag
     - path
@@ -192,16 +192,14 @@ content:
       placeholder: ''
     third_party_settings: {  }
   schema_main_entity:
-    type: layout_paragraphs
-    weight: 97
+    type: entity_reference_revisions_autocomplete
+    weight: 222
     region: content
     settings:
-      view_mode: default
-      preview_view_mode: default
-      form_display_mode: default
-      nesting_depth: 0
-      require_layouts: 0
-      empty_message: 'Click the [+] sign below to choose your first component.'
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
   schema_related_link:
     type: linkit

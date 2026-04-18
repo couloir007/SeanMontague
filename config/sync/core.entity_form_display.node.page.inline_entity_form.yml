@@ -1,0 +1,115 @@
+uuid: 2d5fb263-8f70-486c-90e6-06423b841095
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_form_mode.node.inline_entity_form
+    - field.field.node.page.body
+    - field.field.node.page.field_editorial
+    - field.field.node.page.field_metatag
+    - field.field.node.page.schema_about
+    - field.field.node.page.schema_has_part
+    - field.field.node.page.schema_image
+    - field.field.node.page.schema_is_part_of
+    - field.field.node.page.schema_main_entity
+    - field.field.node.page.schema_related_link
+    - field.field.node.page.schema_significant_link
+    - field.field.node.page.schema_subject_of
+    - field.field.node.page.schema_web_page_type
+    - node.type.page
+  module:
+    - path
+id: node.page.inline_entity_form
+targetEntityType: node
+bundle: page
+mode: inline_entity_form
+content:
+  created:
+    type: datetime_timestamp
+    weight: 200
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  langcode:
+    type: language_select
+    weight: 200
+    region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 220
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  promote:
+    type: boolean_checkbox
+    weight: 210
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  simple_sitemap:
+    weight: 220
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 220
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  sticky:
+    type: boolean_checkbox
+    weight: 210
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: -5
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  translation:
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 200
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  url_redirects:
+    weight: 50
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  body: true
+  field_editorial: true
+  field_metatag: true
+  publish_on: true
+  scheduler_settings: true
+  schema_about: true
+  schema_has_part: true
+  schema_image: true
+  schema_is_part_of: true
+  schema_main_entity: true
+  schema_related_link: true
+  schema_significant_link: true
+  schema_subject_of: true
+  schema_web_page_type: true
+  unpublish_on: true

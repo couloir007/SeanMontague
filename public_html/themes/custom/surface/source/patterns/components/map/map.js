@@ -56,17 +56,46 @@
       attr: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       maxZoom: 19,
     },
+    'open-topo': {
+      url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+      attr: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://opentopomap.org">OpenTopoMap</a>',
+      maxZoom: 17,
+    },
+    'esri-topo': {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+      attr: '&copy; <a href="https://www.esri.com">Esri</a>',
+      maxZoom: 18,
+    },
   };
 
   const resolveTile = (el) => {
-    // Priority 1 — drupalSettings from hook_page_attachments
     const ds = window.drupalSettings?.trailMapper;
+    const serverSets = ds?.tileSets ?? {};
+
+    const lookup = (key) => {
+      const t = serverSets[key] ?? TILE_SETS[key];
+      if (!t) return null;
+      return { url: t.url, attr: t.attribution ?? t.attr ?? '', maxZoom: t.maxZoom ?? 16 };
+    };
+
+    // Priority 1 — data-map-tiles per-element (field_map_tiles per-article override)
+    const attrKey = el.dataset.mapTiles;
+    if (attrKey) {
+      const t = lookup(attrKey);
+      if (t) return t;
+    }
+
+    // Priority 2 — global admin tile key from drupalSettings
+    if (ds?.tileKey) {
+      const t = lookup(ds.tileKey);
+      if (t) return t;
+    }
     if (ds?.tileUrl) {
       return { url: ds.tileUrl, attr: ds.tileAttribution ?? '', maxZoom: ds.tileMaxZoom ?? 16 };
     }
-    // Priority 2 — data-map-tiles per-element override
-    const key = el.dataset.mapTiles ?? 'usgs-topo';
-    return TILE_SETS[key] ?? TILE_SETS['usgs-topo'];
+
+    // Priority 3 — usgs-topo default
+    return TILE_SETS['usgs-topo'];
   };
 
   const pinIcon = (color) => L.divIcon({

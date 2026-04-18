@@ -17,10 +17,7 @@ dependencies:
     - field.field.node.page.schema_web_page_type
     - node.type.page
   module:
-    - field_group
-    - layout_paragraphs
-    - link
-    - options
+    - entity_reference_revisions
     - user
 id: node.page.default
 targetEntityType: node
@@ -33,18 +30,13 @@ content:
     weight: -100
     region: content
   schema_main_entity:
-    type: layout_paragraphs_builder
-    label: hidden
+    type: entity_reference_revisions_entity_view
+    label: above
     settings:
       view_mode: default
       link: ''
-      preview_view_mode: default
-      form_display_mode: default
-      nesting_depth: 0
-      require_layouts: 0
-      empty_message: 'Click the [+] sign below to choose your first component.'
     third_party_settings: {  }
-    weight: 97
+    weight: 98
     region: content
 hidden:
   body: true
