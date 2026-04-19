@@ -1,0 +1,19 @@
+uuid: 53d8692f-d781-4aa4-8d18-dbbe1620b954
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.field_departure_date
+field_name: field_departure_date
+entity_type: node
+type: datetime
+settings:
+  datetime_type: date
+module: datetime
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

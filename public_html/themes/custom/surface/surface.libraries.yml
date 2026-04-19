@@ -469,10 +469,22 @@ nav:
     component:
       dist/css/nav.css: {}
 
+map-link-list:
+  css:
+    component:
+      dist/css/map-link-list.css: {}
+
 places-card:
   css:
     component:
       dist/css/places-card.css: {}
+
+reading-progress:
+  css:
+    component:
+      dist/css/reading-progress.css: {}
+  js:
+    dist/js/reading-progress.js: {}
 
 site-homepage:
   css:

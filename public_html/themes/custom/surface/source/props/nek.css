@@ -4,6 +4,7 @@
   --surface: #ffffff;
   --surface2: #f0ede6;
   --border: #e0dbd1;
+  --border-dark: #c8c2b8;      /* darker border for hover states */
   --muted: #736e62;
   --text: #2c2a25;
   --bright: #161410;
@@ -11,6 +12,9 @@
   --trail: #7a3410;
   --sky: #4a7c9e;
   --stone: #6b6560;
+  --amber: #a05a00;            /* difficulty badge text */
+  --amber-bg: #fff3e0;         /* difficulty badge background */
+  --amber-border: #f0d090;     /* difficulty badge border */
 
   /* NEK font stacks */
   --font-mono-nek: 'DM Mono', monospace;
@@ -20,4 +24,8 @@
   /* Override global font-primary/secondary with NEK fonts */
   --font-primary: var(--font-serif-nek);
   --font-secondary: var(--font-display-nek);
+
+  /* Layout */
+  --content-width: 720px;      /* article body column width */
+  --wide-width: 1100px;        /* max-width for article/header containers */
 }

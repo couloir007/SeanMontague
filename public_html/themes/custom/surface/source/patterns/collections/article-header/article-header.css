@@ -44,9 +44,9 @@
 }
 
 .article-header__difficulty {
-  background: #fff3e0;
-  border: 1px solid #f0d090;
-  color: #a05a00;
+  background: var(--amber-bg);
+  border: 1px solid var(--amber-border);
+  color: var(--amber);
   font-family: var(--font-mono-nek);
   font-size: 9px;
   letter-spacing: 0.18em;

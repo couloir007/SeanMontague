@@ -8,12 +8,13 @@
 .places-card {
   background: var(--surface);
   border: 1px solid var(--border);
+  border-left: 3px solid transparent;
   overflow: hidden;
   padding: 36px;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, border-left-color 0.2s ease;
 }
 
-.places-card:hover { border-color: #b0a898; }
+.places-card:hover { border-color: #b0a898; border-left-color: var(--forest); }
 
 .places-card__meta {
   align-items: baseline;

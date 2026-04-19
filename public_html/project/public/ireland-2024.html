@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ireland April 2024 — Sean Montague</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #f7f6f2;
+  --surface:  #ffffff;
+  --surface2: #f0ede6;
+  --border:   #e0dbd1;
+  --muted:    #7a7568;
+  --text:     #2c2a25;
+  --bright:   #161410;
+  --forest:   #3a5a40;
+  --trail:    #7a3410;
+  --sky:      #4a7c9e;
+  --mono:     'DM Mono', monospace;
+  --serif:    'Cormorant Garamond', serif;
+  --display:  'Bebas Neue', sans-serif;
+  --content-width: 720px;
+  --wide-width: 1160px;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.78;
+  overflow-x: hidden;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 300;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 48px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em;
+  color: var(--bright); text-decoration: none;
+}
+.nav-logo span { color: var(--forest); }
+.nav-links { display: flex; gap: 32px; list-style: none; }
+.nav-links a {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--muted); text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--bright); }
+
+/* ── HERO ── */
+.hero-image-wrap {
+  margin-top: 61px;
+  width: 100%;
+  height: 68vh;
+  min-height: 400px;
+  overflow: hidden;
+}
+.hero-image-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  display: block;
+}
+.hero-content {
+  max-width: var(--wide-width);
+  margin: 0 auto;
+  padding: 52px 48px 0;
+}
+.hero-label {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.25em;
+  text-transform: uppercase; color: var(--forest);
+  margin-bottom: 20px;
+}
+.hero-title {
+  font-family: var(--display);
+  font-size: clamp(40px, 6vw, 80px);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  color: var(--bright);
+  margin-bottom: 24px;
+}
+.hero-dates {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em;
+  color: var(--muted);
+}
+
+/* ── DESTINATION STRIP ── */
+.destination-strip {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.destination-strip::-webkit-scrollbar { display: none; }
+.destination-strip-inner {
+  display: flex; align-items: center; justify-content: center;
+  flex-wrap: wrap;
+  padding: 0 48px;
+  gap: 0;
+}
+.destination-name {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--muted);
+  padding: 16px 0; text-decoration: none;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+.destination-name:hover { color: var(--forest); }
+.destination-sep {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--border); padding: 0 16px;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+/* ── TRIP STATS ── */
+.trip-stats {
+  max-width: var(--wide-width);
+  margin: 48px auto 0;
+  padding: 0 48px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  border-top: 1px solid var(--border);
+}
+.trip-stat {
+  padding: 32px 28px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.trip-stat:last-child { border-right: none; }
+.trip-stat-label {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.24em;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 10px;
+}
+.trip-stat-value {
+  font-family: var(--display); font-size: 36px;
+  color: var(--bright); line-height: 1;
+}
+.trip-stat-unit {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+  color: var(--muted); margin-top: 4px;
+}
+
+/* ── MAP SECTION ── */
+.map-section {
+  max-width: var(--wide-width);
+  margin: 0 auto;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+.map-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 28px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+.map-header-label {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--muted);
+}
+.map-header-note {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em;
+  color: var(--border);
+}
+#trip-map {
+  width: 100%; height: 500px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── BODY + SIDEBAR ── */
+.body-sidebar-wrap {
+  max-width: var(--wide-width);
+  margin: 0 auto;
+  padding: 0 48px 80px;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 80px;
+  align-items: start;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+/* Narrative */
+.trip-narrative {
+  padding-top: 64px;
+}
+.trip-narrative-kicker {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--forest);
+  margin-bottom: 20px;
+}
+.trip-narrative h2 {
+  font-family: var(--serif); font-weight: 400;
+  font-size: 36px; color: var(--bright);
+  line-height: 1.15; margin-bottom: 28px;
+  font-style: italic;
+}
+.trip-narrative p {
+  font-size: 19px; line-height: 1.82;
+  color: var(--text); font-weight: 300;
+  margin-bottom: 26px;
+}
+.trip-narrative p:last-child { margin-bottom: 0; }
+.drop-cap::first-letter {
+  font-family: var(--display);
+  font-size: 4em; line-height: 0.8;
+  float: left; margin-right: 8px; margin-top: 8px;
+  color: var(--bright);
+}
+.trip-narrative blockquote {
+  border-left: 3px solid var(--forest);
+  padding: 16px 24px;
+  margin: 36px 0;
+  background: rgba(58,90,64,0.04);
+}
+.trip-narrative blockquote p {
+  font-size: 22px; font-style: italic;
+  color: var(--bright); font-weight: 300;
+  margin-bottom: 10px;
+}
+.trip-narrative blockquote cite {
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
+}
+.section-divider {
+  border: none; border-top: 1px solid var(--border);
+  margin: 48px 0;
+}
+.trip-narrative h3 {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--forest); margin: 40px 0 14px;
+}
+
+/* Sidebar / Itinerary */
+.trip-sidebar {
+  padding-top: 64px;
+  position: sticky; top: 72px;
+}
+.sidebar-header {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--muted);
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+.itinerary-list { list-style: none; }
+.itinerary-item {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 0 14px;
+  align-items: baseline;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s;
+}
+.itinerary-item:last-child { border-bottom: none; }
+.itinerary-item:hover .itinerary-place { color: var(--forest); }
+.itinerary-num {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+  color: var(--border); text-align: right;
+  padding-top: 2px;
+}
+.itinerary-body {}
+.itinerary-place {
+  font-family: var(--serif); font-size: 17px;
+  color: var(--bright); line-height: 1.2;
+  transition: color 0.2s;
+  display: block; margin-bottom: 2px;
+}
+.itinerary-meta {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+/* ── DESTINATION CARDS ── */
+.cards-section {
+  border-top: 1px solid var(--border);
+  padding: 80px 48px;
+  max-width: var(--wide-width);
+  margin: 0 auto;
+}
+.cards-section-header {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 40px;
+}
+.cards-section-title {
+  font-family: var(--display); font-size: 42px;
+  letter-spacing: 0.02em; color: var(--bright);
+}
+.cards-section-count {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--muted);
+}
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.destination-card {
+  background: var(--surface);
+  text-decoration: none; color: inherit;
+  display: flex; flex-direction: column;
+  transition: background 0.2s;
+  position: relative;
+}
+.destination-card:hover { background: var(--bg); }
+.destination-card:hover .card-arrow { opacity: 1; }
+.card-map-placeholder {
+  height: 160px;
+  background: var(--surface2);
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+.card-map-placeholder .leaflet-map {
+  width: 100%; height: 100%;
+}
+.card-body { padding: 20px 22px 24px; }
+.card-num {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em;
+  color: var(--border); margin-bottom: 8px;
+}
+.card-name {
+  font-family: var(--display); font-size: 24px;
+  letter-spacing: 0.02em; color: var(--bright);
+  line-height: 1; margin-bottom: 6px;
+}
+.card-region {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--muted);
+}
+.card-arrow {
+  position: absolute; top: 20px; right: 22px;
+  font-family: var(--mono); font-size: 11px;
+  color: var(--forest); opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* ── FOOTER ── */
+footer {
+  background: var(--bright);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 28px 48px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.footer-brand { font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,0.3); }
+.footer-copy  { font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.18); }
+.footer-links { display: flex; gap: 24px; list-style: none; }
+.footer-links a {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(255,255,255,0.28);
+  text-decoration: none; transition: color 0.2s;
+}
+.footer-links a:hover { color: rgba(255,255,255,0.65); }
+
+/* Leaflet overrides */
+.leaflet-control-attribution { background-color: rgba(255,255,255,0.9) !important; font-size: 9px !important; }
+.leaflet-popup-content-wrapper {
+  border-radius: 0 !important; font-family: var(--mono) !important;
+  font-size: 11px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+}
+.leaflet-popup-tip { display: none !important; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1100px) {
+  .cards-grid { grid-template-columns: repeat(3, 1fr); }
+  .trip-stats { grid-template-columns: repeat(2, 1fr); }
+  .trip-stats .trip-stat:nth-child(2) { border-right: none; }
+}
+@media (max-width: 900px) {
+  .body-sidebar-wrap { grid-template-columns: 1fr; gap: 0; }
+  .trip-sidebar { position: static; padding-top: 0; }
+  .cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  nav { padding: 18px 24px; }
+  .nav-links { display: none; }
+  .hero-content { padding: 36px 24px 0; }
+  .destination-strip-inner { padding: 0 20px; }
+  .trip-stats { padding: 32px 24px 0; grid-template-columns: repeat(2, 1fr); }
+  .body-sidebar-wrap { padding: 0 24px 60px; }
+  .cards-section { padding: 60px 24px; }
+  .cards-grid { grid-template-columns: 1fr 1fr; }
+  footer { flex-direction: column; gap: 14px; text-align: center; padding: 24px; }
+  .footer-links { flex-wrap: wrap; justify-content: center; gap: 16px; }
+  #trip-map { height: 340px; }
+}
+@media (max-width: 440px) {
+  .cards-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="seanmontague.html" class="nav-logo">Sean Montague <span>/ Burke, VT</span></a>
+  <ul class="nav-links">
+    <li><a href="seanmontague.html#writing">Writing</a></li>
+    <li><a href="seanmontague.html#travel">Travel</a></li>
+    <li><a href="seanmontague.html#about">About</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero-image-wrap">
+  <img src="https://images.pexels.com/photos/1005417/pexels-photo-1005417.jpeg?auto=compress&cs=tinysrgb&w=1920" alt="Ireland landscape">
+</div>
+<div class="hero-content">
+  <div class="hero-label">Travel · Ireland</div>
+  <h1 class="hero-title">Ireland<br>April 2024</h1>
+  <div class="hero-dates">April 17–27, 2024 &nbsp;·&nbsp; 11 Days &nbsp;·&nbsp; 12 Places</div>
+</div>
+
+<!-- DESTINATION STRIP -->
+<div class="destination-strip">
+  <div class="destination-strip-inner">
+    <a href="#dublin" class="destination-name">Dublin</a>
+    <span class="destination-sep">·</span>
+    <a href="#sligo" class="destination-name">Sligo</a>
+    <span class="destination-sep">·</span>
+    <a href="#ceide" class="destination-name">Céide Fields</a>
+    <span class="destination-sep">·</span>
+    <a href="#galway" class="destination-name">Galway</a>
+    <span class="destination-sep">·</span>
+    <a href="#inishmore" class="destination-name">Inishmore</a>
+    <span class="destination-sep">·</span>
+    <a href="#limerick" class="destination-name">Limerick</a>
+    <span class="destination-sep">·</span>
+    <a href="#killarney" class="destination-name">Killarney</a>
+    <span class="destination-sep">·</span>
+    <a href="#dingle" class="destination-name">Dingle</a>
+    <span class="destination-sep">·</span>
+    <a href="#bantry" class="destination-name">Bantry</a>
+    <span class="destination-sep">·</span>
+    <a href="#cork" class="destination-name">Cork</a>
+    <span class="destination-sep">·</span>
+    <a href="#cashel" class="destination-name">Cashel</a>
+    <span class="destination-sep">·</span>
+    <a href="#kilkenny" class="destination-name">Kilkenny</a>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="trip-stats">
+  <div class="trip-stat">
+    <div class="trip-stat-label">Duration</div>
+    <div class="trip-stat-value">11</div>
+    <div class="trip-stat-unit">days</div>
+  </div>
+  <div class="trip-stat">
+    <div class="trip-stat-label">Places</div>
+    <div class="trip-stat-value">12</div>
+    <div class="trip-stat-unit">destinations</div>
+  </div>
+  <div class="trip-stat">
+    <div class="trip-stat-label">Distance</div>
+    <div class="trip-stat-value">~840</div>
+    <div class="trip-stat-unit">km by road</div>
+  </div>
+  <div class="trip-stat">
+    <div class="trip-stat-label">Counties</div>
+    <div class="trip-stat-value">9</div>
+    <div class="trip-stat-unit">across the island</div>
+  </div>
+</div>
+
+<!-- MAP -->
+<div class="map-section">
+  <div class="map-header">
+    <span class="map-header-label">Route Map — Ireland, April 2024</span>
+    <span class="map-header-note">Scroll to zoom · Click markers for details</span>
+  </div>
+  <div id="trip-map"></div>
+</div>
+
+<!-- BODY + SIDEBAR -->
+<div class="body-sidebar-wrap">
+
+  <div class="trip-narrative">
+    <div class="trip-narrative-kicker">Trip Notes</div>
+    <h2>Ten days, the full perimeter, and a lot of stone walls</h2>
+
+    <p class="drop-cap">Ireland in April is not the Ireland of summer tourism brochures. The light is low and specific — that particular Atlantic silver that makes the countryside look like it's been painted on a damp morning. We landed in Dublin on the 17th, collected the car, and drove north before the day was out.</p>
+
+    <p>The plan was loose: north to Sligo for Yeats country and the coast, across to the Céide Fields on the Mayo coast — the oldest field system in the world, buried under four thousand years of bog — then down through Galway, out to Inishmore on the Aran Islands, and a long southern loop through Limerick, Killarney, the Dingle Peninsula, and around to Cork before cutting inland through Cashel and ending in Kilkenny.</p>
+
+    <blockquote>
+      <p>"There is no such thing as bad weather in Ireland, only different kinds of good light."</p>
+      <cite>— overheard, a pub in Sligo</cite>
+    </blockquote>
+
+    <p>What you don't plan for is the pace of it. Ireland resists the itinerary. A conversation at a petrol station turns into a detour to a ring fort. A wrong turn on the Dingle Peninsula leads to a beach with no name on any sign. The country is small enough that you can always recover ground, which makes it easy to follow things that feel interesting and let the schedule be what it is.</p>
+
+    <hr class="section-divider">
+
+    <h3>The North</h3>
+
+    <p>Sligo is underrated in a way that most Irish towns of its size are underrated — it has a distinct character, a working port feel, good pubs, and the surrounding landscape is dramatic without being performative about it. Benbulben sits behind the town like it's always been there, which it has, and the light off the Atlantic in the late afternoon is something that has clearly driven poets toward their notebooks for centuries.</p>
+
+    <p>The Céide Fields were, unexpectedly, one of the best things on the trip. There's almost nothing to see — which is precisely the point. An almost entirely invisible Neolithic landscape, revealed through peat probing, that you look at from a viewing platform while the wind comes off the Atlantic at considerable speed. The museum is excellent. The scale of what it represents — domesticated agriculture on the north Mayo coast five thousand years ago — is genuinely hard to absorb.</p>
+
+    <hr class="section-divider">
+
+    <h3>The West</h3>
+
+    <p>Galway is the easiest place in Ireland to spend more time than you intended. We had one night and it turned into two. The Aran Islands day — ferry from Rossaveal to Inishmore — was one of those travel days that earns its place in the permanent record. Rented bicycles at the pier, rode out to Dún Aonghasa in actual April sunshine, sat on the cliff edge for longer than was sensible, rode back slowly.</p>
+
+    <p>Limestone terraces, wildflowers emerging from cracks in the karst, the Atlantic three hundred feet directly below. A ferry back in the early evening with Connemara hills going dark behind us. The kind of day that recalibrates what you think a good day looks like.</p>
+
+    <hr class="section-divider">
+
+    <h3>The South</h3>
+
+    <p>Killarney and the Ring of Kerry in late April: unexpectedly quiet. We drove the Dingle Peninsula instead of the Ring proper, which was the right call — the Connor Pass, the Blasket Island views, the town of Dingle itself with its excellent bookshop and straightforwardly good fish. Bantry Bay in soft rain. Cork for a day and a half, which is a proper city that gets on with things. Cashel on the way back — the Rock of Cashel at golden hour with almost no other visitors — and then Kilkenny to finish, walked the entire medieval mile twice, flew home the next morning.</p>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="trip-sidebar">
+    <div class="sidebar-header">Itinerary</div>
+    <ul class="itinerary-list">
+      <li><a href="#dublin" class="itinerary-item">
+        <span class="itinerary-num">01</span>
+        <span class="itinerary-body">
+          <span class="itinerary-place">Dublin</span>
+          <span class="itinerary-meta">Apr 17–18 · Co. Dublin</span>
+        </span>
+      </a></li>
+      <li><a href="#sligo" class="itinerary-item">
+        <span class="itinerary-num">02</span>
+        <span class="itinerary-body">
+          <span class="itinerary-place">Sligo</span>
+          <span class="itinerary-meta">Apr 18–19 · Co. Sligo</span>
+        </span>
+      </a></li>
+      <li><a href="#ceide" class="itinerary-item">
+        <span class="itinerary-num">03</span>
+        <span class="itinerary-body">
+          <span class="itinerary-place">Céide Fields</span>
+          <span class="itinerary-meta">Apr 19 · Co. Mayo</span>
+        </span>
+      </a></li>
+      <li><a href="#galway" class="itinerary-item">
+        <span class="itinerary-num">04</span>
+        <span class="itinerary-body">
+          <span class="itinerary-place">Galway</span>
+          <span class="itinerary-meta">Apr 19–21 · Co. Galway</span>
+        </span>
+      </a></li>
+      <li><a href="#inishmore" class="itinerary-item">
+        <span class="itinerary-num">05</span>
+        <span class="itinerary-body">
+          <span class="itinerary-place">Inishmore</span>
+          <span class="itinerary-meta">Apr 20 · Aran Islands</span>
+        </span>
+      </a></li>
+      <li><a href="#limerick" class="itinerary-item">
+        <span class="itinerary-num">06</span>
+        <span class="itinerary-body">
+          <span class="itinerary-place">Limerick</span>
+          <span class="itinerary-meta">Apr 21 · Co. Limerick</span>
+        </span>
+      </a></li>
+      <li><a href="#killarney" class="itinerary-item">
+        <span class="itinerary-num">07</span>
+        <span class="itinerary-body">
+          <span class="itinerary-place">Killarney</span>
+          <span class="itinerary-meta">Apr 22 · Co. Kerry</span>
+        </span>
+      </a></li>
+      <li><a href="#dingle" class="itinerary-item">
+        <span class="itinerary-num">08</span>
+        <span class="itinerary-body">
+          <span class="itinerary-place">Dingle</span>
+          <span class="itinerary-meta">Apr 22–23 · Co. Kerry</span>
+        </span>
+      </a></li>
+      <li><a href="#bantry" class="itinerary-item">
+        <span class="itinerary-num">09</span>
+        <span class="itinerary-body">
+          <span class="itinerary-place">Bantry</span>
+          <span class="itinerary-meta">Apr 24 · Co. Cork</span>
+        </span>
+      </a></li>
+      <li><a href="#cork" class="itinerary-item">
+        <span class="itinerary-num">10</span>
+        <span class="itinerary-body">
+          <span class="itinerary-place">Cork</span>
+          <span class="itinerary-meta">Apr 24–25 · Co. Cork</span>
+        </span>
+      </a></li>
+      <li><a href="#cashel" class="itinerary-item">
+        <span class="itinerary-num">11</span>
+        <span class="itinerary-body">
+          <span class="itinerary-place">Cashel</span>
+          <span class="itinerary-meta">Apr 26 · Co. Tipperary</span>
+        </span>
+      </a></li>
+      <li><a href="#kilkenny" class="itinerary-item">
+        <span class="itinerary-num">12</span>
+        <span class="itinerary-body">
+          <span class="itinerary-place">Kilkenny</span>
+          <span class="itinerary-meta">Apr 26–27 · Co. Kilkenny</span>
+        </span>
+      </a></li>
+    </ul>
+  </aside>
+
+</div>
+
+<!-- DESTINATION CARDS -->
+<div class="cards-section">
+  <div class="cards-section-header">
+    <div class="cards-section-title">Destinations</div>
+    <div class="cards-section-count">12 places · Ireland · April 2024</div>
+  </div>
+  <div class="cards-grid">
+
+    <a href="#dublin" id="dublin" class="destination-card">
+      <div class="card-map-placeholder" id="map-dublin"></div>
+      <div class="card-body">
+        <div class="card-num">01</div>
+        <div class="card-name">Dublin</div>
+        <div class="card-region">Co. Dublin · Apr 17–18</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="#sligo" id="sligo" class="destination-card">
+      <div class="card-map-placeholder" id="map-sligo"></div>
+      <div class="card-body">
+        <div class="card-num">02</div>
+        <div class="card-name">Sligo</div>
+        <div class="card-region">Co. Sligo · Apr 18–19</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="#ceide" id="ceide" class="destination-card">
+      <div class="card-map-placeholder" id="map-ceide"></div>
+      <div class="card-body">
+        <div class="card-num">03</div>
+        <div class="card-name">Céide Fields</div>
+        <div class="card-region">Co. Mayo · Apr 19</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="#galway" id="galway" class="destination-card">
+      <div class="card-map-placeholder" id="map-galway"></div>
+      <div class="card-body">
+        <div class="card-num">04</div>
+        <div class="card-name">Galway</div>
+        <div class="card-region">Co. Galway · Apr 19–21</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="#inishmore" id="inishmore" class="destination-card">
+      <div class="card-map-placeholder" id="map-inishmore"></div>
+      <div class="card-body">
+        <div class="card-num">05</div>
+        <div class="card-name">Inishmore</div>
+        <div class="card-region">Aran Islands · Apr 20</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="#limerick" id="limerick" class="destination-card">
+      <div class="card-map-placeholder" id="map-limerick"></div>
+      <div class="card-body">
+        <div class="card-num">06</div>
+        <div class="card-name">Limerick</div>
+        <div class="card-region">Co. Limerick · Apr 21</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="#killarney" id="killarney" class="destination-card">
+      <div class="card-map-placeholder" id="map-killarney"></div>
+      <div class="card-body">
+        <div class="card-num">07</div>
+        <div class="card-name">Killarney</div>
+        <div class="card-region">Co. Kerry · Apr 22</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="#dingle" id="dingle" class="destination-card">
+      <div class="card-map-placeholder" id="map-dingle"></div>
+      <div class="card-body">
+        <div class="card-num">08</div>
+        <div class="card-name">Dingle</div>
+        <div class="card-region">Co. Kerry · Apr 22–23</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="#bantry" id="bantry" class="destination-card">
+      <div class="card-map-placeholder" id="map-bantry"></div>
+      <div class="card-body">
+        <div class="card-num">09</div>
+        <div class="card-name">Bantry</div>
+        <div class="card-region">Co. Cork · Apr 24</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="#cork" id="cork" class="destination-card">
+      <div class="card-map-placeholder" id="map-cork"></div>
+      <div class="card-body">
+        <div class="card-num">10</div>
+        <div class="card-name">Cork</div>
+        <div class="card-region">Co. Cork · Apr 24–25</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="#cashel" id="cashel" class="destination-card">
+      <div class="card-map-placeholder" id="map-cashel"></div>
+      <div class="card-body">
+        <div class="card-num">11</div>
+        <div class="card-name">Cashel</div>
+        <div class="card-region">Co. Tipperary · Apr 26</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a href="#kilkenny" id="kilkenny" class="destination-card">
+      <div class="card-map-placeholder" id="map-kilkenny"></div>
+      <div class="card-body">
+        <div class="card-num">12</div>
+        <div class="card-name">Kilkenny</div>
+        <div class="card-region">Co. Kilkenny · Apr 26–27</div>
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">Sean Montague · Burke, VT</div>
+  <p class="footer-copy">© 2025 Sean Montague</p>
+  <ul class="footer-links">
+    <li><a href="#">GitHub</a></li>
+    <li><a href="#">Drupal.org</a></li>
+    <li><a href="#">LinkedIn</a></li>
+  </ul>
+</footer>
+
+<script>
+const destinations = [
+  { id: 'dublin',    name: 'Dublin',        lat: 53.3498,  lng: -6.2603,   region: 'Co. Dublin' },
+  { id: 'sligo',     name: 'Sligo',         lat: 54.2697,  lng: -8.4694,   region: 'Co. Sligo' },
+  { id: 'ceide',     name: 'Céide Fields',  lat: 54.3167,  lng: -9.8667,   region: 'Co. Mayo' },
+  { id: 'galway',    name: 'Galway',        lat: 53.2707,  lng: -9.0568,   region: 'Co. Galway' },
+  { id: 'inishmore', name: 'Inishmore',     lat: 53.1228,  lng: -9.7705,   region: 'Aran Islands' },
+  { id: 'limerick',  name: 'Limerick',      lat: 52.6638,  lng: -8.6267,   region: 'Co. Limerick' },
+  { id: 'killarney', name: 'Killarney',     lat: 52.0599,  lng: -9.5044,   region: 'Co. Kerry' },
+  { id: 'dingle',    name: 'Dingle',        lat: 52.1408,  lng: -10.2686,  region: 'Co. Kerry' },
+  { id: 'bantry',    name: 'Bantry',        lat: 51.6829,  lng: -9.4561,   region: 'Co. Cork' },
+  { id: 'cork',      name: 'Cork',          lat: 51.8985,  lng: -8.4756,   region: 'Co. Cork' },
+  { id: 'cashel',    name: 'Cashel',        lat: 52.5176,  lng: -7.8894,   region: 'Co. Tipperary' },
+  { id: 'kilkenny',  name: 'Kilkenny',      lat: 52.6541,  lng: -7.2448,   region: 'Co. Kilkenny' },
+];
+
+function makePin(color, num) {
+  return L.divIcon({
+    html: `<div style="
+      width:26px;height:26px;border-radius:50%;
+      background:${color};border:2px solid #fff;
+      box-shadow:0 1px 6px rgba(0,0,0,0.22);
+      display:flex;align-items:center;justify-content:center;
+      font-family:'DM Mono',monospace;font-size:9px;
+      color:#fff;font-weight:400;letter-spacing:0;
+    ">${num}</div>`,
+    iconSize: [26,26], iconAnchor: [13,13], className: ''
+  });
+}
+
+function makeSmallPin(color) {
+  return L.divIcon({
+    html: `<div style="
+      width:10px;height:10px;border-radius:50%;
+      background:${color};border:2px solid #fff;
+      box-shadow:0 1px 4px rgba(0,0,0,0.28);
+    "></div>`,
+    iconSize: [10,10], iconAnchor: [5,5], className: ''
+  });
+}
+
+const tileUrl = 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png';
+const tileOpts = { maxZoom: 17, attribution: '© <a href="https://opentopomap.org">OpenTopoMap</a>' };
+
+// Main route map
+const mainMap = L.map('trip-map', {
+  center: [53.0, -8.2],
+  zoom: 7,
+  scrollWheelZoom: false,
+  zoomControl: true
+});
+L.tileLayer(tileUrl, tileOpts).addTo(mainMap);
+
+const routeLatLngs = destinations.map(d => [d.lat, d.lng]);
+L.polyline(routeLatLngs, {
+  color: '#3a5a40', weight: 2, opacity: 0.7, dashArray: '6 6'
+}).addTo(mainMap);
+
+destinations.forEach((d, i) => {
+  L.marker([d.lat, d.lng], { icon: makePin('#3a5a40', i+1) })
+    .addTo(mainMap)
+    .bindPopup(`<strong>${d.name}</strong><br><span style="color:#7a7568;font-size:10px;letter-spacing:0.1em">${d.region}</span>`);
+});
+
+// Card mini-maps
+destinations.forEach((d, i) => {
+  const el = document.getElementById('map-' + d.id);
+  if (!el) return;
+  el.style.cursor = 'default';
+
+  const m = L.map(el, {
+    center: [d.lat, d.lng],
+    zoom: 10,
+    zoomControl: false,
+    scrollWheelZoom: false,
+    dragging: false,
+    touchZoom: false,
+    doubleClickZoom: false,
+    keyboard: false,
+    attributionControl: false
+  });
+  L.tileLayer(tileUrl, { maxZoom: 17 }).addTo(m);
+  L.marker([d.lat, d.lng], { icon: makeSmallPin('#3a5a40') }).addTo(m);
+});
+</script>
+</body>
+</html>

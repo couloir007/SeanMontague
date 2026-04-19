@@ -1,6 +1,8 @@
 {{ attach_library('surface/article') }}
 {{ attach_library('surface/article-header') }}
 
+{% include '@elements/reading-progress/reading-progress.twig' %}
+
 {% if header %}
   {% include '@collections/article-header/article-header.twig' with header only %}
 {% endif %}
@@ -28,6 +30,7 @@
 {# Body + sidebar #}
 <div class="article-wrap">
   <article class="article__body">
+    {# Drop cap is opt-in: add class="drop-cap" to the first <p> in the body HTML. #}
     {{ body|raw }}
   </article>
   <aside class="article__sidebar">

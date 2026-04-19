@@ -20,14 +20,14 @@
   {% endif %}
 {% endfor %}
 
-{% set trip_start = node.field_trip_dates.value %}
-{% set trip_end   = node.field_trip_dates.end_value %}
-{% if trip_start %}
-  {% set date_display = trip_start|date('F j') ~ '–' ~ trip_end|date('F j, Y') %}
-{% elseif node.schema_date_published.value %}
-  {% set date_display = node.schema_date_published.value|date('F j, Y') %}
+{% set depart = node.field_departure_date.value %}
+{% set arrive = node.field_arrival_date.value %}
+{% if depart and arrive %}
+  {% set date_display = depart|date('F j') ~ '–' ~ arrive|date('F j, Y') %}
+{% elseif depart %}
+  {% set date_display = depart|date('F j, Y') %}
 {% else %}
-  {% set date_display = '' %}
+  {% set date_display = node.schema_date_published.value|date('F j, Y') %}
 {% endif %}
 
 {% include '@collections/article-header/article-header.twig' with {
@@ -46,5 +46,5 @@
 {% endif %}
 
 <div class="prose">
-  {{ content.body|field_value }}
+  {{ content.field_body|field_value }}
 </div>

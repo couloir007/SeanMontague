@@ -7,18 +7,19 @@
 
 .card {
   background: var(--surface);
+  border-left: 3px solid transparent;
   border-right: 1px solid var(--border);
   color: inherit;
   display: flex;
   flex-direction: column;
   padding: 32px;
   text-decoration: none;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, border-left-color 0.2s ease;
 }
 
 .card:nth-child(3n)   { border-right: none; }
 .card:nth-child(n+4)  { border-top: 1px solid var(--border); }
-.card:hover            { background: var(--bg); }
+.card:hover            { background: var(--bg); border-left-color: var(--forest); }
 
 .card__category {
   font-family: var(--font-mono-nek);
@@ -45,7 +46,7 @@
 
 .card__excerpt {
   color: var(--muted);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 300;
   line-height: 1.8;
   margin-bottom: 16px;

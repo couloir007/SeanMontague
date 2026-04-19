@@ -1,0 +1,1 @@
+(function(){const t=document.getElementById("reading-progress");t&&window.addEventListener("scroll",()=>{const o=window.scrollY,e=document.documentElement.scrollHeight-window.innerHeight,n=e>0?o/e*100:0;t.style.width=n+"%",t.setAttribute("aria-valuenow",Math.round(n))})})();

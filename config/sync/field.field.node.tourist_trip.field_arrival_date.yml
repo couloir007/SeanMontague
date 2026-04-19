@@ -1,0 +1,21 @@
+uuid: ff8e4997-abdf-4d14-bf74-4f933396b6f8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_arrival_date
+    - node.type.tourist_trip
+  module:
+    - datetime
+id: node.tourist_trip.field_arrival_date
+field_name: field_arrival_date
+entity_type: node
+bundle: tourist_trip
+label: 'Arrival date'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

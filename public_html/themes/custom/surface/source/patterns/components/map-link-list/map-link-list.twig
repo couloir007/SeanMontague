@@ -1,0 +1,11 @@
+{{ attach_library('surface/map-link-list') }}
+<div class="map-link-list{{ modifier ? ' ' ~ modifier }}">
+  {% for item in items %}
+    <a href="{{ item.url|default('#') }}"
+       class="map-link-list__item"
+       {{ item.external ? 'target="_blank" rel="noopener"' }}>
+      <span class="map-link-list__label">{{ item.label }}</span>
+      <span class="map-link-list__arrow" aria-hidden="true">→</span>
+    </a>
+  {% endfor %}
+</div>

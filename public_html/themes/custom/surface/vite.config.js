@@ -14,6 +14,7 @@ export default defineConfig({
         base: join(__dirname, './source/patterns/base'),
         collections: join(__dirname, './source/patterns/collections'),
         components: join(__dirname, './source/patterns/components'),
+        elements: join(__dirname, './source/patterns/elements'),
         layouts: join(__dirname, './source/patterns/layouts'),
         theme: join(__dirname, './source/patterns/theme'),
       },

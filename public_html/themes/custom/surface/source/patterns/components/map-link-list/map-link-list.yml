@@ -1,0 +1,12 @@
+items:
+  - label: 'Kingdom Trails Network'
+    url: '#'
+  - label: 'Burke Mountain Ski Lines'
+    url: '#'
+  - label: 'NEK Touring Routes'
+    url: '#'
+  - label: 'Burke Area Trails'
+    url: '#'
+  - label: 'Download GPX'
+    url: '#'
+    external: true

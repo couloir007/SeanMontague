@@ -1,0 +1,21 @@
+uuid: 9d7e0025-4322-47c6-915d-c0879ee3a895
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_departure_date
+    - node.type.tourist_trip
+  module:
+    - datetime
+id: node.tourist_trip.field_departure_date
+field_name: field_departure_date
+entity_type: node
+bundle: tourist_trip
+label: 'Departure date'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime
