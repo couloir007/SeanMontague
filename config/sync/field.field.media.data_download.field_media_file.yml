@@ -1,0 +1,27 @@
+uuid: 9a16b9a3-d104-4ff0-b712-09c2213d6063
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_media_file
+    - media.type.data_download
+  module:
+    - file
+id: media.data_download.field_media_file
+field_name: field_media_file
+entity_type: media
+bundle: data_download
+label: File
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: geoshape
+  file_extensions: 'geojson gpx'
+  max_filesize: ''
+  description_field: false
+field_type: file

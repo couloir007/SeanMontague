@@ -1,0 +1,59 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for SeanMontague Map module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_theme().
+ */
+function seanmontague_map_theme($existing, $type, $theme, $path): array {
+  $base = [
+    'variables' => ['props' => []],
+    'path' => $path . '/templates',
+  ];
+  return [
+    'seanmontague_map_popup_place'   => $base + ['template' => 'map-popup--place'],
+    'seanmontague_map_popup_poi'     => $base + ['template' => 'map-popup--poi'],
+    'seanmontague_map_popup_article' => $base + ['template' => 'map-popup--article'],
+    'seanmontague_map_popup_trip'    => $base + ['template' => 'map-popup--trip'],
+  ];
+}
+
+/**
+ * Implements hook_page_attachments().
+ *
+ * Attaches the seanmontague_map library and passes layer definitions
+ * to drupalSettings.seanMap so the JS layer toggle can function.
+ */
+function seanmontague_map_page_attachments(array &$attachments): void {
+  $attachments['#attached']['library'][] = 'seanmontague_map/seanmontague_map';
+  $attachments['#attached']['drupalSettings']['seanMap'] = [
+    'endpoint' => '/sean-map/items',
+    'layers' => [
+      'places' => [
+        'label'   => 'Places',
+        'color'   => '#5b8dee',
+        'enabled' => TRUE,
+      ],
+      'pois' => [
+        'label'   => 'Points of Interest',
+        'color'   => '#3a5a40',
+        'enabled' => TRUE,
+      ],
+      'articles' => [
+        'label'   => 'Trail Reports',
+        'color'   => '#e07b39',
+        'enabled' => TRUE,
+      ],
+      'trips' => [
+        'label'   => 'Trips',
+        'color'   => '#9055a2',
+        'enabled' => TRUE,
+      ],
+    ],
+  ];
+}

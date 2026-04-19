@@ -65,7 +65,7 @@ lando php vendor/bin/phpunit public_html/modules/custom
 | `trail_mapper` | GeoJSON generation from external PostgreSQL DB; TrailMapper settings form at `/admin/config/trail-mapper`; `GeoShapeConverter` (GPX/GeoJSON); `GeoElevationCalculator` (shelved) |
 | `external_pg` | Service layer (`ExternalPgService`) for external PostgreSQL TrailMapper DB — credentials hardcoded in `ExternalPgService.php` |
 | `geo_content_builder` | Custom entities for plotting geographic content on Leaflet maps |
-| `leaflet_full_page` | Full-page Leaflet mapping with custom paragraph types |
+| `leaflet_full_page` | Generic full-page Leaflet mapping. Configurable GeoJSON endpoint at `/leaflet-full-page/map-items/{bundle}`. Settings at `/admin/config/leaflet-full-page/settings`. EDAN/NMNH specifics removed. |
 | `trailmapper_safeguards` | Prevents invalid `menu_name` on MenuLinkContent entities |
 | `global_volcanism` | Smithsonian NMNH GVP integration |
 | `gvp_external_resources` | GVP external resources views/fields |
@@ -82,6 +82,18 @@ lando php vendor/bin/phpunit public_html/modules/custom
 ---
 
 ## Content Model
+
+### Geo entity model
+
+| Type | Bundle | Schema.org | Purpose |
+|---|---|---|---|
+| `geo_entity` | `poi` | `TouristAttraction` | Attractions, landmarks, features — map markers |
+| `geo_entity` | `destination` | `Place` | Trip stop anchors — Dublin, Galway etc |
+| `node` | `place` | `Place` | Content hub landing pages — Kingdom Trails, Burke Mountain |
+
+`geo_entity:destination` is referenced by TouristTrip `schema_destination`.
+`geo_entity:poi` is referenced by article `schema_poi`.
+`node:place` is referenced by article `schema_place` as a content hub.
 
 ### Single article bundle
 
@@ -120,9 +132,8 @@ set and schema_geoshape is absent.
 | Field | Type | Purpose |
 |---|---|---|
 | `body` | text_with_summary | Trip narrative |
-| `field_departure_date` | date | Departure date → Schema.org `departureTime` |
-| `field_arrival_date` | date | Arrival date → Schema.org `arrivalTime` |
-| `schema_destination` | entity_reference → place[] | Places visited (multi-value, ordered) |
+| `field_trip_dates` | Smart Date (cardinality 1) | Trip date range — start + end |
+| `schema_destination` | entity_reference → geo_entity:destination[] | Trip stop anchors (multi-value, ordered) |
 | `schema_itinerary` | entity_reference → article[] | Articles under this trip (ordered) |
 | `schema_image` | entity_reference → ImageObject | Hero image |
 | `field_editorial` | entity_reference_revisions | Editorial tracking |
@@ -241,7 +252,7 @@ See `claude-code-next-steps.md` for full prompts. Remaining items:
   Schema.org spatialCoverage track output
 - **1** — geo_entity `poi` bundle + `seanmontague_schemadotorg` module
 - **2** — Add `field_key` to `category` and `activity_type` taxonomies
-- **3** — leaflet_full_page refactor + seanmontague_map extension
+- **3b** — seanmontague_map extension module (3a complete — leaflet_full_page refactored)
 
 Bolt → Surface theme integration (Steps A–D complete):
 - Tokens, CSS tweaks, drop cap, reading progress, map-link-list — done

@@ -51,7 +51,7 @@ function trail_mapper_page_attachments(array &$attachments): void {
     'tileUrl'         => $tile['url'],
     'tileAttribution' => $tile['attribution'],
     'tileMaxZoom'     => $tile['maxZoom'] ?? 16,
-    'tileSets'        => TrailMapperSettingsForm::tileSets(),
+    'tileSets'        => TrailMapperSettingsForm::allTileSets(),
     'elevationUnit'   => Drupal::config('trail_mapper.settings')->get('elevation_unit') ?? 'feet',
   ];
 }

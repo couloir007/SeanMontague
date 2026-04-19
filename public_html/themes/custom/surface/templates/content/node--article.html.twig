@@ -16,7 +16,11 @@
 #}
 
 {# ── Geo sources ── #}
-{% set has_geoshape = node.schema_geoshape.target_id is not empty %}
+{% set geoshape_media = node.schema_geoshape.entity %}
+{% set geo_file       = geoshape_media ? geoshape_media.field_media_file.entity : null %}
+{% set geojson_url    = geo_file ? geo_file.uri.value|file_url : null %}
+{% set is_gpx         = geo_file and geo_file.filename matches '/\\.gpx$/i' %}
+{% set has_geoshape   = geo_file is not empty %}
 {% set has_geo      = not node.schema_geo.isEmpty() %}
 {% set place        = node.schema_place.entity %}
 {% set has_place    = place and place.schema_latitude.value is not empty %}
@@ -51,6 +55,15 @@
 
 {% set tiles = node.field_map_tiles.value %}
 
+{# ── Sidebar cards ── #}
+{% set sidebar_cards = [] %}
+{% if is_gpx %}
+  {% set sidebar_cards = sidebar_cards|merge([{
+    'heading': 'Download',
+    'body': '<a href="' ~ geo_file.uri.value|file_url ~ '" download>Download GPX</a>',
+  }]) %}
+{% endif %}
+
 {% set category      = node.schema_category.entity %}
 {% set category_key  = category and category.field_key.value ? category.field_key.value : 'default' %}
 {% set category_name = category ? category.label : '' %}
@@ -71,11 +84,12 @@
   'map_markers':         map_markers,
   'tiles':               tiles,
   'drupal_geo_rendered': null,
-  'geojson_url':         has_geoshape ? node.schema_geoshape.entity.uri.value|file_url,
+  'geojson_url':         geojson_url,
   'elev_gain':           has_stats ? node.schema_elev_gain.value,
   'elev_loss':           has_stats ? node.schema_elev_loss.value,
   'elev_min':            has_stats ? node.schema_elev_min.value,
   'elev_max':            has_stats ? node.schema_elev_max.value,
   'body':                content.body|field_value|render,
+  'sidebar_cards':       sidebar_cards,
 } only %}
 

@@ -12,7 +12,7 @@ dependencies:
     - field.field.node.tourist_trip.schema_related_link
     - field.field.node.tourist_trip.schema_significant_link
     - field.field.node.tourist_trip.schema_subject_of
-    - field.field.node.tourist_trip.schema_trip_dates
+    - field.field.node.tourist_trip.field_trip_dates
     - node.type.tourist_trip
   module:
     - allowed_formats
@@ -28,8 +28,8 @@ third_party_settings:
     group_content:
       children:
         - title
+        - field_trip_dates
         - schema_image
-        - schema_trip_dates
         - field_body
       label: Content
       region: content
@@ -137,6 +137,26 @@ content:
       sidebar: true
       use_details: true
     third_party_settings: {  }
+  field_trip_dates:
+    type: smartdate_only
+    weight: -3
+    region: content
+    settings:
+      hide_date: '1'
+      allday: '1'
+      remove_seconds: '1'
+      duration_overlay: '1'
+      separator: to
+      show_extra: 0
+      modal: false
+      default_duration: 60
+      default_duration_increments: |-
+        30
+        60|1 hour
+        90
+        120|2 hours
+        custom
+    third_party_settings: {  }
   langcode:
     type: language_select
     weight: 200
@@ -225,26 +245,6 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-  schema_trip_dates:
-    type: smartdate_only
-    weight: -3
-    region: content
-    settings:
-      hide_date: '1'
-      allday: '1'
-      remove_seconds: '1'
-      duration_overlay: '1'
-      separator: to
-      show_extra: 0
-      modal: false
-      default_duration: 60
-      default_duration_increments: |-
-        30
-        60|1 hour
-        90
-        120|2 hours
-        custom
-    third_party_settings: {  }
   simple_sitemap:
     weight: 220
     region: content
@@ -294,4 +294,5 @@ content:
     third_party_settings: {  }
 hidden:
   publish_on: true
+  schema_trip_dates: true
   unpublish_on: true

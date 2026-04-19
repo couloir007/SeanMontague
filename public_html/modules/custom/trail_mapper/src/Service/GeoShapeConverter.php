@@ -3,10 +3,13 @@
 namespace Drupal\trail_mapper\Service;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\file\Entity\File;
+use Drupal\media\MediaInterface;
 use Drupal\node\NodeInterface;
+use Drupal\trail_mapper\Form\TrailMapperSettingsForm;
 
 /**
  * Converts GPX and GeoJSON uploads to normalized GeoJSON with Z in meters.
@@ -22,6 +25,7 @@ class GeoShapeConverter {
   public function __construct(
     protected readonly FileSystemInterface $fileSystem,
     protected readonly LoggerChannelFactoryInterface $loggerFactory,
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
   ) {}
 
   /**
@@ -43,9 +47,15 @@ class GeoShapeConverter {
       return;
     }
 
-    /** @var \Drupal\file\Entity\File|null $file */
+    /** @var \Drupal\media\MediaInterface|null $media */
     $referenced = $geoshape->referencedEntities();
-    $file = !empty($referenced) ? reset($referenced) : NULL;
+    $media = !empty($referenced) ? reset($referenced) : NULL;
+    if (!($media instanceof MediaInterface)) {
+      return;
+    }
+
+    /** @var \Drupal\file\Entity\File|null $file */
+    $file = $media->field_media_file->entity ?? NULL;
     if (!($file instanceof File)) {
       return;
     }
@@ -63,7 +73,13 @@ class GeoShapeConverter {
       return;
     }
 
-    $this->overwriteGeoshape($entity, $file, $geojson);
+    $this->overwriteGeoshape($entity, $media, $file, $geojson);
+
+    if ($extension === 'gpx' && TrailMapperSettingsForm::extractWaypointsEnabled()) {
+      // $uri captured before overwriteGeoshape mutates $file — original GPX
+      // is still on disk; only the file entity record is updated.
+      $this->extractWaypoints($uri, $entity);
+    }
   }
 
   /**
@@ -198,12 +214,15 @@ class GeoShapeConverter {
   /**
    * Overwrites schema_geoshape with normalized GeoJSON content.
    *
-   * After save, schema_geoshape always contains a .geojson file.
+   * After save, schema_geoshape always contains a .geojson file wrapped in
+   * a data_download Media entity.
    *
    * @param \Drupal\node\NodeInterface $entity
    *   The node being saved.
+   * @param \Drupal\media\MediaInterface $media
+   *   The media entity referencing the file.
    * @param \Drupal\file\Entity\File $originalFile
-   *   The originally uploaded file entity.
+   *   The source file entity inside the media item.
    * @param string $geojson
    *   The normalized GeoJSON string to store.
    *
@@ -211,6 +230,7 @@ class GeoShapeConverter {
    */
   protected function overwriteGeoshape(
     NodeInterface $entity,
+    MediaInterface $media,
     File $originalFile,
     string $geojson,
   ): void {
@@ -245,9 +265,159 @@ class GeoShapeConverter {
     $originalFile->setMimeType('application/geo+json');
     $originalFile->save();
 
-    // Re-attach converted file. No $entity->save() needed — we are inside
+    // Update the media label to match the new filename.
+    $media->setName(pathinfo($savedUri, PATHINFO_FILENAME));
+    $media->save();
+
+    // Re-attach the media entity. No $entity->save() needed — we are inside
     // hook_entity_presave so the entity saves once with this value already set.
-    $entity->set('schema_geoshape', ['target_id' => $originalFile->id()]);
+    $entity->set('schema_geoshape', ['target_id' => $media->id()]);
+  }
+
+  /**
+   * Extracts <wpt> waypoints from a GPX file and creates POI geo entities.
+   *
+   * Skips waypoints whose coordinates match an existing POI within 0.001°.
+   * Country code is inferred from the article's schema_place if available.
+   *
+   * @param string $uri
+   *   Stream wrapper URI to the original GPX file (before overwrite).
+   * @param \Drupal\node\NodeInterface $article
+   *   The article node being saved.
+   */
+  protected function extractWaypoints(string $uri, NodeInterface $article): void {
+    $path = $this->fileSystem->realpath($uri);
+    if (!$path || !file_exists($path)) {
+      return;
+    }
+
+    libxml_use_internal_errors(TRUE);
+    $gpx = simplexml_load_file($path);
+    if (!$gpx) {
+      return;
+    }
+
+    $countryCode = $this->resolveCountryCode($article);
+    $created = 0;
+
+    foreach ($gpx->wpt as $wpt) {
+      $name = trim((string) $wpt->name);
+      if (!$name) {
+        continue;
+      }
+      $lat = (float) $wpt['lat'];
+      $lon = (float) $wpt['lon'];
+      if ($lat === 0.0 && $lon === 0.0) {
+        continue;
+      }
+
+      if ($this->poiExistsNearby($lat, $lon)) {
+        continue;
+      }
+
+      $this->createPoi($name, $lat, $lon, $countryCode);
+      $created++;
+    }
+
+    if ($created > 0) {
+      $this->loggerFactory->get('trail_mapper')->info(
+        'Created @count POI(s) from GPX waypoints for node @nid.',
+        ['@count' => $created, '@nid' => $article->id()],
+      );
+    }
+  }
+
+  /**
+   * Resolves the country code from the article's referenced Place node.
+   *
+   * @param \Drupal\node\NodeInterface $article
+   *   The article node.
+   *
+   * @return string|null
+   *   ISO 3166-1 alpha-2 country code, or NULL if unavailable.
+   */
+  protected function resolveCountryCode(NodeInterface $article): ?string {
+    if (!$article->hasField('schema_place') || $article->get('schema_place')->isEmpty()) {
+      return NULL;
+    }
+    $place = $article->schema_place->entity;
+    if (!$place || !$place->hasField('schema_address') || $place->get('schema_address')->isEmpty()) {
+      return NULL;
+    }
+    return $place->schema_address->country_code ?: NULL;
+  }
+
+  /**
+   * Checks whether a geo_entity:poi with matching coordinates already exists.
+   *
+   * @param float $lat
+   *   Latitude to check.
+   * @param float $lon
+   *   Longitude to check.
+   *
+   * @return bool
+   *   TRUE if a POI exists within 0.001° on both axes.
+   */
+  protected function poiExistsNearby(float $lat, float $lon): bool {
+    $storage = $this->entityTypeManager->getStorage('geo_entity');
+    $ids = $storage->getQuery()
+      ->condition('bundle', 'poi')
+      ->accessCheck(FALSE)
+      ->execute();
+
+    if (empty($ids)) {
+      return FALSE;
+    }
+
+    foreach ($storage->loadMultiple($ids) as $poi) {
+      if ($poi->get('schema_geo')->isEmpty()) {
+        continue;
+      }
+      $item = $poi->get('schema_geo')->first();
+      $existingLat = (float) $item->get('lat')->getValue();
+      $existingLon = (float) $item->get('lon')->getValue();
+      if (abs($existingLat - $lat) <= 0.001 && abs($existingLon - $lon) <= 0.001) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * Creates a new geo_entity:poi from waypoint data.
+   *
+   * @param string $name
+   *   Waypoint name — becomes the entity label.
+   * @param float $lat
+   *   Latitude.
+   * @param float $lon
+   *   Longitude.
+   * @param string|null $countryCode
+   *   ISO 3166-1 alpha-2 country code for schema_address, or NULL.
+   */
+  protected function createPoi(string $name, float $lat, float $lon, ?string $countryCode): void {
+    $values = [
+      'bundle'     => 'poi',
+      'label'      => $name,
+      'schema_geo' => ['value' => 'POINT (' . $lon . ' ' . $lat . ')'],
+    ];
+
+    if ($countryCode) {
+      $values['schema_address'] = ['country_code' => $countryCode];
+    }
+
+    try {
+      $this->entityTypeManager->getStorage('geo_entity')
+        ->create($values)
+        ->save();
+    }
+    catch (\Exception $e) {
+      $this->loggerFactory->get('trail_mapper')->error(
+        'Failed to create POI "@name": @msg',
+        ['@name' => $name, '@msg' => $e->getMessage()],
+      );
+    }
   }
 
   /**

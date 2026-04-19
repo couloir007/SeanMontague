@@ -1,0 +1,40 @@
+{#
+/**
+ * @file
+ * Map popup for Article nodes (trail reports, ride notes, etc.).
+ *
+ * Variables:
+ *   props.title         — Article title
+ *   props.image_url     — Thumbnail URL (optional)
+ *   props.category      — schema_category term name (optional)
+ *   props.activity_type — schema_activity_type term name (optional)
+ *   props.distance      — Distance string, e.g. "12.4 mi" (optional)
+ *   props.date          — Formatted publication date (optional)
+ *   props.node_url      — Absolute URL to the article
+ *   props.color         — Marker hex color
+ */
+#}
+<div class="map-popup map-popup--article">
+  {% if props.image_url %}
+    <div class="map-popup__image">
+      <img src="{{ props.image_url }}" alt="{{ props.title }}" loading="lazy">
+    </div>
+  {% endif %}
+  <div class="map-popup__content">
+    <div class="map-popup__type" style="color: {{ props.color }}">
+      {{- props.activity_type ?: props.category ?: 'Trail Report' -}}
+    </div>
+    <h3 class="map-popup__title">
+      <a href="{{ props.node_url }}">{{ props.title }}</a>
+    </h3>
+    <div class="map-popup__meta">
+      {% if props.distance %}
+        <span class="map-popup__distance">{{ props.distance }}</span>
+      {% endif %}
+      {% if props.date %}
+        <span class="map-popup__date">{{ props.date }}</span>
+      {% endif %}
+    </div>
+    <a href="{{ props.node_url }}" class="map-popup__link">Read report →</a>
+  </div>
+</div>

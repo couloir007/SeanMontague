@@ -29,7 +29,6 @@ dependencies:
     - allowed_formats
     - datetime
     - field_group
-    - file
     - inline_entity_form
     - leaflet
     - linkit
@@ -338,13 +337,6 @@ content:
         path: '{"color":"#f71ed3","opacity":"0.7","stroke":true,"weight":2,"fillColor":"#ffddfe","fillOpacity":"0.1","radius":3,"dashArray":"5, 5"}'
         snapping: true
     third_party_settings: {  }
-  schema_geoshape:
-    type: file_generic
-    weight: 9
-    region: content
-    settings:
-      progress_indicator: throbber
-    third_party_settings: {  }
   schema_place:
     type: entity_reference_autocomplete
     weight: 1
@@ -444,4 +436,5 @@ content:
     third_party_settings: {  }
 hidden:
   publish_on: true
+  schema_geoshape: true
   unpublish_on: true

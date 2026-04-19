@@ -1,0 +1,38 @@
+{#
+/**
+ * @file
+ * Map popup for TouristTrip nodes (destination polylines).
+ *
+ * Variables:
+ *   props.title        — Trip title
+ *   props.image_url    — Thumbnail URL (optional)
+ *   props.date_display — Formatted date range, e.g. "Sep 3–17, 2024" (optional)
+ *   props.places_count — Number of destination stops
+ *   props.node_url     — Absolute URL to the trip node
+ *   props.color        — Polyline hex color
+ */
+#}
+<div class="map-popup map-popup--trip">
+  {% if props.image_url %}
+    <div class="map-popup__image">
+      <img src="{{ props.image_url }}" alt="{{ props.title }}" loading="lazy">
+    </div>
+  {% endif %}
+  <div class="map-popup__content">
+    <div class="map-popup__type" style="color: {{ props.color }}">Trip</div>
+    <h3 class="map-popup__title">
+      <a href="{{ props.node_url }}">{{ props.title }}</a>
+    </h3>
+    <div class="map-popup__meta">
+      {% if props.date_display %}
+        <span class="map-popup__date">{{ props.date_display }}</span>
+      {% endif %}
+      {% if props.places_count %}
+        <span class="map-popup__stops">
+          {{- props.places_count }} {{ props.places_count == 1 ? 'stop' : 'stops' -}}
+        </span>
+      {% endif %}
+    </div>
+    <a href="{{ props.node_url }}" class="map-popup__link">View trip →</a>
+  </div>
+</div>

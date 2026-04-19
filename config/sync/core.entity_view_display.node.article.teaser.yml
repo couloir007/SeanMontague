@@ -29,7 +29,6 @@ dependencies:
     - node.type.article
   module:
     - datetime
-    - image
     - media
     - options
     - text

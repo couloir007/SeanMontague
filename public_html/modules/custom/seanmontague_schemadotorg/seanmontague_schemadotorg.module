@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\seanmontague_schemadotorg\JsonLd\ArticleJsonLd;
 use Drupal\seanmontague_schemadotorg\JsonLd\PointOfInterestJsonLd;
+use Drupal\seanmontague_schemadotorg\JsonLd\TouristTripJsonLd;
 
 /**
  * Implements hook_schemadotorg_jsonld_schema_type_entity_alter().
@@ -24,5 +25,8 @@ function seanmontague_schemadotorg_schemadotorg_jsonld_schema_type_entity_alter(
   }
   elseif ($entity_type_id === 'node' && $bundle === 'article') {
     ArticleJsonLd::alter($data, $entity, $bubbleable_metadata);
+  }
+  elseif ($entity_type_id === 'node' && $bundle === 'tourist_trip') {
+    TouristTripJsonLd::alter($data, $entity);
   }
 }

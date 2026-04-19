@@ -1,0 +1,10 @@
+seanmontague_map:
+  version: 1.0
+  js:
+    js/seanmontague-map.js: {}
+  css:
+    component:
+      css/seanmontague-map.css: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings

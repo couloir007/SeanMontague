@@ -1,0 +1,30 @@
+{#
+/**
+ * @file
+ * Map popup for Place nodes (content hub pages — Kingdom Trails, Burke Mtn, etc.).
+ *
+ * Variables:
+ *   props.title     — Place name
+ *   props.image_url — Thumbnail URL (optional)
+ *   props.address   — Formatted address string (optional)
+ *   props.node_url  — Absolute URL to the Place node
+ *   props.color     — Marker hex color
+ */
+#}
+<div class="map-popup map-popup--place">
+  {% if props.image_url %}
+    <div class="map-popup__image">
+      <img src="{{ props.image_url }}" alt="{{ props.title }}" loading="lazy">
+    </div>
+  {% endif %}
+  <div class="map-popup__content">
+    <div class="map-popup__type" style="color: {{ props.color }}">Place</div>
+    <h3 class="map-popup__title">
+      <a href="{{ props.node_url }}">{{ props.title }}</a>
+    </h3>
+    {% if props.address %}
+      <div class="map-popup__meta">{{ props.address }}</div>
+    {% endif %}
+    <a href="{{ props.node_url }}" class="map-popup__link">View place →</a>
+  </div>
+</div>

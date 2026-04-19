@@ -1,0 +1,6 @@
+seanmontague_map.items:
+  path: '/sean-map/items'
+  defaults:
+    _controller: '\Drupal\seanmontague_map\Controller\SeanMapController::items'
+  requirements:
+    _permission: 'access content'

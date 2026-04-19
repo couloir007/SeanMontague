@@ -4,3 +4,4 @@ services:
     arguments:
       - '@file_system'
       - '@logger.factory'
+      - '@entity_type.manager'

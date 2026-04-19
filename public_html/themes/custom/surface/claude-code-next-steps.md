@@ -11,67 +11,118 @@ hook pattern used throughout this project.
 
 | Step | Task | Status |
 |---|---|---|
-| 0e | Trip form display, view displays, template | ❌ pending |
+| 0e | Trip Smart Date field + Schema.org hook | ❌ pending |
 | 0f | field_map_tiles + tile sets | ❌ pending |
 | 0g | GPX / DataDownload / POI / Schema.org track | ❌ pending |
 | 1  | geo_entity poi bundle + seanmontague_schemadotorg module | ❌ pending |
 | 2  | field_key on taxonomies | ❌ pending |
-| 3  | leaflet_full_page refactor (generic + site extension) | ❌ pending |
+| 3a | leaflet_full_page refactor — NMNH/EDAN stripped, generic endpoint | ✅ done |
+| 3b | seanmontague_map extension module | ❌ pending |
 | 4  | elevation_unit config sync | ❌ pending |
 
 ---
 
-## Step 0e — Trip display and template fixes (PENDING)
+## Step 0e — Trip date range: Smart Date + programmatic Schema.org (PENDING)
 
-All fields exist. Three config fixes + one template fix needed.
+Replace the two plain date fields (`field_departure_date` +
+`field_arrival_date`) with a single Smart Date field. Schema.org
+`departureTime` and `arrivalTime` are injected programmatically via
+`hook_schemadotorg_jsonld_schema_type_entity_alter()` following the
+GVP pattern — Blueprints only maps one field to one property, but the
+hook can read one Smart Date field and emit two Schema.org properties.
+
+### 0e-i — Manual: swap fields via UI
+
+1. Admin → Structure → Content types → Tourist Trip → Manage fields
+   - Delete `field_departure_date` (plain Date)
+   - Delete `field_arrival_date` (plain Date)
+   - Add new field: Smart Date, machine name `field_trip_dates`,
+     label "Trip Dates", cardinality 1, not required
+   - No recurrence, no default duration needed
+
+2. Admin → Structure → Content types → Tourist Trip → Manage form display
+   - Add `field_trip_dates` to the Content group after title
+   - Widget: smart_date_default (gives a clean date range picker)
+   - Remove `field_departure_date` and `field_arrival_date` from groups
+
+3. Export config:
+   lando drush cex
+   git add config/sync
+   git commit -m "Replace departure/arrival date fields with field_trip_dates Smart Date"
+
+### 0e-ii — Claude Code: form display + template + Schema.org hook
 
 ```
 Read the root CLAUDE.md.
 Read public_html/themes/custom/surface/CLAUDE.md.
+Read public_html/modules/custom/gvp_schemadotorg/gvp_schemadotorg.module.
+Read public_html/modules/custom/gvp_schemadotorg/src/JsonLd/VolcanoJsonLd.php.
 Read config/sync/core.entity_form_display.node.tourist_trip.default.yml.
-Read config/sync/core.entity_view_display.node.tourist_trip.default.yml.
 Read config/sync/core.entity_view_display.node.tourist_trip.teaser.yml.
 Read public_html/themes/custom/surface/templates/content/node--trip.html.twig.
 
-Fix 1 — FORM DISPLAY: date order wrong, departure must come before arrival.
-Update group_content children:
-  title, field_departure_date, field_arrival_date, schema_image, field_body
+Three changes needed:
 
-Fix 2 — VIEW DISPLAY TEASER: only links and schema_image visible.
-Add:
-  field_departure_date: date_default, label hidden, format_type html_date, weight 1
-  field_arrival_date:   date_default, label hidden, format_type html_date, weight 2
-  field_body: text_summary_or_trimmed, label hidden, trim_length 150, weight 3
-  links: weight 4
-  schema_image stays at weight 0
-Hide everything else.
+1. FORM DISPLAY — update Content group to use field_trip_dates:
+   children: title, field_trip_dates, schema_image, field_body
 
-Fix 3 — VIEW DISPLAY DEFAULT: field_body is correctly visible. No change needed.
+2. VIEW DISPLAY TEASER — replace departure/arrival with field_trip_dates:
+   field_trip_dates: smart_date_default formatter, label hidden, weight 1
 
-Fix 4 — TEMPLATE bugs:
-  a) Uses content.body|field_value — field is field_body not body.
-     Fix: content.field_body|field_value
-  b) Date still uses schema_date_published — needs field_departure_date
-     and field_arrival_date.
+3. TEMPLATE — node--trip.html.twig date range logic:
+   Read start and end from Smart Date field:
 
-Replace the date logic with:
-  {% set depart = node.field_departure_date.value %}
-  {% set arrive = node.field_arrival_date.value %}
-  {% if depart and arrive %}
-    {% set date_display = depart|date('F j') ~ '–' ~ arrive|date('F j, Y') %}
-  {% elseif depart %}
-    {% set date_display = depart|date('F j, Y') %}
-  {% else %}
-    {% set date_display = node.schema_date_published.value|date('F j, Y') %}
-  {% endif %}
+   {% set trip_start = node.field_trip_dates.value %}
+   {% set trip_end   = node.field_trip_dates.end_value %}
+   {% if trip_start and trip_end %}
+     {% set date_display = trip_start|date('F j') ~ '–' ~ trip_end|date('F j, Y') %}
+   {% elseif trip_start %}
+     {% set date_display = trip_start|date('F j, Y') %}
+   {% else %}
+     {% set date_display = '' %}
+   {% endif %}
 
-Pass date_display to the article-header include.
+   Also fix: uses content.body|field_value but field is field_body.
+   Fix: content.field_body|field_value
+
+4. SCHEMA.ORG HOOK — add to seanmontague_schemadotorg module.
+   In seanmontague_schemadotorg.module, add tourist_trip to the
+   hook dispatch (alongside geo_entity poi and article):
+
+   case 'tourist_trip':
+     TouristTripJsonLd::alter($data, $entity);
+     break;
+
+   Create src/JsonLd/TouristTripJsonLd.php following the GVP pattern:
+
+   public static function alter(array &$data, NodeInterface $entity): void {
+     self::buildDates($data, $entity);
+   }
+
+   protected static function buildDates(array &$data, NodeInterface $entity): void {
+     if ($entity->get('field_trip_dates')->isEmpty()) {
+       return;
+     }
+     $item = $entity->get('field_trip_dates')->first();
+     $start = $item->get('value')->getValue();
+     $end   = $item->get('end_value')->getValue();
+
+     if ($start) {
+       // Smart Date stores timestamps — format as ISO 8601 date
+       $data['departureTime'] = date('Y-m-d', $start);
+     }
+     if ($end) {
+       $data['arrivalTime'] = date('Y-m-d', $end);
+     }
+   }
+
+   Note: do not map field_trip_dates to any Schema.org property via
+   Blueprints UI — the hook handles both properties from one field.
+   Remove any existing departureTime/arrivalTime Blueprints mappings.
 
 Show all changed files before writing.
 After: lando drush cim && lando drush cr
 ```
-
----
 
 ## Step 0f — Per-article tile set override (PENDING)
 
@@ -252,11 +303,34 @@ After: lando drush cr
 This step introduces Points of Interest and the Schema.org hook module.
 Two sub-steps.
 
-### 1a — Manual: create geo_entity poi bundle
+### 1a — Manual: create geo_entity bundles
 
-The geo_entity contrib module is already installed. Add a poi bundle:
+The geo_entity contrib module is already installed. Create two bundles:
 
+**Bundle 1: Point of Interest (poi)**
+Already created. Fields: field_body, schema_geo, schema_image,
+schema_address (country + admin area only), schema_place, field_show_on_map.
+
+**Bundle 2: Destination (destination)**
 1. Admin → Structure → Geo entity types → Add geo entity type
+   Label: Destination, machine name: destination
+
+2. Manage fields — add to destination bundle:
+   - field_body (text_with_summary) — short description for map popup
+   - schema_geo (Geofield) — coordinates
+   - schema_image (entity_reference → ImageObject media) — popup image
+   - schema_address (address) — country + admin area only
+
+3. Update schema_destination on tourist_trip:
+   - Change target bundle from place node → geo_entity:destination
+   - Ireland trip Place node destinations will need to be recreated
+     as geo_entity:destination records
+
+4. Update Inline Entity Form on schema_destination to show only:
+   title, schema_geo, schema_address (country only)
+
+Original bundle setup: Point of Interest (poi)
+Admin → Structure → Geo entity types → Add geo entity type
    Label: Point of Interest, machine name: poi
 
 2. Manage fields — add to poi bundle:

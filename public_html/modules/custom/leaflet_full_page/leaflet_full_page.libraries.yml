@@ -4,13 +4,8 @@ custom_leaflet:
     component:
       css/custom_leaflet.css: {}
   js:
-#    js/custom_leaflet.js: {}
-    js/StateCoordinatesMap.js: {}
-    js/LeafletMapInteraction.js: { }
-    https://mads.si.edu/mads-viewer/dist/latest/mads-viewer.js: { external: true }
+    js/LeafletMapInteraction.js: {}
   dependencies:
     - core/drupal
     - core/jquery
     - core/once
-    - si_dams_video/si_dams_video
-

@@ -1,0 +1,30 @@
+{#
+/**
+ * @file
+ * Map popup for geo_entity poi (Points of Interest).
+ *
+ * Variables:
+ *   props.title     — POI name
+ *   props.image_url — Thumbnail URL (optional)
+ *   props.teaser    — First 120 chars of field_body (optional)
+ *   props.node_url  — Absolute URL to the POI entity
+ *   props.color     — Marker hex color
+ */
+#}
+<div class="map-popup map-popup--poi">
+  {% if props.image_url %}
+    <div class="map-popup__image">
+      <img src="{{ props.image_url }}" alt="{{ props.title }}" loading="lazy">
+    </div>
+  {% endif %}
+  <div class="map-popup__content">
+    <div class="map-popup__type" style="color: {{ props.color }}">Point of Interest</div>
+    <h3 class="map-popup__title">
+      <a href="{{ props.node_url }}">{{ props.title }}</a>
+    </h3>
+    {% if props.teaser %}
+      <p class="map-popup__teaser">{{ props.teaser }}</p>
+    {% endif %}
+    <a href="{{ props.node_url }}" class="map-popup__link">View details →</a>
+  </div>
+</div>

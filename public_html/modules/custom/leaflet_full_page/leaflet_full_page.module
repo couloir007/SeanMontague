@@ -1,63 +1,7 @@
 <?php
 
-use Drupal\Component\Serialization\Json;
 use Drupal\views\ViewExecutable;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Markup;
-
-/**
- * Defines theme hook implementations for the Leaflet Full Page module.
- *
- * This function provides theme definitions, including templates and their
- * corresponding file paths, for rendering specific views in the Leaflet Full
- * Page module.
- *
- * @param array $existing
- *   An array of existing theme definitions.
- * @param string $type
- *   The type of hook being invoked.
- * @param string $theme
- *   The name of the theme for which suggestions are being retrieved.
- * @param string $path
- *   The path to the theme engine.
- *
- * @return array
- *   An array of theme definitions specific to the Leaflet Full Page module.
- *   Each theme definition contains the template name and its file path.
- */
-/**
- * Implements hook_preprocess_block().
- */
-function leaflet_full_page_preprocess_block__gesso_smithsonianbrandingmap(&$variables) {
-    $variables['return_site'] = null;
-
-    $current_path = \Drupal::service('path.current')->getPath();
-    $alias = \Drupal::service('path_alias.manager')
-        ->getAliasByPath($current_path);
-
-    // Standardize alias by ensuring it starts with a slash and doesn't have a trailing slash.
-    $alias = '/' . trim($alias, '/');
-
-    if ($alias === '/visit/find-your-place-at-the-museum/interactive-us-map' || str_contains($current_path, '/visit/find-your-place-at-the-museum/interactive-us-map')) {
-        $variables['nmnh_leaflet'] = '/' . \Drupal::service('extension.list.module')
-                ->getPath('leaflet_full_page') . '/images/NMNH_White.png';
-        $variables['return_site'] = [
-          '#type' => 'link',
-          '#title' => Markup::create('<span class="org-name__return-site__text">Return to Site </span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/></svg>'),
-          '#url' => \Drupal\Core\Url::fromUserInput('/node/16359'),
-          '#options' => [
-            'html' => TRUE,
-          ],
-          '#attributes' => [
-            'class' => ['org-name__return-site', 'return-site-link'],
-            'title' => t('Natural History'),
-            'rel' => 'home',
-          ],
-        ];
-    } else {
-        $variables['return_site'] = null;
-    }
-}
 
 /**
  * Implements hook_theme().
@@ -68,12 +12,10 @@ function leaflet_full_page_theme($existing, $type, $theme, $path) {
     return [
         'views_view__leaflet_full_page__legend' => [
             'template' => 'views-view--leaflet-full-page--legend',
-            // Filename without .html.twig
             'path' => $module_path . '/templates',
         ],
         'views_view__leaflet_full_page__no_legend' => [
             'template' => 'views-view--leaflet-full-page--no_legend',
-            // Filename without .html.twig
             'path' => $module_path . '/templates',
         ],
     ];
@@ -81,14 +23,8 @@ function leaflet_full_page_theme($existing, $type, $theme, $path) {
 
 /**
  * Implements hook_preprocess_html().
- *
- * Adds custom CSS classes to the body element for leaflet full page views.
  */
 function leaflet_full_page_preprocess_html(&$variables) {
-    // Get the current route.
-    $route_match = \Drupal::routeMatch();
-
-    // You can also check for specific view displays
     $request = \Drupal::request();
     if ($request->attributes->has('view_id')) {
         $view_id = $request->attributes->get('view_id');
@@ -99,7 +35,7 @@ function leaflet_full_page_preprocess_html(&$variables) {
 }
 
 /**
- *
+ * Implements hook_theme_suggestions_views_view_alter().
  */
 function leaflet_full_page_theme_suggestions_views_view_alter(array &$suggestions, array $variables) {
     $view = $variables['view'];
@@ -107,22 +43,11 @@ function leaflet_full_page_theme_suggestions_views_view_alter(array &$suggestion
 
     if (isset($leaflet_full_page_extenders['template'])) {
         $suggestions[] = 'views_view__leaflet_full_page__' . $leaflet_full_page_extenders['template'];
-    } else {
     }
 }
 
 /**
  * Checks if the provided view is a "leaflet full page" mapping view.
- *
- * Determines if the given view has a "leaflet_full_page_view" extender
- * with a valid template configuration.
- *
- * @param mixed $view The view object to analyze.
- * @param array $options An array to store extender options if the conditions
- *     are met.
- *
- * @return bool Returns TRUE if the view is a "leaflet full page" mapping view,
- *     FALSE otherwise.
  */
 function _leaflet_full_page_is_si_mapping_view($view, &$options = []): bool {
     if (
@@ -138,20 +63,7 @@ function _leaflet_full_page_is_si_mapping_view($view, &$options = []): bool {
 }
 
 /**
- * Alters the form structure for specific Views exposed forms in the context of
- * leaflet full page integration.
- *
- * This function checks if the form ID corresponds to a Views exposed form and
- * further verifies if the associated view is related to leaflet full page
- * functionality. If the conditions are met, it adds a `leaflet_full_page`
- * configuration to the form based on the provided template options.
- *
- * @param array $form
- *   The form structure to be altered.
- * @param FormStateInterface $form_state
- *   The current state of the form.
- * @param string $form_id
- *   The unique identifier of the form being altered.
+ * Implements hook_form_alter().
  */
 function leaflet_full_page_form_alter(&$form, FormStateInterface $form_state, $form_id) {
     if (strpos($form_id, 'views_exposed_form') !== FALSE) {
@@ -172,79 +84,25 @@ function leaflet_full_page_form_alter(&$form, FormStateInterface $form_state, $f
 }
 
 /**
- * Modifies the pre-render phase of a view to handle "leaflet full page"
- * specific settings.
- *
- * Checks if the view's ID contains "leaflet_full_page" and, if so, applies
- * custom Drupal settings for the current display, provided it does not contain
- * "items."
- *
- * @param ViewExecutable $view The view instance being pre-rendered.
- *
- * @return void
+ * Implements hook_views_pre_render().
  */
 function leaflet_full_page_views_pre_render(ViewExecutable $view): void {
-    // Preserve existing behavior for leaflet_full_page view classes.
     if (strpos($view->id(), 'leaflet_full_page') !== FALSE) {
         if (strpos($view->current_display, 'items') === FALSE) {
-            // Only set if not already set, or preserve the original
             $existing_settings = $view->element['#attached']['drupalSettings']['leaflet_full_page'] ?? [];
 
-            // Get the display handler for the current display.
             $display = $view->display_handler;
-
-            // Get the path configured on this display (e.g. "my-view-path/%").
-            $path = $display->getOption('path');  // e.g. "leaflet-full-page/%"
-
-            // Usually you want it as an internal path with leading slash:
-            $internal_path = '/' . ltrim($path, '/');
+            $path = $display->getOption('path');
             $view->element['#attached']['drupalSettings']['leaflet_full_page']['currentPath'] = $path;
 
             if (empty($existing_settings['currentDisplay'])) {
                 $view->element['#attached']['drupalSettings']['leaflet_full_page']['currentDisplay'] = $view->current_display;
             }
+
+            $config = \Drupal::config('leaflet_full_page.settings');
+            $endpoint = $config->get('endpoint_path') ?: '/leaflet-full-page/map-items';
+            $view->element['#attached']['drupalSettings']['leaflet_full_page']['itemsEndpoint'] = $endpoint;
         }
-    }
-}
-
-/**
- * Implements preprocess_views_view().
- */
-function leaflet_full_page_preprocess_views_view__leaflet_full_page__legend(&$variables) {
-    // Only add to specific pages
-    $route_name = \Drupal::routeMatch()->getRouteName();
-
-    if ($route_name === 'view.leaflet_full_page.semiquincentennial') {
-        $file_uri = 'public://find_your_place/interactive-us-map_mapitems.json';
-        $file_system = \Drupal::service('file_system');
-        $real_path = $file_system->realpath($file_uri);
-
-        $map_items = [];
-
-        if ($real_path && is_readable($real_path)) {
-            $json = file_get_contents($real_path);
-            if ($json !== FALSE && trim($json) !== '') {
-                try {
-                    $decoded = Json::decode($json);
-                    if (is_array($decoded)) {
-                        $map_items = $decoded;
-                    }
-                }
-                catch (\Throwable $e) {
-                    \Drupal::logger('leaflet_full_page')
-                        ->warning('Failed to decode map items JSON: @message', [
-                            '@message' => $e->getMessage(),
-                        ]);
-                }
-            }
-        } else {
-            \Drupal::logger('leaflet_full_page')
-                ->warning('Map items JSON file not readable: @uri', [
-                    '@uri' => $file_uri,
-                ]);
-        }
-
-        $variables['map_items'] = $map_items;
     }
 }
 
@@ -252,8 +110,7 @@ function leaflet_full_page_preprocess_views_view__leaflet_full_page__legend(&$va
  * Helper function to render a field.
  */
 function _leaflet_full_page_render_field($entity, $field_name, $view_mode = 'default') {
-    if (!$entity->hasField($field_name) || $entity->get($field_name)
-            ->isEmpty()) {
+    if (!$entity->hasField($field_name) || $entity->get($field_name)->isEmpty()) {
         return '';
     }
 

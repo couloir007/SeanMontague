@@ -1,17 +1,4 @@
 services:
-  leaflet_full_page.edan_object_service:
-    class: Drupal\leaflet_full_page\Service\LeafletEdanObjectService
-    arguments: ['@edan_connector.simple']
-
-  leaflet_full_page.normalizer.edan_record:
-    class: Drupal\leaflet_full_page\Normalizer\EdanRecordNormalizer
-    arguments: ['@edan_connector.simple']
-    tags:
-      - { name: normalizer, priority: 100 }
   leaflet_full_page.map_items:
     class: Drupal\leaflet_full_page\Service\LeafletMapItemsService
-    arguments: [ '@entity_type.manager', '@renderer', '@leaflet_full_page.edan_object_service' ]
-  leaflet_full_page.edan_proxy_controller:
-    class: Drupal\leaflet_full_page\Controller\EdanProxyController
-    arguments:
-      - '@http_client'
+    arguments: ['@entity_type.manager', '@renderer']

@@ -82,6 +82,13 @@ class TrailMapperSettingsForm extends ConfigFormBase {
       '#description'   => $this->t('Unit used in the stats bar and elevation profile. GeoJSON is always stored in meters.'),
     ];
 
+    $form['extract_waypoints'] = [
+      '#type'          => 'checkbox',
+      '#title'         => $this->t('Extract waypoints from GPX'),
+      '#default_value' => $config->get('extract_waypoints') ?? FALSE,
+      '#description'   => $this->t('When a GPX file is uploaded, automatically create POI geo entities from any &lt;wpt&gt; elements found in the file. Skips waypoints whose coordinates match an existing POI within 0.001°.'),
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -94,6 +101,7 @@ class TrailMapperSettingsForm extends ConfigFormBase {
       ->set('tile_url', $form_state->getValue('tile_url'))
       ->set('tile_attribution', $form_state->getValue('tile_attribution'))
       ->set('elevation_unit', $form_state->getValue('elevation_unit'))
+      ->set('extract_waypoints', (bool) $form_state->getValue('extract_waypoints'))
       ->save();
 
     parent::submitForm($form, $form_state);
@@ -146,6 +154,16 @@ class TrailMapperSettingsForm extends ConfigFormBase {
   }
 
   /**
+   * Returns all tile set definitions (alias for tileSets()).
+   *
+   * @return array
+   *   Keyed by tile set key; each entry has url, attribution, maxZoom.
+   */
+  public static function allTileSets(): array {
+    return self::tileSets();
+  }
+
+  /**
    * Returns resolved tile config for use in hook_page_attachments.
    *
    * @return array
@@ -177,6 +195,15 @@ class TrailMapperSettingsForm extends ConfigFormBase {
    */
   public static function elevationUnit(): string {
     return \Drupal::config(self::CONFIG_NAME)->get('elevation_unit') ?? 'feet';
+  }
+
+  /**
+   * Returns whether GPX waypoint extraction is enabled.
+   *
+   * @return bool
+   */
+  public static function extractWaypointsEnabled(): bool {
+    return (bool) (\Drupal::config(self::CONFIG_NAME)->get('extract_waypoints') ?? FALSE);
   }
 
 }
