@@ -41,7 +41,7 @@ lando composer require drupal/module_name
 
 # Frontend — run from theme directory via lando ssh, or:
 lando npm run build           # full production build (lint + vite)
-lando npm run watch           # dev mode: Vite + Storybook on localhost:6007
+lando npm run watch           # dev mode: Vite + Storybook on localhost:6006
 lando npm run lint:fix        # Biome JS/TS auto-fix
 lando npm run stylelint:fix   # CSS auto-fix
 
@@ -100,6 +100,7 @@ navigation. There is no separate `trail_report` bundle.
 | `schema_trip` | entity_reference → tourist_trip | Parent trip (optional) |
 | `schema_place` | entity_reference → place | Map center fallback (optional) |
 | `schema_geo` | geofield | Direct lat/lon map center fallback (optional) |
+| `field_map_tiles` | list (text) | Per-article tile set override — for non-US content |
 | `schema_geoshape` | file | GeoJSON/GPX track — drives map + elevation profile |
 | `schema_distance` | decimal | Miles (manual — display fallback when no geoshape) |
 | `schema_elev_gain` | integer | Feet gain (manual) |
@@ -113,6 +114,48 @@ navigation. There is no separate `trail_report` bundle.
 Stat fields (distance, elev_*) are optional — relevant only for trail/ski
 articles. Stats bar renders from Twig manual fields when schema_distance is
 set and schema_geoshape is absent.
+
+### TouristTrip fields
+
+| Field | Type | Purpose |
+|---|---|---|
+| `body` | text_with_summary | Trip narrative |
+| `field_departure_date` | date | Departure date → Schema.org `departureTime` |
+| `field_arrival_date` | date | Arrival date → Schema.org `arrivalTime` |
+| `schema_destination` | entity_reference → place[] | Places visited (multi-value, ordered) |
+| `schema_itinerary` | entity_reference → article[] | Articles under this trip (ordered) |
+| `schema_image` | entity_reference → ImageObject | Hero image |
+| `field_editorial` | entity_reference_revisions | Editorial tracking |
+
+**Date fields note:** Smart Date (`schema_event_schedule`) was removed.
+Schema.org Blueprints cannot map a single field to both `departureTime`
+and `arrivalTime`, so two separate plain Date fields are used instead.
+`schema_date_published` remains on the bundle as a fallback but is
+superseded by `field_departure_date` / `field_arrival_date`.
+
+**Template date range pattern:**
+```twig
+{% set depart = node.field_departure_date.value %}
+{% set arrive = node.field_arrival_date.value %}
+{% if depart and arrive %}
+  {% set date_display = depart|date('F j') ~ '–' ~ arrive|date('F j, Y') %}
+{% elseif depart %}
+  {% set date_display = depart|date('F j, Y') %}
+{% else %}
+  {% set date_display = node.schema_date_published.value|date('F j, Y') %}
+{% endif %}
+```
+
+### Place fields
+
+| Field | Type | Purpose |
+|---|---|---|
+| `body` | text_with_summary | Place description |
+| `schema_latitude` | decimal | Latitude — map center |
+| `schema_longitude` | decimal | Longitude — map center |
+| `schema_address` | address | Structured address (country required inline) |
+| `schema_image` | entity_reference → ImageObject | Place photo |
+| `schema_telephone` | string | Phone |
 
 ### Geo field access — IMPORTANT
 
@@ -138,14 +181,8 @@ node.schema_longitude.value
 {% set map_center = place.schema_latitude.value ~ ',' ~ place.schema_longitude.value %}
 ```
 
-The common mistake is using `place.schema_geo.value.lat` — Place has no
-`schema_geo` field, so `has_place` evaluates false and the map center
-fallback silently breaks.
-
-### TouristTrip fields
-
-`body`, `schema_date_published`, `schema_destination` (→ Place[]),
-`schema_itinerary` (→ Article[]), `schema_image`, `field_editorial`
+The common mistake is `place.schema_geo.value.lat` — Place has no
+`schema_geo`, so `has_place` silently evaluates false.
 
 ### Taxonomy vocabularies
 
@@ -155,8 +192,8 @@ fallback silently breaks.
 | Activity Type | `activity_type` | bike / hike / ski — needs `field_key` added |
 | Tags | `tags` | general tagging |
 
-`field_key` is a plain text field (max 32 chars) on taxonomy terms used by
-the Pathauto hook to generate URL path segments. **It does not exist yet.**
+`field_key` is a plain text field (max 32 chars) on taxonomy terms.
+**Does not exist yet** — needed for URL alias conventions.
 
 ---
 
@@ -167,7 +204,9 @@ All Leaflet rendering is handled by `map.js` in the Surface theme.
 - **Never** use the Drupal Leaflet module formatter on article pages —
   `schema_geo` must be **hidden** in the article view display to prevent
   a rogue second map from rendering
-- USGS National Map tiles — no API key required
+- Default tiles: USGS National Map (US only, no API key)
+- Per-article tile override: `field_map_tiles` — use for non-US content
+- Available tile keys: `usgs-topo`, `osm`, `open-topo`, `esri-topo`
 - GeoJSON Z values stored in **meters** by GeoShapeConverter; converted to
   display unit client-side via `drupalSettings.trailMapper.elevationUnit`
 - After init: `window._surfaceMaps[map_id]`, `window._surfaceTracks[map_id]`,
@@ -175,27 +214,40 @@ All Leaflet rendering is handled by `map.js` in the Surface theme.
 
 ---
 
+## URL Aliases
+
+Set manually on each node. No Pathauto automation.
+
+| Content | Pattern |
+|---|---|
+| Trail report | `/trails/bike/[title]`, `/trails/hike/[title]`, `/trails/ski/[title]` |
+| Trip | `/trips/[title]` |
+| Trip article | `/trips/[trip-title]/[article-title]` |
+| Drupal post | `/drupal/[title]` |
+| Permaculture post | `/permaculture/[title]` |
+| Writing | `/writing/[title]` |
+
+---
+
 ## Pending Work
 
-The following items are documented in `claude-code-next-steps.md`:
+See `claude-code-next-steps.md` for full prompts. Remaining items:
 
-### Unblocked — do first
-- **Form display:** Move `schema_geo` from Trail Stats group → Location & Trip;
-  add `schema_activity_type` to Content group
-- **View display default:** Hide `schema_geo` (critical — kills rogue Leaflet map),
-  hide all other fields except `body`
-- **View display teaser:** Build out with image, date, category, difficulty, summary
-- **Template bug:** `node--article.html.twig` references `place.schema_geo.value.lat`
-  — must be updated to `place.schema_latitude.value` / `place.schema_longitude.value`
+- **0e** — Add `field_departure_date` + `field_arrival_date` to tourist_trip;
+  update `node--trip.html.twig` to render date range
+- **0f** — `field_map_tiles` on article; register tile sets in trail_mapper;
+  wire through template and map.js
+- **0g** — GPX: DataDownload media type, waypoint POI extraction,
+  Schema.org spatialCoverage track output
+- **1** — geo_entity `poi` bundle + `seanmontague_schemadotorg` module
+- **2** — Add `field_key` to `category` and `activity_type` taxonomies
+- **3** — leaflet_full_page refactor + seanmontague_map extension
 
-### Blocked on field_key
-- Add `field_key` (text plain, max 32) to `category` and `activity_type` vocabularies
-- Populate term keys: trails, drupal, permaculture, maps / bike, hike, ski
-- Implement `hook_pathauto_pattern_alter()` for conditional URL aliases
-
-### Configuration gaps
-- `elevation_unit` missing from `trail_mapper.settings.yml` and schema —
-  needs adding to config schema + install config + `hook_page_attachments`
+Bolt → Surface theme integration (Steps A–D complete):
+- Tokens, CSS tweaks, drop cap, reading progress, map-link-list — done
+- New components: dest-index, dest-timeline (destination strip + itinerary)
+- Step E pending: node--trip.html.twig redesign using dest-index +
+  dest-timeline + ireland-2024.html layout reference
 
 ---
 
@@ -244,3 +296,8 @@ lando drush cim && lando drush cr
 
 See `public_html/themes/custom/surface/CLAUDE.md` for full theme architecture,
 Twig rules, content model, component patterns, JS standards, and Leaflet patterns.
+
+When working on anything inside the Surface theme, also read
+`public_html/themes/custom/surface/STORYBOOK.md` before making any changes.
+It contains critical rules for avoiding Storybook breakage — scope restrictions,
+JS dual-context patterns, Twig namespace rules, and common failure modes.
