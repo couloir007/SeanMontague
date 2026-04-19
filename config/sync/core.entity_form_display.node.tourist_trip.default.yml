@@ -6,16 +6,18 @@ dependencies:
     - field.field.node.tourist_trip.field_body
     - field.field.node.tourist_trip.field_editorial
     - field.field.node.tourist_trip.field_metatag
+    - field.field.node.tourist_trip.schema_date_published
     - field.field.node.tourist_trip.schema_destination
     - field.field.node.tourist_trip.schema_image
     - field.field.node.tourist_trip.schema_itinerary
     - field.field.node.tourist_trip.schema_related_link
     - field.field.node.tourist_trip.schema_significant_link
     - field.field.node.tourist_trip.schema_subject_of
-    - field.field.node.tourist_trip.field_trip_dates
+    - field.field.node.tourist_trip.schema_trip_dates
     - node.type.tourist_trip
   module:
     - allowed_formats
+    - datetime
     - field_group
     - inline_entity_form
     - linkit
@@ -28,7 +30,7 @@ third_party_settings:
     group_content:
       children:
         - title
-        - field_trip_dates
+        - schema_trip_dates
         - schema_image
         - field_body
       label: Content
@@ -86,6 +88,7 @@ third_party_settings:
         required_fields: true
     group_editorial:
       children:
+        - schema_date_published
         - field_editorial
       label: 'Editorial information'
       region: content
@@ -107,7 +110,7 @@ content:
     third_party_settings: {  }
   field_body:
     type: text_textarea
-    weight: 0
+    weight: -2
     region: content
     settings:
       rows: 12
@@ -118,7 +121,7 @@ content:
         hide_guidelines: '0'
   field_editorial:
     type: inline_entity_form_simple
-    weight: 221
+    weight: 223
     region: content
     settings:
       form_mode: default
@@ -131,31 +134,11 @@ content:
     third_party_settings: {  }
   field_metatag:
     type: metatag_firehose
-    weight: 7
+    weight: 6
     region: content
     settings:
       sidebar: true
       use_details: true
-    third_party_settings: {  }
-  field_trip_dates:
-    type: smartdate_only
-    weight: -3
-    region: content
-    settings:
-      hide_date: '1'
-      allday: '1'
-      remove_seconds: '1'
-      duration_overlay: '1'
-      separator: to
-      show_extra: 0
-      modal: false
-      default_duration: 60
-      default_duration_increments: |-
-        30
-        60|1 hour
-        90
-        120|2 hours
-        custom
     third_party_settings: {  }
   langcode:
     type: language_select
@@ -177,6 +160,12 @@ content:
     settings:
       display_label: true
     third_party_settings: {  }
+  schema_date_published:
+    type: datetime_default
+    weight: 222
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   schema_destination:
     type: inline_entity_form_complex
     weight: 9
@@ -197,7 +186,7 @@ content:
     third_party_settings: {  }
   schema_image:
     type: entity_reference_autocomplete
-    weight: -4
+    weight: -3
     region: content
     settings:
       match_operator: CONTAINS
@@ -227,7 +216,7 @@ content:
     third_party_settings: {  }
   schema_significant_link:
     type: linkit
-    weight: 9
+    weight: 8
     region: content
     settings:
       placeholder_url: ''
@@ -237,13 +226,33 @@ content:
     third_party_settings: {  }
   schema_subject_of:
     type: entity_reference_autocomplete
-    weight: 10
+    weight: 3
     region: content
     settings:
       match_operator: CONTAINS
       match_limit: 10
       size: 60
       placeholder: ''
+    third_party_settings: {  }
+  schema_trip_dates:
+    type: smartdate_inline
+    weight: -4
+    region: content
+    settings:
+      modal: false
+      default_duration: 60
+      default_duration_increments: |-
+        30
+        60|1 hour
+        90
+        120|2 hours
+        custom
+      show_extra: false
+      hide_date: true
+      allday: true
+      remove_seconds: false
+      duration_overlay: true
+      separator: to
     third_party_settings: {  }
   simple_sitemap:
     weight: 220
@@ -273,7 +282,7 @@ content:
       placeholder: ''
     third_party_settings: {  }
   translation:
-    weight: 5
+    weight: 4
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -288,11 +297,10 @@ content:
       placeholder: ''
     third_party_settings: {  }
   url_redirects:
-    weight: 6
+    weight: 5
     region: content
     settings: {  }
     third_party_settings: {  }
 hidden:
   publish_on: true
-  schema_trip_dates: true
   unpublish_on: true

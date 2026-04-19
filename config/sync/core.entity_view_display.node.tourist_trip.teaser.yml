@@ -7,7 +7,7 @@ dependencies:
     - field.field.node.tourist_trip.field_body
     - field.field.node.tourist_trip.field_editorial
     - field.field.node.tourist_trip.field_metatag
-    - field.field.node.tourist_trip.field_trip_dates
+    - field.field.node.tourist_trip.schema_date_published
     - field.field.node.tourist_trip.schema_destination
     - field.field.node.tourist_trip.schema_image
     - field.field.node.tourist_trip.schema_itinerary
@@ -18,8 +18,8 @@ dependencies:
     - image.style.medium
     - node.type.tourist_trip
   module:
+    - datetime
     - media
-    - smart_date
     - text
     - user
 id: node.tourist_trip.teaser
@@ -35,32 +35,19 @@ content:
     third_party_settings: {  }
     weight: 3
     region: content
-  field_trip_dates:
-    type: smartdate_default
-    label: hidden
-    settings:
-      timezone_override: ''
-      format_type: medium
-      format: default
-      force_chronological: false
-      add_classes: false
-      time_wrapper: true
-      localize: false
-      parts:
-        - start
-        - end
-      duration:
-        separator: ' | '
-        unit: ''
-        decimals: 2
-        suffix: h
-    third_party_settings: {  }
-    weight: 1
-    region: content
   links:
     settings: {  }
     third_party_settings: {  }
     weight: -100
+    region: content
+  schema_date_published:
+    type: datetime_default
+    label: hidden
+    settings:
+      timezone_override: ''
+      format_type: html_date
+    third_party_settings: {  }
+    weight: 1
     region: content
   schema_image:
     type: media_thumbnail

@@ -2,6 +2,7 @@
 
 namespace Drupal\seanmontague_schemadotorg\JsonLd;
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 
@@ -35,7 +36,7 @@ class PointOfInterestJsonLd {
   }
 
   protected static function buildGeo(EntityInterface $entity): ?array {
-    if ($entity->get('field_geo')->isEmpty()) {
+    if (!$entity instanceof ContentEntityInterface || !$entity->hasField('field_geo') || $entity->get('field_geo')->isEmpty()) {
       return NULL;
     }
     $item = $entity->get('field_geo')->first();
@@ -47,7 +48,7 @@ class PointOfInterestJsonLd {
   }
 
   protected static function buildContainedInPlace(EntityInterface $entity): ?array {
-    if ($entity->get('schema_place')->isEmpty()) {
+    if (!$entity instanceof ContentEntityInterface || !$entity->hasField('schema_place') || $entity->get('schema_place')->isEmpty()) {
       return NULL;
     }
     $place = $entity->get('schema_place')->entity;
@@ -61,7 +62,7 @@ class PointOfInterestJsonLd {
   }
 
   protected static function buildImage(EntityInterface $entity): ?array {
-    if ($entity->get('schema_image')->isEmpty()) {
+    if (!$entity instanceof ContentEntityInterface || !$entity->hasField('schema_image') || $entity->get('schema_image')->isEmpty()) {
       return NULL;
     }
     $media = $entity->get('schema_image')->entity;

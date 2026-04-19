@@ -6,6 +6,7 @@ dependencies:
     - field.field.node.article.body
     - field.field.node.article.field_editorial
     - field.field.node.article.field_image
+    - field.field.node.article.field_map_tiles
     - field.field.node.article.field_metatag
     - field.field.node.article.schema_activity_type
     - field.field.node.article.schema_audio
@@ -26,6 +27,7 @@ dependencies:
     - field.field.node.article.schema_trip
     - node.type.article
   module:
+    - options
     - text
     - user
 id: node.article.default
@@ -47,6 +49,13 @@ content:
       link: true
     third_party_settings: {  }
     weight: 1
+    region: content
+  field_map_tiles:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 2
     region: content
 hidden:
   field_editorial: true

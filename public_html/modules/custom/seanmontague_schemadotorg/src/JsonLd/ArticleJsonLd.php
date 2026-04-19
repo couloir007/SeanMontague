@@ -2,6 +2,7 @@
 
 namespace Drupal\seanmontague_schemadotorg\JsonLd;
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 
@@ -23,7 +24,7 @@ class ArticleJsonLd {
   }
 
   protected static function buildMentions(EntityInterface $entity): array {
-    if ($entity->get('schema_poi')->isEmpty()) {
+    if (!$entity instanceof ContentEntityInterface || !$entity->hasField('schema_poi') || $entity->get('schema_poi')->isEmpty()) {
       return [];
     }
     $mentions = [];
@@ -42,7 +43,7 @@ class ArticleJsonLd {
   }
 
   protected static function buildSpatialCoverage(EntityInterface $entity): ?array {
-    if (!$entity->hasField('schema_geoshape') || $entity->get('schema_geoshape')->isEmpty()) {
+    if (!$entity instanceof ContentEntityInterface || !$entity->hasField('schema_geoshape') || $entity->get('schema_geoshape')->isEmpty()) {
       return NULL;
     }
 

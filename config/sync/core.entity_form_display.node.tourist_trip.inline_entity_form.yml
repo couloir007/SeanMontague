@@ -7,6 +7,7 @@ dependencies:
     - field.field.node.tourist_trip.field_body
     - field.field.node.tourist_trip.field_editorial
     - field.field.node.tourist_trip.field_metatag
+    - field.field.node.tourist_trip.schema_date_published
     - field.field.node.tourist_trip.schema_destination
     - field.field.node.tourist_trip.schema_image
     - field.field.node.tourist_trip.schema_itinerary
@@ -101,6 +102,7 @@ hidden:
   field_metatag: true
   publish_on: true
   scheduler_settings: true
+  schema_date_published: true
   schema_destination: true
   schema_image: true
   schema_itinerary: true
