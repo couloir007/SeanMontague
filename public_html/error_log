@@ -1,0 +1,301 @@
+[25-Jul-2025 17:49:23 UTC] Error: Interface "Drush\Commands\sql\sanitize\SanitizePluginInterface" not found in /home/roundybr/public_html/modules/contrib/webform/src/Commands/WebformSanitizeSubmissionsCommands.php on line 18 #0 /home/roundybr/vendor/composer/ClassLoader.php(576): include()
+#1 /home/roundybr/vendor/composer/ClassLoader.php(427): Composer\Autoload\{closure}('/home/roundybr/...')
+#2 [internal function]: Composer\Autoload\ClassLoader->loadClass('Drupal\\webform\\...')
+#3 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(192): ReflectionClass->__construct('\\Drupal\\webform...')
+#4 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(174): Drush\Runtime\LegacyServiceInstantiator->instantiateObject('\\Drupal\\webform...', Array)
+#5 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(131): Drush\Runtime\LegacyServiceInstantiator->create('\\Drupal\\webform...', Array, Array)
+#6 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(60): Drush\Runtime\LegacyServiceInstantiator->instantiateServices(Array)
+#7 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(239): Drush\Runtime\LegacyServiceInstantiator->loadServiceFiles(Array)
+#8 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(215): Drush\Boot\DrupalBoot8->addDrupalModuleDrushCommands(Object(Drush\Boot\BootstrapManager))
+#9 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(236): Drush\Boot\DrupalBoot8->bootstrapDrupalFull(Object(Drush\Boot\BootstrapManager), NULL)
+#10 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(422): Drush\Boot\BootstrapManager->doBootstrap(5, 6, NULL)
+#11 /home/roundybr/vendor/drush/drush/src/Application.php(225): Drush\Boot\BootstrapManager->bootstrapMax()
+#12 /home/roundybr/vendor/drush/drush/src/Application.php(191): Drush\Application->bootstrapAndFind('cim')
+#13 /home/roundybr/vendor/symfony/console/Application.php(266): Drush\Application->find('cim')
+#14 /home/roundybr/vendor/symfony/console/Application.php(175): Symfony\Component\Console\Application->doRun(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#15 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(110): Symfony\Component\Console\Application->run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#16 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(40): Drush\Runtime\Runtime->doRun(Array, Object(Symfony\Component\Console\Output\ConsoleOutput))
+#17 /home/roundybr/vendor/drush/drush/drush.php(139): Drush\Runtime\Runtime->run(Array)
+#18 /home/roundybr/vendor/drush/drush/drush(4): require('/home/roundybr/...')
+#19 {main}
+[25-Jul-2025 17:52:11 UTC] Error: Interface "Drush\Commands\sql\sanitize\SanitizePluginInterface" not found in /home/roundybr/public_html/modules/contrib/webform/src/Commands/WebformSanitizeSubmissionsCommands.php on line 18 #0 /home/roundybr/vendor/composer/ClassLoader.php(576): include()
+#1 /home/roundybr/vendor/composer/ClassLoader.php(427): Composer\Autoload\{closure}('/home/roundybr/...')
+#2 [internal function]: Composer\Autoload\ClassLoader->loadClass('Drupal\\webform\\...')
+#3 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(192): ReflectionClass->__construct('\\Drupal\\webform...')
+#4 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(174): Drush\Runtime\LegacyServiceInstantiator->instantiateObject('\\Drupal\\webform...', Array)
+#5 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(131): Drush\Runtime\LegacyServiceInstantiator->create('\\Drupal\\webform...', Array, Array)
+#6 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(60): Drush\Runtime\LegacyServiceInstantiator->instantiateServices(Array)
+#7 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(239): Drush\Runtime\LegacyServiceInstantiator->loadServiceFiles(Array)
+#8 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(215): Drush\Boot\DrupalBoot8->addDrupalModuleDrushCommands(Object(Drush\Boot\BootstrapManager))
+#9 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(236): Drush\Boot\DrupalBoot8->bootstrapDrupalFull(Object(Drush\Boot\BootstrapManager), NULL)
+#10 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(422): Drush\Boot\BootstrapManager->doBootstrap(5, 6, NULL)
+#11 /home/roundybr/vendor/drush/drush/src/Application.php(225): Drush\Boot\BootstrapManager->bootstrapMax()
+#12 /home/roundybr/vendor/drush/drush/src/Application.php(191): Drush\Application->bootstrapAndFind('cim')
+#13 /home/roundybr/vendor/symfony/console/Application.php(266): Drush\Application->find('cim')
+#14 /home/roundybr/vendor/symfony/console/Application.php(175): Symfony\Component\Console\Application->doRun(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#15 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(110): Symfony\Component\Console\Application->run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#16 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(40): Drush\Runtime\Runtime->doRun(Array, Object(Symfony\Component\Console\Output\ConsoleOutput))
+#17 /home/roundybr/vendor/drush/drush/drush.php(139): Drush\Runtime\Runtime->run(Array)
+#18 /home/roundybr/vendor/drush/drush/drush(4): require('/home/roundybr/...')
+#19 {main}
+[25-Jul-2025 18:12:33 UTC] Error: Interface "Drush\Commands\sql\sanitize\SanitizePluginInterface" not found in /home/roundybr/public_html/modules/contrib/webform/src/Commands/WebformSanitizeSubmissionsCommands.php on line 18 #0 /home/roundybr/vendor/composer/ClassLoader.php(576): include()
+#1 /home/roundybr/vendor/composer/ClassLoader.php(427): Composer\Autoload\{closure}('/home/roundybr/...')
+#2 [internal function]: Composer\Autoload\ClassLoader->loadClass('Drupal\\webform\\...')
+#3 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(192): ReflectionClass->__construct('\\Drupal\\webform...')
+#4 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(174): Drush\Runtime\LegacyServiceInstantiator->instantiateObject('\\Drupal\\webform...', Array)
+#5 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(131): Drush\Runtime\LegacyServiceInstantiator->create('\\Drupal\\webform...', Array, Array)
+#6 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(60): Drush\Runtime\LegacyServiceInstantiator->instantiateServices(Array)
+#7 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(239): Drush\Runtime\LegacyServiceInstantiator->loadServiceFiles(Array)
+#8 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(215): Drush\Boot\DrupalBoot8->addDrupalModuleDrushCommands(Object(Drush\Boot\BootstrapManager))
+#9 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(236): Drush\Boot\DrupalBoot8->bootstrapDrupalFull(Object(Drush\Boot\BootstrapManager), NULL)
+#10 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(422): Drush\Boot\BootstrapManager->doBootstrap(5, 6, NULL)
+#11 /home/roundybr/vendor/drush/drush/src/Application.php(225): Drush\Boot\BootstrapManager->bootstrapMax()
+#12 /home/roundybr/vendor/drush/drush/src/Application.php(191): Drush\Application->bootstrapAndFind('cim')
+#13 /home/roundybr/vendor/symfony/console/Application.php(266): Drush\Application->find('cim')
+#14 /home/roundybr/vendor/symfony/console/Application.php(175): Symfony\Component\Console\Application->doRun(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#15 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(110): Symfony\Component\Console\Application->run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#16 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(40): Drush\Runtime\Runtime->doRun(Array, Object(Symfony\Component\Console\Output\ConsoleOutput))
+#17 /home/roundybr/vendor/drush/drush/drush.php(139): Drush\Runtime\Runtime->run(Array)
+#18 /home/roundybr/vendor/drush/drush/drush(4): require('/home/roundybr/...')
+#19 {main}
+[25-Jul-2025 18:12:40 UTC] Error: Interface "Drush\Commands\sql\sanitize\SanitizePluginInterface" not found in /home/roundybr/public_html/modules/contrib/webform/src/Commands/WebformSanitizeSubmissionsCommands.php on line 18 #0 /home/roundybr/vendor/composer/ClassLoader.php(576): include()
+#1 /home/roundybr/vendor/composer/ClassLoader.php(427): Composer\Autoload\{closure}('/home/roundybr/...')
+#2 [internal function]: Composer\Autoload\ClassLoader->loadClass('Drupal\\webform\\...')
+#3 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(192): ReflectionClass->__construct('\\Drupal\\webform...')
+#4 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(174): Drush\Runtime\LegacyServiceInstantiator->instantiateObject('\\Drupal\\webform...', Array)
+#5 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(131): Drush\Runtime\LegacyServiceInstantiator->create('\\Drupal\\webform...', Array, Array)
+#6 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(60): Drush\Runtime\LegacyServiceInstantiator->instantiateServices(Array)
+#7 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(239): Drush\Runtime\LegacyServiceInstantiator->loadServiceFiles(Array)
+#8 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(215): Drush\Boot\DrupalBoot8->addDrupalModuleDrushCommands(Object(Drush\Boot\BootstrapManager))
+#9 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(236): Drush\Boot\DrupalBoot8->bootstrapDrupalFull(Object(Drush\Boot\BootstrapManager), NULL)
+#10 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(422): Drush\Boot\BootstrapManager->doBootstrap(5, 6, NULL)
+#11 /home/roundybr/vendor/drush/drush/src/Application.php(225): Drush\Boot\BootstrapManager->bootstrapMax()
+#12 /home/roundybr/vendor/drush/drush/src/Application.php(191): Drush\Application->bootstrapAndFind('cim')
+#13 /home/roundybr/vendor/symfony/console/Application.php(266): Drush\Application->find('cim')
+#14 /home/roundybr/vendor/symfony/console/Application.php(175): Symfony\Component\Console\Application->doRun(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#15 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(110): Symfony\Component\Console\Application->run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#16 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(40): Drush\Runtime\Runtime->doRun(Array, Object(Symfony\Component\Console\Output\ConsoleOutput))
+#17 /home/roundybr/vendor/drush/drush/drush.php(139): Drush\Runtime\Runtime->run(Array)
+#18 /home/roundybr/vendor/drush/drush/drush(4): require('/home/roundybr/...')
+#19 {main}
+[25-Jul-2025 18:18:23 UTC] Error: Interface "Drush\Commands\sql\sanitize\SanitizePluginInterface" not found in /home/roundybr/public_html/modules/contrib/webform/src/Commands/WebformSanitizeSubmissionsCommands.php on line 18 #0 /home/roundybr/vendor/composer/ClassLoader.php(576): include()
+#1 /home/roundybr/vendor/composer/ClassLoader.php(427): Composer\Autoload\{closure}('/home/roundybr/...')
+#2 [internal function]: Composer\Autoload\ClassLoader->loadClass('Drupal\\webform\\...')
+#3 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(192): ReflectionClass->__construct('\\Drupal\\webform...')
+#4 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(174): Drush\Runtime\LegacyServiceInstantiator->instantiateObject('\\Drupal\\webform...', Array)
+#5 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(131): Drush\Runtime\LegacyServiceInstantiator->create('\\Drupal\\webform...', Array, Array)
+#6 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(60): Drush\Runtime\LegacyServiceInstantiator->instantiateServices(Array)
+#7 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(239): Drush\Runtime\LegacyServiceInstantiator->loadServiceFiles(Array)
+#8 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(215): Drush\Boot\DrupalBoot8->addDrupalModuleDrushCommands(Object(Drush\Boot\BootstrapManager))
+#9 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(236): Drush\Boot\DrupalBoot8->bootstrapDrupalFull(Object(Drush\Boot\BootstrapManager), Object(Consolidation\AnnotatedCommand\AnnotationData))
+#10 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(377): Drush\Boot\BootstrapManager->doBootstrap(5, 5, Object(Consolidation\AnnotatedCommand\AnnotationData))
+#11 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(329): Drush\Boot\BootstrapManager->bootstrapToPhaseIndex(5, Object(Consolidation\AnnotatedCommand\AnnotationData))
+#12 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapHook.php(36): Drush\Boot\BootstrapManager->bootstrapToPhase('full', Object(Consolidation\AnnotatedCommand\AnnotationData))
+#13 /home/roundybr/vendor/consolidation/annotated-command/src/Hooks/Dispatchers/InitializeHookDispatcher.php(44): Drush\Boot\BootstrapHook->initialize(Object(Symfony\Component\Console\Input\ArgvInput), Object(Consolidation\AnnotatedCommand\AnnotationData))
+#14 /home/roundybr/vendor/consolidation/annotated-command/src/Hooks/Dispatchers/InitializeHookDispatcher.php(36): Consolidation\AnnotatedCommand\Hooks\Dispatchers\InitializeHookDispatcher->doInitializeHook(Object(Drush\Boot\BootstrapHook), Object(Symfony\Component\Console\Input\ArgvInput), Object(Consolidation\AnnotatedCommand\AnnotationData))
+#15 /home/roundybr/vendor/consolidation/annotated-command/src/Hooks/Dispatchers/InitializeHookDispatcher.php(29): Consolidation\AnnotatedCommand\Hooks\Dispatchers\InitializeHookDispatcher->callInitializeHook(Object(Drush\Boot\BootstrapHook), Object(Symfony\Component\Console\Input\ArgvInput), Object(Consolidation\AnnotatedCommand\AnnotationData))
+#16 /home/roundybr/vendor/consolidation/annotated-command/src/CommandProcessor.php(145): Consolidation\AnnotatedCommand\Hooks\Dispatchers\InitializeHookDispatcher->initialize(Object(Symfony\Component\Console\Input\ArgvInput), Object(Consolidation\AnnotatedCommand\AnnotationData))
+#17 /home/roundybr/vendor/consolidation/annotated-command/src/AnnotatedCommand.php(376): Consolidation\AnnotatedCommand\CommandProcessor->initializeHook(Object(Symfony\Component\Console\Input\ArgvInput), Array, Object(Consolidation\AnnotatedCommand\AnnotationData))
+#18 /home/roundybr/vendor/symfony/console/Command/Command.php(292): Consolidation\AnnotatedCommand\AnnotatedCommand->initialize(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#19 /home/roundybr/vendor/symfony/console/Application.php(1096): Symfony\Component\Console\Command\Command->run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#20 /home/roundybr/vendor/symfony/console/Application.php(324): Symfony\Component\Console\Application->doRunCommand(Object(Consolidation\AnnotatedCommand\AnnotatedCommand), Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#21 /home/roundybr/vendor/symfony/console/Application.php(175): Symfony\Component\Console\Application->doRun(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#22 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(110): Symfony\Component\Console\Application->run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#23 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(40): Drush\Runtime\Runtime->doRun(Array, Object(Symfony\Component\Console\Output\ConsoleOutput))
+#24 /home/roundybr/vendor/drush/drush/drush.php(139): Drush\Runtime\Runtime->run(Array)
+#25 /home/roundybr/vendor/drush/drush/drush(4): require('/home/roundybr/...')
+#26 {main}
+[25-Jul-2025 18:18:27 UTC] Error: Interface "Drush\Commands\sql\sanitize\SanitizePluginInterface" not found in /home/roundybr/public_html/modules/contrib/webform/src/Commands/WebformSanitizeSubmissionsCommands.php on line 18 #0 /home/roundybr/vendor/composer/ClassLoader.php(576): include()
+#1 /home/roundybr/vendor/composer/ClassLoader.php(427): Composer\Autoload\{closure}('/home/roundybr/...')
+#2 [internal function]: Composer\Autoload\ClassLoader->loadClass('Drupal\\webform\\...')
+#3 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(192): ReflectionClass->__construct('\\Drupal\\webform...')
+#4 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(174): Drush\Runtime\LegacyServiceInstantiator->instantiateObject('\\Drupal\\webform...', Array)
+#5 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(131): Drush\Runtime\LegacyServiceInstantiator->create('\\Drupal\\webform...', Array, Array)
+#6 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(60): Drush\Runtime\LegacyServiceInstantiator->instantiateServices(Array)
+#7 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(239): Drush\Runtime\LegacyServiceInstantiator->loadServiceFiles(Array)
+#8 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(215): Drush\Boot\DrupalBoot8->addDrupalModuleDrushCommands(Object(Drush\Boot\BootstrapManager))
+#9 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(236): Drush\Boot\DrupalBoot8->bootstrapDrupalFull(Object(Drush\Boot\BootstrapManager), NULL)
+#10 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(422): Drush\Boot\BootstrapManager->doBootstrap(5, 6, NULL)
+#11 /home/roundybr/vendor/drush/drush/src/Application.php(225): Drush\Boot\BootstrapManager->bootstrapMax()
+#12 /home/roundybr/vendor/drush/drush/src/Application.php(191): Drush\Application->bootstrapAndFind('cim')
+#13 /home/roundybr/vendor/symfony/console/Application.php(266): Drush\Application->find('cim')
+#14 /home/roundybr/vendor/symfony/console/Application.php(175): Symfony\Component\Console\Application->doRun(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#15 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(110): Symfony\Component\Console\Application->run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#16 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(40): Drush\Runtime\Runtime->doRun(Array, Object(Symfony\Component\Console\Output\ConsoleOutput))
+#17 /home/roundybr/vendor/drush/drush/drush.php(139): Drush\Runtime\Runtime->run(Array)
+#18 /home/roundybr/vendor/drush/drush/drush(4): require('/home/roundybr/...')
+#19 {main}
+[25-Jul-2025 18:18:56 UTC] Error: Interface "Drush\Commands\sql\sanitize\SanitizePluginInterface" not found in /home/roundybr/public_html/modules/contrib/webform/src/Commands/WebformSanitizeSubmissionsCommands.php on line 18 #0 /home/roundybr/vendor/composer/ClassLoader.php(576): include()
+#1 /home/roundybr/vendor/composer/ClassLoader.php(427): Composer\Autoload\{closure}('/home/roundybr/...')
+#2 [internal function]: Composer\Autoload\ClassLoader->loadClass('Drupal\\webform\\...')
+#3 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(192): ReflectionClass->__construct('\\Drupal\\webform...')
+#4 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(174): Drush\Runtime\LegacyServiceInstantiator->instantiateObject('\\Drupal\\webform...', Array)
+#5 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(131): Drush\Runtime\LegacyServiceInstantiator->create('\\Drupal\\webform...', Array, Array)
+#6 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(60): Drush\Runtime\LegacyServiceInstantiator->instantiateServices(Array)
+#7 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(239): Drush\Runtime\LegacyServiceInstantiator->loadServiceFiles(Array)
+#8 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(215): Drush\Boot\DrupalBoot8->addDrupalModuleDrushCommands(Object(Drush\Boot\BootstrapManager))
+#9 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(236): Drush\Boot\DrupalBoot8->bootstrapDrupalFull(Object(Drush\Boot\BootstrapManager), NULL)
+#10 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(422): Drush\Boot\BootstrapManager->doBootstrap(5, 6, NULL)
+#11 /home/roundybr/vendor/drush/drush/src/Application.php(225): Drush\Boot\BootstrapManager->bootstrapMax()
+#12 /home/roundybr/vendor/drush/drush/src/Application.php(191): Drush\Application->bootstrapAndFind('cim')
+#13 /home/roundybr/vendor/symfony/console/Application.php(266): Drush\Application->find('cim')
+#14 /home/roundybr/vendor/symfony/console/Application.php(175): Symfony\Component\Console\Application->doRun(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#15 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(110): Symfony\Component\Console\Application->run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#16 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(40): Drush\Runtime\Runtime->doRun(Array, Object(Symfony\Component\Console\Output\ConsoleOutput))
+#17 /home/roundybr/vendor/drush/drush/drush.php(139): Drush\Runtime\Runtime->run(Array)
+#18 /home/roundybr/vendor/drush/drush/drush(4): require('/home/roundybr/...')
+#19 {main}
+[25-Jul-2025 18:19:03 UTC] Error: Interface "Drush\Commands\sql\sanitize\SanitizePluginInterface" not found in /home/roundybr/public_html/modules/contrib/webform/src/Commands/WebformSanitizeSubmissionsCommands.php on line 18 #0 /home/roundybr/vendor/composer/ClassLoader.php(576): include()
+#1 /home/roundybr/vendor/composer/ClassLoader.php(427): Composer\Autoload\{closure}('/home/roundybr/...')
+#2 [internal function]: Composer\Autoload\ClassLoader->loadClass('Drupal\\webform\\...')
+#3 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(192): ReflectionClass->__construct('\\Drupal\\webform...')
+#4 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(174): Drush\Runtime\LegacyServiceInstantiator->instantiateObject('\\Drupal\\webform...', Array)
+#5 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(131): Drush\Runtime\LegacyServiceInstantiator->create('\\Drupal\\webform...', Array, Array)
+#6 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(60): Drush\Runtime\LegacyServiceInstantiator->instantiateServices(Array)
+#7 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(239): Drush\Runtime\LegacyServiceInstantiator->loadServiceFiles(Array)
+#8 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(215): Drush\Boot\DrupalBoot8->addDrupalModuleDrushCommands(Object(Drush\Boot\BootstrapManager))
+#9 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(236): Drush\Boot\DrupalBoot8->bootstrapDrupalFull(Object(Drush\Boot\BootstrapManager), Object(Consolidation\AnnotatedCommand\AnnotationData))
+#10 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(377): Drush\Boot\BootstrapManager->doBootstrap(5, 5, Object(Consolidation\AnnotatedCommand\AnnotationData))
+#11 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(329): Drush\Boot\BootstrapManager->bootstrapToPhaseIndex(5, Object(Consolidation\AnnotatedCommand\AnnotationData))
+#12 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapHook.php(36): Drush\Boot\BootstrapManager->bootstrapToPhase('full', Object(Consolidation\AnnotatedCommand\AnnotationData))
+#13 /home/roundybr/vendor/consolidation/annotated-command/src/Hooks/Dispatchers/InitializeHookDispatcher.php(44): Drush\Boot\BootstrapHook->initialize(Object(Symfony\Component\Console\Input\ArgvInput), Object(Consolidation\AnnotatedCommand\AnnotationData))
+#14 /home/roundybr/vendor/consolidation/annotated-command/src/Hooks/Dispatchers/InitializeHookDispatcher.php(36): Consolidation\AnnotatedCommand\Hooks\Dispatchers\InitializeHookDispatcher->doInitializeHook(Object(Drush\Boot\BootstrapHook), Object(Symfony\Component\Console\Input\ArgvInput), Object(Consolidation\AnnotatedCommand\AnnotationData))
+#15 /home/roundybr/vendor/consolidation/annotated-command/src/Hooks/Dispatchers/InitializeHookDispatcher.php(29): Consolidation\AnnotatedCommand\Hooks\Dispatchers\InitializeHookDispatcher->callInitializeHook(Object(Drush\Boot\BootstrapHook), Object(Symfony\Component\Console\Input\ArgvInput), Object(Consolidation\AnnotatedCommand\AnnotationData))
+#16 /home/roundybr/vendor/consolidation/annotated-command/src/CommandProcessor.php(145): Consolidation\AnnotatedCommand\Hooks\Dispatchers\InitializeHookDispatcher->initialize(Object(Symfony\Component\Console\Input\ArgvInput), Object(Consolidation\AnnotatedCommand\AnnotationData))
+#17 /home/roundybr/vendor/consolidation/annotated-command/src/AnnotatedCommand.php(376): Consolidation\AnnotatedCommand\CommandProcessor->initializeHook(Object(Symfony\Component\Console\Input\ArgvInput), Array, Object(Consolidation\AnnotatedCommand\AnnotationData))
+#18 /home/roundybr/vendor/symfony/console/Command/Command.php(292): Consolidation\AnnotatedCommand\AnnotatedCommand->initialize(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#19 /home/roundybr/vendor/symfony/console/Application.php(1096): Symfony\Component\Console\Command\Command->run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#20 /home/roundybr/vendor/symfony/console/Application.php(324): Symfony\Component\Console\Application->doRunCommand(Object(Consolidation\AnnotatedCommand\AnnotatedCommand), Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#21 /home/roundybr/vendor/symfony/console/Application.php(175): Symfony\Component\Console\Application->doRun(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#22 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(110): Symfony\Component\Console\Application->run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#23 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(40): Drush\Runtime\Runtime->doRun(Array, Object(Symfony\Component\Console\Output\ConsoleOutput))
+#24 /home/roundybr/vendor/drush/drush/drush.php(139): Drush\Runtime\Runtime->run(Array)
+#25 /home/roundybr/vendor/drush/drush/drush(4): require('/home/roundybr/...')
+#26 {main}
+[10-Mar-2026 18:16:22 UTC] Error: Interface "Drush\Commands\sql\sanitize\SanitizePluginInterface" not found in /home/roundybr/public_html/modules/contrib/webform/src/Commands/WebformSanitizeSubmissionsCommands.php on line 18 #0 /home/roundybr/vendor/composer/ClassLoader.php(576): include()
+#1 /home/roundybr/vendor/composer/ClassLoader.php(427): Composer\Autoload\{closure}('/home/roundybr/...')
+#2 [internal function]: Composer\Autoload\ClassLoader->loadClass('Drupal\\webform\\...')
+#3 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(192): ReflectionClass->__construct('\\Drupal\\webform...')
+#4 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(174): Drush\Runtime\LegacyServiceInstantiator->instantiateObject('\\Drupal\\webform...', Array)
+#5 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(131): Drush\Runtime\LegacyServiceInstantiator->create('\\Drupal\\webform...', Array, Array)
+#6 /home/roundybr/vendor/drush/drush/src/Runtime/LegacyServiceInstantiator.php(60): Drush\Runtime\LegacyServiceInstantiator->instantiateServices(Array)
+#7 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(239): Drush\Runtime\LegacyServiceInstantiator->loadServiceFiles(Array)
+#8 /home/roundybr/vendor/drush/drush/src/Boot/DrupalBoot8.php(215): Drush\Boot\DrupalBoot8->addDrupalModuleDrushCommands(Object(Drush\Boot\BootstrapManager))
+#9 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(236): Drush\Boot\DrupalBoot8->bootstrapDrupalFull(Object(Drush\Boot\BootstrapManager), NULL)
+#10 /home/roundybr/vendor/drush/drush/src/Boot/BootstrapManager.php(422): Drush\Boot\BootstrapManager->doBootstrap(5, 6, NULL)
+#11 /home/roundybr/vendor/drush/drush/src/Application.php(225): Drush\Boot\BootstrapManager->bootstrapMax()
+#12 /home/roundybr/vendor/drush/drush/src/Application.php(191): Drush\Application->bootstrapAndFind('cim')
+#13 /home/roundybr/vendor/symfony/console/Application.php(266): Drush\Application->find('cim')
+#14 /home/roundybr/vendor/symfony/console/Application.php(175): Symfony\Component\Console\Application->doRun(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#15 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(110): Symfony\Component\Console\Application->run(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+#16 /home/roundybr/vendor/drush/drush/src/Runtime/Runtime.php(40): Drush\Runtime\Runtime->doRun(Array, Object(Symfony\Component\Console\Output\ConsoleOutput))
+#17 /home/roundybr/vendor/drush/drush/drush.php(139): Drush\Runtime\Runtime->run(Array)
+#18 /home/roundybr/vendor/drush/drush/drush(4): require('/home/roundybr/...')
+#19 {main}
+[10-Mar-2026 18:33:41 UTC] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 8.1.34. in /home/roundybr/vendor/composer/platform_check.php:26
+Stack trace:
+#0 /home/roundybr/vendor/composer/autoload_real.php(25): require()
+#1 /home/roundybr/vendor/autoload.php(22): ComposerAutoloaderInit67d7decdf870c2c08473aaf31d232e58::getLoader()
+#2 /home/roundybr/vendor/drush/drush/drush.php(124): include('/home/roundybr/...')
+#3 {main}
+  thrown in /home/roundybr/vendor/composer/platform_check.php on line 26
+[10-Mar-2026 18:54:30 UTC] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 8.1.34. in /home/roundybr/vendor/composer/platform_check.php:26
+Stack trace:
+#0 /home/roundybr/vendor/composer/autoload_real.php(25): require()
+#1 /home/roundybr/vendor/autoload.php(22): ComposerAutoloaderInit67d7decdf870c2c08473aaf31d232e58::getLoader()
+#2 /home/roundybr/vendor/drush/drush/drush.php(124): include('/home/roundybr/...')
+#3 {main}
+  thrown in /home/roundybr/vendor/composer/platform_check.php on line 26
+[10-Mar-2026 18:55:21 UTC] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 8.1.34. in /home/roundybr/vendor/composer/platform_check.php:26
+Stack trace:
+#0 /home/roundybr/vendor/composer/autoload_real.php(25): require()
+#1 /home/roundybr/vendor/autoload.php(22): ComposerAutoloaderInit67d7decdf870c2c08473aaf31d232e58::getLoader()
+#2 /home/roundybr/vendor/drush/drush/drush.php(124): include('/home/roundybr/...')
+#3 {main}
+  thrown in /home/roundybr/vendor/composer/platform_check.php on line 26
+[10-Mar-2026 19:01:42 UTC] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 8.1.34. in /home/roundybr/vendor/composer/platform_check.php:26
+Stack trace:
+#0 /home/roundybr/vendor/composer/autoload_real.php(25): require()
+#1 /home/roundybr/vendor/autoload.php(22): ComposerAutoloaderInit67d7decdf870c2c08473aaf31d232e58::getLoader()
+#2 /home/roundybr/vendor/drush/drush/drush.php(124): include('/home/roundybr/...')
+#3 {main}
+  thrown in /home/roundybr/vendor/composer/platform_check.php on line 26
+[10-Mar-2026 21:03:19 UTC] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 8.1.34. in /home/roundybr/vendor/composer/platform_check.php:26
+Stack trace:
+#0 /home/roundybr/vendor/composer/autoload_real.php(25): require()
+#1 /home/roundybr/vendor/autoload.php(22): ComposerAutoloaderInit67d7decdf870c2c08473aaf31d232e58::getLoader()
+#2 /home/roundybr/vendor/drush/drush/drush.php(124): include('/home/roundybr/...')
+#3 {main}
+  thrown in /home/roundybr/vendor/composer/platform_check.php on line 26
+[10-Mar-2026 21:04:10 UTC] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 8.1.34. in /home/roundybr/vendor/composer/platform_check.php:26
+Stack trace:
+#0 /home/roundybr/vendor/composer/autoload_real.php(25): require()
+#1 /home/roundybr/vendor/autoload.php(22): ComposerAutoloaderInit67d7decdf870c2c08473aaf31d232e58::getLoader()
+#2 /home/roundybr/vendor/drush/drush/drush.php(124): include('/home/roundybr/...')
+#3 {main}
+  thrown in /home/roundybr/vendor/composer/platform_check.php on line 26
+[10-Mar-2026 21:05:17 UTC] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 8.1.34. in /home/roundybr/vendor/composer/platform_check.php:26
+Stack trace:
+#0 /home/roundybr/vendor/composer/autoload_real.php(25): require()
+#1 /home/roundybr/vendor/autoload.php(22): ComposerAutoloaderInit67d7decdf870c2c08473aaf31d232e58::getLoader()
+#2 /home/roundybr/vendor/drush/drush/drush.php(124): include('/home/roundybr/...')
+#3 {main}
+  thrown in /home/roundybr/vendor/composer/platform_check.php on line 26
+[10-Mar-2026 21:08:43 UTC] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 8.1.34. in /home/roundybr/vendor/composer/platform_check.php:26
+Stack trace:
+#0 /home/roundybr/vendor/composer/autoload_real.php(25): require()
+#1 /home/roundybr/vendor/autoload.php(22): ComposerAutoloaderInit67d7decdf870c2c08473aaf31d232e58::getLoader()
+#2 /home/roundybr/vendor/drush/drush/drush.php(124): include('/home/roundybr/...')
+#3 {main}
+  thrown in /home/roundybr/vendor/composer/platform_check.php on line 26
+[10-Mar-2026 21:30:39 UTC] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 8.1.34. in /home/roundybr/vendor/composer/platform_check.php:26
+Stack trace:
+#0 /home/roundybr/vendor/composer/autoload_real.php(25): require()
+#1 /home/roundybr/vendor/autoload.php(22): ComposerAutoloaderInit67d7decdf870c2c08473aaf31d232e58::getLoader()
+#2 /home/roundybr/vendor/drush/drush/drush.php(124): include('/home/roundybr/...')
+#3 {main}
+  thrown in /home/roundybr/vendor/composer/platform_check.php on line 26
+[10-Mar-2026 21:32:35 UTC] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 8.1.34. in /home/roundybr/vendor/composer/platform_check.php:26
+Stack trace:
+#0 /home/roundybr/vendor/composer/autoload_real.php(25): require()
+#1 /home/roundybr/vendor/autoload.php(22): ComposerAutoloaderInit67d7decdf870c2c08473aaf31d232e58::getLoader()
+#2 /home/roundybr/vendor/drush/drush/drush.php(124): include('/home/roundybr/...')
+#3 {main}
+  thrown in /home/roundybr/vendor/composer/platform_check.php on line 26
+[10-Mar-2026 21:37:43 UTC] PHP Fatal error:  Uncaught RuntimeException: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.3.0". You are running 8.1.34. in /home/roundybr/vendor/composer/platform_check.php:26
+Stack trace:
+#0 /home/roundybr/vendor/composer/autoload_real.php(25): require()
+#1 /home/roundybr/vendor/autoload.php(22): ComposerAutoloaderInit67d7decdf870c2c08473aaf31d232e58::getLoader()
+#2 /home/roundybr/vendor/drush/drush/drush.php(124): include('/home/roundybr/...')
+#3 {main}
+  thrown in /home/roundybr/vendor/composer/platform_check.php on line 26
+[10-Mar-2026 20:22:12 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 1499136 bytes) in /home/roundybr/public_html/core/lib/Drupal/Core/Database/StatementWrapperIterator.php on line 113
+[10-Mar-2026 20:25:07 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 1499136 bytes) in /home/roundybr/public_html/core/lib/Drupal/Core/Database/StatementWrapperIterator.php on line 113
+[10-Mar-2026 20:25:27 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 749568 bytes) in /home/roundybr/public_html/core/modules/pgsql/src/Driver/Database/pgsql/Upsert.php on line 44
+[10-Mar-2026 20:33:10 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 81920 bytes) in /home/roundybr/vendor/symfony/routing/RouteCollection.php on line 74
+[10-Mar-2026 20:33:10 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 65536 bytes) in /home/roundybr/vendor/ramsey/uuid/src/Generator/TimeGeneratorInterface.php on line 22
+[10-Mar-2026 20:39:19 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 32768 bytes) in /home/roundybr/public_html/core/modules/system/src/Form/ModulesListForm.php on line 304
+[16-Apr-2026 18:05:13 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 147456 bytes) in /home/roundybr/public_html/core/lib/Drupal/Core/Database/StatementWrapperIterator.php on line 113
+[16-Apr-2026 18:15:40 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 81920 bytes) in /home/roundybr/vendor/symfony/routing/RouteCollection.php on line 156
+[16-Apr-2026 18:15:40 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 32768 bytes) in /home/roundybr/vendor/spatie/ray/src/Ray.php on line 1
+[16-Apr-2026 18:18:24 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 81920 bytes) in /home/roundybr/vendor/symfony/routing/RouteCollection.php on line 74
+[16-Apr-2026 18:18:24 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 32768 bytes) in /home/roundybr/vendor/spatie/ray/src/Ray.php on line 612
+[16-Apr-2026 18:18:55 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 147456 bytes) in /home/roundybr/public_html/core/lib/Drupal/Core/Database/StatementWrapperIterator.php on line 113
+[16-Apr-2026 18:18:55 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 32768 bytes) in /home/roundybr/vendor/spatie/ray/src/Settings/SettingsFactory.php on line 1
+[16-Apr-2026 18:20:23 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 81920 bytes) in /home/roundybr/vendor/symfony/routing/RouteCollection.php on line 156
+[16-Apr-2026 18:20:23 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 32768 bytes) in /home/roundybr/vendor/spatie/ray/src/Ray.php on line 612
+[16-Apr-2026 18:20:36 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 20480 bytes) in /home/roundybr/public_html/core/lib/Drupal/Component/Graph/Graph.php on line 129
+[16-Apr-2026 18:20:36 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 65536 bytes) in /home/roundybr/vendor/ramsey/uuid/src/Uuid.php on line 47
+[17-Apr-2026 14:06:35 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 1384448 bytes) in /home/roundybr/public_html/core/lib/Drupal/Core/Database/StatementWrapperIterator.php on line 113
+[17-Apr-2026 14:08:21 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 1384448 bytes) in /home/roundybr/public_html/core/lib/Drupal/Core/Database/StatementWrapperIterator.php on line 113
+[17-Apr-2026 14:08:26 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 1404928 bytes) in /home/roundybr/public_html/core/lib/Drupal/Core/Database/StatementWrapperIterator.php on line 113
+[17-Apr-2026 14:32:20 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 1015808 bytes) in /home/roundybr/public_html/core/lib/Drupal/Core/Database/StatementWrapperIterator.php on line 113
+[17-Apr-2026 15:06:39 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 1605632 bytes) in /home/roundybr/public_html/core/modules/pgsql/src/Driver/Database/pgsql/Upsert.php on line 44
+[19-Apr-2026 10:32:32 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 20480 bytes) in /home/roundybr/public_html/core/modules/views/views.views.inc on line 649
+[19-Apr-2026 10:32:32 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 32768 bytes) in /home/roundybr/vendor/spatie/ray/src/Settings/SettingsFactory.php on line 1
+[19-Apr-2026 10:34:03 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 233472 bytes) in /home/roundybr/public_html/core/modules/pgsql/src/Driver/Database/pgsql/Upsert.php on line 44
+[19-Apr-2026 10:34:03 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 32768 bytes) in /home/roundybr/vendor/ramsey/uuid/src/Uuid.php on line 537
+[19-Apr-2026 11:33:41 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 454656 bytes) in /home/roundybr/public_html/core/lib/Drupal/Core/Database/StatementWrapperIterator.php on line 113
+[19-Apr-2026 11:33:41 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 65536 bytes) in /home/roundybr/vendor/ramsey/uuid/src/FeatureSet.php on line 87
+[19-Apr-2026 11:34:32 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 962560 bytes) in /home/roundybr/public_html/core/lib/Drupal/Component/Serialization/PhpSerialize.php on line 14
+[19-Apr-2026 11:34:49 America/New_York] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 188416 bytes) in /home/roundybr/public_html/core/lib/Drupal/Core/Database/StatementWrapperIterator.php on line 113
