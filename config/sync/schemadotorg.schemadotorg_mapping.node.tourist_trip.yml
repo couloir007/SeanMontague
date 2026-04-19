@@ -4,7 +4,6 @@ status: true
 dependencies:
   config:
     - field.field.node.tourist_trip.field_body
-    - field.field.node.tourist_trip.schema_destination
     - field.field.node.tourist_trip.schema_image
     - field.field.node.tourist_trip.schema_related_link
     - field.field.node.tourist_trip.schema_significant_link
@@ -19,7 +18,6 @@ schema_type: TouristTrip
 schema_properties:
   field_body: description
   schema_image: image
-  schema_destination: itinerary
   title: name
   schema_subject_of: subjectOf
 additional_mappings:

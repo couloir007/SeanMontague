@@ -1,0 +1,83 @@
+uuid: ba9c5acd-8c1f-4a4a-950e-b7d255d8b389
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.geo_entity.destination.field_body
+    - field.field.geo_entity.destination.schema_address
+    - field.field.geo_entity.destination.schema_geo
+    - field.field.geo_entity.destination.schema_image
+    - geo_entity.geo_entity_type.destination
+  module:
+    - address
+    - geofield
+    - text
+id: geo_entity.destination.default
+targetEntityType: geo_entity
+bundle: destination
+mode: default
+content:
+  created:
+    type: datetime_timestamp
+    weight: 20
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_body:
+    type: text_textarea
+    weight: 26
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  langcode:
+    type: language_select
+    weight: 2
+    region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
+  schema_address:
+    type: address_default
+    weight: 29
+    region: content
+    settings:
+      wrapper_type: fieldset
+    third_party_settings: {  }
+  schema_geo:
+    type: geofield_latlon
+    weight: 27
+    region: content
+    settings:
+      html5_geolocation: false
+    third_party_settings: {  }
+  schema_image:
+    type: entity_reference_autocomplete
+    weight: 28
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 0
+    region: content
+    settings:
+      display_label: false
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 15
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  label: true

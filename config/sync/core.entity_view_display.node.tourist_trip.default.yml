@@ -16,6 +16,7 @@ dependencies:
     - field.field.node.tourist_trip.schema_trip_dates
     - node.type.tourist_trip
   module:
+    - entity_reference_revisions
     - field_group
     - link
     - metatag
@@ -60,12 +61,13 @@ content:
     weight: 9
     region: content
   schema_destination:
-    type: entity_reference_label
+    type: entity_reference_revisions_entity_view
     label: above
     settings:
-      link: true
+      view_mode: default
+      link: ''
     third_party_settings: {  }
-    weight: 3
+    weight: 10
     region: content
   schema_image:
     type: entity_reference_entity_view

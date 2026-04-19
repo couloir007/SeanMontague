@@ -1,16 +1,18 @@
-uuid: a3b4c5d6-e7f8-9012-abcd-123456789012
+uuid: 8544a2ef-f4f9-44aa-8049-9b67ac7030a8
 langcode: en
 status: true
 dependencies:
   module:
+    - entity_reference_revisions
+    - geo_entity
     - node
 id: node.schema_destination
 field_name: schema_destination
 entity_type: node
-type: entity_reference
+type: entity_reference_revisions
 settings:
-  target_type: node
-module: core
+  target_type: geo_entity
+module: entity_reference_revisions
 locked: false
 cardinality: -1
 translatable: true
