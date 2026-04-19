@@ -1,0 +1,383 @@
+/* =====================================================
+   DESTINATION GRID — ALTERNATIVES STYLESHEET
+   Matches Sean Montague kit tokens (--forest, --bright,
+   --muted, --border, --surface, --bg, font-display/mono/serif)
+   ===================================================== */
+
+/* Shared section frame */
+.dest-alt-frame {
+  padding: 120px 80px;
+  max-width: 1600px;
+  margin: 0 auto;
+  border-top: 1px solid var(--border);
+}
+.dest-alt-frame + .dest-alt-frame { border-top: 1px solid var(--border); }
+
+/* Approach label (shown in compare view) */
+.dest-alt-banner {
+  padding: 40px 80px 28px;
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+  border-top: 4px solid var(--forest);
+}
+.dest-alt-banner__key {
+  font-family: var(--font-display);
+  font-size: 64px;
+  line-height: 1;
+  color: var(--forest);
+}
+.dest-alt-banner__title {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 28px;
+  color: var(--bright);
+  margin: 0;
+}
+.dest-alt-banner__desc {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-left: auto;
+  max-width: 420px;
+  text-align: right;
+}
+
+/* ============================================================
+   APPROACH A · INDEX LIST
+   ============================================================ */
+.destA { padding: 120px 80px; max-width: 1600px; margin: 0 auto; }
+.destA__header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 28px;
+  align-items: baseline;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--border);
+}
+.destA__label {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--forest);
+}
+.destA__title {
+  font-family: var(--font-display); font-size: clamp(44px, 5vw, 72px);
+  font-weight: 400; line-height: 1; color: var(--bright); margin: 0;
+  letter-spacing: 0.01em;
+}
+.destA__title em { font-family: var(--font-serif); font-style: italic; font-weight: 300; color: var(--forest); }
+.destA__count {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+.destA__list { list-style: none; margin: 0; padding: 0; }
+.destA__row { border-bottom: 1px solid var(--border); }
+.destA__link {
+  display: grid;
+  grid-template-columns: 80px 1.4fr 1fr 1fr 1fr 32px;
+  gap: 28px;
+  align-items: center;
+  padding: 22px 16px 22px 0;
+  border-left: 3px solid transparent;
+  text-decoration: none;
+  transition: background .2s, border-left-color .2s, padding-left .2s;
+}
+.destA__link:hover {
+  background: var(--surface);
+  border-left-color: var(--forest);
+  padding-left: 16px;
+}
+.destA__num {
+  font-family: var(--font-display); font-size: 40px; line-height: 1;
+  color: var(--forest); letter-spacing: 0.01em;
+}
+.destA__name {
+  font-family: var(--font-serif); font-size: 26px; font-weight: 400;
+  color: var(--bright); line-height: 1.15;
+}
+.destA__region,
+.destA__dates {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--muted);
+}
+.destA__coords {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+  color: var(--forest); text-align: right;
+}
+.destA__arrow {
+  font-family: var(--font-serif); font-size: 20px; color: var(--forest);
+  text-align: right; transition: transform .25s;
+}
+.destA__link:hover .destA__arrow { transform: translateX(6px); }
+
+@media (max-width: 900px) {
+  .destA__link { grid-template-columns: 48px 1fr 24px; }
+  .destA__region, .destA__dates, .destA__coords { display: none; }
+}
+
+/* ============================================================
+   APPROACH B · STAGGERED TIMELINE
+   ============================================================ */
+.destB { padding: 120px 80px; max-width: 1400px; margin: 0 auto; }
+.destB__header {
+  text-align: center;
+  padding-bottom: 64px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 64px;
+}
+.destB__label {
+  display: block; font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: 0.32em; text-transform: uppercase; color: var(--forest);
+  margin-bottom: 16px;
+}
+.destB__title {
+  font-family: var(--font-display); font-size: clamp(48px, 6vw, 92px);
+  font-weight: 400; line-height: 1; color: var(--bright); margin: 0;
+  letter-spacing: 0.01em;
+}
+.destB__title em { font-family: var(--font-serif); font-style: italic; font-weight: 300; color: var(--forest); }
+
+.destB__track {
+  position: relative;
+  padding: 40px 0;
+}
+.destB__line {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 50%;
+  width: 0;
+  border-left: 2px dashed var(--forest);
+  opacity: 0.55;
+  transform: translateX(-1px);
+}
+
+.destB__node {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 60px 1fr;
+  align-items: center;
+  margin-bottom: 48px;
+  text-decoration: none;
+  color: inherit;
+}
+.destB__dot {
+  grid-column: 2;
+  width: 16px; height: 16px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 3px solid var(--forest);
+  box-shadow: 0 0 0 6px var(--bg);
+  transition: background .2s, transform .2s;
+}
+.destB__node:hover .destB__dot {
+  background: var(--forest);
+  transform: scale(1.2);
+}
+
+.destB__card {
+  padding: 28px 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid transparent;
+  transition: border-left-color .2s, background .2s;
+}
+.destB__node:hover .destB__card {
+  border-left-color: var(--forest);
+  background: #fafaf7;
+}
+.destB__aside {
+  padding: 0 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.destB__num {
+  font-family: var(--font-display); font-size: 48px; line-height: 1;
+  color: var(--forest); margin-bottom: 8px; letter-spacing: 0.01em;
+}
+.destB__name {
+  font-family: var(--font-display); font-size: 40px; font-weight: 400;
+  color: var(--bright); line-height: 1; margin-bottom: 10px;
+  letter-spacing: 0.01em;
+}
+.destB__region {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--muted);
+}
+.destB__dates {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--bright);
+}
+.destB__coords {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em;
+  color: var(--forest); line-height: 1.6;
+}
+
+/* Left-side node: card on left (aligns right), aside on right */
+.destB__node--left .destB__card {
+  grid-column: 1;
+  text-align: right;
+  border-left: 1px solid var(--border);
+  border-right: 4px solid transparent;
+}
+.destB__node--left:hover .destB__card {
+  border-left-color: var(--border);
+  border-right-color: var(--forest);
+}
+.destB__node--left .destB__aside {
+  grid-column: 3;
+  text-align: left;
+  align-items: flex-start;
+}
+
+/* Right-side node: aside on left, card on right */
+.destB__node--right .destB__aside {
+  grid-column: 1;
+  text-align: right;
+  align-items: flex-end;
+}
+.destB__node--right .destB__card {
+  grid-column: 3;
+  text-align: left;
+}
+
+@media (max-width: 900px) {
+  .destB__line { left: 20px; }
+  .destB__node { grid-template-columns: 40px 1fr; }
+  .destB__dot { grid-column: 1; }
+  .destB__node--left .destB__card,
+  .destB__node--right .destB__card {
+    grid-column: 2;
+    text-align: left;
+    border-left: 4px solid transparent;
+    border-right: 1px solid var(--border);
+  }
+  .destB__node--left .destB__aside,
+  .destB__node--right .destB__aside {
+    grid-column: 2;
+    text-align: left;
+    align-items: flex-start;
+    padding-top: 8px;
+    padding-bottom: 16px;
+  }
+}
+
+/* ============================================================
+   APPROACH C · MAP-ANCHORED LIST
+   ============================================================ */
+.destC { padding: 120px 80px 80px; max-width: 1600px; margin: 0 auto; }
+.destC__header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 28px;
+  align-items: baseline;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 40px;
+}
+.destC__label {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--forest);
+}
+.destC__title {
+  font-family: var(--font-display); font-size: clamp(44px, 5vw, 72px);
+  font-weight: 400; line-height: 1; color: var(--bright); margin: 0;
+  letter-spacing: 0.01em;
+}
+.destC__title em { font-family: var(--font-serif); font-style: italic; font-weight: 300; color: var(--forest); }
+.destC__count {
+  font-family: var(--font-display); font-size: 56px; line-height: 1;
+  color: var(--forest); letter-spacing: 0.01em;
+}
+
+.destC__layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--border);
+  min-height: 720px;
+}
+
+.destC__mapWrap {
+  position: sticky;
+  top: 80px;
+  height: 720px;
+  border-right: 1px solid var(--border);
+}
+.destC__map {
+  width: 100%;
+  height: 100%;
+  background: var(--surface);
+}
+
+.destC__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 720px;
+  overflow-y: auto;
+}
+.destC__item {
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  gap: 20px;
+  align-items: center;
+  padding: 22px 28px;
+  border-bottom: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  transition: background .2s, border-left-color .2s, padding-left .2s;
+}
+.destC__item:hover,
+.destC__item.is-active {
+  background: var(--surface);
+  border-left-color: var(--forest);
+  padding-left: 32px;
+}
+.destC__num {
+  font-family: var(--font-display); font-size: 36px; line-height: 1;
+  color: var(--forest); letter-spacing: 0.01em;
+}
+.destC__name {
+  font-family: var(--font-serif); font-size: 22px; font-weight: 400;
+  color: var(--bright); line-height: 1.2; margin-bottom: 4px;
+}
+.destC__meta {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--muted);
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.destC__coords {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em;
+  color: var(--forest); line-height: 1.5; text-align: right;
+}
+
+/* Leaflet marker override for Approach C */
+.destC-marker { position: relative; }
+.destC-marker__pin {
+  position: absolute; inset: 0;
+  background: var(--forest);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+.destC-marker__num {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 1100px) {
+  .destC__layout { grid-template-columns: 1fr; }
+  .destC__mapWrap { position: relative; top: 0; height: 420px; border-right: none; border-bottom: 1px solid var(--border); }
+  .destC__list { max-height: none; }
+}

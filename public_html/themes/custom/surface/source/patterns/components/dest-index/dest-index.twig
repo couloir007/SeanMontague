@@ -1,0 +1,27 @@
+{{ attach_library('surface/dest-index') }}
+<section class="dest-index">
+  <div class="dest-index__header">
+    <span class="dest-index__label">{{ label|default('Destinations') }}</span>
+    <h2 class="dest-index__title">{{ title|default('All') }} <em>{{ title_em|default('destinations') }}</em></h2>
+    <span class="dest-index__count">{{ destinations|length }} stops</span>
+  </div>
+  <ol class="dest-index__list">
+    {% for dest in destinations %}
+      <li class="dest-index__row">
+        <a href="{{ dest.url|default('#') }}" class="dest-index__link">
+          <span class="dest-index__num">{{ '%02d'|format(loop.index) }}</span>
+          <span class="dest-index__name">{{ dest.name }}</span>
+          {% if dest.region %}
+            <span class="dest-index__region">{{ dest.region }}</span>
+          {% endif %}
+          {% if dest.lat and dest.lon %}
+            <span class="dest-index__coords">
+              {{- dest.lat|number_format(3, '.', '') }}° N · {{ dest.lon|abs|number_format(3, '.', '') }}° W -}}
+            </span>
+          {% endif %}
+          <span class="dest-index__arrow">→</span>
+        </a>
+      </li>
+    {% endfor %}
+  </ol>
+</section>

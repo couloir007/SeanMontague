@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+body { margin:0; padding:0; background:var(--bg); }
+nav { display:flex; align-items:center; justify-content:space-between; padding:18px 28px; background:var(--bg); border-bottom:1px solid var(--border); }
+.logo { font-family:var(--font-mono); font-size:12px; letter-spacing:0.08em; color:var(--bright); text-decoration:none; }
+.logo span { color:var(--forest); }
+.links { display:flex; gap:32px; list-style:none; margin:0; padding:0; }
+.links a { font-family:var(--font-mono); font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); text-decoration:none; transition: color .2s; }
+.links a:hover { color:var(--bright); }
+.links a.active { color:var(--bright); }
+</style></head><body>
+<nav>
+  <a href="#" class="logo">Sean Montague <span>/ Burke, VT</span></a>
+  <ul class="links">
+    <li><a class="active" href="#">Maps</a></li>
+    <li><a href="#">Writing</a></li>
+    <li><a href="#">Places</a></li>
+    <li><a href="#">About</a></li>
+  </ul>
+</nav>
+</body></html>

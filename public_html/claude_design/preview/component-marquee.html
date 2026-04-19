@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+body { margin:0; padding:0; background:var(--bg); overflow:hidden; }
+html, body { height:100%; }
+.wrap { height:44px; display:flex; align-items:center; border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:var(--surface); overflow:hidden; }
+.track { display:flex; white-space:nowrap; animation: mq 28s linear infinite; align-items:center; }
+.item { font-family:var(--font-mono); font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); padding:0 26px; flex-shrink:0; line-height:1; }
+.sep { color:var(--forest); padding:0 10px; opacity:0.7; }
+@keyframes mq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+</style></head><body>
+<div class="wrap">
+  <div class="track">
+    <span class="item">Kingdom Trails</span><span class="sep">/</span>
+    <span class="item">Burke Mountain</span><span class="sep">/</span>
+    <span class="item">Leaflet Mapping</span><span class="sep">/</span>
+    <span class="item">Permaculture</span><span class="sep">/</span>
+    <span class="item">Northeast Kingdom</span><span class="sep">/</span>
+    <span class="item">Open Source</span><span class="sep">/</span>
+    <span class="item">Kingdom Trails</span><span class="sep">/</span>
+    <span class="item">Burke Mountain</span><span class="sep">/</span>
+    <span class="item">Leaflet Mapping</span><span class="sep">/</span>
+    <span class="item">Permaculture</span><span class="sep">/</span>
+    <span class="item">Northeast Kingdom</span><span class="sep">/</span>
+    <span class="item">Open Source</span><span class="sep">/</span>
+  </div>
+</div>
+</body></html>

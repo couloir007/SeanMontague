@@ -1,0 +1,35 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+body { margin:0; padding:20px; background:var(--bg); }
+.wrap { display:flex; flex-direction:column; gap:10px; }
+.label { font-family:var(--font-mono); font-size:9px; letter-spacing:0.25em; color:var(--muted); text-transform:uppercase; margin-bottom:6px; }
+.tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.tag { font-family:var(--font-mono); font-size:9px; letter-spacing:0.1em; text-transform:uppercase; padding:3px 8px; border:1px solid var(--border); color:var(--muted); background:var(--bg); }
+.cats { display:flex; gap:10px; }
+.cat { font-family:var(--font-mono); font-size:9px; letter-spacing:0.22em; text-transform:uppercase; padding:4px 10px; border:1px solid; }
+.c-t { color:var(--trail); border-color:rgba(122,52,16,0.3); background:rgba(122,52,16,0.05); }
+.c-f { color:var(--forest); border-color:rgba(58,90,64,0.3); background:rgba(58,90,64,0.06); }
+.c-s { color:var(--sky); border-color:rgba(74,124,158,0.3); background:rgba(74,124,158,0.05); }
+.c-st { color:var(--stone); border-color:rgba(107,101,96,0.3); background:rgba(107,101,96,0.05); }
+</style></head><body>
+<div class="wrap">
+  <div class="label">Category badges</div>
+  <div class="cats">
+    <span class="cat c-t">Kingdom Trails</span>
+    <span class="cat c-t">Burke Mountain</span>
+    <span class="cat c-f">Permaculture</span>
+    <span class="cat c-s">Maps</span>
+    <span class="cat c-st">Travel</span>
+    <span class="cat c-st">Drupal</span>
+  </div>
+  <div class="label">Place tags</div>
+  <div class="tags">
+    <span class="tag">Mountain Biking</span>
+    <span class="tag">Trail Running</span>
+    <span class="tag">Zone 5</span>
+    <span class="tag">Leaflet</span>
+    <span class="tag">GeoJSON</span>
+  </div>
+</div>
+</body></html>

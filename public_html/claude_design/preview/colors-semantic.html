@@ -1,0 +1,24 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+body { margin:0; padding:22px 24px; background:var(--bg); }
+.row { display:grid; grid-template-columns: repeat(4, 1fr); gap: 0; border:1px solid var(--border); background:var(--surface); }
+.sw { padding:14px; border-right:1px solid var(--border); display:flex; flex-direction:column; gap:6px; }
+.sw:last-child { border-right:none; }
+.n { font-family:var(--font-mono); font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+.badge { display:inline-block; font-family:var(--font-mono); font-size:10px; letter-spacing:0.18em; text-transform:uppercase; padding:5px 10px; }
+.difficulty { background:#fff3e0; color:#a05a00; border:1px solid #f0d090; }
+.r-green { background:#e6f2e8; color:#3a5a40; border:1px solid #c8ddc8; }
+.r-blue  { background:#ddeeff; color:#336699; border:1px solid #bbddff; }
+.r-black { background:#222; color:#fff; }
+.group { font-family:var(--font-mono); font-size:9px; letter-spacing:0.3em; color:var(--muted); text-transform:uppercase; margin-bottom:10px; }
+.use { font-family:var(--font-serif); font-size:12px; font-style:italic; color:var(--muted); }
+</style></head><body>
+<div class="group">Semantic · difficulty / rating badges</div>
+<div class="row">
+  <div class="sw"><div class="n">DIFFICULTY</div><div><span class="badge difficulty">Moderate</span></div><div class="use">amber / article headers</div></div>
+  <div class="sw"><div class="n">RATING · GREEN</div><div><span class="badge r-green">Easy</span></div><div class="use">beginner trails</div></div>
+  <div class="sw"><div class="n">RATING · BLUE</div><div><span class="badge r-blue">Intermediate</span></div><div class="use">blue square</div></div>
+  <div class="sw"><div class="n">RATING · BLACK</div><div><span class="badge r-black">Expert</span></div><div class="use">black diamond</div></div>
+</div>
+</body></html>

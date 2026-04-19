@@ -1,0 +1,60 @@
+label: 'Destinations'
+title: 'All'
+title_em: 'stops'
+destinations:
+  - name: 'Dublin'
+    region: 'Co. Dublin'
+    lat: 53.3498
+    lon: -6.2603
+  - name: 'Glendalough'
+    region: 'Co. Wicklow'
+    lat: 53.0117
+    lon: -6.3261
+  - name: 'Kilkenny'
+    region: 'Co. Kilkenny'
+    lat: 52.6541
+    lon: -7.2448
+  - name: 'Cork'
+    region: 'Co. Cork'
+    lat: 51.8985
+    lon: -8.4756
+  - name: 'Kinsale'
+    region: 'Co. Cork'
+    lat: 51.7059
+    lon: -8.5222
+  - name: 'Killarney'
+    region: 'Co. Kerry'
+    lat: 52.0599
+    lon: -9.5044
+  - name: 'Dingle'
+    region: 'Co. Kerry'
+    lat: 52.1409
+    lon: -10.2640
+  - name: 'Limerick'
+    region: 'Co. Limerick'
+    lat: 52.6638
+    lon: -8.6267
+  - name: 'Cliffs of Moher'
+    region: 'Co. Clare'
+    lat: 52.9715
+    lon: -9.4309
+  - name: 'Inishmore'
+    region: 'Aran Islands'
+    lat: 53.1244
+    lon: -9.7470
+  - name: 'Connemara'
+    region: 'Co. Galway'
+    lat: 53.5333
+    lon: -9.8500
+  - name: 'Céide Fields'
+    region: 'Co. Mayo'
+    lat: 54.3066
+    lon: -9.4519
+  - name: 'Donegal'
+    region: 'Co. Donegal'
+    lat: 54.6543
+    lon: -8.1099
+  - name: 'Belfast'
+    region: 'Co. Antrim'
+    lat: 54.5973
+    lon: -5.9301

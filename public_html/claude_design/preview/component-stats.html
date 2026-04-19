@@ -1,0 +1,20 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+body { margin:0; padding:20px; background:var(--bg); }
+.stats { display:grid; grid-template-columns: repeat(5, 1fr); border:1px solid var(--border); background:var(--surface); }
+.stat { padding:18px 20px; border-right:1px solid var(--border); display:flex; flex-direction:column; gap:4px; }
+.stat:last-child { border-right:none; }
+.l { font-family:var(--font-mono); font-size:9px; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); }
+.v { font-family:var(--font-display); font-size:28px; color:var(--bright); line-height:1; letter-spacing:0.02em; }
+.vt { font-family:var(--font-display); font-size:22px; color:var(--bright); line-height:1; padding-top:3px; letter-spacing:0.02em; }
+.u { font-family:var(--font-mono); font-size:9px; letter-spacing:0.1em; color:var(--muted); text-transform:uppercase; }
+</style></head><body>
+<div class="stats">
+  <div class="stat"><span class="l">Distance</span><span class="v">12.4</span><span class="u">MILES</span></div>
+  <div class="stat"><span class="l">Elevation</span><span class="v">1,680</span><span class="u">FT GAIN</span></div>
+  <div class="stat"><span class="l">Summit</span><span class="v">3,271</span><span class="u">FT</span></div>
+  <div class="stat"><span class="l">Grade</span><span class="vt">Moderate</span><span class="u">BLUE SQ</span></div>
+  <div class="stat"><span class="l">Time</span><span class="v">2:15</span><span class="u">H:MM</span></div>
+</div>
+</body></html>

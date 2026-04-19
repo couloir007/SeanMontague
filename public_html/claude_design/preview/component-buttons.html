@@ -1,0 +1,23 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+body { margin:0; padding:24px; background:var(--bg); }
+.tag { font-family:var(--font-mono); font-size:9px; letter-spacing:0.28em; color:var(--muted); text-transform:uppercase; margin-bottom:12px; }
+.row { display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
+.btn-primary { font-family:var(--font-mono); font-size:10px; letter-spacing:0.18em; text-transform:uppercase; background:var(--forest); color:#fff; padding:11px 26px; text-decoration:none; border:none; cursor:pointer; transition: opacity 0.2s; }
+.btn-primary:hover { opacity:.82; }
+.btn-ghost { font-family:var(--font-mono); font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); text-decoration:none; border-bottom:1px solid var(--border); padding-bottom:2px; transition: color .2s, border-color .2s; }
+.btn-ghost:hover { color:var(--bright); border-color:var(--text); }
+.btn-back { font-family:var(--font-mono); font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); text-decoration:none; transition: color .2s; }
+.btn-back:hover { color:var(--bright); }
+.btn-back::before { content:'← '; }
+.cap { font-family:var(--font-mono); font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-top:10px; display:flex; gap:18px; flex-wrap:wrap; }
+</style></head><body>
+<div class="tag">Buttons · all radius-0</div>
+<div class="row">
+  <a href="#" class="btn-primary">Explore the Maps</a>
+  <a href="#" class="btn-ghost">Read the Writing</a>
+  <a href="#" class="btn-back">Back to index</a>
+</div>
+<div class="cap"><span>PRIMARY · FOREST</span><span>GHOST · UNDERLINED</span><span>BACK · ARROW GLYPH</span></div>
+</body></html>

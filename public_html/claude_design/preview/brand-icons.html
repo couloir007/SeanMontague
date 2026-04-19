@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+body { margin:0; padding:20px; background:var(--bg); }
+.row { display:grid; grid-template-columns: repeat(6, 1fr); gap:0; border:1px solid var(--border); background:var(--surface); }
+.cell { padding:12px 8px; border-right:1px solid var(--border); display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; }
+.cell:last-child { border-right:none; }
+.ico { width:24px; height:24px; color:var(--bright); }
+.n { font-family:var(--font-mono); font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); }
+</style></head><body>
+<div class="row">
+  <div class="cell"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span class="n">Globe</span></div>
+  <div class="cell"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 17l5-10 4 6 3-4 6 8"/></svg><span class="n">Mountain</span></div>
+  <div class="cell"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M12 12v10M8 22h8"/></svg><span class="n">Tree</span></div>
+  <div class="cell"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 3L3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/></svg><span class="n">Map</span></div>
+  <div class="cell"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span class="n">Pencil</span></div>
+  <div class="cell"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg><span class="n">Arrow</span></div>
+</div>
+</body></html>

@@ -1,0 +1,212 @@
+/* =========================================================
+   Surface Design System — Colors & Type
+   Personal editorial site: Kingdom Trails MTB, Burke Mt skiing,
+   permaculture, Leaflet mapping. Typography-forward outdoor/editorial.
+   ========================================================= */
+
+/* ---------- Fonts ---------- */
+/* Bebas Neue + Cormorant Garamond: self-hosted (shipped in fonts/). DM Mono: Google Fonts CDN. */
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&display=swap");
+
+@font-face {
+  font-family: "Bebas Neue";
+  src: url("./fonts/BebasNeue-Regular.ttf") format("truetype"),
+       url("../fonts/BebasNeue-Regular.ttf") format("truetype"),
+       url("../../fonts/BebasNeue-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("./fonts/CormorantGaramond-VariableFont_wght.ttf") format("truetype-variations"),
+       url("../fonts/CormorantGaramond-VariableFont_wght.ttf") format("truetype-variations"),
+       url("../../fonts/CormorantGaramond-VariableFont_wght.ttf") format("truetype-variations");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("./fonts/CormorantGaramond-Italic-VariableFont_wght.ttf") format("truetype-variations"),
+       url("../fonts/CormorantGaramond-Italic-VariableFont_wght.ttf") format("truetype-variations"),
+       url("../../fonts/CormorantGaramond-Italic-VariableFont_wght.ttf") format("truetype-variations");
+  font-weight: 300 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  /* =============== COLOR TOKENS =============== */
+
+  /* Surface palette — warm off-white editorial ground */
+  --bg:          #f7f6f2;  /* page background */
+  --surface:     #ffffff;  /* cards, primary surface */
+  --surface2:    #f0ede6;  /* tinted surface, section alt */
+  --border:      #e0dbd1;  /* default hairline */
+  --border-dark: #c8c2b8;  /* hover border */
+
+  /* Ink */
+  --bright: #161410;  /* headings, strongest text */
+  --text:   #2c2a25;  /* body copy */
+  --muted:  #736e62;  /* secondary text, labels */
+  --stone:  #6b6560;  /* neutral accent, generic place tags */
+
+  /* Subject accents — one color per content pillar */
+  --forest: #3a5a40;  /* PRIMARY accent: permaculture, brand, hover rails */
+  --trail:  #7a3410;  /* MTB / ski / Kingdom Trails */
+  --sky:    #4a7c9e;  /* maps, Leaflet, technical */
+
+  /* Difficulty / attention badge */
+  --amber:        #a05a00;
+  --amber-bg:     #fff3e0;
+  --amber-border: #f0d090;
+
+  /* Trail difficulty (ski/MTB convention) */
+  --rating-green-bg:     #e6f2e8;
+  --rating-green-fg:     #3a5a40;
+  --rating-green-border: #c8ddc8;
+  --rating-blue-bg:      #ddeeff;
+  --rating-blue-fg:      #336699;
+  --rating-blue-border:  #bbddff;
+  --rating-black-bg:     #222222;
+  --rating-black-fg:     #ffffff;
+
+  /* =============== TYPE TOKENS =============== */
+  --font-display: "Bebas Neue", "Oswald", Impact, sans-serif;
+  --font-serif:   "Cormorant Garamond", "EB Garamond", Georgia, serif;
+  --font-mono:    "DM Mono", "IBM Plex Mono", "Menlo", monospace;
+
+  /* Semantic aliases */
+  --font-heading: var(--font-display);
+  --font-body:    var(--font-serif);
+  --font-label:   var(--font-mono);
+
+  /* Weight */
+  --fw-light:    300;
+  --fw-regular:  400;
+  --fw-semibold: 600;
+
+  /* Size — clamped where fluid */
+  --fs-hero:    clamp(64px, 9vw, 120px); /* hero name/display */
+  --fs-title:   clamp(40px, 6vw, 80px);  /* article titles */
+  --fs-h2:      clamp(28px, 3.5vw, 48px);
+  --fs-h3:      2rem;      /* 32px */
+  --fs-h4:      1.5rem;    /* 24px */
+  --fs-body-lg: 1.1875rem; /* 19px — article body */
+  --fs-body:    1.125rem;  /* 18px — default body */
+  --fs-body-sm: 1rem;      /* 16px */
+  --fs-label:   0.625rem;  /* 10px — mono labels */
+  --fs-label-xs: 0.5625rem;/* 9px — smallest mono labels */
+
+  /* Line height */
+  --lh-display: 0.9;
+  --lh-tight:   1.15;
+  --lh-snug:    1.25;
+  --lh-normal:  1.5;
+  --lh-body:    1.75;
+  --lh-prose:   1.8;
+
+  /* Tracking (letter-spacing) */
+  --ls-display: 0.02em;   /* Bebas Neue headlines */
+  --ls-label:   0.18em;   /* Mono button / nav */
+  --ls-label-wide: 0.25em;/* Mono section labels */
+  --ls-mono:    0.08em;   /* Mono inline metadata */
+
+  /* =============== SPACING / LAYOUT =============== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  --content-width: 720px;   /* article body column */
+  --wide-width:    1100px;  /* section container */
+  --site-max:      1376px;
+
+  /* Borders & rings */
+  --border-w:       1px;
+  --border-accent:  3px;      /* the signature hover rail */
+  --radius:         0;        /* NO rounded corners, anywhere */
+
+  /* Motion */
+  --ease-out:   cubic-bezier(0.25, 0, 0.2, 1);
+  --t-fast:     0.15s;
+  --t-base:     0.2s;
+  --t-slow:     0.3s;
+}
+
+/* =========================================================
+   Semantic element styles — apply by default
+   ========================================================= */
+html {
+  background: var(--bg);
+  color: var(--text);
+  accent-color: var(--forest);
+  caret-color: var(--forest);
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-light);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  color: var(--text);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--bright);
+  font-family: var(--font-heading);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-tight);
+  margin: 0;
+}
+
+h1 { font-size: var(--fs-title); letter-spacing: var(--ls-display); line-height: var(--lh-display); }
+h2 { font-family: var(--font-serif); font-weight: var(--fw-light); font-size: var(--fs-h2); }
+h3 { font-family: var(--font-serif); font-weight: var(--fw-regular); font-size: var(--fs-h3); }
+h4 { font-family: var(--font-serif); font-weight: var(--fw-regular); font-size: var(--fs-h4); }
+
+p { margin: 0; }
+
+a {
+  color: var(--forest);
+  text-decoration: none;
+}
+
+::selection { background: var(--forest); color: #fff; }
+
+/* Utility classes — editorial staples */
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--ls-label-wide);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--forest);
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: var(--fw-regular);
+  letter-spacing: var(--ls-display);
+  line-height: var(--lh-display);
+  text-transform: uppercase;
+  color: var(--bright);
+}

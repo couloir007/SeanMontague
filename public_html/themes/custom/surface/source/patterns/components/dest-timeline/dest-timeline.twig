@@ -1,0 +1,36 @@
+{{ attach_library('surface/dest-timeline') }}
+<section class="dest-timeline">
+  <div class="dest-timeline__header">
+    <span class="dest-timeline__label">{{ label|default('Route · in order') }}</span>
+    <h2 class="dest-timeline__title">The <em>{{ title_em|default('itinerary') }}</em></h2>
+  </div>
+
+  <div class="dest-timeline__track">
+    <div class="dest-timeline__line" aria-hidden="true"></div>
+
+    {% for dest in destinations %}
+      {% set side = loop.index is odd ? 'left' : 'right' %}
+      <div class="dest-timeline__node dest-timeline__node--{{ side }}">
+        <span class="dest-timeline__dot" aria-hidden="true"></span>
+        <div class="dest-timeline__card">
+          <div class="dest-timeline__num">{{ '%02d'|format(loop.index) }}</div>
+          <div class="dest-timeline__name">{{ dest.name }}</div>
+          {% if dest.region %}
+            <div class="dest-timeline__region">{{ dest.region }}</div>
+          {% endif %}
+        </div>
+        <div class="dest-timeline__aside">
+          {% if dest.dates %}
+            <div class="dest-timeline__dates">{{ dest.dates }}</div>
+          {% endif %}
+          {% if dest.lat and dest.lon %}
+            <div class="dest-timeline__coords">
+              {{ dest.lat|number_format(3, '.', '') }}° N<br>
+              {{ dest.lon|abs|number_format(3, '.', '') }}° W
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>

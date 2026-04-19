@@ -1,0 +1,20 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+body { margin:0; padding:20px; background:var(--bg); }
+.pc { background:var(--surface); border:1px solid var(--border); padding:26px 28px; position:relative; overflow:hidden; transition: border-color .2s, border-left-color .2s; border-left:3px solid transparent; }
+.num { font-family:var(--font-display); font-size:60px; color:var(--surface2); line-height:1; position:absolute; top:10px; right:16px; letter-spacing:0.02em; user-select:none; }
+.sub { font-family:var(--font-mono); font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+.title { font-family:var(--font-serif); font-size:26px; font-weight:400; color:var(--bright); margin:0 0 6px; line-height:1.1; }
+.desc { font-family:var(--font-serif); font-size:14px; font-weight:300; line-height:1.75; color:var(--muted); margin:0 0 14px; }
+.tags { display:flex; flex-wrap:wrap; gap:5px; }
+.tag { font-family:var(--font-mono); font-size:9px; letter-spacing:0.1em; text-transform:uppercase; padding:3px 8px; border:1px solid var(--border); color:var(--muted); background:var(--bg); }
+</style></head><body>
+<div class="pc">
+  <span class="num">01</span>
+  <p class="sub">East Burke, Vermont</p>
+  <h3 class="title">Kingdom Trails</h3>
+  <p class="desc">Over 100 miles of meticulously maintained singletrack in the hills above East Burke.</p>
+  <div class="tags"><span class="tag">Mountain Biking</span><span class="tag">Trail Running</span><span class="tag">Leaflet Maps</span></div>
+</div>
+</body></html>

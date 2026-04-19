@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 48px; background: var(--bg); }
+  .mark { font-family: var(--font-mono); font-size: 14px; letter-spacing: 0.08em; color: var(--bright); }
+  .mark span { color: var(--forest); }
+  .mark-lg { font-size: 24px; }
+  .stack { display: flex; flex-direction: column; gap: 32px; }
+  .stack > div > .label { font-size: 9px; letter-spacing: 0.25em; color: var(--muted); margin-bottom: 10px; }
+</style></head>
+<body>
+<div class="stack">
+  <div>
+    <div class="label">WORDMARK · DEFAULT</div>
+    <div class="mark">Sean Montague <span>/ Burke, VT</span></div>
+  </div>
+  <div>
+    <div class="label">WORDMARK · LARGE</div>
+    <div class="mark mark-lg">Sean Montague <span>/ Burke, VT</span></div>
+  </div>
+</div>
+</body></html>

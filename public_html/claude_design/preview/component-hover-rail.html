@@ -1,0 +1,31 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+body { margin:0; padding:24px; background:var(--bg); }
+.grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; border:1px solid var(--border); background:var(--surface); }
+.cell { padding:16px; border-right:1px solid var(--border); display:flex; flex-direction:column; gap:8px; }
+.cell:last-child { border-right:none; }
+.box { height:38px; background:var(--surface); border:1px solid var(--border); position:relative; }
+.box.hov { border-left:3px solid var(--forest); }
+.box.hov2 { background:var(--bg); border-left:3px solid var(--forest); }
+.lab { font-family:var(--font-mono); font-size:9px; letter-spacing:0.18em; color:var(--muted); text-transform:uppercase; }
+.desc { font-family:var(--font-serif); font-size:12px; font-style:italic; color:var(--muted); line-height:1.4; }
+</style></head><body>
+<div class="grid">
+  <div class="cell">
+    <div class="box"></div>
+    <div class="lab">Rest</div>
+    <div class="desc">1px hairline border.</div>
+  </div>
+  <div class="cell">
+    <div class="box hov"></div>
+    <div class="lab">Hover · rail</div>
+    <div class="desc">3px forest left-border appears.</div>
+  </div>
+  <div class="cell">
+    <div class="box hov2"></div>
+    <div class="lab">Hover · row</div>
+    <div class="desc">Background shifts to --bg, rail stays.</div>
+  </div>
+</div>
+</body></html>

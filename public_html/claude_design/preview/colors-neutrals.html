@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+body { margin:0; padding:22px 24px; background:var(--bg); }
+.row { display:grid; grid-template-columns: repeat(6, 1fr); gap: 0; border:1px solid var(--border); background:var(--surface); }
+.sw { padding:14px 12px; border-right:1px solid var(--border); display:flex; flex-direction:column; gap:6px; }
+.sw:last-child { border-right:none; }
+.chip { height:46px; border:1px solid var(--border); }
+.n { font-family:var(--font-mono); font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--bright); }
+.v { font-family:var(--font-mono); font-size:8.5px; letter-spacing:0.08em; color:var(--muted); }
+.group { font-family:var(--font-mono); font-size:9px; letter-spacing:0.3em; color:var(--muted); text-transform:uppercase; margin-bottom:10px; }
+</style></head><body>
+<div class="group">Neutrals — warm editorial ground</div>
+<div class="row">
+  <div class="sw"><div class="chip" style="background:#f7f6f2"></div><div class="n">BG</div><div class="v">#f7f6f2</div></div>
+  <div class="sw"><div class="chip" style="background:#ffffff"></div><div class="n">SURFACE</div><div class="v">#ffffff</div></div>
+  <div class="sw"><div class="chip" style="background:#f0ede6"></div><div class="n">SURFACE 2</div><div class="v">#f0ede6</div></div>
+  <div class="sw"><div class="chip" style="background:#e0dbd1"></div><div class="n">BORDER</div><div class="v">#e0dbd1</div></div>
+  <div class="sw"><div class="chip" style="background:#c8c2b8"></div><div class="n">BORDER DK</div><div class="v">#c8c2b8</div></div>
+  <div class="sw"><div class="chip" style="background:#161410"></div><div class="n" style="color:#161410">BRIGHT</div><div class="v">#161410</div></div>
+</div>
+</body></html>
