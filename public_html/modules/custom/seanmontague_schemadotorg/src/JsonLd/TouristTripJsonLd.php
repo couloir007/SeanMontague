@@ -23,15 +23,21 @@ class TouristTripJsonLd {
     if (!$entity instanceof ContentEntityInterface || !$entity->hasField('schema_trip_dates') || $entity->get('schema_trip_dates')->isEmpty()) {
       return;
     }
-    $item = $entity->get('schema_trip_dates')->first();
-    $start = $item->get('value')->getValue();
-    $end   = $item->get('end_value')->getValue();
+    $items = $entity->get('schema_trip_dates');
+    $item0 = $items->get(0);
+    $item1 = $items->get(1);
 
-    if ($start) {
-      $data['arrivalTime'] = date('Y-m-d', $start);
+    if ($item0) {
+      $start = $item0->get('value')->getValue();
+      if ($start) {
+        $data['departureTime'] = date('Y-m-d', $start);
+      }
     }
-    if ($end) {
-      $data['departureTime'] = date('Y-m-d', $end);
+    if ($item1) {
+      $end = $item1->get('value')->getValue();
+      if ($end) {
+        $data['arrivalTime'] = date('Y-m-d', $end);
+      }
     }
   }
 

@@ -42,8 +42,8 @@ class PointOfInterestJsonLd {
     $item = $entity->get('field_geo')->first();
     return [
       '@type' => 'GeoCoordinates',
-      'latitude' => $item->get('lat')->getValue(),
-      'longitude' => $item->get('lon')->getValue(),
+      'latitude'  => (float) $item->get('lat')->getValue(),
+      'longitude' => (float) $item->get('lon')->getValue(),
     ];
   }
 

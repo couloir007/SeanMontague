@@ -9,9 +9,35 @@ declare(strict_types=1);
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\node\NodeInterface;
 use Drupal\seanmontague_schemadotorg\JsonLd\ArticleJsonLd;
 use Drupal\seanmontague_schemadotorg\JsonLd\PointOfInterestJsonLd;
 use Drupal\seanmontague_schemadotorg\JsonLd\TouristTripJsonLd;
+
+/**
+ * Implements hook_schemadotorg_jsonld_alter().
+ */
+function seanmontague_schemadotorg_schemadotorg_jsonld_alter(array &$data, BubbleableMetadata $bubbleable_metadata): void {
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if (!($node instanceof NodeInterface)) {
+    return;
+  }
+
+  $year = NULL;
+  if ($node->hasField('schema_date_published') && !$node->get('schema_date_published')->isEmpty()) {
+    $published = $node->get('schema_date_published')->value;
+    if ($published) {
+      $year = (int) date('Y', strtotime($published));
+    }
+  }
+  if (!$year) {
+    $year = (int) date('Y', $node->getCreatedTime());
+  }
+
+  if (isset($data['schemadotorg_jsonld_entity']) && is_array($data['schemadotorg_jsonld_entity'])) {
+    $data['schemadotorg_jsonld_entity']['copyrightYear'] = $year;
+  }
+}
 
 /**
  * Implements hook_schemadotorg_jsonld_schema_type_entity_alter().
