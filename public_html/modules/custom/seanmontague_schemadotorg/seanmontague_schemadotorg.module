@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for SeanMontague Schema.org module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\seanmontague_schemadotorg\JsonLd\ArticleJsonLd;
+use Drupal\seanmontague_schemadotorg\JsonLd\PointOfInterestJsonLd;
+
+/**
+ * Implements hook_schemadotorg_jsonld_schema_type_entity_alter().
+ */
+function seanmontague_schemadotorg_schemadotorg_jsonld_schema_type_entity_alter(array &$data, EntityInterface $entity, mixed $mapping, BubbleableMetadata $bubbleable_metadata): void {
+  $entity_type_id = $entity->getEntityTypeId();
+  $bundle = $entity->bundle();
+
+  if ($entity_type_id === 'geo_entity' && $bundle === 'poi') {
+    PointOfInterestJsonLd::alter($data, $entity, $bubbleable_metadata);
+  }
+  elseif ($entity_type_id === 'node' && $bundle === 'article') {
+    ArticleJsonLd::alter($data, $entity, $bubbleable_metadata);
+  }
+}

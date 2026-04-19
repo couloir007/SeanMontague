@@ -1,0 +1,12 @@
+name: 'SeanMontague Schema.org'
+type: module
+description: 'Custom Schema.org JSON-LD for seanmontague.com. Extends
+  SchemaBlueprints with TouristAttraction (geo_entity poi) and
+  BlogPosting enhancements (POI mentions, spatial coverage).'
+package: Custom
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:node
+  - schemadotorg:schemadotorg
+  - schemadotorg:schemadotorg_jsonld
+  - geo_entity:geo_entity
