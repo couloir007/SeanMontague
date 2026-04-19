@@ -1,0 +1,35 @@
+leaflet_full_page.edan_test:
+  path: '/admin/config/development/leaflet-full-page/edan-test/{edan_id}'
+  defaults:
+    _controller: '\Drupal\leaflet_full_page\Controller\EdanTestController::test'
+    _title: 'Leaflet Full Page EDAN Test'
+    edan_id: null
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE
+
+leaflet_full_page.edan_test_noparam:
+  path: '/admin/config/development/leaflet-full-page/edan-test'
+  defaults:
+    _controller: '\Drupal\leaflet_full_page\Controller\EdanTestController::test'
+    _title: 'Leaflet Full Page EDAN Test'
+    edan_id: null
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE
+
+leaflet_full_page.edan_proxy:
+  path: '/leaflet-full-page/edan-proxy'
+  defaults:
+    _controller: '\Drupal\leaflet_full_page\Controller\EdanProxyController::proxy'
+  requirements:
+    _permission: 'access content'
+
+leaflet_full_page.map_items_dump2:
+  path: '/visit/find-your-place-at-the-museum/interactive-us-map_mapitems'
+  defaults:
+    _controller: '\Drupal\leaflet_full_page\Controller\MapItemsController::dump'
+  requirements:
+    _permission: 'access content'

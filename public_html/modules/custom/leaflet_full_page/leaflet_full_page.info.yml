@@ -11,4 +11,7 @@ dependencies:
   - drupal:datetime
   - drupal:text
   - drupal:paragraphs
+  - drupal:serialization
+  - drupal:rest
   - geo_entity:geo_entity
+  - edan_connector
