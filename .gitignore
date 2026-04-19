@@ -56,7 +56,7 @@
 # Ignore SimpleTest multi-site environment.
 /public_html/sites/simpletest
 /public_html/mapping
-public_html/mapping
+/public_html/libraries/chosen
 
 
 # Ignore custom modules managed by Composer.
