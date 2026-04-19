@@ -25,33 +25,33 @@ dependencies:
     - field_group
     - link
     - options
+    - telephone
     - text
     - user
 third_party_settings:
   field_group:
     group_general:
       children:
+        - schema_given_name
         - schema_additional_name
         - schema_family_name
-        - schema_given_name
-        - schema_image
         - schema_knows_language
         - body
-        - title
+        - schema_image
       label: General
       parent_name: ''
       region: content
-      weight: -20
+      weight: 0
       format_type: fieldset
       format_settings: {  }
     group_contact:
       children:
-        - schema_email
         - schema_telephone
+        - schema_email
       label: Contact
       parent_name: ''
       region: content
-      weight: -18
+      weight: 1
       format_type: fieldset
       format_settings: {  }
     group_organization:
@@ -61,18 +61,18 @@ third_party_settings:
       label: Organization
       parent_name: ''
       region: content
-      weight: -13
+      weight: 2
       format_type: fieldset
       format_settings: {  }
     group_links:
       children:
-        - schema_same_as
         - schema_related_link
         - schema_significant_link
+        - schema_same_as
       label: Links
       parent_name: ''
       region: content
-      weight: 20
+      weight: 3
       format_type: fieldset
       format_settings: {  }
     group_references:
@@ -81,7 +81,7 @@ third_party_settings:
       label: References
       parent_name: ''
       region: content
-      weight: 22
+      weight: 4
       format_type: fieldset
       format_settings: {  }
     group_editorial:
@@ -208,7 +208,7 @@ content:
       rel: ''
       target: ''
     third_party_settings: {  }
-    weight: 1
+    weight: 2
     region: content
   schema_subject_of:
     type: entity_reference_label
@@ -219,9 +219,10 @@ content:
     weight: 1
     region: content
   schema_telephone:
-    type: basic_string
+    type: telephone_link
     label: above
-    settings: {  }
+    settings:
+      title: ''
     third_party_settings: {  }
     weight: 4
     region: content

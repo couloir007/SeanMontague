@@ -1,0 +1,38 @@
+uuid: ed26d943-e6f4-43a7-bf12-b29d1bdaa7d8
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+    - serialization
+    - user
+_core:
+  default_config_hash: fUWVLhoNCH44f11m4DdJ20pvD_-lvyZGv1IMutI4FpY
+id: entity.geo_entity
+plugin_id: 'entity:geo_entity'
+granularity: method
+configuration:
+  GET:
+    supported_formats:
+      - json
+      - xml
+    supported_auth:
+      - cookie
+  POST:
+    supported_formats:
+      - json
+      - xml
+    supported_auth:
+      - cookie
+  PATCH:
+    supported_formats:
+      - json
+      - xml
+    supported_auth:
+      - cookie
+  DELETE:
+    supported_formats:
+      - json
+      - xml
+    supported_auth:
+      - cookie

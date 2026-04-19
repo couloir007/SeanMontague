@@ -1,0 +1,21 @@
+uuid: ccca7e39-b7d7-4827-8c44-b96595440723
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_telephone
+    - geo_entity.geo_entity_type.poi
+  module:
+    - telephone
+id: geo_entity.poi.schema_telephone
+field_name: schema_telephone
+entity_type: geo_entity
+bundle: poi
+label: Telephone
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: telephone

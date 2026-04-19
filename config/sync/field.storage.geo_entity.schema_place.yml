@@ -1,0 +1,20 @@
+uuid: 55ca3934-6f37-4d3e-ac9d-36edbf25026d
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+    - node
+id: geo_entity.schema_place
+field_name: schema_place
+entity_type: geo_entity
+type: entity_reference
+settings:
+  target_type: node
+module: core
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

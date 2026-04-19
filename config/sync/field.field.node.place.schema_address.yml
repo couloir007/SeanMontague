@@ -40,11 +40,11 @@ settings:
   langcode_override: ''
   field_overrides:
     givenName:
-      override: optional
+      override: hidden
     additionalName:
-      override: optional
+      override: hidden
     familyName:
-      override: optional
+      override: hidden
     organization:
       override: optional
     addressLine1:
@@ -52,13 +52,13 @@ settings:
     addressLine2:
       override: optional
     addressLine3:
-      override: optional
+      override: hidden
     postalCode:
       override: optional
     sortingCode:
-      override: optional
+      override: hidden
     dependentLocality:
-      override: optional
+      override: hidden
     locality:
       override: optional
     administrativeArea:

@@ -23,7 +23,6 @@ dependencies:
     - taxonomy.vocabulary.activity_type
     - taxonomy.vocabulary.category
     - taxonomy.vocabulary.tags
-    - user.role.admin
     - user.role.authenticated
   module:
     - auto_entitylabel
@@ -52,7 +51,6 @@ dependencies:
     - file
     - file_delete
     - geocoder
-    - gvp_external_resources
     - help
     - honeypot
     - image
@@ -154,15 +152,7 @@ permissions:
   - 'administer embedded content'
   - 'administer entity browsers'
   - 'administer environment indicator settings'
-  - 'administer external resource endpoint entities'
-  - 'administer external resource entities'
-  - 'administer external_resource_endpoint display'
-  - 'administer external_resource_endpoint fields'
-  - 'administer external_resource_endpoint form display'
   - 'administer field validation rule set'
-  - 'administer gvp_external_resource display'
-  - 'administer gvp_external_resource fields'
-  - 'administer gvp_external_resource form display'
   - 'administer honeypot'
   - 'administer image styles'
   - 'administer languages'
@@ -220,10 +210,6 @@ permissions:
   - 'administer user form display'
   - 'administer users'
   - 'administer views'
-  - 'administer volcano external resource entities'
-  - 'administer volcano_external_resource display'
-  - 'administer volcano_external_resource fields'
-  - 'administer volcano_external_resource form display'
   - 'administer webform'
   - 'administer webform element access'
   - 'administer webform labels'
@@ -377,7 +363,6 @@ permissions:
   - 'import configuration'
   - 'link to any page'
   - 'manage all content model document revisions'
-  - 'masquerade as admin'
   - 'masquerade as any user'
   - 'masquerade as authenticated'
   - 'masquerade as super user'

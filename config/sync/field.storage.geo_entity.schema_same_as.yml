@@ -1,0 +1,19 @@
+uuid: 8b6e52e9-49f5-4086-af15-ea66438ab88a
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+    - link
+id: geo_entity.schema_same_as
+field_name: schema_same_as
+entity_type: geo_entity
+type: link
+settings: {  }
+module: link
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,7 @@
+uuid: ced3fd62-2d61-437f-a934-d25b05be01f6
+langcode: en
+status: true
+dependencies: {  }
+id: poi
+label: POI
+label_token: POI

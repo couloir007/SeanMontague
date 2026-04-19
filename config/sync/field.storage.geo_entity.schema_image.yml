@@ -1,0 +1,20 @@
+uuid: 70bfa04e-fba4-43fb-b562-723a88cd8479
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+    - media
+id: geo_entity.schema_image
+field_name: schema_image
+entity_type: geo_entity
+type: entity_reference
+settings:
+  target_type: media
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

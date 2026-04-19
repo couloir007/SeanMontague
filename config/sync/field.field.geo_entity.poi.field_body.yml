@@ -1,0 +1,22 @@
+uuid: 94ed3750-c2e3-41fb-ad55-08c26d461f17
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.field_body
+    - geo_entity.geo_entity_type.poi
+  module:
+    - text
+id: geo_entity.poi.field_body
+field_name: field_body
+entity_type: geo_entity
+bundle: poi
+label: Body
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

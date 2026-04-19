@@ -1,0 +1,19 @@
+uuid: 5a48452a-fd24-4187-8481-7cb1818b50c7
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - smart_date
+id: node.schema_trip_dates
+field_name: schema_trip_dates
+entity_type: node
+type: smartdate
+settings: {  }
+module: smart_date
+locked: false
+cardinality: 2
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

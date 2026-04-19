@@ -1,0 +1,18 @@
+uuid: b3911917-07db-4578-9826-d5df53c9adea
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+id: geo_entity.field_show_on_map
+field_name: field_show_on_map
+entity_type: geo_entity
+type: boolean
+settings: {  }
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

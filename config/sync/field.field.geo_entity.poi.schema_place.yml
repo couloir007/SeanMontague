@@ -1,0 +1,29 @@
+uuid: 820a5f3a-9e2d-4ebf-8a45-1c69d9d39776
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_place
+    - geo_entity.geo_entity_type.poi
+    - node.type.place
+id: geo_entity.poi.schema_place
+field_name: schema_place
+entity_type: geo_entity
+bundle: poi
+label: 'Parent Place'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      place: place
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

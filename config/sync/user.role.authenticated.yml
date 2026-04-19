@@ -8,6 +8,7 @@ dependencies:
     - filter.format.webform_default
   module:
     - filter
+    - geo_entity
     - media
     - system
 _core:
@@ -21,4 +22,5 @@ permissions:
   - 'use text format basic_html'
   - 'use text format full_html'
   - 'use text format webform_default'
+  - 'view geo'
   - 'view media'

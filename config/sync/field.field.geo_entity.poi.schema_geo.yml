@@ -1,0 +1,21 @@
+uuid: 5d25de49-46be-47ea-9f8d-6c7f9aaec645
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_geo
+    - geo_entity.geo_entity_type.poi
+  module:
+    - geofield
+id: geo_entity.poi.schema_geo
+field_name: schema_geo
+entity_type: geo_entity
+bundle: poi
+label: GEO
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: geofield

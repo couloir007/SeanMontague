@@ -3,9 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.node.tourist_trip.field_arrival_date
     - field.field.node.tourist_trip.field_body
-    - field.field.node.tourist_trip.field_departure_date
     - field.field.node.tourist_trip.field_editorial
     - field.field.node.tourist_trip.field_metatag
     - field.field.node.tourist_trip.schema_destination
@@ -14,24 +12,24 @@ dependencies:
     - field.field.node.tourist_trip.schema_related_link
     - field.field.node.tourist_trip.schema_significant_link
     - field.field.node.tourist_trip.schema_subject_of
+    - field.field.node.tourist_trip.schema_trip_dates
     - node.type.tourist_trip
   module:
     - allowed_formats
-    - datetime
     - field_group
     - inline_entity_form
     - linkit
     - metatag
     - path
+    - smart_date
     - text
 third_party_settings:
   field_group:
     group_content:
       children:
         - title
-        - field_departure_date
-        - field_arrival_date
         - schema_image
+        - schema_trip_dates
         - field_body
       label: Content
       region: content
@@ -63,8 +61,13 @@ third_party_settings:
       weight: 2
       format_type: details
       format_settings:
+        classes: ''
+        show_empty_fields: false
+        id: ''
+        label_as_html: false
         open: false
         description: ''
+        required_fields: true
     group_references:
       children:
         - schema_subject_of
@@ -74,8 +77,13 @@ third_party_settings:
       weight: 3
       format_type: details
       format_settings:
+        classes: ''
+        show_empty_fields: false
+        id: ''
+        label_as_html: false
         open: false
         description: ''
+        required_fields: true
     group_editorial:
       children:
         - field_editorial
@@ -97,15 +105,9 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
-  field_arrival_date:
-    type: datetime_default
-    weight: -3
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   field_body:
     type: text_textarea
-    weight: -1
+    weight: 0
     region: content
     settings:
       rows: 12
@@ -114,12 +116,6 @@ content:
       allowed_formats:
         hide_help: '0'
         hide_guidelines: '0'
-  field_departure_date:
-    type: datetime_default
-    weight: -2
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   field_editorial:
     type: inline_entity_form_simple
     weight: 221
@@ -135,7 +131,7 @@ content:
     third_party_settings: {  }
   field_metatag:
     type: metatag_firehose
-    weight: 6
+    weight: 7
     region: content
     settings:
       sidebar: true
@@ -191,7 +187,7 @@ content:
     third_party_settings: {  }
   schema_itinerary:
     type: entity_reference_autocomplete
-    weight: 12
+    weight: 11
     region: content
     settings:
       match_operator: CONTAINS
@@ -221,13 +217,33 @@ content:
     third_party_settings: {  }
   schema_subject_of:
     type: entity_reference_autocomplete
-    weight: 12
+    weight: 10
     region: content
     settings:
       match_operator: CONTAINS
       match_limit: 10
       size: 60
       placeholder: ''
+    third_party_settings: {  }
+  schema_trip_dates:
+    type: smartdate_only
+    weight: -3
+    region: content
+    settings:
+      hide_date: '1'
+      allday: '1'
+      remove_seconds: '1'
+      duration_overlay: '1'
+      separator: to
+      show_extra: 0
+      modal: false
+      default_duration: 60
+      default_duration_increments: |-
+        30
+        60|1 hour
+        90
+        120|2 hours
+        custom
     third_party_settings: {  }
   simple_sitemap:
     weight: 220
@@ -257,7 +273,7 @@ content:
       placeholder: ''
     third_party_settings: {  }
   translation:
-    weight: 4
+    weight: 5
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -272,7 +288,7 @@ content:
       placeholder: ''
     third_party_settings: {  }
   url_redirects:
-    weight: 5
+    weight: 6
     region: content
     settings: {  }
     third_party_settings: {  }
