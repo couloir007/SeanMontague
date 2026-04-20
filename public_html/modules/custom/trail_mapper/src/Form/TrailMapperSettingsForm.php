@@ -48,7 +48,7 @@ class TrailMapperSettingsForm extends ConfigFormBase {
         'osm'               => $this->t('OpenStreetMap'),
         'open-topo'         => $this->t('OpenTopoMap'),
         'esri-topo'         => $this->t('Esri World Topo'),
-        'esri-nat-geo'         => $this->t('Esri Nat Geo'),
+        'esri-nat-geo'      => $this->t('Esri Nat Geo'),
         'custom'            => $this->t('Custom URL'),
       ],
     ];

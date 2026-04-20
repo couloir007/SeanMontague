@@ -31,11 +31,6 @@
   "use strict";
 
   const TILE_SETS = {
-    'esri-nat-geo': {
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',
-      attribution: '&copy; <a href="https://www.esri.com">Esri</a>',
-      maxZoom: 18,
-    },
     'usgs-topo': {
       url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',
       attr: 'Tiles &copy; <a href="https://usgs.gov">USGS</a> The National Map',
@@ -69,6 +64,11 @@
     'esri-topo': {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
       attr: '&copy; <a href="https://www.esri.com">Esri</a>',
+      maxZoom: 18,
+    },
+    'esri-nat-geo': {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',
+      attribution: '&copy; <a href="https://www.esri.com">Esri</a>',
       maxZoom: 18,
     },
   };
@@ -148,8 +148,6 @@
       doubleClickZoom: interactive,
       keyboard: interactive,
     });
-
-    console.log('map: init', mapId, geojson, { lat, lon, zoom, interactive, markers, lines, tile });
 
     L.tileLayer(tile.url, { maxZoom: tile.maxZoom, attribution: tile.attr }).addTo(map);
 

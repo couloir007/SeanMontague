@@ -45,8 +45,8 @@ third_party_settings:
         - title
         - schema_date_published
         - schema_category
-        - body
         - schema_activity_type
+        - body
       label: Content
       region: content
       parent_name: ''
@@ -60,8 +60,8 @@ third_party_settings:
         - field_map_tiles
         - schema_place
         - schema_trip
-        - schema_geoshape
         - field_route_type
+        - schema_geoshape
         - schema_geo
       label: 'Location & Trip'
       region: content
@@ -185,7 +185,7 @@ content:
     third_party_settings: {  }
   field_route_type:
     type: entity_reference_autocomplete
-    weight: 8
+    weight: 7
     region: content
     settings:
       match_operator: CONTAINS
@@ -220,7 +220,7 @@ content:
     third_party_settings: {  }
   schema_activity_type:
     type: options_select
-    weight: 26
+    weight: 4
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -360,7 +360,7 @@ content:
     third_party_settings: {  }
   schema_geoshape:
     type: inline_entity_form_complex
-    weight: 7
+    weight: 8
     region: content
     settings:
       form_mode: default

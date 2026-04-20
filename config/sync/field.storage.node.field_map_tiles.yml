@@ -21,11 +21,11 @@ settings:
       value: esri-topo
       label: 'ESRI World Topo'
     -
-      value: esri_nat_geo
-      label: 'ESRI Nat Geo'
-    -
       value: usgs-topo
       label: 'USGS National Map'
+    -
+      value: esri-nat-geo
+      label: 'ESRI Nat Geo'
   allowed_values_function: ''
 module: options
 locked: false
