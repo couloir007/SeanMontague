@@ -9,6 +9,7 @@ dependencies:
     - field.field.node.article.field_image
     - field.field.node.article.field_map_tiles
     - field.field.node.article.field_metatag
+    - field.field.node.article.field_route_type
     - field.field.node.article.schema_activity_type
     - field.field.node.article.schema_audio
     - field.field.node.article.schema_category
@@ -91,6 +92,7 @@ hidden:
   field_editorial: true
   field_map_tiles: true
   field_metatag: true
+  field_route_type: true
   langcode: true
   schema_activity_type: true
   schema_audio: true

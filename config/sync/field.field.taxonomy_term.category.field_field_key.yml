@@ -1,0 +1,19 @@
+uuid: f0d9fad3-8daa-4bea-966c-22d02cc52b07
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_field_key
+    - taxonomy.vocabulary.category
+id: taxonomy_term.category.field_field_key
+field_name: field_field_key
+entity_type: taxonomy_term
+bundle: category
+label: 'Field Key'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

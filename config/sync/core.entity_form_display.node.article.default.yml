@@ -8,6 +8,7 @@ dependencies:
     - field.field.node.article.field_image
     - field.field.node.article.field_map_tiles
     - field.field.node.article.field_metatag
+    - field.field.node.article.field_route_type
     - field.field.node.article.schema_activity_type
     - field.field.node.article.schema_audio
     - field.field.node.article.schema_category
@@ -60,6 +61,7 @@ third_party_settings:
         - schema_place
         - schema_trip
         - schema_geoshape
+        - field_route_type
         - schema_geo
       label: 'Location & Trip'
       region: content
@@ -140,7 +142,7 @@ content:
         hide_guidelines: '1'
   created:
     type: datetime_timestamp
-    weight: 6
+    weight: 7
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -175,22 +177,32 @@ content:
     third_party_settings: {  }
   field_metatag:
     type: metatag_firehose
-    weight: 9
+    weight: 10
     region: content
     settings:
       sidebar: true
       use_details: true
     third_party_settings: {  }
+  field_route_type:
+    type: entity_reference_autocomplete
+    weight: 8
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   langcode:
     type: language_select
-    weight: 7
+    weight: 8
     region: content
     settings:
       include_locked: true
     third_party_settings: {  }
   path:
     type: path
-    weight: 8
+    weight: 9
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -242,42 +254,42 @@ content:
     third_party_settings: {  }
   schema_distance:
     type: number
-    weight: 9
+    weight: 10
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   schema_elev_gain:
     type: number
-    weight: 10
+    weight: 11
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   schema_elev_loss:
     type: number
-    weight: 11
+    weight: 12
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   schema_elev_max:
     type: number
-    weight: 13
+    weight: 14
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   schema_elev_min:
     type: number
-    weight: 12
+    weight: 13
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   schema_geo:
     type: leaflet_widget_default
-    weight: 8
+    weight: 9
     region: content
     settings:
       geometry_validation: false
@@ -378,7 +390,7 @@ content:
     third_party_settings: {  }
   schema_related_link:
     type: linkit
-    weight: 6
+    weight: 8
     region: content
     settings:
       placeholder_url: ''
@@ -388,7 +400,7 @@ content:
     third_party_settings: {  }
   schema_significant_link:
     type: linkit
-    weight: 7
+    weight: 9
     region: content
     settings:
       placeholder_url: ''
@@ -398,7 +410,7 @@ content:
     third_party_settings: {  }
   schema_topic:
     type: entity_reference_autocomplete
-    weight: 5
+    weight: 7
     region: content
     settings:
       match_operator: CONTAINS
@@ -423,7 +435,7 @@ content:
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 9
+    weight: 10
     region: content
     settings:
       display_label: true
@@ -450,7 +462,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 10
+    weight: 11
     region: content
     settings:
       match_operator: CONTAINS

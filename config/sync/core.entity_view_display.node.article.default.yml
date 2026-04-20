@@ -8,6 +8,7 @@ dependencies:
     - field.field.node.article.field_image
     - field.field.node.article.field_map_tiles
     - field.field.node.article.field_metatag
+    - field.field.node.article.field_route_type
     - field.field.node.article.schema_activity_type
     - field.field.node.article.schema_audio
     - field.field.node.article.schema_category
@@ -56,6 +57,14 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 2
+    region: content
+  field_route_type:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 3
     region: content
 hidden:
   field_editorial: true
