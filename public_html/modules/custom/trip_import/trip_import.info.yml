@@ -1,0 +1,9 @@
+name: 'Trip Importer'
+type: module
+description: 'Admin UI to import KMZ files as geo_entity records, GeoJSON route files, and Drupal content for trip documentation.'
+core_version_requirement: ^10 || ^11
+package: 'Sean Montague'
+dependencies:
+  - drupal:file
+  - drupal:node
+  - drupal:media

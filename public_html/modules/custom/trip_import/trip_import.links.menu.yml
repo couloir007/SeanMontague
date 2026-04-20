@@ -1,0 +1,6 @@
+trip_import.form:
+  title: 'Trip Importer'
+  description: 'Import KMZ files as geo_entity records and create trip content.'
+  route_name: trip_import.form
+  parent: system.admin_config_development
+  weight: 10

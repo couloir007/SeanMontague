@@ -1,0 +1,7 @@
+trip_import.form:
+  path: '/admin/config/trip-import'
+  defaults:
+    _form: '\Drupal\trip_import\Form\TripImportForm'
+    _title: 'Trip Importer'
+  requirements:
+    _permission: 'administer site configuration'
