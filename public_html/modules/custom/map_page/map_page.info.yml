@@ -1,0 +1,15 @@
+name: Map Page
+type: module
+description: 'Provides full-page leaflet mapping functionality with custom paragraph types'
+core_version_requirement: ^10 || ^11
+package: Sean Montague
+dependencies:
+  - drupal:field
+  - drupal:views
+  - drupal:geofield
+  - drupal:taxonomy
+  - drupal:datetime
+  - drupal:text
+  - drupal:paragraphs
+  - drupal:serialization
+  - geo_entity:geo_entity

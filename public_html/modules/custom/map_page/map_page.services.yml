@@ -1,0 +1,4 @@
+services:
+  map_page.map_items:
+    class: Drupal\map_page\Service\MapItemsService
+    arguments: ['@entity_type.manager', '@renderer']

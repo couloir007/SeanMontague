@@ -1,7 +1,7 @@
 name: 'SeanMontague Map'
 type: module
 description: 'Site-specific map aggregating Places, POIs, Trail Articles, and Trips into a single GeoJSON endpoint for seanmontague.com.'
-package: Custom
+package: Sean Montague
 core_version_requirement: ^10 || ^11
 dependencies:
   - drupal:node

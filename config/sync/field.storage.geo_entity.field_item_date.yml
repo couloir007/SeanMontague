@@ -1,0 +1,22 @@
+uuid: 855be3b8-ff80-4d01-9e10-b80889216e95
+langcode: en
+status: true
+dependencies:
+  module:
+    - datetime
+    - geo_entity
+_core:
+  default_config_hash: oXnFwzjO4KcyOE-UEILMEDS59guTZyQ_jPe106qIIos
+id: geo_entity.field_item_date
+field_name: field_item_date
+entity_type: geo_entity
+type: datetime
+settings:
+  datetime_type: date
+module: datetime
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

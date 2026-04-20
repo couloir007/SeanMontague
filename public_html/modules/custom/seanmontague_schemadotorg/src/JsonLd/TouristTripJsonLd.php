@@ -27,16 +27,19 @@ class TouristTripJsonLd {
     $item0 = $items->get(0);
     $item1 = $items->get(1);
 
+    // schema_trip_dates cardinality=2:
+    //   item 0 = date arrived at destination (arrivalTime)
+    //   item 1 = date departed destination   (departureTime)
     if ($item0) {
-      $start = $item0->get('value')->getValue();
-      if ($start) {
-        $data['departureTime'] = date('Y-m-d', $start);
+      $arrived = $item0->get('value')->getValue();
+      if ($arrived) {
+        $data['arrivalTime'] = date('Y-m-d', $arrived);
       }
     }
     if ($item1) {
-      $end = $item1->get('value')->getValue();
-      if ($end) {
-        $data['arrivalTime'] = date('Y-m-d', $end);
+      $departed = $item1->get('value')->getValue();
+      if ($departed) {
+        $data['departureTime'] = date('Y-m-d', $departed);
       }
     }
   }

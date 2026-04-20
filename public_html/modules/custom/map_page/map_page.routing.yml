@@ -1,0 +1,24 @@
+map_page.map_items:
+  path: '/map-page/map-items/{bundle}'
+  defaults:
+    _controller: '\Drupal\map_page\Controller\MapItemsController::dump'
+  requirements:
+    _permission: 'access content'
+
+map_page.map_items_default:
+  path: '/map-page/map-items'
+  defaults:
+    _controller: '\Drupal\map_page\Controller\MapItemsController::dump'
+    bundle: ''
+  requirements:
+    _permission: 'access content'
+
+map_page.settings:
+  path: '/admin/config/map-page/settings'
+  defaults:
+    _form: '\Drupal\map_page\Form\SettingsForm'
+    _title: 'Map Page Settings'
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE

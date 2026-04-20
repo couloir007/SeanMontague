@@ -1,0 +1,6 @@
+_core:
+  default_config_hash: 4cvaHcuF5axkzhNGDtSZiMUHaHRJyl8Ck510wv2TieA
+bundle: ''
+geo_field: location
+endpoint_path: /map-page/map-items
+field_map: {  }

@@ -1,0 +1,4 @@
+bundle: ''
+geo_field: location
+endpoint_path: /map-page/map-items
+field_map: {  }

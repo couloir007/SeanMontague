@@ -1,4 +1,0 @@
-services:
-  leaflet_full_page.map_items:
-    class: Drupal\leaflet_full_page\Service\LeafletMapItemsService
-    arguments: ['@entity_type.manager', '@renderer']
