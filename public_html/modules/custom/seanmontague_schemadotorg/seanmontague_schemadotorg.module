@@ -25,11 +25,13 @@ function seanmontague_schemadotorg_schemadotorg_jsonld_alter(array &$data, Route
     return;
   }
 
+  // copyrightYear from schema_date_published
   $year = NULL;
-  if ($node->hasField('schema_date_published') && !$node->get('schema_date_published')->isEmpty()) {
-    $published = $node->get('schema_date_published')->value;
-    if ($published) {
-      $year = (int) date('Y', strtotime($published));
+  if ($node->hasField('schema_date_published') && !$node->get('schema_date_published')
+      ->isEmpty()) {
+    $ts = strtotime($node->get('schema_date_published')->value);
+    if ($ts !== FALSE) {
+      $year = (int) date('Y', $ts);
     }
   }
   if (!$year) {
@@ -37,7 +39,19 @@ function seanmontague_schemadotorg_schemadotorg_jsonld_alter(array &$data, Route
   }
 
   if (isset($data['schemadotorg_jsonld_entity']) && is_array($data['schemadotorg_jsonld_entity'])) {
+    // mainEntity
     $data['schemadotorg_jsonld_entity']['copyrightYear'] = $year;
+  }
+
+  if ($node->bundle() === 'tourist_trip'
+    && $node->hasField('schema_trip_dates')
+    && !$node->get('schema_trip_dates')->isEmpty()) {
+    $item   = $node->get('schema_trip_dates')->first();
+    $values = $item->getValue();
+    $arrived  = !empty($values['value'])     ? date('Y-m-d', (int) $values['value'])     : NULL;
+    $departed = !empty($values['end_value']) ? date('Y-m-d', (int) $values['end_value']) : NULL;
+    if ($arrived)  { $data['schemadotorg_jsonld_entity']['arrivalTime']   = $arrived; }
+    if ($departed) { $data['schemadotorg_jsonld_entity']['departureTime'] = $departed; }
   }
 }
 
@@ -50,14 +64,11 @@ function seanmontague_schemadotorg_schemadotorg_jsonld_schema_type_entity_alter(
 
   if ($entity_type_id === 'geo_entity' && $bundle === 'poi') {
     PointOfInterestJsonLd::alter($data, $entity, $bubbleable_metadata);
-  }
-  elseif ($entity_type_id === 'geo_entity' && $bundle === 'lodging') {
+  } elseif ($entity_type_id === 'geo_entity' && $bundle === 'lodging') {
     LodgingJsonLd::alter($data, $entity, $bubbleable_metadata);
-  }
-  elseif ($entity_type_id === 'node' && $bundle === 'article') {
+  } elseif ($entity_type_id === 'node' && $bundle === 'article') {
     ArticleJsonLd::alter($data, $entity, $bubbleable_metadata);
-  }
-  elseif ($entity_type_id === 'node' && $bundle === 'tourist_trip' && $entity instanceof NodeInterface) {
+  } elseif ($entity_type_id === 'node' && $bundle === 'tourist_trip' && $entity instanceof NodeInterface) {
     TouristTripJsonLd::alter($data, $entity);
   }
 }

@@ -77,9 +77,11 @@ class TripImportBatch {
       if (in_array($folder_name, ['Points of Interest', 'Sites'], TRUE)) {
         foreach ($xpath->query('kml:Placemark', $folder) as $pm) {
           $item = self::parsePoint($xpath, $pm);
-          if ($item) {
-            $result['pois'][] = $item;
+          if (!$item) {
+            continue;
           }
+          $item['label'] = self::cleanLabel($item['label']); // strip 'Day N: '
+          $result['pois'][] = $item;
         }
       }
 
@@ -87,9 +89,11 @@ class TripImportBatch {
       elseif ($folder_name === 'Destinations') {
         foreach ($xpath->query('kml:Placemark', $folder) as $pm) {
           $item = self::parsePoint($xpath, $pm);
-          if ($item) {
-            $result['destinations'][] = $item;
+          if (!$item) {
+            continue;
           }
+          $item['label'] = self::cleanLabel($item['label']); // strip 'Day N: '
+          $result['destinations'][] = $item;
         }
       }
 
@@ -274,7 +278,15 @@ class TripImportBatch {
     $node = Node::create($node_values);
 
     if ($node->hasField('field_route_type')) {
-      $node->set('field_route_type', $primary['route_type']);
+      $map = self::buildRouteTypeMap();
+      $tid = $map[$primary['route_type']] ?? NULL;
+      if ($tid) {
+        $node->set('field_route_type', ['target_id' => $tid]);
+      }
+    }
+
+    if ($node->hasField('schema_date_published')) {
+      $node->set('schema_date_published', $trip_start_date); // 'Y-m-d' string
     }
 
     $node->save();
@@ -312,6 +324,10 @@ class TripImportBatch {
     if ($node->hasField('schema_trip_dates')) {
       $ts = strtotime($start_date);
       $node->set('schema_trip_dates', [['value' => $ts, 'end_value' => $ts]]);
+    }
+
+    if ($node->hasField('schema_date_published')) {
+      $node->set('schema_date_published', $start_date); // 'Y-m-d' string
     }
 
     if ($node->hasField('schema_itinerary') && !empty($itinerary)) {
@@ -452,7 +468,10 @@ class TripImportBatch {
    *   'Night 5, Night 6: Bar' → 'Bar'
    * Regex per spec: /^(Day|Night)\s+[\d,\s]+[;:]\s* /iu
    */
-  private static function cleanLabel(string $label): string {
+  private static function cleanLabel(?string $label): string {
+    if ($label === NULL) {
+      return '';
+    }
     return trim(preg_replace('/^(Day|Night)\s+[\d,\s]+[;:]\s*/iu', '', $label));
   }
 
@@ -575,6 +594,19 @@ class TripImportBatch {
 
     $entity->save();
     return (int) $entity->id();
+  }
+
+  private static function buildRouteTypeMap(): array {
+    $terms = \Drupal::entityTypeManager()
+      ->getStorage('taxonomy_term')
+      ->loadByProperties(['vid' => 'route_type']);
+    $map = [];
+    foreach ($terms as $term) {
+      if (!$term->get('field_key')->isEmpty()) {
+        $map[$term->get('field_key')->value] = (int) $term->id();
+      }
+    }
+    return $map;
   }
 
 }

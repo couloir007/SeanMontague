@@ -44,7 +44,7 @@ third_party_settings:
         description: ''
     group_destinations:
       children:
-        1: schema_itinerary
+        - schema_itinerary
       label: 'Destinations & Itinerary'
       region: content
       parent_name: ''
@@ -168,7 +168,7 @@ content:
     third_party_settings: {  }
   schema_destination:
     type: entity_reference_revisions_autocomplete
-    weight: 224
+    weight: 17
     region: content
     settings:
       match_operator: CONTAINS
