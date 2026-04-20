@@ -1,0 +1,7 @@
+uuid: 9fa16ebd-7544-4081-a854-96ae8bfae227
+langcode: en
+status: true
+dependencies: {  }
+id: lodging
+label: Lodging
+label_token: Lodging

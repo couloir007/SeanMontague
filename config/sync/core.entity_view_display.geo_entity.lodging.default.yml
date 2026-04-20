@@ -1,23 +1,24 @@
-uuid: 3d85daf1-6131-443a-b45f-78dcc6f0123e
+uuid: e30bcabe-a40a-4eb4-abec-6c4a2005feff
 langcode: en
 status: true
 dependencies:
   config:
-    - field.field.geo_entity.destination.field_body
-    - field.field.geo_entity.destination.schema_address
-    - field.field.geo_entity.destination.schema_geo
-    - field.field.geo_entity.destination.schema_image
-    - field.field.geo_entity.destination.schema_same_as
-    - geo_entity.geo_entity_type.destination
+    - field.field.geo_entity.lodging.field_body
+    - field.field.geo_entity.lodging.field_nights
+    - field.field.geo_entity.lodging.schema_address
+    - field.field.geo_entity.lodging.schema_geo
+    - field.field.geo_entity.lodging.schema_image
+    - field.field.geo_entity.lodging.schema_same_as
+    - geo_entity.geo_entity_type.lodging
   module:
     - address
     - geofield
     - link
     - text
     - user
-id: geo_entity.destination.default
+id: geo_entity.lodging.default
 targetEntityType: geo_entity
-bundle: destination
+bundle: lodging
 mode: default
 content:
   created:
@@ -45,6 +46,15 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 21
+    region: content
+  field_nights:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 27
     region: content
   schema_address:
     type: address_default

@@ -1,0 +1,29 @@
+uuid: 61b6b4e1-9924-4258-84c4-2dfb749d737d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_image
+    - geo_entity.geo_entity_type.lodging
+    - media.type.image
+id: geo_entity.lodging.schema_image
+field_name: schema_image
+entity_type: geo_entity
+bundle: lodging
+label: Image
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      image: image
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

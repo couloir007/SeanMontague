@@ -1,0 +1,23 @@
+uuid: f7a4e455-f8bb-48c8-8ef1-38659e6d7184
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_same_as
+    - geo_entity.geo_entity_type.lodging
+  module:
+    - link
+id: geo_entity.lodging.schema_same_as
+field_name: schema_same_as
+entity_type: geo_entity
+bundle: lodging
+label: 'Same As'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 17
+field_type: link
