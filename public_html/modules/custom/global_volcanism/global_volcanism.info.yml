@@ -1,5 +1,0 @@
-name: 'Global Volcanism'
-type: module
-description: 'Smithsonian Global Volcanism Program (GVP)'
-package: Smithsonian
-core_version_requirement: ^10 || ^11

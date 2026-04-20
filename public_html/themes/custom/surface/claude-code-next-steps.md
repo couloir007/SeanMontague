@@ -5,68 +5,34 @@ Read **public_html/themes/custom/surface/CLAUDE.md** for theme/Twig/JS work.
 Read **public_html/themes/custom/surface/STORYBOOK.md** before any source/ changes.
 Follow the GVP pattern in `public_html/modules/custom/gvp_schemadotorg/` for Schema.org hooks.
 
+All custom modules should use `package: Sean Montague` (not `package: Custom`).
+
 ---
 
 ## Status (April 2026)
 
 | Step | Task | Status |
 |---|---|---|
-| 0e | Smart Date on tourist_trip + Schema.org hook | ✅ done |
-| 0f-i | field_map_tiles on article | ❌ pending — manual UI |
-| 0f-ii | Tile sets in trail_mapper + map.js wire | ❌ pending — Claude Code |
+| 0e | Smart Date + Schema.org dates hook | ✅ done |
+| 0f-i | field_map_tiles on article | ✅ done |
+| 0f-ii | Tile sets in trail_mapper + map.js | ❌ pending |
 | 0g-i | DataDownload media type | ❌ pending — manual UI |
-| 0g-ii | GeoShapeConverter + template update | ❌ pending — Claude Code |
-| 0g-iii | GPX waypoint → POI extraction | ❌ pending — optional |
-| 0g-iv | spatialCoverage Schema.org track | ❌ pending — optional |
-| 1a | geo_entity destination bundle | ❌ pending — manual UI |
+| 0g-ii | GeoShapeConverter + template | ❌ pending — Claude Code |
+| 1a | geo_entity destination bundle | ✅ done |
 | 1b | seanmontague_schemadotorg module | ✅ done |
-| 2a | route_type taxonomy + field on article | ❌ pending — manual UI |
-| 2b | field_key on category + activity_type | ❌ pending — manual UI |
+| 2a | route_type taxonomy + field_route_type | ❌ pending — manual UI |
+| 2b | field_key on taxonomies | ❌ pending — manual UI |
 | 3a | leaflet_full_page refactor | ✅ done |
-| 3b | seanmontague_map extension module | ✅ done |
-| 4a | Schema.org fixes — manual UI (date published, lat/lon precision, copyright) | ❌ pending |
-| 4b | TouristTripJsonLd dates fix + view display cleanup | ❌ pending — Claude Code |
-| 5 | KMZ importer (Ireland trip) | ❌ pending — Claude Code |
+| 3b | seanmontague_map module | ✅ done |
+| 4a | Add schema_date_published to tourist_trip | ✅ done |
+| 4b | Schema.org fixes (Claude Code) | ❌ pending |
+| M  | Module package rename + removals | ❌ pending — Claude Code |
+| N  | Rename leaflet_full_page → map_page | ❌ pending — Claude Code |
+| 5  | KMZ importer with UI | ❌ pending — Claude Code |
 
 ---
 
-## What exists — confirmed from config + module audit
-
-### Modules (custom)
-- `trail_mapper` — GeoJSON, tile config, elevation unit ✅
-- `leaflet_full_page` — generic, NMNH stripped, configurable endpoint ✅
-- `seanmontague_schemadotorg` — TouristTripJsonLd, PointOfInterestJsonLd, ArticleJsonLd ✅
-- `seanmontague_map` — GeoJSON endpoint `/sean-map/items`, popup templates ✅
-
-### Content model
-- Article: `body`, `field_image`, `schema_*` fields — view displays clean ✅
-- TouristTrip: `field_trip_dates` (Smart Date cardinality 1) + `schema_trip_dates` (cardinality 2, legacy — remove) ✅/⚠️
-- geo_entity `poi` bundle: `field_body`, `schema_geo`, `schema_image`, `schema_address`, `schema_place`, `field_show_on_map` ✅
-- geo_entity `destination` bundle: NOT YET CREATED ❌
-
-### Issues found
-- `schema_trip_dates` (cardinality 2) still exists alongside `field_trip_dates` (cardinality 1) — legacy, should be removed
-- tourist_trip view display default shows too many fields — needs cleanup (Step 4)
-
----
-
-## Step 0f — Per-article tile set override (PENDING)
-
-### 0f-i — Manual UI
-1. Admin → Structure → Content types → Article → Manage fields
-   Add field: List (text), machine name `field_map_tiles`, label "Map Tiles"
-   Allowed values:
-     osm|OpenStreetMap
-     open-topo|OpenTopoMap (global topo — good for hiking/travel)
-     esri-topo|ESRI World Topo
-     usgs-topo|USGS National Map (US only, default)
-   Not required.
-
-2. Add to Location & Trip group in form display.
-
-3. Export: `lando drush cex && git add config/sync && git commit -m "Add field_map_tiles to article"`
-
-### 0f-ii — Claude Code
+## Step 0f-ii — Tile sets in trail_mapper + map.js (PENDING)
 
 ```
 Read the root CLAUDE.md.
@@ -74,30 +40,27 @@ Read public_html/modules/custom/trail_mapper/src/Form/TrailMapperSettingsForm.ph
 Read public_html/themes/custom/surface/templates/content/node--article.html.twig.
 Read public_html/themes/custom/surface/source/patterns/components/map/map.js.
 
-1. TRAIL_MAPPER — add open-topo and esri-topo to tile definitions.
-   Add allTileSets() static method returning full keyed array.
-   Pass to drupalSettings as tileSets in hook_page_attachments.
+1. TRAIL_MAPPER — add open-topo and esri-topo tile definitions.
+   Add allTileSets() static method. Pass all sets to drupalSettings
+   as tileSets in hook_page_attachments.
 
-2. NODE TEMPLATE — read field_map_tiles.value, pass as tiles param
-   to article collection include.
+2. NODE TEMPLATE — read field_map_tiles.value, pass as tiles param.
 
-3. MAP.JS — verify data-tiles → tileSets lookup resolution order.
-   Show current tile code before any changes.
+3. MAP.JS — verify data-tiles → tileSets lookup. Show current code first.
 
 Show all changed files before writing. After: lando drush cr
 ```
 
 ---
 
-## Step 0g — GPX: DataDownload + Schema.org (PENDING)
+## Step 0g — GPX as DataDownload (PENDING)
 
 ### 0g-i — Manual UI
 1. Admin → Structure → Media types → Add
-   Name: Data Download, machine name: `data_download`
-   Source: File, allowed: gpx, geojson, json
+   Name: Data Download, machine name: `data_download`, source: File
+   Allowed: gpx, geojson, json
 2. Map to Schema.org DataDownload via Blueprints
-3. Change `schema_geoshape` on article to entity reference → data_download media
-   (may need delete/recreate — check if field type can change in place)
+3. Change `schema_geoshape` on article to entity reference → data_download
 4. Export config and commit.
 
 ### 0g-ii — Claude Code
@@ -112,203 +75,234 @@ Add "Download GPX" link when source file is .gpx.
 Show both files before writing. After: lando drush cr
 ```
 
-### 0g-iii — Waypoint → POI extraction (optional, after 1a)
-### 0g-iv — spatialCoverage Schema.org (optional, after seanmontague_schemadotorg ArticleJsonLd)
-
 ---
 
-## Step 1a — geo_entity destination bundle (PENDING — manual UI)
-
-1. Admin → Structure → Geo entity types → Add
-   Label: Destination, machine name: `destination`
-
-2. Fields:
-   - `field_body` (text with summary) — popup description
-   - `schema_geo` (Geofield) — coordinates
-   - `schema_image` (entity_reference → ImageObject) — popup image
-   - `schema_address` (address) — country + admin area only
-
-3. Update `schema_destination` on tourist_trip:
-   Change target bundle from place node → geo_entity:destination
-   Update Inline Entity Form to show: title, schema_geo, schema_address (country only)
-
-4. Note: Ireland trip Place node destinations need recreating as
-   geo_entity:destination records after this change.
-
-5. Export config and commit.
-
----
-
-## Step 2a — route_type taxonomy + field on article (PENDING — manual UI)
+## Step 2a — route_type taxonomy (PENDING — manual UI)
 
 1. Admin → Structure → Taxonomy → Add vocabulary
    Name: Route Type, machine name: `route_type`
-   Add terms:
-     Driving (key: driving)
-     Walking (key: walking)
-     Hiking (key: hiking)
-     Cycling (key: cycling)
+   Terms: Driving (driving), Walking (walking), Hiking (hiking), Cycling (cycling)
 
 2. Admin → Structure → Content types → Article → Manage fields
-   Add field: Entity reference → route_type, machine name `field_route_type`,
+   Add: Entity reference → route_type, machine name `field_route_type`,
    label "Route Type", cardinality 1, not required.
+   Add to Location & Trip group in form display.
 
-3. Add to Location & Trip group in form display.
-
-4. Map line styling by route_type (for The Map and article maps):
-   driving → --muted dashed
-   walking → --forest solid
-   hiking  → --trail solid
-   cycling → --sky solid
-
-5. Export config and commit.
-
----
-
-## Step 2b — field_key on taxonomy terms (PENDING — manual UI)
-
-1. Admin → Structure → Taxonomy → Category → Manage fields
-   Add: Text (plain), machine name `field_key`, label "Key", max 32 chars
-
-2. Admin → Structure → Taxonomy → Activity Type → Manage fields
-   Add existing: field_key (reuse storage)
-
-3. Populate category terms:
-   Kingdom Trails → trails | Burke Mountain → ski | Permaculture → permaculture
-   Drupal → drupal | Maps → maps | Travel → travel
-
-4. Populate activity_type terms:
-   Mountain Biking → bike | Hiking → hike | Skiing → ski | Telemark → ski
-
-5. Export config and commit.
-
----
-
-## Step 4 — Schema.org fixes + tourist_trip cleanup (PENDING — Claude Code + manual)
-
-### 4a — Manual UI
-
-1. TOURIST_TRIP: Add `schema_date_published` date field
-   Admin → Structure → Content types → Tourist Trip → Manage fields
-   Add existing field: schema_date_published (reuse storage from article)
-   Label: "Date Published", not required
-   Add to Content group in form display after field_trip_dates.
-
-2. PLACE: Increase lat/lon decimal precision
-   Admin → Structure → Content types → Place → Manage fields
-   Edit schema_latitude and schema_longitude — increase precision to 6 decimal places.
-
-3. SITE-WIDE: Fix copyrightYear
-   Admin → Config → Search and metadata → Schema.org: JSON-LD
-   Find the copyrightYear setting — change from dynamic current year
-   to use node creation year or remove it.
+3. Map line styling by route_type:
+   driving → --muted dashed | walking → --forest solid
+   hiking  → --trail solid  | cycling → --sky solid
 
 4. Export config and commit.
 
-### 4b — Claude Code: TouristTripJsonLd + view display cleanup
+---
+
+## Step 2b — field_key on taxonomies (PENDING — manual UI)
+
+1. Category → Add field_key (text plain, max 32)
+   Terms: Kingdom Trails→trails, Burke Mountain→ski,
+   Permaculture→permaculture, Drupal→drupal, Maps→maps, Travel→travel
+
+2. Activity Type → Add existing field_key
+   Terms: Mountain Biking→bike, Hiking→hike, Skiing→ski, Telemark→ski
+
+3. Export config and commit.
+
+---
+
+## Step 4b — Schema.org fixes (PENDING — Claude Code)
 
 ```
 Read the root CLAUDE.md.
+Read public_html/modules/custom/seanmontague_schemadotorg/seanmontague_schemadotorg.module.
 Read public_html/modules/custom/seanmontague_schemadotorg/src/JsonLd/TouristTripJsonLd.php.
 Read public_html/modules/custom/seanmontague_schemadotorg/src/JsonLd/PointOfInterestJsonLd.php.
+Read public_html/modules/custom/seanmontague_schemadotorg/src/JsonLd/ArticleJsonLd.php.
 Read config/sync/core.entity_view_display.node.tourist_trip.default.yml.
 
 Fix 1 — TouristTripJsonLd::buildDates():
-  schema_trip_dates has cardinality 2.
-  Item 0 = departure, item 1 = arrival.
-  Cannot be mapped via Blueprints UI (one field → two properties).
-  Fix to read both items:
-
-  $items = $entity->get('schema_trip_dates');
-  $item0 = $items->get(0);
-  $item1 = $items->get(1);
-  if ($item0) {
-    $start = $item0->get('value')->getValue();
-    if ($start) $data['departureTime'] = date('Y-m-d', $start);
-  }
-  if ($item1) {
-    $end = $item1->get('value')->getValue();
-    if ($end) $data['arrivalTime'] = date('Y-m-d', $end);
-  }
-  Also remove field_trip_dates from buildDates() — schema_trip_dates
-  is the correct field.
+  Swap departureTime/arrivalTime — trip is TO Ireland so:
+    start value (item 0) = arrivalTime (arrived in Ireland)
+    end value   (item 1) = departureTime (departed Ireland)
+  Current code reads .value and .end_value from first() — confirm
+  this matches actual Smart Date field structure and fix if needed.
 
 Fix 2 — PointOfInterestJsonLd::buildGeo():
-  Blueprints truncates lat/lon decimal fields to low precision.
-  Ensure geo coordinates are cast to float with full precision:
-  'latitude'  => (float) $lat,
-  'longitude' => (float) $lon,
+  Blueprints truncates lat/lon regardless of field precision.
+  Cast to float to bypass Blueprints formatter:
+    'latitude'  => (float) $lat,
+    'longitude' => (float) $lon,
+  Apply same float cast anywhere Place coordinates appear.
 
-Fix 3 — View display default cleanup:
-  tourist_trip.default currently shows too many fields.
-  node--trip.html.twig handles all rendering via direct field access.
-  Set visible: field_body only (label hidden).
-  Set hidden: everything else.
-  Also remove schema_trip_dates from visible if it's rendering
-  via Leaflet formatter (same issue as schema_geo on article).
+Fix 3 — Copyright year:
+  No site-wide Blueprints setting exists for copyrightYear.
+  Implement hook_schemadotorg_jsonld_alter() in the module.
+  Read schema_date_published from the mainEntity node:
+    $data['schemadotorg_jsonld_entity']['copyrightYear'] =
+      (int) date('Y', strtotime($published));
+  Fall back to node created year if schema_date_published is empty.
 
-Fix 4 — Remove legacy field_trip_dates:
-  field_trip_dates (cardinality 1) is superseded by schema_trip_dates
-  (cardinality 2). If field_trip_dates has no content, delete it:
-  Admin → Structure → Content types → Tourist Trip → Manage fields
-  Delete field_trip_dates.
-  Note: check for content first — lando drush php-eval
-  "echo \Drupal::entityQuery('node')->condition('type','tourist_trip')
-  ->condition('field_trip_dates',NULL,'IS NOT NULL')->count()->execute();"
+Fix 4 — ArticleJsonLd::buildMentions() crash:
+  schema_poi field does not exist yet on article bundle.
+  Add hasField() guard:
+    if (!$entity->hasField('schema_poi') ||
+        $entity->get('schema_poi')->isEmpty()) {
+      return;
+    }
+
+Fix 5 — tourist_trip view display:
+  node--trip.html.twig handles all rendering directly.
+  Set visible: field_body only. Hide everything else.
+
+Fix 6 — Remove legacy field_trip_dates:
+  Superseded by schema_trip_dates. Confirm no content exists, then
+  advise deleting via UI (Admin → Tourist Trip → Manage fields).
 
 Show all changed files before writing.
 After: lando drush cim && lando drush cr
 ```
 
-## Step 5 — KMZ importer for Ireland trip (PENDING — Claude Code)
+---
 
-Two KMZ files:
-- `public_html/project/Ireland_Trip_Day_1-5_Final.kmz`
-- `public_html/project/Ireland_Trip_Day_6___7_Final.kmz`
+## Step M — Module package rename + removals (PENDING — Claude Code)
 
 ```
 Read the root CLAUDE.md.
-Read public_html/modules/custom/trail_mapper/trail_mapper.module.
 
-Create a Drush script or migration to import Ireland trip data from
-the two KMZ files. KMZ is a zipped KML — unzip to access doc.kml.
+1. RENAME package in all custom modules:
+   Change 'package: Custom' → 'package: Sean Montague'
+   in every .info.yml under public_html/modules/custom/
+   Exception: do not change global_volcanism or gvp_* modules
+   (they belong to Smithsonian, not seanmontague.com).
 
-The script should:
+2. REMOVE these modules (safe to delete — no active use on this site):
+   - custom_entity — scaffolding placeholder, @todo, no content
+   - geo_content_builder — superseded by geo_entity contrib module
+   - global_volcanism — Smithsonian GVP, not for this site
+   - gvp_external_resources — Smithsonian GVP, not for this site
 
-1. SITES → geo_entity:poi records
-   Parse all <Placemark> elements in the Sites folder.
-   For each: create a geo_entity with bundle poi,
-   label = placemark name, schema_geo = coordinates.
-   Skip if a poi with the same label already exists.
+   Before deleting each, verify:
+   lando drush php-eval "echo \Drupal::moduleHandler()
+     ->moduleExists('MODULE_NAME') ? 'enabled' : 'disabled';"
+   Only delete if disabled. If enabled, disable first:
+   lando drush pm:uninstall MODULE_NAME
 
-2. LODGING → geo_entity:destination records (after Step 1a)
-   Parse "Lodging Full Trip" folder placemarks.
-   Create geo_entity:destination records.
+3. Show all .info.yml changes before writing.
+   After removals: lando drush cr
+```
 
-3. DAILY ROUTES → GeoJSON files
-   Parse each named Day folder (Day 1 Walking Dublin, Day 2, Day 3 etc).
-   For each route <Placemark> with <LineString>:
-   - Extract coordinates
-   - Convert to GeoJSON LineString FeatureCollection
-   - Save as public://geoshape/{day-slug}.geojson
-   - Output a summary of files created
+---
 
-4. ROUTE TYPE MAPPING
-   Detect route type from folder name:
-     "Walking" or "Inis Mór" → walking
-     "McGillicuddy Reeks" → hiking
-     Driving day routes → driving
+## Step N — Rename leaflet_full_page → map_page (PENDING — Claude Code)
 
-Output a summary table of what was created/skipped.
-Show full implementation before running.
-Run with: lando drush php:script scripts/ireland-import.php
+Complete module rename. Must be done while the module is DISABLED on
+the live site to avoid config ID conflicts.
+
+Before running: `lando drush pm:uninstall leaflet_full_page`
+
+```
+Read the root CLAUDE.md.
+Read all files in public_html/modules/custom/leaflet_full_page/.
+
+Rename the module from leaflet_full_page to map_page throughout.
+This is a mechanical find-and-replace across all files plus a
+directory rename. New module lives at:
+  public_html/modules/custom/map_page/
+
+Rename map:
+  leaflet_full_page          → map_page
+  LeafletFullPage            → MapPage
+  leaflet-full-page          → map-page
+  Leaflet Full Page          → Map Page
+  LeafletMapInteraction.js   → map-interaction.js
+  LeafletMapItemsService.php → MapItemsService.php
+  LeafletFullPageDisplayExtender.php → MapPageDisplayExtender.php
+  leaflet_full_page_display_extender → map_page_display_extender
+  drupalSettings.leaflet_full_page   → drupalSettings.map_page
+
+Files requiring changes:
+  leaflet_full_page.info.yml       → map_page.info.yml
+  leaflet_full_page.module         → map_page.module
+  leaflet_full_page.routing.yml    → map_page.routing.yml
+  leaflet_full_page.services.yml   → map_page.services.yml
+  leaflet_full_page.libraries.yml  → map_page.libraries.yml
+  leaflet_full_page.install        → map_page.install
+  config/install/leaflet_full_page.settings.yml → map_page.settings.yml
+  config/install/views.view.leaflet_full_page.yml → views.view.map_page.yml
+  src/Plugin/views/display_extender/LeafletFullPageDisplayExtender.php
+  src/Service/LeafletMapItemsService.php → src/Service/MapItemsService.php
+  src/Controller/MapItemsController.php (namespace only)
+  src/Form/SettingsForm.php (namespace + config key)
+  js/LeafletMapInteraction.js → js/map-interaction.js
+
+URL paths update:
+  /leaflet-full-page/map-items     → /map-page/map-items
+  /leaflet-full-page/map-items/{bundle} → /map-page/map-items/{bundle}
+  /admin/config/leaflet-full-page/settings → /admin/config/map-page/settings
+
+Also update package: 'Sean Montague' in map_page.info.yml.
+
+Also update seanmontague_map if it references leaflet_full_page anywhere.
+
+Show the complete list of changes before writing any files.
+After writing:
+  lando drush en map_page
+  lando drush cr
+  Verify settings at /admin/config/map-page/settings
+  Verify endpoint at /map-page/map-items
+```
+
+## Step 5 — KMZ importer with admin UI (PENDING — Claude Code)
+
+```
+Read the root CLAUDE.md.
+
+Create a new module public_html/modules/custom/ireland_import/ with:
+
+ireland_import.info.yml:
+  name: 'Ireland Trip Importer'
+  package: 'Sean Montague'
+  description: 'Admin UI to import KMZ files as geo_entity records
+    and GeoJSON route files for the Ireland April 2024 trip.'
+
+Admin form at /admin/config/ireland-import with:
+  - File upload field for KMZ file (or path to existing KMZ)
+  - Checkboxes: Import Sites (POIs), Import Lodging (Destinations),
+    Extract Routes (GeoJSON)
+  - Submit button → runs import batch
+
+The importer parses KML from KMZ (unzip in memory):
+
+SITES folder → geo_entity:poi records
+  label = placemark name
+  schema_geo = coordinates (Geofield WKT point)
+  Skip if poi with same label already exists.
+
+Lodging folder → geo_entity:destination records
+  label = simplified name (strip address cruft)
+  schema_geo = coordinates
+
+Day folders (Day 1, Day 2 etc) → GeoJSON LineString files
+  saved to public://geoshape/{slug}.geojson
+  Route type detection from folder name:
+    contains "Walking" or "Inis" → walking
+    contains "Reeks" or "Dún" → hiking
+    otherwise → driving
+  Output a results table showing files created.
+
+KMZ files are at:
+  public_html/project/Ireland_Trip_Day_1-5_Final.kmz
+  public_html/project/Ireland_Trip_Day_6___7_Final.kmz
+
+Show full implementation before writing.
+After: lando drush en ireland_import && lando drush cr
+Access at: /admin/config/ireland-import
 ```
 
 ---
 
 ## URL Aliases
 
-Set manually on each node:
+Set manually. Convention:
 
 | Content | Pattern |
 |---|---|
@@ -324,6 +318,6 @@ Set manually on each node:
 
 ## Execution order
 
-Manual first: 0f-i → 1a → 2a → 2b
-Then Claude Code: 0f-ii → 0g-i → 0g-ii → 4 → 5
+Manual first: 2a → 2b → 0g-i
+Claude Code: M → 4b → 0f-ii → 0g-ii → 5
 Optional: 0g-iii → 0g-iv

@@ -1,4 +1,0 @@
-administer custom_entity types:
-  title: 'Administer custom entity types'
-  description: 'Maintain the types of custom entity entity.'
-  restrict access: true

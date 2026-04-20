@@ -4,9 +4,11 @@ status: true
 dependencies:
   config:
     - field.field.media.data_download.field_media_file
+    - field.field.media.data_download.schema_content_url
     - media.type.data_download
   module:
     - file
+    - linkit
 id: media.data_download.default
 targetEntityType: media
 bundle: data_download
@@ -26,6 +28,16 @@ content:
     settings:
       size: 60
       placeholder: ''
+    third_party_settings: {  }
+  schema_content_url:
+    type: linkit
+    weight: 13
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+      linkit_profile: default
+      linkit_auto_link_text: true
     third_party_settings: {  }
 hidden:
   created: true
