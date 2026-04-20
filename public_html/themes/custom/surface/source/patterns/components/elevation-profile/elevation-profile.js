@@ -20,7 +20,24 @@
     return Math.sqrt(dx * dx + dy * dy);
   }
 
+  /**
+   * Returns true if elevData contains at least one coordinate with a
+   * non-zero, finite Z (elevation) value. Driving and destination routes
+   * exported from Google My Maps have Z=0 throughout — skip the profile.
+   */
+  function hasElevation(elevData) {
+    if (!elevData || !elevData.length) return false;
+    return elevData.some(function(c) {
+      return c.length >= 3 && isFinite(c[2]) && c[2] !== 0;
+    });
+  }
+
   function renderProfile(el, elevData) {
+    if (!hasElevation(elevData)) {
+      el.style.display = 'none';
+      return;
+    }
+
     const canvas = el.querySelector('.elevation-profile__canvas');
     const tooltip = el.querySelector('.elevation-profile__tooltip');
     if (!canvas || !tooltip) return;

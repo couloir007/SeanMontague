@@ -48,6 +48,7 @@ class TrailMapperSettingsForm extends ConfigFormBase {
         'osm'               => $this->t('OpenStreetMap'),
         'open-topo'         => $this->t('OpenTopoMap'),
         'esri-topo'         => $this->t('Esri World Topo'),
+        'esri-nat-geo'         => $this->t('Esri Nat Geo'),
         'custom'            => $this->t('Custom URL'),
       ],
     ];
@@ -147,6 +148,11 @@ class TrailMapperSettingsForm extends ConfigFormBase {
       ],
       'esri-topo' => [
         'url'         => 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+        'attribution' => '&copy; <a href="https://www.esri.com">Esri</a>',
+        'maxZoom'     => 18,
+      ],
+      'esri-nat-geo' => [
+        'url'         => 'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',
         'attribution' => '&copy; <a href="https://www.esri.com">Esri</a>',
         'maxZoom'     => 18,
       ],

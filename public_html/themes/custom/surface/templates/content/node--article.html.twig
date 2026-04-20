@@ -19,7 +19,9 @@
 {% set geoshape_media = node.schema_geoshape.entity %}
 {% set geo_file       = geoshape_media ? geoshape_media.field_media_file.entity : null %}
 {% set geojson_url    = geo_file ? geo_file.uri.value|file_url : null %}
-{% set is_gpx = geo_file and geo_file.filename matches '/\\.gpx$/i' %}
+{% set geo_media = node.schema_geoshape.entity %}
+{% set geo_file = geo_media ? geo_media.field_media_file.entity : null %}
+{% set is_gpx = geo_file and geo_file.filename.value matches '/\\.gpx$/i' %}
 {% set has_geoshape   = geo_file is not empty %}
 {% set has_geo      = not node.schema_geo.isEmpty() %}
 {% set place        = node.schema_place.entity %}

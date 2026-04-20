@@ -21,6 +21,9 @@ settings:
       value: esri-topo
       label: 'ESRI World Topo'
     -
+      value: esri_nat_geo
+      label: 'ESRI Nat Geo'
+    -
       value: usgs-topo
       label: 'USGS National Map'
   allowed_values_function: ''
