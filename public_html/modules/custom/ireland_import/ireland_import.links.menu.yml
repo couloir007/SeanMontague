@@ -1,0 +1,6 @@
+ireland_import.form:
+  title: 'Ireland Trip Importer'
+  description: 'Import KMZ files as geo_entity records and GeoJSON route files.'
+  route_name: ireland_import.form
+  parent: system.admin_config_development
+  weight: 10

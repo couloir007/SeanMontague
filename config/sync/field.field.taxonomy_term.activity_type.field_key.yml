@@ -1,12 +1,12 @@
-uuid: 05523f20-f874-4d95-8f07-28d35ba3f8ee
+uuid: c83224d1-f89a-475d-ae4b-44c1dec2e89a
 langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.taxonomy_term.field_field_key
+    - field.storage.taxonomy_term.field_key
     - taxonomy.vocabulary.activity_type
-id: taxonomy_term.activity_type.field_field_key
-field_name: field_field_key
+id: taxonomy_term.activity_type.field_key
+field_name: field_key
 entity_type: taxonomy_term
 bundle: activity_type
 label: 'Field Key'

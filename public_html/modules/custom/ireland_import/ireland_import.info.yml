@@ -1,0 +1,7 @@
+name: 'Ireland Trip Importer'
+type: module
+description: 'Admin UI to import KMZ files as geo_entity records and GeoJSON route files for the Ireland April 2024 trip.'
+core_version_requirement: ^10 || ^11
+package: 'Sean Montague'
+dependencies:
+  - drupal:file

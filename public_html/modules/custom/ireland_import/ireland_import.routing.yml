@@ -1,0 +1,7 @@
+ireland_import.form:
+  path: '/admin/config/ireland-import'
+  defaults:
+    _form: '\Drupal\ireland_import\Form\IrelandImportForm'
+    _title: 'Ireland Trip Importer'
+  requirements:
+    _permission: 'administer site configuration'

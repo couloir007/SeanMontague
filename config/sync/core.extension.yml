@@ -72,6 +72,7 @@ module:
   honeypot: 0
   image: 0
   inline_entity_form: 0
+  ireland_import: 0
   jquery_ui: 0
   jquery_ui_autocomplete: 0
   jquery_ui_menu: 0

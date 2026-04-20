@@ -1,15 +1,15 @@
-uuid: f0d9fad3-8daa-4bea-966c-22d02cc52b07
+uuid: 3943ee15-d188-4df5-8a05-b0f9a99f85fc
 langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.taxonomy_term.field_field_key
+    - field.storage.taxonomy_term.field_key
     - taxonomy.vocabulary.category
-id: taxonomy_term.category.field_field_key
-field_name: field_field_key
+id: taxonomy_term.category.field_key
+field_name: field_key
 entity_type: taxonomy_term
 bundle: category
-label: 'Field Key'
+label: 'Field KeyKey'
 description: ''
 required: false
 translatable: false
