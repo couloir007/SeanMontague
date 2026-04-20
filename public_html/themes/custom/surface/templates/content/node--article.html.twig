@@ -4,7 +4,7 @@
  * Article node template — handles all post types via schema_category.
  *
  * Map sources (any combination):
- * - schema_geoshape (file)    → GeoJSON track + elevation profile
+ * - schema_geoshape (data_download media) → GeoJSON track + elevation profile
  *                               Stats (distance, gain, loss, min, max)
  *                               computed from GeoJSON Z values by map.js
  * - schema_geo (geofield)     → map center fallback only, no marker
@@ -19,7 +19,7 @@
 {% set geoshape_media = node.schema_geoshape.entity %}
 {% set geo_file       = geoshape_media ? geoshape_media.field_media_file.entity : null %}
 {% set geojson_url    = geo_file ? geo_file.uri.value|file_url : null %}
-{% set is_gpx = node.schema_geoshape.entity and node.schema_geoshape.entity.filename matches '/\\.gpx$/i' %}
+{% set is_gpx = geo_file and geo_file.filename matches '/\\.gpx$/i' %}
 {% set has_geoshape   = geo_file is not empty %}
 {% set has_geo      = not node.schema_geo.isEmpty() %}
 {% set place        = node.schema_place.entity %}

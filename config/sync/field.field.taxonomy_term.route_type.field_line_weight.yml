@@ -1,0 +1,25 @@
+uuid: 5ddfa544-18bb-4aa3-b8cc-15d63cf13907
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_line_weight
+    - taxonomy.vocabulary.route_type
+id: taxonomy_term.route_type.field_line_weight
+field_name: field_line_weight
+entity_type: taxonomy_term
+bundle: route_type
+label: 'Line Weight'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 3
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

@@ -1,0 +1,30 @@
+uuid: 4084f8c8-ac30-4738-8ff1-35a6d1563a8e
+langcode: en
+status: true
+dependencies:
+  module:
+    - options
+    - taxonomy
+id: taxonomy_term.field_dash_pattern
+field_name: field_dash_pattern
+entity_type: taxonomy_term
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: solid
+      label: Solid
+    -
+      value: dashed
+      label: Dashed
+    -
+      value: dotted
+      label: Dotted
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false
