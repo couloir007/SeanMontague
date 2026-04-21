@@ -9,7 +9,7 @@ cta_ghost:
   url: '#writing'
 map_id: 'hero-map'
 map_center: '44.593,-71.918'
-map_zoom: 11
+map_zoom: 12
 map_markers:
   - lat: 44.5965
     lon: -71.9105

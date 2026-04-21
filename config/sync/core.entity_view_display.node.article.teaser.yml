@@ -14,15 +14,21 @@ dependencies:
     - field.field.node.article.schema_audio
     - field.field.node.article.schema_category
     - field.field.node.article.schema_date_published
+    - field.field.node.article.schema_destination
     - field.field.node.article.schema_difficulty
-    - field.field.node.article.schema_distance
+    - field.field.node.article.schema_distance_cycling
+    - field.field.node.article.schema_distance_driving
+    - field.field.node.article.schema_distance_hiking
+    - field.field.node.article.schema_distance_walking
     - field.field.node.article.schema_elev_gain
     - field.field.node.article.schema_elev_loss
     - field.field.node.article.schema_elev_max
     - field.field.node.article.schema_elev_min
     - field.field.node.article.schema_geo
     - field.field.node.article.schema_geoshape
+    - field.field.node.article.schema_lodging
     - field.field.node.article.schema_place
+    - field.field.node.article.schema_poi
     - field.field.node.article.schema_related_link
     - field.field.node.article.schema_significant_link
     - field.field.node.article.schema_topic
@@ -96,14 +102,20 @@ hidden:
   langcode: true
   schema_activity_type: true
   schema_audio: true
-  schema_distance: true
+  schema_destination: true
+  schema_distance_cycling: true
+  schema_distance_driving: true
+  schema_distance_hiking: true
+  schema_distance_walking: true
   schema_elev_gain: true
   schema_elev_loss: true
   schema_elev_max: true
   schema_elev_min: true
   schema_geo: true
   schema_geoshape: true
+  schema_lodging: true
   schema_place: true
+  schema_poi: true
   schema_related_link: true
   schema_significant_link: true
   schema_topic: true

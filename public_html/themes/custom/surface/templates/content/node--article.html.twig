@@ -16,44 +16,119 @@
 #}
 
 {# ── Geo sources ── #}
-{% set geoshape_media = node.schema_geoshape.entity %}
-{% set geo_file       = geoshape_media ? geoshape_media.field_media_file.entity : null %}
-{% set geojson_url    = geo_file ? geo_file.uri.value|file_url : null %}
-{% set geo_media = node.schema_geoshape.entity %}
-{% set geo_file = geo_media ? geo_media.field_media_file.entity : null %}
-{% set is_gpx = geo_file and geo_file.filename.value matches '/\\.gpx$/i' %}
-{% set has_geoshape   = geo_file is not empty %}
+{% set geo_media    = node.schema_geoshape.entity %}
+{% set geo_file     = geo_media ? geo_media.field_media_file.entity : null %}
+{% set is_gpx       = geo_file and geo_file.filename.value matches '/\\.gpx$/i' %}
+{% set geojson_url  = geo_file ? geo_file.fileuri|file_url : null %}
+{% set has_geoshape = geo_file is not empty %}
 {% set has_geo      = not node.schema_geo.isEmpty() %}
 {% set place        = node.schema_place.entity %}
 {% set has_place    = place and place.schema_latitude.value is not empty %}
 {% set has_map      = has_geoshape or has_geo or has_place %}
 
-{# ── Manual stats — fallback when no geoshape file ── #}
-{% set has_stats = not node.schema_distance.isEmpty() %}
+{# ── Distance fields ── #}
+{% set distances = [] %}
+{% if node.schema_distance_driving.value %}
+  {% set distances = distances|merge([{type: 'Driving', value: node.schema_distance_driving.value, unit: 'mi'}]) %}
+{% endif %}
+{% if node.schema_distance_hiking.value %}
+  {% set distances = distances|merge([{type: 'Hiking', value: node.schema_distance_hiking.value, unit: 'mi'}]) %}
+{% endif %}
+{% if node.schema_distance_walking.value %}
+  {% set distances = distances|merge([{type: 'Walking', value: node.schema_distance_walking.value, unit: 'mi'}]) %}
+{% endif %}
+{% if node.schema_distance_cycling.value %}
+  {% set distances = distances|merge([{type: 'Cycling', value: node.schema_distance_cycling.value, unit: 'mi'}]) %}
+{% endif %}
+
+{# Legacy schema_distance — only show if no new distance fields set #}
+{% if distances is empty and node.schema_distance.value %}
+  {% set distances = distances|merge([{type: '', value: node.schema_distance.value, unit: 'mi'}]) %}
+{% endif %}
+
+{% set multi = distances|length > 1 %}
+{% set stats = [] %}
+{% for d in distances %}
+  {% set label = multi ? 'Distance ' ~ d.type : 'Distance' %}
+  {% set stats = stats|merge([{label: label, value: d.value, unit: d.unit}]) %}
+{% endfor %}
+
+{# Add elevation stats if present #}
+{% if node.schema_elev_gain.value %}
+  {% set stats = stats|merge([{label: 'Gain', value: node.schema_elev_gain.value, unit: 'ft'}]) %}
+{% endif %}
+{% if node.schema_elev_loss.value %}
+  {% set stats = stats|merge([{label: 'Loss', value: node.schema_elev_loss.value, unit: 'ft'}]) %}
+{% endif %}
+{% if node.schema_elev_min.value %}
+  {% set stats = stats|merge([{label: 'Min Elev', value: node.schema_elev_min.value, unit: 'ft'}]) %}
+{% endif %}
+{% if node.schema_elev_max.value %}
+  {% set stats = stats|merge([{label: 'Max Elev', value: node.schema_elev_max.value, unit: 'ft'}]) %}
+{% endif %}
+
+
+{# Count POIs if schema_poi is populated #}
+{% if node.schema_poi is not empty %}
+  {% set poi_count = node.schema_poi|length %}
+  {% if poi_count > 0 %}
+    {% set stats = stats|merge([{label: 'Sites', value: poi_count, unit: null}]) %}
+  {% endif %}
+{% endif %}
 
 {# ── Map center fallback — overridden by fitBounds when geojson present ── #}
 {% if has_geo %}
-  {% set map_center = node.schema_geo.lat ~ ',' ~ node.schema_geo.lon %}
+  {% set map_center = node.schema_geo.lat.value ~ ',' ~ node.schema_geo.lon.value %}
 {% elseif has_place %}
   {% set map_center = place.schema_latitude.value ~ ',' ~ place.schema_longitude.value %}
 {% else %}
   {% set map_center = '44.593,-71.918' %}
 {% endif %}
 
-{# ── Markers — place is center only, never a marker ── #}
+{# ── Map markers ── #}
 {% set map_markers = [] %}
+
+{# POI markers — forest green #}
+{% for item in node.schema_poi %}
+  {% set poi = item.entity %}
+  {% if poi and not poi.schema_geo.isEmpty %}
+    {% set map_markers = map_markers|merge([{
+      'lat':   poi.schema_geo.lat,
+      'lon':   poi.schema_geo.lon,
+      'type':  'poi',
+      'label': '<strong>' ~ poi.label.value ~ '</strong>',
+    }]) %}
+  {% endif %}
+{% endfor %}
+
+{# Destination markers — sky blue #}
+{% for item in node.schema_destination %}
+  {% set dest = item.entity %}
+  {% if dest and not dest.schema_geo.isEmpty %}
+    {% set map_markers = map_markers|merge([{
+      'lat':   dest.schema_geo.lat,
+      'lon':   dest.schema_geo.lon,
+      'type':  'destination',
+      'label': '<strong>' ~ dest.label.value ~ '</strong>',
+    }]) %}
+  {% endif %}
+{% endfor %}
+
+{# Lodging markers — sky blue #}
+{% for item in node.schema_lodging %}
+  {% set dest = item.entity %}
+  {% if dest and not dest.schema_geo.isEmpty %}
+    {% set map_markers = map_markers|merge([{
+      'lat':   dest.schema_geo.lat,
+      'lon':   dest.schema_geo.lon,
+      'type':  'destination',
+      'label': '<strong>' ~ dest.label.value ~ '</strong>',
+    }]) %}
+  {% endif %}
+{% endfor %}
 
 {# ── Map ID ── #}
 {% set map_id = has_map ? 'article-map-' ~ node.id : '' %}
-
-{# ── Stats — manual fields only when no geoshape ── #}
-{% set stats = has_stats ? [
-  { 'label': 'Distance',  'value': node.schema_distance.value,                          'unit': 'miles' },
-  { 'label': 'Elevation', 'value': node.schema_elev_gain.value|number_format(0, '.', ','), 'unit': 'ft gain' },
-  { 'label': 'Loss',      'value': node.schema_elev_loss.value|number_format(0, '.', ','), 'unit': 'ft loss' },
-  { 'label': 'Min Elev',  'value': node.schema_elev_min.value|number_format(0, '.', ','),  'unit': 'ft' },
-  { 'label': 'Max Elev',  'value': node.schema_elev_max.value|number_format(0, '.', ','),  'unit': 'ft' },
-] : [] %}
 
 {% set tiles = node.field_map_tiles.value %}
 
@@ -62,7 +137,7 @@
 {% if is_gpx %}
   {% set sidebar_cards = sidebar_cards|merge([{
     'heading': 'Download',
-    'body': '<a href="' ~ geo_file.uri.value|file_url ~ '" download>Download GPX</a>',
+    'body': '<a href="' ~ geo_file.fileuri|file_url ~ '" download>Download GPX</a>',
   }]) %}
 {% endif %}
 
@@ -87,11 +162,10 @@
   'tiles':               tiles,
   'drupal_geo_rendered': null,
   'geojson_url':         geojson_url,
-  'elev_gain':           has_stats ? node.schema_elev_gain.value,
-  'elev_loss':           has_stats ? node.schema_elev_loss.value,
-  'elev_min':            has_stats ? node.schema_elev_min.value,
-  'elev_max':            has_stats ? node.schema_elev_max.value,
+  'elev_gain':           node.schema_elev_gain.value,
+  'elev_loss':           node.schema_elev_loss.value,
+  'elev_min':            node.schema_elev_min.value,
+  'elev_max':            node.schema_elev_max.value,
   'body':                content.body|field_value|render,
   'sidebar_cards':       sidebar_cards,
 } only %}
-

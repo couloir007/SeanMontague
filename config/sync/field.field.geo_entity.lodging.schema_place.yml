@@ -1,0 +1,29 @@
+uuid: c57c0253-ba24-4041-b35e-f1132bb5b594
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_place
+    - geo_entity.geo_entity_type.lodging
+    - node.type.place
+id: geo_entity.lodging.schema_place
+field_name: schema_place
+entity_type: geo_entity
+bundle: lodging
+label: 'Parent Place'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      place: place
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

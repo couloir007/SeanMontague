@@ -15,7 +15,9 @@ label: 'Map Tiles'
 description: ''
 required: false
 translatable: false
-default_value: {  }
+default_value:
+  -
+    value: osm
 default_value_callback: ''
 settings: {  }
 field_type: list_string

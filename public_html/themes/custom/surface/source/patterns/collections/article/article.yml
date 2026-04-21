@@ -1,5 +1,16 @@
 # ── Header ────────────────────────────────────────────────────────
 header:
+  logo_text: 'Sean Montague <span>· Burke, VT</span>'
+  logo_url: '/'
+  links:
+    - text: 'Writing'
+      url: '#writing'
+    - text: 'Places'
+      url: '#places'
+    - text: 'About'
+      url: '#about'
+    - text: 'Contact'
+      url: '#contact'
   category: 'Kingdom Trails'
   category_key: 'trails'
   difficulty: 'Intermediate'
@@ -81,8 +92,16 @@ drupal_geo_rendered: null
 map_markers:
   - lat: 44.5877777
     lon: -71.9447325
-    color: '#3a5a40'
+    type: 'poi'
     label: '<strong>Kingdom Trails HQ</strong>'
+  - lat: 44.570545172608
+    lon: -71.89249750860803
+    type: 'destination'
+    label: '<strong>Burke Mountain</strong>'
+  - lat: 44.560
+    lon: -71.920
+    type: 'lodging'
+    label: '<strong>Inn at East Burke</strong>'
 map_lines:
   - coords: *track
     color: '#3a5a40'

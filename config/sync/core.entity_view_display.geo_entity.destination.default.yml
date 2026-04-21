@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.field.geo_entity.destination.field_body
+    - field.field.geo_entity.destination.field_day
     - field.field.geo_entity.destination.schema_address
     - field.field.geo_entity.destination.schema_geo
     - field.field.geo_entity.destination.schema_image
@@ -45,6 +46,15 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 21
+    region: content
+  field_day:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 27
     region: content
   schema_address:
     type: address_default

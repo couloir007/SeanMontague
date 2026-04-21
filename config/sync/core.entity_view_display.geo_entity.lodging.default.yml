@@ -1,14 +1,18 @@
-uuid: e30bcabe-a40a-4eb4-abec-6c4a2005feff
+uuid: 598f5122-63dd-44a9-8062-54538eadb2ac
 langcode: en
 status: true
 dependencies:
   config:
     - field.field.geo_entity.lodging.field_body
+    - field.field.geo_entity.lodging.field_day
     - field.field.geo_entity.lodging.field_nights
+    - field.field.geo_entity.lodging.field_show_on_map
     - field.field.geo_entity.lodging.schema_address
     - field.field.geo_entity.lodging.schema_geo
     - field.field.geo_entity.lodging.schema_image
+    - field.field.geo_entity.lodging.schema_place
     - field.field.geo_entity.lodging.schema_same_as
+    - field.field.geo_entity.lodging.schema_telephone
     - geo_entity.geo_entity_type.lodging
   module:
     - address
@@ -47,7 +51,7 @@ content:
     third_party_settings: {  }
     weight: 21
     region: content
-  field_nights:
+  field_day:
     type: number_integer
     label: above
     settings:
@@ -55,6 +59,25 @@ content:
       prefix_suffix: true
     third_party_settings: {  }
     weight: 27
+    region: content
+  field_nights:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 29
+    region: content
+  field_show_on_map:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 28
     region: content
   schema_address:
     type: address_default
@@ -81,6 +104,14 @@ content:
     third_party_settings: {  }
     weight: 23
     region: content
+  schema_place:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 27
+    region: content
   schema_same_as:
     type: link
     label: above
@@ -92,6 +123,13 @@ content:
       target: ''
     third_party_settings: {  }
     weight: 26
+    region: content
+  schema_telephone:
+    type: basic_string
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 25
     region: content
   status:
     type: boolean

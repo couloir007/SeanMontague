@@ -2,43 +2,144 @@
 /**
  * @file
  * Trip (TouristTrip) node template.
- * Builds a multi-marker map from schema_destination Place nodes,
- * renders article-header, map, and body.
+ * Builds a multi-marker map from schema_destination geo_entities and
+ * schema_poi across all itinerary articles.
+ * Renders article-header, stats-bar, map, and body.
  */
 #}
 
+{# ── Destination markers — circle, sky ring ── #}
 {% set markers = [] %}
 {% for item in node.schema_destination %}
-  {% set place = item.entity %}
-  {% if place and place.schema_latitude.value %}
+  {% set dest = item.entity %}
+  {% if dest and not dest.schema_geo.isEmpty %}
     {% set markers = markers|merge([{
-      'lat':   place.schema_latitude.value,
-      'lon':   place.schema_longitude.value,
-      'color': '#3a5a40',
-      'label': '<strong>' ~ place.label ~ '</strong>',
+      'lat':   dest.schema_geo.lat.value,
+      'lon':   dest.schema_geo.lon.value,
+      'type':  'destination',
+      'label': '<strong>' ~ dest.label.value ~ '</strong>',
     }]) %}
   {% endif %}
 {% endfor %}
 
-{% set trip_start = node.field_trip_dates.value %}
-{% set trip_end   = node.field_trip_dates.end_value %}
-{% if trip_start and trip_end %}
-  {% set date_display = trip_start|date('F j') ~ '–' ~ trip_end|date('F j, Y') %}
-{% elseif trip_start %}
-  {% set date_display = trip_start|date('F j, Y') %}
+{# ── POI markers from itinerary articles — triangle, forest ring ── #}
+{% for article_item in node.schema_itinerary %}
+  {% set article = article_item.entity %}
+  {% if article %}
+    {% for poi_item in article.schema_poi %}
+      {% set poi = poi_item.entity %}
+      {% if poi and not poi.schema_geo.isEmpty %}
+        {% set markers = markers|merge([{
+          'lat':   poi.schema_geo.lat.value,
+          'lon':   poi.schema_geo.lon.value,
+          'type':  'poi',
+          'label': '<strong>' ~ poi.label.value ~ '</strong>',
+        }]) %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endfor %}
+
+{# ── Map center — first destination or Ireland default ── #}
+{% if markers %}
+  {% set map_center = markers[0].lat ~ ',' ~ markers[0].lon %}
+{% else %}
+  {% set map_center = '53.5,-7.5' %}
+{% endif %}
+
+{# ── Trip dates ── #}
+{% set trip_item = node.schema_trip_dates.first %}
+{% set days = 0 %}
+{% if trip_item %}
+  {% set start = trip_item.value %}
+  {% set end   = trip_item.end_value %}
+  {% if start and end %}
+    {% set days = ((end - start) / 86400)|round + 1 %}
+  {% endif %}
+{% endif %}
+
+{% if trip_item and trip_item.value %}
+  {% if trip_item.end_value %}
+    {% set date_display = trip_item.value|date('F j') ~ '–' ~ trip_item.end_value|date('F j, Y') %}
+  {% else %}
+    {% set date_display = trip_item.value|date('F j, Y') %}
+  {% endif %}
 {% else %}
   {% set date_display = '' %}
 {% endif %}
 
+{# ── Destination count ── #}
+{% set dest_count = node.schema_destination|length %}
+
+{# ── Distance totals from itinerary articles ── #}
+{% set total_driving  = 0 %}
+{% set total_hiking   = 0 %}
+{% set total_walking  = 0 %}
+{% set total_cycling  = 0 %}
+{% for item in node.schema_itinerary %}
+  {% set article = item.entity %}
+  {% if article %}
+    {% if article.schema_distance_driving.value %}
+      {% set total_driving = total_driving + article.schema_distance_driving.value %}
+    {% endif %}
+    {% if article.schema_distance_hiking.value %}
+      {% set total_hiking = total_hiking + article.schema_distance_hiking.value %}
+    {% endif %}
+    {% if article.schema_distance_walking.value %}
+      {% set total_walking = total_walking + article.schema_distance_walking.value %}
+    {% endif %}
+    {% if article.schema_distance_cycling.value %}
+      {% set total_cycling = total_cycling + article.schema_distance_cycling.value %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+{# ── Distance multi-label logic ── #}
+{% set distances = [] %}
+{% if total_driving > 0 %}
+  {% set distances = distances|merge([{type: 'Driving', value: total_driving, unit: 'mi'}]) %}
+{% endif %}
+{% if total_hiking > 0 %}
+  {% set distances = distances|merge([{type: 'Hiking', value: total_hiking, unit: 'mi'}]) %}
+{% endif %}
+{% if total_walking > 0 %}
+  {% set distances = distances|merge([{type: 'Walking', value: total_walking, unit: 'mi'}]) %}
+{% endif %}
+{% if total_cycling > 0 %}
+  {% set distances = distances|merge([{type: 'Cycling', value: total_cycling, unit: 'mi'}]) %}
+{% endif %}
+
+{% set multi = distances|length > 1 %}
+
+{# ── Build stats array ── #}
+{% set stats = [] %}
+{% if days > 0 %}
+  {% set stats = stats|merge([{label: 'Days', value: days, unit: null}]) %}
+{% endif %}
+{% if dest_count > 0 %}
+  {% set stats = stats|merge([{label: 'Destinations', value: dest_count, unit: null}]) %}
+{% endif %}
+{% for d in distances %}
+  {% set label = multi ? 'Distance ' ~ d.type : 'Distance' %}
+  {% set stats = stats|merge([{label: label, value: d.value, unit: d.unit}]) %}
+{% endfor %}
+
+{# ── Render ── #}
 {% include '@collections/article-header/article-header.twig' with {
   'title': node.label,
   'date':  date_display,
 } only %}
 
+{% if stats is not empty %}
+  {% include '@components/stats-bar/stats-bar.twig' with {
+    'stats': stats,
+  } only %}
+{% endif %}
+
 {% if markers %}
   {% include '@components/map/map.twig' with {
     'map_id':      'trip-map-' ~ node.id,
-    'center':      markers[0].lat ~ ',' ~ markers[0].lon,
+    'center':      map_center,
     'zoom':        8,
     'interactive': 'true',
     'markers':     markers,

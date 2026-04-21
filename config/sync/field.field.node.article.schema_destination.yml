@@ -1,18 +1,15 @@
-uuid: eaba0b34-d9e7-4264-ab9a-89cb3cf97fbf
+uuid: 40b14805-b31e-4120-a0d6-a88fec85795d
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.node.schema_destination
     - geo_entity.geo_entity_type.destination
-    - geo_entity.geo_entity_type.poi
-    - node.type.tourist_trip
-  module:
-    - entity_reference_revisions
-id: node.tourist_trip.schema_destination
+    - node.type.article
+id: node.article.schema_destination
 field_name: schema_destination
 entity_type: node
-bundle: tourist_trip
+bundle: article
 label: Destination
 description: ''
 required: false
@@ -24,10 +21,9 @@ settings:
   handler_settings:
     target_bundles:
       destination: destination
-      poi: poi
     sort:
       field: _none
       direction: ASC
     auto_create: false
-    auto_create_bundle: destination
-field_type: entity_reference_revisions
+    auto_create_bundle: ''
+field_type: entity_reference

@@ -87,8 +87,8 @@ lando php vendor/bin/phpunit public_html/modules/custom
 
 | Type | Bundle | Schema.org | Purpose |
 |---|---|---|---|
-| `geo_entity` | `poi` | `TouristAttraction` | Attractions, landmarks, features — map markers |
-| `geo_entity` | `destination` | `Place` | Trip stop anchors — Dublin, Galway etc |
+| `geo_entity` | `poi` | `TouristAttraction` | Attractions, landmarks, features — map markers ✅ |
+| `geo_entity` | `destination` | `Place` | Trip stop anchors — Dublin, Galway etc ❌ pending |
 | `node` | `place` | `Place` | Content hub landing pages — Kingdom Trails, Burke Mountain |
 
 `geo_entity:destination` is referenced by TouristTrip `schema_destination`.
@@ -175,8 +175,12 @@ Two different geo patterns are used. Never mix them up:
 **Article** — `schema_geo` is a **Geofield**. Access as:
 ```twig
 {% set has_geo = not node.schema_geo.isEmpty() %}
-{% set map_center = node.schema_geo.lat ~ ',' ~ node.schema_geo.lon %}
+{% set map_center = node.schema_geo.lat.value ~ ',' ~ node.schema_geo.lon.value %}
 ```
+
+`schema_geo.lat` and `schema_geo.lon` return `FloatData` TypedData objects, **not**
+raw PHP floats. Always append `.value` before using in string concatenation (`~`),
+`json_encode`, or any other string context.
 
 **Place** — uses separate **decimal fields** `schema_latitude` and
 `schema_longitude`. No Geofield on Place. Access as:
@@ -195,6 +199,23 @@ node.schema_longitude.value
 The common mistake is `place.schema_geo.value.lat` — Place has no
 `schema_geo`, so `has_place` silently evaluates false.
 
+**geo_entity (poi / destination) — Geofield + label:**
+```twig
+{# lat/lon: always .value #}
+'lat': poi.schema_geo.lat.value,
+'lon': poi.schema_geo.lon.value,
+
+{# label: geo_entity defines "label" = "label" in entity keys, so .label returns
+   a FieldItemList, not a string. Always use .label.value #}
+'label': '<strong>' ~ poi.label.value ~ '</strong>',
+```
+
+**schema_geoshape file entity — filename:**
+```twig
+{# filename returns a FieldItemList, not a string. Always use .value for matches/string ops #}
+{% set is_gpx = geo_file and geo_file.filename.value matches '/\\.gpx$/i' %}
+```
+
 ### Taxonomy vocabularies
 
 | Vocabulary | machine name | Notes |
@@ -205,6 +226,18 @@ The common mistake is `place.schema_geo.value.lat` — Place has no
 
 `field_key` is a plain text field (max 32 chars) on taxonomy terms.
 **Does not exist yet** — needed for URL alias conventions.
+
+### route_type vocabulary (pending)
+
+| Term | Key | Map line style |
+|---|---|---|
+| Driving | `driving` | `--muted` dashed |
+| Walking | `walking` | `--forest` solid |
+| Hiking | `hiking` | `--trail` solid |
+| Cycling | `cycling` | `--sky` solid |
+
+Field `field_route_type` (entity_reference → route_type) on article bundle.
+Drives map line color/dash styling in seanmontague_map and map.js.
 
 ---
 

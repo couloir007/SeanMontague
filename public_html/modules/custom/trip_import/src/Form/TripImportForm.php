@@ -8,6 +8,21 @@ use Drupal\trip_import\Batch\TripImportBatch;
 
 /**
  * Admin form for importing trip KMZ data into Drupal content.
+ *
+ * Accepts up to 5 KMZ files in one submission — necessary because Google
+ * My Maps limits layers per map, so a single trip may require multiple
+ * exports (e.g. Day 1-5 routes, Day 6-7 routes, Destinations, Lodging).
+ *
+ * All KMZ files are parsed before any batch operations are queued, so
+ * POI/destination/lodging IDs accumulated from earlier files are available
+ * when createDayArticle runs for routes from later files.
+ *
+ * Operation order within the batch:
+ *   1. importPoi        (all files)
+ *   2. importDestination (all files)
+ *   3. importLodging    (all files)
+ *   4. createDayArticle (all files, days ascending)
+ *   5. createTrip       (once, last)
  */
 class TripImportForm extends FormBase {
 
@@ -36,12 +51,13 @@ class TripImportForm extends FormBase {
       '#required'    => TRUE,
     ];
 
-    $form['kmz_file'] = [
+    $form['kmz_files'] = [
       '#type'              => 'managed_file',
-      '#title'             => $this->t('KMZ file'),
-      '#description'       => $this->t('Upload a Google Maps KMZ export. Expected folders: Points of Interest (or Sites), Destinations, Lodging (or Lodging Full Trip), Day N route folders.'),
+      '#title'             => $this->t('KMZ files'),
+      '#description'       => $this->t('Upload up to 5 KMZ exports from Google My Maps. All files are parsed together before import begins, so POIs, destinations, and lodging from any file are attached to the correct day articles regardless of upload order. Expected folders: Points of Interest (or Sites), Destinations, Lodging, Day N route folders.'),
       '#upload_location'   => 'temporary://',
       '#upload_validators' => ['file_validate_extensions' => ['kmz']],
+      '#multiple'          => TRUE,
       '#required'          => TRUE,
     ];
 
@@ -71,52 +87,91 @@ class TripImportForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
-    $fids = $form_state->getValue('kmz_file');
-    $fid  = is_array($fids) ? reset($fids) : $fids;
+    $fids         = $form_state->getValue('kmz_files');
+    $trip_title   = $form_state->getValue('trip_title');
+    $start_date   = $form_state->getValue('trip_start_date');
+    $import_types = array_filter($form_state->getValue('import_types'));
 
-    /** @var \Drupal\file\FileInterface|null $file */
-    $file = \Drupal::entityTypeManager()->getStorage('file')->load($fid);
-    if (!$file) {
-      $this->messenger()->addError($this->t('Could not load the uploaded file.'));
+    if (empty($fids)) {
+      $this->messenger()->addError($this->t('No files uploaded.'));
       return;
     }
 
-    $real_path     = \Drupal::service('file_system')->realpath($file->getFileUri());
-    $trip_title    = $form_state->getValue('trip_title');
-    $start_date    = $form_state->getValue('trip_start_date');
-    $import_types  = array_filter($form_state->getValue('import_types'));
+    $file_storage = \Drupal::entityTypeManager()->getStorage('file');
+    $file_system  = \Drupal::service('file_system');
 
-    $parsed = TripImportBatch::parseKmz($real_path);
-    if ($parsed === NULL) {
-      $this->messenger()->addError($this->t('Failed to parse KMZ. Ensure the file is a valid Google Maps KMZ export containing a doc.kml entry.'));
-      return;
+    // Parse ALL KMZ files first, merging results into one combined dataset.
+    // This ensures destinations/lodging from a separate KMZ are available
+    // when createDayArticle runs for routes from a different KMZ.
+    $combined = ['pois' => [], 'destinations' => [], 'lodging' => [], 'days' => []];
+    $parse_errors = [];
+
+    foreach ((array) $fids as $fid) {
+      /** @var \Drupal\file\FileInterface|null $file */
+      $file = $file_storage->load($fid);
+      if (!$file) {
+        continue;
+      }
+      $real_path = $file_system->realpath($file->getFileUri());
+      $parsed    = TripImportBatch::parseKmz($real_path);
+
+      if ($parsed === NULL) {
+        $parse_errors[] = $file->getFilename();
+        continue;
+      }
+
+      $combined['pois']         = array_merge($combined['pois'], $parsed['pois']);
+      $combined['destinations'] = array_merge($combined['destinations'], $parsed['destinations']);
+      $combined['lodging']      = array_merge($combined['lodging'], $parsed['lodging']);
+
+      // Merge days — if the same day number appears in multiple files,
+      // merge their routes rather than overwriting.
+      foreach ($parsed['days'] as $day => $day_data) {
+        if (!isset($combined['days'][$day])) {
+          $combined['days'][$day] = $day_data;
+        }
+        else {
+          $combined['days'][$day]['routes'] = array_merge(
+            $combined['days'][$day]['routes'],
+            $day_data['routes']
+          );
+        }
+      }
     }
 
+    if (!empty($parse_errors)) {
+      $this->messenger()->addWarning($this->t(
+        'Could not parse: @files. Continuing with successfully parsed files.',
+        ['@files' => implode(', ', $parse_errors)]
+      ));
+    }
+
+    // Build operations in the correct order:
+    // All entity imports first, then articles, then trip — so that
+    // $context['results'] has all IDs available when createDayArticle runs.
     $operations = [];
 
     if (!empty($import_types['pois'])) {
-      foreach ($parsed['pois'] as $item) {
+      foreach ($combined['pois'] as $item) {
         $operations[] = [[TripImportBatch::class, 'importPoi'], [$item]];
       }
     }
 
     if (!empty($import_types['destinations'])) {
-      foreach ($parsed['destinations'] as $item) {
+      foreach ($combined['destinations'] as $item) {
         $operations[] = [[TripImportBatch::class, 'importDestination'], [$item]];
       }
     }
 
     if (!empty($import_types['lodging'])) {
-      foreach ($parsed['lodging'] as $item) {
+      foreach ($combined['lodging'] as $item) {
         $operations[] = [[TripImportBatch::class, 'importLodging'], [$item]];
       }
     }
 
     if (!empty($import_types['routes'])) {
-      // Sort days ascending so articles are created in order.
-      $days = $parsed['days'];
-      ksort($days);
-      foreach ($days as $day => $day_data) {
+      ksort($combined['days']);
+      foreach ($combined['days'] as $day => $day_data) {
         if (!empty($day_data['routes'])) {
           $operations[] = [[TripImportBatch::class, 'createDayArticle'], [$day, $day_data['routes'], $start_date]];
         }
@@ -128,7 +183,7 @@ class TripImportForm extends FormBase {
     }
 
     if (empty($operations)) {
-      $this->messenger()->addWarning($this->t('No items to import — no matching folders found in KMZ or no import options selected.'));
+      $this->messenger()->addWarning($this->t('No items to import — no matching folders found in any KMZ file.'));
       return;
     }
 

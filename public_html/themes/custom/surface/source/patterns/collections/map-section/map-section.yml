@@ -8,11 +8,11 @@ map_zoom: 13
 map_markers:
   - lat: 44.5877777
     lon: -71.9447325
-    color: '#3a5a40'
+    type: 'poi'
     label: '<strong>Kingdom Trails HQ</strong>'
   - lat: 44.570545172608
     lon: -71.89249750860803
-    color: '#7a3410'
+    type: 'trail'
     label: '<strong>Burke Mountain</strong><br>3,271 ft summit'
 map_lines:
   - coords: [

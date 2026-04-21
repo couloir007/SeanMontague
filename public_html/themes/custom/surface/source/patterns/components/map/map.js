@@ -103,12 +103,55 @@
     return TILE_SETS['usgs-topo'];
   };
 
-  const pinIcon = (color) => L.divIcon({
-    html: `<div style="width:10px;height:10px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,0.3)"></div>`,
-    iconSize: [10, 10],
-    iconAnchor: [5, 5],
-    className: '',
-  });
+  // Marker icon — tinted ring (E) + distinct inner shape (C) per entity type.
+  // type: 'poi' (triangle), 'destination' (circle), 'lodging' (square),
+  //       'trail' (diamond), 'place' (muted circle). Falls back to legacy color dot.
+  const surfaceMarker = (type, color) => {
+    const configs = {
+      poi: {
+        ring: '#3a5a40', fill: 'rgba(58,90,64,0.15)',
+        inner: '<polygon points="12,5 19,17 5,17" fill="#3a5a40"/>',
+      },
+      destination: {
+        ring: '#4a7c9e', fill: 'rgba(74,124,158,0.15)',
+        inner: '<circle cx="12" cy="12" r="5" fill="#4a7c9e"/>',
+      },
+      lodging: {
+        ring: '#a05a00', fill: 'rgba(160,90,0,0.15)',
+        inner: '<rect x="7.5" y="7.5" width="9" height="9" rx="1.5" fill="#a05a00"/>',
+      },
+      trail: {
+        ring: '#7a3410', fill: 'rgba(122,52,16,0.15)',
+        inner: '<polygon points="12,5 19,12 12,19 5,12" fill="#7a3410"/>',
+      },
+      place: {
+        ring: '#3a5a40', fill: 'rgba(58,90,64,0.1)',
+        inner: '<circle cx="12" cy="12" r="5" fill="#3a5a40" opacity="0.5"/>',
+      },
+    };
+    const c = configs[type];
+    if (!c) {
+      // Legacy fallback — plain colored dot for markers with no type
+      const col = color || '#3a5a40';
+      return L.divIcon({
+        html: `<div style="width:10px;height:10px;border-radius:50%;background:${col};border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.25)"></div>`,
+        iconSize: [10, 10],
+        iconAnchor: [5, 5],
+        className: '',
+      });
+    }
+    const svg = `<svg width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">`
+      + `<circle cx="12" cy="12" r="11" fill="${c.fill}" stroke="${c.ring}" stroke-width="2"/>`
+      + c.inner
+      + `</svg>`;
+    return L.divIcon({
+      html: svg,
+      className: '',
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
+      popupAnchor: [0, -16],
+    });
+  };
 
   const parseJSON = (str, fallback) => {
     if (!str) return fallback;
@@ -136,6 +179,8 @@
     // Guard against double-init (fetch error catch calling initLeaflet twice)
     if (el._leafletMapInstance) return;
     el._leafletMapInstance = true;
+
+    console.log(1, zoom);
 
     const initLat = isFinite(lat) ? lat : 44.593;
     const initLon = isFinite(lon) ? lon : -71.918;
@@ -168,7 +213,7 @@
         return;
       }
       const title = m.label?.replace(/<[^>]*>?/gm, '') ?? '';
-      const marker = L.marker([m.lat, m.lon], { icon: pinIcon(m.color ?? '#3a5a40'), title })
+      const marker = L.marker([m.lat, m.lon], { icon: surfaceMarker(m.type, m.color), title })
         .addTo(map)
         .bindPopup(m.label ?? '');
 
@@ -210,6 +255,7 @@
 
     // ── invalidateSize + fitBounds after layout ────────────────────────────
     const fitToData = () => {
+      if (!interactive) return;  // ← add this line
       if (coords && coords.length) {
         const bounds = trackLayer.getBounds();
         markerLatLngs.forEach((ll) => bounds.extend(ll));
@@ -304,6 +350,8 @@
     const mapId = el.id ?? 'map';
     const tile = resolveTile(el);
 
+    console.log(zoom);
+
     const opts = { lat, lon, zoom, interactive, markers, lines, tile, mapId };
 
     if (geojsonUrl) {
@@ -333,10 +381,16 @@
     };
   }
 
-  // Storybook / standalone
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => initAll());
-  } else {
-    setTimeout(() => initAll(), 0);
-  }
+  // Storybook / standalone — retry until Leaflet is available
+  (function waitForLeaflet(attempts) {
+    if (typeof L !== 'undefined') {
+      initAll();
+      return;
+    }
+    if (attempts > 20) {
+      console.warn('map: Leaflet did not load after 2s');
+      return;
+    }
+    setTimeout(() => waitForLeaflet(attempts + 1), 100);
+  }(0));
 })();

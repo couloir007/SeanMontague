@@ -87,6 +87,13 @@ display:
                 confirm_help_text: ''
                 label_override: ''
                 message_override: ''
+            -
+              action_id: views_bulk_operations_delete_entity
+              preconfiguration:
+                add_confirmation: false
+                confirm_help_text: ''
+                label_override: ''
+                message_override: ''
         label:
           id: label
           table: geo_entity_field_data

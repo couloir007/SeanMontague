@@ -13,15 +13,21 @@ dependencies:
     - field.field.node.article.schema_audio
     - field.field.node.article.schema_category
     - field.field.node.article.schema_date_published
+    - field.field.node.article.schema_destination
     - field.field.node.article.schema_difficulty
-    - field.field.node.article.schema_distance
+    - field.field.node.article.schema_distance_cycling
+    - field.field.node.article.schema_distance_driving
+    - field.field.node.article.schema_distance_hiking
+    - field.field.node.article.schema_distance_walking
     - field.field.node.article.schema_elev_gain
     - field.field.node.article.schema_elev_loss
     - field.field.node.article.schema_elev_max
     - field.field.node.article.schema_elev_min
     - field.field.node.article.schema_geo
     - field.field.node.article.schema_geoshape
+    - field.field.node.article.schema_lodging
     - field.field.node.article.schema_place
+    - field.field.node.article.schema_poi
     - field.field.node.article.schema_related_link
     - field.field.node.article.schema_significant_link
     - field.field.node.article.schema_topic
@@ -57,12 +63,12 @@ third_party_settings:
         description: ''
     group_location:
       children:
-        - field_map_tiles
-        - schema_place
-        - schema_trip
-        - field_route_type
-        - schema_geoshape
-        - schema_geo
+        0: field_map_tiles
+        1: schema_place
+        5: schema_trip
+        6: field_route_type
+        7: schema_geoshape
+        8: schema_geo
       label: 'Location & Trip'
       region: content
       parent_name: ''
@@ -74,19 +80,27 @@ third_party_settings:
     group_trail_stats:
       children:
         - schema_difficulty
-        - schema_distance
         - schema_elev_gain
         - schema_elev_loss
         - schema_elev_min
         - schema_elev_max
-      label: 'Trail Stats'
+        - schema_distance_cycling
+        - schema_distance_hiking
+        - schema_distance_walking
+        - schema_distance_driving
+      label: 'Activity Stats'
       region: content
       parent_name: ''
       weight: 2
       format_type: details
       format_settings:
+        classes: ''
+        show_empty_fields: false
+        id: ''
+        label_as_html: false
         open: false
         description: 'Fill in for trail and ski reports. Leave empty for writing posts.'
+        required_fields: true
     group_audio:
       children:
         - schema_audio
@@ -171,13 +185,13 @@ content:
     third_party_settings: {  }
   field_map_tiles:
     type: options_select
-    weight: 4
+    weight: 7
     region: content
     settings: {  }
     third_party_settings: {  }
   field_metatag:
     type: metatag_firehose
-    weight: 10
+    weight: 13
     region: content
     settings:
       sidebar: true
@@ -185,7 +199,7 @@ content:
     third_party_settings: {  }
   field_route_type:
     type: entity_reference_autocomplete
-    weight: 7
+    weight: 13
     region: content
     settings:
       match_operator: CONTAINS
@@ -226,7 +240,7 @@ content:
     third_party_settings: {  }
   schema_audio:
     type: entity_reference_autocomplete
-    weight: 10
+    weight: 8
     region: content
     settings:
       match_operator: CONTAINS
@@ -246,50 +260,81 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
+  schema_destination:
+    type: entity_reference_autocomplete
+    weight: 29
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   schema_difficulty:
     type: options_select
     weight: 8
     region: content
     settings: {  }
     third_party_settings: {  }
-  schema_distance:
-    type: number
-    weight: 10
-    region: content
-    settings:
-      placeholder: ''
-    third_party_settings: {  }
-  schema_elev_gain:
-    type: number
-    weight: 11
-    region: content
-    settings:
-      placeholder: ''
-    third_party_settings: {  }
-  schema_elev_loss:
-    type: number
-    weight: 12
-    region: content
-    settings:
-      placeholder: ''
-    third_party_settings: {  }
-  schema_elev_max:
-    type: number
-    weight: 14
-    region: content
-    settings:
-      placeholder: ''
-    third_party_settings: {  }
-  schema_elev_min:
+  schema_distance_cycling:
     type: number
     weight: 13
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
+  schema_distance_driving:
+    type: number
+    weight: 16
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  schema_distance_hiking:
+    type: number
+    weight: 14
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  schema_distance_walking:
+    type: number
+    weight: 15
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  schema_elev_gain:
+    type: number
+    weight: 9
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  schema_elev_loss:
+    type: number
+    weight: 10
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  schema_elev_max:
+    type: number
+    weight: 12
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  schema_elev_min:
+    type: number
+    weight: 11
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
   schema_geo:
     type: leaflet_widget_default
-    weight: 9
+    weight: 15
     region: content
     settings:
       geometry_validation: false
@@ -360,7 +405,7 @@ content:
     third_party_settings: {  }
   schema_geoshape:
     type: inline_entity_form_complex
-    weight: 8
+    weight: 14
     region: content
     settings:
       form_mode: default
@@ -378,9 +423,29 @@ content:
     third_party_settings:
       entity_browser_entity_form:
         entity_browser_id: geo_entity_library
+  schema_lodging:
+    type: entity_reference_autocomplete
+    weight: 26
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   schema_place:
     type: entity_reference_autocomplete
-    weight: 5
+    weight: 8
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  schema_poi:
+    type: entity_reference_autocomplete
+    weight: 28
     region: content
     settings:
       match_operator: CONTAINS
@@ -400,7 +465,7 @@ content:
     third_party_settings: {  }
   schema_significant_link:
     type: linkit
-    weight: 9
+    weight: 12
     region: content
     settings:
       placeholder_url: ''
@@ -420,7 +485,7 @@ content:
     third_party_settings: {  }
   schema_trip:
     type: entity_reference_autocomplete
-    weight: 6
+    weight: 12
     region: content
     settings:
       match_operator: CONTAINS

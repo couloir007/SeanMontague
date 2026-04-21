@@ -3,5 +3,5 @@ _core:
 tile_key: esri-topo
 tile_url: ''
 tile_attribution: ''
-elevation_unit: feet
+elevation_unit: meters
 extract_waypoints: false

@@ -25,16 +25,14 @@
 
 .hero__overlay {
   background:
-    linear-gradient(to bottom, rgb(247 246 242 / 70%) 0%, rgb(247 246 242 / 40%) 40%, rgb(247 246 242 / 85%) 82%, var(--bg) 100%),
-    linear-gradient(to right, rgb(247 246 242 / 65%) 0%, transparent 60%);
-  background-color: var(--bg);
+    linear-gradient(to bottom, rgba(247,246,242,0.55) 0%, rgba(247,246,242,0.3) 40%, rgba(247,246,242,0.88) 82%, var(--bg) 100%),
+    linear-gradient(to right, rgba(247,246,242,0.7) 0%, transparent 65%);
   inset: 0;
   position: absolute;
   z-index: 1;
 }
 
 .hero__content {
-  background-color: var(--bg);
   display: flex;
   flex-direction: column;
   margin-top: auto;

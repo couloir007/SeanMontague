@@ -1,70 +1,101 @@
-uuid: 5955ccd4-9712-4f16-8fb6-91f976fde622
+uuid: 76ac07a6-f8f8-46c9-8418-3e50853f2cef
 langcode: en
 status: true
 dependencies:
   config:
     - field.field.geo_entity.lodging.field_body
+    - field.field.geo_entity.lodging.field_day
     - field.field.geo_entity.lodging.field_nights
+    - field.field.geo_entity.lodging.field_show_on_map
     - field.field.geo_entity.lodging.schema_address
     - field.field.geo_entity.lodging.schema_geo
     - field.field.geo_entity.lodging.schema_image
+    - field.field.geo_entity.lodging.schema_place
     - field.field.geo_entity.lodging.schema_same_as
+    - field.field.geo_entity.lodging.schema_telephone
     - geo_entity.geo_entity_type.lodging
   module:
     - address
     - geofield
     - link
+    - telephone
     - text
 id: geo_entity.lodging.default
 targetEntityType: geo_entity
 bundle: lodging
 mode: default
 content:
-  created:
-    type: datetime_timestamp
-    weight: 20
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   field_body:
     type: text_textarea
-    weight: 26
+    weight: 2
     region: content
     settings:
       rows: 5
       placeholder: ''
     third_party_settings: {  }
-  field_nights:
+  field_day:
     type: number
-    weight: 32
+    weight: 8
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
+  field_nights:
+    type: number
+    weight: 11
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_show_on_map:
+    type: boolean_checkbox
+    weight: 10
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  label:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   langcode:
     type: language_select
-    weight: 2
+    weight: 12
     region: content
     settings:
       include_locked: true
     third_party_settings: {  }
   schema_address:
     type: address_default
-    weight: 29
+    weight: 5
     region: content
     settings:
       wrapper_type: fieldset
     third_party_settings: {  }
   schema_geo:
     type: geofield_latlon
-    weight: 27
+    weight: 3
     region: content
     settings:
       html5_geolocation: false
     third_party_settings: {  }
   schema_image:
     type: entity_reference_autocomplete
-    weight: 28
+    weight: 4
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  schema_place:
+    type: entity_reference_autocomplete
+    weight: 9
     region: content
     settings:
       match_operator: CONTAINS
@@ -74,28 +105,26 @@ content:
     third_party_settings: {  }
   schema_same_as:
     type: link_default
-    weight: 31
+    weight: 7
     region: content
     settings:
       placeholder_url: ''
       placeholder_title: ''
     third_party_settings: {  }
+  schema_telephone:
+    type: telephone_default
+    weight: 6
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 0
+    weight: 1
     region: content
     settings:
       display_label: false
     third_party_settings: {  }
-  uid:
-    type: entity_reference_autocomplete
-    weight: 15
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
 hidden:
-  label: true
+  created: true
+  uid: true

@@ -79,6 +79,29 @@ segment. The pattern is always `@{level}/{name}/{name}.twig`.
 Breaking this hierarchy causes circular includes or missing template
 errors in Storybook.
 
+### Never apply `matches` to a field object
+
+`matches` requires a string. Always traverse to the scalar value first:
+
+```twig
+{# WRONG — crashes: matches applied to FieldItemList object #}
+{% set is_gpx = node.schema_geoshape matches '/\.gpx$/i' %}
+
+{# WRONG — crashes: entity is a media object, not a string #}
+{% set is_gpx = node.schema_geoshape.entity matches '/\.gpx$/i' %}
+
+{# CORRECT — traverse all the way to the filename string #}
+{% set geo_media = node.schema_geoshape.entity %}
+{% set geo_file  = geo_media ? geo_media.field_media_file.entity : null %}
+{% set is_gpx    = geo_file and geo_file.filename.value matches '/\.gpx$/i' %}
+{# NOTE: geo_file.filename is a FieldItemList in Drupal — .value unwraps
+   to the scalar string. Never apply matches to the field object directly. #}
+```
+
+`schema_geoshape` is a `data_download` media entity reference. The file
+is at `schema_geoshape → media entity → field_media_file → file entity`.
+`geo_file.filename` is the string. Never shortcut this traversal.
+
 ### Never use Drupal-only Twig filters or functions in pattern templates
 
 These do not exist in `twig.js` and will crash Storybook:
@@ -331,12 +354,55 @@ After making changes, verify in Storybook that:
 
 ---
 
+
+---
+
+## YAML fixture rules
+
+### Multi-line arrays in `.yml` files require deep indentation
+
+When a YAML value is a multi-line flow sequence (e.g. coordinate arrays),
+continuation lines MUST be indented beyond the key. The most common failure
+is `coords` inside a list item — the list item adds one level, the key adds
+another, so values need at least 6 spaces:
+
+```yaml
+# CORRECT — 6 spaces on continuation lines
+map_lines:
+  - coords: [
+      [-71.945434,44.588812],[-71.945209,44.588583],
+      [-71.944501,44.588152],[-71.943888,44.587773]
+    ]
+    color: '#3a5a40'
+    weight: 3
+
+# WRONG — 4 spaces causes YAMLException: deficient indentation
+map_lines:
+  - coords: [
+    [-71.945434,44.588812],[-71.945209,44.588583],
+    [-71.944501,44.588152],[-71.943888,44.587773]
+  ]
+    color: '#3a5a40'
+```
+
+The rule: continuation lines inside a block sequence item (`- key: [`)
+must be indented to at least the key column + 2. With 2-space list indent
+and 2-space key indent, that means **6 spaces minimum** for the values,
+and **4 spaces** for the closing `]`.
+
+This applies to all multi-line arrays in fixture files:
+`map_lines`, `map_markers`, `elev_data`, `coords`, `markers` etc.
+
+When in doubt, put the entire array on one line or use the
+YAML block sequence format instead of flow sequence.
+
 ## Common ways Storybook breaks — do not do these
 
 | Action | Why it breaks |
 |---|---|
 | Use `once()` in component JS | `once` is undefined in Storybook |
 | Use `|field_value` in pattern Twig | Filter doesn't exist in twig.js |
+| Apply `matches` to a field object | Must apply to a string — always traverse to the scalar value first |
 | Hardcode `drupalSettings.X` without null guard | Crashes when undefined |
 | Change a Twig namespace in vite.config.js | All includes using that namespace break |
 | Add `@components/surface/` prefix to includes | Old nested path, never correct |

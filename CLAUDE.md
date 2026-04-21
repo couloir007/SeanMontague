@@ -145,8 +145,12 @@ Two different geo patterns are used. Never mix them up:
 **Article** — `schema_geo` is a **Geofield**. Access as:
 ```twig
 {% set has_geo = not node.schema_geo.isEmpty() %}
-{% set map_center = node.schema_geo.lat ~ ',' ~ node.schema_geo.lon %}
+{% set map_center = node.schema_geo.lat.value ~ ',' ~ node.schema_geo.lon.value %}
 ```
+
+`schema_geo.lat` and `schema_geo.lon` return `FloatData` TypedData objects, **not**
+raw PHP floats. Always append `.value` before using in string concatenation (`~`),
+`json_encode`, or any other string context.
 
 **Place** — uses separate **decimal fields** `schema_latitude` and
 `schema_longitude`. There is no `schema_geo` on Place. Access as:
@@ -164,6 +168,23 @@ node.schema_longitude.value
 
 The common mistake is `place.schema_geo.value.lat` — Place has no `schema_geo`,
 so `has_place` silently evaluates false and the map center fallback never works.
+
+**geo_entity (poi / destination) — Geofield + label:**
+```twig
+{# lat/lon: always .value #}
+'lat': poi.schema_geo.lat.value,
+'lon': poi.schema_geo.lon.value,
+
+{# label: geo_entity defines "label" = "label" in entity keys, so .label returns
+   a FieldItemList, not a string. Always use .label.value #}
+'label': '<strong>' ~ poi.label.value ~ '</strong>',
+```
+
+**schema_geoshape file entity — filename:**
+```twig
+{# filename returns a FieldItemList, not a string. Always use .value for matches/string ops #}
+{% set is_gpx = geo_file and geo_file.filename.value matches '/\\.gpx$/i' %}
+```
 
 ### Taxonomy vocabularies
 

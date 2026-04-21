@@ -1,0 +1,27 @@
+uuid: ab35c04d-f501-48fe-bcfa-702a3f7fc2dd
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_lodging
+    - node.type.article
+id: node.article.schema_lodging
+field_name: schema_lodging
+entity_type: node
+bundle: article
+label: Lodging
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:geo_entity'
+  handler_settings:
+    target_bundles: {  }
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

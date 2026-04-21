@@ -80,6 +80,10 @@ class TripImportBatch {
           if (!$item) {
             continue;
           }
+          // Extract day number from raw label before cleaning ("Day 4: Place Name")
+          if (preg_match('/^Day\s+(\d+)/i', $item['label'], $dm)) {
+            $item['day'] = (int) $dm[1];
+          }
           $item['label'] = self::cleanLabel($item['label']); // strip 'Day N: '
           $result['pois'][] = $item;
         }
@@ -92,6 +96,9 @@ class TripImportBatch {
           if (!$item) {
             continue;
           }
+          // Extract day numbers from raw label ("Day 5: City" or "Day 5, Day 6: City")
+          preg_match_all('/Day\s+(\d+)/i', $item['label'], $dm);
+          $item['days'] = !empty($dm[1]) ? array_map('intval', $dm[1]) : [];
           $item['label'] = self::cleanLabel($item['label']); // strip 'Day N: '
           $result['destinations'][] = $item;
         }
@@ -107,6 +114,10 @@ class TripImportBatch {
           $raw_name = $item['label'];
           $item['nights'] = self::nightsFromLabel($raw_name, $item['desc'] ?? '');
           $item['label']  = self::cleanLabel($raw_name);
+          // Extract first night number from "Night 5: Hotel" or "Night 5, Night 6: Hotel"
+          if (preg_match('/Night\s+(\d+)/i', $raw_name, $nm)) {
+            $item['night'] = (int) $nm[1];
+          }
           unset($item['desc']);
           $result['lodging'][] = $item;
         }
@@ -163,9 +174,11 @@ class TripImportBatch {
       $context['results']['rows'][] = ['POI', $label, 'SKIPPED'];
     }
     else {
-      self::createGeoEntity('poi', $label, $item['lon'], $item['lat'], $item['url'] ?? NULL, [
-        'field_show_on_map' => 1,
-      ]);
+      $extra = ['field_show_on_map' => 1];
+      if (isset($item['day'])) {
+        $extra['field_day'] = (int) $item['day'];
+      }
+      self::createGeoEntity('poi', $label, $item['lon'], $item['lat'], $item['url'] ?? NULL, $extra);
       $context['results']['poi_created'] = ($context['results']['poi_created'] ?? 0) + 1;
       $context['results']['rows'][] = ['POI', $label, 'CREATED'];
     }
@@ -182,7 +195,11 @@ class TripImportBatch {
       $context['results']['rows'][] = ['Destination', $label, 'SKIPPED'];
     }
     else {
-      $id = self::createGeoEntity('destination', $label, $item['lon'], $item['lat'], $item['url'] ?? NULL);
+      $extra_dest = [];
+      if (!empty($item['days'])) {
+        $extra_dest['field_day'] = (int) reset($item['days']);
+      }
+      $id = self::createGeoEntity('destination', $label, $item['lon'], $item['lat'], $item['url'] ?? NULL, $extra_dest);
       $context['results']['dest_created']  = ($context['results']['dest_created'] ?? 0) + 1;
       $context['results']['destination_ids'][] = $id;
       $context['results']['rows'][] = ['Destination', $label, 'CREATED'];
@@ -203,6 +220,9 @@ class TripImportBatch {
       $extra = [];
       if (isset($item['nights'])) {
         $extra['field_nights'] = (int) $item['nights'];
+      }
+      if (isset($item['night'])) {
+        $extra['field_day'] = (int) $item['night'];
       }
       self::createGeoEntity('lodging', $label, $item['lon'], $item['lat'], $item['url'] ?? NULL, $extra);
       $context['results']['lodging_created'] = ($context['results']['lodging_created'] ?? 0) + 1;
@@ -277,6 +297,51 @@ class TripImportBatch {
 
     $node = Node::create($node_values);
 
+    // Attach geo entities for this day by querying field_day.
+    // Fields are plain entity_reference so ['target_id' => $id] is sufficient.
+    $eq = \Drupal::entityQuery('geo_entity')->accessCheck(FALSE);
+
+    $poi_ids = (clone $eq)
+      ->condition('bundle', 'poi')
+      ->condition('field_day', $day)
+      ->execute();
+
+    $node->set('schema_poi', []);
+    if (!empty($poi_ids) && $node->hasField('schema_poi')) {
+      $node->set('schema_poi',
+        array_map(fn($id) => ['target_id' => $id], array_values($poi_ids))
+      );
+    }
+
+    $dest_ids = (clone $eq)
+      ->condition('bundle', 'destination')
+      ->condition('field_day', $day)
+      ->execute();
+
+    $node->set('schema_destination', []);
+    if (!empty($dest_ids) && $node->hasField('schema_destination')) {
+      try {
+        $node->set('schema_destination',
+          array_map(fn($id) => ['target_id' => $id], array_values($dest_ids))
+        );
+      }
+      catch (\Exception $e) {
+        \Drupal::logger('trip_import')->error($e->getMessage());
+      }
+    }
+
+    $lodge_ids = (clone $eq)
+      ->condition('bundle', 'lodging')
+      ->condition('field_day', $day)
+      ->execute();
+
+    $node->set('schema_lodging', []);
+    if (!empty($lodge_ids) && $node->hasField('schema_lodging')) {
+      $node->set('schema_lodging',
+        array_map(fn($id) => ['target_id' => $id], array_values($dest_ids))
+      );
+    }
+
     if ($node->hasField('field_route_type')) {
       $map = self::buildRouteTypeMap();
       $tid = $map[$primary['route_type']] ?? NULL;
@@ -284,6 +349,8 @@ class TripImportBatch {
         $node->set('field_route_type', ['target_id' => $tid]);
       }
     }
+
+    ray($node);
 
     if ($node->hasField('schema_date_published')) {
       $node->set('schema_date_published', $trip_start_date); // 'Y-m-d' string
@@ -610,3 +677,4 @@ class TripImportBatch {
   }
 
 }
+

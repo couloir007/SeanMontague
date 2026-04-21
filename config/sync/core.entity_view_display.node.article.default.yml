@@ -13,15 +13,21 @@ dependencies:
     - field.field.node.article.schema_audio
     - field.field.node.article.schema_category
     - field.field.node.article.schema_date_published
+    - field.field.node.article.schema_destination
     - field.field.node.article.schema_difficulty
-    - field.field.node.article.schema_distance
+    - field.field.node.article.schema_distance_cycling
+    - field.field.node.article.schema_distance_driving
+    - field.field.node.article.schema_distance_hiking
+    - field.field.node.article.schema_distance_walking
     - field.field.node.article.schema_elev_gain
     - field.field.node.article.schema_elev_loss
     - field.field.node.article.schema_elev_max
     - field.field.node.article.schema_elev_min
     - field.field.node.article.schema_geo
     - field.field.node.article.schema_geoshape
+    - field.field.node.article.schema_lodging
     - field.field.node.article.schema_place
+    - field.field.node.article.schema_poi
     - field.field.node.article.schema_related_link
     - field.field.node.article.schema_significant_link
     - field.field.node.article.schema_topic
@@ -66,6 +72,72 @@ content:
     third_party_settings: {  }
     weight: 3
     region: content
+  schema_destination:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 14
+    region: content
+  schema_distance_cycling:
+    type: number_decimal
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 9
+    region: content
+  schema_distance_driving:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 7
+    region: content
+  schema_distance_hiking:
+    type: number_decimal
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 8
+    region: content
+  schema_distance_walking:
+    type: number_decimal
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 10
+    region: content
+  schema_lodging:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 11
+    region: content
+  schema_poi:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 13
+    region: content
 hidden:
   field_editorial: true
   field_metatag: true
@@ -76,7 +148,6 @@ hidden:
   schema_category: true
   schema_date_published: true
   schema_difficulty: true
-  schema_distance: true
   schema_elev_gain: true
   schema_elev_loss: true
   schema_elev_max: true
