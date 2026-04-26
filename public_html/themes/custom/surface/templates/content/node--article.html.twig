@@ -143,11 +143,11 @@
 
 {% set category      = node.schema_category.entity %}
 {% set category_key  = category and category.field_key.value ? category.field_key.value : 'default' %}
-{% set category_name = category ? category.label : '' %}
+{% set category_name = category ? category.label.value : '' %}
 
 {% include '@collections/article/article.twig' with {
   'header': {
-    'title':        node.label,
+    'title':        node.label.value,
     'date':         node.schema_date_published.value ? node.schema_date_published.value|date('F j, Y') : '',
     'category':     category_name,
     'category_key': category_key,

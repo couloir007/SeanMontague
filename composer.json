@@ -15,8 +15,10 @@
         }
     ],
     "require": {
+        "ext-dom": "*",
         "ext-libxml": "*",
         "ext-simplexml": "*",
+        "ext-zip": "*",
         "composer/installers": "^2.0",
         "defuse/php-encryption": "^2.4",
         "drupal/admin_dialogs": "^1.0",
@@ -37,6 +39,7 @@
         "drupal/devel": "^5.1",
         "drupal/devel_entity_updates": "^4.2",
         "drupal/diff": "^1.9",
+        "drupal/easy_breadcrumb": "^2.0",
         "drupal/embed": "^1.10",
         "drupal/embedded_content": "^2.0",
         "drupal/entity": "^1.6",
@@ -80,6 +83,7 @@
         "drupal/pathauto": "^1.6",
         "drupal/queue_ui": "^3.2",
         "drupal/r4032login": "^2.2",
+        "drupal/rabbit_hole": "^2.0@beta",
         "drupal/ray_debugger": "^1.0",
         "drupal/recaptcha": "^3.2",
         "drupal/redirect": "^1.11",
@@ -106,9 +110,7 @@
         "drupal/webform": "^6.3@beta",
         "drush/drush": "^13.0",
         "patrickschur/language-detection": "^5.3",
-        "wikimedia/composer-merge-plugin": "^2.0",
-        "ext-dom": "*",
-        "ext-zip": "*"
+        "wikimedia/composer-merge-plugin": "^2.0"
     },
     "conflict": {
         "drupal/drupal": "*"

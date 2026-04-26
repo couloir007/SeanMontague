@@ -186,24 +186,56 @@ class TripImportBatch {
   }
 
   /**
-   * Batch op: create geo_entity:destination.
+   * Batch op: create node:tourist_destination.
+   *
+   * geo_entity:destination is retired. Destinations are now content nodes
+   * with a URL, editorial body, and full Schema.org TouristDestination output.
+   * Duplicate detection uses a title match rather than coordinate proximity
+   * since node storage does not support the BETWEEN geo query.
    */
   public static function importDestination(array $item, array &$context): void {
     $label = $item['label'];
-    if (self::entityExistsByCoords('destination', $item['lat'], $item['lon'])) {
+
+    // Duplicate detection — skip if a tourist_destination node with this
+    // title already exists.
+    $existing = \Drupal::entityQuery('node')
+      ->condition('type', 'tourist_destination')
+      ->condition('title', $label)
+      ->accessCheck(FALSE)
+      ->execute();
+
+    if (!empty($existing)) {
       $context['results']['dest_skipped'] = ($context['results']['dest_skipped'] ?? 0) + 1;
       $context['results']['rows'][] = ['Destination', $label, 'SKIPPED'];
+      return;
     }
-    else {
-      $extra_dest = [];
-      if (!empty($item['days'])) {
-        $extra_dest['field_day'] = (int) reset($item['days']);
-      }
-      $id = self::createGeoEntity('destination', $label, $item['lon'], $item['lat'], $item['url'] ?? NULL, $extra_dest);
-      $context['results']['dest_created']  = ($context['results']['dest_created'] ?? 0) + 1;
-      $context['results']['destination_ids'][] = $id;
-      $context['results']['rows'][] = ['Destination', $label, 'CREATED'];
+
+    $node_values = [
+      'type'   => 'tourist_destination',
+      'title'  => $label,
+      'status' => 1,
+      'schema_geo' => [
+        'value' => sprintf('POINT (%F %F)', $item['lon'], $item['lat']),
+      ],
+    ];
+
+    // Store first day number for later article attachment.
+    if (!empty($item['days'])) {
+      $node_values['field_day'] = (int) reset($item['days']);
     }
+
+    $node = Node::create($node_values);
+
+    if (!empty($item['url']) && $node->hasField('schema_same_as')) {
+      $node->set('schema_same_as', ['uri' => $item['url']]);
+    }
+
+    $node->save();
+    $nid = (int) $node->id();
+
+    $context['results']['dest_created']     = ($context['results']['dest_created'] ?? 0) + 1;
+    $context['results']['destination_ids'][] = $nid;
+    $context['results']['rows'][] = ['Destination', $label, 'CREATED (nid ' . $nid . ')'];
     $context['message'] = t('Importing destination: @label', ['@label' => $label]);
   }
 
@@ -313,20 +345,25 @@ class TripImportBatch {
       );
     }
 
-    $dest_ids = (clone $eq)
-      ->condition('bundle', 'destination')
-      ->condition('field_day', $day)
-      ->execute();
-
     $node->set('schema_destination', []);
-    if (!empty($dest_ids) && $node->hasField('schema_destination')) {
-      try {
-        $node->set('schema_destination',
-          array_map(fn($id) => ['target_id' => $id], array_values($dest_ids))
-        );
-      }
-      catch (\Exception $e) {
-        \Drupal::logger('trip_import')->error($e->getMessage());
+    if ($node->hasField('schema_destination')) {
+      // schema_destination now targets node:tourist_destination — query nodes,
+      // not geo_entity. Destinations carry field_day set during import.
+      $dest_ids = \Drupal::entityQuery('node')
+        ->condition('type', 'tourist_destination')
+        ->condition('field_day', $day)
+        ->accessCheck(FALSE)
+        ->execute();
+
+      if (!empty($dest_ids)) {
+        try {
+          $node->set('schema_destination',
+            array_map(fn($id) => ['target_id' => $id], array_values($dest_ids))
+          );
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('trip_import')->error($e->getMessage());
+        }
       }
     }
 
@@ -338,7 +375,7 @@ class TripImportBatch {
     $node->set('schema_lodging', []);
     if (!empty($lodge_ids) && $node->hasField('schema_lodging')) {
       $node->set('schema_lodging',
-        array_map(fn($id) => ['target_id' => $id], array_values($dest_ids))
+        array_map(fn($id) => ['target_id' => $id], array_values($lodge_ids))
       );
     }
 

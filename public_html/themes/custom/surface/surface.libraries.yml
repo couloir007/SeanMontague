@@ -414,6 +414,13 @@ article:
   dependencies:
     - surface/article-map-section
 
+trip:
+  css:
+    component:
+      dist/css/trip.css: {}
+  js:
+    dist/js/trip.js: { }
+
 article-header:
   css:
     component:

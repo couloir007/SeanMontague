@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.storage.node.schema_lodging
+    - geo_entity.geo_entity_type.lodging
     - node.type.article
 id: node.article.schema_lodging
 field_name: schema_lodging
@@ -18,7 +19,8 @@ default_value_callback: ''
 settings:
   handler: 'default:geo_entity'
   handler_settings:
-    target_bundles: {  }
+    target_bundles:
+      lodging: lodging
     sort:
       field: _none
       direction: ASC

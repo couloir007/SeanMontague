@@ -4075,6 +4075,104 @@
             "install-path": "../../public_html/modules/contrib/diff"
         },
         {
+            "name": "drupal/easy_breadcrumb",
+            "version": "2.0.9",
+            "version_normalized": "2.0.9.0",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/project/easy_breadcrumb.git",
+                "reference": "2.0.9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/easy_breadcrumb-2.0.9.zip",
+                "reference": "2.0.9",
+                "shasum": "9e7c33e2ec0637d37d509776795a476f2f2d9bb8"
+            },
+            "require": {
+                "drupal/core": "^9.2 || ^10 || ^11"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "drupal": {
+                    "version": "2.0.9",
+                    "datestamp": "1732752214",
+                    "security-coverage": {
+                        "status": "covered",
+                        "message": "Covered by Drupal's security advisory policy"
+                    }
+                }
+            },
+            "installation-source": "dist",
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Neslee Canil Pinto",
+                    "homepage": "https://www.drupal.org/u/neslee-canil-pinto",
+                    "role": "Maintainer"
+                },
+                {
+                    "name": "Greg Boggs",
+                    "homepage": "https://www.drupal.org/u/greg-boggs",
+                    "role": "Maintainer"
+                },
+                {
+                    "name": "diamondsea",
+                    "homepage": "https://www.drupal.org/user/430714"
+                },
+                {
+                    "name": "greg boggs",
+                    "homepage": "https://www.drupal.org/user/153069"
+                },
+                {
+                    "name": "hmartens",
+                    "homepage": "https://www.drupal.org/user/622826"
+                },
+                {
+                    "name": "loopduplicate",
+                    "homepage": "https://www.drupal.org/user/717290"
+                },
+                {
+                    "name": "neslee canil pinto",
+                    "homepage": "https://www.drupal.org/user/3580850"
+                },
+                {
+                    "name": "nickdickinsonwilde",
+                    "homepage": "https://www.drupal.org/user/3094661"
+                },
+                {
+                    "name": "rakesh.gectcr",
+                    "homepage": "https://www.drupal.org/user/1177822"
+                },
+                {
+                    "name": "renatog",
+                    "homepage": "https://www.drupal.org/user/3326031"
+                },
+                {
+                    "name": "sonemonu",
+                    "homepage": "https://www.drupal.org/user/1667988"
+                },
+                {
+                    "name": "spuky",
+                    "homepage": "https://www.drupal.org/user/209353"
+                },
+                {
+                    "name": "tatarbj",
+                    "homepage": "https://www.drupal.org/user/649590"
+                }
+            ],
+            "description": "Adds configuration to the system breadcrumbs.",
+            "homepage": "https://www.drupal.org/project/easy_breadcrumb",
+            "support": {
+                "source": "https://git.drupalcode.org/project/easy_breadcrumb",
+                "issues": "https://www.drupal.org/project/issues/easy_breadcrumb"
+            },
+            "install-path": "../../public_html/modules/contrib/easy_breadcrumb"
+        },
+        {
             "name": "drupal/embed",
             "version": "1.10.0",
             "version_normalized": "1.10.0.0",
@@ -8285,6 +8383,89 @@
                 "issues": "https://www.drupal.org/project/issues/r4032login"
             },
             "install-path": "../../public_html/modules/contrib/r4032login"
+        },
+        {
+            "name": "drupal/rabbit_hole",
+            "version": "2.0.0-beta2",
+            "version_normalized": "2.0.0.0-beta2",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/project/rabbit_hole.git",
+                "reference": "2.0.0-beta2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/rabbit_hole-2.0.0-beta2.zip",
+                "reference": "2.0.0-beta2",
+                "shasum": "342487411389d7956ab91c9b91459a8cb01320e3"
+            },
+            "require": {
+                "drupal/core": "^9.5 || ^10 || ^11"
+            },
+            "require-dev": {
+                "drupal/commerce_product": "*",
+                "drupal/file_entity": "*",
+                "drupal/group": "*",
+                "drupal/paragraphs-paragraphs_library": "*",
+                "drupal/token": "*",
+                "drupal/tour": "*"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "drupal": {
+                    "version": "2.0.0-beta2",
+                    "datestamp": "1773704580",
+                    "security-coverage": {
+                        "status": "not-covered",
+                        "message": "Beta releases are not covered by Drupal security advisories."
+                    }
+                }
+            },
+            "installation-source": "dist",
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "aleksey.tk",
+                    "homepage": "https://www.drupal.org/user/22093"
+                },
+                {
+                    "name": "bohart",
+                    "homepage": "https://www.drupal.org/user/289861"
+                },
+                {
+                    "name": "dylan donkersgoed",
+                    "homepage": "https://www.drupal.org/user/2803351"
+                },
+                {
+                    "name": "japerry",
+                    "homepage": "https://www.drupal.org/user/45640"
+                },
+                {
+                    "name": "matroskeen",
+                    "homepage": "https://www.drupal.org/user/3426249"
+                },
+                {
+                    "name": "mparker17",
+                    "homepage": "https://www.drupal.org/user/536298"
+                },
+                {
+                    "name": "Odd Hill",
+                    "homepage": "https://www.drupal.org/user/789934"
+                },
+                {
+                    "name": "olofbokedal",
+                    "homepage": "https://www.drupal.org/user/1198438"
+                }
+            ],
+            "description": "Basic functionality that is shared among the different Rabbit Hole modules.",
+            "homepage": "https://www.drupal.org/project/rabbit_hole",
+            "support": {
+                "source": "https://git.drupalcode.org/project/rabbit_hole"
+            },
+            "install-path": "../../public_html/modules/contrib/rabbit_hole"
         },
         {
             "name": "drupal/rat",

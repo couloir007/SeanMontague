@@ -1,0 +1,186 @@
+{#
+/**
+ * @file
+ * node--tourist-trip.html.twig
+ *
+ * TouristTrip node template. Maps Drupal fields to the
+ * @collections/trip/trip.twig pattern.
+ *
+ * Field sources:
+ *   schema_trip_dates (Smart Date)  → dates string + days count
+ *     Access: node.schema_trip_dates[0].value / .end_value (Unix timestamps)
+ *     NOTE: use [0] not .first — .first is blocked by Twig sandbox on Smart Date
+ *   schema_image (media:ImageObject) → hero image URL
+ *     Access: node.schema_image.entity.field_media_image.entity.fileuri|file_url
+ *   field_editorial (text)           → narrative heading / lede
+ *   field_body (text_with_summary)   → narrative prose body
+ *   schema_itinerary (article[])     → destinations list, distance stats, map markers
+ *     ↳ each article:
+ *       schema_destination (geo_entity:destination[])
+ *         dest.label.value         — entity label string
+ *         dest.schema_geo.lat/.lon — Geofield direct floats (no .value)
+ *         dest.schema_address.administrative_area — region string
+ *       schema_poi (geo_entity:poi[])
+ *         poi.schema_geo.lat/.lon  — Geofield direct floats (no .value)
+ *         poi.label.value          — entity label string
+ *       schema_date_published.value  — day timestamp
+ *       schema_distance_driving.value / schema_distance_hiking.value
+ *       schema_distance_walking.value / schema_distance_cycling.value
+ */
+#}
+
+{# ── Hero image ── #}
+{% set trip_image = node.schema_image.entity %}
+{% set image_url = trip_image
+  ? trip_image.field_media_image.entity.fileuri|file_url
+  : null %}
+
+{# ── Trip dates from Smart Date ── #}
+{# Use [0] not .first — .first is blocked by Drupal Twig sandbox on SmartDateFieldItemList #}
+{% set trip_date_item = node.schema_trip_dates[0] %}
+{% set arrived  = trip_date_item ? trip_date_item.value : null %}
+{% set departed = trip_date_item ? trip_date_item.end_value : null %}
+{% set days = 0 %}
+{% if arrived and departed %}
+  {% set days = ((departed - arrived) / 86400)|round + 1 %}
+{% endif %}
+
+{% set arrived_str  = arrived  ? arrived|date('F j')       : '' %}
+{% set departed_str = departed ? departed|date('F j, Y')   : '' %}
+{% set dates_str = arrived_str and departed_str
+  ? arrived_str ~ '–' ~ departed_str ~ (days > 0 ? ' · ' ~ days ~ ' Days' : '')
+  : '' %}
+
+{# ── Loop itinerary articles — build destinations, stats, markers ── #}
+{% set destinations  = [] %}
+{% set map_markers   = [] %}
+{% set total_driving = 0 %}
+{% set total_hiking  = 0 %}
+{% set total_walking = 0 %}
+{% set total_cycling = 0 %}
+{% set total_poi     = 0 %}
+
+{% for item in node.schema_itinerary %}
+  {% set article = item.entity %}
+  {% if article %}
+
+    {# Distance totals across all day articles #}
+    {% if article.schema_distance_driving.value %}
+      {% set total_driving = total_driving + article.schema_distance_driving.value %}
+    {% endif %}
+    {% if article.schema_distance_hiking.value %}
+      {% set total_hiking = total_hiking + article.schema_distance_hiking.value %}
+    {% endif %}
+    {% if article.schema_distance_walking.value %}
+      {% set total_walking = total_walking + article.schema_distance_walking.value %}
+    {% endif %}
+    {% if article.schema_distance_cycling.value %}
+      {% set total_cycling = total_cycling + article.schema_distance_cycling.value %}
+    {% endif %}
+
+    {# Article date for itinerary display #}
+    {% set art_date = article.schema_date_published.value
+      ? article.schema_date_published.value|date('M j')
+      : '' %}
+
+    {# Sidebar / strip / cards — one entry per article, not per destination #}
+    {% set destinations = destinations|merge([{
+      'name':   article.title.value,
+      'region': article.schema_address.administrative_area is defined
+                ? article.schema_address.administrative_area : '',
+      'dates':  art_date,
+    }]) %}
+
+    {# Map markers still come from geo_entity destinations on each article #}
+    {% for dest_item in article.schema_destination %}
+      {% set dest = dest_item.entity %}
+      {% if dest %}
+        {% set dest_geo = dest.schema_geo %}
+        {% if dest_geo and dest_geo.lat %}
+          {% set map_markers = map_markers|merge([{
+            'lat':   dest_geo.lat,
+            'lon':   dest_geo.lon,
+            'type':  'destination',
+            'label': '<strong>' ~ dest.label.value ~ '</strong>',
+          }]) %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+
+    {# POI geo_entities — triangle markers on map, counted for stats #}
+    {% for poi_item in article.schema_poi %}
+      {% set poi = poi_item.entity %}
+      {% if poi and not poi.schema_geo.isEmpty %}
+        {% set total_poi = total_poi + 1 %}
+        {# schema_geo.lat/.lon are direct Geofield floats — no .value needed #}
+        {% set map_markers = map_markers|merge([{
+          'lat':   poi.schema_geo.lat,
+          'lon':   poi.schema_geo.lon,
+          'type':  'poi',
+          'label': '<strong>' ~ poi.label.value ~ '</strong>',
+        }]) %}
+      {% endif %}
+    {% endfor %}
+
+  {% endif %}
+{% endfor %}
+
+{# ── Stats bar — activity data, not structural metadata ── #}
+{% set stats = [] %}
+{% if days > 0 %}
+  {% set stats = stats|merge([{label: 'Days', value: days, unit: null}]) %}
+{% endif %}
+
+{# Distance — single type gets plain label; multiple types get qualified labels #}
+{% set dist_items = [] %}
+{% if total_driving > 0 %}
+  {% set dist_items = dist_items|merge([{type: 'Driving', value: total_driving, unit: 'mi'}]) %}
+{% endif %}
+{% if total_hiking > 0 %}
+  {% set dist_items = dist_items|merge([{type: 'Hiking', value: total_hiking, unit: 'mi'}]) %}
+{% endif %}
+{% if total_walking > 0 %}
+  {% set dist_items = dist_items|merge([{type: 'Walking', value: total_walking, unit: 'mi'}]) %}
+{% endif %}
+{% if total_cycling > 0 %}
+  {% set dist_items = dist_items|merge([{type: 'Cycling', value: total_cycling, unit: 'mi'}]) %}
+{% endif %}
+
+{% set multi_dist = dist_items|length > 1 %}
+{% for d in dist_items %}
+  {% set stats = stats|merge([{
+    label:    multi_dist ? 'Distance ' ~ d.type : 'Distance',
+    value:    d.value,
+    unit:     d.unit,
+    is_small: multi_dist,
+  }]) %}
+{% endfor %}
+
+{% if total_poi > 0 %}
+  {% set stats = stats|merge([{label: 'Sites', value: total_poi, unit: null}]) %}
+{% endif %}
+
+{# ── Map center — first destination marker, else Ireland default ── #}
+{% set map_center = '53.0,-8.2' %}
+{% if map_markers|length > 0 %}
+  {% set map_center = map_markers[0].lat ~ ',' ~ map_markers[0].lon %}
+{% endif %}
+
+{% include '@collections/trip/trip.twig' with {
+  'label':             'Travel',
+  'title':             node.label.value,
+  'dates':             dates_str,
+  'image_url':         image_url,
+  'stats':             stats,
+  'map_id':            'trip-map-' ~ node.id,
+  'map_center':        map_center,
+  'map_zoom':          7,
+  'map_label':         'Route Map — ' ~ node.label.value,
+  'map_note':          'Click markers for details',
+  'map_markers':       map_markers,
+  'tiles':             'open-topo',
+  'narrative_kicker':  'Trip Notes',
+  'narrative_heading': content.field_editorial|field_value|render ?: null,
+  'body':              content.field_body|field_value|render,
+  'destinations':      destinations,
+} only %}

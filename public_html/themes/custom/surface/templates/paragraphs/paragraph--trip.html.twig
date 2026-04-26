@@ -18,7 +18,7 @@
       'lat':   place.schema_latitude.value,
       'lon':   place.schema_longitude.value,
       'color': '#3a5a40',
-      'label': '<strong>' ~ place.label ~ '</strong>',
+      'label': '<strong>' ~ place.label.value ~ '</strong>',
     }]) %}
   {% endif %}
 {% endfor %}
@@ -26,7 +26,7 @@
 <div{{ attributes.addClass('paragraph', 'paragraph--type--trip') }}>
 
   {% include '@collections/article-header/article-header.twig' with {
-    'title': paragraph.label,
+    'title': paragraph.label.value,
     'date':  content.schema_date_published|field_value,
   } only %}
 

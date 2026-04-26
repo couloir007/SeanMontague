@@ -1,0 +1,23 @@
+uuid: 2f3053f7-d41d-49ac-a416-5d55611f3a7f
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: schema_node_thing
+label: 'Schema.org: Content - Thing'
+type: 'canonical_entities:node'
+pattern: '[node:schemadotorg:base-path]/[node:schemadotorg:alternate-name]'
+selection_criteria:
+  f10c12b3-fb4f-4522-8f59-440b25a49919:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: f10c12b3-fb4f-4522-8f59-440b25a49919
+    context_mapping:
+      node: node
+    bundles:
+      article: article
+      tourist_destination: tourist_destination
+selection_logic: and
+weight: -10
+relationships: {  }

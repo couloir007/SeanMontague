@@ -228,9 +228,9 @@ content:
         120|2 hours
         custom
       show_extra: false
-      hide_date: true
+      hide_date: false
       allday: true
-      remove_seconds: false
+      remove_seconds: true
       duration_overlay: true
       separator: to
     third_party_settings: {  }

@@ -1,16 +1,15 @@
-uuid: 22826dad-5223-4f44-ba3f-ae96d61432fb
+uuid: 05b50df6-dc03-4586-aa1f-bd191f27abe2
 langcode: en
 status: true
 dependencies:
   module:
-    - geo_entity
     - node
 id: node.schema_destination
 field_name: schema_destination
 entity_type: node
 type: entity_reference
 settings:
-  target_type: geo_entity
+  target_type: node
 module: core
 locked: false
 cardinality: -1

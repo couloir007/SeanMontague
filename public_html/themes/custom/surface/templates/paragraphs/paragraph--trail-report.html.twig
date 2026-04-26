@@ -1,9 +1,9 @@
 <div{{ attributes.addClass('paragraph', 'paragraph--type--trail-report') }}>
   {% include '@components/places-card/places-card.twig' with {
-    'title':      node.label,
+    'title':      node.label.value,
     'date':       node.schema_date_published.value|date('M j, Y'),
     'image_url':  node.schema_image.entity.uri.value|image_style('large'),
-    'category':   node.schema_category.entity.label,
+    'category':   node.schema_category.entity.label.value,
     'url':        url,
     'stats': [
       { 'label': 'Dist', 'value': node.schema_distance.value, 'unit': 'mi' },

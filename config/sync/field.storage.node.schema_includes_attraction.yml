@@ -1,0 +1,20 @@
+uuid: dbcf2601-eaf7-4186-a234-e24627748054
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+    - node
+id: node.schema_includes_attraction
+field_name: schema_includes_attraction
+entity_type: node
+type: entity_reference
+settings:
+  target_type: geo_entity
+module: core
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -126,7 +126,7 @@
 
 {# ── Render ── #}
 {% include '@collections/article-header/article-header.twig' with {
-  'title': node.label,
+  'title': node.label.value,
   'date':  date_display,
 } only %}
 

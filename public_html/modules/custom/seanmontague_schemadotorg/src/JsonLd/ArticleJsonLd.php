@@ -17,9 +17,9 @@ class ArticleJsonLd {
       $data['mentions'] = $mentions;
     }
 
-    $spatial = static::buildSpatialCoverage($entity);
+    $spatial = static::buildContentLocation($entity);
     if ($spatial) {
-      $data['spatialCoverage'] = $spatial;
+      $data['contentLocation'] = $spatial;
     }
   }
 
@@ -42,7 +42,7 @@ class ArticleJsonLd {
     return $mentions;
   }
 
-  protected static function buildSpatialCoverage(EntityInterface $entity): ?array {
+  protected static function buildContentLocation(EntityInterface $entity): ?array {
     if (!$entity instanceof ContentEntityInterface || !$entity->hasField('schema_geoshape') || $entity->get('schema_geoshape')->isEmpty()) {
       return NULL;
     }
@@ -89,8 +89,11 @@ class ArticleJsonLd {
     );
 
     return [
-      '@type' => 'GeoShape',
-      'line'  => implode(' ', $pairs),
+      '@type' => 'Place',
+      'geo'   => [
+        '@type' => 'GeoShape',
+        'line'  => implode(' ', $pairs),
+      ],
     ];
   }
 

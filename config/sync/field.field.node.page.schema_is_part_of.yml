@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.storage.node.schema_is_part_of
+    - node.type.article
     - node.type.blog_posting
     - node.type.page
     - node.type.podcast_episode
@@ -33,6 +34,7 @@ settings:
     excluded_schema_types: {  }
     ignore_additional_mappings: true
     target_bundles:
+      article: article
       blog_posting: blog_posting
       page: page
       podcast_episode: podcast_episode

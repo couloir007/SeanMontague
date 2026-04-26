@@ -3,6 +3,17 @@
 /**
  * @file
  * Primary module hooks for SeanMontague Schema.org module.
+ *
+ * Alters Schema.org Blueprints JSON-LD output for seanmontague.com content
+ * types. Handles per-bundle entity-level enrichment (mentions, spatialCoverage,
+ * trip dates) and page-level corrections (copyrightYear, isPartOf URL).
+ *
+ * Two hooks are implemented:
+ *   - hook_schemadotorg_jsonld_alter: fires once per page request on the
+ *     fully assembled JSON-LD data array. Used for page-level corrections.
+ *   - hook_schemadotorg_jsonld_schema_type_entity_alter: fires once per entity
+ *     Blueprints resolves — including referenced entities and the WebPage
+ *     wrapper. Used for entity-level enrichment and per-bundle corrections.
  */
 
 declare(strict_types=1);
@@ -18,6 +29,14 @@ use Drupal\seanmontague_schemadotorg\JsonLd\TouristTripJsonLd;
 
 /**
  * Implements hook_schemadotorg_jsonld_alter().
+ *
+ * Fires once per page on the fully assembled JSON-LD data array. The
+ * 'schemadotorg_jsonld_entity' key holds the mainEntity data assembled
+ * from the current node's Schema.org mapping.
+ *
+ * Corrections applied here:
+ *   - copyrightYear on the mainEntity, resolved from schema_date_published
+ *     (content date) rather than node created time (page date).
  */
 function seanmontague_schemadotorg_schemadotorg_jsonld_alter(array &$data, RouteMatchInterface $route_match, BubbleableMetadata $bubbleable_metadata): void {
   $node = $route_match->getParameter('node');
@@ -25,50 +44,124 @@ function seanmontague_schemadotorg_schemadotorg_jsonld_alter(array &$data, Route
     return;
   }
 
-  // copyrightYear from schema_date_published
-  $year = NULL;
-  if ($node->hasField('schema_date_published') && !$node->get('schema_date_published')
-      ->isEmpty()) {
-    $ts = strtotime($node->get('schema_date_published')->value);
-    if ($ts !== FALSE) {
-      $year = (int) date('Y', $ts);
-    }
-  }
-  if (!$year) {
-    $year = (int) date('Y', $node->getCreatedTime());
-  }
-
+  // Set copyrightYear on the mainEntity from schema_date_published.
+  // Blueprints defaults to node created time — for content dated to a past
+  // trip or article, schema_date_published is the correct year.
   if (isset($data['schemadotorg_jsonld_entity']) && is_array($data['schemadotorg_jsonld_entity'])) {
-    // mainEntity
-    $data['schemadotorg_jsonld_entity']['copyrightYear'] = $year;
-  }
-
-  if ($node->bundle() === 'tourist_trip'
-    && $node->hasField('schema_trip_dates')
-    && !$node->get('schema_trip_dates')->isEmpty()) {
-    $item   = $node->get('schema_trip_dates')->first();
-    $values = $item->getValue();
-    $arrived  = !empty($values['value'])     ? date('Y-m-d', (int) $values['value'])     : NULL;
-    $departed = !empty($values['end_value']) ? date('Y-m-d', (int) $values['end_value']) : NULL;
-    if ($arrived)  { $data['schemadotorg_jsonld_entity']['arrivalTime']   = $arrived; }
-    if ($departed) { $data['schemadotorg_jsonld_entity']['departureTime'] = $departed; }
+    $data['schemadotorg_jsonld_entity']['copyrightYear'] = _seanmontague_copyright_year($node);
   }
 }
 
 /**
  * Implements hook_schemadotorg_jsonld_schema_type_entity_alter().
+ *
+ * Fires once per entity Blueprints resolves while building JSON-LD — including
+ * the current node as both its Schema.org type (e.g. Article, TouristTrip)
+ * and as the WebPage wrapper Blueprints adds around every node page. Also
+ * fires for referenced entities (e.g. geo_entity POIs, the web_site node
+ * referenced via schema_is_part_of).
+ *
+ * The $data['@type'] value distinguishes which pass is running:
+*   - 'WebPage'      — the outer wrapper Blueprints adds to every node page
+ *   - 'Article'      — the BlogPosting mainEntity for article nodes
+ *   - 'TouristTrip'  — the TouristTrip mainEntity for tourist_trip nodes
+ *   - 'TouristAttraction' — a referenced geo_entity:poi
+ *
+ * Enrichment applied here:
+ *   - geo_entity:poi    → TouristAttraction JSON-LD via PointOfInterestJsonLd
+ *   - geo_entity:lodging → Lodging JSON-LD via LodgingJsonLd
+ *   - tourist_trip (TouristTrip pass) → trip dates via TouristTripJsonLd
+ *   - article (Article pass) → mentions, spatialCoverage via ArticleJsonLd
+ *   - WebPage wrapper → isPartOf @url/@id corrected to site root
  */
 function seanmontague_schemadotorg_schemadotorg_jsonld_schema_type_entity_alter(array &$data, EntityInterface $entity, mixed $mapping, BubbleableMetadata $bubbleable_metadata): void {
   $entity_type_id = $entity->getEntityTypeId();
-  $bundle = $entity->bundle();
+  $bundle         = $entity->bundle();
 
+  // geo_entity bundles are handled independently of node logic below.
   if ($entity_type_id === 'geo_entity' && $bundle === 'poi') {
     PointOfInterestJsonLd::alter($data, $entity, $bubbleable_metadata);
-  } elseif ($entity_type_id === 'geo_entity' && $bundle === 'lodging') {
-    LodgingJsonLd::alter($data, $entity, $bubbleable_metadata);
-  } elseif ($entity_type_id === 'node' && $bundle === 'article') {
-    ArticleJsonLd::alter($data, $entity, $bubbleable_metadata);
-  } elseif ($entity_type_id === 'node' && $bundle === 'tourist_trip' && $entity instanceof NodeInterface) {
-    TouristTripJsonLd::alter($data, $entity);
+    return;
   }
+
+  if ($entity_type_id === 'geo_entity' && $bundle === 'lodging') {
+    LodgingJsonLd::alter($data, $entity, $bubbleable_metadata);
+    return;
+  }
+
+  // All remaining logic applies to nodes only.
+  if (!($entity instanceof NodeInterface)) {
+    return;
+  }
+
+  // tourist_trip fires twice — once as TouristTrip, once as WebPage wrapper.
+  // Trip dates and enrichment belong on the TouristTrip pass only.
+  if ($bundle === 'tourist_trip' && ($data['@type'] ?? NULL) === 'TouristTrip') {
+    TouristTripJsonLd::alter($data, $entity, $bubbleable_metadata);
+  }
+
+  // article fires twice — once as Article, once as WebPage wrapper.
+  // mentions and spatialCoverage belong on the Article pass only.
+  if ($bundle === 'article' && ($data['@type'] ?? NULL) === 'Article') {
+    ArticleJsonLd::alter($data, $entity, $bubbleable_metadata);
+    return;
+  }
+
+  // WebPage wrapper — applies to all node bundles.
+  // Blueprints wraps every node page in WebPage regardless of Schema.org type.
+  // Fix isPartOf @url/@id to point to the site root rather than the web_site
+  // node path — the web_site node is a data anchor, not a routable page.
+  if (isset($data['isPartOf']) && ($data['@type'] ?? NULL) === 'WebPage') {
+    $data = _seanmontague_schema_is_part_of($data);
+  }
+}
+
+/**
+ * Rewrites isPartOf WebSite @url and @id to the site root.
+ *
+ * Blueprints generates the URL from the web_site node's path (e.g.
+ * /node/121). The canonical identifier for a WebSite is the site root —
+ * the node path is an implementation detail, not a semantic identifier.
+ *
+ * @param array $data
+ *   Entity JSON-LD data array containing an isPartOf key.
+ *
+ * @return array
+ *   The modified data array.
+ */
+function _seanmontague_schema_is_part_of(array $data): array {
+  $base_url = \Drupal::request()->getSchemeAndHttpHost();
+  foreach ($data['isPartOf'] as &$part) {
+    if (isset($part['@type']) && in_array('WebSite', (array) $part['@type'])) {
+      $part['@url'] = $base_url . '/';
+      $part['@id']  = $base_url . '/';
+    }
+  }
+  unset($part);
+
+  return $data;
+}
+
+/**
+ * Resolves the copyright year for a node.
+ *
+ * Uses schema_date_published when available — this reflects the date the
+ * content is about (e.g. a 2024 trip article published in 2026 should carry
+ * copyrightYear 2024). Falls back to node created time when the field is
+ * absent or empty.
+ *
+ * @param \Drupal\node\NodeInterface $node
+ *   The node to resolve the year from.
+ *
+ * @return int
+ *   Four-digit copyright year.
+ */
+function _seanmontague_copyright_year(NodeInterface $node): int {
+  if ($node->hasField('schema_date_published') && !$node->get('schema_date_published')->isEmpty()) {
+    $ts = strtotime($node->get('schema_date_published')->value);
+    if ($ts !== FALSE) {
+      return (int) date('Y', (int) $ts);
+    }
+  }
+  return (int) date('Y', (int) $node->getCreatedTime());
 }

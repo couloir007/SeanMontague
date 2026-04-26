@@ -1,0 +1,16 @@
+uuid: 3edea7fe-f4ce-4aed-a816-8e78470c4d76
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.tourist_destination
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+id: node.tourist_destination
+target_entity_type_id: node
+target_bundle: tourist_destination
+default_langcode: site_default
+language_alterable: false

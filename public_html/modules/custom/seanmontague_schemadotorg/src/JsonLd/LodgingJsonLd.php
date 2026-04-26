@@ -42,8 +42,8 @@ class LodgingJsonLd {
     $item = $entity->get('schema_geo')->first();
     return [
       '@type'     => 'GeoCoordinates',
-      'latitude'  => (float) $item->get('lat')->getValue(),
-      'longitude' => (float) $item->get('lon')->getValue(),
+      'latitude'  => (float) $item->lat,
+      'longitude' => (float) $item->lon,
     ];
   }
 
@@ -54,29 +54,20 @@ class LodgingJsonLd {
     $item = $entity->get('schema_address')->first();
     $out  = ['@type' => 'PostalAddress'];
 
-    $country = $item->get('country_code')->getValue();
-    if ($country) {
-      $out['addressCountry'] = $country;
+    if ($item->country_code) {
+      $out['addressCountry'] = $item->country_code;
+    }
+    if ($item->locality) {
+      $out['addressLocality'] = $item->locality;
+    }
+    if ($item->administrative_area) {
+      $out['addressRegion'] = $item->administrative_area;
+    }
+    if ($item->postal_code) {
+      $out['postalCode'] = $item->postal_code;
     }
 
-    $locality = $item->get('locality')->getValue();
-    if ($locality) {
-      $out['addressLocality'] = $locality;
-    }
-
-    $region = $item->get('administrative_area')->getValue();
-    if ($region) {
-      $out['addressRegion'] = $region;
-    }
-
-    $postal = $item->get('postal_code')->getValue();
-    if ($postal) {
-      $out['postalCode'] = $postal;
-    }
-
-    $line1  = $item->get('address_line1')->getValue();
-    $line2  = $item->get('address_line2')->getValue();
-    $street = trim(implode(', ', array_filter([$line1, $line2])));
+    $street = trim(implode(', ', array_filter([$item->address_line1, $item->address_line2])));
     if ($street) {
       $out['streetAddress'] = $street;
     }

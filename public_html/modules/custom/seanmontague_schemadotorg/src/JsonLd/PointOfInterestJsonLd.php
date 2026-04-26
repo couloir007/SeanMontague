@@ -36,14 +36,14 @@ class PointOfInterestJsonLd {
   }
 
   protected static function buildGeo(EntityInterface $entity): ?array {
-    if (!$entity instanceof ContentEntityInterface || !$entity->hasField('field_geo') || $entity->get('field_geo')->isEmpty()) {
+    if (!$entity instanceof ContentEntityInterface || !$entity->hasField('schema_geo') || $entity->get('schema_geo')->isEmpty()) {
       return NULL;
     }
-    $item = $entity->get('field_geo')->first();
+    $item = $entity->get('schema_geo')->first();
     return [
       '@type' => 'GeoCoordinates',
-      'latitude'  => (float) $item->get('lat')->getValue(),
-      'longitude' => (float) $item->get('lon')->getValue(),
+      'latitude'  => (float) $item->lat,
+      'longitude' => (float) $item->lon,
     ];
   }
 
@@ -55,9 +55,11 @@ class PointOfInterestJsonLd {
     if (!$place) {
       return NULL;
     }
+    $type = $place->bundle() === 'tourist_destination' ? 'TouristDestination' : 'Place';
     return [
-      '@type' => 'Place',
-      'name' => $place->label(),
+      '@type' => $type,
+      'name'  => $place->label(),
+      '@id'   => $place->toUrl('canonical', ['absolute' => TRUE])->toString(),
     ];
   }
 

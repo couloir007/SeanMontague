@@ -11,18 +11,24 @@ foreach (glob(\Drupal::service('extension.list.theme')->getPath('surface') . '/i
   include $file;
 }
 
-// function surface_preprocess_field(&$variables): void {
-//  $rich_field_types = ['text_with_summary', 'text', 'text_long'];
+use Drupal\Core\Breadcrumb\Breadcrumb;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_system_breadcrumb_alter().
+ */
+//function surface_system_breadcrumb_alter(Breadcrumb &$breadcrumb, RouteMatchInterface $route_match, array $context): void {
+//  $links = $breadcrumb->getLinks();
+//  $filtered = array_filter($links, fn($link) => !empty($link->getText()));
 //
-//  if (in_array($variables['field_type'], $rich_field_types, TRUE)) {
-//    $variables['attributes']['class'][] = 'prose';
+//  $new_breadcrumb = new Breadcrumb();
+//  $new_breadcrumb->setLinks(array_values($filtered));
+//  $new_breadcrumb->addCacheableDependency($breadcrumb);
+//
+//  $breadcrumb = $new_breadcrumb;
+//
+//  if (function_exists('ray')) {
+//    ray($breadcrumb);
 //  }
 //}
-//
-//
-///**
-// * Implements theme_preprocess to add variables.
-// */
-//function surface_preprocess(&$variables) {
-//    $variables['data_menu'] = 'dropdown';
-//}
+

@@ -1,0 +1,116 @@
+label: 'Travel · Ireland'
+title: "Ireland<br>April 2024"
+dates: 'April 19–27, 2024 · 9 Days · 8 Destinations'
+image_url: 'https://images.pexels.com/photos/1005417/pexels-photo-1005417.jpeg?auto=compress&cs=tinysrgb&w=1920'
+
+stats:
+  - label: 'Days'
+    value: '9'
+    unit: 'total'
+  - label: 'Destinations'
+    value: '8'
+    unit: 'stops'
+  - label: 'Distance'
+    value: '~840'
+    unit: 'km by road'
+    is_small: true
+  - label: 'Counties'
+    value: '7'
+    unit: 'across Ireland'
+    is_small: true
+
+map_id: 'ireland-trip-map'
+map_center: '53.0,-8.2'
+map_zoom: 7
+map_label: 'Route Map — Ireland, April 2024'
+map_note: 'Scroll to zoom · Click markers for details'
+tiles: 'open-topo'
+map_markers:
+  - lat: 53.3418
+    lon: -6.2731
+    type: 'destination'
+    label: '<strong>Dublin</strong><br>Co. Dublin'
+  - lat: 54.2724
+    lon: -8.4775
+    type: 'destination'
+    label: '<strong>Sligo</strong><br>Co. Sligo'
+  - lat: 53.2709
+    lon: -9.0522
+    type: 'destination'
+    label: '<strong>Galway</strong><br>Co. Galway'
+  - lat: 53.1042
+    lon: -9.6563
+    type: 'destination'
+    label: '<strong>Inishmore</strong><br>Aran Islands'
+  - lat: 52.6627
+    lon: -8.6255
+    type: 'destination'
+    label: '<strong>Limerick</strong><br>Co. Limerick'
+  - lat: 52.0560
+    lon: -9.4966
+    type: 'destination'
+    label: '<strong>Killarney</strong><br>Co. Kerry'
+  - lat: 52.1391
+    lon: -10.2719
+    type: 'destination'
+    label: '<strong>Dingle</strong><br>Co. Kerry'
+  - lat: 52.6556
+    lon: -7.2487
+    type: 'destination'
+    label: '<strong>Kilkenny</strong><br>Co. Kilkenny'
+
+narrative_kicker: 'Trip Notes'
+narrative_heading: 'Ten days, the full perimeter, and a lot of stone walls'
+body: |
+  <p>Ireland in April is not the Ireland of summer tourism brochures. The light is low and specific — that particular Atlantic silver that makes the countryside look like it has been painted on a damp morning. We landed in Dublin on the 19th, collected the car, and drove north before the day was out.</p>
+  <p>The plan was loose: north to Sligo for Yeats country and the coast, then down through Galway, out to Inishmore on the Aran Islands, and a long southern loop through Limerick, Killarney, and the Dingle Peninsula before ending in Kilkenny.</p>
+  <blockquote>
+    <p>"There is no such thing as bad weather in Ireland, only different kinds of good light."</p>
+    <cite>— overheard, a pub in Sligo</cite>
+  </blockquote>
+  <p>What you don't plan for is the pace of it. Ireland resists the itinerary. A conversation at a petrol station turns into a detour to a ring fort. A wrong turn on the Dingle Peninsula leads to a beach with no name on any sign.</p>
+  <hr>
+  <h3>The West</h3>
+  <p>Galway is the easiest place in Ireland to spend more time than you intended. The Aran Islands day — ferry from Rossaveal to Inishmore — was one of those travel days that earns its place in the permanent record. Rented bicycles at the pier, rode out to Dún Aonghasa in actual April sunshine, sat on the cliff edge for longer than was sensible.</p>
+
+destinations:
+  - name: 'Dublin'
+    region: 'Co. Dublin'
+    dates: 'Apr 19'
+    lat: 53.3418
+    lon: -6.2731
+  - name: 'Sligo'
+    region: 'Co. Sligo'
+    dates: 'Apr 20'
+    lat: 54.2724
+    lon: -8.4775
+  - name: 'Galway'
+    region: 'Co. Galway'
+    dates: 'Apr 21'
+    lat: 53.2709
+    lon: -9.0522
+  - name: 'Inishmore'
+    region: 'Aran Islands'
+    dates: 'Apr 21'
+    lat: 53.1042
+    lon: -9.6563
+  - name: 'Limerick'
+    region: 'Co. Limerick'
+    dates: 'Apr 22'
+    lat: 52.6627
+    lon: -8.6255
+  - name: 'Killarney'
+    region: 'Co. Kerry'
+    dates: 'Apr 23–24'
+    lat: 52.0560
+    lon: -9.4966
+  - name: 'Dingle'
+    region: 'Co. Kerry'
+    dates: 'Apr 24'
+    lat: 52.1391
+    lon: -10.2719
+  - name: 'Kilkenny'
+    region: 'Co. Kilkenny'
+    dates: 'Apr 26–27'
+    lat: 52.6556
+    lon: -7.2487

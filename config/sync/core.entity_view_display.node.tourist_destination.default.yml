@@ -1,0 +1,240 @@
+uuid: 0cbaec04-9591-4cb3-852c-022d9d2736fc
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.tourist_destination.body
+    - field.field.node.tourist_destination.field_editorial
+    - field.field.node.tourist_destination.field_metatag
+    - field.field.node.tourist_destination.schema_address
+    - field.field.node.tourist_destination.schema_geo
+    - field.field.node.tourist_destination.schema_image
+    - field.field.node.tourist_destination.schema_inc_attraction
+    - field.field.node.tourist_destination.schema_includes_attraction
+    - field.field.node.tourist_destination.schema_latitude
+    - field.field.node.tourist_destination.schema_longitude
+    - field.field.node.tourist_destination.schema_place
+    - field.field.node.tourist_destination.schema_related_link
+    - field.field.node.tourist_destination.schema_significant_link
+    - field.field.node.tourist_destination.schema_subject_of
+    - field.field.node.tourist_destination.schema_telephone
+    - field.field.node.tourist_destination.schema_tourist_type
+    - node.type.tourist_destination
+  module:
+    - address
+    - entity_reference_revisions
+    - field_group
+    - geofield
+    - link
+    - text
+    - user
+third_party_settings:
+  field_group:
+    group_contact:
+      children:
+        - schema_address
+        - schema_latitude
+        - schema_longitude
+        - schema_telephone
+      label: Contact
+      parent_name: ''
+      region: content
+      weight: -18
+      format_type: fieldset
+      format_settings: {  }
+    group_general:
+      children:
+        - schema_image
+        - body
+        - title
+      label: General
+      parent_name: ''
+      region: content
+      weight: -20
+      format_type: fieldset
+      format_settings: {  }
+    group_tourist_destination:
+      children:
+        - schema_inc_attraction
+        - schema_tourist_type
+      label: 'Tourist destination'
+      parent_name: ''
+      region: content
+      weight: 0
+      format_type: fieldset
+      format_settings: {  }
+    group_references:
+      children:
+        - schema_subject_of
+      label: References
+      parent_name: ''
+      region: content
+      weight: 22
+      format_type: fieldset
+      format_settings: {  }
+    group_editorial:
+      children:
+        - field_editorial
+      label: 'Editorial information'
+      parent_name: ''
+      region: content
+      weight: 220
+      format_type: details
+      format_settings: {  }
+    group_links:
+      children:
+        - schema_related_link
+        - schema_significant_link
+      label: Links
+      parent_name: ''
+      region: content
+      weight: 20
+      format_type: fieldset
+      format_settings: {  }
+id: node.tourist_destination.default
+targetEntityType: node
+bundle: tourist_destination
+mode: default
+content:
+  body:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 18
+    region: content
+  field_editorial:
+    type: entity_reference_revisions_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 111
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -100
+    region: content
+  schema_address:
+    type: address_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  schema_geo:
+    type: geofield_default
+    label: above
+    settings:
+      output_format: wkt
+      output_escape: true
+    third_party_settings: {  }
+    weight: 221
+    region: content
+  schema_image:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 23
+    region: content
+  schema_inc_attraction:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 110
+    region: content
+  schema_includes_attraction:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 222
+    region: content
+  schema_latitude:
+    type: number_decimal
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  schema_longitude:
+    type: number_decimal
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  schema_place:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 224
+    region: content
+  schema_related_link:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  schema_significant_link:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  schema_subject_of:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  schema_telephone:
+    type: basic_string
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 4
+    region: content
+  schema_tourist_type:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 110
+    region: content
+hidden:
+  field_metatag: true
+  langcode: true

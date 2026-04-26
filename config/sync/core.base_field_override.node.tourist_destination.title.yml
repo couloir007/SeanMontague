@@ -1,0 +1,18 @@
+uuid: 8cf0c786-3a43-448c-8dc4-1435176e3fb9
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.tourist_destination
+id: node.tourist_destination.title
+field_name: title
+entity_type: node
+bundle: tourist_destination
+label: Name
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

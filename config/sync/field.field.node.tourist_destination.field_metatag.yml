@@ -1,0 +1,21 @@
+uuid: 9964a558-c602-49be-ad44-019d246a26a8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_metatag
+    - node.type.tourist_destination
+  module:
+    - metatag
+id: node.tourist_destination.field_metatag
+field_name: field_metatag
+entity_type: node
+bundle: tourist_destination
+label: 'Meta tags'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: metatag

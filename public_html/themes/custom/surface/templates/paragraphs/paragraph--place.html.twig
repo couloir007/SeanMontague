@@ -13,7 +13,7 @@
 
 <div{{ attributes.addClass('paragraph', 'paragraph--type--place') }}>
   {% include '@components/places-card/places-card.twig' with {
-    'name':     paragraph.label,
+    'name':     paragraph.label.value,
     'subtitle': content.schema_address|field_value,
     'coords':   has_geo ? lat|round(4) ~ '° N, ' ~ lon|abs|round(4) ~ '° W',
     'desc':     content.body|field_value,
