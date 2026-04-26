@@ -1,0 +1,30 @@
+{#
+/**
+ * @file
+ * Homepage writing grid — renders each article row into card.twig.
+ *
+ * Template suggestion: views-view-unformatted--homepage-writing.html.twig
+ * Matches View ID: homepage_writing, all displays.
+ *
+ * The URL is sourced from the node path via the title field's link_to_entity
+ * setting being false — the path field provides the raw alias. If the path
+ * field is not available, falls back to the title field's linked output.
+ *
+ * category_key derives from the category label — used for BEM modifier CSS
+ * (card--trails, card--maps, card--tech, card--garden).
+ *
+ * @see @components/card/card.twig
+ * @see views-view-unformatted.html.twig
+ */
+#}
+{% for row in rows %}
+  {% set category = row.content.schema_category|render|striptags|trim %}
+  {% include '@components/card/card.twig' with {
+    'url':          row.content.title|render|striptags|trim,
+    'title':        row.content.title|render|striptags|trim,
+    'excerpt':      row.content.body|render|striptags|trim,
+    'date':         row.content.schema_date_published|render|striptags|trim,
+    'category':     category,
+    'category_key': category|lower|replace({' ': '-', '/': '-', '+': '', '&': ''})|trim('-'),
+  } only %}
+{% endfor %}

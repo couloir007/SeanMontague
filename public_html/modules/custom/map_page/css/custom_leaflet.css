@@ -586,17 +586,11 @@ select.leaflet-control-select {
   display: none !important;
 }
 
-.leaflet .edan_object_thumbs figure.slick-slide {
-  margin: 0 5px;
-}
 
 .leaflet figure.slick-slide {
   width: 129px !important;
 }
 
-.leaflet .edan_object_thumbs.slick-dotted.slick-slider {
-  margin-bottom: 15px;
-}
 
 .org-name-container {
   display: flex;

@@ -6,6 +6,7 @@ dependencies:
     - core.entity_form_mode.node.inline_entity_form
     - field.field.node.article.body
     - field.field.node.article.field_editorial
+    - field.field.node.article.field_featured
     - field.field.node.article.field_map_tiles
     - field.field.node.article.field_metatag
     - field.field.node.article.field_route_type
@@ -122,6 +123,7 @@ content:
 hidden:
   body: true
   field_editorial: true
+  field_featured: true
   field_map_tiles: true
   field_metatag: true
   field_route_type: true

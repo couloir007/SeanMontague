@@ -5,7 +5,9 @@ dependencies:
   config:
     - field.field.node.tourist_destination.body
     - field.field.node.tourist_destination.field_editorial
+    - field.field.node.tourist_destination.field_featured
     - field.field.node.tourist_destination.field_metatag
+    - field.field.node.tourist_destination.field_subtitle
     - field.field.node.tourist_destination.schema_address
     - field.field.node.tourist_destination.schema_geo
     - field.field.node.tourist_destination.schema_image
@@ -18,6 +20,7 @@ dependencies:
     - field.field.node.tourist_destination.schema_significant_link
     - field.field.node.tourist_destination.schema_subject_of
     - field.field.node.tourist_destination.schema_telephone
+    - field.field.node.tourist_destination.schema_topic
     - field.field.node.tourist_destination.schema_tourist_type
     - node.type.tourist_destination
   module:
@@ -26,6 +29,7 @@ dependencies:
     - field_group
     - geofield
     - link
+    - telephone
     - text
     - user
 third_party_settings:
@@ -33,24 +37,24 @@ third_party_settings:
     group_contact:
       children:
         - schema_address
-        - schema_latitude
         - schema_longitude
+        - schema_latitude
         - schema_telephone
       label: Contact
       parent_name: ''
       region: content
-      weight: -18
+      weight: 1
       format_type: fieldset
       format_settings: {  }
     group_general:
       children:
-        - schema_image
+        - field_subtitle
         - body
-        - title
+        - schema_image
       label: General
       parent_name: ''
       region: content
-      weight: -20
+      weight: 0
       format_type: fieldset
       format_settings: {  }
     group_tourist_destination:
@@ -60,7 +64,7 @@ third_party_settings:
       label: 'Tourist destination'
       parent_name: ''
       region: content
-      weight: 0
+      weight: 2
       format_type: fieldset
       format_settings: {  }
     group_references:
@@ -69,7 +73,7 @@ third_party_settings:
       label: References
       parent_name: ''
       region: content
-      weight: 22
+      weight: 4
       format_type: fieldset
       format_settings: {  }
     group_editorial:
@@ -78,7 +82,7 @@ third_party_settings:
       label: 'Editorial information'
       parent_name: ''
       region: content
-      weight: 220
+      weight: 5
       format_type: details
       format_settings: {  }
     group_links:
@@ -88,7 +92,7 @@ third_party_settings:
       label: Links
       parent_name: ''
       region: content
-      weight: 20
+      weight: 3
       format_type: fieldset
       format_settings: {  }
 id: node.tourist_destination.default
@@ -101,7 +105,7 @@ content:
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 18
+    weight: 20
     region: content
   field_editorial:
     type: entity_reference_revisions_entity_view
@@ -112,10 +116,18 @@ content:
     third_party_settings: {  }
     weight: 111
     region: content
+  field_subtitle:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 19
+    region: content
   links:
     settings: {  }
     third_party_settings: {  }
-    weight: -100
+    weight: 10
     region: content
   schema_address:
     type: address_default
@@ -131,7 +143,7 @@ content:
       output_format: wkt
       output_escape: true
     third_party_settings: {  }
-    weight: 221
+    weight: 6
     region: content
   schema_image:
     type: entity_reference_entity_view
@@ -140,7 +152,7 @@ content:
       view_mode: default
       link: false
     third_party_settings: {  }
-    weight: 23
+    weight: 21
     region: content
   schema_inc_attraction:
     type: string
@@ -156,7 +168,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 222
+    weight: 7
     region: content
   schema_latitude:
     type: number_decimal
@@ -167,7 +179,7 @@ content:
       scale: 2
       prefix_suffix: true
     third_party_settings: {  }
-    weight: 3
+    weight: 2
     region: content
   schema_longitude:
     type: number_decimal
@@ -178,7 +190,7 @@ content:
       scale: 2
       prefix_suffix: true
     third_party_settings: {  }
-    weight: 2
+    weight: 1
     region: content
   schema_place:
     type: entity_reference_label
@@ -186,7 +198,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 224
+    weight: 8
     region: content
   schema_related_link:
     type: link
@@ -221,11 +233,20 @@ content:
     weight: 1
     region: content
   schema_telephone:
-    type: basic_string
+    type: telephone_link
     label: above
-    settings: {  }
+    settings:
+      title: ''
     third_party_settings: {  }
     weight: 4
+    region: content
+  schema_topic:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 9
     region: content
   schema_tourist_type:
     type: string
@@ -233,8 +254,9 @@ content:
     settings:
       link_to_entity: false
     third_party_settings: {  }
-    weight: 110
+    weight: 111
     region: content
 hidden:
+  field_featured: true
   field_metatag: true
   langcode: true

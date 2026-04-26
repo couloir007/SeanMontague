@@ -1,0 +1,38 @@
+{#
+/**
+ * @file
+ * Homepage places grid — renders each tourist destination row into
+ * places-card.twig.
+ *
+ * Template suggestion: views-view-unformatted--homepage-places.html.twig
+ * Matches View ID: homepage_places, all displays.
+ *
+ * schema_tourist_type is a plain text field with unlimited cardinality.
+ * The View renders all values separated by commas — split on ', ' to
+ * reconstruct the tags array for the places-card component.
+ *
+ * schema_geo is rendered but not passed to places-card directly — the
+ * coords display string is derived from the field output. The places-card
+ * component shows coords as a decorative string; actual map rendering uses
+ * the node template, not the homepage card.
+ *
+ * @see @components/places-card/places-card.twig
+ * @see views-view-unformatted.html.twig
+ */
+#}
+{% for row in rows %}
+  {# Split comma-separated tourist types into a tags array. #}
+  {% set types_raw = row.content.schema_tourist_type|render|striptags|trim %}
+  {% set tags = types_raw ? types_raw|split(', ')|map(t => t|trim)|filter(t => t) : [] %}
+
+  {# Derive display coords from schema_geo rendered output. #}
+  {% set coords_raw = row.content.schema_geo|render|striptags|trim %}
+
+  {% include '@components/places-card/places-card.twig' with {
+    'name':     row.content.title|render|striptags|trim,
+    'subtitle': row.content.field_subtitle|render|striptags|trim,
+    'desc':     row.content.body|render|striptags|trim,
+    'coords':   coords_raw,
+    'tags':     tags,
+  } only %}
+{% endfor %}

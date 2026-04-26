@@ -39,6 +39,7 @@
         "drupal/devel": "^5.1",
         "drupal/devel_entity_updates": "^4.2",
         "drupal/diff": "^1.9",
+        "drupal/draggableviews": "^2.1",
         "drupal/easy_breadcrumb": "^2.0",
         "drupal/embed": "^1.10",
         "drupal/embedded_content": "^2.0",

@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.field.node.article.body
     - field.field.node.article.field_editorial
+    - field.field.node.article.field_featured
     - field.field.node.article.field_map_tiles
     - field.field.node.article.field_metatag
     - field.field.node.article.field_route_type
@@ -135,6 +136,7 @@ third_party_settings:
         description: ''
     group_editorial:
       children:
+        - field_featured
         - field_editorial
       label: Editorial
       region: content
@@ -190,7 +192,7 @@ content:
         hide_guidelines: '1'
   field_editorial:
     type: inline_entity_form_simple
-    weight: 11
+    weight: 13
     region: content
     settings:
       form_mode: default
@@ -200,6 +202,13 @@ content:
       collapsible: false
       collapsed: false
       revision: false
+    third_party_settings: {  }
+  field_featured:
+    type: boolean_checkbox
+    weight: 12
+    region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   field_map_tiles:
     type: options_select

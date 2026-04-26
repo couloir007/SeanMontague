@@ -1,20 +1,144 @@
-{%
-  set classes = [
-    'node',
-    'node--type-' ~ node.bundle|clean_class,
-    not node.isPublished() ? 'node--unpublished',
-    view_mode ? 'node--view-mode-' ~ view_mode|clean_class,
-  ]
-%}
-<article{{ attributes.addClass(classes) }}>
-  {{ title_prefix }}
-  {% if not page %}
-    <h2{{ title_attributes }}>
-      <a href="{{ url }}" rel="bookmark">{{ label }}</a>
-    </h2>
-  {% endif %}
-  {{ title_suffix }}
-  <div{{ content_attributes }}>
-    {{ content }}
-  </div>
-</article>
+{#
+/**
+ * @file
+ * Front page template for the web_page bundle.
+ *
+ * Activated via surface_theme_suggestions_node_alter() when
+ * node.bundle() === 'web_page' and path.matcher::isFrontPage() is TRUE.
+ *
+ * Wires the Drupal node context to @layouts/site-homepage/site-homepage.twig.
+ * Static sections (hero, marquee, about, contact) pull from hardcoded values
+ * below. Dynamic sections (writing, places) use drupal_view().
+ *
+ * @see surface_theme_suggestions_node_alter()
+ * @see source/patterns/layouts/site-homepage/site-homepage.twig
+ */
+#}
+
+{% extends '@layouts/site-container/site-container.twig' %}
+
+{% block header %}
+  {% include '@components/nav/nav.twig' with {
+    'logo_text': 'Sean Montague <span>· Burke, VT</span>',
+    'logo_url':  '/',
+    'links': [
+      { 'text': 'Maps',    'url': '#maps' },
+      { 'text': 'Writing', 'url': '#writing' },
+      { 'text': 'Places',  'url': '#places' },
+      { 'text': 'About',   'url': '#about' },
+      { 'text': 'Contact', 'url': '#contact' },
+    ],
+  } only %}
+{% endblock %}
+
+{% block main %}
+  {{ attach_library('surface/site-homepage') }}
+
+  {# ── Hero ─────────────────────────────────────────────────────────────── #}
+  {% include '@components/hero/hero.twig' with {
+    'map_id':     'hero-map',
+    'map_center': '44.593,-71.918',
+    'map_zoom':   11,
+    'map_markers': [
+      { 'lat': 44.5965, 'lon': -71.9105, 'color': '#3a5a40', 'label': '<strong>Kingdom Trails HQ</strong><br>East Burke, VT' },
+      { 'lat': 44.5847, 'lon': -71.9012, 'color': '#7a3410', 'label': '<strong>Burke Mountain</strong><br>3,271 ft' },
+    ],
+    'eyebrow':  'Burke, Vermont · Northeast Kingdom',
+    'name':     'SEAN<br>MONTAGUE',
+    'tagline':  'Maps, trails, and growing things. Web developer at the Smithsonian, living and exploring in the Northeast Kingdom.',
+    'cta_primary': { 'text': 'Explore the Maps',  'url': '#maps' },
+    'cta_ghost':   { 'text': 'Read the Writing',  'url': '#writing' },
+    'categories': [
+      { 'text': 'Kingdom Trails', 'icon': '🌲', 'url': '#places' },
+      { 'text': 'Burke Mountain', 'icon': '⛷',  'url': '#places' },
+      { 'text': 'Permaculture',   'icon': '🌱', 'url': '#places' },
+      { 'text': 'Leaflet Maps',   'icon': '🗺',  'url': '#maps' },
+      { 'text': 'Writing',        'icon': '✍',  'url': '#writing' },
+    ],
+  } only %}
+
+  {# ── Marquee ──────────────────────────────────────────────────────────── #}
+  {% include '@components/marquee/marquee.twig' with {
+    'items': [
+      'Kingdom Trails',
+      'Burke Mountain',
+      'Leaflet Mapping',
+      'Permaculture',
+      'Drupal',
+      'Northeast Kingdom',
+      'Open Source',
+      'Smithsonian NMNH',
+    ],
+  } only %}
+
+  {# ── Map section ──────────────────────────────────────────────────────── #}
+  {% include '@collections/map-section/map-section.twig' with {
+    'label':    'Interactive Maps',
+    'title':    'The Kingdom, <em>mapped.</em>',
+    'text':     '<p>Custom Leaflet maps of the places I know best — Kingdom Trails singletrack, Burke Mountain terrain, back-road touring routes, and the land around Burke.</p><p>Built with Leaflet.js, USGS National Map tiles, and GeoJSON from years of riding, skiing, and wandering.</p>',
+    'map_id':   'featured-map',
+    'map_center': '44.593,-71.918',
+    'map_zoom': 12,
+    'links': [
+      { 'text': 'Kingdom Trails Network',  'url': '/places/kingdom-trails' },
+      { 'text': 'Burke Mountain Ski Lines', 'url': '/places/burke-mountain' },
+    ],
+  } only %}
+
+  {# ── Writing — latest articles ────────────────────────────────────────── #}
+  <section class="homepage__writing" id="writing">
+    <span class="homepage__eyebrow">Writing</span>
+    <div class="homepage__cards-grid">
+      {{ drupal_view('homepage_writing', 'block_1') }}
+    </div>
+  </section>
+
+  {# ── Places & Projects ────────────────────────────────────────────────── #}
+  <section class="homepage__places" id="places">
+    <span class="homepage__eyebrow">Places &amp; Projects</span>
+    <div class="homepage__places-grid">
+      {{ drupal_view('homepage_places', 'block_1') }}
+    </div>
+  </section>
+
+  {# ── About ────────────────────────────────────────────────────────────── #}
+  {% include '@components/about/about.twig' with {
+    'label': 'About',
+    'title': 'Builder, rider, <em>grower.</em>',
+    'skills': [
+      'Smithsonian NMNH',
+      'Drupal & Twig',
+      'Leaflet & GIS / Mapping',
+      'SVG & Data Visualization',
+      'JavaScript / Open Source',
+      'Permaculture Design',
+      'Kingdom Trails regular',
+    ],
+    'paragraphs': [
+      "I'm Sean Montague — a web developer based in Burke, Vermont, in the Northeast Kingdom. I work at the Smithsonian National Museum of Natural History, building Drupal systems, interactive maps, and data visualization tools for one of the world's great natural history institutions.",
+      "This site is a personal outlet for the things I care about outside of work: riding Kingdom Trails, skiing Burke Mountain, building a food forest, and making maps of the places I know well.",
+      "The technical stuff — Leaflet, GeoJSON, Twig, SVG — bleeds into the personal projects too. That's fine by me.",
+    ],
+  } only %}
+
+  {# ── Contact ──────────────────────────────────────────────────────────── #}
+  {% include '@components/contact/contact.twig' with {
+    'label':    'Contact',
+    'headline': 'Say hello.',
+    'sub':      'Always happy to talk trails, maps, or growing things.',
+    'email':    'sean@seanmontague.com',
+  } only %}
+
+{% endblock %}
+
+{% block footer %}
+  {% include '@components/footer/footer.twig' with {
+    'brand_text':     'Sean Montague · Burke, VT',
+    'copyright_text': '© 2025 Sean Montague',
+    'links': [
+      { 'text': 'GitHub',     'url': 'https://github.com/seanmontague' },
+      { 'text': 'Drupal.org', 'url': 'https://drupal.org/u/seanmontague' },
+      { 'text': 'LinkedIn',   'url': 'https://linkedin.com/in/seanmontague' },
+    ],
+  } only %}
+{% endblock %}

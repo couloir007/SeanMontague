@@ -36,6 +36,7 @@ module:
   devel_entity_updates: 0
   devel_generate: 0
   diff: 0
+  draggableviews: 0
   dynamic_page_cache: 0
   easy_breadcrumb: 0
   editor: 0

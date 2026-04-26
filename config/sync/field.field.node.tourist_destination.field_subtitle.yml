@@ -1,0 +1,19 @@
+uuid: 74c97336-bebe-416d-b4be-4b31f9ebe9cb
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_subtitle
+    - node.type.tourist_destination
+id: node.tourist_destination.field_subtitle
+field_name: field_subtitle
+entity_type: node
+bundle: tourist_destination
+label: Subtitle
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

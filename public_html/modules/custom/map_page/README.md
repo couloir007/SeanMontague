@@ -1,55 +1,77 @@
-Map Page — How to use
+# Map Page
 
-Overview
-- Test page to render an EDAN media viewer (iframe) from an EDAN record.
-- Custom serializer Normalizer for field_edan_record in Views REST exports.
+Provides full-page Leaflet mapping functionality for seanmontague.com,
+driven by `geo_entity` bundles. Exposes a configurable GeoJSON endpoint
+and wires Views display extender template suggestions for map layouts.
 
-Prerequisites
-- Enable modules: Serialization, REST, Views, Map Page, edan_connector and the EDAN provider it depends on.
-- Clear caches after enabling or updating (drush cr).
+---
 
-1) EDAN iframe test route
-This route renders a full-height iframe using the first media item from an EDAN record.
+## Overview
 
-Paths (admin only):
-- /admin/config/development/map-page/edan-test/edanmdm:nmnhanthro_12345
-- /admin/config/development/map-page/edan-test?edan_id=edanmdm:nmnhanthro_12345
-- /admin/config/development/map-page/edan-test?url=url:edanmdm:nmnhanthro_12345
+- **GeoJSON endpoint** — `/map-page/map-items/{bundle}` serves any
+  `geo_entity` bundle as a GeoJSON FeatureCollection for client-side
+  Leaflet rendering.
+- **Views integration** — a `map_page_display_extender` drives template
+  selection (`legend` or `no_legend`) per Views display.
+- **Settings form** — `/admin/config/map-page/settings` configures the
+  default bundle, geo field name, and field map for the endpoint.
 
-Parameter precedence
-- If route/path {edan_id} is provided, it wins.
-- Else, if query edan_id is provided, use it.
-- Else, if url is provided, use getObjectByUrl(url).
-- Else, a safe sample fallback is used.
+---
 
-Code reference
-- Controller: src/Controller/EdanTestController.php
-- Service wrapper: src/Service/LeafletEdanObjectService.php
-- Routing: map_page.routing.yml
+## Prerequisites
 
-2) Views REST export Normalizer (field_edan_record)
-The module registers a serializer normalizer that only acts on the field named field_edan_record. It extends Drupal\serialization\Normalizer\FieldNormalizer and post-processes the value of each field item during serialization.
+- Enable modules: Field, Views, Geofield, Taxonomy, Paragraphs,
+  Serialization, `geo_entity`, `map_page`.
+- Clear caches after enabling or updating: `lando drush cr`.
 
-How to use
-- Ensure the Serialization and REST modules are enabled.
-- Create or edit a View with a REST export display (e.g., JSON format).
-- In the REST export display, set Row style to "Entity" (not "Fields"). Normalizers only run when the serializer processes entities/fields.
-- Add the field field_edan_record to the display (it can still be included in the output when using Row: Entity with a suitable serializer output).
-- When the view is requested, the normalizer is applied to that field.
+---
 
-Customize processing
-- Edit src/Normalizer/EdanRecordNormalizer.php
-- Implement your logic in processEdanRecord($value, array $context = []) to transform the output (e.g., decode/encode JSON, filter keys, map to a summary).
+## GeoJSON endpoint
 
-Quick test
-- After setting up a REST export view, request it with curl:
-  curl -H "Accept: application/json" "https://example.org/path/to/your/rest/export"
+Returns all published `geo_entity` records for the given bundle as a
+GeoJSON FeatureCollection. Used by `map.js` to load map markers.
 
-Troubleshooting
-- Iframe route shows error: Confirm the EDAN ID/URL is valid and edan_connector is configured.
-- REST output unchanged: Verify the field is named exactly field_edan_record and that REST/Serialization are enabled. Clear caches.
-- Permissions: The test routes are restricted to administrators (administer site configuration). Adjust if you need broader access.
+```
+GET /map-page/map-items/{bundle}
+GET /map-page/map-items          ← uses configured default bundle
+```
 
-Support & Maintenance
-- Hook help: Admin > Help > Map Page shows these instructions within Drupal.
-- Keep your caches clear after updating code: drush cr.
+**Response:**
+```json
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "42",
+      "geometry": { "type": "Point", "coordinates": [-71.91, 44.59] },
+      "properties": { "title": "Kingdom Trails HQ" }
+    }
+  ]
+}
+```
+
+Configure the default bundle, geo field, and additional field mappings
+at `/admin/config/map-page/settings`.
+
+---
+
+## Views display extender
+
+Add the `Map Page Display Extender` to any Views page display. Set the
+`template` option to `legend` or `no_legend` to select the map layout:
+
+- **legend** — sidebar list + map panel (`views-view--map-page--legend.html.twig`)
+- **no_legend** — full-width map (`views-view--map-page--no_legend.html.twig`)
+
+The `map-interaction.js` script reads `drupalSettings.map_page.itemsEndpoint`
+to fetch GeoJSON and render markers after page load.
+
+---
+
+## Commands
+
+```bash
+lando drush cr          # clear cache after template or code changes
+lando drush cex         # export config after settings changes
+```

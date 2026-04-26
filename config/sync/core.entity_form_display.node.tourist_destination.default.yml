@@ -5,7 +5,9 @@ dependencies:
   config:
     - field.field.node.tourist_destination.body
     - field.field.node.tourist_destination.field_editorial
+    - field.field.node.tourist_destination.field_featured
     - field.field.node.tourist_destination.field_metatag
+    - field.field.node.tourist_destination.field_subtitle
     - field.field.node.tourist_destination.schema_address
     - field.field.node.tourist_destination.schema_geo
     - field.field.node.tourist_destination.schema_image
@@ -18,6 +20,7 @@ dependencies:
     - field.field.node.tourist_destination.schema_significant_link
     - field.field.node.tourist_destination.schema_subject_of
     - field.field.node.tourist_destination.schema_telephone
+    - field.field.node.tourist_destination.schema_topic
     - field.field.node.tourist_destination.schema_tourist_type
     - node.type.tourist_destination
   module:
@@ -36,26 +39,27 @@ third_party_settings:
     group_contact:
       children:
         - schema_address
-        - schema_latitude
         - schema_longitude
+        - schema_latitude
         - schema_telephone
       label: Contact
       region: content
       parent_name: ''
-      weight: -18
+      weight: 1
       format_type: details
       format_settings:
         open: true
         description: ''
     group_general:
       children:
-        - schema_image
-        - body
         - title
+        - field_subtitle
+        - body
+        - schema_image
       label: General
       region: content
       parent_name: ''
-      weight: -20
+      weight: 0
       format_type: details
       format_settings:
         open: true
@@ -67,7 +71,7 @@ third_party_settings:
       label: 'Tourist destination'
       region: content
       parent_name: ''
-      weight: 0
+      weight: 2
       format_type: details
       format_settings:
         open: true
@@ -78,18 +82,19 @@ third_party_settings:
       label: References
       region: content
       parent_name: ''
-      weight: 22
+      weight: 8
       format_type: details
       format_settings:
         open: true
         description: ''
     group_editorial:
       children:
+        - field_featured
         - field_editorial
       label: 'Editorial information'
       region: content
       parent_name: ''
-      weight: 220
+      weight: 11
       format_type: details_sidebar
       format_settings:
         description: 'Track the editorial decisions and status of a document.'
@@ -100,7 +105,7 @@ third_party_settings:
       label: Links
       region: content
       parent_name: ''
-      weight: 20
+      weight: 7
       format_type: details
       format_settings:
         open: true
@@ -112,7 +117,7 @@ mode: default
 content:
   body:
     type: text_textarea_with_summary
-    weight: 18
+    weight: 3
     region: content
     settings:
       rows: 9
@@ -125,13 +130,13 @@ content:
         hide_guidelines: '1'
   created:
     type: datetime_timestamp
-    weight: 200
+    weight: 15
     region: content
     settings: {  }
     third_party_settings: {  }
   field_editorial:
     type: inline_entity_form_simple
-    weight: 221
+    weight: 10
     region: content
     settings:
       form_mode: default
@@ -142,44 +147,52 @@ content:
       collapsed: false
       revision: false
     third_party_settings: {  }
+  field_featured:
+    type: boolean_checkbox
+    weight: 9
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
   field_metatag:
     type: metatag_firehose
-    weight: 99
+    weight: 13
     region: content
     settings:
       sidebar: true
       use_details: true
     third_party_settings: {  }
+  field_subtitle:
+    type: string_textfield
+    weight: 2
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   langcode:
     type: language_select
-    weight: 200
+    weight: 14
     region: content
     settings:
       include_locked: true
     third_party_settings: {  }
   path:
     type: path
-    weight: 220
+    weight: 17
     region: content
     settings: {  }
     third_party_settings: {  }
-  promote:
-    type: boolean_checkbox
-    weight: 210
-    region: content
-    settings:
-      display_label: true
-    third_party_settings: {  }
   schema_address:
     type: address_default
-    weight: 0
+    weight: 112
     region: content
     settings:
       wrapper_type: fieldset
     third_party_settings: {  }
   schema_geo:
     type: leaflet_widget_default
-    weight: 15
+    weight: 6
     region: content
     settings:
       geometry_validation: false
@@ -250,7 +263,7 @@ content:
     third_party_settings: {  }
   schema_image:
     type: entity_reference_autocomplete
-    weight: 23
+    weight: 4
     region: content
     settings:
       match_operator: CONTAINS
@@ -268,7 +281,7 @@ content:
     third_party_settings: {  }
   schema_includes_attraction:
     type: entity_reference_autocomplete
-    weight: 222
+    weight: 10
     region: content
     settings:
       match_operator: CONTAINS
@@ -278,21 +291,21 @@ content:
     third_party_settings: {  }
   schema_latitude:
     type: number
-    weight: 3
+    weight: 114
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   schema_longitude:
     type: number
-    weight: 2
+    weight: 113
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   schema_place:
     type: entity_reference_autocomplete
-    weight: 8
+    weight: 4
     region: content
     settings:
       match_operator: CONTAINS
@@ -302,7 +315,7 @@ content:
     third_party_settings: {  }
   schema_related_link:
     type: linkit
-    weight: 0
+    weight: 12
     region: content
     settings:
       placeholder_url: ''
@@ -312,7 +325,7 @@ content:
     third_party_settings: {  }
   schema_significant_link:
     type: linkit
-    weight: 1
+    weight: 13
     region: content
     settings:
       placeholder_url: ''
@@ -332,34 +345,37 @@ content:
     third_party_settings: {  }
   schema_telephone:
     type: telephone_default
-    weight: 4
+    weight: 115
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
+  schema_topic:
+    type: entity_reference_autocomplete
+    weight: 3
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   schema_tourist_type:
     type: string_textfield
-    weight: 110
+    weight: 112
     region: content
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
   simple_sitemap:
-    weight: 220
+    weight: 18
     region: content
     settings: {  }
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 220
-    region: content
-    settings:
-      display_label: true
-    third_party_settings: {  }
-  sticky:
-    type: boolean_checkbox
-    weight: 210
+    weight: 16
     region: content
     settings:
       display_label: true
@@ -373,25 +389,18 @@ content:
       placeholder: ''
     third_party_settings: {  }
   translation:
-    weight: 10
+    weight: 5
     region: content
     settings: {  }
     third_party_settings: {  }
-  uid:
-    type: entity_reference_autocomplete
-    weight: 200
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
   url_redirects:
-    weight: 50
+    weight: 12
     region: content
     settings: {  }
     third_party_settings: {  }
 hidden:
+  promote: true
   publish_on: true
+  sticky: true
+  uid: true
   unpublish_on: true
