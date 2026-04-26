@@ -5,7 +5,6 @@ dependencies:
   config:
     - field.field.node.article.body
     - field.field.node.article.field_editorial
-    - field.field.node.article.field_image
     - field.field.node.article.field_map_tiles
     - field.field.node.article.field_metatag
     - field.field.node.article.field_route_type
@@ -29,6 +28,7 @@ dependencies:
     - field.field.node.article.schema_geo
     - field.field.node.article.schema_geoshape
     - field.field.node.article.schema_image
+    - field.field.node.article.schema_is_part_of
     - field.field.node.article.schema_lodging
     - field.field.node.article.schema_place
     - field.field.node.article.schema_poi
@@ -68,14 +68,14 @@ third_party_settings:
         description: ''
     group_location:
       children:
-        0: field_map_tiles
-        1: schema_place
-        2: schema_trip
-        3: schema_lodging
-        5: schema_poi
-        6: field_route_type
-        7: schema_geoshape
-        8: schema_geo
+        - field_map_tiles
+        - schema_place
+        - schema_trip
+        - schema_lodging
+        - schema_poi
+        - field_route_type
+        - schema_geoshape
+        - schema_geo
       label: 'Location & Trip'
       region: content
       parent_name: ''
@@ -139,20 +139,20 @@ third_party_settings:
       label: Editorial
       region: content
       parent_name: ''
-      weight: 220
+      weight: 8
       format_type: details_sidebar
       format_settings:
         description: 'Track the editorial decisions and status of a document.'
     group_general:
       children:
         - schema_article_type
-        - schema_image
-        - body
         - title
+        - body
+        - schema_image
       label: General
       region: content
       parent_name: ''
-      weight: -20
+      weight: 0
       format_type: details
       format_settings:
         open: true
@@ -161,10 +161,11 @@ third_party_settings:
       children:
         - schema_about
         - schema_subject_of
+        - schema_is_part_of
       label: References
       region: content
       parent_name: ''
-      weight: 22
+      weight: 6
       format_type: details
       format_settings:
         open: true
@@ -187,12 +188,6 @@ content:
       allowed_formats:
         hide_help: '1'
         hide_guidelines: '1'
-  created:
-    type: datetime_timestamp
-    weight: 200
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   field_editorial:
     type: inline_entity_form_simple
     weight: 11
@@ -205,16 +200,6 @@ content:
       collapsible: false
       collapsed: false
       revision: false
-    third_party_settings: {  }
-  field_image:
-    type: entity_reference_autocomplete
-    weight: 21
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
     third_party_settings: {  }
   field_map_tiles:
     type: options_select
@@ -242,32 +227,25 @@ content:
     third_party_settings: {  }
   langcode:
     type: language_select
-    weight: 200
+    weight: 13
     region: content
     settings:
       include_locked: true
     third_party_settings: {  }
   path:
     type: path
-    weight: 220
+    weight: 11
     region: content
     settings: {  }
     third_party_settings: {  }
-  promote:
-    type: boolean_checkbox
-    weight: 210
-    region: content
-    settings:
-      display_label: true
-    third_party_settings: {  }
   scheduler_settings:
-    weight: 18
+    weight: 16
     region: content
     settings: {  }
     third_party_settings: {  }
   schema_about:
     type: entity_reference_autocomplete
-    weight: 0
+    weight: 20
     region: content
     settings:
       match_operator: CONTAINS
@@ -289,7 +267,7 @@ content:
     third_party_settings: {  }
   schema_audio:
     type: entity_reference_autocomplete
-    weight: 8
+    weight: 20
     region: content
     settings:
       match_operator: CONTAINS
@@ -311,7 +289,7 @@ content:
     third_party_settings: {  }
   schema_destination:
     type: entity_reference_autocomplete
-    weight: 26
+    weight: 7
     region: content
     settings:
       match_operator: CONTAINS
@@ -321,62 +299,62 @@ content:
     third_party_settings: {  }
   schema_difficulty:
     type: options_select
-    weight: 8
+    weight: 13
     region: content
     settings: {  }
     third_party_settings: {  }
   schema_distance_cycling:
-    type: number
-    weight: 15
-    region: content
-    settings:
-      placeholder: ''
-    third_party_settings: {  }
-  schema_distance_driving:
     type: number
     weight: 18
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
+  schema_distance_driving:
+    type: number
+    weight: 22
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
   schema_distance_hiking:
     type: number
-    weight: 16
+    weight: 20
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   schema_distance_walking:
     type: number
-    weight: 17
+    weight: 21
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   schema_elev_gain:
     type: number
-    weight: 9
+    weight: 14
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   schema_elev_loss:
     type: number
-    weight: 10
+    weight: 15
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   schema_elev_max:
     type: number
-    weight: 14
+    weight: 17
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   schema_elev_min:
     type: number
-    weight: 13
+    weight: 16
     region: content
     settings:
       placeholder: ''
@@ -502,6 +480,16 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+  schema_is_part_of:
+    type: entity_reference_autocomplete
+    weight: 22
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   schema_lodging:
     type: entity_reference_autocomplete
     weight: 10
@@ -524,7 +512,7 @@ content:
     third_party_settings: {  }
   schema_poi:
     type: entity_reference_autocomplete
-    weight: 12
+    weight: 11
     region: content
     settings:
       match_operator: CONTAINS
@@ -554,7 +542,7 @@ content:
     third_party_settings: {  }
   schema_subject_of:
     type: entity_reference_autocomplete
-    weight: 1
+    weight: 21
     region: content
     settings:
       match_operator: CONTAINS
@@ -583,20 +571,13 @@ content:
       placeholder: ''
     third_party_settings: {  }
   simple_sitemap:
-    weight: 220
+    weight: 15
     region: content
     settings: {  }
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 220
-    region: content
-    settings:
-      display_label: true
-    third_party_settings: {  }
-  sticky:
-    type: boolean_checkbox
-    weight: 210
+    weight: 9
     region: content
     settings:
       display_label: true
@@ -610,13 +591,13 @@ content:
       placeholder: ''
     third_party_settings: {  }
   translation:
-    weight: 20
+    weight: 14
     region: content
     settings: {  }
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 200
+    weight: 12
     region: content
     settings:
       match_operator: CONTAINS
@@ -625,10 +606,13 @@ content:
       placeholder: ''
     third_party_settings: {  }
   url_redirects:
-    weight: 19
+    weight: 10
     region: content
     settings: {  }
     third_party_settings: {  }
 hidden:
+  created: true
+  promote: true
   publish_on: true
+  sticky: true
   unpublish_on: true

@@ -193,4 +193,4 @@ default_component_weights:
   path: 220
   status: 220
   group_editorial: 220
-default_component_weights_update: true
+default_component_weights_update: false

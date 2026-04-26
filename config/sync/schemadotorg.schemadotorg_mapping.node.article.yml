@@ -8,6 +8,7 @@ dependencies:
     - field.field.node.article.schema_article_type
     - field.field.node.article.schema_destination
     - field.field.node.article.schema_image
+    - field.field.node.article.schema_is_part_of
     - field.field.node.article.schema_related_link
     - field.field.node.article.schema_significant_link
     - field.field.node.article.schema_subject_of
@@ -23,8 +24,8 @@ target_entity_type_id: node
 target_bundle: article
 schema_type: Article
 schema_properties:
-  schema_article_type: additionalType
   schema_about: about
+  schema_article_type: additionalType
   body: articleBody
   schema_destination: contentLocation
   created: dateCreated
@@ -40,6 +41,7 @@ additional_mappings:
       created: dateCreated
       changed: dateModified
       langcode: inLanguage
+      schema_is_part_of: isPartOf
       title: name
       schema_image: primaryImageOfPage
       schema_related_link: relatedLink

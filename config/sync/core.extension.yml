@@ -37,6 +37,7 @@ module:
   devel_generate: 0
   diff: 0
   dynamic_page_cache: 0
+  easy_breadcrumb: 0
   editor: 0
   embed: 0
   embedded_content: 0
@@ -104,6 +105,7 @@ module:
   pgsql: 0
   queue_ui: 0
   r4032login: 0
+  rabbit_hole: 0
   ray_debugger: 0
   ray_debugger_js: 0
   ray_debugger_twig: 0

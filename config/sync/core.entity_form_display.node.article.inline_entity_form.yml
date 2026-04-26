@@ -1,0 +1,159 @@
+uuid: a19c4c07-7ef9-4d3a-a2a9-73eeb2f4c723
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_form_mode.node.inline_entity_form
+    - field.field.node.article.body
+    - field.field.node.article.field_editorial
+    - field.field.node.article.field_map_tiles
+    - field.field.node.article.field_metatag
+    - field.field.node.article.field_route_type
+    - field.field.node.article.schema_about
+    - field.field.node.article.schema_activity_type
+    - field.field.node.article.schema_article_type
+    - field.field.node.article.schema_audio
+    - field.field.node.article.schema_category
+    - field.field.node.article.schema_date_published
+    - field.field.node.article.schema_destination
+    - field.field.node.article.schema_difficulty
+    - field.field.node.article.schema_distance_cycling
+    - field.field.node.article.schema_distance_driving
+    - field.field.node.article.schema_distance_hiking
+    - field.field.node.article.schema_distance_walking
+    - field.field.node.article.schema_elev_gain
+    - field.field.node.article.schema_elev_loss
+    - field.field.node.article.schema_elev_max
+    - field.field.node.article.schema_elev_min
+    - field.field.node.article.schema_event_schedule
+    - field.field.node.article.schema_geo
+    - field.field.node.article.schema_geoshape
+    - field.field.node.article.schema_image
+    - field.field.node.article.schema_is_part_of
+    - field.field.node.article.schema_lodging
+    - field.field.node.article.schema_place
+    - field.field.node.article.schema_poi
+    - field.field.node.article.schema_related_link
+    - field.field.node.article.schema_significant_link
+    - field.field.node.article.schema_subject_of
+    - field.field.node.article.schema_topic
+    - field.field.node.article.schema_trip
+    - node.type.article
+  module:
+    - path
+id: node.article.inline_entity_form
+targetEntityType: node
+bundle: article
+mode: inline_entity_form
+content:
+  created:
+    type: datetime_timestamp
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  langcode:
+    type: language_select
+    weight: 2
+    region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 30
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  promote:
+    type: boolean_checkbox
+    weight: 15
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  simple_sitemap:
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 120
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  sticky:
+    type: boolean_checkbox
+    weight: 16
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: -5
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  translation:
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 5
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  url_redirects:
+    weight: 50
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  body: true
+  field_editorial: true
+  field_map_tiles: true
+  field_metatag: true
+  field_route_type: true
+  publish_on: true
+  scheduler_settings: true
+  schema_about: true
+  schema_activity_type: true
+  schema_article_type: true
+  schema_audio: true
+  schema_category: true
+  schema_date_published: true
+  schema_destination: true
+  schema_difficulty: true
+  schema_distance_cycling: true
+  schema_distance_driving: true
+  schema_distance_hiking: true
+  schema_distance_walking: true
+  schema_elev_gain: true
+  schema_elev_loss: true
+  schema_elev_max: true
+  schema_elev_min: true
+  schema_event_schedule: true
+  schema_geo: true
+  schema_geoshape: true
+  schema_image: true
+  schema_is_part_of: true
+  schema_lodging: true
+  schema_place: true
+  schema_poi: true
+  schema_related_link: true
+  schema_significant_link: true
+  schema_subject_of: true
+  schema_topic: true
+  schema_trip: true
+  unpublish_on: true

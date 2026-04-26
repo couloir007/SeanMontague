@@ -5,19 +5,27 @@ dependencies:
   module:
     - node
 id: schema_node_thing
-label: 'Schema.org: Content - Thing'
+label: Default
 type: 'canonical_entities:node'
-pattern: '[node:schemadotorg:base-path]/[node:schemadotorg:alternate-name]'
+pattern: '[node:menu-link:parents:join-path]/[node:title]'
 selection_criteria:
-  f10c12b3-fb4f-4522-8f59-440b25a49919:
+  d075ef49-4c1c-4f8d-a7c5-c0007141c050:
     id: 'entity_bundle:node'
     negate: false
-    uuid: f10c12b3-fb4f-4522-8f59-440b25a49919
+    uuid: d075ef49-4c1c-4f8d-a7c5-c0007141c050
     context_mapping:
       node: node
     bundles:
       article: article
+      event: event
+      event_series: event_series
+      page: page
+      person: person
+      place: place
+      podcast_episode: podcast_episode
+      podcast_series: podcast_series
       tourist_destination: tourist_destination
+      tourist_trip: tourist_trip
 selection_logic: and
 weight: -10
 relationships: {  }

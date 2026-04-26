@@ -5,7 +5,6 @@ dependencies:
   config:
     - field.storage.node.schema_subject_of
     - node.type.article
-    - node.type.blog_posting
     - node.type.event
     - node.type.event_series
     - node.type.page
@@ -42,7 +41,6 @@ settings:
     ignore_additional_mappings: false
     target_bundles:
       article: article
-      blog_posting: blog_posting
       event: event
       event_series: event_series
       page: page

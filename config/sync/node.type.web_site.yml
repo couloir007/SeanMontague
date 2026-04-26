@@ -4,6 +4,7 @@ status: true
 dependencies:
   module:
     - menu_ui
+    - scheduler
     - type_tray
 third_party_settings:
   menu_ui:
@@ -13,12 +14,26 @@ third_party_settings:
     type_category: page
     type_thumbnail: ''
     type_icon: /modules/contrib/schemadotorg/modules/schemadotorg_type_tray/images/schemadotorg_type_tray/icon/creative_work.png
+    type_description: ''
     existing_nodes_link_text: 'View existing <em class="placeholder">Web Site</em> content'
     type_weight: -19
+  scheduler:
+    expand_fieldset: when_required
+    fields_display_mode: vertical_tab
+    publish_enable: false
+    publish_past_date: error
+    publish_past_date_created: false
+    publish_required: false
+    publish_revision: false
+    publish_touch: false
+    show_message_after_update: true
+    unpublish_enable: false
+    unpublish_required: false
+    unpublish_revision: false
 name: 'Web Site'
 type: web_site
-description: ''
-help: ''
-new_revision: true
+description: null
+help: null
+new_revision: false
 preview_mode: 1
 display_submitted: false

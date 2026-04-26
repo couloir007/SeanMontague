@@ -5,7 +5,6 @@ dependencies:
   config:
     - field.field.node.article.body
     - field.field.node.article.field_editorial
-    - field.field.node.article.field_image
     - field.field.node.article.field_map_tiles
     - field.field.node.article.field_metatag
     - field.field.node.article.field_route_type
@@ -29,6 +28,7 @@ dependencies:
     - field.field.node.article.schema_geo
     - field.field.node.article.schema_geoshape
     - field.field.node.article.schema_image
+    - field.field.node.article.schema_is_part_of
     - field.field.node.article.schema_lodging
     - field.field.node.article.schema_place
     - field.field.node.article.schema_poi
@@ -79,14 +79,6 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 19
-    region: content
-  field_image:
-    type: entity_reference_label
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    weight: 1
     region: content
   field_map_tiles:
     type: list_default
@@ -198,6 +190,14 @@ content:
       link: false
     third_party_settings: {  }
     weight: 23
+    region: content
+  schema_is_part_of:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 24
     region: content
   schema_lodging:
     type: entity_reference_label

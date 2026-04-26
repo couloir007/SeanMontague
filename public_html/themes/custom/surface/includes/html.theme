@@ -31,6 +31,19 @@ function surface_preprocess_region(&$variables) {
   $variables['is_front'] = \Drupal::service('path.matcher')->isFrontPage();
 }
 
+/**
+ * Implements hook_theme_suggestions_node_alter().
+ *
+ * Adds a 'node--page--front' template suggestion for the front page node
+ * so the homepage uses node-homepage.twig while other pages render directly.
+ */
+function surface_theme_suggestions_node_alter(array &$suggestions, array $variables) {
+  $node = $variables['elements']['#node'];
+  if ($node->bundle() === 'page' && \Drupal::service('path.matcher')->isFrontPage()) {
+    $suggestions[] = 'node__page__front';
+  }
+}
+
 function surface_preprocess_field(&$variables): void {
   $rich_field_types = ['text_with_summary', 'text', 'text_long'];
 

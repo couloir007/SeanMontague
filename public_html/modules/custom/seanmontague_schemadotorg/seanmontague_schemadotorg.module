@@ -44,11 +44,60 @@ function seanmontague_schemadotorg_schemadotorg_jsonld_alter(array &$data, Route
     return;
   }
 
+  $is_front = \Drupal::service('path.matcher')->isFrontPage();
+
+  if ($is_front) {
+    $base_url = \Drupal::request()->getSchemeAndHttpHost();
+    if (isset($data['schemadotorg_jsonld_entity']['@url'])) {
+      $data['schemadotorg_jsonld_entity']['@url'] = $base_url . '/';
+    }
+    // Fix outer WebPage wrapper too.
+    foreach ($data as &$block) {
+      if (is_array($block) && ($block['@type'] ?? NULL) === 'WebPage') {
+        $block['@url'] = $base_url . '/';
+      }
+    }
+    unset($block);
+  }
+
   // Set copyrightYear on the mainEntity from schema_date_published.
   // Blueprints defaults to node created time — for content dated to a past
   // trip or article, schema_date_published is the correct year.
   if (isset($data['schemadotorg_jsonld_entity']) && is_array($data['schemadotorg_jsonld_entity'])) {
     $data['schemadotorg_jsonld_entity']['copyrightYear'] = _seanmontague_copyright_year($node);
+  }
+
+
+
+  // Fix breadcrumb — fill missing @id on Home, remove duplicate empty @id items.
+  if (isset($data['schemadotorg_jsonld_breadcrumb_schemadotorg_jsonld'])) {
+    $base_url = \Drupal::request()->getSchemeAndHttpHost();
+
+    foreach ($data['schemadotorg_jsonld_breadcrumb_schemadotorg_jsonld']['itemListElement'] as &$item) {
+      // Home crumb always gets the site root URL.
+      if ($item['item']['@id'] === '' && $item['item']['name'] === 'Home') {
+        $item['item']['@id'] = $base_url . '/';
+      }
+    }
+    unset($item);
+
+    // Remove remaining items with empty @id — these are duplicate crumbs
+    // Blueprints generates before the aliased URL is resolved.
+    $data['schemadotorg_jsonld_breadcrumb_schemadotorg_jsonld']['itemListElement'] = array_values(array_filter(
+      $data['schemadotorg_jsonld_breadcrumb_schemadotorg_jsonld']['itemListElement'],
+      fn($item) => !empty($item['item']['@id'])
+    ));
+
+    // Resequence position numbers after filtering.
+    foreach ($data['schemadotorg_jsonld_breadcrumb_schemadotorg_jsonld']['itemListElement'] as $i => &$item) {
+      $item['position'] = $i + 1;
+    }
+    unset($item);
+
+
+    if ($is_front) {
+      unset($data['schemadotorg_jsonld_breadcrumb_schemadotorg_jsonld']);
+    }
   }
 }
 

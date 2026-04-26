@@ -6,6 +6,7 @@ dependencies:
     - field.field.node.web_site.body
     - field.field.node.web_site.field_editorial
     - field.field.node.web_site.field_metatag
+    - field.field.node.web_site.rabbit_hole__settings
     - field.field.node.web_site.schema_about
     - field.field.node.web_site.schema_image
     - field.field.node.web_site.schema_related_link
@@ -19,6 +20,7 @@ dependencies:
     - linkit
     - metatag
     - path
+    - rabbit_hole
     - text
 third_party_settings:
   field_group:
@@ -133,6 +135,13 @@ content:
     region: content
     settings:
       display_label: true
+    third_party_settings: {  }
+  rabbit_hole__settings:
+    type: rabbit_hole_default
+    weight: 100
+    region: content
+    settings:
+      advanced: true
     third_party_settings: {  }
   schema_about:
     type: entity_reference_autocomplete

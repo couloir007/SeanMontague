@@ -7,21 +7,7 @@ types:
   - MedicalEntity
   - SpecialAnnouncement
   - WebContent
-default_notes: |
-  <h2>Introduction</h2>
-  <p>@todo Add introduction here.</p>
-
-  <h2>FAQ</h2>
-  <p>@todo Add FAQ here.</p>
-
-  <h2>Recommendations</h2>
-  <p>@todo Add recommendations here.</p>
-
-  <h2>Resources</h2>
-  <p>@todo Add resources here.</p>
-
-  <h2>Contacts</h2>
-  <p>@todo Add contacts here.</p>
+default_notes: "<h2>Introduction</h2>\r\n<p>@todo Add introduction here.</p>\r\n\r\n<h2>FAQ</h2>\r\n<p>@todo Add FAQ here.</p>\r\n\r\n<h2>Recommendations</h2>\r\n<p>@todo Add recommendations here.</p>\r\n\r\n<h2>Resources</h2>\r\n<p>@todo Add resources here.</p>\r\n\r\n<h2>Contacts</h2>\r\n<p>@todo Add contacts here.</p>\r\n"
 default_format: full_html
 link_text: 'Read documentation'
 link_modal: true

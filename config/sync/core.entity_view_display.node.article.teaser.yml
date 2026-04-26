@@ -6,7 +6,6 @@ dependencies:
     - core.entity_view_mode.node.teaser
     - field.field.node.article.body
     - field.field.node.article.field_editorial
-    - field.field.node.article.field_image
     - field.field.node.article.field_map_tiles
     - field.field.node.article.field_metatag
     - field.field.node.article.field_route_type
@@ -30,6 +29,7 @@ dependencies:
     - field.field.node.article.schema_geo
     - field.field.node.article.schema_geoshape
     - field.field.node.article.schema_image
+    - field.field.node.article.schema_is_part_of
     - field.field.node.article.schema_lodging
     - field.field.node.article.schema_place
     - field.field.node.article.schema_poi
@@ -38,11 +38,9 @@ dependencies:
     - field.field.node.article.schema_subject_of
     - field.field.node.article.schema_topic
     - field.field.node.article.schema_trip
-    - image.style.medium
     - node.type.article
   module:
     - datetime
-    - media
     - options
     - smart_date
     - text
@@ -59,17 +57,6 @@ content:
       trim_length: 180
     third_party_settings: {  }
     weight: 4
-    region: content
-  field_image:
-    type: media_thumbnail
-    label: hidden
-    settings:
-      image_link: content
-      image_style: medium
-      image_loading:
-        attribute: lazy
-    third_party_settings: {  }
-    weight: 0
     region: content
   links:
     settings: {  }
@@ -144,6 +131,7 @@ hidden:
   schema_geo: true
   schema_geoshape: true
   schema_image: true
+  schema_is_part_of: true
   schema_lodging: true
   schema_place: true
   schema_poi: true
