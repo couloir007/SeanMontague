@@ -3,13 +3,15 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.node.field_featured
+    - field.storage.node.body
     - field.storage.node.field_subtitle
     - field.storage.node.schema_geo
     - field.storage.node.schema_tourist_type
     - node.type.tourist_destination
   module:
+    - geofield
     - node
+    - text
     - user
 id: homepage_places
 label: 'Homepage Places'
@@ -74,52 +76,6 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-        field_subtitle:
-          id: field_subtitle
-          table: node__field_subtitle
-          field: field_subtitle_value
-          relationship: none
-          group_type: group
-          admin_label: ''
-          entity_type: node
-          entity_field: field_subtitle
-          plugin_id: field
-          label: ''
-          exclude: false
-          alter:
-            alter_text: false
-            make_link: false
-            absolute: false
-            word_boundary: false
-            ellipsis: false
-            strip_tags: false
-            trim: false
-            html: false
-          element_type: ''
-          element_class: ''
-          element_label_type: ''
-          element_label_class: ''
-          element_label_colon: false
-          element_wrapper_type: ''
-          element_wrapper_class: ''
-          element_default_classes: true
-          empty: ''
-          hide_empty: false
-          empty_zero: false
-          hide_alter_empty: true
-          click_sort_column: value
-          type: string
-          settings: {  }
-          group_column: value
-          group_columns: {  }
-          group_rows: true
-          delta_limit: 0
-          delta_offset: 0
-          delta_reversed: false
-          delta_first_last: false
-          multi_type: separator
-          separator: ', '
-          field_api_classes: false
         body:
           id: body
           table: node__body
@@ -157,52 +113,6 @@ display:
           type: text_summary_or_trimmed
           settings:
             trim_length: 200
-          group_column: value
-          group_columns: {  }
-          group_rows: true
-          delta_limit: 0
-          delta_offset: 0
-          delta_reversed: false
-          delta_first_last: false
-          multi_type: separator
-          separator: ', '
-          field_api_classes: false
-        schema_tourist_type:
-          id: schema_tourist_type
-          table: node__schema_tourist_type
-          field: schema_tourist_type_value
-          relationship: none
-          group_type: group
-          admin_label: ''
-          entity_type: node
-          entity_field: schema_tourist_type
-          plugin_id: field
-          label: ''
-          exclude: false
-          alter:
-            alter_text: false
-            make_link: false
-            absolute: false
-            word_boundary: false
-            ellipsis: false
-            strip_tags: false
-            trim: false
-            html: false
-          element_type: ''
-          element_class: ''
-          element_label_type: ''
-          element_label_class: ''
-          element_label_colon: false
-          element_wrapper_type: ''
-          element_wrapper_class: ''
-          element_default_classes: true
-          empty: ''
-          hide_empty: false
-          empty_zero: false
-          hide_alter_empty: true
-          click_sort_column: value
-          type: string
-          settings: {  }
           group_column: value
           group_columns: {  }
           group_rows: true
@@ -259,11 +169,137 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
+        field_subtitle:
+          id: field_subtitle
+          table: node__field_subtitle
+          field: field_subtitle
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: field
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: string
+          settings:
+            link_to_entity: false
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+        schema_tourist_type:
+          id: schema_tourist_type
+          table: node__schema_tourist_type
+          field: schema_tourist_type
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: field
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: string
+          settings:
+            link_to_entity: false
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
       pager:
         type: some
         options:
-          items_per_page: 6
           offset: 0
+          items_per_page: 6
       exposed_form:
         type: basic
         options:
@@ -325,7 +361,7 @@ display:
           entity_type: node
           entity_field: type
           plugin_id: bundle
-          operator: 'in'
+          operator: in
           value:
             tourist_destination: tourist_destination
           group: 1
@@ -369,37 +405,47 @@ display:
       relationships: {  }
       header: {  }
       footer: {  }
+      display_extenders: {  }
     cache_metadata:
       max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-        - url.query_args
         - 'user.node_grants:view'
         - user.permissions
-      tags: {  }
+      tags:
+        - 'config:field.storage.node.body'
+        - 'config:field.storage.node.field_subtitle'
+        - 'config:field.storage.node.schema_geo'
+        - 'config:field.storage.node.schema_tourist_type'
+        - schemadotorg_descriptions.settings
   block_1:
     id: block_1
     display_title: 'Homepage Places Block'
     display_plugin: block
     position: 1
     display_options:
-      display_description: 'Six featured tourist destinations for the homepage places grid.'
+      title: ''
       defaults:
         title: false
         use_more: false
         use_more_always: false
         use_more_text: false
-      title: ''
+      display_description: 'Six featured tourist destinations for the homepage places grid.'
       use_more: false
       use_more_always: false
       use_more_text: ''
+      display_extenders: {  }
     cache_metadata:
       max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-        - url.query_args
         - 'user.node_grants:view'
         - user.permissions
-      tags: {  }
+      tags:
+        - 'config:field.storage.node.body'
+        - 'config:field.storage.node.field_subtitle'
+        - 'config:field.storage.node.schema_geo'
+        - 'config:field.storage.node.schema_tourist_type'
+        - schemadotorg_descriptions.settings

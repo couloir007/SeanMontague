@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - core.date_format.article_date
     - field.storage.node.field_featured
     - field.storage.node.schema_category
     - field.storage.node.schema_date_published
@@ -73,6 +74,39 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
+        path:
+          id: path
+          table: node_field_data
+          field: path
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: node
+          plugin_id: node_path
+          label: ''
+          exclude: true
+          alter:
+            alter_text: false
+            make_link: false
+            absolute: true
+            word_boundary: false
+            ellipsis: false
+            strip_tags: false
+            trim: false
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          field_api_classes: false
         schema_date_published:
           id: schema_date_published
           table: node__schema_date_published
@@ -109,8 +143,8 @@ display:
           click_sort_column: value
           type: datetime_default
           settings:
-            format_type: medium
             timezone_override: ''
+            format_type: article_date
           group_column: value
           group_columns: {  }
           group_rows: true
@@ -218,8 +252,8 @@ display:
       pager:
         type: some
         options:
-          items_per_page: 6
           offset: 0
+          items_per_page: 6
       exposed_form:
         type: basic
         options:
@@ -281,7 +315,7 @@ display:
           entity_type: node
           entity_field: type
           plugin_id: bundle
-          operator: 'in'
+          operator: in
           value:
             article: article
           group: 1
@@ -340,13 +374,13 @@ display:
     display_plugin: block
     position: 1
     display_options:
-      display_description: 'Six featured articles for the homepage writing grid.'
+      title: ''
       defaults:
         title: false
         use_more: false
         use_more_always: false
         use_more_text: false
-      title: ''
+      display_description: 'Six featured articles for the homepage writing grid.'
       use_more: false
       use_more_always: false
       use_more_text: ''
