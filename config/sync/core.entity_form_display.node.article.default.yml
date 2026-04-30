@@ -5,7 +5,6 @@ dependencies:
   config:
     - field.field.node.article.body
     - field.field.node.article.field_editorial
-    - field.field.node.article.field_featured
     - field.field.node.article.field_map_tiles
     - field.field.node.article.field_metatag
     - field.field.node.article.field_route_type
@@ -77,6 +76,7 @@ third_party_settings:
         - field_route_type
         - schema_geoshape
         - schema_geo
+        - schema_destination
       label: 'Location & Trip'
       region: content
       parent_name: ''
@@ -125,7 +125,6 @@ third_party_settings:
         - schema_topic
         - schema_related_link
         - schema_significant_link
-        - field_metatag
       label: 'SEO & Links'
       region: content
       parent_name: ''
@@ -136,12 +135,11 @@ third_party_settings:
         description: ''
     group_editorial:
       children:
-        - field_featured
-        - field_editorial
+        2: field_editorial
       label: Editorial
       region: content
       parent_name: ''
-      weight: 8
+      weight: 7
       format_type: details_sidebar
       format_settings:
         description: 'Track the editorial decisions and status of a document.'
@@ -192,7 +190,7 @@ content:
         hide_guidelines: '1'
   field_editorial:
     type: inline_entity_form_simple
-    weight: 13
+    weight: 102
     region: content
     settings:
       form_mode: default
@@ -203,13 +201,6 @@ content:
       collapsed: false
       revision: false
     third_party_settings: {  }
-  field_featured:
-    type: boolean_checkbox
-    weight: 12
-    region: content
-    settings:
-      display_label: true
-    third_party_settings: {  }
   field_map_tiles:
     type: options_select
     weight: 7
@@ -218,7 +209,7 @@ content:
     third_party_settings: {  }
   field_metatag:
     type: metatag_firehose
-    weight: 99
+    weight: 8
     region: content
     settings:
       sidebar: true
@@ -226,7 +217,7 @@ content:
     third_party_settings: {  }
   field_route_type:
     type: entity_reference_autocomplete
-    weight: 13
+    weight: 12
     region: content
     settings:
       match_operator: CONTAINS
@@ -236,19 +227,19 @@ content:
     third_party_settings: {  }
   langcode:
     type: language_select
-    weight: 13
+    weight: 14
     region: content
     settings:
       include_locked: true
     third_party_settings: {  }
   path:
     type: path
-    weight: 11
+    weight: 12
     region: content
     settings: {  }
     third_party_settings: {  }
   scheduler_settings:
-    weight: 16
+    weight: 17
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -298,7 +289,7 @@ content:
     third_party_settings: {  }
   schema_destination:
     type: entity_reference_autocomplete
-    weight: 7
+    weight: 15
     region: content
     settings:
       match_operator: CONTAINS
@@ -314,7 +305,7 @@ content:
     third_party_settings: {  }
   schema_distance_cycling:
     type: number
-    weight: 18
+    weight: 19
     region: content
     settings:
       placeholder: ''
@@ -356,14 +347,14 @@ content:
     third_party_settings: {  }
   schema_elev_max:
     type: number
-    weight: 17
+    weight: 18
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   schema_elev_min:
     type: number
-    weight: 16
+    weight: 17
     region: content
     settings:
       placeholder: ''
@@ -390,7 +381,7 @@ content:
     third_party_settings: {  }
   schema_geo:
     type: leaflet_widget_default
-    weight: 15
+    weight: 14
     region: content
     settings:
       geometry_validation: false
@@ -461,7 +452,7 @@ content:
     third_party_settings: {  }
   schema_geoshape:
     type: inline_entity_form_complex
-    weight: 14
+    weight: 13
     region: content
     settings:
       form_mode: default
@@ -580,13 +571,13 @@ content:
       placeholder: ''
     third_party_settings: {  }
   simple_sitemap:
-    weight: 15
+    weight: 16
     region: content
     settings: {  }
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 9
+    weight: 10
     region: content
     settings:
       display_label: true
@@ -600,13 +591,13 @@ content:
       placeholder: ''
     third_party_settings: {  }
   translation:
-    weight: 14
+    weight: 15
     region: content
     settings: {  }
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 12
+    weight: 13
     region: content
     settings:
       match_operator: CONTAINS
@@ -615,7 +606,7 @@ content:
       placeholder: ''
     third_party_settings: {  }
   url_redirects:
-    weight: 10
+    weight: 11
     region: content
     settings: {  }
     third_party_settings: {  }

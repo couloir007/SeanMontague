@@ -22,6 +22,9 @@
 with theming of highlight component. This template is inherited by 3 other
 templates: article-related, events-highlight, and events-related (all views) #}
 
+{% if title %}
+  <h3>{{ title }}</h3>
+{% endif %}
 {% for row in rows %}
-  {{- row.content -}}
+  {{ row.content }}
 {% endfor %}

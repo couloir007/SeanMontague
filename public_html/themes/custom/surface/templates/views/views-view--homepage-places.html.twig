@@ -1,0 +1,19 @@
+{#
+/**
+ * @file
+ * Homepage places view template.
+ *
+ * Strips all Views wrapper markup — no view__content div, no view container.
+ * The homepage__places-grid in node--page--front.html.twig provides the grid
+ * wrapper. Cards render directly from views-view-fields--homepage-places.twig.
+ *
+ * Template suggestion: views-view--homepage-places.html.twig
+ * Matches View ID: homepage_places, all displays.
+ *
+ * @see @layouts/view/view--homepage.twig
+ * @see views-view-fields--homepage-places.html.twig
+ */
+#}
+{% include '@layouts/view/view--homepage.twig' with {
+  'rows': rows,
+} only %}

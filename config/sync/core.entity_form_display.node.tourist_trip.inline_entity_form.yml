@@ -4,7 +4,7 @@ status: false
 dependencies:
   config:
     - core.entity_form_mode.node.inline_entity_form
-    - field.field.node.tourist_trip.field_body
+    - field.field.node.tourist_trip.body
     - field.field.node.tourist_trip.field_editorial
     - field.field.node.tourist_trip.field_metatag
     - field.field.node.tourist_trip.schema_date_published
@@ -96,7 +96,7 @@ content:
     settings: {  }
     third_party_settings: {  }
 hidden:
-  field_body: true
+  body: true
   field_editorial: true
   field_metatag: true
   publish_on: true

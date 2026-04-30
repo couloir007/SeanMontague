@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.node.tourist_trip.field_body
+    - field.field.node.tourist_trip.body
     - field.field.node.tourist_trip.field_editorial
     - field.field.node.tourist_trip.field_metatag
     - field.field.node.tourist_trip.schema_date_published
@@ -23,12 +23,12 @@ targetEntityType: node
 bundle: tourist_trip
 mode: default
 content:
-  field_body:
+  body:
     type: text_default
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    weight: 1
+    weight: 19
     region: content
   schema_trip_dates:
     type: smartdate_default

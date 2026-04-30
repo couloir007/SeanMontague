@@ -1,0 +1,23 @@
+uuid: fe081127-4ecd-4f43-8ef8-5349bc04fa90
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_map_zoom
+    - node.type.page
+id: node.page.field_map_zoom
+field_name: field_map_zoom
+entity_type: node
+bundle: page
+label: 'Map Zoom'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

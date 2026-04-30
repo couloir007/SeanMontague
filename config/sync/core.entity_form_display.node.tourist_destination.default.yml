@@ -5,7 +5,6 @@ dependencies:
   config:
     - field.field.node.tourist_destination.body
     - field.field.node.tourist_destination.field_editorial
-    - field.field.node.tourist_destination.field_featured
     - field.field.node.tourist_destination.field_metatag
     - field.field.node.tourist_destination.field_subtitle
     - field.field.node.tourist_destination.schema_address
@@ -89,8 +88,7 @@ third_party_settings:
         description: ''
     group_editorial:
       children:
-        - field_featured
-        - field_editorial
+        1: field_editorial
       label: 'Editorial information'
       region: content
       parent_name: ''
@@ -146,13 +144,6 @@ content:
       collapsible: false
       collapsed: false
       revision: false
-    third_party_settings: {  }
-  field_featured:
-    type: boolean_checkbox
-    weight: 9
-    region: content
-    settings:
-      display_label: true
     third_party_settings: {  }
   field_metatag:
     type: metatag_firehose

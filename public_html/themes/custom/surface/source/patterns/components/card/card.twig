@@ -7,10 +7,10 @@
   {% if title %}
     <h3 class="card__title">{{ title }}</h3>
   {% endif %}
-  {% if excerpt %}
-    <p class="card__excerpt">{{ excerpt }}</p>
-  {% endif %}
   {% if date or readtime %}
     <span class="card__meta">{{ date }}{% if date and readtime %} · {% endif %}{{ readtime }}</span>
+  {% endif %}
+  {% if excerpt %}
+    <p class="card__excerpt">{{ excerpt }}</p>
   {% endif %}
 </a>

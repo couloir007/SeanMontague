@@ -1,0 +1,117 @@
+/**
+ * @file
+ * Self-hosted font declarations for the Surface theme.
+ *
+ * Fonts are loaded from source/assets/fonts/ and bundled by Vite into
+ * dist/assets/fonts/. The path here is relative to the compiled CSS output
+ * in dist/css/ — so ../assets/fonts/ resolves correctly after build.
+ *
+ * Fonts in use:
+ *   Bebas Neue          — display: hero titles, stats values, eyebrows
+ *   Cormorant Garamond  — serif: body text, article headings (variable font)
+ *   DM Mono             — mono: labels, nav, metadata, tags
+ *
+ * Variable font notes:
+ *   Cormorant Garamond uses variable font files covering weights 100–900
+ *   in a single file per style. The font-weight range allows the browser
+ *   to use any weight within that range.
+ *
+ * font-display: swap — text renders immediately in the fallback font and
+ * swaps to the custom font when loaded. Prevents invisible text during load.
+ */
+
+/* ── Bebas Neue ────────────────────────────────────────────────────────── */
+
+@font-face {
+  font-family: 'Bebas Neue';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    url('../fonts/BebasNeue-Regular.woff2') format('woff2'),
+    url('../fonts/BebasNeue-Regular.ttf') format('truetype');
+}
+
+/* ── Cormorant Garamond (variable) ─────────────────────────────────────── */
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src:
+    url('../fonts/CormorantGaramond-VariableFont_wght.woff2') format('woff2'),
+    url('../fonts/CormorantGaramond-VariableFont_wght.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src:
+    url('../fonts/CormorantGaramond-Italic-VariableFont_wght.woff2') format('woff2'),
+    url('../fonts/CormorantGaramond-Italic-VariableFont_wght.ttf') format('truetype');
+}
+
+/* ── DM Mono ───────────────────────────────────────────────────────────── */
+
+@font-face {
+  font-family: 'DM Mono';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src:
+    url('../fonts/DMMono-Light.woff2') format('woff2'),
+    url('../fonts/DMMono-Light.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Mono';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src:
+    url('../fonts/DMMono-LightItalic.woff2') format('woff2'),
+    url('../fonts/DMMono-LightItalic.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    url('../fonts/DMMono-Regular.woff2') format('woff2'),
+    url('../fonts/DMMono-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Mono';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    url('../fonts/DMMono-Italic.woff2') format('woff2'),
+    url('../fonts/DMMono-Italic.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src:
+    url('../fonts/DMMono-Medium.woff2') format('woff2'),
+    url('../fonts/DMMono-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Mono';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src:
+    url('../fonts/DMMono-MediumItalic.woff2') format('woff2'),
+    url('../fonts/DMMono-MediumItalic.ttf') format('truetype');
+}

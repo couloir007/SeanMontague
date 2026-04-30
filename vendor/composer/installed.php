@@ -3,7 +3,7 @@
         'name' => 'drupal/recommended-project',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'bace3efc8ef116227a76483b503f35849091cf64',
+        'reference' => '2fdc6b1c77679fe315a076a9bec280cbbe87e5f6',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -766,6 +766,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'drupal/entityqueue' => array(
+            'pretty_version' => '1.10.0',
+            'version' => '1.10.0.0',
+            'reference' => '8.x-1.10',
+            'type' => 'drupal-module',
+            'install_path' => __DIR__ . '/../../public_html/modules/contrib/entityqueue',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'drupal/environment_indicator' => array(
             'pretty_version' => '4.0.25',
             'version' => '4.0.25.0',
@@ -1273,7 +1282,7 @@
         'drupal/recommended-project' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'bace3efc8ef116227a76483b503f35849091cf64',
+            'reference' => '2fdc6b1c77679fe315a076a9bec280cbbe87e5f6',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

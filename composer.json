@@ -47,6 +47,7 @@
         "drupal/entity_browser": "^2.12",
         "drupal/entity_embed": "^1.7",
         "drupal/entity_reference_revisions": "^1.12",
+        "drupal/entityqueue": "^1.10",
         "drupal/environment_indicator": "^4.0",
         "drupal/feeds": "^3.0",
         "drupal/field_group": "^4.0",
