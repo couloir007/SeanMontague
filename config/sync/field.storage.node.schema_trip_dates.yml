@@ -1,4 +1,4 @@
-uuid: c6362277-9f9e-4b6a-987a-44b4218d50f8
+uuid: 5a48452a-fd24-4187-8481-7cb1818b50c7
 langcode: en
 status: true
 dependencies:
@@ -12,7 +12,7 @@ type: smartdate
 settings: {  }
 module: smart_date
 locked: false
-cardinality: 1
+cardinality: 2
 translatable: true
 indexes: {  }
 persist_with_no_fields: false

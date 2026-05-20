@@ -81,69 +81,69 @@ default_schema_properties:
       calories:
         data_type: integer
         suffix: ' calories'
+        scale: 0
         min: 0
         max: 1000
-        scale: 0
       carbohydrateContent:
         data_type: integer
         suffix: ' grams'
+        scale: 0
         min: 0
         max: 1000
-        scale: 0
       cholesterolContent:
         data_type: integer
         suffix: milligrams
+        scale: 0
         min: 0
         max: 1000
-        scale: 0
       fatContent:
         data_type: integer
         suffix: ' grams'
+        scale: 0
         min: 0
         max: 1000
-        scale: 0
       fiberContent:
         data_type: integer
         suffix: ' grams'
+        scale: 0
         min: 0
         max: 1000
-        scale: 0
       proteinContent:
         data_type: integer
         suffix: ' grams'
+        scale: 0
         min: 0
         max: 1000
-        scale: 0
       saturatedFatContent:
         data_type: integer
         suffix: ' grams'
+        scale: 0
         min: 0
         max: 1000
-        scale: 0
       sodiumContent:
         data_type: integer
         suffix: ' grams'
+        scale: 0
         min: 0
         max: 1000
-        scale: 0
       sugarContent:
         data_type: integer
         suffix: ' grams'
+        scale: 0
         min: 0
         max: 1000
-        scale: 0
       transFatContent:
         data_type: integer
         suffix: ' grams'
+        scale: 0
         min: 0
         max: 1000
-        scale: 0
       unsaturatedFatContent:
         data_type: integer
         suffix: ' grams'
+        scale: 0
         min: 0
         max: 1000
-        scale: 0
   recommendedIntake:
     schema_type: RecommendedDoseSchedule
     schema_properties:

@@ -1,17 +1,20 @@
-uuid: a5aed5c8-6414-4db2-adca-0ac692e4cbc1
+uuid: 942b8f29-9f42-408c-9279-f2c9eb7a3dce
 langcode: en
 status: true
 dependencies:
   module:
-    - media
+    - file
     - node
 id: node.schema_geoshape
 field_name: schema_geoshape
 entity_type: node
-type: entity_reference
+type: file
 settings:
-  target_type: media
-module: core
+  target_type: file
+  display_field: false
+  display_default: false
+  uri_scheme: public
+module: file
 locked: false
 cardinality: 1
 translatable: true

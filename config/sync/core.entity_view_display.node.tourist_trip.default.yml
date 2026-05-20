@@ -3,10 +3,10 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.node.tourist_trip.body
+    - field.field.node.tourist_trip.field_body
     - field.field.node.tourist_trip.field_editorial
     - field.field.node.tourist_trip.field_metatag
-    - field.field.node.tourist_trip.schema_date_published
+    - field.field.node.tourist_trip.schema_destination
     - field.field.node.tourist_trip.schema_image
     - field.field.node.tourist_trip.schema_itinerary
     - field.field.node.tourist_trip.schema_related_link
@@ -15,20 +15,105 @@ dependencies:
     - field.field.node.tourist_trip.schema_trip_dates
     - node.type.tourist_trip
   module:
+    - field_group
+    - link
+    - metatag
     - smart_date
     - text
     - user
+third_party_settings:
+  field_group:
+    group_content:
+      children:
+        - schema_trip_dates
+        - schema_image
+        - field_body
+      label: Content
+      parent_name: ''
+      region: content
+      weight: 0
+      format_type: fieldset
+      format_settings:
+        classes: ''
+        show_empty_fields: false
+        id: ''
+        label_as_html: false
+        description: ''
 id: node.tourist_trip.default
 targetEntityType: node
 bundle: tourist_trip
 mode: default
 content:
-  body:
+  field_body:
     type: text_default
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    weight: 19
+    weight: 3
+    region: content
+  field_metatag:
+    type: metatag_empty_formatter
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 9
+    region: content
+  schema_destination:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  schema_image:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  schema_itinerary:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 4
+    region: content
+  schema_related_link:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 6
+    region: content
+  schema_significant_link:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 7
+    region: content
+  schema_subject_of:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 8
     region: content
   schema_trip_dates:
     type: smartdate_default
@@ -50,16 +135,9 @@ content:
         decimals: 2
         suffix: h
     third_party_settings: {  }
-    weight: 2
+    weight: 1
     region: content
 hidden:
   field_editorial: true
-  field_metatag: true
   langcode: true
   links: true
-  schema_date_published: true
-  schema_image: true
-  schema_itinerary: true
-  schema_related_link: true
-  schema_significant_link: true
-  schema_subject_of: true

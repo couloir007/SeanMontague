@@ -3,7 +3,6 @@ langcode: en
 status: true
 dependencies:
   module:
-    - node
     - system
   theme:
     - surface
@@ -20,20 +19,4 @@ settings:
   label: Breadcrumbs
   label_display: '0'
   provider: system
-visibility:
-  'entity_bundle:node':
-    id: 'entity_bundle:node'
-    negate: false
-    context_mapping:
-      node: '@node.node_route_context:node'
-    bundles:
-      article: article
-      event: event
-      event_series: event_series
-      page: page
-      person: person
-      place: place
-      podcast_episode: podcast_episode
-      podcast_series: podcast_series
-      tourist_destination: tourist_destination
-      tourist_trip: tourist_trip
+visibility: {  }

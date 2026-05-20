@@ -1,0 +1,34 @@
+uuid: 108c95b7-d4be-4326-82de-26e7e4f92b12
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_image
+    - media.type.image
+    - node.type.blog_posting
+  module:
+    - epp
+third_party_settings:
+  epp:
+    value: 'target_id: [current-page:query:image]'
+id: node.blog_posting.schema_image
+field_name: schema_image
+entity_type: node
+bundle: blog_posting
+label: Image
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'schemadotorg:media'
+  handler_settings:
+    target_type: media
+    schema_types:
+      ImageObject: ImageObject
+    excluded_schema_types: {  }
+    ignore_additional_mappings: false
+    target_bundles:
+      image: image
+field_type: entity_reference

@@ -1,19 +1,13 @@
 uuid: 2d5fb263-8f70-486c-90e6-06423b841095
 langcode: en
-status: false
+status: true
 dependencies:
   config:
     - core.entity_form_mode.node.inline_entity_form
     - field.field.node.page.body
-    - field.field.node.page.field_cta_ghost
-    - field.field.node.page.field_cta_primary
     - field.field.node.page.field_editorial
-    - field.field.node.page.field_eyebrow
-    - field.field.node.page.field_map_markers
-    - field.field.node.page.field_map_zoom
     - field.field.node.page.field_metatag
     - field.field.node.page.schema_about
-    - field.field.node.page.schema_geo
     - field.field.node.page.schema_has_part
     - field.field.node.page.schema_image
     - field.field.node.page.schema_is_part_of
@@ -21,7 +15,6 @@ dependencies:
     - field.field.node.page.schema_related_link
     - field.field.node.page.schema_significant_link
     - field.field.node.page.schema_subject_of
-    - field.field.node.page.schema_topic
     - field.field.node.page.schema_web_page_type
     - node.type.page
   module:
@@ -106,17 +99,11 @@ content:
     third_party_settings: {  }
 hidden:
   body: true
-  field_cta_ghost: true
-  field_cta_primary: true
   field_editorial: true
-  field_eyebrow: true
-  field_map_markers: true
-  field_map_zoom: true
   field_metatag: true
   publish_on: true
   scheduler_settings: true
   schema_about: true
-  schema_geo: true
   schema_has_part: true
   schema_image: true
   schema_is_part_of: true
@@ -124,6 +111,5 @@ hidden:
   schema_related_link: true
   schema_significant_link: true
   schema_subject_of: true
-  schema_topic: true
   schema_web_page_type: true
   unpublish_on: true

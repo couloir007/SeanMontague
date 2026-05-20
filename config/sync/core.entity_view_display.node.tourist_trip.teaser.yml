@@ -4,10 +4,10 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.node.teaser
-    - field.field.node.tourist_trip.body
+    - field.field.node.tourist_trip.field_body
     - field.field.node.tourist_trip.field_editorial
     - field.field.node.tourist_trip.field_metatag
-    - field.field.node.tourist_trip.schema_date_published
+    - field.field.node.tourist_trip.schema_destination
     - field.field.node.tourist_trip.schema_image
     - field.field.node.tourist_trip.schema_itinerary
     - field.field.node.tourist_trip.schema_related_link
@@ -17,7 +17,6 @@ dependencies:
     - image.style.medium
     - node.type.tourist_trip
   module:
-    - datetime
     - media
     - text
     - user
@@ -26,27 +25,18 @@ targetEntityType: node
 bundle: tourist_trip
 mode: teaser
 content:
-  body:
+  field_body:
     type: text_summary_or_trimmed
     label: hidden
     settings:
-      trim_length: 180
+      trim_length: 150
     third_party_settings: {  }
-    weight: 4
+    weight: 3
     region: content
   links:
     settings: {  }
     third_party_settings: {  }
     weight: -100
-    region: content
-  schema_date_published:
-    type: datetime_default
-    label: hidden
-    settings:
-      timezone_override: ''
-      format_type: html_date
-    third_party_settings: {  }
-    weight: 1
     region: content
   schema_image:
     type: media_thumbnail
@@ -63,6 +53,7 @@ hidden:
   field_editorial: true
   field_metatag: true
   langcode: true
+  schema_destination: true
   schema_itinerary: true
   schema_related_link: true
   schema_significant_link: true

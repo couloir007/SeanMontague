@@ -7,7 +7,6 @@ dependencies:
     - field.field.node.web_site.body
     - field.field.node.web_site.field_editorial
     - field.field.node.web_site.field_metatag
-    - field.field.node.web_site.rabbit_hole__settings
     - field.field.node.web_site.schema_about
     - field.field.node.web_site.schema_image
     - field.field.node.web_site.schema_related_link
@@ -39,7 +38,6 @@ hidden:
   field_editorial: true
   field_metatag: true
   langcode: true
-  rabbit_hole__settings: true
   schema_about: true
   schema_image: true
   schema_related_link: true

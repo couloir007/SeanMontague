@@ -4,15 +4,9 @@ status: true
 dependencies:
   config:
     - field.field.node.page.body
-    - field.field.node.page.field_cta_ghost
-    - field.field.node.page.field_cta_primary
     - field.field.node.page.field_editorial
-    - field.field.node.page.field_eyebrow
-    - field.field.node.page.field_map_markers
-    - field.field.node.page.field_map_zoom
     - field.field.node.page.field_metatag
     - field.field.node.page.schema_about
-    - field.field.node.page.schema_geo
     - field.field.node.page.schema_has_part
     - field.field.node.page.schema_image
     - field.field.node.page.schema_is_part_of
@@ -20,15 +14,13 @@ dependencies:
     - field.field.node.page.schema_related_link
     - field.field.node.page.schema_significant_link
     - field.field.node.page.schema_subject_of
-    - field.field.node.page.schema_topic
     - field.field.node.page.schema_web_page_type
     - node.type.page
   module:
     - allowed_formats
+    - entity_reference_revisions
     - field_group
     - inline_entity_form
-    - leaflet
-    - link
     - linkit
     - metatag
     - path
@@ -38,12 +30,12 @@ third_party_settings:
     group_general:
       children:
         - title
-        - body
         - schema_image
+        - body
       label: General
       region: content
       parent_name: ''
-      weight: 0
+      weight: -20
       format_type: details
       format_settings:
         open: true
@@ -54,7 +46,7 @@ third_party_settings:
       label: 'Editorial information'
       region: content
       parent_name: ''
-      weight: 11
+      weight: 220
       format_type: details_sidebar
       format_settings:
         description: 'Track the editorial decisions and status of a document.'
@@ -65,19 +57,19 @@ third_party_settings:
       label: References
       region: content
       parent_name: ''
-      weight: 10
+      weight: 22
       format_type: details
       format_settings:
         open: true
         description: ''
     group_hierarchy:
       children:
-        - schema_is_part_of
         - schema_has_part
+        - schema_is_part_of
       label: Hierarchy
       region: content
       parent_name: ''
-      weight: 9
+      weight: 21
       format_type: details
       format_settings:
         open: true
@@ -89,33 +81,11 @@ third_party_settings:
       label: Links
       region: content
       parent_name: ''
-      weight: 3
+      weight: 20
       format_type: details
       format_settings:
         open: true
         description: ''
-    group_hero:
-      children:
-        - field_eyebrow
-        - field_cta_primary
-        - field_cta_ghost
-        - schema_topic
-        - field_map_zoom
-        - field_map_markers
-        - schema_geo
-      label: Hero
-      region: content
-      parent_name: ''
-      weight: 1
-      format_type: details
-      format_settings:
-        classes: ''
-        show_empty_fields: false
-        id: ''
-        label_as_html: false
-        open: false
-        description: ''
-        required_fields: true
 id: node.page.default
 targetEntityType: node
 bundle: page
@@ -123,7 +93,7 @@ mode: default
 content:
   body:
     type: text_textarea_with_summary
-    weight: 2
+    weight: 20
     region: content
     settings:
       rows: 9
@@ -136,25 +106,9 @@ content:
         hide_guidelines: '1'
   created:
     type: datetime_timestamp
-    weight: 16
+    weight: 200
     region: content
     settings: {  }
-    third_party_settings: {  }
-  field_cta_ghost:
-    type: link_default
-    weight: 5
-    region: content
-    settings:
-      placeholder_url: ''
-      placeholder_title: ''
-    third_party_settings: {  }
-  field_cta_primary:
-    type: link_default
-    weight: 4
-    region: content
-    settings:
-      placeholder_url: ''
-      placeholder_title: ''
     third_party_settings: {  }
   field_editorial:
     type: inline_entity_form_simple
@@ -169,34 +123,9 @@ content:
       collapsed: false
       revision: false
     third_party_settings: {  }
-  field_eyebrow:
-    type: string_textfield
-    weight: 3
-    region: content
-    settings:
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-  field_map_markers:
-    type: entity_reference_autocomplete
-    weight: 8
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-  field_map_zoom:
-    type: number
-    weight: 7
-    region: content
-    settings:
-      placeholder: ''
-    third_party_settings: {  }
   field_metatag:
     type: metatag_firehose
-    weight: 13
+    weight: 99
     region: content
     settings:
       sidebar: true
@@ -204,16 +133,23 @@ content:
     third_party_settings: {  }
   langcode:
     type: language_select
-    weight: 14
+    weight: 200
     region: content
     settings:
       include_locked: true
     third_party_settings: {  }
   path:
     type: path
-    weight: 19
+    weight: 220
     region: content
     settings: {  }
+    third_party_settings: {  }
+  promote:
+    type: boolean_checkbox
+    weight: 210
+    region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   schema_about:
     type: entity_reference_autocomplete
@@ -225,88 +161,7 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-  schema_geo:
-    type: leaflet_widget_default
-    weight: 9
-    region: content
-    settings:
-      geometry_validation: false
-      map:
-        leaflet_map: 'OSM Mapnik'
-        height: 400
-        auto_center: 1
-        map_position:
-          force: false
-          center:
-            lat: 0.0
-            lon: 0.0
-          zoomControlPosition: topleft
-          zoom: 5
-          minZoom: 1
-          maxZoom: 18
-          zoomFiner: 0
-        scroll_zoom_enabled: 1
-      input:
-        show: true
-        readonly: false
-      toolbar:
-        position: topright
-        marker: defaultMarker
-        drawPolyline: true
-        drawRectangle: true
-        drawPolygon: true
-        drawCircle: false
-        drawText: false
-        editMode: true
-        dragMode: true
-        cutPolygon: false
-        removalMode: true
-        rotateMode: false
-      reset_map:
-        control: false
-        options: '{"position":"topleft","title":"Reset View"}'
-      map_scale:
-        control: false
-        options: '{"position":"bottomright","maxWidth":100,"metric":true,"imperial":false,"updateWhenIdle":false}'
-      fullscreen:
-        control: false
-        options: '{"position":"topleft","pseudoFullscreen":false}'
-      path: '{"color":"#3388ff","opacity":"1.0","stroke":true,"weight":3,"fill":"depends","fillColor":"*","fillOpacity":"0.2","radius":"6"}'
-      feature_properties:
-        values: ''
-      locate:
-        control: false
-        options: '{"position":"topright","setView":"untilPanOrZoom","returnToPrevBounds":true,"keepCurrentZoomLevel":true,"strings":{"title":"Locate my position"}}'
-        automatic: false
-      geocoder:
-        control: false
-        settings:
-          popup: false
-          position: topright
-          input_size: 20
-          providers: {  }
-          min_terms: 4
-          delay: 800
-          zoom: 16
-          options: ''
-      geojson_overlays:
-        sources:
-          fields: {  }
-        zoom_to_geojson: true
-        path: '{"color":"#f71ed3","opacity":"0.7","stroke":true,"weight":2,"fillColor":"#ffddfe","fillOpacity":"0.1","radius":3,"dashArray":"5, 5"}'
-        snapping: true
-    third_party_settings: {  }
   schema_has_part:
-    type: entity_reference_autocomplete
-    weight: 4
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-  schema_image:
     type: entity_reference_autocomplete
     weight: 3
     region: content
@@ -316,9 +171,19 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+  schema_image:
+    type: entity_reference_autocomplete
+    weight: 25
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   schema_is_part_of:
     type: entity_reference_autocomplete
-    weight: 0
+    weight: 2
     region: content
     settings:
       match_operator: CONTAINS
@@ -327,22 +192,14 @@ content:
       placeholder: ''
     third_party_settings: {  }
   schema_main_entity:
-    type: inline_entity_form_complex
-    weight: 21
+    type: entity_reference_revisions_autocomplete
+    weight: 222
     region: content
     settings:
-      form_mode: default
-      override_labels: false
-      label_singular: ''
-      label_plural: ''
-      allow_new: true
-      allow_existing: false
       match_operator: CONTAINS
-      allow_duplicate: false
-      collapsible: false
-      collapsed: false
-      revision: false
-      removed_reference: optional
+      match_limit: 10
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
   schema_related_link:
     type: linkit
@@ -374,30 +231,27 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-  schema_topic:
-    type: entity_reference_autocomplete
-    weight: 6
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
   schema_web_page_type:
     type: options_select
-    weight: 2
+    weight: 0
     region: content
     settings: {  }
     third_party_settings: {  }
   simple_sitemap:
-    weight: 20
+    weight: 220
     region: content
     settings: {  }
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 17
+    weight: 220
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  sticky:
+    type: boolean_checkbox
+    weight: 210
     region: content
     settings:
       display_label: true
@@ -411,13 +265,13 @@ content:
       placeholder: ''
     third_party_settings: {  }
   translation:
-    weight: 18
+    weight: 10
     region: content
     settings: {  }
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 15
+    weight: 200
     region: content
     settings:
       match_operator: CONTAINS
@@ -426,12 +280,10 @@ content:
       placeholder: ''
     third_party_settings: {  }
   url_redirects:
-    weight: 12
+    weight: 50
     region: content
     settings: {  }
     third_party_settings: {  }
 hidden:
-  promote: true
   publish_on: true
-  sticky: true
   unpublish_on: true

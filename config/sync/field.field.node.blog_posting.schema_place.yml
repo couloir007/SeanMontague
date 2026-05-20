@@ -1,0 +1,28 @@
+uuid: e7f8a9b0-c1d2-3456-efab-567890123456
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_place
+    - node.type.blog_posting
+    - node.type.place
+id: node.blog_posting.schema_place
+field_name: schema_place
+entity_type: node
+bundle: blog_posting
+label: Place
+description: 'Location this post is about.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      place: place
+    sort:
+      field: title
+      direction: asc
+    auto_create: false
+field_type: entity_reference

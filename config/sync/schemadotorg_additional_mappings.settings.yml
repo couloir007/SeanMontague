@@ -52,7 +52,6 @@ default_properties:
     - primaryImageOfPage
     - relatedLink
     - significantLink
-    - isPartOf
   MedicalWebPage:
     - dateCreated
     - dateModified

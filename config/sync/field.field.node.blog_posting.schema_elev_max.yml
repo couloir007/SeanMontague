@@ -1,0 +1,23 @@
+uuid: f4a5b6c7-d8e9-0123-fabc-234567890123
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_elev_max
+    - node.type.blog_posting
+id: node.blog_posting.schema_elev_max
+field_name: schema_elev_max
+entity_type: node
+bundle: blog_posting
+label: 'Elev Max'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

@@ -4,7 +4,7 @@ status: true
 dependencies:
   config:
     - field.storage.node.schema_about
-    - node.type.article
+    - node.type.blog_posting
     - node.type.event
     - node.type.event_series
     - node.type.page
@@ -12,7 +12,6 @@ dependencies:
     - node.type.place
     - node.type.podcast_episode
     - node.type.podcast_series
-    - node.type.tourist_destination
     - node.type.tourist_trip
     - node.type.web_site
   module:
@@ -39,7 +38,7 @@ settings:
     excluded_schema_types: {  }
     ignore_additional_mappings: false
     target_bundles:
-      article: article
+      blog_posting: blog_posting
       event: event
       event_series: event_series
       page: page
@@ -47,7 +46,6 @@ settings:
       place: place
       podcast_episode: podcast_episode
       podcast_series: podcast_series
-      tourist_destination: tourist_destination
       tourist_trip: tourist_trip
       web_site: web_site
 field_type: entity_reference

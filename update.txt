@@ -11,6 +11,7 @@ PHP OPcode caching
 
 # Export
 lando ssh -s database -c "pg_dump -h us17.acugis-dns.com -U roundybr -d roundybr_drupal --no-owner --no-privileges --format=p" > production_dump.sql
+lando ssh -s database -c "pg_dump -h us17.acugis-dns.com -U roundybr -d roundybr_drupal --no-owner --no-privileges --format=p" > production_dump.sql
 
 # Import
 lando db-import production_dump.sql

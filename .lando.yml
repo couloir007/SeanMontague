@@ -4,7 +4,7 @@ config:
   webroot: web
   php: '8.3'
   composer_version: '2'
-  database: postgres:15
+  database: postgres:17
 
 proxy:
   appserver:
@@ -22,7 +22,7 @@ services:
         DRUSH_OPTIONS_URI: "https://seanmontague.lndo.site"
 
   database:
-    type: postgres:15
+    type: postgres:17
     creds:
       database: drupal
       user: drupal

@@ -4,7 +4,6 @@ status: true
 dependencies:
   config:
     - field.field.geo_entity.poi.field_body
-    - field.field.geo_entity.poi.field_day
     - field.field.geo_entity.poi.field_show_on_map
     - field.field.geo_entity.poi.schema_address
     - field.field.geo_entity.poi.schema_geo
@@ -49,15 +48,6 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 21
-    region: content
-  field_day:
-    type: number_integer
-    label: above
-    settings:
-      thousand_separator: ''
-      prefix_suffix: true
-    third_party_settings: {  }
-    weight: 27
     region: content
   field_show_on_map:
     type: boolean

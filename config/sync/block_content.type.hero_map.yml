@@ -1,8 +1,0 @@
-uuid: 137e95ea-f9a5-4e8a-8e7b-4a92ce6ee210
-langcode: en
-status: true
-dependencies: {  }
-id: hero_map
-label: 'Hero Map'
-revision: false
-description: null

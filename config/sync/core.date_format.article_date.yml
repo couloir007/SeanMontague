@@ -1,8 +1,0 @@
-uuid: b1c2d3e4-f5a6-7890-bcde-f12345678901
-langcode: en
-status: true
-dependencies: {  }
-id: article_date
-label: 'Article Date'
-locked: false
-pattern: 'F j, Y'
