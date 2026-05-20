@@ -324,9 +324,7 @@ class EntityMatcher extends ConfigurableMatcherBase {
     $suggestions = new SuggestionCollection();
     $query = $this->buildEntityQuery($string);
     $query->accessCheck(TRUE);
-    $query_result = $query->execute();
-    $url_results = $this->findEntityIdByUrl($string);
-    $result = array_merge($query_result, $url_results);
+    $result = $query->execute();
 
     // If no results, return an empty suggestion collection.
     if (empty($result)) {
@@ -368,9 +366,11 @@ class EntityMatcher extends ConfigurableMatcherBase {
     $entity_type = $this->entityTypeManager->getDefinition($this->targetType);
     $query = $this->entityTypeManager->getStorage($this->targetType)->getQuery();
     $query->accessCheck(TRUE);
-    $label_key = $entity_type->getKey('label');
 
-    if ($label_key) {
+    if ($ids = $this->findEntityIdByUrl($search_string)) {
+      $query->condition($entity_type->getKey('id'), reset($ids));
+    }
+    elseif ($label_key = $entity_type->getKey('label')) {
       // For configuration entities, the condition needs to be CONTAINS as
       // the matcher does not support LIKE.
       if ($entity_type instanceof ConfigEntityTypeInterface) {
@@ -380,7 +380,7 @@ class EntityMatcher extends ConfigurableMatcherBase {
         $query->condition($label_key, '%' . $search_string . '%', 'LIKE');
       }
 
-      $query->sort($label_key, 'ASC');
+      $query->sort($label_key);
     }
 
     // Bundle check.
