@@ -2618,10 +2618,6 @@
                     "homepage": "https://www.drupal.org/user/291091"
                 },
                 {
-                    "name": "bmcclure",
-                    "homepage": "https://www.drupal.org/user/278485"
-                },
-                {
                     "name": "chertzog",
                     "homepage": "https://www.drupal.org/user/806366"
                 },
@@ -2644,6 +2640,10 @@
                 {
                     "name": "phenaproxima",
                     "homepage": "https://www.drupal.org/user/205645"
+                },
+                {
+                    "name": "replicaobscura",
+                    "homepage": "https://www.drupal.org/user/278485"
                 }
             ],
             "description": "Allows user to create two-way references between entities.",
@@ -4882,18 +4882,18 @@
         },
         {
             "name": "drupal/entity_usage",
-            "version": "2.0.0-beta28",
-            "version_normalized": "2.0.0.0-beta28",
+            "version": "2.0.0-beta29",
+            "version_normalized": "2.0.0.0-beta29",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/entity_usage.git",
-                "reference": "8.x-2.0-beta28"
+                "reference": "8.x-2.0-beta29"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/entity_usage-8.x-2.0-beta28.zip",
-                "reference": "8.x-2.0-beta28",
-                "shasum": "7e97367d1c583a41dfab91226e4f688309ae2ce7"
+                "url": "https://ftp.drupal.org/files/projects/entity_usage-8.x-2.0-beta29.zip",
+                "reference": "8.x-2.0-beta29",
+                "shasum": "41e3fe3f23472bb66cecafa5371d0e1b2202efaf"
             },
             "require": {
                 "drupal/core": "^10.3 || ^11"
@@ -4914,8 +4914,8 @@
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "8.x-2.0-beta28",
-                    "datestamp": "1771495229",
+                    "version": "8.x-2.0-beta29",
+                    "datestamp": "1778682392",
                     "security-coverage": {
                         "status": "not-covered",
                         "message": "Beta releases are not covered by Drupal security advisories."
@@ -5512,7 +5512,7 @@
                     "datestamp": "1681554383",
                     "security-coverage": {
                         "status": "not-covered",
-                        "message": "Project has not opted into security advisory coverage!"
+                        "message": "Beta releases are not covered by Drupal security advisories."
                     }
                 }
             },
@@ -5522,6 +5522,10 @@
                 "GPL-2.0-or-later"
             ],
             "authors": [
+                {
+                    "name": "batigolix",
+                    "homepage": "https://www.drupal.org/user/22175"
+                },
                 {
                     "name": "matsbla",
                     "homepage": "https://www.drupal.org/user/2325394"
@@ -10833,6 +10837,10 @@
                 {
                     "name": "berdir",
                     "homepage": "https://www.drupal.org/user/214652"
+                },
+                {
+                    "name": "dieterholvoet",
+                    "homepage": "https://www.drupal.org/user/3567222"
                 },
                 {
                     "name": "gielfeldt",
