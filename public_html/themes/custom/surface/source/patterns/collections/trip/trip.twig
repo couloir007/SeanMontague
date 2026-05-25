@@ -51,13 +51,14 @@
       <span class="trip__map-note">{{ map_note|default('Scroll to zoom · Click markers for details') }}</span>
     </div>
     {% include '@components/map/map.twig' with {
-      'map_id':      map_id,
-      'center':      map_center|default('53.0,-8.2'),
-      'zoom':        map_zoom|default(7),
-      'interactive': 'true',
-      'markers':     map_markers|default([]),
-      'lines':       map_lines|default([]),
-      'tiles':       tiles|default('usgs-topo'),
+      'map_id':        map_id,
+      'center':        map_center|default('53.0,-8.2'),
+      'zoom':          map_zoom|default(7),
+      'interactive':   'true',
+      'markers':       map_markers|default([]),
+      'lines':         map_lines|default([]),
+      'tiles':         tiles|default('usgs-topo'),
+      'geojson_urls':  geojson_urls|default([]),
     } only %}
   </div>
 {% endif %}

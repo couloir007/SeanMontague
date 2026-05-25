@@ -1,7 +1,7 @@
 _core:
   default_config_hash: oGNHOYG16M-w-WqdZ7LDIomSyQzL_m6RIZ8My_Brknk
-tile_key: esri-topo
+tile_key: osm
 tile_url: ''
 tile_attribution: ''
-elevation_unit: meters
+elevation_unit: feet
 extract_waypoints: false

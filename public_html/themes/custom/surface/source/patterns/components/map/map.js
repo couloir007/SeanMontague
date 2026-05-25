@@ -175,7 +175,7 @@
     return pts;
   };
 
-  const initLeaflet = (el, geojson, { lat, lon, zoom, interactive, markers, lines, tile, mapId }) => {
+  const initLeaflet = async (el, geojson, { lat, lon, zoom, interactive, markers, lines, tile, mapId, geojsonUrls }) => {
     // Guard against double-init (fetch error catch calling initLeaflet twice)
     if (el._leafletMapInstance) return;
     el._leafletMapInstance = true;
@@ -233,6 +233,7 @@
     // from the rendered geometry, then fitBounds on track + markers.
     let coords = null;
     let trackLayer = null;
+    const allTrackLayers = [];
     if (geojson) {
       // Filter to LineString/MultiLineString only — Point features are app
       // waypoints that crash Leaflet's marker renderer.
@@ -251,13 +252,41 @@
       coords = flattenCoords(geojson);
       window._surfaceTracks = window._surfaceTracks ?? {};
       window._surfaceTracks[mapId] = coords;
+      allTrackLayers.push(trackLayer);
+    }
+
+    // ── Multi-track GeoJSON (trip page) ───────────────────────────────────
+    if (!geojson && geojsonUrls.length) {
+      const results = await Promise.all(
+        geojsonUrls.map((url) => fetch(url).then((r) => r.ok ? r.json() : null).catch(() => null))
+      );
+      const mergedCoords = [];
+      results.forEach((gj) => {
+        if (!gj) return;
+        const trackOnly = {
+          type: 'FeatureCollection',
+          features: gj.features.filter(({ geometry }) =>
+            geometry?.type === 'LineString' || geometry?.type === 'MultiLineString'
+          ),
+        };
+        const layer = L.geoJSON(trackOnly, {
+          style: () => ({ color: '#3a5a40', weight: 3, opacity: 0.85 }),
+        }).addTo(map);
+        allTrackLayers.push(layer);
+        flattenCoords(gj).forEach((c) => mergedCoords.push(c));
+      });
+      if (mergedCoords.length) {
+        window._surfaceTracks = window._surfaceTracks ?? {};
+        window._surfaceTracks[mapId] = mergedCoords;
+      }
     }
 
     // ── invalidateSize + fitBounds after layout ────────────────────────────
     const fitToData = () => {
-      if (!interactive) return;  // ← add this line
-      if (coords && coords.length) {
-        const bounds = trackLayer.getBounds();
+      if (!interactive) return;
+      if (allTrackLayers.length) {
+        const bounds = L.latLngBounds();
+        allTrackLayers.forEach((layer) => bounds.extend(layer.getBounds()));
         markerLatLngs.forEach((ll) => bounds.extend(ll));
         if (bounds.isValid()) map.fitBounds(bounds, { padding: [32, 32] });
       } else if (markerLatLngs.length > 1) {
@@ -347,12 +376,13 @@
     const markers = parseJSON(el.dataset.mapMarkers, []);
     const lines = parseJSON(el.dataset.mapLines, []);
     const geojsonUrl = el.dataset.mapGeojson ?? null;
+    const geojsonUrls = parseJSON(el.dataset.mapGeojsonUrls, []);
     const mapId = el.id ?? 'map';
     const tile = resolveTile(el);
 
     console.log(zoom);
 
-    const opts = { lat, lon, zoom, interactive, markers, lines, tile, mapId };
+    const opts = { lat, lon, zoom, interactive, markers, lines, tile, mapId, geojsonUrls };
 
     if (geojsonUrl) {
       try {

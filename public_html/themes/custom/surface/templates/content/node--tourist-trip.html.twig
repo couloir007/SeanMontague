@@ -54,6 +54,7 @@
 {# ── Loop itinerary articles — build destinations, stats, markers ── #}
 {% set destinations  = [] %}
 {% set map_markers   = [] %}
+{% set geojson_urls  = [] %}
 {% set total_driving = 0 %}
 {% set total_hiking  = 0 %}
 {% set total_walking = 0 %}
@@ -122,6 +123,13 @@
       {% endif %}
     {% endfor %}
 
+    {# Collect day GeoJSON URLs for multi-track trip map #}
+    {% set day_geo_media = article.schema_geoshape.entity %}
+    {% set day_geo_file  = day_geo_media ? day_geo_media.field_media_file.entity : null %}
+    {% if day_geo_file and day_geo_file.filename.value matches '/\\.geojson$/i' %}
+      {% set geojson_urls = geojson_urls|merge([day_geo_file.fileuri|file_url]) %}
+    {% endif %}
+
   {% endif %}
 {% endfor %}
 
@@ -179,6 +187,7 @@
   'map_note':          'Click markers for details',
   'map_markers':       map_markers,
   'tiles':             'open-topo',
+  'geojson_urls':      geojson_urls,
   'narrative_kicker':  'Trip Notes',
   'narrative_heading': content.field_editorial|field_value|render ?: null,
   'body':              content.field_body|field_value|render,
