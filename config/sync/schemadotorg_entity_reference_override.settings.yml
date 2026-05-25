@@ -18,9 +18,9 @@ schema_properties:
     override_label: 'Enter role'
   MedicalStudy--member:
     type: select
-    placeholder: null
-    size: null
     required: true
+    size: null
+    placeholder: null
     options:
       '': '- None -'
       'Principle Investigator': 'Principle Investigator'

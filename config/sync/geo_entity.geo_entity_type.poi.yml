@@ -4,4 +4,4 @@ status: true
 dependencies: {  }
 id: poi
 label: POI
-label_token: POI
+label_token: ''

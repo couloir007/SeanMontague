@@ -87,6 +87,18 @@
 
 {# ── Map markers ── #}
 {% set map_markers = [] %}
+{# Destination markers — sky blue #}
+{% for item in node.schema_destination %}
+  {% set dest = item.entity %}
+  {% if dest and not dest.schema_geo.isEmpty %}
+    {% set map_markers = map_markers|merge([{
+      'lat':   dest.schema_geo.lat,
+      'lon':   dest.schema_geo.lon,
+      'type':  'destination',
+      'label': '<strong>' ~ dest.title.value ~ '</strong>',
+    }]) %}
+  {% endif %}
+{% endfor %}
 
 {# POI markers — forest green #}
 {% for item in node.schema_poi %}
@@ -97,19 +109,6 @@
       'lon':   poi.schema_geo.lon,
       'type':  'poi',
       'label': '<strong>' ~ poi.label.value ~ '</strong>',
-    }]) %}
-  {% endif %}
-{% endfor %}
-
-{# Destination markers — sky blue #}
-{% for item in node.schema_destination %}
-  {% set dest = item.entity %}
-  {% if dest and not dest.schema_geo.isEmpty %}
-    {% set map_markers = map_markers|merge([{
-      'lat':   dest.schema_geo.lat,
-      'lon':   dest.schema_geo.lon,
-      'type':  'destination',
-      'label': '<strong>' ~ dest.label.value ~ '</strong>',
     }]) %}
   {% endif %}
 {% endfor %}

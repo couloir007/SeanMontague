@@ -36,7 +36,9 @@ module:
   devel_entity_updates: 0
   devel_generate: 0
   diff: 0
+  draggableviews: 0
   dynamic_page_cache: 0
+  easy_breadcrumb: 0
   editor: 0
   embed: 0
   embedded_content: 0
@@ -46,6 +48,7 @@ module:
   entity_embed: 0
   entity_reference_override: 0
   entity_reference_revisions: 0
+  entityqueue: 0
   environment_indicator: 0
   environment_indicator_toolbar: 0
   environment_indicator_ui: 0
@@ -104,6 +107,7 @@ module:
   pgsql: 0
   queue_ui: 0
   r4032login: 0
+  rabbit_hole: 0
   ray_debugger: 0
   ray_debugger_js: 0
   ray_debugger_twig: 0
@@ -165,6 +169,8 @@ module:
   schemadotorg_translation: 0
   schemadotorg_type_tray: 0
   schemadotorg_ui: 0
+  seanmontague_map: 0
+  seanmontague_schemadotorg: 0
   serialization: 0
   shortcut: 0
   simple_sitemap: 0
@@ -180,6 +186,7 @@ module:
   toolbar: 0
   trail_mapper: 0
   trash: 0
+  trip_import: 0
   twig_field_value: 0
   twig_tweak: 0
   type_tray: 0

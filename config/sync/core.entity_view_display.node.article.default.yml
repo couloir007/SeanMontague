@@ -5,29 +5,68 @@ dependencies:
   config:
     - field.field.node.article.body
     - field.field.node.article.field_editorial
-    - field.field.node.article.field_image
+    - field.field.node.article.field_map_tiles
     - field.field.node.article.field_metatag
+    - field.field.node.article.field_route_type
+    - field.field.node.article.schema_about
     - field.field.node.article.schema_activity_type
+    - field.field.node.article.schema_article_type
     - field.field.node.article.schema_audio
     - field.field.node.article.schema_category
     - field.field.node.article.schema_date_published
+    - field.field.node.article.schema_destination
     - field.field.node.article.schema_difficulty
-    - field.field.node.article.schema_distance
+    - field.field.node.article.schema_distance_cycling
+    - field.field.node.article.schema_distance_driving
+    - field.field.node.article.schema_distance_hiking
+    - field.field.node.article.schema_distance_walking
     - field.field.node.article.schema_elev_gain
     - field.field.node.article.schema_elev_loss
     - field.field.node.article.schema_elev_max
     - field.field.node.article.schema_elev_min
+    - field.field.node.article.schema_event_schedule
     - field.field.node.article.schema_geo
     - field.field.node.article.schema_geoshape
+    - field.field.node.article.schema_image
+    - field.field.node.article.schema_is_part_of
+    - field.field.node.article.schema_lodging
     - field.field.node.article.schema_place
+    - field.field.node.article.schema_poi
     - field.field.node.article.schema_related_link
     - field.field.node.article.schema_significant_link
+    - field.field.node.article.schema_subject_of
     - field.field.node.article.schema_topic
     - field.field.node.article.schema_trip
     - node.type.article
   module:
+    - field_group
+    - options
+    - smart_date
     - text
     - user
+third_party_settings:
+  field_group:
+    group_general:
+      children:
+        - schema_article_type
+        - body
+        - schema_image
+      label: General
+      parent_name: ''
+      region: content
+      weight: 0
+      format_type: fieldset
+      format_settings: {  }
+    group_references:
+      children:
+        - schema_about
+        - schema_subject_of
+      label: References
+      parent_name: ''
+      region: content
+      weight: 11
+      format_type: fieldset
+      format_settings: {  }
 id: node.article.default
 targetEntityType: node
 bundle: article
@@ -38,9 +77,144 @@ content:
     label: hidden
     settings: {  }
     third_party_settings: {  }
+    weight: 19
+    region: content
+  field_map_tiles:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_route_type:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  schema_about:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
     weight: 0
     region: content
-  field_image:
+  schema_article_type:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  schema_destination:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 10
+    region: content
+  schema_distance_cycling:
+    type: number_decimal
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 6
+    region: content
+  schema_distance_driving:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 4
+    region: content
+  schema_distance_hiking:
+    type: number_decimal
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 5
+    region: content
+  schema_distance_walking:
+    type: number_decimal
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 7
+    region: content
+  schema_event_schedule:
+    type: smartdate_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+      format: default
+      force_chronological: false
+      add_classes: false
+      time_wrapper: true
+      localize: false
+      parts:
+        - start
+        - end
+      duration:
+        separator: ' | '
+        unit: ''
+        decimals: 2
+        suffix: h
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  schema_image:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 23
+    region: content
+  schema_is_part_of:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 12
+    region: content
+  schema_lodging:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 8
+    region: content
+  schema_poi:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 9
+    region: content
+  schema_subject_of:
     type: entity_reference_label
     label: above
     settings:
@@ -58,7 +232,6 @@ hidden:
   schema_category: true
   schema_date_published: true
   schema_difficulty: true
-  schema_distance: true
   schema_elev_gain: true
   schema_elev_loss: true
   schema_elev_max: true

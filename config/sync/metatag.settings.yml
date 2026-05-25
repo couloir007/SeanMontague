@@ -50,6 +50,9 @@ entity_type_groups:
     podcast_series:
       basic: basic
       advanced: advanced
+    tourist_destination:
+      basic: basic
+      advanced: advanced
 separator: ''
 tag_trim_method: beforeValue
 use_maxlength: true

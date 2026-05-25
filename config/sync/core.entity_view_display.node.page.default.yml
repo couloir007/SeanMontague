@@ -4,9 +4,15 @@ status: true
 dependencies:
   config:
     - field.field.node.page.body
+    - field.field.node.page.field_cta_ghost
+    - field.field.node.page.field_cta_primary
     - field.field.node.page.field_editorial
+    - field.field.node.page.field_eyebrow
+    - field.field.node.page.field_map_markers
+    - field.field.node.page.field_map_zoom
     - field.field.node.page.field_metatag
     - field.field.node.page.schema_about
+    - field.field.node.page.schema_geo
     - field.field.node.page.schema_has_part
     - field.field.node.page.schema_image
     - field.field.node.page.schema_is_part_of
@@ -14,39 +20,109 @@ dependencies:
     - field.field.node.page.schema_related_link
     - field.field.node.page.schema_significant_link
     - field.field.node.page.schema_subject_of
+    - field.field.node.page.schema_topic
     - field.field.node.page.schema_web_page_type
     - node.type.page
   module:
-    - entity_reference_revisions
+    - geofield
+    - link
+    - metatag
+    - text
     - user
 id: node.page.default
 targetEntityType: node
 bundle: page
 mode: default
 content:
-  links:
+  body:
+    type: text_default
+    label: hidden
     settings: {  }
     third_party_settings: {  }
-    weight: -100
+    weight: 0
     region: content
-  schema_main_entity:
-    type: entity_reference_revisions_entity_view
+  field_cta_ghost:
+    type: link
     label: above
     settings:
-      view_mode: default
-      link: ''
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
     third_party_settings: {  }
-    weight: 98
+    weight: 4
+    region: content
+  field_cta_primary:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_eyebrow:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_map_markers:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 7
+    region: content
+  field_map_zoom:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 6
+    region: content
+  field_metatag:
+    type: metatag_empty_formatter
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  schema_geo:
+    type: geofield_default
+    label: above
+    settings:
+      output_format: wkt
+      output_escape: true
+    third_party_settings: {  }
+    weight: 5
+    region: content
+  schema_topic:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 8
     region: content
 hidden:
-  body: true
   field_editorial: true
-  field_metatag: true
   langcode: true
+  links: true
   schema_about: true
   schema_has_part: true
   schema_image: true
   schema_is_part_of: true
+  schema_main_entity: true
   schema_related_link: true
   schema_significant_link: true
   schema_subject_of: true

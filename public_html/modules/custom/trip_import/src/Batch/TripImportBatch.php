@@ -387,12 +387,6 @@ class TripImportBatch {
       }
     }
 
-    ray($node);
-
-    if ($node->hasField('schema_date_published')) {
-      $node->set('schema_date_published', $trip_start_date); // 'Y-m-d' string
-    }
-
     $node->save();
     $nid = (int) $node->id();
 

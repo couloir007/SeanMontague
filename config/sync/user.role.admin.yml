@@ -10,7 +10,6 @@ dependencies:
     - media.type.remote_video
     - media.type.video
     - node.type.article
-    - node.type.blog_posting
     - node.type.event
     - node.type.event_series
     - node.type.page
@@ -227,7 +226,6 @@ permissions:
   - 'create and edit custom blocks'
   - 'create article content'
   - 'create audio media'
-  - 'create blog_posting content'
   - 'create content translations'
   - 'create event content'
   - 'create event_series content'
@@ -253,7 +251,6 @@ permissions:
   - 'delete any article content'
   - 'delete any audio media'
   - 'delete any audio media revisions'
-  - 'delete any blog_posting content'
   - 'delete any event content'
   - 'delete any event_series content'
   - 'delete any file'
@@ -274,7 +271,6 @@ permissions:
   - 'delete any webform'
   - 'delete any webform submission'
   - 'delete article revisions'
-  - 'delete blog_posting revisions'
   - 'delete content model document entities'
   - 'delete content translations'
   - 'delete event revisions'
@@ -285,7 +281,6 @@ permissions:
   - 'delete orphan revisions'
   - 'delete own article content'
   - 'delete own audio media'
-  - 'delete own blog_posting content'
   - 'delete own event content'
   - 'delete own event_series content'
   - 'delete own files'
@@ -316,7 +311,6 @@ permissions:
   - 'delete web_site revisions'
   - 'edit any article content'
   - 'edit any audio media'
-  - 'edit any blog_posting content'
   - 'edit any event content'
   - 'edit any event_series content'
   - 'edit any image media'
@@ -336,7 +330,6 @@ permissions:
   - 'edit entity sitemap settings'
   - 'edit own article content'
   - 'edit own audio media'
-  - 'edit own blog_posting content'
   - 'edit own event content'
   - 'edit own event_series content'
   - 'edit own image media'
@@ -388,7 +381,6 @@ permissions:
   - 'revert any remote_video media revisions'
   - 'revert any video media revisions'
   - 'revert article revisions'
-  - 'revert blog_posting revisions'
   - 'revert event revisions'
   - 'revert event_series revisions'
   - 'revert page revisions'
@@ -413,7 +405,6 @@ permissions:
   - 'translate any entity'
   - 'translate article node'
   - 'translate audio media'
-  - 'translate blog_posting node'
   - 'translate configuration'
   - 'translate editable entities'
   - 'translate event node'
@@ -448,7 +439,6 @@ permissions:
   - 'view any video media revisions'
   - 'view any webform submission'
   - 'view article revisions'
-  - 'view blog_posting revisions'
   - 'view content model documentation'
   - 'view content model documentation reports'
   - 'view cron jobs'
