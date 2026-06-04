@@ -13,75 +13,135 @@ Leaflet-based interactive mapping. Built on Drupal 10/11 with a custom theme
 (Surface) and custom geospatial modules. Sean is a web developer at the
 Smithsonian NMNH. This is a personal outlet — not a portfolio or consulting site.
 
-## Environment
+## Related Documentation
 
-- **Local:** Lando (Pantheon recipe) — `lando start` to start services
-- **Hosting:** Pantheon
-- **PHP:** 8.3, **Database:** PostgreSQL 15 with PostGIS
+| Doc | Path | Scope |
+|---|---|---|
+| **This file** | `CLAUDE.md` | Stack, repo layout, quick-start |
+| **Schema.org Blueprints** | `SCHEMADOTORG.md` | Content types, field naming, shared storages, JSON-LD |
+| **Trail journal guidelines** | `public_html/themes/custom/surface/CLAUDE.md` | Writing voice, NH 48, biking reports |
+| **Surface theme** | `public_html/themes/custom/surface/CLAUDE.md` | Drupal templates, preprocess, content model, Leaflet |
+| **Storybook rules** | `public_html/themes/custom/surface/STORYBOOK.md` | JS dual-context, Twig rules, Storybook failure modes |
+
+Read `SCHEMADOTORG.md` before creating any content type, field, or JSON-LD
+customisation. Read `STORYBOOK.md` before touching anything in `source/`.
+
+---
+
+## Stack
+
+- **CMS:** Drupal 10/11 (PHP 8.3, Composer, Drush)
+- **Hosting:** Pantheon (no frontend build step — `dist/` is committed)
+- **Local dev:** Lando (Pantheon recipe) — `lando start` to start services
+- **Database:** PostgreSQL 15 with PostGIS
+- **Theme:** Surface — Storybook-driven pattern library, Vite build
+- **Content model:** Schema.org Blueprints (`drupal/schemadotorg`)
+- **Mapping:** Leaflet + GeoJSON, custom `trail_mapper` and `leaflet_full_page` modules
 - **URL:** https://seanmontague.lndo.site
 
 Always prefix PHP/Drupal/frontend commands with `lando` — never run `drush`,
-`composer`, or `npm` directly on the host.
+`composer`, `npm`, or `terminus` directly on the host.
 
-## Common Commands
+---
+
+## Repo Layout
+
+```
+/
+├── CLAUDE.md                          # ← you are here
+├── SCHEMADOTORG.md                    # Schema.org Blueprints reference
+├── composer.json / .lock              # Drupal + PHP dependencies
+├── config/                            # Drupal config export (drush cex/cim)
+├── public_html/
+│   ├── modules/custom/
+│   │   ├── trail_mapper/              # GeoJSON/GPX, elevation, geo utilities
+│   │   ├── external_pg/               # External PostgreSQL service layer
+│   │   ├── geo_content_builder/       # Geographic content entities
+│   │   ├── leaflet_full_page/         # Full-page Leaflet map module
+│   │   └── trailmapper_safeguards/    # MenuLinkContent validation
+│   └── themes/custom/
+│       └── surface/                   # The theme
+│           ├── CLAUDE.md              # Theme architecture + writing guidelines
+│           ├── STORYBOOK.md           # Storybook rules — read before touching source/
+│           ├── source/                # Design system source (Vite + Storybook)
+│           │   ├── props/             # Design tokens (nek.css)
+│           │   └── patterns/          # elements/ → components/ → collections/ → layouts/
+│           ├── dist/                  # Vite build output (committed for Pantheon)
+│           └── templates/             # Drupal twig overrides
+└── upstream-configuration/            # Pantheon upstream
+```
+
+---
+
+## Quick Start (local dev)
 
 ```bash
-# Start local environment
+composer install
 lando start
-lando info                    # show URLs and credentials
+lando db-import snapshot.sql.gz       # latest DB snapshot
+lando drush cim -y                    # import config
+lando drush cr                        # clear cache
 
-# Drupal
-lando drush cr                # clear cache
-lando drush cim               # import config
-lando drush cex               # export config
-
-# Composer
-lando composer install
-lando composer require drupal/module_name
-
-# Frontend — run from theme directory via lando ssh, or:
-lando npm run build           # full production build (lint + vite)
-lando npm run watch           # dev mode: Vite + Storybook on localhost:6007
-lando npm run lint:fix        # Biome JS/TS auto-fix
-lando npm run stylelint:fix   # CSS auto-fix
+# Theme development
+cd public_html/themes/custom/surface
+lando npm install
+lando npm run watch                   # Storybook + Vite dev server (localhost:6006)
+lando npm run build                   # compile source → dist/
 
 # Tests
 lando php public_html/modules/custom/trail_mapper/tests/Unit/GeoElevationCalculatorTest.php
 lando php vendor/bin/phpunit public_html/modules/custom
 ```
 
-## Directory Structure
+---
 
-- **Web root:** `public_html/`
-- **Custom theme:** `public_html/themes/custom/surface/`
-- **Custom modules:** `public_html/modules/custom/`
-- **Config sync:** `config/sync/`
-- **Composer:** `composer.json` at project root
+## Deployment Workflow
 
-## Custom Modules
+Pantheon has no frontend build step. The compiled `dist/` must be committed:
 
-| Module | Purpose |
-|---|---|
-| `trail_mapper` | GeoJSON generation from external PostgreSQL DB; TrailMapper settings form at `/admin/config/trail-mapper`; `GeoShapeConverter` (GPX/GeoJSON); `GeoElevationCalculator` (shelved) |
-| `external_pg` | Service layer (`ExternalPgService`) for external PostgreSQL TrailMapper DB — credentials hardcoded in `ExternalPgService.php` |
-| `geo_content_builder` | Custom entities for plotting geographic content on Leaflet maps |
-| `leaflet_full_page` | Full-page Leaflet mapping with custom paragraph types |
-| `trailmapper_safeguards` | Prevents invalid `menu_name` on MenuLinkContent entities |
-| `global_volcanism` | Smithsonian NMNH GVP integration |
-| `gvp_external_resources` | GVP external resources views/fields |
-| `custom_entity` | Placeholder/scaffolding — incomplete (`@todo`) |
-
-## Coding Standards
-
-- **Drupal:** [Drupal Coding Standards](https://www.drupal.org/docs/develop/standards)
-- **CSS:** BEM (Block Element Modifier)
-- **JavaScript:** ES6+; all JS files must begin with `/* jshint esversion: 6 */`
-- **Theme:** Modified Atomic Design — Base → Elements → Components → Collections → Layouts → Pages
-- **Twig:** Use namespaces (`@components`, `@elements`, etc.); never `@components/surface/`
+```bash
+# After any source/ changes:
+cd public_html/themes/custom/surface
+lando npm run build
+cd /path/to/repo/root
+git add public_html/themes/custom/surface/dist/
+git commit -m "Rebuild dist"
+git push
+```
 
 ---
 
-## Content Model
+## Common Commands
+
+```bash
+# Drupal
+lando drush cr                    # clear cache
+lando drush cim                   # config import
+lando drush cex                   # config export
+lando drush schemadotorg:create-type node:Place
+
+# Composer
+lando composer require drupal/module_name
+lando composer install
+
+# Frontend (from theme directory)
+lando npm run build
+lando npm run watch
+lando npm run lint:fix             # Biome JS/TS auto-fix
+lando npm run stylelint:fix        # CSS auto-fix
+
+# Pantheon
+lando terminus env:deploy seanmontague.dev
+lando terminus drush seanmontague.dev -- cr
+```
+
+---
+
+## Content Model (overview)
+
+All content types use Schema.org Blueprints. Fields use `schema_` prefix for
+schema-mapped fields, `field_` for editorial-only. See `SCHEMADOTORG.md` for
+the full reference — especially the shared storage rule.
 
 ### Single article bundle
 
@@ -89,153 +149,38 @@ All written content uses a single `article` (BlogPosting) bundle.
 `schema_category` and `schema_activity_type` taxonomy drives display and
 navigation. There is no separate `trail_report` bundle.
 
-### Article (BlogPosting) fields
+### Content Types
 
-| Field | Type | Purpose |
+| Bundle | Schema.org type | Purpose |
 |---|---|---|
-| `body` | text_with_summary | Article body |
-| `schema_date_published` | datetime | Publication date |
-| `schema_category` | entity_reference → category | trails / drupal / permaculture / maps |
-| `schema_activity_type` | entity_reference → activity_type | bike / hike / ski |
-| `schema_trip` | entity_reference → tourist_trip | Parent trip (optional) |
-| `schema_place` | entity_reference → place | Map center fallback (optional) |
-| `schema_geo` | geofield | Direct lat/lon map center fallback (optional) |
-| `field_map_tiles` | list (text) | Per-article tile set override (optional) — for non-US content |
-| `schema_geoshape` | file | GeoJSON/GPX track — drives map + elevation profile |
-| `schema_distance` | decimal | Miles (manual — display fallback when no geoshape) |
-| `schema_elev_gain` | integer | Feet gain (manual) |
-| `schema_elev_loss` | integer | Feet loss (manual) |
-| `schema_elev_min` | integer | Feet min elevation (manual) |
-| `schema_elev_max` | integer | Feet max elevation (manual) |
-| `schema_difficulty` | list | Easy / Intermediate / Hard / Expert |
-| `schema_audio` | entity_reference → AudioObject | ElevenLabs TTS (optional) |
-| `field_image` | entity_reference → ImageObject | Hero image |
+| `article` | `BlogPosting` | All trail reports, writing, Drupal, permaculture posts |
+| `trip` | `TouristTrip` | Multi-destination travel posts |
+| `place` | `Place` | Content hub landing pages (Kingdom Trails, Burke Mountain) |
+| `event` | `Event` | Kingdom Trails events, group rides, clinics |
+| `event_series` | `EventSeries` | Recurring events |
+| `web_page` | `WebPage` | Static pages (About, Contact) |
+| `web_site` | `WebSite` | Site-level structured data, authorship anchor |
 
-Stat fields (distance, elev_*) are optional — relevant only for trail/ski
-articles. Stats bar renders from Twig manual fields when schema_distance is
-set and schema_geoshape is absent.
+### Geo Entity Model
 
-### TouristTrip fields
+| Type | Bundle | Schema.org | Purpose |
+|---|---|---|---|
+| `geo_entity` | `poi` | `TouristAttraction` | Map markers — attractions, landmarks, features |
+| `geo_entity` | `destination` | `Place` | Trip stop anchors (Dublin, Galway, etc.) |
+| `node` | `place` | `Place` | Content hub landing pages |
 
-| Field | Type | Purpose |
-|---|---|---|
-| `body` | text_with_summary | Trip overview |
-| `schema_date_published` | datetime | Fallback date |
-| `field_trip_dates` | Smart Date (cardinality 1) | Trip date range — start + end |
-| `schema_destination` | entity_reference → place[] | Places visited (multi-value, ordered) |
-| `schema_itinerary` | entity_reference → article[] | Articles under this trip |
-| `schema_image` | entity_reference → ImageObject | Hero image |
-| `field_editorial` | entity_reference_revisions | Editorial tracking |
-
-### Place fields
-
-| Field | Type | Purpose |
-|---|---|---|
-| `body` | text_with_summary | Place description |
-| `schema_latitude` | decimal | Latitude — map center |
-| `schema_longitude` | decimal | Longitude — map center |
-| `schema_address` | address | Structured address |
-| `schema_image` | entity_reference → ImageObject | Place photo |
-| `schema_telephone` | string | Phone |
-
-### Geo field access — IMPORTANT
-
-Two different geo patterns are used. Never mix them up:
-
-**Article** — `schema_geo` is a **Geofield**. Access as:
-```twig
-{% set has_geo = not node.schema_geo.isEmpty() %}
-{% set map_center = node.schema_geo.lat.value ~ ',' ~ node.schema_geo.lon.value %}
-```
-
-`schema_geo.lat` and `schema_geo.lon` return `FloatData` TypedData objects, **not**
-raw PHP floats. Always append `.value` before using in string concatenation (`~`),
-`json_encode`, or any other string context.
-
-**Place** — uses separate **decimal fields** `schema_latitude` and
-`schema_longitude`. There is no `schema_geo` on Place. Access as:
-```twig
-node.schema_latitude.value
-node.schema_longitude.value
-```
-
-**Reading Place geo from a referenced Place on an article:**
-```twig
-{% set place = node.schema_place.entity %}
-{% set has_place = place and place.schema_latitude.value is not empty %}
-{% set map_center = place.schema_latitude.value ~ ',' ~ place.schema_longitude.value %}
-```
-
-The common mistake is `place.schema_geo.value.lat` — Place has no `schema_geo`,
-so `has_place` silently evaluates false and the map center fallback never works.
-
-**geo_entity (poi / destination) — Geofield + label:**
-```twig
-{# lat/lon: always .value #}
-'lat': poi.schema_geo.lat.value,
-'lon': poi.schema_geo.lon.value,
-
-{# label: geo_entity defines "label" = "label" in entity keys, so .label returns
-   a FieldItemList, not a string. Always use .label.value #}
-'label': '<strong>' ~ poi.label.value ~ '</strong>',
-```
-
-**schema_geoshape file entity — filename:**
-```twig
-{# filename returns a FieldItemList, not a string. Always use .value for matches/string ops #}
-{% set is_gpx = geo_file and geo_file.filename.value matches '/\\.gpx$/i' %}
-```
-
-### Taxonomy vocabularies
+### Taxonomy
 
 | Vocabulary | machine name | Notes |
 |---|---|---|
-| Category | `category` | trails / drupal / permaculture / maps — needs `field_key` added |
-| Activity Type | `activity_type` | bike / hike / ski — needs `field_key` added |
+| Category | `category` | trails / drupal / permaculture / maps |
+| Activity Type | `activity_type` | bike / hike / ski |
 | Tags | `tags` | general tagging |
+| Route Type | `route_type` | driving / walking / hiking / cycling — drives map line style |
 
-`field_key` is a plain text field (max 32 chars) on taxonomy terms used by
-the Pathauto hook to generate URL path segments. **It does not exist yet.**
+### Schema.org Content Type Creation Order
 
----
-
-## Mapping
-
-All Leaflet rendering is handled by `map.js` in the Surface theme.
-
-- **Never** use the Drupal Leaflet module formatter on article pages —
-  `schema_geo` must be **hidden** in the article view display to prevent
-  a rogue second map from rendering
-- Default tiles: USGS National Map (US only, no API key)
-- Per-article tile override: `field_map_tiles` — use for non-US content
-- Available tile keys: `usgs-topo`, `osm`, `open-topo`, `esri-topo`
-- GeoJSON Z values stored in **meters** by GeoShapeConverter; converted to
-  display unit client-side via `drupalSettings.trailMapper.elevationUnit`
-- After init: `window._surfaceMaps[map_id]`, `window._surfaceTracks[map_id]`,
-  `surface-map-ready` CustomEvent `{ map_id, map, coords }`
-
----
-
-## Pending Work
-
-See `claude-code-next-steps.md` for full prompts. Remaining items:
-
-- **0e** — `field_trip_dates` Smart Date (cardinality 1) on tourist_trip;
-  update `node--trip.html.twig` to render date range
-- **0f** — `field_map_tiles` select field on article; register tile sets
-  in trail_mapper; wire override through `node--article.html.twig` and `map.js`
-- **2** — Add `field_key` (text plain, max 32) to `category` and
-  `activity_type` vocabularies; populate term keys
-- **4** — Add `elevation_unit` to `trail_mapper.settings` schema +
-  install config + `hook_page_attachments`
-- **5** — `hook_pathauto_pattern_alter()` for conditional URL aliases
-  (blocked on step 2)
-
----
-
-## Schema.org Content Type Creation Order
-
-Create types in dependency order — dependencies must exist before dependents:
+Always create in dependency order:
 
 ```bash
 lando drush schemadotorg:create-type taxonomy_term:DefinedTerm
@@ -247,6 +192,59 @@ lando drush schemadotorg:create-type node:BlogPosting
 lando drush schemadotorg:create-type node:TouristTrip
 lando drush schemadotorg:create-type node:Event
 ```
+
+---
+
+## Custom Modules
+
+| Module | Purpose |
+|---|---|
+| `trail_mapper` | GeoJSON generation from external PostgreSQL DB; `GeoShapeConverter` (GPX/GeoJSON); settings at `/admin/config/trail-mapper` |
+| `external_pg` | Service layer (`ExternalPgService`) for external PostgreSQL TrailMapper DB |
+| `geo_content_builder` | Custom entities for plotting geographic content on Leaflet maps |
+| `leaflet_full_page` | Generic full-page Leaflet mapping; configurable GeoJSON endpoint at `/leaflet-full-page/map-items/{bundle}` |
+| `trailmapper_safeguards` | Prevents invalid `menu_name` on MenuLinkContent entities |
+
+---
+
+## Mapping
+
+All Leaflet rendering is handled by `map.js` in the Surface theme.
+
+- **Never** use the Drupal Leaflet module formatter on article pages —
+  `schema_geo` must be **hidden** in the article view display to prevent
+  a second map from rendering
+- Default tiles: USGS National Map (US only, no API key, feet units)
+- Per-article tile override: `field_map_tiles` — use for non-US content
+- Available tile keys: `usgs-topo`, `osm`, `open-topo`, `esri-topo`
+- After init: `window._surfaceMaps[map_id]`, `window._surfaceTracks[map_id]`,
+  `surface-map-ready` CustomEvent fires with `{ map_id, map, coords }`
+- Event key is `map_id` (snake_case), not `mapId`
+
+---
+
+## URL Aliases
+
+Set manually on each node. No Pathauto automation.
+
+| Content | Pattern |
+|---|---|
+| Trail report | `/trails/bike/[title]`, `/trails/hike/[title]`, `/trails/ski/[title]` |
+| Trip | `/trips/[title]` |
+| Trip article | `/trips/[trip-title]/[article-title]` |
+| Drupal post | `/drupal/[title]` |
+| Permaculture post | `/permaculture/[title]` |
+| Writing | `/writing/[title]` |
+
+---
+
+## Coding Standards
+
+- **Drupal:** [Drupal Coding Standards](https://www.drupal.org/docs/develop/standards)
+- **CSS:** BEM (Block Element Modifier)
+- **JavaScript:** ES6+; all JS files must begin with `/* jshint esversion: 6 */`
+- **Theme:** Modified Atomic Design — Base → Elements → Components → Collections → Layouts → Pages
+- **Twig:** Use namespaces (`@components`, `@elements`, etc.); never `@components/surface/`
 
 ---
 
@@ -266,15 +264,24 @@ Always import on environment setup or after pulling:
 lando drush cim && lando drush cr
 ```
 
+---
+
 ## Git Workflow
 
+- Sean handles all git operations
 - Do not commit: `public_html/core`, `public_html/modules/contrib`,
   `public_html/themes/contrib`
 - Config changes (`config/sync`) should be committed with the feature
-  that requires them
+  that requires them — never separately unless a config-only change
 - Do not edit `settings.php` directly — local overrides go in `settings.lando.php`
 
-## Theme Reference
+---
 
-See `public_html/themes/custom/surface/CLAUDE.md` for full theme architecture,
-Twig rules, content model, component patterns, JS standards, and Leaflet patterns.
+## Working Rules
+
+- **Read the relevant docs before working.** Token values, field schemas, and
+  component patterns change. Don't work from memory.
+- **No programmatic `hook_install()` field creation** — it conflicts with
+  config-managed fields. All fields via Blueprints UI or Structure → Manage fields.
+- **Config is managed via `drush cex` / `drush cim`.** Export after every UI change.
+- **Sean handles all git operations.** Never commit, push, or manage branches.
