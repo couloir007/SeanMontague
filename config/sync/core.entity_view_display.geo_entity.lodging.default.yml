@@ -1,0 +1,152 @@
+uuid: 598f5122-63dd-44a9-8062-54538eadb2ac
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.geo_entity.lodging.field_body
+    - field.field.geo_entity.lodging.field_day
+    - field.field.geo_entity.lodging.field_nights
+    - field.field.geo_entity.lodging.field_show_on_map
+    - field.field.geo_entity.lodging.schema_address
+    - field.field.geo_entity.lodging.schema_geo
+    - field.field.geo_entity.lodging.schema_image
+    - field.field.geo_entity.lodging.schema_place
+    - field.field.geo_entity.lodging.schema_same_as
+    - field.field.geo_entity.lodging.schema_telephone
+    - geo_entity.geo_entity_type.lodging
+  module:
+    - address
+    - geofield
+    - link
+    - text
+    - user
+id: geo_entity.lodging.default
+targetEntityType: geo_entity
+bundle: lodging
+mode: default
+content:
+  created:
+    type: timestamp
+    label: above
+    settings:
+      date_format: medium
+      custom_date_format: ''
+      timezone: ''
+      tooltip:
+        date_format: long
+        custom_date_format: ''
+      time_diff:
+        enabled: false
+        future_format: '@interval hence'
+        past_format: '@interval ago'
+        granularity: 2
+        refresh: 60
+    third_party_settings: {  }
+    weight: 20
+    region: content
+  field_body:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 21
+    region: content
+  field_day:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 27
+    region: content
+  field_nights:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 29
+    region: content
+  field_show_on_map:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 28
+    region: content
+  schema_address:
+    type: address_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 24
+    region: content
+  schema_geo:
+    type: geofield_default
+    label: above
+    settings:
+      output_format: wkt
+      output_escape: true
+    third_party_settings: {  }
+    weight: 22
+    region: content
+  schema_image:
+    type: entity_reference_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 23
+    region: content
+  schema_place:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 27
+    region: content
+  schema_same_as:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 26
+    region: content
+  schema_telephone:
+    type: basic_string
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 25
+    region: content
+  status:
+    type: boolean
+    label: above
+    settings:
+      format: enabled-disabled
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  uid:
+    type: author
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 15
+    region: content
+hidden:
+  langcode: true

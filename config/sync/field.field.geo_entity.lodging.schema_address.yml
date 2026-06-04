@@ -1,0 +1,49 @@
+uuid: 167a92dd-0b1c-42be-a846-c756d5df4dd4
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_address
+    - geo_entity.geo_entity_type.lodging
+  module:
+    - address
+id: geo_entity.lodging.schema_address
+field_name: schema_address
+entity_type: geo_entity
+bundle: lodging
+label: Address
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  available_countries: {  }
+  langcode_override: ''
+  field_overrides:
+    givenName:
+      override: hidden
+    additionalName:
+      override: hidden
+    familyName:
+      override: hidden
+    organization:
+      override: hidden
+    addressLine1:
+      override: hidden
+    addressLine2:
+      override: hidden
+    addressLine3:
+      override: hidden
+    postalCode:
+      override: hidden
+    sortingCode:
+      override: hidden
+    dependentLocality:
+      override: hidden
+    locality:
+      override: optional
+    administrativeArea:
+      override: optional
+  fields: {  }
+field_type: address

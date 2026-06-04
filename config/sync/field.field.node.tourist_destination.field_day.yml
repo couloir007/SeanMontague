@@ -1,0 +1,23 @@
+uuid: 3bde131f-7a7e-4368-98c2-b4c0b55ba291
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_day
+    - node.type.tourist_destination
+id: node.tourist_destination.field_day
+field_name: field_day
+entity_type: node
+bundle: tourist_destination
+label: Day
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

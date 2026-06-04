@@ -1,0 +1,59 @@
+uuid: 65b742bb-64d5-4483-819c-b3dd432cab66
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.taxonomy_term.route_type.field_color
+    - field.field.taxonomy_term.route_type.field_dash_pattern
+    - field.field.taxonomy_term.route_type.field_key
+    - field.field.taxonomy_term.route_type.field_line_weight
+    - taxonomy.vocabulary.route_type
+  module:
+    - options
+    - text
+id: taxonomy_term.route_type.default
+targetEntityType: taxonomy_term
+bundle: route_type
+mode: default
+content:
+  description:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_color:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_dash_pattern:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_key:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_line_weight:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 3
+    region: content
+hidden:
+  langcode: true

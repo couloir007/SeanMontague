@@ -1,0 +1,22 @@
+uuid: 1ea99e06-01fc-4c8d-971d-945ed686073b
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.tourist_destination
+id: node.tourist_destination.promote
+field_name: promote
+entity_type: node
+bundle: tourist_destination
+label: 'Promoted to front page'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 1
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

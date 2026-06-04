@@ -1,0 +1,24 @@
+uuid: 4f25f731-8434-4368-8b33-2c4c122a3291
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+    - type_tray
+third_party_settings:
+  menu_ui:
+    available_menus: {  }
+    parent: ''
+  type_tray:
+    type_category: place
+    type_thumbnail: ''
+    type_icon: /modules/contrib/schemadotorg/modules/schemadotorg_type_tray/images/schemadotorg_type_tray/icon/place.png
+    existing_nodes_link_text: 'View existing <em class="placeholder">Tourist Destination</em> content'
+    type_weight: -12
+name: 'Tourist Destination'
+type: tourist_destination
+description: null
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: false

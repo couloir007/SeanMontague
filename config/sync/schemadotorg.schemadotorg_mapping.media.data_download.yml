@@ -1,0 +1,20 @@
+uuid: a668ec87-7e22-427c-8719-75d083b4c797
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.media.data_download.schema_content_url
+    - media.type.data_download
+  module:
+    - media
+id: media.data_download
+target_entity_type_id: media
+target_bundle: data_download
+schema_type: DataDownload
+schema_properties:
+  schema_content_url: contentUrl
+  created: dateCreated
+  changed: dateModified
+  langcode: inLanguage
+  name: name
+additional_mappings: {  }

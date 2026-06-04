@@ -1,0 +1,29 @@
+uuid: b2e620ae-01c6-4c70-a939-445b26f77aef
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_place
+    - node.type.place
+    - node.type.tourist_destination
+id: node.tourist_destination.schema_place
+field_name: schema_place
+entity_type: node
+bundle: tourist_destination
+label: containedInPlace
+description: 'Location this post is about.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      place: place
+    sort:
+      field: title
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

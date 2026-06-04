@@ -1,0 +1,33 @@
+uuid: 5063894d-6fd4-44a7-8248-41f82d58b41a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_image
+    - node.type.tourist_destination
+  module:
+    - epp
+third_party_settings:
+  epp:
+    value: 'target_id: [current-page:query:image]'
+id: node.tourist_destination.schema_image
+field_name: schema_image
+entity_type: node
+bundle: tourist_destination
+label: Image
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'schemadotorg:media'
+  handler_settings:
+    target_type: media
+    schema_types:
+      ImageObject: ImageObject
+    excluded_schema_types: {  }
+    ignore_additional_mappings: false
+    target_bundles:
+      image: image
+field_type: entity_reference

@@ -1,0 +1,29 @@
+uuid: f5b1682c-1529-4e5f-a569-d43f7377f94b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_destination
+    - node.type.article
+    - node.type.tourist_destination
+id: node.article.schema_destination
+field_name: schema_destination
+entity_type: node
+bundle: article
+label: Destination
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      tourist_destination: tourist_destination
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

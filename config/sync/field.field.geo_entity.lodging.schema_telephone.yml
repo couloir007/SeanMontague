@@ -1,0 +1,21 @@
+uuid: 25797fcd-99a6-4c29-a0cb-78230ae681d8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_telephone
+    - geo_entity.geo_entity_type.lodging
+  module:
+    - telephone
+id: geo_entity.lodging.schema_telephone
+field_name: schema_telephone
+entity_type: geo_entity
+bundle: lodging
+label: Telephone
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: telephone

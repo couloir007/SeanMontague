@@ -1,0 +1,28 @@
+uuid: 8d631032-5227-47cb-accb-26b9d7c3ac2e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_event_schedule
+    - node.type.article
+  module:
+    - smart_date
+id: node.article.schema_event_schedule
+field_name: schema_event_schedule
+entity_type: node
+bundle: article
+label: 'Trip Date'
+description: 'Associates an <a href="https://schema.org/Event">Event</a> with a <a href="https://schema.org/Schedule">Schedule</a>.'
+required: false
+translatable: false
+default_value:
+  -
+    default_duration: 60
+    default_duration_increments: "30\r\n60|1 hour\r\n90\r\n120|2 hours\r\ncustom"
+    default_date_type: next_hour
+    default_date: ''
+    min: ''
+    max: ''
+default_value_callback: ''
+settings: {  }
+field_type: smartdate

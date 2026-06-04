@@ -1,0 +1,12 @@
+uuid: ee38e1fc-ed33-415c-9ba4-49582dacda4a
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: hGAXeDMSR_hoOrnBPTDnEWmb3ZkjBsHW0RtrlK5ZrV0
+id: map_field_link
+label: 'Map Field Link'
+icon_uuid: null
+icon_default: null
+description: ''
+behavior_plugins: {  }

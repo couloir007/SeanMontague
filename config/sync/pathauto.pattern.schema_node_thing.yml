@@ -1,0 +1,31 @@
+uuid: 2f3053f7-d41d-49ac-a416-5d55611f3a7f
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: schema_node_thing
+label: Default
+type: 'canonical_entities:node'
+pattern: '/[node:menu-link:parents:join-path]/[node:title]'
+selection_criteria:
+  d075ef49-4c1c-4f8d-a7c5-c0007141c050:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: d075ef49-4c1c-4f8d-a7c5-c0007141c050
+    context_mapping:
+      node: node
+    bundles:
+      article: article
+      event: event
+      event_series: event_series
+      page: page
+      person: person
+      place: place
+      podcast_episode: podcast_episode
+      podcast_series: podcast_series
+      tourist_destination: tourist_destination
+      tourist_trip: tourist_trip
+selection_logic: and
+weight: -10
+relationships: {  }

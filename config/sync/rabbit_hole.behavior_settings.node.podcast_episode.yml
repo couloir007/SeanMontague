@@ -1,0 +1,13 @@
+uuid: 85f833df-274a-4fdc-9adf-18c1d0f26c7a
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.podcast_episode
+id: node.podcast_episode
+targetEntityType: node
+bundle: podcast_episode
+action: display_page
+no_bypass: false
+bypass_message: false
+configuration: {  }
