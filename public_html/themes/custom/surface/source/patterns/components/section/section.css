@@ -1,0 +1,75 @@
+/**
+ * Section — generic content section shell.
+ * Migrated from the old .homepage__writing / .homepage__places rules in
+ * site-homepage.css. Those .homepage__* classes can now be removed.
+ */
+
+.section {
+  border-block-end: var(--border-size-1, 1px) solid var(--border);
+  padding-block: var(--size-20);                /* 80px */
+  padding-inline: var(--size-12);               /* 48px */
+}
+
+/* Surface-tinted variant — was .homepage__places background */
+.section--alt {
+  background: var(--surface2);
+}
+
+/* Eyebrow spacing within the section. The .eyebrow element owns its own
+   typography (font, tracking, uppercase, color modifiers); the section only
+   owns the spacing beneath it. */
+.section__eyebrow {
+  margin-block-end: var(--size-10);             /* 40px */
+}
+
+.section__title {
+  color: var(--bright);
+  font-family: var(--font-serif-nek);
+  margin-block: 0 var(--size-8);
+}
+
+/* Base grid — sensible responsive default. Modifiers below pin specific
+   column counts to match the original homepage layouts. */
+.section__grid {
+  display: grid;
+  gap: var(--size-5);                           /* 20px */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+}
+
+/* Writing cards — 3-up with the framing border (was .homepage__cards-grid) */
+.section__grid--cards {
+  border: var(--border-size-1, 1px) solid var(--border);
+  gap: 0;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Places — 2-up (was .homepage__places-grid) */
+.section__grid--places {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (width <= 960px) {
+  .section {
+    padding-block: var(--size-15);              /* 60px */
+    padding-inline: var(--size-6);              /* 24px */
+  }
+
+  .section__grid--cards,
+  .section__grid--places {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────────────
+   ADD to section.css — inverted frame variant.
+   Place just after the .section--alt rule.
+   ─────────────────────────────────────────────────────────────────────── */
+
+/* Inverted frame — dark background, centered, taller padding, no border.
+   Contact (closing CTA) uses this. Pair with .eyebrow--invert on the eyebrow. */
+.section--invert {
+  background: var(--bright);
+  border-block-end: 0;
+  padding-block: var(--size-25);                /* 100px */
+  text-align: center;
+}

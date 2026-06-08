@@ -1,0 +1,10 @@
+{{ attach_library('surface/pullquote') }}
+
+<blockquote class="pullquote{{ modifier ? ' pullquote--' ~ modifier : '' }}">
+  <div class="pullquote__text">
+    {{ text|raw }}
+  </div>
+  {% if cite %}
+    <cite class="pullquote__cite">{{ cite }}</cite>
+  {% endif %}
+</blockquote>

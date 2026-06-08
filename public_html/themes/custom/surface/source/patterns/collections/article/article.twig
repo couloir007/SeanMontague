@@ -34,13 +34,13 @@
 <div class="article-wrap">
   <article class="article__body">
     {# Drop cap is opt-in: add class="drop-cap" to the first <p> in the body HTML. #}
-    {{ body|raw }}
+    {{ body }}
   </article>
   <aside class="article__sidebar">
     {% for card in sidebar_cards %}
       <div class="sidebar-card">
         <div class="sidebar-card__header">{{ card.heading }}</div>
-        <div class="sidebar-card__body">{{ card.body|raw }}</div>
+        <div class="sidebar-card__body">{{ card.body }}</div>
       </div>
     {% endfor %}
   </aside>

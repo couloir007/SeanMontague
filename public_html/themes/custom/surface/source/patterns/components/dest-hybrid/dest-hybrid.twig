@@ -1,0 +1,68 @@
+{{ attach_library('surface/dest-hybrid') }}
+
+<section class="dest-hybrid" data-dest-hybrid>
+  {% if header_label or header_title or header_lede %}
+    <div class="dest-hybrid__header">
+      {% if header_label %}
+        <span class="dest-hybrid__label">{{ header_label }}</span>
+      {% endif %}
+      {% if header_title %}
+        <h2 class="dest-hybrid__title">{{ header_title|raw }}</h2>
+      {% endif %}
+      {% if header_lede %}
+        <p class="dest-hybrid__lede">{{ header_lede }}</p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="dest-hybrid__layout">
+    <div class="dest-hybrid__map-wrap">
+      <div class="dest-hybrid__map"
+           id="{{ map_id|default('dest-hybrid-map') }}"
+           data-center="{{ map_center|default('53.3,-8.0') }}"
+           data-zoom="{{ map_zoom|default(7) }}">
+      </div>
+      {% if map_caption_label or map_caption_meta %}
+        <div class="dest-hybrid__map-caption">
+          <span class="dest-hybrid__map-caption-label">{{ map_caption_label }}</span>
+          <span class="dest-hybrid__map-caption-meta">{{ map_caption_meta }}</span>
+        </div>
+      {% endif %}
+    </div>
+
+    <ol class="dest-hybrid__timeline" data-dest-timeline>
+      {% for dest in destinations %}
+        {% set num = loop.index|format_number({minimum_integer_digits: 2}) %}
+        <li class="dest-hybrid__node"
+            data-slug="{{ dest.slug }}"
+            data-lat="{{ dest.coords.0 }}"
+            data-lon="{{ dest.coords.1 }}">
+          <button class="dest-hybrid__node-head"
+                  aria-expanded="false">
+            <span class="dest-hybrid__dot">
+              <span class="dest-hybrid__dot-num">{{ num }}</span>
+            </span>
+            <span class="dest-hybrid__node-body">
+              <span class="dest-hybrid__node-name">{{ dest.name }}</span>
+              <span class="dest-hybrid__node-meta">
+                {{ dest.region }}
+                {% if dest.region and dest.dates %}
+                  <span class="dest-hybrid__node-sep"> · </span>
+                {% endif %}
+                {{ dest.dates }}
+              </span>
+            </span>
+            {% if dest.coords_label %}
+              <span class="dest-hybrid__node-coords">{{ dest.coords_label|raw }}</span>
+            {% endif %}
+            <span class="dest-hybrid__chev" aria-hidden="true">+</span>
+          </button>
+          <div class="dest-hybrid__panel" hidden>
+            <p class="dest-hybrid__note">{{ dest.note|default('Notes for this stop are forthcoming.') }}</p>
+            <a class="dest-hybrid__link" href="#{{ dest.slug }}">Read full entry →</a>
+          </div>
+        </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>

@@ -1,0 +1,14 @@
+---
+id: 'writing'
+modifier: ''
+eyebrow: 'Writing'
+eyebrow_modifier: ''
+title: ''
+grid_modifier: 'section__grid--cards'
+content: |
+  <a href="#" class="card">
+    <span class="card__category card__category--trails">Trails</span>
+    <h3 class="card__title">Demo card in the section grid slot</h3>
+    <span class="card__meta">May 2026 · 4 min</span>
+    <p class="card__excerpt">Fixture content rendered through the slot fallback.</p>
+  </a>

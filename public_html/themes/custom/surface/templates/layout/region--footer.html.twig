@@ -1,11 +1,18 @@
-{% if content %}
-  {% include '@components/footer/footer.twig' with {
-    'brand_text': 'Sean Montague · Burke, VT',
-    'copyright_text': '© ' ~ "now"|date("Y") ~ ' Sean Montague',
-    'links': [
-      { 'text': 'GitHub',     'url': 'https://github.com/seanmontague' },
-      { 'text': 'Drupal.org', 'url': 'https://drupal.org/u/seanmontague' },
-      { 'text': 'LinkedIn',   'url': 'https://linkedin.com/in/seanmontague' },
-    ],
-  } only %}
-{% endif %}
+{# ── Contact ──────────────────────────────────────────────────────────── #}
+{% include '@components/contact/contact.twig' with {
+  'label':    'Contact',
+  'headline': 'Say hello.',
+  'sub':      'Always happy to talk trails, maps, or growing things.',
+  'email':    'jeany_boy@JeanMontagu.com',
+} only %}
+
+{% include '@components/footer/footer.twig' with {
+  'brand_text':     'Sean Montague · Burke, VT',
+  'copyright_text': '© 2025 Sean Montague',
+  'links': [
+    { 'text': 'GitHub',     'url': 'https://github.com/seanmontague' },
+    { 'text': 'Drupal.org', 'url': 'https://drupal.org/u/seanmontague' },
+    { 'text': 'LinkedIn',   'url': 'https://linkedin.com/in/seanmontague' },
+  ],
+} only %}
+

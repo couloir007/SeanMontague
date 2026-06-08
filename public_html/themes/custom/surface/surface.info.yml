@@ -15,15 +15,12 @@ libraries:
 
 regions:
   header: Header
-  hero: Hero (full width)
   highlighted: Highlighted
   breadcrumb: Breadcrumb
   content_above: Content Above
   content: Content
-  sidebar: Sidebar
   content_below: Content Below
-  footer_top: Footer Top
-  footer_bottom: Footer Bottom
+  footer: Footer
   disabled: Disabled
 
 ckeditor5-stylesheets:

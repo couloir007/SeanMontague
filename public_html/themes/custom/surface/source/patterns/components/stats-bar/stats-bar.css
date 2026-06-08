@@ -5,6 +5,10 @@
   grid-template-columns: repeat(5, 1fr);
   margin: 0 auto;
   max-width: 1100px;
+
+  &.three-col {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .stats-bar__item {
@@ -48,25 +52,62 @@
 
 @media (width <= 1000px) {
   .stats-bar {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .stats-bar__item {
+    grid-column: span 2;
   }
 
   .stats-bar__item:nth-child(3) {
     border-right: none;
   }
 
-  .stats-bar__item:nth-child(4),
-  .stats-bar__item:nth-child(5) {
+  /* When there are 5 items, the last 2 should fill the second row (3 columns each in a 6-col grid) */
+  .stats-bar__item:nth-child(4):nth-last-child(2),
+  .stats-bar__item:nth-child(5):last-child {
+    grid-column: span 3;
+  }
+
+  .stats-bar__item:nth-child(n+4) {
     border-top: 1px solid var(--border);
   }
 
-  .stats-bar__item:nth-child(5) {
+  /* Reset border for the new row end if it's the 5th item now acting as 2nd in row */
+  .stats-bar__item:last-child {
     border-right: none;
   }
 }
 
 @media (width <= 640px) {
   .stats-bar {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stats-bar__item {
+    grid-column: span 1;
+  }
+
+  /* Reset spans for mobile if they were set above */
+  .stats-bar__item:nth-child(4):nth-last-child(2) {
+    grid-column: span 1;
+  }
+
+  /* When there is an odd number of items, the last one should be 100% (2 columns) */
+  .stats-bar__item:nth-child(odd):last-child {
+    border-right: none;
+    grid-column: span 2;
+  }
+
+  .stats-bar__item:nth-child(odd):not(:last-child) {
+    border-right: 1px solid var(--border);
+  }
+
+  .stats-bar__item:nth-child(even) {
+    border-right: none;
+  }
+
+  .stats-bar__item:nth-child(n+3) {
+    border-top: 1px solid var(--border);
   }
 }

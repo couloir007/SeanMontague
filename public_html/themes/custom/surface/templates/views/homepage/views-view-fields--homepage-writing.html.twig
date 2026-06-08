@@ -1,0 +1,63 @@
+{#
+/**
+ * @file
+ * Homepage writing grid — renders each article row into card.twig.
+ *
+ * Template suggestion: views-view-fields--homepage-writing.html.twig
+ * View ID: homepage_writing (row style: Fields).
+ *
+ * Field IDs used from the view (verified against views.view.homepage_writing):
+ *   title                  — article title
+ *   view_node              — Link to content (entity_link) → node URL.
+ *                            SET THIS FIELD's "Exclude from display" = true in
+ *                            the view (currently exclude: false, so it also
+ *                            renders a stray visible link).
+ *   schema_date_published  — formatted date
+ *   body                   — summary, trimmed
+ *   schema_category        — category term label (entity_reference_label,
+ *                            link:true → striptags reduces it to plain text)
+ *   field_key              — NOT in the view yet; see category_key fallback
+ *
+ * The grid wrapper is provided by section.twig (.section__grid--cards) in
+ * node--page--front.html.twig — this template emits a bare card, no wrapper.
+ *
+ * card.twig styles only .card__category--{trails,garden,maps,tech}; the pill
+ * COLOR comes from category_key, which must be one of those four — not a slug
+ * of the label.
+ *
+ * @see @components/card/card.twig
+ */
+#}
+
+{% set category = fields.schema_category.content|render|striptags|trim %}
+
+{#
+Pill color key. PREFERRED: a `field_key` field on the category term exposed in
+the view, whose value is already trails|garden|maps|tech — pass it straight
+through. Until that exists, fall back to mapping known labels to keys. A raw
+slug of the label ("Kingdom Trails" → "kingdom-trails") matches no
+.card__category--KEY rule and renders an unstyled pill.
+#}
+{% set category_key = fields.field_key.content|default('')|render|striptags|trim %}
+
+{% if not category_key %}
+  {% set label_lower = category|lower %}
+  {% if 'trail' in label_lower or 'burke' in label_lower or 'kingdom' in label_lower or 'ski' in label_lower %}
+    {% set category_key = 'trails' %}
+  {% elseif 'permaculture' in label_lower or 'garden' in label_lower or 'food' in label_lower %}
+    {% set category_key = 'garden' %}
+  {% elseif 'map' in label_lower or 'leaflet' in label_lower or 'geojson' in label_lower %}
+    {% set category_key = 'maps' %}
+  {% else %}
+    {% set category_key = 'tech' %}
+  {% endif %}
+{% endif %}
+
+{% include '@components/card/card.twig' with {
+  'url':          fields.view_node.content|render|striptags|trim|default('#'),
+  'title':        fields.title.content|render|striptags|trim,
+  'excerpt':      fields.body.content|render|striptags|trim,
+  'date':         fields.schema_date_published.content|render|striptags|trim,
+  'category':     category,
+  'category_key': category_key,
+} only %}

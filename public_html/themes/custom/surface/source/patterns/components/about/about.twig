@@ -1,9 +1,24 @@
 {{ attach_library('surface/about') }}
 
-<section class="about{{ modifier ? ' ' ~ modifier }}" id="about">
+{#
+  About — editorial two-column section.
+  Wears the shared .section frame (padding, border, --alt tint, eyebrow
+  spacing + responsive padding all come from section.css). About owns ONLY
+  its inner grid (.about__grid is 1fr 1.5fr, not a card grid — that is why it
+  does not route through the section.twig embed slot).
+
+  Depends on surface/section for the frame classes — see surface.libraries.yml.
+#}
+
+<section class="about section{{ modifier ? ' ' ~ modifier }}" id="about">
   {% if label %}
-    <span class="about__label">{{ label }}</span>
+    <div class="section__eyebrow">
+      {% include '@elements/eyebrow/eyebrow.twig' with {
+        eyebrow: { text: label, modifier: label_modifier|default('') }
+      } only %}
+    </div>
   {% endif %}
+
   <div class="about__grid">
     <div>
       {% if title %}

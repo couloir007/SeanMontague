@@ -178,9 +178,36 @@ pre {
 }
 
 blockquote {
-  font-family: var(--font-secondary);
+  background: rgba(58, 90, 64, 4%);
+  border-left: 3px solid var(--forest);
+  margin: 32px 0;
+  padding: 16px 24px;
+}
+
+blockquote p {
+  color: var(--bright);
+  font-family: "Cormorant Garamond", "EB Garamond", Georgia, serif;
+  font-size: 22px;
   font-style: italic;
-  letter-spacing: var(--tracking-wide);
+  font-weight: 300;
+  margin-bottom: 8px;
+}
+
+blockquote cite {
+  color: var(--muted);
+  font-family: var(--font-mono-nek);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.pullquote__cite {
+  color: var(--muted);
+  font-family: var(--font-mono-nek);
+  font-size: 9px;
+  font-style: normal;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
 }
 
 fieldset {

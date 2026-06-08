@@ -1,0 +1,70 @@
+{#
+/**
+ * @file
+ * Homepage places grid — renders each destination row into places-card.twig.
+ *
+ * Template suggestion: views-view-fields--homepage-places.html.twig
+ * View ID: homepage_places (row style: Fields).
+ *
+ * Field IDs used from the view (verified against views.view.homepage_places):
+ *   title                — destination name → places-card `name`
+ *   field_subtitle       — short geographic descriptor
+ *   body                 — summary, trimmed
+ *   schema_tourist_type  — tourist type tags (comma separated)
+ *   schema_geo           — geofield, formatter geofield_latlon, separator ", ",
+ *                          decimal_degrees → renders "lat, lon" (coords parse OK)
+ *   path                 — node_path URL, exclude: true (there is NO view_node
+ *                          field in this view). Unused below — see note.
+ *
+ * The grid wrapper is provided by section.twig (.section__grid--places) in
+ * node--page--front.html.twig — this template emits a bare places-card.
+ *
+ * NOTE: places-card has no `label` and no `url` prop, so neither is passed.
+ *
+ * @see @components/places-card/places-card.twig
+ */
+#}
+
+{# Tags: split the comma-separated tourist types into an array. #}
+{% set types_raw = fields.schema_tourist_type.content|render|striptags|trim %}
+{% set tags = types_raw ? types_raw|split(',')|map(t => t|trim)|filter(t => t) : [] %}
+
+{#
+  Coords display. The view's schema_geo formatter is geofield_latlon with
+  separator ", " (decimal_degrees), so coords_raw is "lat, lon" — this parse is
+  correct for the current config. If the formatter is ever changed to WKT
+  ("POINT (lon lat)"), split(',') yields one part and we fall back to the raw
+  string; keep the formatter as lat/lon to avoid that.
+#}
+{% set coords_raw = fields.schema_geo.content|render|striptags|trim %}
+{% set coords_parts = coords_raw|split(',') %}
+
+{% if coords_parts|length >= 2 %}
+  {% set lat = coords_parts[0]|trim + 0 %}
+  {% set lng = coords_parts[1]|trim + 0 %}
+  {% set coords = '%0.4f° %s, %0.4f° %s'|format(
+    lat < 0 ? lat * -1 : lat,
+    lat < 0 ? 'S' : 'N',
+    lng < 0 ? lng * -1 : lng,
+    lng < 0 ? 'W' : 'E'
+  ) %}
+{% else %}
+  {% set coords = coords_raw %}
+{% endif %}
+
+{% include '@components/places-card/places-card.twig' with {
+  'name':     fields.title.content|render|striptags|trim,
+  'subtitle': fields.field_subtitle.content|render|striptags|trim,
+  'desc':     fields.body.content|render|striptags|trim,
+  'coords':   coords,
+  'tags':     tags,
+} only %}
+
+{#
+  NOTE: places-card.twig is a <div> with no link — it has no `url` prop. The
+  view's URL field is `path` (node_path, exclude: true); it is intentionally
+  not passed here. If places should link to the node, that is a places-card
+  COMPONENT change (wrap in <a> / add a url prop), then pass
+  fields.path.content here. There is no view_node field in this view.
+#}
+

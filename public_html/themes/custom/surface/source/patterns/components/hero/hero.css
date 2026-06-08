@@ -3,7 +3,7 @@
   border-bottom: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 200px);
+  height: calc(100vh - 250px);
   min-height: 480px;
   overflow: hidden;
   position: relative;
@@ -38,8 +38,8 @@
   flex: 1;
   flex-direction: column;
   justify-content: center;
-  max-width: 680px;
-  padding: 70px 48px 100px;
+  max-width: 900;
+  padding: 50px 48px 20px;
   position: relative;
   z-index: 2;
 }
@@ -56,7 +56,7 @@
 .hero__name {
   color: var(--bright);
   font-family: var(--font-display-nek);
-  font-size: clamp(64px, 10.5vw, 120px);
+  font-size: clamp(80px, 15vw, 130px);
   font-weight: 400;
   letter-spacing: 0.02em;
   line-height: 0.9;
@@ -66,7 +66,7 @@
 .hero__tagline {
   color: var(--text);
   font-family: var(--font-serif-nek);
-  font-size: 19px;
+  font-size: 24px;
   font-style: italic;
   font-weight: 300;
   line-height: 1.5;
@@ -85,12 +85,21 @@
   background: var(--forest);
   color: #fff;
   font-family: var(--font-mono-nek);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.18em;
-  padding: 11px 26px;
+  line-height: 45px;
+  padding: 0;
+  text-align: center;
   text-decoration: none;
   text-transform: uppercase;
   transition: opacity 0.2s ease;
+  width: 170px;
+
+  @media (width >= 412px) {
+    font-size: 12px;
+    line-height: 50px;
+    width: 175px;
+  }
 }
 
 .hero__btn-primary:hover { opacity: 82%; }
@@ -101,10 +110,17 @@
   font-family: var(--font-mono-nek);
   font-size: 10px;
   letter-spacing: 0.18em;
-  padding-bottom: 2px;
+  padding-bottom: 0;
   text-decoration: none;
   text-transform: uppercase;
   transition: color 0.2s ease, border-color 0.2s ease;
+  width: 130px;
+
+  @media (width >= 412px) {
+    font-size: 12px;
+    line-height: 50px;
+    width: 153px;
+  }
 }
 
 .hero__btn-ghost:hover {

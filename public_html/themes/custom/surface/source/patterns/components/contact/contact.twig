@@ -1,8 +1,22 @@
 {{ attach_library('surface/contact') }}
 
-<section class="contact{{ modifier ? ' ' ~ modifier }}" id="contact">
+{#
+  Contact — centered closing CTA on a dark frame.
+  Wears the shared frame as an INVERTED variant: `section section--invert`
+  supplies the dark background, centered text, 100px padding, no bottom border
+  (all from section.css). The eyebrow uses the element's `--invert` modifier
+  for dim-white-on-dark. Contact owns only its headline / sub / email type.
+
+  Depends on surface/section (frame) — see surface.libraries.yml.
+#}
+
+<section class="contact section section--invert{{ modifier ? ' ' ~ modifier }}" id="contact">
   {% if label %}
-    <span class="contact__label">{{ label }}</span>
+    <div class="section__eyebrow">
+      {% include '@elements/eyebrow/eyebrow.twig' with {
+        eyebrow: { text: label, modifier: 'eyebrow--invert' }
+      } only %}
+    </div>
   {% endif %}
   {% if headline %}
     <h2 class="contact__headline">{{ headline }}</h2>

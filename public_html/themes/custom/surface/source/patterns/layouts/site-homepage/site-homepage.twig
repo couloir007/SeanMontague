@@ -5,34 +5,102 @@
 {% endblock %}
 
 {% block main %}
-  {{ attach_library('surface/site-homepage') }}
-  {% include "@components/hero/hero.twig" with hero %}
+{#  {{ attach_library('surface/site-homepage') }}#}
+  {% include '@components/hero/hero.twig' with {
+    'map_id':      hero.map_id,
+    'map_center':  hero.map_center,
+    'map_zoom':    hero.map_zoom,
+    'map_markers': hero.map_markers,
+    'eyebrow':     hero.eyebrow,
+    'name':        hero.name,
+    'tagline':     hero.tagline,
+    'cta_primary': hero.cta_primary,
+    'cta_ghost':   hero.cta_ghost,
+    'categories':  hero.categories
+  } only %}
 
-  {% include "@components/marquee/marquee.twig" with marquee %}
+  {% include '@collections/map-section/map-section.twig' with {
+    'label':      maps.label,
+    'title':      maps.title,
+    'text':       maps.text,
+    'map_id':     maps.map_id,
+    'map_center': maps.map_center,
+    'map_zoom':   maps.map_zoom,
+    'links':      maps.links
+  } only %}
 
-  {% include "@collections/map-section/map-section.twig" with maps %}
-
-  <section class="homepage__writing" id="writing">
-    <span class="homepage__eyebrow">Writing</span>
-    <div class="homepage__cards-grid">
+  {% embed '@components/section/section.twig' with {
+    id: 'writing',
+    eyebrow: 'Writing',
+    grid_modifier: 'section__grid--cards',
+  } %}
+    {% block content %}
       {% for card_item in writing.cards %}
-        {% include "@components/card/card.twig" with card_item %}
+        {% include '@components/card/card.twig' with {
+          card_items:
+          category: card_item.category,
+          modifier: card_item.modifier,
+          title:    card_item.title,
+          excerpt:  card_item.excerpt,
+          meta:     card_item.meta,
+        } only %}
       {% endfor %}
-    </div>
-  </section>
+    {% endblock %}
+  {% endembed %}
 
-  <section class="homepage__places" id="places">
-    <span class="homepage__eyebrow">Places & Projects</span>
-    <div class="homepage__places-grid">
+  {% embed '@components/section/section.twig' with {
+    id: 'places',
+    eyebrow: 'Places & Projects',
+    modifier: 'section--alt',
+    grid_modifier: 'section__grid--places',
+  } %}
+    {% block content %}
       {% for place in places.items %}
-        {% include "@components/places-card/places-card.twig" with place %}
+        {% include '@components/places-card/places-card.twig' with {
+          label:    place.label,
+          coords:   place.coords,
+          subtitle: place.subtitle,
+          name:     place.name,
+          desc:     place.desc,
+          tags:     place.tags,
+        } only %}
       {% endfor %}
-    </div>
-  </section>
+    {% endblock %}
+  {% endembed %}
 
-  {% include "@components/about/about.twig" with about %}
+  {% embed '@components/section/section.twig' with {
+    id: 'places',
+    eyebrow: 'Places & Projects',
+    modifier: 'section--alt',
+    grid_modifier: 'section__grid--places',
+  } %}
+    {% block content %}
+      {% for place in places.items %}
+        {% include '@components/places-card/places-card.twig' with {
+          label:    place.label,
+          coords:   place.coords,
+          subtitle: place.subtitle,
+          name:     place.name,
+          desc:     place.desc,
+          tags:     place.tags,
+        } only %}
+      {% endfor %}
+    {% endblock %}
+  {% endembed %}
 
-  {% include "@components/contact/contact.twig" with contact %}
+  {% include '@components/about/about.twig' with {
+    label:      about.label,
+    title:      about.title,
+    skills:     about.skills,
+    paragraphs: about.paragraphs
+  } only %}
+
+  {% include '@components/contact/contact.twig' with {
+    label:      contact.label,
+    headline:   contact.headline,
+    sub:        contact.sub,
+    email:      contact.email
+  } only %}
 {% endblock %}
 
 {% block footer %}

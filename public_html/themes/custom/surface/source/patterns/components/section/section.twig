@@ -1,0 +1,38 @@
+{{ attach_library('surface/section') }}
+
+{#
+  Section — generic content section shell.
+  A component: includes @elements/eyebrow only, exposes a content slot.
+
+  Props:
+    id              optional anchor id (e.g. 'writing')
+    modifier        section block modifier (e.g. 'section--alt')
+    eyebrow         eyebrow label text (string)
+    eyebrow_modifier  eyebrow color modifier ('eyebrow--forest' | '--trail' | '--sky')
+    title           optional heading (raw HTML allowed)
+    grid_modifier   grid modifier ('section__grid--cards' | 'section__grid--places')
+    content         slot fallback — rendered when no {% block content %} override
+
+  Consumers fill the grid via {% embed %} + {% block content %}, or by
+  passing a pre-rendered `content` string (Storybook / simple cases).
+#}
+
+<section class="section{{ modifier ? ' ' ~ modifier }}"{% if id %} id="{{ id }}"{% endif %}>
+  {% if eyebrow %}
+    <div class="section__eyebrow">
+      {% include '@elements/eyebrow/eyebrow.twig' with {
+        eyebrow: { text: eyebrow, modifier: eyebrow_modifier|default('') }
+      } only %}
+    </div>
+  {% endif %}
+
+  {% if title %}
+    <h2 class="section__title">{{ title|raw }}</h2>
+  {% endif %}
+
+  <div class="section__grid{{ grid_modifier ? ' ' ~ grid_modifier }}">
+    {% block content %}
+      {{ content|raw }}
+    {% endblock %}
+  </div>
+</section>

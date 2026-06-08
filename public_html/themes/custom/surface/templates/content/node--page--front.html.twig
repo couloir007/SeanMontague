@@ -28,23 +28,7 @@
 
 {% extends '@layouts/site-container/site-container.twig' %}
 
-{% block header %}
-  {% include '@components/nav/nav.twig' with {
-    'logo_text': 'Sean Montague <span>· Burke, VT</span>',
-    'logo_url':  '/',
-    'links': [
-      { 'text': 'Maps',    'url': '#maps' },
-      { 'text': 'Writing', 'url': '#writing' },
-      { 'text': 'Places',  'url': '#places' },
-      { 'text': 'About',   'url': '#about' },
-      { 'text': 'Contact', 'url': '#contact' },
-    ],
-  } only %}
-{% endblock %}
-
 {% block main %}
-  {{ attach_library('surface/site-homepage') }}
-
   {# ── Build map center from schema_geo geofield ────────────────────────── #}
   {% set has_geo = not node.schema_geo.isEmpty() %}
   {% set map_center = has_geo
@@ -97,26 +81,40 @@
     'map_zoom':    map_zoom,
     'map_markers': map_markers,
     'eyebrow':     node.field_eyebrow.value|default('Burke, Vermont · Northeast Kingdom'),
-    'name':        node.title.value,
+    'name':        'Sean <br /> Montague',
     'tagline':     node.body.summary|default('Maps, trails, and growing things. Web developer at the Smithsonian, living and exploring in the Northeast Kingdom.'),
     'cta_primary': cta_primary,
     'cta_ghost':   cta_ghost,
-    'categories':  categories,
-  } only %}
-
-  {# ── Marquee ──────────────────────────────────────────────────────────── #}
-  {% include '@components/marquee/marquee.twig' with {
-    'items': [
-      'Kingdom Trails',
-      'Burke Mountain',
-      'Leaflet Mapping',
-      'Permaculture',
-      'Drupal',
-      'Northeast Kingdom',
-      'Open Source',
-      'Smithsonian NMNH',
+    'categories': [
+      {
+        'text': 'Kingdom Trails',
+        'icon': '🌲',
+        'url': '#places',
+      },
+      {
+        'text': 'Burke Mountain',
+        'icon': '⛷',
+        'url': '#places',
+      },
+      {
+        'text': 'Permaculture',
+        'icon': '🌱',
+        'url': '#places',
+      },
+      {
+        'text': 'Writing',
+        'icon': '✍',
+        'url': '#writing',
+      },
     ],
   } only %}
+
+{#  {#}
+{#  'text': 'Leaflet Maps',#}
+{#  'icon': '🗺',#}
+{#  'url': '#maps',#}
+{#  },#}
+
 
   {# ── Map section ──────────────────────────────────────────────────────── #}
   {% include '@collections/map-section/map-section.twig' with {
@@ -133,20 +131,28 @@
   } only %}
 
   {# ── Writing — latest featured articles ───────────────────────────────── #}
-  <section class="homepage__writing" id="writing">
-    <span class="homepage__eyebrow">Writing</span>
-    <div class="homepage__cards-grid">
+  {% embed '@components/section/section.twig' with {
+    id: 'writing',
+    eyebrow: 'Writing',
+    grid_modifier: 'section__grid--cards',
+  } only %}
+    {% block content %}
       {{ drupal_view('homepage_writing', 'block_1') }}
-    </div>
-  </section>
+    {% endblock %}
+  {% endembed %}
+
 
   {# ── Places & Projects ────────────────────────────────────────────────── #}
-  <section class="homepage__places" id="places">
-    <span class="homepage__eyebrow">Places &amp; Projects</span>
-    <div class="homepage__places-grid">
+  {% embed '@components/section/section.twig' with {
+    id: 'places',
+    eyebrow: 'Places & Projects',
+    modifier: 'section--alt',
+    grid_modifier: 'section__grid--places',
+  } only %}
+    {% block content %}
       {{ drupal_view('homepage_places', 'block_1') }}
-    </div>
-  </section>
+    {% endblock %}
+  {% endembed %}
 
   {# ── About ────────────────────────────────────────────────────────────── #}
   {% include '@components/about/about.twig' with {
@@ -168,24 +174,8 @@
     ],
   } only %}
 
-  {# ── Contact ──────────────────────────────────────────────────────────── #}
-  {% include '@components/contact/contact.twig' with {
-    'label':    'Contact',
-    'headline': 'Say hello.',
-    'sub':      'Always happy to talk trails, maps, or growing things.',
-    'email':    'sean@seanmontague.com',
-  } only %}
+
 
 {% endblock %}
 
-{% block footer %}
-  {% include '@components/footer/footer.twig' with {
-    'brand_text':     'Sean Montague · Burke, VT',
-    'copyright_text': '© 2025 Sean Montague',
-    'links': [
-      { 'text': 'GitHub',     'url': 'https://github.com/seanmontague' },
-      { 'text': 'Drupal.org', 'url': 'https://drupal.org/u/seanmontague' },
-      { 'text': 'LinkedIn',   'url': 'https://linkedin.com/in/seanmontague' },
-    ],
-  } only %}
-{% endblock %}
+

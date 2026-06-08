@@ -1,0 +1,102 @@
+header_label: Destinations
+header_title: "<em>Fourteen</em> stops, <em>one</em> island"
+header_lede: "Hover a destination to see it on the map. Click to expand notes."
+map_id: dest-hybrid-map
+map_center: "53.3,-8.0"
+map_zoom: 7
+map_caption_label: The Route
+map_caption_meta: "14 stops · ~840km by road"
+destinations:
+  - slug: dublin
+    name: Dublin
+    region: Co. Dublin
+    dates: Apr 17–18
+    coords: [53.3498, -6.2603]
+    coords_label: "53.3498° N<br>6.2603° W"
+    note: "Two days in the capital — Trinity College, the Long Room, and a walk along the Liffey at dusk."
+  - slug: wicklow
+    name: Glendalough
+    region: Co. Wicklow
+    dates: Apr 19
+    coords: [53.0117, -6.3261]
+    coords_label: "53.0117° N<br>6.3261° W"
+    note: "Early-medieval monastic ruins in a glacial valley, mostly empty by 4pm. Upper lake loop and camp at the edge of the woods."
+  - slug: kilkenny
+    name: Kilkenny
+    region: Co. Kilkenny
+    dates: Apr 19
+    coords: [52.6541, -7.2448]
+    coords_label: "52.6541° N<br>7.2448° W"
+  - slug: cork
+    name: Cork
+    region: Co. Cork
+    dates: Apr 20
+    coords: [51.8985, -8.4756]
+    coords_label: "51.8985° N<br>8.4756° W"
+  - slug: kinsale
+    name: Kinsale
+    region: Co. Cork
+    dates: Apr 20
+    coords: [51.7059, -8.5222]
+    coords_label: "51.7059° N<br>8.5222° W"
+    note: "Harbor lunch, Charles Fort in the afternoon."
+  - slug: killarney
+    name: Killarney
+    region: Co. Kerry
+    dates: Apr 21
+    coords: [52.0599, -9.5044]
+    coords_label: "52.0599° N<br>9.5044° W"
+    note: "Gap of Dunloe — eight miles of switchbacks and tarns, wind so hard at the top that conversation stopped working."
+  - slug: dingle
+    name: Dingle
+    region: Co. Kerry
+    dates: Apr 21
+    coords: [52.1409, -10.2640]
+    coords_label: "52.1409° N<br>10.2640° W"
+  - slug: limerick
+    name: Limerick
+    region: Co. Limerick
+    dates: Apr 22
+    coords: [52.6638, -8.6267]
+    coords_label: "52.6638° N<br>8.6267° W"
+  - slug: cliffs-of-moher
+    name: Cliffs of Moher
+    region: Co. Clare
+    dates: Apr 22
+    coords: [52.9715, -9.4309]
+    coords_label: "52.9715° N<br>9.4309° W"
+    note: "Walk fifteen minutes north along the cliff path and the crowd thins to nothing. Cheese sandwiches on the grass with legs over an 800-foot drop."
+  - slug: inishmore
+    name: Inishmore
+    region: Aran Islands
+    dates: Apr 23–24
+    coords: [53.1244, -9.7470]
+    coords_label: "53.1244° N<br>9.7470° W"
+    note: "The trip pivot. Two nights, rented bikes, rode the perimeter. Dun Aonghasa on the second afternoon — the fort sits on the lip of a 300-foot drop into the Atlantic."
+  - slug: connemara
+    name: Connemara
+    region: Co. Galway
+    dates: Apr 24
+    coords: [53.5333, -9.8500]
+    coords_label: "53.5333° N<br>9.8500° W"
+  - slug: ceide-fields
+    name: "Céide Fields"
+    region: Co. Mayo
+    dates: Apr 25
+    coords: [54.3066, -9.4519]
+    coords_label: "54.3066° N<br>9.4519° W"
+    note: "Neolithic farmscape preserved under bog — the oldest known field system in the world. We walked the boardwalk loop in horizontal rain."
+  - slug: donegal
+    name: Donegal
+    region: Co. Donegal
+    dates: Apr 26
+    coords: [54.6543, -8.1099]
+    coords_label: "54.6543° N<br>8.1099° W"
+    note: "Rest day. The country gets bigger and emptier from Connemara north."
+  - slug: belfast
+    name: Belfast
+    region: Co. Antrim
+    dates: Apr 27
+    coords: [54.5973, -5.9301]
+    coords_label: "54.5973° N<br>5.9301° W"
+    note: "Cathedral Quarter, dinner near St Annes, rental car returned early the next morning."

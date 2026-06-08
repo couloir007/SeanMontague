@@ -1,0 +1,19 @@
+{{ attach_library('surface/meta-strip') }}
+
+<div class="meta-strip{{ modifier ? ' ' ~ modifier }}">
+  <div class="meta-strip__inner">
+    {% if category %}
+      <span class="meta-strip__category">{{ category }}</span>
+    {% endif %}
+
+    {% if badge %}
+      <span class="meta-strip__badge">{{ badge }}</span>
+    {% endif %}
+
+    <span class="meta-strip__rule"></span>
+
+    {% if date %}
+      <span class="meta-strip__date">{{ date }}</span>
+    {% endif %}
+  </div>
+</div>

@@ -1,0 +1,20 @@
+uuid: ba4153e1-a6aa-450d-9223-d047e7f4368a
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - surface
+id: surface_breadcrumbs_2
+theme: surface
+region: disabled
+weight: -5
+provider: null
+plugin: system_breadcrumb_block
+settings:
+  id: system_breadcrumb_block
+  label: Breadcrumbs
+  label_display: visible
+  provider: system
+visibility: {  }

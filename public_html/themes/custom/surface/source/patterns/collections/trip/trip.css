@@ -192,7 +192,7 @@
   font-style: italic;
 }
 
-.trip__prose p {
+.trip__prose:not(blockquote) > p {
   font-size: 19px;
   line-height: 1.82;
   color: var(--text);
@@ -200,9 +200,8 @@
   margin-bottom: 26px;
 }
 
-.trip__prose p:last-child { margin-bottom: 0; }
 
-.trip__prose p::first-letter {
+.trip__prose:not(blockquote) > p::first-letter {
   font-family: var(--font-display-nek);
   font-size: 4em;
   line-height: 0.8;
@@ -213,29 +212,6 @@
 }
 
 .trip__prose p + p::first-letter { font-size: inherit; float: none; margin: 0; line-height: inherit; }
-
-.trip__prose blockquote {
-  border-left: 3px solid var(--forest);
-  padding: 16px 24px;
-  margin: 36px 0;
-  background: rgba(58, 90, 64, 0.04);
-}
-
-.trip__prose blockquote p {
-  font-size: 22px;
-  font-style: italic;
-  color: var(--bright);
-  font-weight: 300;
-  margin-bottom: 10px;
-}
-
-.trip__prose blockquote cite {
-  font-family: var(--font-mono-nek);
-  font-size: 9px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
 
 .trip__prose hr {
   border: none;

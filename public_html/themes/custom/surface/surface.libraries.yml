@@ -312,6 +312,11 @@ quote:
     component:
       dist/css/quote.css: {}
 
+pullquote:
+  css:
+    component:
+      dist/css/pullquote.css: {}
+
 readtime:
   css:
     component:
@@ -693,4 +698,9 @@ ui-menu:
   css:
     theme:
       dist/css/ui-menu.css: {}
+
+section:
+  css:
+    theme:
+      dist/css/section.css: {}
 

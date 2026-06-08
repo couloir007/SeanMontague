@@ -1,7 +1,18 @@
-{% if content %}
-  {% include '@components/nav/nav.twig' with {
-    'logo_text': 'Sean Montague <span>/ Burke, VT</span>',
-    'logo_url': path('<front>'),
-    'modifier': is_front ? '' : 'nav--scrolled',
-  } only %}
-{% endif %}
+{% embed '@layouts/site-header/site-header.twig' with {
+  'modifier':     '',
+  'nav_modifier': '',
+} %}
+  {% block primary %}
+    {% include '@components/nav/nav.twig' with {
+      'logo_text': 'Sean Montague <span>· Burke, VT</span>',
+      'logo_url':  '/',
+      'links': [
+        { 'text': 'Maps',    'url': '#maps' },
+        { 'text': 'Writing', 'url': '#writing' },
+        { 'text': 'Places',  'url': '#places' },
+        { 'text': 'About',   'url': '#about' },
+        { 'text': 'Contact', 'url': '#contact' },
+      ],
+    } only %}
+  {% endblock %}
+{% endembed %}

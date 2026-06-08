@@ -11,8 +11,8 @@ _core:
   default_config_hash: VhBzWb7lMRtIOg9G7VSw_0uopi-7zXeHq4vXqqV1HFE
 id: surface_breadcrumbs
 theme: surface
-region: breadcrumb
-weight: 0
+region: header
+weight: -1
 provider: null
 plugin: system_breadcrumb_block
 settings:

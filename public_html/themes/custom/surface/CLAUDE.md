@@ -340,6 +340,58 @@ Three modifiers in `source/patterns/elements/button/`:
 
 ---
 
+## The Section Frame — shared class vs. slot component
+
+Two distinct things share the `section` name. Don't conflate them:
+
+- **`.section` (CSS, in `section.css`)** — the shared *frame*: `padding 80px 48px`,
+  `border-bottom`, the `--alt` surface tint, `.section__eyebrow` spacing, and the
+  responsive padding drop. **Any block can wear it.** Change the frame once here
+  and every section follows.
+- **`section.twig` (component)** — frame + eyebrow + a **card-grid slot**
+  (`section__grid`). For repeated-component sections only (writing, places),
+  filled via `{% embed %}` + `{% block content %}`.
+
+A block that wants the *frame* but has its own bespoke layout (not a card grid)
+should **wear the class, not use the embed**:
+
+```twig
+{# about.twig — shares the frame, renders its own 1fr 1.5fr grid #}
+<section class="about section{{ modifier ? ' ' ~ modifier }}" id="about">
+  <div class="section__eyebrow">
+    {% include '@elements/eyebrow/eyebrow.twig' with { eyebrow: { text: label } } only %}
+  </div>
+  <div class="about__grid"> … </div>
+</section>
+```
+
+Such a component must **depend on `surface/section`** in `surface.libraries.yml`
+so the frame CSS loads on the live site (Storybook hides the omission because
+`styles.css` globs everything). `about`, `map-section`, and `contact` are the
+frame-wearing kind; `writing`/`places` are the embed-slot kind.
+
+### Frame variants
+
+The frame has skin variants, applied as modifiers alongside `.section`:
+
+| Variant | Skin | Eyebrow modifier | Used by |
+|---|---|---|---|
+| (base) | light, `80px 48px`, bottom border | `.eyebrow` (muted) | writing, about |
+| `--alt` | `--surface2` tint | `.eyebrow` (muted) | places |
+| `--invert` | `--bright` dark, centered, `100px`, no border | `.eyebrow--invert` | contact |
+
+A dark frame's eyebrow color is an **element modifier** (`.eyebrow--invert`),
+never a `.section--invert .eyebrow { … }` descendant override — the frame must
+not reach in and restyle a child component's bare selector. Add new skins as
+`.section--x` in `section.css`, and any matching eyebrow color as `.eyebrow--x`
+on the element.
+
+**Do not** route a frame-wearer through the `section.twig` embed — nesting its
+bespoke grid inside `section__grid` doubles the wrapper and produces two
+eyebrows / double padding.
+
+---
+
 ## Layout Shells & Slots
 
 Layout shells (`site-header`, `site-container`) own the landmark and expose

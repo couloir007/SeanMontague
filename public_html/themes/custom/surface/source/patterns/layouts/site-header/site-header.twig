@@ -1,14 +1,27 @@
 {{ attach_library('surface/site-header') }}
 
-<header id="header" class="site-header" data-drupal-selector="site-header" role="banner" data-once="navigation">
+<header
+  class="site-header{{ modifier ? ' ' ~ modifier }}"
+  role="banner"
+  data-drupal-selector="site-header"
+  data-once="navigation"
+>
   <div class="site-header__container">
     <a href="{{ site_url|default('/') }}" class="site-header__logo">
       {{ site_name|default('Sean Montague')|raw }} <span>{{ site_slogan|default('Burke, VT')|raw }}</span>
     </a>
 
     {% block navigation %}
-      {% include '@layouts/site-navigation/site-navigation.twig' with {
-        'items': items
+      {% include '@components/nav/nav.twig' with {
+        'logo_text': 'Sean Montague <span>· Burke, VT</span>',
+        'logo_url':  '/',
+        'links': [
+          { 'text': 'Maps',    'url': '#maps' },
+          { 'text': 'Writing', 'url': '#writing' },
+          { 'text': 'Places',  'url': '#places' },
+          { 'text': 'About',   'url': '#about' },
+          { 'text': 'Contact', 'url': '#contact' },
+        ],
       } only %}
     {% endblock %}
   </div>
