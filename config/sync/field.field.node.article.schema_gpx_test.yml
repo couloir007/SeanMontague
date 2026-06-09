@@ -1,16 +1,16 @@
-uuid: d06ef824-4f21-46fa-a206-45d1e96caa25
+uuid: 850dcf87-66e8-4135-a35c-33a7420e5ad8
 langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.node.schema_geoshape
+    - field.storage.node.schema_gpx_test
     - media.type.data_download
     - node.type.article
-id: node.article.schema_geoshape
-field_name: schema_geoshape
+id: node.article.schema_gpx_test
+field_name: schema_gpx_test
 entity_type: node
 bundle: article
-label: 'Track File (GPX or GeoJSON)'
+label: gpx_test
 description: ''
 required: false
 translatable: false

@@ -5,16 +5,19 @@
     {% if drupal_geo_rendered %}
       {{ drupal_geo_rendered }}
     {% elseif map_id %}
+      {# 'lines' is merged in only when truthy — the Drupal article path always
+         passes map_lines as null, and passing 'lines': null would override a
+         real array. Storybook fixtures pass real arrays, which survive. #}
       {% include '@components/map/map.twig' with {
         'map_id':      map_id,
         'center':      map_center,
         'zoom':        map_zoom|default(13),
         'interactive': 'true',
         'markers':     map_markers,
-        'lines':       map_lines,
-        'geojson_url': geojson_url,
+        'geojson_url':  geojson_url,
+        'geojson_urls': geojson_urls,
         'tiles':       tiles|default('usgs-topo'),
-      } only %}
+      }|merge(map_lines ? { 'lines': map_lines } : {}) only %}
     {% endif %}
   </div>
 

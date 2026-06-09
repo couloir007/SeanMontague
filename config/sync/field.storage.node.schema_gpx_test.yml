@@ -1,12 +1,12 @@
-uuid: 5c51c26f-e255-461b-8868-b5302760efc3
+uuid: e7a69864-4fe0-4197-85e8-8f6a2c7a8cd9
 langcode: en
 status: true
 dependencies:
   module:
     - media
     - node
-id: node.schema_geoshape
-field_name: schema_geoshape
+id: node.schema_gpx_test
+field_name: schema_gpx_test
 entity_type: node
 type: entity_reference
 settings:

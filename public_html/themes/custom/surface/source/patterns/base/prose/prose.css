@@ -67,29 +67,8 @@
   position: absolute;
 }
 
-.prose blockquote {
-  border-left: 3px solid var(--forest);
-  margin: 2rem 0;
-  padding: 0.25rem 0 0.25rem 1.5rem;
-}
-
-.prose blockquote p {
-  color: var(--bright);
-  font-size: 1.375rem;
-  font-style: italic;
-  font-weight: 300;
-  line-height: 1.55;
-  margin-bottom: 0.5rem;
-}
-
-.prose blockquote cite {
-  color: var(--muted);
-  font-family: var(--font-mono-nek);
-  font-size: 0.625rem;
-  font-style: normal;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
+/* Blockquote styling is canonical in base/global/global.css — a blockquote is
+   styled identically wherever it appears, so prose adds no overrides here. */
 
 .prose strong {
   color: var(--bright);

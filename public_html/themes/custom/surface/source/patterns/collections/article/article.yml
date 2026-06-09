@@ -88,6 +88,11 @@ map_center: '44.593,-71.918'
 map_zoom: 13
 tiles: 'usgs-topo'
 geojson_url: null
+# Two demo tracks exercise the multi-track map path. Served at /geojson/* via
+# Vite publicDir (source/assets) during `npm run watch`.
+geojson_urls:
+  - '/geojson/demo-track-a.geojson'
+  - '/geojson/demo-track-b.geojson'
 drupal_geo_rendered: null
 map_markers:
   - lat: 44.5877777
@@ -115,6 +120,8 @@ elev_max: '1,595'
 elev_data: *track
 
 # ── Body ──────────────────────────────────────────────────────────
+# Optional modifier — 'article__body--with-map' for trail reports.
+body_modifier: ''
 body: |
   <h2>Getting There</h2>
   <p>Kingdom Trails is headquartered in East Burke, Vermont — a small village about ten miles east of I-91 off Exit 23. The main trailhead and welcome center is on Route 114. Day passes are purchased here.</p>

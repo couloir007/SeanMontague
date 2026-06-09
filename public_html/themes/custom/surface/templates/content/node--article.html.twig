@@ -16,11 +16,24 @@
 #}
 
 {# ── Geo sources ── #}
-{% set geo_media    = node.schema_geoshape.entity %}
-{% set geo_file     = geo_media ? geo_media.field_media_file.entity : null %}
+{# schema_geoshape is multi-value: collect a URL for every referenced media
+   that has a file. The first file drives is_gpx, the elevation profile, and
+   the download card; the full list drives the multi-track map. #}
+{% set geojson_urls = [] %}
+{% set geo_file     = null %}
+{% for item in node.schema_geoshape %}
+  {% set media = item.entity %}
+  {% set file  = media ? media.field_media_file.entity : null %}
+  {% if file %}
+    {% if geo_file is null %}
+      {% set geo_file = file %}
+    {% endif %}
+    {% set geojson_urls = geojson_urls|merge([file.fileuri|file_url]) %}
+  {% endif %}
+{% endfor %}
+{% set geojson_url  = geojson_urls[0]|default(null) %}
 {% set is_gpx       = geo_file and geo_file.filename.value matches '/\\.gpx$/i' %}
-{% set geojson_url  = geo_file ? geo_file.fileuri|file_url : null %}
-{% set has_geoshape = geo_file is not empty %}
+{% set has_geoshape = geojson_urls is not empty %}
 {% set has_geo      = not node.schema_geo.isEmpty() %}
 {% set place        = node.schema_place.entity %}
 {% set has_place    = place and place.schema_latitude.value is not empty %}
@@ -90,7 +103,7 @@
 {# Destination markers — sky blue #}
 {% for item in node.schema_destination %}
   {% set dest = item.entity %}
-  {% if dest and not dest.schema_geo.isEmpty %}
+  {% if dest and not dest.schema_geo.isEmpty() %}
     {% set map_markers = map_markers|merge([{
       'lat':   dest.schema_geo.lat,
       'lon':   dest.schema_geo.lon,
@@ -103,7 +116,7 @@
 {# POI markers — forest green #}
 {% for item in node.schema_poi %}
   {% set poi = item.entity %}
-  {% if poi and not poi.schema_geo.isEmpty %}
+  {% if poi and not poi.schema_geo.isEmpty() %}
     {% set map_markers = map_markers|merge([{
       'lat':   poi.schema_geo.lat,
       'lon':   poi.schema_geo.lon,
@@ -116,7 +129,7 @@
 {# Lodging markers — sky blue #}
 {% for item in node.schema_lodging %}
   {% set dest = item.entity %}
-  {% if dest and not dest.schema_geo.isEmpty %}
+  {% if dest and not dest.schema_geo.isEmpty() %}
     {% set map_markers = map_markers|merge([{
       'lat':   dest.schema_geo.lat,
       'lon':   dest.schema_geo.lon,
@@ -144,27 +157,37 @@
 {% set category_key  = category and category.field_key.value ? category.field_key.value : 'default' %}
 {% set category_name = category ? category.label.value : '' %}
 
-{% include '@collections/article/article.twig' with {
-  'header': {
-    'title':        node.label.value,
-    'date':         node.schema_date_published.value ? node.schema_date_published.value|date('F j, Y') : '',
-    'category':     category_name,
-    'category_key': category_key,
-    'difficulty':   node.schema_difficulty.value,
-    'stats':        stats,
-    'map_id':       map_id,
-  },
-  'map_id':              map_id,
-  'map_center':          map_center,
-  'map_zoom':            13,
-  'map_markers':         map_markers,
-  'tiles':               tiles,
-  'drupal_geo_rendered': null,
-  'geojson_url':         geojson_url,
-  'elev_gain':           node.schema_elev_gain.value,
-  'elev_loss':           node.schema_elev_loss.value,
-  'elev_min':            node.schema_elev_min.value,
-  'elev_max':            node.schema_elev_max.value,
-  'body':                content.body|field_value|render,
-  'sidebar_cards':       sidebar_cards,
-} only %}
+{% extends '@layouts/site-container/site-container.twig' %}
+{% block main %}
+  {% include '@collections/article/article.twig' with {
+    'header': {
+      'title':        node.label.value,
+      'date':         node.schema_date_published.value ? node.schema_date_published.value|date('F j, Y') : '',
+      'category':     category_name,
+      'category_key': category_key,
+      'difficulty':   node.schema_difficulty.value,
+      'stats':        stats,
+      'map_id':       map_id,
+    },
+    'map_label':           has_map ? (category_name ?: 'Map') : null,
+    'map_title':           has_map ? node.label.value : null,
+    'map_text':            null,
+    'map_id':              map_id,
+    'map_center':          map_center,
+    'map_zoom':            13,
+    'map_markers':         map_markers,
+    'map_lines':           null,
+    'tiles':               tiles,
+    'drupal_geo_rendered': null,
+    'geojson_url':         geojson_url,
+    'geojson_urls':        geojson_urls,
+    'elev_gain':           node.schema_elev_gain.value,
+    'elev_loss':           node.schema_elev_loss.value,
+    'elev_min':            node.schema_elev_min.value,
+    'elev_max':            node.schema_elev_max.value,
+    'body':                content.body|field_value,
+    'body_modifier':       has_map ? 'article__body--with-map' : '',
+    'sidebar_cards':       sidebar_cards,
+  } only %}
+{% endblock %}
+

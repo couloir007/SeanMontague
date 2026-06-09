@@ -1,0 +1,25 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Demo Loop A",
+        "route_type": "cycling",
+        "source": "geojson",
+        "elevation_unit": "meters"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-71.9454, 44.5888, 812],
+          [-71.9438, 44.5867, 870],
+          [-71.9414, 44.5837, 967],
+          [-71.9402, 44.5818, 1009],
+          [-71.9381, 44.5828, 1100],
+          [-71.9363, 44.5824, 1117]
+        ]
+      }
+    }
+  ]
+}

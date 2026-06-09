@@ -27,6 +27,7 @@ dependencies:
     - field.field.node.article.schema_event_schedule
     - field.field.node.article.schema_geo
     - field.field.node.article.schema_geoshape
+    - field.field.node.article.schema_gpx_test
     - field.field.node.article.schema_image
     - field.field.node.article.schema_is_part_of
     - field.field.node.article.schema_lodging
@@ -39,34 +40,10 @@ dependencies:
     - field.field.node.article.schema_trip
     - node.type.article
   module:
-    - field_group
     - options
     - smart_date
     - text
     - user
-third_party_settings:
-  field_group:
-    group_general:
-      children:
-        - schema_article_type
-        - body
-        - schema_image
-      label: General
-      parent_name: ''
-      region: content
-      weight: 0
-      format_type: fieldset
-      format_settings: {  }
-    group_references:
-      children:
-        - schema_about
-        - schema_subject_of
-      label: References
-      parent_name: ''
-      region: content
-      weight: 11
-      format_type: fieldset
-      format_settings: {  }
 id: node.article.default
 targetEntityType: node
 bundle: article
@@ -77,14 +54,14 @@ content:
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    weight: 19
+    weight: 2
     region: content
   field_map_tiles:
     type: list_default
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 1
+    weight: 4
     region: content
   field_route_type:
     type: entity_reference_label
@@ -92,7 +69,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 3
+    weight: 6
     region: content
   schema_about:
     type: entity_reference_label
@@ -100,14 +77,14 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 0
+    weight: 15
     region: content
   schema_article_type:
     type: list_default
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 0
+    weight: 1
     region: content
   schema_destination:
     type: entity_reference_label
@@ -115,7 +92,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 10
+    weight: 13
     region: content
   schema_distance_cycling:
     type: number_decimal
@@ -126,7 +103,7 @@ content:
       scale: 2
       prefix_suffix: true
     third_party_settings: {  }
-    weight: 6
+    weight: 9
     region: content
   schema_distance_driving:
     type: number_integer
@@ -135,7 +112,7 @@ content:
       thousand_separator: ''
       prefix_suffix: true
     third_party_settings: {  }
-    weight: 4
+    weight: 7
     region: content
   schema_distance_hiking:
     type: number_decimal
@@ -146,7 +123,7 @@ content:
       scale: 2
       prefix_suffix: true
     third_party_settings: {  }
-    weight: 5
+    weight: 8
     region: content
   schema_distance_walking:
     type: number_decimal
@@ -157,7 +134,7 @@ content:
       scale: 2
       prefix_suffix: true
     third_party_settings: {  }
-    weight: 7
+    weight: 10
     region: content
   schema_event_schedule:
     type: smartdate_default
@@ -179,7 +156,25 @@ content:
         decimals: 2
         suffix: h
     third_party_settings: {  }
-    weight: 2
+    weight: 5
+    region: content
+  schema_geoshape:
+    type: entity_reference_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 19
+    region: content
+  schema_gpx_test:
+    type: entity_reference_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 18
     region: content
   schema_image:
     type: entity_reference_entity_view
@@ -188,7 +183,7 @@ content:
       view_mode: default
       link: false
     third_party_settings: {  }
-    weight: 23
+    weight: 3
     region: content
   schema_is_part_of:
     type: entity_reference_label
@@ -196,7 +191,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 12
+    weight: 17
     region: content
   schema_lodging:
     type: entity_reference_label
@@ -204,7 +199,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 8
+    weight: 11
     region: content
   schema_poi:
     type: entity_reference_label
@@ -212,7 +207,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 9
+    weight: 12
     region: content
   schema_subject_of:
     type: entity_reference_label
@@ -220,7 +215,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 1
+    weight: 16
     region: content
 hidden:
   field_editorial: true
@@ -237,7 +232,6 @@ hidden:
   schema_elev_max: true
   schema_elev_min: true
   schema_geo: true
-  schema_geoshape: true
   schema_place: true
   schema_related_link: true
   schema_significant_link: true

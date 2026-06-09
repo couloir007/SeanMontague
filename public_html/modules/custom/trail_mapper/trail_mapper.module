@@ -53,7 +53,67 @@ function trail_mapper_page_attachments(array &$attachments): void {
     'tileMaxZoom'     => $tile['maxZoom'] ?? 16,
     'tileSets'        => TrailMapperSettingsForm::allTileSets(),
     'elevationUnit'   => Drupal::config('trail_mapper.settings')->get('elevation_unit') ?? 'feet',
+    'routeStyles'     => _trail_mapper_route_styles(),
   ];
+}
+
+/**
+ * Builds the route_type term style map for drupalSettings.trailMapper.
+ *
+ * Loads every term in the route_type vocabulary and keys the map by each
+ * term's field_key. Each value carries the styling fields — color
+ * (field_color, raw), weight (field_line_weight, raw), and dash, which
+ * translates field_dash_pattern's keyword into an SVG dashArray string for
+ * Leaflet (solid / unrecognised values omit the key). Any missing field is
+ * simply omitted.
+ *
+ * @return array
+ *   Map of route key => { color?, dash?, weight? } where dash is an SVG
+ *   dashArray string when present.
+ */
+function _trail_mapper_route_styles(): array {
+  $styles = [];
+
+  try {
+    $terms = \Drupal::entityTypeManager()
+      ->getStorage('taxonomy_term')
+      ->loadByProperties(['vid' => 'route_type']);
+  }
+  catch (\Exception $e) {
+    return $styles;
+  }
+
+  foreach ($terms as $term) {
+    $key = $term->hasField('field_key') ? $term->get('field_key')->value : NULL;
+    if (!$key) {
+      continue;
+    }
+
+    $style = [];
+    if ($term->hasField('field_color') && !$term->get('field_color')->isEmpty()) {
+      $style['color'] = $term->get('field_color')->value;
+    }
+    if ($term->hasField('field_dash_pattern') && !$term->get('field_dash_pattern')->isEmpty()) {
+      // Translate the keyword to an SVG dashArray (what Leaflet's dashArray
+      // expects), tuned for the line weights in use. 'solid' and any
+      // unrecognised value omit the key entirely → solid line.
+      $dash = match ($term->get('field_dash_pattern')->value) {
+        'dashed' => '8 6',
+        'dotted' => '2 6',
+        default  => NULL,
+      };
+      if ($dash !== NULL) {
+        $style['dash'] = $dash;
+      }
+    }
+    if ($term->hasField('field_line_weight') && !$term->get('field_line_weight')->isEmpty()) {
+      $style['weight'] = $term->get('field_line_weight')->value;
+    }
+
+    $styles[$key] = $style;
+  }
+
+  return $styles;
 }
 
 

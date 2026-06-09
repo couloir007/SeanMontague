@@ -27,6 +27,7 @@ dependencies:
     - field.field.node.article.schema_event_schedule
     - field.field.node.article.schema_geo
     - field.field.node.article.schema_geoshape
+    - field.field.node.article.schema_gpx_test
     - field.field.node.article.schema_image
     - field.field.node.article.schema_is_part_of
     - field.field.node.article.schema_lodging
@@ -41,7 +42,6 @@ dependencies:
   module:
     - allowed_formats
     - datetime
-    - entity_browser_entity_form
     - field_group
     - inline_entity_form
     - leaflet
@@ -75,6 +75,7 @@ third_party_settings:
         - schema_poi
         - field_route_type
         - schema_geoshape
+        - schema_gpx_test
         - schema_geo
         - schema_destination
       label: 'Location & Trip'
@@ -135,7 +136,7 @@ third_party_settings:
         description: ''
     group_editorial:
       children:
-        2: field_editorial
+        - field_editorial
       label: Editorial
       region: content
       parent_name: ''
@@ -245,7 +246,7 @@ content:
     third_party_settings: {  }
   schema_about:
     type: entity_reference_autocomplete
-    weight: 20
+    weight: 104
     region: content
     settings:
       match_operator: CONTAINS
@@ -289,7 +290,7 @@ content:
     third_party_settings: {  }
   schema_destination:
     type: entity_reference_autocomplete
-    weight: 15
+    weight: 16
     region: content
     settings:
       match_operator: CONTAINS
@@ -354,7 +355,7 @@ content:
     third_party_settings: {  }
   schema_elev_min:
     type: number
-    weight: 17
+    weight: 16
     region: content
     settings:
       placeholder: ''
@@ -381,7 +382,7 @@ content:
     third_party_settings: {  }
   schema_geo:
     type: leaflet_widget_default
-    weight: 14
+    weight: 15
     region: content
     settings:
       geometry_validation: false
@@ -451,25 +452,25 @@ content:
         snapping: true
     third_party_settings: {  }
   schema_geoshape:
-    type: inline_entity_form_complex
+    type: entity_reference_autocomplete
     weight: 13
     region: content
     settings:
-      form_mode: default
-      override_labels: false
-      label_singular: ''
-      label_plural: ''
-      allow_new: true
-      allow_existing: true
       match_operator: CONTAINS
-      allow_duplicate: false
-      collapsible: false
-      collapsed: false
-      revision: false
-      removed_reference: optional
-    third_party_settings:
-      entity_browser_entity_form:
-        entity_browser_id: geo_entity_library
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  schema_gpx_test:
+    type: entity_reference_autocomplete
+    weight: 14
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   schema_image:
     type: entity_reference_autocomplete
     weight: 23
@@ -482,7 +483,7 @@ content:
     third_party_settings: {  }
   schema_is_part_of:
     type: entity_reference_autocomplete
-    weight: 22
+    weight: 106
     region: content
     settings:
       match_operator: CONTAINS
@@ -542,7 +543,7 @@ content:
     third_party_settings: {  }
   schema_subject_of:
     type: entity_reference_autocomplete
-    weight: 21
+    weight: 105
     region: content
     settings:
       match_operator: CONTAINS

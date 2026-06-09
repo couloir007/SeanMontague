@@ -1,0 +1,25 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Demo Spur B",
+        "route_type": "hiking",
+        "source": "geojson",
+        "elevation_unit": "meters"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-71.9160, 44.5786, 1528],
+          [-71.9152, 44.5881, 1221],
+          [-71.9139, 44.5933, 1147],
+          [-71.9124, 44.5958, 1209],
+          [-71.9102, 44.5970, 1217],
+          [-71.9045, 44.5971, 1290]
+        ]
+      }
+    }
+  ]
+}

@@ -180,8 +180,6 @@
     if (el._leafletMapInstance) return;
     el._leafletMapInstance = true;
 
-    console.log(1, zoom);
-
     const initLat = isFinite(lat) ? lat : 44.593;
     const initLon = isFinite(lon) ? lon : -71.918;
     const map = L.map(el, {
@@ -257,9 +255,31 @@
 
     // ── Multi-track GeoJSON (trip page) ───────────────────────────────────
     if (!geojson && geojsonUrls.length) {
+      console.log(geojsonUrls);
       const results = await Promise.all(
         geojsonUrls.map((url) => fetch(url).then((r) => r.ok ? r.json() : null).catch(() => null))
       );
+
+      console.log(results);
+
+      // Per-feature styling from properties.route_type. The style map comes from
+      // drupalSettings.trailMapper.routeStyles; Storybook has no drupalSettings,
+      // so this resolves to {} and every feature uses the forest-green default.
+      const routeStyles = window.drupalSettings?.trailMapper?.routeStyles ?? {};
+      const styleFeature = (feature) => {
+        const rs = routeStyles[feature?.properties?.route_type];
+        const style = {
+          color: rs?.color ?? '#3a5a40',
+          weight: rs?.weight ?? 3,
+          opacity: 0.85,
+        };
+        // Solid by default; only apply a dash pattern when the route type has one.
+        if (rs?.dash) {
+          style.dashArray = rs.dash;
+        }
+        return style;
+      };
+
       const mergedCoords = [];
       results.forEach((gj) => {
         if (!gj) return;
@@ -270,7 +290,7 @@
           ),
         };
         const layer = L.geoJSON(trackOnly, {
-          style: () => ({ color: '#3a5a40', weight: 3, opacity: 0.85 }),
+          style: styleFeature,
         }).addTo(map);
         allTrackLayers.push(layer);
         flattenCoords(gj).forEach((c) => mergedCoords.push(c));
@@ -380,11 +400,14 @@
     const mapId = el.id ?? 'map';
     const tile = resolveTile(el);
 
-    console.log(zoom);
-
     const opts = { lat, lon, zoom, interactive, markers, lines, tile, mapId, geojsonUrls };
 
-    if (geojsonUrl) {
+    // The multi-track array takes precedence: only run the single-URL fetch
+    // when there is no geojson_urls array. In the article case both are set
+    // (geojson_url is geojson_urls[0] for the elevation profile), so we fall
+    // through to the multi-track block, which draws and styles every track.
+
+    if (geojsonUrl && !geojsonUrls.length) {
       try {
         const r = await fetch(geojsonUrl);
         if (!r.ok) throw new Error(`HTTP ${r.status}`);

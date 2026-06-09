@@ -47,39 +47,57 @@ class GeoShapeConverter {
       return;
     }
 
-    /** @var \Drupal\media\MediaInterface|null $media */
     $referenced = $geoshape->referencedEntities();
-    $media = !empty($referenced) ? reset($referenced) : NULL;
-    if (!($media instanceof MediaInterface)) {
+    if (empty($referenced)) {
       return;
     }
 
-    /** @var \Drupal\file\Entity\File|null $file */
-    $file = $media->field_media_file->entity ?? NULL;
-    if (!($file instanceof File)) {
-      return;
+    // Convert every referenced media in place and rebuild the ordered list of
+    // target IDs. Media are mutated (file + media saved in place) so their IDs
+    // do not change; the field is set once at the end so a multi-value list is
+    // no longer collapsed down to a single item.
+    $targetIds = [];
+
+    foreach ($referenced as $media) {
+      if (!($media instanceof MediaInterface)) {
+        continue;
+      }
+      // Preserve this media in the list regardless of conversion outcome.
+      $targetIds[] = $media->id();
+
+      /** @var \Drupal\file\Entity\File|null $file */
+      $file = $media->field_media_file->entity ?? NULL;
+      if (!($file instanceof File)) {
+        continue;
+      }
+
+      $uri = $file->getFileUri();
+      $extension = strtolower(pathinfo($uri, PATHINFO_EXTENSION));
+
+      // Route-type key from this media's field_route_type term (media wins).
+      $routeKey = $this->resolveRouteKey($media);
+
+      $geojson = match ($extension) {
+        'gpx'             => $this->convertGpx($uri, $routeKey),
+        'geojson', 'json' => $this->normalizeGeoJson($uri, $routeKey),
+        default           => NULL,
+      };
+
+      if ($geojson === NULL) {
+        continue;
+      }
+
+      $this->overwriteGeoshape($media, $file, $geojson);
+
+      if ($extension === 'gpx' && TrailMapperSettingsForm::extractWaypointsEnabled()) {
+        // $uri captured before overwriteGeoshape mutates $file — original GPX
+        // is still on disk; only the file entity record is updated.
+        $this->extractWaypoints($uri, $entity);
+      }
     }
 
-    $uri = $file->getFileUri();
-    $extension = strtolower(pathinfo($uri, PATHINFO_EXTENSION));
-
-    $geojson = match ($extension) {
-      'gpx'           => $this->convertGpx($uri),
-      'geojson', 'json' => $this->normalizeGeoJson($uri),
-      default         => NULL,
-    };
-
-    if ($geojson === NULL) {
-      return;
-    }
-
-    $this->overwriteGeoshape($entity, $media, $file, $geojson);
-
-    if ($extension === 'gpx' && TrailMapperSettingsForm::extractWaypointsEnabled()) {
-      // $uri captured before overwriteGeoshape mutates $file — original GPX
-      // is still on disk; only the file entity record is updated.
-      $this->extractWaypoints($uri, $entity);
-    }
+    // Set the field once to the full ordered list — stop collapsing to one.
+    $entity->set('schema_geoshape', $targetIds);
   }
 
   /**
@@ -87,11 +105,14 @@ class GeoShapeConverter {
    *
    * @param string $uri
    *   Drupal stream wrapper URI to the GPX file.
+   * @param string|null $routeKey
+   *   Route-type key from the media's field_route_type term, baked into each
+   *   feature's properties.route_type when set; NULL leaves it unset.
    *
    * @return string|null
    *   JSON-encoded GeoJSON string, or NULL on failure.
    */
-  protected function convertGpx(string $uri): ?string {
+  protected function convertGpx(string $uri, ?string $routeKey = NULL): ?string {
     $path = $this->fileSystem->realpath($uri);
     if (!$path || !file_exists($path)) {
       $this->loggerFactory->get('trail_mapper')
@@ -118,7 +139,7 @@ class GeoShapeConverter {
         if (empty($coordinates)) {
           continue;
         }
-        $features[] = $this->makeFeature($coordinates, $name, 'gpx');
+        $features[] = $this->makeFeature($coordinates, $name, 'gpx', $routeKey);
       }
     }
 
@@ -128,7 +149,7 @@ class GeoShapeConverter {
       if (empty($coordinates)) {
         continue;
       }
-      $features[] = $this->makeFeature($coordinates, $name, 'gpx');
+      $features[] = $this->makeFeature($coordinates, $name, 'gpx', $routeKey);
     }
 
     if (empty($features)) {
@@ -156,11 +177,15 @@ class GeoShapeConverter {
    *
    * @param string $uri
    *   Drupal stream wrapper URI to the GeoJSON file.
+   * @param string|null $routeKey
+   *   Route-type key from the media's field_route_type term. When set it is
+   *   baked into each feature's properties.route_type (media wins); when NULL
+   *   any existing properties.route_type (e.g. from trip_import) is preserved.
    *
    * @return string|null
    *   JSON-encoded GeoJSON string with Z in meters, or NULL on failure.
    */
-  protected function normalizeGeoJson(string $uri): ?string {
+  protected function normalizeGeoJson(string $uri, ?string $routeKey = NULL): ?string {
     $path = $this->fileSystem->realpath($uri);
     if (!$path || !file_exists($path)) {
       $this->loggerFactory->get('trail_mapper')
@@ -197,6 +222,11 @@ class GeoShapeConverter {
         // (feet/meters) is handled client-side in map.js.
         $feature['properties']['elevation_unit'] = 'meters';
         $feature['properties']['source'] = $feature['properties']['source'] ?? 'geojson';
+        // Media route_type wins when set; otherwise leave any existing
+        // route_type untouched (preserves a value baked in by trip_import).
+        if ($routeKey !== NULL) {
+          $feature['properties']['route_type'] = $routeKey;
+        }
       }
       unset($feature);
     }
@@ -212,13 +242,11 @@ class GeoShapeConverter {
   }
 
   /**
-   * Overwrites schema_geoshape with normalized GeoJSON content.
+   * Overwrites a single media's file in place with normalized GeoJSON content.
    *
-   * After save, schema_geoshape always contains a .geojson file wrapped in
-   * a data_download Media entity.
+   * Mutates the file and media entities (both saved here). The media ID is
+   * unchanged, so the caller re-points schema_geoshape to the same target.
    *
-   * @param \Drupal\node\NodeInterface $entity
-   *   The node being saved.
    * @param \Drupal\media\MediaInterface $media
    *   The media entity referencing the file.
    * @param \Drupal\file\Entity\File $originalFile
@@ -229,7 +257,6 @@ class GeoShapeConverter {
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
   protected function overwriteGeoshape(
-    NodeInterface $entity,
     MediaInterface $media,
     File $originalFile,
     string $geojson,
@@ -268,10 +295,27 @@ class GeoShapeConverter {
     // Update the media label to match the new filename.
     $media->setName(pathinfo($savedUri, PATHINFO_FILENAME));
     $media->save();
+  }
 
-    // Re-attach the media entity. No $entity->save() needed — we are inside
-    // hook_entity_presave so the entity saves once with this value already set.
-    $entity->set('schema_geoshape', ['target_id' => $media->id()]);
+  /**
+   * Resolves the route-type key from a media's field_route_type term.
+   *
+   * @param \Drupal\media\MediaInterface $media
+   *   The geoshape media entity.
+   *
+   * @return string|null
+   *   The referenced term's field_key value, or NULL if the field, the term,
+   *   or the key is unset.
+   */
+  protected function resolveRouteKey(MediaInterface $media): ?string {
+    if (!$media->hasField('field_route_type') || $media->get('field_route_type')->isEmpty()) {
+      return NULL;
+    }
+    $term = $media->get('field_route_type')->entity;
+    if (!$term || !$term->hasField('field_key') || $term->get('field_key')->isEmpty()) {
+      return NULL;
+    }
+    return $term->get('field_key')->value ?: NULL;
   }
 
   /**
@@ -454,22 +498,30 @@ class GeoShapeConverter {
    *   Feature name for properties.
    * @param string $source
    *   Source format (gpx, geojson).
+   * @param string|null $routeKey
+   *   Route-type key baked into properties.route_type when set; NULL omits it.
    *
    * @return array
    *   GeoJSON Feature array.
    */
-  protected function makeFeature(array $coordinates, string $name, string $source): array {
+  protected function makeFeature(array $coordinates, string $name, string $source, ?string $routeKey = NULL): array {
+    $properties = [
+      'name' => $name,
+      'source' => $source,
+      'elevation_unit' => 'meters',
+    ];
+    // Media route_type wins when set; a freshly built GPX feature has no
+    // pre-existing route_type to preserve.
+    if ($routeKey !== NULL) {
+      $properties['route_type'] = $routeKey;
+    }
     return [
       'type' => 'Feature',
       'geometry' => [
         'type' => 'LineString',
         'coordinates' => $coordinates,
       ],
-      'properties' => [
-        'name' => $name,
-        'source' => $source,
-        'elevation_unit' => 'meters',
-      ],
+      'properties' => $properties,
     ];
   }
 

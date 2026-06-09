@@ -28,6 +28,7 @@ dependencies:
     - field.field.node.article.schema_event_schedule
     - field.field.node.article.schema_geo
     - field.field.node.article.schema_geoshape
+    - field.field.node.article.schema_gpx_test
     - field.field.node.article.schema_image
     - field.field.node.article.schema_is_part_of
     - field.field.node.article.schema_lodging
@@ -130,6 +131,7 @@ hidden:
   schema_elev_min: true
   schema_geo: true
   schema_geoshape: true
+  schema_gpx_test: true
   schema_image: true
   schema_is_part_of: true
   schema_lodging: true

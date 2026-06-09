@@ -1,0 +1,29 @@
+uuid: c44a805c-8147-4a4f-b85d-07a279a7092d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_route_type
+    - media.type.data_download
+    - taxonomy.vocabulary.route_type
+id: media.data_download.field_route_type
+field_name: field_route_type
+entity_type: media
+bundle: data_download
+label: 'Route Type'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      route_type: route_type
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

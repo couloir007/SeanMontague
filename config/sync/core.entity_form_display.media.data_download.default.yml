@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.field.media.data_download.field_media_file
+    - field.field.media.data_download.field_route_type
     - field.field.media.data_download.schema_content_url
     - media.type.data_download
   module:
@@ -20,6 +21,16 @@ content:
     region: content
     settings:
       progress_indicator: throbber
+    third_party_settings: {  }
+  field_route_type:
+    type: entity_reference_autocomplete
+    weight: 26
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
   name:
     type: string_textfield

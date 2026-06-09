@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.field.media.data_download.field_media_file
+    - field.field.media.data_download.field_route_type
     - field.field.media.data_download.schema_content_url
     - image.style.thumbnail
     - media.type.data_download
@@ -34,6 +35,14 @@ content:
         refresh: 60
     third_party_settings: {  }
     weight: 200
+    region: content
+  field_route_type:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 201
     region: content
   schema_content_url:
     type: link

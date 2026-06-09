@@ -1,6 +1,11 @@
 map_id: 'article-map-demo'
 map_center: '44.593,-71.918'
 map_zoom: 13
+# Two demo tracks exercise the multi-track map path. Served at /geojson/* via
+# Vite publicDir (source/assets) during `npm run watch`.
+geojson_urls:
+  - '/geojson/demo-track-a.geojson'
+  - '/geojson/demo-track-b.geojson'
 map_lines:
   - coords: [
       [-71.945434,44.588812],[-71.945209,44.588583],[-71.944501,44.588152],

@@ -1,19 +1,19 @@
-uuid: 5c51c26f-e255-461b-8868-b5302760efc3
+uuid: 5e80fadc-4396-4520-8dbd-0e102892130a
 langcode: en
 status: true
 dependencies:
   module:
     - media
-    - node
-id: node.schema_geoshape
-field_name: schema_geoshape
-entity_type: node
+    - taxonomy
+id: media.field_route_type
+field_name: field_route_type
+entity_type: media
 type: entity_reference
 settings:
-  target_type: media
+  target_type: taxonomy_term
 module: core
 locked: false
-cardinality: -1
+cardinality: 1
 translatable: true
 indexes: {  }
 persist_with_no_fields: false

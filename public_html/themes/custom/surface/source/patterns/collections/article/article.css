@@ -12,6 +12,10 @@
 /* ── Body ── */
 .article__body { min-width: 0; }
 
+/* Trail-report variant — body follows a full-width map section above,
+   so lead with a little extra breathing room. */
+.article__body--with-map { padding-top: 8px; }
+
 .article__body p {
   color: var(--text);
   font-size: 19px;
