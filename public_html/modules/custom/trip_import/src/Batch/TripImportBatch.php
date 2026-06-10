@@ -288,6 +288,7 @@ class TripImportBatch {
     $file_repo = \Drupal::service('file.repository');
 
     $primary_media_id = NULL;
+    $media_ids = [];
 
     foreach ($routes as $i => $route) {
       $geojson  = self::buildGeoJson($route['name'], $route['coords'], $route['route_type']);
@@ -304,6 +305,8 @@ class TripImportBatch {
         'status'            => 1,
       ]);
       $media->save();
+      // Collect every route media so all tracks attach, in route order.
+      $media_ids[] = ['target_id' => (int) $media->id()];
 
       if ($i === 0) {
         $primary_media_id = (int) $media->id();
@@ -323,8 +326,10 @@ class TripImportBatch {
       'status'               => 1,
       'schema_date_published' => $date,
     ];
-    if ($primary_media_id) {
-      $node_values['schema_geoshape'] = ['target_id' => $primary_media_id];
+    // Attach every route media in order; schema_geoshape[0] (routes[0]) is what
+    // the elevation profile and single geojson_url use as the initial track.
+    if ($media_ids) {
+      $node_values['schema_geoshape'] = $media_ids;
     }
 
     $node = Node::create($node_values);

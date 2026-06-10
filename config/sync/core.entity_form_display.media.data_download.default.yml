@@ -6,7 +6,9 @@ dependencies:
     - field.field.media.data_download.field_ascent
     - field.field.media.data_download.field_descent
     - field.field.media.data_download.field_distance
+    - field.field.media.data_download.field_max_elevation
     - field.field.media.data_download.field_media_file
+    - field.field.media.data_download.field_min_elevation
     - field.field.media.data_download.field_route_type
     - field.field.media.data_download.schema_content_url
     - media.type.data_download
@@ -39,12 +41,26 @@ content:
     settings:
       placeholder: ''
     third_party_settings: {  }
+  field_max_elevation:
+    type: number
+    weight: 31
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
   field_media_file:
     type: file_generic
     weight: 1
     region: content
     settings:
       progress_indicator: throbber
+    third_party_settings: {  }
+  field_min_elevation:
+    type: number
+    weight: 30
+    region: content
+    settings:
+      placeholder: ''
     third_party_settings: {  }
   field_route_type:
     type: entity_reference_autocomplete

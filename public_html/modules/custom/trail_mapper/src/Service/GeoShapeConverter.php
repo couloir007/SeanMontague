@@ -29,7 +29,13 @@ class GeoShapeConverter {
   ) {}
 
   /**
-   * Processes schema_geoshape on a node — converts and overwrites in place.
+   * Node presave: node-coupled geoshape work only.
+   *
+   * Per-media file conversion now lives on the media presave hook
+   * (::processMedia), so it runs identically for every trigger — trip_import,
+   * standalone upload, or file replacement. This method keeps only what needs
+   * the node: waypoint→POI extraction (uses the node's country) and re-setting
+   * the multi-value schema_geoshape so the reference list is never collapsed.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity being saved.
@@ -52,52 +58,205 @@ class GeoShapeConverter {
       return;
     }
 
-    // Convert every referenced media in place and rebuild the ordered list of
-    // target IDs. Media are mutated (file + media saved in place) so their IDs
-    // do not change; the field is set once at the end so a multi-value list is
-    // no longer collapsed down to a single item.
+    $extractEnabled = TrailMapperSettingsForm::extractWaypointsEnabled();
     $targetIds = [];
 
     foreach ($referenced as $media) {
       if (!($media instanceof MediaInterface)) {
         continue;
       }
-      // Preserve this media in the list regardless of conversion outcome.
+      // Preserve every referenced media so a multi-value list is never
+      // collapsed. Media are mutated in place by the media hook, so IDs are
+      // stable.
       $targetIds[] = $media->id();
 
-      /** @var \Drupal\file\Entity\File|null $file */
-      $file = $media->field_media_file->entity ?? NULL;
-      if (!($file instanceof File)) {
-        continue;
-      }
-
-      $uri = $file->getFileUri();
-      $extension = strtolower(pathinfo($uri, PATHINFO_EXTENSION));
-
-      // Route-type key from this media's field_route_type term (media wins).
-      $routeKey = $this->resolveRouteKey($media);
-
-      $geojson = match ($extension) {
-        'gpx'             => $this->convertGpx($uri, $routeKey),
-        'geojson', 'json' => $this->normalizeGeoJson($uri, $routeKey),
-        default           => NULL,
-      };
-
-      if ($geojson === NULL) {
-        continue;
-      }
-
-      $this->overwriteGeoshape($media, $file, $geojson);
-
-      if ($extension === 'gpx' && TrailMapperSettingsForm::extractWaypointsEnabled()) {
-        // $uri captured before overwriteGeoshape mutates $file — original GPX
-        // is still on disk; only the file entity record is updated.
-        $this->extractWaypoints($uri, $entity);
+      // FLAG — waypoint / GPX ordering issue.
+      // Waypoint extraction needs the node's country code, so it lives here on
+      // the node hook. But the media presave hook (::processMedia) normally runs
+      // FIRST and converts the uploaded .gpx to .geojson in place — so by the
+      // time the node saves the file is usually no longer a .gpx and the guard
+      // below skips it. The only path that reliably still sees the .gpx is the
+      // media hook, which lacks node/country context. This cannot be cleanly
+      // resolved without refactoring extractWaypoints to run without a node (or
+      // threading node context into the media hook). Left here so waypoints
+      // still work in any flow where the node is saved before its media is
+      // converted; revisit if POIs must be created on the media-first path.
+      if ($extractEnabled) {
+        /** @var \Drupal\file\Entity\File|null $file */
+        $file = $media->get('field_media_file')->entity ?? NULL;
+        if ($file instanceof File) {
+          $uri = $file->getFileUri();
+          if (strtolower(pathinfo($uri, PATHINFO_EXTENSION)) === 'gpx') {
+            $this->extractWaypoints($uri, $entity);
+          }
+        }
       }
     }
 
-    // Set the field once to the full ordered list — stop collapsing to one.
+    // Re-set once to the full ordered list — guards against list collapse.
     $entity->set('schema_geoshape', $targetIds);
+  }
+
+  /**
+   * Media presave: converts one geoshape media's file in place.
+   *
+   * Detects the file type, bakes the media's route_type into the output, and
+   * overwrites the file with normalized GeoJSON (Z in meters). Runs on the
+   * media's own presave so it behaves identically whether the media was created
+   * by trip_import, uploaded standalone, or had its file replaced.
+   *
+   * @param \Drupal\media\MediaInterface $media
+   *   The geoshape media entity being saved.
+   */
+  public function processMedia(MediaInterface $media): void {
+    /** @var \Drupal\file\Entity\File|null $file */
+    $file = $media->get('field_media_file')->entity ?? NULL;
+    if (!($file instanceof File)) {
+      return;
+    }
+
+    $uri = $file->getFileUri();
+    $extension = strtolower(pathinfo($uri, PATHINFO_EXTENSION));
+
+    // Route-type key from this media's field_route_type term (media wins).
+    $routeKey = $this->resolveRouteKey($media);
+
+    // (a) Read the SOURCE file for stats BEFORE overwriteGeoshape replaces it
+    // with the normalized .geojson — the source uri/extension are still valid.
+    [$coords, $sourceProps] = $this->parseSource($uri, $extension);
+
+    // (b) Build normalized GeoJSON.
+    $geojson = match ($extension) {
+      'gpx'             => $this->convertGpx($uri, $routeKey),
+      'geojson', 'json' => $this->normalizeGeoJson($uri, $routeKey),
+      default           => NULL,
+    };
+
+    if ($geojson === NULL) {
+      return;
+    }
+
+    // (c) Overwrite the file in place with the normalized GeoJSON.
+    $this->overwriteGeoshape($media, $file, $geojson);
+
+    // (d) Write per-track stat fields onto the media (never saves the media —
+    // we are inside its presave).
+    $this->writeStats($media, $coords, $sourceProps);
+  }
+
+  /**
+   * Parses a source geo file into a coordinate array + first track properties.
+   *
+   * Read before overwriteGeoshape replaces the file, so stats use the original
+   * source (which may carry distance / total_ascent / total_descent properties
+   * that our normalized GPX output does not).
+   *
+   * @param string $uri
+   *   Stream wrapper URI to the source file.
+   * @param string $extension
+   *   Lowercased file extension ('gpx', 'geojson', 'json').
+   *
+   * @return array
+   *   [$coords, $sourceProps] — $coords is a list of [lon, lat, ele_m]
+   *   (ele may be NULL); $sourceProps is the first LineString/MultiLineString
+   *   feature's properties (empty for GPX, which carries no such track stats).
+   */
+  protected function parseSource(string $uri, string $extension): array {
+    $path = $this->fileSystem->realpath($uri);
+    if (!$path || !file_exists($path)) {
+      return [[], []];
+    }
+
+    if ($extension === 'gpx') {
+      // Standard GPX carries no distance/ascent/descent track properties.
+      return [GeoElevationCalculator::parseGpx($path), []];
+    }
+
+    // GeoJSON / JSON.
+    $content = file_get_contents($path);
+    if ($content === FALSE || $content === '') {
+      return [[], []];
+    }
+    try {
+      $data = json_decode($content, TRUE, 512, JSON_THROW_ON_ERROR);
+    }
+    catch (\JsonException $e) {
+      return [[], []];
+    }
+
+    $coords = [];
+    $sourceProps = [];
+    $gotProps = FALSE;
+    foreach ($data['features'] ?? [] as $feature) {
+      $geomType = $feature['geometry']['type'] ?? NULL;
+      if ($geomType !== 'LineString' && $geomType !== 'MultiLineString') {
+        continue;
+      }
+      // First track feature supplies the source stat properties.
+      if (!$gotProps) {
+        $sourceProps = $feature['properties'] ?? [];
+        $gotProps = TRUE;
+      }
+      $geomCoords = $feature['geometry']['coordinates'] ?? [];
+      // MultiLineString nests an extra level (array of LineStrings).
+      $lines = $geomType === 'MultiLineString' ? $geomCoords : [$geomCoords];
+      foreach ($lines as $line) {
+        foreach ($line as $c) {
+          // Normalize to [lon, lat, ele] so the calculator never hits an
+          // undefined index when a source point omits elevation.
+          $coords[] = [$c[0] ?? NULL, $c[1] ?? NULL, $c[2] ?? NULL];
+        }
+      }
+    }
+
+    return [$coords, $sourceProps];
+  }
+
+  /**
+   * Writes per-track stat fields onto the media. Never saves the media.
+   *
+   * All fields are decimal meters. Distance prefers the source's
+   * properties.distance, else GeoElevationCalculator's computed distance
+   * (miles → meters). Min/max elevation are always computed. Ascent and descent
+   * are SOURCE ONLY: set from properties.total_ascent / total_descent when
+   * present, otherwise the field is left untouched (never computed, never
+   * zeroed) so an existing or hand-entered value survives a file replacement.
+   *
+   * @param \Drupal\media\MediaInterface $media
+   *   The media being saved.
+   * @param array $coords
+   *   Source [lon, lat, ele_m] coordinate array.
+   * @param array $sourceProps
+   *   Source track properties; distance / total_ascent / total_descent assumed
+   *   to be in meters when present.
+   */
+  protected function writeStats(MediaInterface $media, array $coords, array $sourceProps): void {
+    $stats = count($coords) >= 2 ? GeoElevationCalculator::compute($coords) : NULL;
+
+    // DISTANCE — source meters if present, else computed miles → meters.
+    $distM = $sourceProps['distance']
+      ?? ($stats !== NULL ? $stats['distance_mi'] * 1609.344 : NULL);
+    if ($distM !== NULL && $media->hasField('field_distance')) {
+      $media->set('field_distance', round((float) $distM, 2));
+    }
+
+    // MIN / MAX ELEVATION — always computed (already meters).
+    if ($stats !== NULL && $stats['elev_min_m'] !== NULL && $media->hasField('field_min_elevation')) {
+      $media->set('field_min_elevation', round((float) $stats['elev_min_m'], 2));
+    }
+    if ($stats !== NULL && $stats['elev_max_m'] !== NULL && $media->hasField('field_max_elevation')) {
+      $media->set('field_max_elevation', round((float) $stats['elev_max_m'], 2));
+    }
+
+    // ASCENT / DESCENT — SOURCE ONLY. Leave the field untouched when the source
+    // has no value (preserves an existing / hand-entered number); never use the
+    // calculator's gain/loss.
+    if (isset($sourceProps['total_ascent']) && $media->hasField('field_ascent')) {
+      $media->set('field_ascent', round((float) $sourceProps['total_ascent'], 2));
+    }
+    if (isset($sourceProps['total_descent']) && $media->hasField('field_descent')) {
+      $media->set('field_descent', round((float) $sourceProps['total_descent'], 2));
+    }
   }
 
   /**
@@ -242,13 +401,19 @@ class GeoShapeConverter {
   }
 
   /**
-   * Overwrites a single media's file in place with normalized GeoJSON content.
+   * Overwrites a media's file in place with normalized GeoJSON content.
    *
-   * Mutates the file and media entities (both saved here). The media ID is
-   * unchanged, so the caller re-points schema_geoshape to the same target.
+   * Runs from the media's OWN presave, so it must NOT save the media — Drupal
+   * persists it after the hook returns; calling $media->save() here would
+   * recurse. Only the file entity (a separate entity) is saved. The media name
+   * is never auto-changed: the user / importer owns it, and preserving it keeps
+   * a human label when a file is later replaced by a differently-named export.
+   * Set any media field values directly on $media (e.g. stats, later) — never
+   * save it here.
    *
    * @param \Drupal\media\MediaInterface $media
-   *   The media entity referencing the file.
+   *   The media entity referencing the file. Mutated in place if needed, never
+   *   saved here.
    * @param \Drupal\file\Entity\File $originalFile
    *   The source file entity inside the media item.
    * @param string $geojson
@@ -292,9 +457,10 @@ class GeoShapeConverter {
     $originalFile->setMimeType('application/geo+json');
     $originalFile->save();
 
-    // Update the media label to match the new filename.
-    $media->setName(pathinfo($savedUri, PATHINFO_FILENAME));
-    $media->save();
+    // NB: the media is intentionally NOT renamed or saved here. We are inside
+    // the media's own presave; Drupal saves it after the hook returns, and
+    // calling $media->save() would recurse. The media name is left untouched so
+    // the user / importer keeps ownership of the label.
   }
 
   /**

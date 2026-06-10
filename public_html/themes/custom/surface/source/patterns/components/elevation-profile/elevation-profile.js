@@ -9,7 +9,8 @@
  *   2. 'surface-map-ready' event      — detail.tracks (per-track array)
  *   3. data-geojson-url               — fetch directly (no map present)
  *   4. data-elev                      — inline JSON array (Storybook)
- * Coords format: [lon, lat, elevation_ft]
+ * Coords format: [lon, lat, elevation_m] — elevation is METERS; cumulative
+ * distance is computed in KILOMETERS. Imperial (ft / mi) is display-only.
  * Mode-aware: only walking/hiking/cycling tracks get a profile; a lone track
  * always qualifies. 'surface-track-select' (per map_id) swaps the shown track,
  * hiding the profile when the selected track is ineligible (driving/ferry).
@@ -20,10 +21,37 @@
 
 (() => {
   function dist2d(a, b) {
-    const dx = (b[0] - a[0]) * Math.cos((((a[1] + b[1]) / 2) * Math.PI) / 180) * 69.0;
-    const dy = (b[1] - a[1]) * 69.0;
-    return Math.sqrt(dx * dx + dy * dy);
+    const dx = (b[0] - a[0]) * Math.cos((((a[1] + b[1]) / 2) * Math.PI) / 180) * 111.0;
+    const dy = (b[1] - a[1]) * 111.0;
+    return Math.sqrt(dx * dx + dy * dy); // kilometers
   }
+
+  // Stored data is metric (meters, km). Imperial is a display-only conversion.
+  const M_TO_FT = 3.28084;
+  const KM_TO_MI = 0.621371;
+  const UNITS = {
+    metric:   { elev: 1,       elevLabel: 'm',  dist: 1,       distLabel: 'km' },
+    imperial: { elev: M_TO_FT, elevLabel: 'ft', dist: KM_TO_MI, distLabel: 'mi' },
+  };
+
+  function safeLocalGet(key) {
+    try { return window.localStorage ? window.localStorage.getItem(key) : null; }
+    catch (e) { return null; }
+  }
+
+  function defaultUnit() {
+    const stored = safeLocalGet('elevationUnit');
+    if (stored === 'imperial' || stored === 'metric') return stored;
+    const siteDefault = window.drupalSettings &&
+      window.drupalSettings.trailMapper &&
+      window.drupalSettings.trailMapper.elevationUnit;
+    if (siteDefault === 'imperial' || siteDefault === 'metric') return siteDefault;
+    const loc = (navigator.language || 'en-US');
+    const region = (loc.split('-')[1] || '').toUpperCase();
+    return ['US', 'LR', 'MM'].includes(region) ? 'imperial' : 'metric';
+  }
+
+  let currentUnit = defaultUnit(); // module-level, shared by all profiles
 
   /**
    * Returns true if elevData contains at least one coordinate with a
@@ -104,6 +132,9 @@
       const minE = Math.min.apply(null, elevs) - 60;
       const maxE = Math.max.apply(null, elevs) + 80;
 
+      // Geometry stays native (km on x, meters on y); only label text converts.
+      const U = UNITS[currentUnit];
+
       function xS(d) {
         return PAD.left + (d / totalDist) * w;
       }
@@ -124,14 +155,14 @@
         ctx.moveTo(PAD.left, y);
         ctx.lineTo(PAD.left + w, y);
         ctx.stroke();
-        ctx.fillText(Math.round(e) + ' ft', PAD.left - 6, y + 3);
+        ctx.fillText(Math.round(e * U.elev) + ' ' + U.elevLabel, PAD.left - 6, y + 3);
       }
 
       // X distance labels
       ctx.textAlign = 'center';
       for (let xi = 0; xi <= 6; xi++) {
         const xd = (totalDist / 6) * xi;
-        ctx.fillText(xd.toFixed(1) + ' mi', xS(xd), H - PAD.bottom + 14);
+        ctx.fillText((xd * U.dist).toFixed(1) + ' ' + U.distLabel, xS(xd), H - PAD.bottom + 14);
       }
 
       // Gradient fill
@@ -215,6 +246,9 @@
     }
 
     drawChart();
+    // Expose a redraw hook so a unit change can re-render this profile at base
+    // state (the user is not mid-hover when toggling the nav).
+    el._elevRedraw = () => drawChart();
     window.addEventListener('resize', () => {
       drawChart();
     });
@@ -247,7 +281,10 @@
       tooltip.style.opacity = '1';
       tooltip.style.left = e.clientX - rect.left + 12 + 'px';
       tooltip.style.top = e.clientY - rect.top - 36 + 'px';
-      tooltip.textContent = hd.toFixed(1) + ' mi  ·  ' + Math.round(elev) + ' ft';
+      const U = UNITS[currentUnit];
+      tooltip.textContent =
+        (hd * U.dist).toFixed(1) + ' ' + U.distLabel + '  ·  ' +
+        Math.round(elev * U.elev) + ' ' + U.elevLabel;
 
       if (isFinite(lat) && isFinite(lon)) {
         window.dispatchEvent(new CustomEvent('surface-profile-hover', {
@@ -350,6 +387,17 @@
       initProfile(els[i]);
     }
   }
+
+  // Live unit toggle (dispatched by the nav). Update the shared unit and redraw
+  // every rendered profile with converted labels/values.
+  window.addEventListener('surface-units-change', (e) => {
+    const u = e.detail && e.detail.unit;
+    if (u !== 'imperial' && u !== 'metric') return;
+    currentUnit = u;
+    document.querySelectorAll('.elevation-profile').forEach((el) => {
+      if (typeof el._elevRedraw === 'function') el._elevRedraw();
+    });
+  });
 
   // Drupal
   if (typeof Drupal !== 'undefined' && typeof Drupal.behaviors !== 'undefined') {

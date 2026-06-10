@@ -1,0 +1,23 @@
+uuid: ec1e87fa-aedc-421a-97bd-8e49bf8b7e01
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_min_elevation
+    - media.type.data_download
+id: media.data_download.field_min_elevation
+field_name: field_min_elevation
+entity_type: media
+bundle: data_download
+label: 'Min Elevation'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

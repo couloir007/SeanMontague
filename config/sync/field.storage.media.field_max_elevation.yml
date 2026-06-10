@@ -1,0 +1,20 @@
+uuid: 5d91c133-5c28-4ed6-a036-f2029c6a36b2
+langcode: en
+status: true
+dependencies:
+  module:
+    - media
+id: media.field_max_elevation
+field_name: field_max_elevation
+entity_type: media
+type: decimal
+settings:
+  precision: 10
+  scale: 2
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

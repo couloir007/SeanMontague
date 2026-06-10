@@ -23,20 +23,67 @@
  * If a file uses feet, pre-convert before uploading.
  */
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\media\MediaInterface;
 use Drupal\trail_mapper\Form\TrailMapperSettingsForm;
 
 /**
  * Implements hook_entity_presave().
  *
- * Delegates to GeoShapeConverter service to keep hook thin.
- * Converts uploaded GPX or GeoJSON to normalized GeoJSON with Z in feet,
- * overwrites schema_geoshape in place.
+ * Node-coupled geoshape work only — waypoint→POI extraction and the
+ * multi-value schema_geoshape re-set. Per-media file conversion lives on the
+ * media presave hook (trail_mapper_media_presave). processEntity() ignores
+ * non-node entities, so this is a no-op for the media saved above.
  *
- * Uses presave so the converted file is saved as part of the same
- * transaction — no second save needed, no recursion risk.
+ * Uses presave so any node-side change is part of the same save — no second
+ * save, no recursion.
  */
 function trail_mapper_entity_presave(EntityInterface $entity): void {
   \Drupal::service('trail_mapper.geo_shape_converter')->processEntity($entity);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave() for media.
+ *
+ * Converts a data_download geoshape file in place whenever the file is new or
+ * replaced, and re-bakes route_type when only the field_route_type tag changes.
+ * Running on the media's own presave means the same conversion happens however
+ * the media is created: trip_import, standalone upload, or file replacement.
+ *
+ * No recursion: GeoShapeConverter::overwriteGeoshape() saves only the file
+ * entity, never the media — Drupal persists the media after this hook returns.
+ */
+function trail_mapper_media_presave(MediaInterface $media): void {
+  if ($media->bundle() !== 'data_download' || !$media->hasField('field_media_file')) {
+    return;
+  }
+
+  /** @var \Drupal\trail_mapper\Service\GeoShapeConverter $converter */
+  $converter = \Drupal::service('trail_mapper.geo_shape_converter');
+
+  $original = $media->original ?? NULL;
+  $oldFid = $original ? ($original->get('field_media_file')->target_id ?? NULL) : NULL;
+  $newFid = $media->get('field_media_file')->target_id ?? NULL;
+  $isNew = !$original;
+  $fileChanged = $isNew || ($oldFid !== $newFid);
+
+  if ($fileChanged) {
+    // New media or replaced file — full conversion + route_type bake.
+    // (Per-feature stats are added in a later step.)
+    $converter->processMedia($media);
+    return;
+  }
+
+  // File unchanged. If only the route_type tag changed, re-bake route_type into
+  // the existing .geojson: processMedia() detects the current (.geojson) file
+  // and runs normalizeGeoJson(), which re-stamps properties.route_type without
+  // touching geometry or stats. Skips entirely when the tag is unchanged.
+  if ($media->hasField('field_route_type')) {
+    $oldRouteTid = $original->get('field_route_type')->target_id ?? NULL;
+    $newRouteTid = $media->get('field_route_type')->target_id ?? NULL;
+    if ($oldRouteTid !== $newRouteTid) {
+      $converter->processMedia($media);
+    }
+  }
 }
 
 /**

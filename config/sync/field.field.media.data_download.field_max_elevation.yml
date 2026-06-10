@@ -1,0 +1,23 @@
+uuid: 82bf5686-1f59-4764-a1ae-f91b5a533fc0
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_max_elevation
+    - media.type.data_download
+id: media.data_download.field_max_elevation
+field_name: field_max_elevation
+entity_type: media
+bundle: data_download
+label: 'Max Elevation'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal
