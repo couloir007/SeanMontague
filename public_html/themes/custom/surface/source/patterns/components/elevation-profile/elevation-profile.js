@@ -16,7 +16,10 @@
  * is DATA-DRIVEN: it renders when the coords carry real (non-zero, finite) Z,
  * regardless of route_type — not mode-based. 'surface-track-select' (per map_id)
  * swaps the shown track; the component hides only when a track has neither a
- * chart nor any stat.
+ * chart nor any stat. The drawn line uses the server-simplified profile
+ * (meta.profile, RDP-baked into the GeoJSON for DRIVING tracks only) when
+ * present, else the raw coords; raw coords always drive min/max, hover readout,
+ * and the dispatched lat/lon marker.
  * Works in Drupal (via Drupal.behaviors) and Storybook (via DOMContentLoaded).
  */
 /* jshint esversion: 6 */
@@ -72,23 +75,6 @@
   // a ferry can carry stray non-zero GPS altitude, so the data check alone is
   // not enough. (driving is NOT here: Gaia-plotted drives have real elevation.)
   const NO_ELEVATION_MODES = new Set(['ferry']);
-
-  // Window (points) for the moving-average that smooths the PLOTTED curve only.
-  const SMOOTH_WINDOW = 7;
-
-  // Moving-average over Z, used only for drawing the chart curve — never for the
-  // hover readout, min/max stats, or the lat/lon → marker mapping.
-  function smoothElev(coords, win) {
-    const half = Math.floor(win / 2);
-    return coords.map((c, i) => {
-      let sum = 0, n = 0;
-      for (let j = Math.max(0, i - half); j <= Math.min(coords.length - 1, i + half); j++) {
-        const z = coords[j][2];
-        if (isFinite(z)) { sum += z; n++; }
-      }
-      return [c[0], c[1], n ? sum / n : c[2]];
-    });
-  }
 
   // First track in array order eligible for a chart: NOT a no-elevation mode
   // (e.g. ferry) AND its coords carry real elevation; null if none. Used to pick
@@ -237,9 +223,35 @@
     }
     const totalDist = cumDist[cumDist.length - 1];
 
-    // Smoothed Z for the DRAWN curve + scrub-dot y only. Raw elevData stays
-    // authoritative for the hover readout, min/max, and lat/lon dispatch.
-    const smoothed = smoothElev(elevData, SMOOTH_WINDOW);
+    // Chart line dataset: prefer the server-simplified profile ([lon,lat,ele],
+    // RDP, baked at media-save for DRIVING tracks only); else the raw coords
+    // (every non-driving track, plus Storybook / files without the property).
+    // The line is DISPLAY-ONLY — raw elevData stays authoritative for the hover
+    // readout, min/max, and the lat/lon → marker dispatch. lineCum/lineTotal
+    // scale the line to full width.
+    const profile = (meta && Array.isArray(meta.profile) && meta.profile.length >= 2)
+      ? meta.profile
+      : null;
+    const lineCoords = profile || elevData;
+    const lineCum = [0];
+    for (let i = 1; i < lineCoords.length; i++) {
+      lineCum.push(lineCum[i - 1] + dist2d(lineCoords[i - 1], lineCoords[i]));
+    }
+    const lineTotal = lineCum[lineCum.length - 1] || 1;
+
+    // Elevation of the line at a 0..1 fraction of its length (for the scrub dot,
+    // so the dot sits on the drawn curve).
+    function lineElevAtFraction(frac) {
+      const d = frac * lineTotal;
+      let i = 0;
+      for (let k = 0; k < lineCum.length - 1; k++) {
+        if (d >= lineCum[k] && d <= lineCum[k + 1]) { i = k; break; }
+      }
+      const span = lineCum[i + 1] - lineCum[i];
+      const lt = span > 0 ? (d - lineCum[i]) / span : 0;
+      const next = Math.min(i + 1, lineCoords.length - 1);
+      return lineCoords[i][2] + lt * (lineCoords[next][2] - lineCoords[i][2]);
+    }
 
     // The "you are here" marker is owned by map.js as a single shared marker —
     // the profile only dispatches hover position via 'surface-profile-hover'.
@@ -266,6 +278,11 @@
 
       function xS(d) {
         return PAD.left + (d / totalDist) * w;
+      }
+      // x for the drawn line, scaled to the line dataset's own length so it
+      // spans the full width regardless of how sparse the simplified profile is.
+      function xLine(d) {
+        return PAD.left + (d / lineTotal) * w;
       }
       function yS(e) {
         return PAD.top + h - ((e - minE) / (maxE - minE)) * h;
@@ -299,36 +316,36 @@
       grad.addColorStop(0, 'rgba(58,90,64,0.22)');
       grad.addColorStop(1, 'rgba(58,90,64,0.02)');
       ctx.beginPath();
-      ctx.moveTo(xS(cumDist[0]), yS(smoothed[0][2]));
-      for (let pi = 1; pi < smoothed.length; pi++) {
-        const cx = (xS(cumDist[pi - 1]) + xS(cumDist[pi])) / 2;
+      ctx.moveTo(xLine(lineCum[0]), yS(lineCoords[0][2]));
+      for (let pi = 1; pi < lineCoords.length; pi++) {
+        const cx = (xLine(lineCum[pi - 1]) + xLine(lineCum[pi])) / 2;
         ctx.bezierCurveTo(
           cx,
-          yS(smoothed[pi - 1][2]),
+          yS(lineCoords[pi - 1][2]),
           cx,
-          yS(smoothed[pi][2]),
-          xS(cumDist[pi]),
-          yS(smoothed[pi][2])
+          yS(lineCoords[pi][2]),
+          xLine(lineCum[pi]),
+          yS(lineCoords[pi][2])
         );
       }
-      ctx.lineTo(xS(totalDist), PAD.top + h);
-      ctx.lineTo(xS(0), PAD.top + h);
+      ctx.lineTo(xLine(lineTotal), PAD.top + h);
+      ctx.lineTo(xLine(0), PAD.top + h);
       ctx.closePath();
       ctx.fillStyle = grad;
       ctx.fill();
 
       // Profile line
       ctx.beginPath();
-      ctx.moveTo(xS(cumDist[0]), yS(smoothed[0][2]));
-      for (let li = 1; li < smoothed.length; li++) {
-        const lcx = (xS(cumDist[li - 1]) + xS(cumDist[li])) / 2;
+      ctx.moveTo(xLine(lineCum[0]), yS(lineCoords[0][2]));
+      for (let li = 1; li < lineCoords.length; li++) {
+        const lcx = (xLine(lineCum[li - 1]) + xLine(lineCum[li])) / 2;
         ctx.bezierCurveTo(
           lcx,
-          yS(smoothed[li - 1][2]),
+          yS(lineCoords[li - 1][2]),
           lcx,
-          yS(smoothed[li][2]),
-          xS(cumDist[li]),
-          yS(smoothed[li][2])
+          yS(lineCoords[li][2]),
+          xLine(lineCum[li]),
+          yS(lineCoords[li][2])
         );
       }
       ctx.strokeStyle = '#3a5a40';
@@ -339,22 +356,9 @@
       // Hover scrub line + dot
       if (hoverFraction !== undefined) {
         const sx = PAD.left + hoverFraction * w;
-        const hd = hoverFraction * totalDist;
-        let idx = 0;
-        for (let si = 0; si < cumDist.length - 1; si++) {
-          if (hd >= cumDist[si] && hd <= cumDist[si + 1]) {
-            idx = si;
-            break;
-          }
-        }
-        const t =
-          cumDist[idx + 1] > cumDist[idx]
-            ? (hd - cumDist[idx]) / (cumDist[idx + 1] - cumDist[idx])
-            : 0;
-        const next = Math.min(idx + 1, smoothed.length - 1);
-        // Dot sits on the DRAWN (smoothed) curve.
-        const sElev = smoothed[idx][2] + t * (smoothed[next][2] - smoothed[idx][2]);
-        const sy = yS(sElev);
+        // Dot sits on the DRAWN line (the simplified/smoothed curve), so its y
+        // comes from the line dataset at the hovered fraction.
+        const sy = yS(lineElevAtFraction(hoverFraction));
 
         ctx.beginPath();
         ctx.moveTo(sx, PAD.top);
@@ -449,7 +453,7 @@
         return;
       }
       const track = pickElevationTrack(tracks) || tracks[0];
-      renderProfile(el, track.coords || [], { name: track.name, stats: track.stats });
+      renderProfile(el, track.coords || [], { name: track.name, stats: track.stats, profile: track.profile });
     };
 
     // 3 & 4. Fallback: fetch geojson-url or parse inline elev.
@@ -501,7 +505,7 @@
       // (and hides the component if the track has neither chart nor stat).
       window.addEventListener('surface-track-select', (e) => {
         if (e.detail.map_id !== mapId) return;
-        renderProfile(el, e.detail.coords || [], { name: e.detail.name, stats: e.detail.stats });
+        renderProfile(el, e.detail.coords || [], { name: e.detail.name, stats: e.detail.stats, profile: e.detail.profile });
       });
     } else {
       // No map / no _surfaceTracks — standalone Storybook (data-elev) path.

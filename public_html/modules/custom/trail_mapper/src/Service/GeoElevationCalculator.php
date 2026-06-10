@@ -32,6 +32,12 @@ class GeoElevationCalculator {
   const EARTH_RADIUS_MI = 3958.8;
 
   /**
+   * RDP tolerance (meters) for the DRIVING display profile. Only driving tracks
+   * are simplified — jittery road GPS benefits; trail data is drawn raw.
+   */
+  const DRIVING_PROFILE_EPSILON_M = 5.0;
+
+  /**
    * Compute stats from raw coordinate array.
    *
    * @param array $coords
@@ -316,6 +322,119 @@ class GeoElevationCalculator {
       + cos(deg2rad($lat1)) * cos(deg2rad($lat2))
       * sin($dLon / 2) ** 2;
     return static::EARTH_RADIUS_MI * 2 * atan2(sqrt($a), sqrt(1 - $a));
+  }
+
+  /**
+   * Simplifies a track into a sparse elevation profile via Ramer–Douglas–Peucker.
+   *
+   * RDP runs on the (cumulative distance, elevation) plane — both meters — so
+   * the result is a display-friendly polyline of the elevation curve. lon/lat
+   * are carried through so the chart's hover marker still maps to real
+   * coordinates. The raw geometry is NOT modified — this is display-only.
+   *
+   * @param array $coords
+   *   Array of [lon, lat, ele_m] (ele may be NULL / missing).
+   * @param float $epsilonM
+   *   Perpendicular tolerance in meters; larger drops more points.
+   *
+   * @return array
+   *   Surviving points as [lon, lat, ele_m], in order. Returns $coords
+   *   unchanged when there are fewer than 3 points.
+   */
+  public static function simplifyProfile(array $coords, float $epsilonM): array {
+    if (count($coords) < 3) {
+      return $coords;
+    }
+
+    // Build [dist_m, elev_m, lon, lat] tuples (cumulative distance, elevation).
+    $pts = [];
+    $cum = 0.0;
+    $prev = NULL;
+    foreach ($coords as $c) {
+      $lon = (float) $c[0];
+      $lat = (float) $c[1];
+      $ele = isset($c[2]) && is_numeric($c[2]) ? (float) $c[2] : 0.0;
+      if ($prev !== NULL) {
+        $cum += static::haversineM($prev[1], $prev[0], $lat, $lon);
+      }
+      $pts[] = [$cum, $ele, $lon, $lat];
+      $prev = [$lon, $lat];
+    }
+
+    $keep = static::rdp($pts, 0, count($pts) - 1, $epsilonM);
+
+    $out = [];
+    foreach ($keep as $i) {
+      // [lon, lat, ele].
+      $out[] = [$pts[$i][2], $pts[$i][3], $pts[$i][1]];
+    }
+    return $out;
+  }
+
+  /**
+   * Ramer–Douglas–Peucker on (dist_m, elev_m) tuples; returns kept indices.
+   *
+   * @param array $pts
+   *   Tuples [dist_m, elev_m, lon, lat].
+   * @param int $start
+   *   First index (inclusive).
+   * @param int $end
+   *   Last index (inclusive).
+   * @param float $epsilonM
+   *   Tolerance in meters.
+   *
+   * @return int[]
+   *   Sorted surviving indices, always including $start and $end.
+   */
+  protected static function rdp(array $pts, int $start, int $end, float $epsilonM): array {
+    if ($end <= $start + 1) {
+      return [$start, $end];
+    }
+
+    $ax = $pts[$start][0];
+    $ay = $pts[$start][1];
+    $bx = $pts[$end][0];
+    $by = $pts[$end][1];
+
+    $maxDist = -1.0;
+    $maxIdx = $start;
+    for ($i = $start + 1; $i < $end; $i++) {
+      $d = static::perpDistance($pts[$i][0], $pts[$i][1], $ax, $ay, $bx, $by);
+      if ($d > $maxDist) {
+        $maxDist = $d;
+        $maxIdx = $i;
+      }
+    }
+
+    if ($maxDist > $epsilonM) {
+      $left = static::rdp($pts, $start, $maxIdx, $epsilonM);
+      $right = static::rdp($pts, $maxIdx, $end, $epsilonM);
+      // Drop the duplicated junction point before merging.
+      array_pop($left);
+      return array_merge($left, $right);
+    }
+
+    return [$start, $end];
+  }
+
+  /**
+   * Perpendicular distance from (px,py) to the line through (ax,ay)-(bx,by).
+   */
+  protected static function perpDistance(
+    float $px, float $py,
+    float $ax, float $ay,
+    float $bx, float $by,
+  ): float {
+    $dx = $bx - $ax;
+    $dy = $by - $ay;
+    $len = sqrt($dx * $dx + $dy * $dy);
+    if ($len == 0.0) {
+      // Degenerate segment — distance to the shared endpoint.
+      $ex = $px - $ax;
+      $ey = $py - $ay;
+      return sqrt($ex * $ex + $ey * $ey);
+    }
+    return abs($dy * $px - $dx * $py + $bx * $ay - $by * $ax) / $len;
   }
 
 }

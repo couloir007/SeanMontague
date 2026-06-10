@@ -21,12 +21,14 @@
  * After init:
  *   window._surfaceMaps[map_id]    — Leaflet map instance
  *   window._surfaceTracks[map_id]  — array of per-track { route_type, coords,
- *                                    name, stats }, coords being [lon, lat, ele]
- *                                    points; stats are stored meters or null
+ *                                    name, stats, profile }, coords being
+ *                                    [lon, lat, ele]; stats are stored meters or
+ *                                    null; profile is the server-simplified
+ *                                    [lon,lat,ele] for the chart line (or null)
  *   'surface-map-ready' event      — { map_id, map, tracks, coords } where
  *                                    coords is the first track (backward-compat)
- *   'surface-track-select' event   — { map_id, route_type, coords, name, stats }
- *                                    on track click
+ *   'surface-track-select' event   — { map_id, route_type, coords, name, stats,
+ *                                    profile } on track click
  */
 
 /* jshint esversion: 11 */
@@ -266,7 +268,7 @@
     // swap to the clicked track.
     const selectTrack = (track) => {
       window.dispatchEvent(new CustomEvent('surface-track-select', {
-        detail: { map_id: mapId, route_type: track.route_type, coords: track.coords, name: track.name, stats: track.stats },
+        detail: { map_id: mapId, route_type: track.route_type, coords: track.coords, name: track.name, stats: track.stats, profile: track.profile },
       }));
     };
 
@@ -318,6 +320,8 @@
         name: trackName,
         // Stored stats (meters) — informational; never overrides route_type.
         stats: trackStats[0] ?? null,
+        // Server-simplified [lon,lat,ele] for the chart line only (null if none).
+        profile: trackOnlyGeojson.features[0]?.properties?.elevation_profile ?? null,
       };
       tracks.push(track);
       trackLayer.on('click', () => selectTrack(track));
@@ -380,6 +384,8 @@
           name: trackName,
           // Stored stats (meters), index-matched to geojsonUrls / trackStats.
           stats: trackStats[i] ?? null,
+          // Server-simplified [lon,lat,ele] for the chart line only (null if none).
+          profile: trackOnly.features[0]?.properties?.elevation_profile ?? null,
         };
         tracks.push(track);
         layer.on('click', () => selectTrack(track));

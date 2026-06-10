@@ -136,12 +136,77 @@ class GeoShapeConverter {
       return;
     }
 
-    // (c) Overwrite the file in place with the normalized GeoJSON.
+    // (c) Bake a simplified, display-only elevation profile (RDP) into the first
+    // track feature when the track has real elevation. Raw geometry is untouched.
+    $geojson = $this->bakeElevationProfile($geojson, $coords, $routeKey);
+
+    // (d) Overwrite the file in place with the normalized GeoJSON.
     $this->overwriteGeoshape($media, $file, $geojson);
 
-    // (d) Write per-track stat fields onto the media (never saves the media —
+    // (e) Write per-track stat fields onto the media (never saves the media —
     // we are inside its presave).
     $this->writeStats($media, $coords, $sourceProps);
+  }
+
+  /**
+   * Bakes a simplified elevation profile into the first track feature.
+   *
+   * ONLY driving tracks are simplified (jittery road GPS), and only when there
+   * is real (non-zero, finite) elevation. Every other route_type gets no
+   * property — the chart draws raw coords for those. Adds
+   * properties.elevation_profile (array of [lon, lat, ele_m]) — display-only;
+   * the feature's full-resolution coordinates are left intact for the map line
+   * and hover marker.
+   *
+   * @param string $geojson
+   *   The normalized GeoJSON string.
+   * @param array $coords
+   *   Source [lon, lat, ele_m] coordinate array.
+   * @param string|null $routeKey
+   *   Route-type key; only 'driving' is simplified.
+   *
+   * @return string
+   *   The GeoJSON string, with the profile baked in for driving tracks with
+   *   real elevation; otherwise (and on any failure) the input is unchanged.
+   */
+  protected function bakeElevationProfile(string $geojson, array $coords, ?string $routeKey): string {
+    // Driving only.
+    if ($routeKey !== 'driving') {
+      return $geojson;
+    }
+
+    // Real elevation = at least one non-zero, finite Z. Mirrors the JS check.
+    $hasElevation = FALSE;
+    foreach ($coords as $c) {
+      if (isset($c[2]) && is_finite((float) $c[2]) && (float) $c[2] != 0.0) {
+        $hasElevation = TRUE;
+        break;
+      }
+    }
+    if (!$hasElevation) {
+      return $geojson;
+    }
+
+    try {
+      $data = json_decode($geojson, TRUE, 512, JSON_THROW_ON_ERROR);
+    }
+    catch (\JsonException $e) {
+      return $geojson;
+    }
+    if (empty($data['features'][0])) {
+      return $geojson;
+    }
+
+    $data['features'][0]['properties'] ??= [];
+    $data['features'][0]['properties']['elevation_profile'] =
+      GeoElevationCalculator::simplifyProfile($coords, GeoElevationCalculator::DRIVING_PROFILE_EPSILON_M);
+
+    try {
+      return json_encode($data, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
+    }
+    catch (\JsonException $e) {
+      return $geojson;
+    }
   }
 
   /**
