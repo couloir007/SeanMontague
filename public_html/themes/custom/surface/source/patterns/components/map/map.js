@@ -20,11 +20,13 @@
  *
  * After init:
  *   window._surfaceMaps[map_id]    — Leaflet map instance
- *   window._surfaceTracks[map_id]  — array of per-track { route_type, coords },
- *                                    coords being [lon, lat, ele] points
+ *   window._surfaceTracks[map_id]  — array of per-track { route_type, coords,
+ *                                    name, stats }, coords being [lon, lat, ele]
+ *                                    points; stats are stored meters or null
  *   'surface-map-ready' event      — { map_id, map, tracks, coords } where
  *                                    coords is the first track (backward-compat)
- *   'surface-track-select' event   — { map_id, route_type, coords } on track click
+ *   'surface-track-select' event   — { map_id, route_type, coords, name, stats }
+ *                                    on track click
  */
 
 /* jshint esversion: 11 */
@@ -183,7 +185,7 @@
     return pts;
   };
 
-  const initLeaflet = async (el, geojson, { lat, lon, zoom, interactive, markers, lines, tile, mapId, geojsonUrls }) => {
+  const initLeaflet = async (el, geojson, { lat, lon, zoom, interactive, markers, lines, tile, mapId, geojsonUrls, trackStats = [] }) => {
     // Guard against double-init (fetch error catch calling initLeaflet twice)
     if (el._leafletMapInstance) return;
     el._leafletMapInstance = true;
@@ -251,7 +253,7 @@
     // swap to the clicked track.
     const selectTrack = (track) => {
       window.dispatchEvent(new CustomEvent('surface-track-select', {
-        detail: { map_id: mapId, route_type: track.route_type, coords: track.coords },
+        detail: { map_id: mapId, route_type: track.route_type, coords: track.coords, name: track.name, stats: track.stats },
       }));
     };
 
@@ -290,10 +292,17 @@
         style: () => ({ color: '#3a5a40', weight: 3, opacity: 0.85 }),
       }).addTo(map);
 
-      // Single track: flatten its coords; route_type from the first track feature.
+      // Single track: flatten its coords; route_type + human name from the first
+      // track feature (prefer title, then name).
+      const trackName = trackOnlyGeojson.features[0]?.properties?.title
+                     ?? trackOnlyGeojson.features[0]?.properties?.name
+                     ?? null;
       const track = {
         route_type: trackOnlyGeojson.features[0]?.properties?.route_type ?? null,
         coords: flattenCoords(geojson),
+        name: trackName,
+        // Stored stats (meters) — informational; never overrides route_type.
+        stats: trackStats[0] ?? null,
       };
       tracks.push(track);
       trackLayer.on('click', () => selectTrack(track));
@@ -324,7 +333,7 @@
         return style;
       };
 
-      results.forEach((gj) => {
+      results.forEach((gj, i) => {
         if (!gj) return;
         const trackOnly = {
           type: 'FeatureCollection',
@@ -341,10 +350,19 @@
         // cursor on the path elements. Markers are untouched.
         layer.eachLayer((p) => { if (p._path) p._path.style.cursor = 'pointer'; });
 
-        // Keep this track's own coords + route_type (from its first feature).
+        // Keep this track's own coords + route_type + human name (from its first
+        // feature; prefer title, then name).
+        const trackName = trackOnly.features[0]?.properties?.title
+                       ?? trackOnly.features[0]?.properties?.name
+                       ?? null;
         const track = {
+          // File is authoritative for route_type (eligibility + styling); the
+          // template's stats.route_type is only informational and may be null.
           route_type: trackOnly.features[0]?.properties?.route_type ?? null,
           coords: flattenCoords(gj),
+          name: trackName,
+          // Stored stats (meters), index-matched to geojsonUrls / trackStats.
+          stats: trackStats[i] ?? null,
         };
         tracks.push(track);
         layer.on('click', () => selectTrack(track));
@@ -463,10 +481,14 @@
     const lines = parseJSON(el.dataset.mapLines, []);
     const geojsonUrl = el.dataset.mapGeojson ?? null;
     const geojsonUrls = parseJSON(el.dataset.mapGeojsonUrls, []);
+    // Per-track stored stats (meters), index-matched to geojsonUrls by the node
+    // template. Absent in Storybook → []. Informational only — never overrides
+    // the file's route_type.
+    const trackStats = parseJSON(el.dataset.mapTrackStats, []);
     const mapId = el.id ?? 'map';
     const tile = resolveTile(el);
 
-    const opts = { lat, lon, zoom, interactive, markers, lines, tile, mapId, geojsonUrls };
+    const opts = { lat, lon, zoom, interactive, markers, lines, tile, mapId, geojsonUrls, trackStats };
 
     // The multi-track array takes precedence: only run the single-URL fetch
     // when there is no geojson_urls array. In the article case both are set

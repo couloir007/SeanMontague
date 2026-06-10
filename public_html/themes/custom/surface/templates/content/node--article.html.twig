@@ -20,6 +20,7 @@
    that has a file. The first file drives is_gpx, the elevation profile, and
    the download card; the full list drives the multi-track map. #}
 {% set geojson_urls = [] %}
+{% set track_stats  = [] %}
 {% set geo_file     = null %}
 {% for item in node.schema_geoshape %}
   {% set media = item.entity %}
@@ -29,6 +30,18 @@
       {% set geo_file = file %}
     {% endif %}
     {% set geojson_urls = geojson_urls|merge([file.fileuri|file_url]) %}
+    {# Index-matched to geojson_urls (same media per index). Values are stored
+       in METERS; the map/elevation JS converts for display. null is fine —
+       the JS skips null stats. #}
+    {% set track_stats = track_stats|merge([{
+      'distance':   media.field_distance.value,
+      'ascent':     media.field_ascent.value,
+      'descent':    media.field_descent.value,
+      'min_elev':   media.field_min_elevation.value,
+      'max_elev':   media.field_max_elevation.value,
+      'route_type': media.field_route_type.entity ? media.field_route_type.entity.field_key.value : null,
+      'name':       media.name.value,
+    }]) %}
   {% endif %}
 {% endfor %}
 {% set geojson_url  = geojson_urls[0]|default(null) %}
@@ -181,6 +194,7 @@
     'drupal_geo_rendered': null,
     'geojson_url':         geojson_url,
     'geojson_urls':        geojson_urls,
+    'track_stats':         track_stats,
     'elev_gain':           node.schema_elev_gain.value,
     'elev_loss':           node.schema_elev_loss.value,
     'elev_min':            node.schema_elev_min.value,

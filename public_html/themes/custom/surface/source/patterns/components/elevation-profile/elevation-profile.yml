@@ -1,10 +1,8 @@
 # Optional modifier slot — elevation-profile.js toggles 'elevation-profile--hidden'
 # at runtime for ineligible/no-track states.
 modifier: ''
-gain: '2,600'
-loss: '2,596'
-min_elev: '811'
-max_elev: '1,595'
+# Header name + stats are filled by JS from the selected track's stored stats;
+# the standalone (data-elev) story has none, so the header shows just the label.
 canvas_id: 'elevation-chart'
 tooltip_id: 'elev-tooltip'
 elev_data: [

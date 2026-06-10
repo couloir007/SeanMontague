@@ -6,6 +6,22 @@ map_zoom: 13
 geojson_urls:
   - '/geojson/demo-track-a.geojson'
   - '/geojson/demo-track-b.geojson'
+# Index-matched to geojson_urls. Stats stored in METERS; JS converts for display.
+track_stats:
+  - distance: 4830
+    ascent: 288
+    descent: 305
+    min_elev: 812
+    max_elev: 1117
+    route_type: 'cycling'
+    name: 'Demo Loop A'
+  - distance: 9012
+    ascent: 470
+    descent: 451
+    min_elev: 1217
+    max_elev: 1528
+    route_type: 'hiking'
+    name: 'Demo Spur B'
 map_lines:
   - coords: [
       [-71.945434,44.588812],[-71.945209,44.588583],[-71.944501,44.588152],

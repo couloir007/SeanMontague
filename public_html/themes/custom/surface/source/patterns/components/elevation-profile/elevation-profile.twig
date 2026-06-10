@@ -4,34 +4,12 @@
      {% if map_id %}data-map-id="{{ map_id }}"{% endif %}
      {% if geojson_url %}data-geojson-url="{{ geojson_url }}"{% endif %}
      {% if elev_data %}data-elev='{{ elev_data|json_encode }}'{% endif %}>
+  {# Header name + stats are filled by elevation-profile.js from the selected
+     track's stored media stats (display-only, unit-converted). #}
   <div class="elevation-profile__header">
     <span class="elevation-profile__header-label">Elevation Profile</span>
-    <div class="elevation-profile__header-stats">
-      {% if gain %}
-        <div class="elevation-profile__stat">
-          <span class="elevation-profile__stat-val">{{ gain }}</span>
-          <span class="elevation-profile__stat-unit">ft gain</span>
-        </div>
-      {% endif %}
-      {% if loss %}
-        <div class="elevation-profile__stat">
-          <span class="elevation-profile__stat-val">{{ loss }}</span>
-          <span class="elevation-profile__stat-unit">ft loss</span>
-        </div>
-      {% endif %}
-      {% if min_elev %}
-        <div class="elevation-profile__stat">
-          <span class="elevation-profile__stat-val">{{ min_elev }}</span>
-          <span class="elevation-profile__stat-unit">ft min</span>
-        </div>
-      {% endif %}
-      {% if max_elev %}
-        <div class="elevation-profile__stat">
-          <span class="elevation-profile__stat-val">{{ max_elev }}</span>
-          <span class="elevation-profile__stat-unit">ft max</span>
-        </div>
-      {% endif %}
-    </div>
+    <span class="elevation-profile__header-name"></span>
+    <div class="elevation-profile__header-stats"></div>
   </div>
   <canvas class="elevation-profile__canvas" id="{{ canvas_id|default('elevation-chart') }}"></canvas>
   <div class="elevation-profile__tooltip" id="{{ tooltip_id|default('elev-tooltip') }}"></div>

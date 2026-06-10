@@ -27,6 +27,21 @@
   text-transform: uppercase;
 }
 
+/* Selected track name — JS-filled. margin-right:auto keeps it beside the label
+   and pushes the stats to the right; :empty collapses it (standalone / hidden)
+   so the header falls back to label + stats. */
+.elevation-profile__header-name {
+  color: var(--bright);
+  font-family: var(--font-serif-nek);
+  font-size: 15px;
+  margin-right: auto;
+  padding-left: 14px;
+}
+
+.elevation-profile__header-name:empty {
+  display: none;
+}
+
 .elevation-profile__header-stats {
   display: flex;
   gap: 32px;

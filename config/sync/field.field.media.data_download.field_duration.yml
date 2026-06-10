@@ -1,0 +1,23 @@
+uuid: 537f10d0-9129-4509-8c92-5e3a2125c5fe
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_duration
+    - media.type.data_download
+id: media.data_download.field_duration
+field_name: field_duration
+entity_type: media
+bundle: data_download
+label: Duration
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

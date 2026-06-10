@@ -16,6 +16,7 @@
         'markers':     map_markers,
         'geojson_url':  geojson_url,
         'geojson_urls': geojson_urls,
+        'track_stats':  track_stats,
         'tiles':       tiles|default('usgs-topo'),
       }|merge(map_lines ? { 'lines': map_lines } : {}) only %}
     {% endif %}

@@ -10,5 +10,6 @@
   {% if lines %}data-map-lines="{{ lines|json_encode|e('html_attr') }}"{% endif %}
   {% if geojson_url %}data-map-geojson="{{ geojson_url }}"{% endif %}
   {% if geojson_urls %}data-map-geojson-urls="{{ geojson_urls|json_encode|e('html_attr') }}"{% endif %}
+  {% if track_stats %}data-map-track-stats="{{ track_stats|json_encode|e('html_attr') }}"{% endif %}
   data-map-tiles="{{ tiles|default('usgs-topo') }}"
 ></div>

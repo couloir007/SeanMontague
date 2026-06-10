@@ -85,21 +85,84 @@
     return null;
   }
 
+  function clearHeader(el) {
+    const nameEl = el.querySelector('.elevation-profile__header-name');
+    const statsEl = el.querySelector('.elevation-profile__header-stats');
+    if (nameEl) nameEl.textContent = '';
+    if (statsEl) statsEl.textContent = '';
+  }
+
+  function renderHeaderName(el, name) {
+    const nameEl = el.querySelector('.elevation-profile__header-name');
+    if (nameEl) nameEl.textContent = name || '';
+  }
+
+  // Builds the header stat chips from the selected track's stored media stats.
+  // Values are METERS (distance too) — display-only, converted to currentUnit.
+  // Only present (non-null) stats render — imported tracks may lack ascent/descent.
+  function renderHeaderStats(el, stats) {
+    const statsEl = el.querySelector('.elevation-profile__header-stats');
+    if (!statsEl) return;
+    statsEl.textContent = '';
+    if (!stats) return;
+
+    const U = UNITS[currentUnit];
+    const chips = [];
+    // distance is METERS → km (÷1000), then U.dist (km→mi for imperial).
+    if (stats.distance != null) {
+      chips.push([(stats.distance / 1000 * U.dist).toFixed(1), U.distLabel]);
+    }
+    if (stats.ascent != null) {
+      chips.push([String(Math.round(stats.ascent * U.elev)), U.elevLabel + ' gain']);
+    }
+    if (stats.descent != null) {
+      chips.push([String(Math.round(stats.descent * U.elev)), U.elevLabel + ' loss']);
+    }
+    if (stats.min_elev != null) {
+      chips.push([String(Math.round(stats.min_elev * U.elev)), U.elevLabel + ' min']);
+    }
+    if (stats.max_elev != null) {
+      chips.push([String(Math.round(stats.max_elev * U.elev)), U.elevLabel + ' max']);
+    }
+
+    chips.forEach((chip) => {
+      const stat = document.createElement('div');
+      stat.className = 'elevation-profile__stat';
+      const v = document.createElement('span');
+      v.className = 'elevation-profile__stat-val';
+      v.textContent = chip[0];
+      const u = document.createElement('span');
+      u.className = 'elevation-profile__stat-unit';
+      u.textContent = chip[1];
+      stat.appendChild(v);
+      stat.appendChild(u);
+      statsEl.appendChild(stat);
+    });
+  }
+
   function hideProfile(el) {
     el.classList.add('elevation-profile--hidden');
+    clearHeader(el);
   }
 
   function showProfile(el) {
     el.classList.remove('elevation-profile--hidden');
   }
 
-  function renderProfile(el, elevData) {
+  // meta (optional): { name, stats } for the selected track — display-only.
+  function renderProfile(el, elevData, meta) {
     if (!hasElevation(elevData)) {
       hideProfile(el);
       return;
     }
     // Un-hide in case a previous (ineligible) selection hid the profile.
     showProfile(el);
+
+    // Header: route name + stored stats. Remember the stats so a unit flip can
+    // reconvert them without re-fetching.
+    el._elevStats = (meta && meta.stats) ? meta.stats : null;
+    renderHeaderName(el, (meta && meta.name) ? meta.name : null);
+    renderHeaderStats(el, el._elevStats);
 
     const canvas = el.querySelector('.elevation-profile__canvas');
     const tooltip = el.querySelector('.elevation-profile__tooltip');
@@ -248,7 +311,7 @@
     drawChart();
     // Expose a redraw hook so a unit change can re-render this profile at base
     // state (the user is not mid-hover when toggling the nav).
-    el._elevRedraw = () => drawChart();
+    el._elevRedraw = () => { drawChart(); renderHeaderStats(el, el._elevStats); };
     window.addEventListener('resize', () => {
       drawChart();
     });
@@ -314,7 +377,7 @@
     const renderFromTracks = (tracks) => {
       const track = pickEligibleTrack(tracks);
       if (track && track.coords && track.coords.length) {
-        renderProfile(el, track.coords);
+        renderProfile(el, track.coords, { name: track.name, stats: track.stats });
       } else {
         hideProfile(el);
       }
@@ -369,7 +432,7 @@
       window.addEventListener('surface-track-select', (e) => {
         if (e.detail.map_id !== mapId) return;
         if (isEligibleMode(e.detail.route_type) && e.detail.coords && e.detail.coords.length) {
-          renderProfile(el, e.detail.coords);
+          renderProfile(el, e.detail.coords, { name: e.detail.name, stats: e.detail.stats });
         } else {
           hideProfile(el);
         }

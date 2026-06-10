@@ -1,0 +1,19 @@
+uuid: 323ad36a-7b97-4005-85f5-9967016e76c6
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_duration_units
+    - media.type.data_download
+id: media.data_download.field_duration_units
+field_name: field_duration_units
+entity_type: media
+bundle: data_download
+label: 'Duration Units'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

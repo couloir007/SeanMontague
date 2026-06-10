@@ -6,6 +6,8 @@ dependencies:
     - field.field.media.data_download.field_ascent
     - field.field.media.data_download.field_descent
     - field.field.media.data_download.field_distance
+    - field.field.media.data_download.field_duration
+    - field.field.media.data_download.field_duration_units
     - field.field.media.data_download.field_max_elevation
     - field.field.media.data_download.field_media_file
     - field.field.media.data_download.field_min_elevation
@@ -73,6 +75,25 @@ content:
       prefix_suffix: true
     third_party_settings: {  }
     weight: 202
+    region: content
+  field_duration:
+    type: number_decimal
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 207
+    region: content
+  field_duration_units:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 208
     region: content
   field_max_elevation:
     type: number_decimal
