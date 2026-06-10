@@ -1,0 +1,20 @@
+uuid: f69303ed-5ec9-47ff-afdb-eb35d0946858
+langcode: en
+status: true
+dependencies:
+  module:
+    - media
+id: media.field_ascent
+field_name: field_ascent
+entity_type: media
+type: decimal
+settings:
+  precision: 10
+  scale: 2
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

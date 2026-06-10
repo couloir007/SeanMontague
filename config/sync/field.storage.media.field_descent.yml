@@ -1,0 +1,20 @@
+uuid: 1b44617c-9a08-4a25-b62a-595bf0a71e97
+langcode: en
+status: true
+dependencies:
+  module:
+    - media
+id: media.field_descent
+field_name: field_descent
+entity_type: media
+type: decimal
+settings:
+  precision: 10
+  scale: 2
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

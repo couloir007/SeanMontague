@@ -3,6 +3,9 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.media.data_download.field_ascent
+    - field.field.media.data_download.field_descent
+    - field.field.media.data_download.field_distance
     - field.field.media.data_download.field_media_file
     - field.field.media.data_download.field_route_type
     - field.field.media.data_download.schema_content_url
@@ -35,6 +38,39 @@ content:
         refresh: 60
     third_party_settings: {  }
     weight: 200
+    region: content
+  field_ascent:
+    type: number_decimal
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 203
+    region: content
+  field_descent:
+    type: number_decimal
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 204
+    region: content
+  field_distance:
+    type: number_decimal
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 202
     region: content
   field_route_type:
     type: entity_reference_label

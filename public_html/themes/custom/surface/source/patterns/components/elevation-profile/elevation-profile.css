@@ -4,6 +4,12 @@
   position: relative;
 }
 
+/* Toggled by elevation-profile.js when no eligible track exists or an
+   ineligible track (driving / ferry) is selected. */
+.elevation-profile--hidden {
+  display: none;
+}
+
 .elevation-profile__header {
   align-items: center;
   background: var(--surface2);

@@ -20,8 +20,11 @@
  *
  * After init:
  *   window._surfaceMaps[map_id]    — Leaflet map instance
- *   window._surfaceTracks[map_id]  — raw GeoJSON coordinates [lon, lat, ele_ft]
- *   'surface-map-ready' event      — dispatched with { map_id, map, coords }
+ *   window._surfaceTracks[map_id]  — array of per-track { route_type, coords },
+ *                                    coords being [lon, lat, ele] points
+ *   'surface-map-ready' event      — { map_id, map, tracks, coords } where
+ *                                    coords is the first track (backward-compat)
+ *   'surface-track-select' event   — { map_id, route_type, coords } on track click
  */
 
 /* jshint esversion: 11 */
@@ -29,6 +32,11 @@
 
 (() => {
   "use strict";
+
+  // Route types that have a meaningful elevation profile (mirrors
+  // elevation-profile.js). Used to decide whether to hint that tracks are
+  // clickable for elevation.
+  const ELEVATION_MODES = new Set(['walking', 'hiking', 'cycling']);
 
   const TILE_SETS = {
     'usgs-topo': {
@@ -229,9 +237,45 @@
     // ── GeoJSON track ──────────────────────────────────────────────────────
     // Add the layer to the map first — Leaflet computes correct bounds
     // from the rendered geometry, then fitBounds on track + markers.
-    let coords = null;
+    // Per-track data: [{ route_type, coords }, ...] in layer order, so an
+    // elevation profile can be shown for a single selected track.
     let trackLayer = null;
     const allTrackLayers = [];
+    const tracks = [];
+    // Set true when the multi-track path builds at least one elevation-eligible
+    // track — gates the "tap a route" hint shown below.
+    let showTrackHint = false;
+    window._surfaceTracks = window._surfaceTracks ?? {};
+
+    // Dispatch a track selection so listeners (e.g. the elevation profile) can
+    // swap to the clicked track.
+    const selectTrack = (track) => {
+      window.dispatchEvent(new CustomEvent('surface-track-select', {
+        detail: { map_id: mapId, route_type: track.route_type, coords: track.coords },
+      }));
+    };
+
+    // Single shared "you are here" marker, driven by the elevation profile's
+    // hover events. One marker per map, moved (not recreated) and removed on
+    // clear — so it can never leak or appear on two tracks.
+    let hoverMarker = null;
+    window.addEventListener('surface-profile-hover', (e) => {
+      if (e.detail.map_id !== mapId) return;
+      if (e.detail.clear || !isFinite(e.detail.lat) || !isFinite(e.detail.lon)) {
+        if (hoverMarker) { map.removeLayer(hoverMarker); hoverMarker = null; }
+        return;
+      }
+      const ll = [e.detail.lat, e.detail.lon];
+      if (!hoverMarker) {
+        hoverMarker = L.circleMarker(ll, {
+          radius: 7, color: '#fff', weight: 2,
+          fillColor: '#3a5a40', fillOpacity: 1, interactive: false,
+        }).addTo(map);
+      } else {
+        hoverMarker.setLatLng(ll);
+      }
+    });
+
     if (geojson) {
       // Filter to LineString/MultiLineString only — Point features are app
       // waypoints that crash Leaflet's marker renderer.
@@ -246,21 +290,21 @@
         style: () => ({ color: '#3a5a40', weight: 3, opacity: 0.85 }),
       }).addTo(map);
 
-      // Flatten all LineString/MultiLineString coords for elevation profile + stats
-      coords = flattenCoords(geojson);
-      window._surfaceTracks = window._surfaceTracks ?? {};
-      window._surfaceTracks[mapId] = coords;
+      // Single track: flatten its coords; route_type from the first track feature.
+      const track = {
+        route_type: trackOnlyGeojson.features[0]?.properties?.route_type ?? null,
+        coords: flattenCoords(geojson),
+      };
+      tracks.push(track);
+      trackLayer.on('click', () => selectTrack(track));
       allTrackLayers.push(trackLayer);
     }
 
     // ── Multi-track GeoJSON (trip page) ───────────────────────────────────
     if (!geojson && geojsonUrls.length) {
-      console.log(geojsonUrls);
       const results = await Promise.all(
         geojsonUrls.map((url) => fetch(url).then((r) => r.ok ? r.json() : null).catch(() => null))
       );
-
-      console.log(results);
 
       // Per-feature styling from properties.route_type. The style map comes from
       // drupalSettings.trailMapper.routeStyles; Storybook has no drupalSettings,
@@ -280,7 +324,6 @@
         return style;
       };
 
-      const mergedCoords = [];
       results.forEach((gj) => {
         if (!gj) return;
         const trackOnly = {
@@ -293,12 +336,26 @@
           style: styleFeature,
         }).addTo(map);
         allTrackLayers.push(layer);
-        flattenCoords(gj).forEach((c) => mergedCoords.push(c));
+
+        // Tracks are clickable (for their elevation profile) — show a pointer
+        // cursor on the path elements. Markers are untouched.
+        layer.eachLayer((p) => { if (p._path) p._path.style.cursor = 'pointer'; });
+
+        // Keep this track's own coords + route_type (from its first feature).
+        const track = {
+          route_type: trackOnly.features[0]?.properties?.route_type ?? null,
+          coords: flattenCoords(gj),
+        };
+        tracks.push(track);
+        layer.on('click', () => selectTrack(track));
       });
-      if (mergedCoords.length) {
-        window._surfaceTracks = window._surfaceTracks ?? {};
-        window._surfaceTracks[mapId] = mergedCoords;
-      }
+
+      // Hint only makes sense when at least one built track is elevation-eligible.
+      showTrackHint = tracks.some((t) => ELEVATION_MODES.has(t.route_type));
+    }
+
+    if (tracks.length) {
+      window._surfaceTracks[mapId] = tracks;
     }
 
     // ── invalidateSize + fitBounds after layout ────────────────────────────
@@ -323,8 +380,10 @@
     window._surfaceMaps[mapId] = map;
     window._surfaceMapInstance ??= map;
 
+    // tracks: full per-track array so listeners that load before any click can
+    // pick the initial track. coords kept for backward-compat = first track.
     window.dispatchEvent(new CustomEvent('surface-map-ready', {
-      detail: { map_id: mapId, map, coords },
+      detail: { map_id: mapId, map, coords: tracks[0]?.coords ?? null, tracks },
     }));
 
     // ── Ctrl+scroll / touch gesture hints ─────────────────────────────────
@@ -376,6 +435,13 @@
       el.addEventListener('touchstart', (e) => {
         if (e.touches.length === 1) showHint('Use two fingers to move the map');
       }, { passive: true });
+    }
+
+    // One-time hint that tracks are clickable for elevation. Only when the
+    // multi-track path produced an eligible track; honours the showHint throttle
+    // so it does not fight the zoom/touch hints. Same text on touch devices.
+    if (showTrackHint) {
+      showHint('Tap a route for its elevation');
     }
   };
 

@@ -1,3 +1,6 @@
+# Optional modifier slot — elevation-profile.js toggles 'elevation-profile--hidden'
+# at runtime for ineligible/no-track states.
+modifier: ''
 gain: '2,600'
 loss: '2,596'
 min_elev: '811'

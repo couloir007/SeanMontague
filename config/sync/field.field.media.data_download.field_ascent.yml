@@ -1,0 +1,23 @@
+uuid: 9fe09c45-8676-4d49-9aee-098085b2c975
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_ascent
+    - media.type.data_download
+id: media.data_download.field_ascent
+field_name: field_ascent
+entity_type: media
+bundle: data_download
+label: Ascent
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

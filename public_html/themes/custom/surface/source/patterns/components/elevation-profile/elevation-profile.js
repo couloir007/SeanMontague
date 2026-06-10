@@ -1,17 +1,22 @@
 /**
  * elevation-profile.js
  *
- * Canvas elevation chart with hover scrub + map marker sync.
+ * Canvas elevation chart with hover scrub. Hover position is dispatched via the
+ * 'surface-profile-hover' event; map.js owns the single shared "you are here"
+ * marker (this file no longer touches Leaflet or the map).
  * Data sources (priority order):
- *   1. window._surfaceTracks[map_id]  — map.js already fetched, reuse coords
- *   2. 'surface-map-ready' event      — map.js fetches concurrently, wait for it
+ *   1. window._surfaceTracks[map_id]  — map.js per-track [{ route_type, coords }]
+ *   2. 'surface-map-ready' event      — detail.tracks (per-track array)
  *   3. data-geojson-url               — fetch directly (no map present)
  *   4. data-elev                      — inline JSON array (Storybook)
- * All formats: [lon, lat, elevation_ft]
+ * Coords format: [lon, lat, elevation_ft]
+ * Mode-aware: only walking/hiking/cycling tracks get a profile; a lone track
+ * always qualifies. 'surface-track-select' (per map_id) swaps the shown track,
+ * hiding the profile when the selected track is ineligible (driving/ferry).
  * Works in Drupal (via Drupal.behaviors) and Storybook (via DOMContentLoaded).
  */
 /* jshint esversion: 6 */
-/* global L, Drupal */
+/* global Drupal */
 
 (() => {
   function dist2d(a, b) {
@@ -32,11 +37,41 @@
     });
   }
 
+  // Route types that get an elevation profile. Driving / ferry / etc. do not.
+  const ELEVATION_MODES = new Set(['walking', 'hiking', 'cycling']);
+
+  function isEligibleMode(routeType) {
+    return ELEVATION_MODES.has(routeType);
+  }
+
+  // First eligible track in a [{ route_type, coords }] array. A lone track is
+  // always eligible (a single-track article may carry no route_type); in a
+  // multi-track array only walking/hiking/cycling qualify.
+  function pickEligibleTrack(tracks) {
+    if (!Array.isArray(tracks) || !tracks.length) return null;
+    if (tracks.length === 1) return tracks[0];
+    for (let i = 0; i < tracks.length; i++) {
+      const t = tracks[i];
+      if (t && isEligibleMode(t.route_type)) return t;
+    }
+    return null;
+  }
+
+  function hideProfile(el) {
+    el.classList.add('elevation-profile--hidden');
+  }
+
+  function showProfile(el) {
+    el.classList.remove('elevation-profile--hidden');
+  }
+
   function renderProfile(el, elevData) {
     if (!hasElevation(elevData)) {
-      el.style.display = 'none';
+      hideProfile(el);
       return;
     }
+    // Un-hide in case a previous (ineligible) selection hid the profile.
+    showProfile(el);
 
     const canvas = el.querySelector('.elevation-profile__canvas');
     const tooltip = el.querySelector('.elevation-profile__tooltip');
@@ -49,38 +84,8 @@
     }
     const totalDist = cumDist[cumDist.length - 1];
 
-    // Scrub marker on map if Leaflet map exists
-    let scrubMarker = null;
-
-    function tryConnectMap() {
-      if (typeof L === 'undefined' || scrubMarker) return;
-
-      // Try to find an associated map by id, or fall back to global instance
-      const mapId = el.dataset.mapId || 'featured-map';
-      const mapInst =
-        (window._surfaceMaps && window._surfaceMaps[mapId]) || window._surfaceMapInstance;
-
-      if (mapInst) {
-        const firstLat = elevData[0]?.[1];
-        const firstLon = elevData[0]?.[0];
-        if (!isFinite(firstLat) || !isFinite(firstLon)) return;
-        scrubMarker = L.circleMarker([firstLat, firstLon], {
-          radius: 7,
-          color: '#fff',
-          weight: 2,
-          fillColor: '#3a5a40',
-          fillOpacity: 1,
-          interactive: false,
-        }).addTo(mapInst);
-      }
-    }
-
-    tryConnectMap();
-    // If not found yet, maybe the map is still initializing
-    if (!scrubMarker) {
-      setTimeout(tryConnectMap, 500);
-      setTimeout(tryConnectMap, 2000);
-    }
+    // The "you are here" marker is owned by map.js as a single shared marker —
+    // the profile only dispatches hover position via 'surface-profile-hover'.
 
     function drawChart(hoverFraction) {
       const W = canvas.offsetWidth;
@@ -244,16 +249,19 @@
       tooltip.style.top = e.clientY - rect.top - 36 + 'px';
       tooltip.textContent = hd.toFixed(1) + ' mi  ·  ' + Math.round(elev) + ' ft';
 
-      tryConnectMap();
-      if (scrubMarker && isFinite(lat) && isFinite(lon)) scrubMarker.setLatLng([lat, lon]);
+      if (isFinite(lat) && isFinite(lon)) {
+        window.dispatchEvent(new CustomEvent('surface-profile-hover', {
+          detail: { map_id: el.dataset.mapId, lat, lon },
+        }));
+      }
       drawChart(frac);
     });
 
     canvas.addEventListener('mouseleave', () => {
       tooltip.style.opacity = '0';
-      if (scrubMarker && isFinite(elevData[0]?.[1]) && isFinite(elevData[0]?.[0])) {
-        scrubMarker.setLatLng([elevData[0][1], elevData[0][0]]);
-      }
+      window.dispatchEvent(new CustomEvent('surface-profile-hover', {
+        detail: { map_id: el.dataset.mapId, clear: true },
+      }));
       drawChart();
     });
   }
@@ -264,29 +272,19 @@
 
     const mapId = el.dataset.mapId;
 
-    // 1. map.js already fetched — reuse coords synchronously
-    if (mapId && window._surfaceTracks && window._surfaceTracks[mapId]) {
-      renderProfile(el, window._surfaceTracks[mapId]);
-      return;
-    }
-
-    // 2. Listen for map.js to finish fetching (Drupal — map has geojson_url)
-    if (mapId) {
-      const onReady = (e) => {
-        if (e.detail.map_id !== mapId) return;
-        window.removeEventListener('surface-map-ready', onReady);
-        if (e.detail.coords && e.detail.coords.length) {
-          renderProfile(el, e.detail.coords);
-          return;
-        }
-        tryFallback();
-      };
-      window.addEventListener('surface-map-ready', onReady);
-    }
+    // Render the first eligible track from a [{ route_type, coords }] array,
+    // or hide the profile when none qualifies.
+    const renderFromTracks = (tracks) => {
+      const track = pickEligibleTrack(tracks);
+      if (track && track.coords && track.coords.length) {
+        renderProfile(el, track.coords);
+      } else {
+        hideProfile(el);
+      }
+    };
 
     // 3 & 4. Fallback: fetch geojson-url or parse inline elev.
-    // Called immediately — handles Storybook (data-elev) and the case
-    // where elevation-profile is present without a map (no surface-map-ready).
+    // Handles Storybook (data-elev) and elevation-profile present without a map.
     function tryFallback() {
       const geojsonUrl = el.dataset.geojsonUrl;
       if (geojsonUrl) {
@@ -311,9 +309,38 @@
       renderProfile(el, elevData);
     }
 
-    // Run immediately for Storybook / no-map context.
-    tryFallback();
+    if (mapId) {
+      // 1. map.js already built per-track data — reuse synchronously.
+      if (window._surfaceTracks && window._surfaceTracks[mapId]) {
+        renderFromTracks(window._surfaceTracks[mapId]);
+      } else {
+        // 2. Wait for map.js to finish; fall back if it reports no tracks.
+        const onReady = (e) => {
+          if (e.detail.map_id !== mapId) return;
+          window.removeEventListener('surface-map-ready', onReady);
+          if (Array.isArray(e.detail.tracks) && e.detail.tracks.length) {
+            renderFromTracks(e.detail.tracks);
+          } else {
+            tryFallback();
+          }
+        };
+        window.addEventListener('surface-map-ready', onReady);
+      }
 
+      // Track selection: clicking a track shows its profile when the route_type
+      // is eligible, or hides the profile entirely (driving/ferry/etc.).
+      window.addEventListener('surface-track-select', (e) => {
+        if (e.detail.map_id !== mapId) return;
+        if (isEligibleMode(e.detail.route_type) && e.detail.coords && e.detail.coords.length) {
+          renderProfile(el, e.detail.coords);
+        } else {
+          hideProfile(el);
+        }
+      });
+    } else {
+      // No map / no _surfaceTracks — standalone Storybook (data-elev) path.
+      tryFallback();
+    }
   }
 
   function initAll(context) {

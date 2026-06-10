@@ -1,0 +1,23 @@
+uuid: 3ffe9e0d-d7b9-47b5-9881-52d9b0fac032
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_descent
+    - media.type.data_download
+id: media.data_download.field_descent
+field_name: field_descent
+entity_type: media
+bundle: data_download
+label: Descent
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

@@ -3,6 +3,9 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.media.data_download.field_ascent
+    - field.field.media.data_download.field_descent
+    - field.field.media.data_download.field_distance
     - field.field.media.data_download.field_media_file
     - field.field.media.data_download.field_route_type
     - field.field.media.data_download.schema_content_url
@@ -15,6 +18,27 @@ targetEntityType: media
 bundle: data_download
 mode: default
 content:
+  field_ascent:
+    type: number
+    weight: 28
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_descent:
+    type: number
+    weight: 29
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_distance:
+    type: number
+    weight: 27
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
   field_media_file:
     type: file_generic
     weight: 1
