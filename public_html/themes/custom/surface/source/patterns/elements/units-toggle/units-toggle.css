@@ -1,0 +1,33 @@
+/* Compact segmented metric/imperial control, mono type to match the nav. */
+.units-toggle {
+  border: 1px solid var(--border);
+  display: inline-flex;
+  overflow: hidden;
+}
+
+.units-toggle__option {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: var(--font-mono-nek);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  padding: 5px 8px;
+  text-transform: uppercase;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.units-toggle__option + .units-toggle__option {
+  border-left: 1px solid var(--border);
+}
+
+.units-toggle__option:hover {
+  color: var(--text);
+}
+
+.units-toggle__option--active {
+  background: var(--forest);
+  color: #fff;
+}

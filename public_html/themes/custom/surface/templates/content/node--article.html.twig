@@ -34,13 +34,15 @@
        in METERS; the map/elevation JS converts for display. null is fine —
        the JS skips null stats. #}
     {% set track_stats = track_stats|merge([{
-      'distance':   media.field_distance.value,
-      'ascent':     media.field_ascent.value,
-      'descent':    media.field_descent.value,
-      'min_elev':   media.field_min_elevation.value,
-      'max_elev':   media.field_max_elevation.value,
-      'route_type': media.field_route_type.entity ? media.field_route_type.entity.field_key.value : null,
-      'name':       media.name.value,
+      'distance':      media.field_distance.value,
+      'ascent':        media.field_ascent.value,
+      'descent':       media.field_descent.value,
+      'min_elev':      media.field_min_elevation.value,
+      'max_elev':      media.field_max_elevation.value,
+      'duration':      media.field_duration.value,
+      'duration_unit': media.field_duration_units.value,
+      'route_type':    media.field_route_type.entity ? media.field_route_type.entity.field_key.value : null,
+      'name':          track_names[media.id]|default(media.name.value),
     }]) %}
   {% endif %}
 {% endfor %}
@@ -98,7 +100,7 @@
 {% if node.schema_poi is not empty %}
   {% set poi_count = node.schema_poi|length %}
   {% if poi_count > 0 %}
-    {% set stats = stats|merge([{label: 'Sites', value: poi_count, unit: null}]) %}
+    {% set stats = stats|merge([{label: 'Points of Intrest', value: poi_count, unit: null}]) %}
   {% endif %}
 {% endif %}
 

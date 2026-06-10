@@ -28,6 +28,14 @@
 
 .nav__logo span { color: var(--forest); }
 
+/* Groups the links/back link + units toggle on the right of the nav so
+   space-between only separates the logo from this group. */
+.nav__right {
+  align-items: center;
+  display: flex;
+  gap: 28px;
+}
+
 .nav__links {
   display: flex;
   gap: 36px;

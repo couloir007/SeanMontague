@@ -35,10 +35,23 @@
 (() => {
   "use strict";
 
-  // Route types that have a meaningful elevation profile (mirrors
-  // elevation-profile.js). Used to decide whether to hint that tracks are
-  // clickable for elevation.
-  const ELEVATION_MODES = new Set(['walking', 'hiking', 'cycling']);
+  // True when coords carry real (non-zero, finite) elevation. Matches
+  // elevation-profile.js's data-driven chart rule — used to decide whether to
+  // hint that tracks are clickable for elevation (not mode-based).
+  const trackHasElevation = (coords) =>
+    Array.isArray(coords) && coords.some((c) => c.length >= 3 && isFinite(c[2]) && c[2] !== 0);
+
+  // Strip a leading trip-day prefix ("Day 4:", "Leg 2 -", "Stop 3 —") from a
+  // track's display name. The shown name is the GeoJSON feature property
+  // (title/name) read here from the file, NOT the media name the theme's
+  // _surface_strip_day_prefix() cleans — so the same strip must run here too.
+  // Requires both a number and a separator, so "Stage Road Loop" /
+  // "Part of the Burren" are left intact; never returns an empty string.
+  const stripDayPrefix = (name) => {
+    if (!name) return name;
+    const cleaned = name.replace(/^(Day|Leg|Stop|Part|Stage|Segment)\s*\d+\s*[:\-–—]\s*/iu, '').trim();
+    return cleaned !== '' ? cleaned : name;
+  };
 
   const TILE_SETS = {
     'usgs-topo': {
@@ -294,9 +307,11 @@
 
       // Single track: flatten its coords; route_type + human name from the first
       // track feature (prefer title, then name).
-      const trackName = trackOnlyGeojson.features[0]?.properties?.title
-                     ?? trackOnlyGeojson.features[0]?.properties?.name
-                     ?? null;
+      const trackName = stripDayPrefix(
+        trackOnlyGeojson.features[0]?.properties?.title
+        ?? trackOnlyGeojson.features[0]?.properties?.name
+        ?? null
+      );
       const track = {
         route_type: trackOnlyGeojson.features[0]?.properties?.route_type ?? null,
         coords: flattenCoords(geojson),
@@ -352,9 +367,11 @@
 
         // Keep this track's own coords + route_type + human name (from its first
         // feature; prefer title, then name).
-        const trackName = trackOnly.features[0]?.properties?.title
-                       ?? trackOnly.features[0]?.properties?.name
-                       ?? null;
+        const trackName = stripDayPrefix(
+          trackOnly.features[0]?.properties?.title
+          ?? trackOnly.features[0]?.properties?.name
+          ?? null
+        );
         const track = {
           // File is authoritative for route_type (eligibility + styling); the
           // template's stats.route_type is only informational and may be null.
@@ -368,8 +385,9 @@
         layer.on('click', () => selectTrack(track));
       });
 
-      // Hint only makes sense when at least one built track is elevation-eligible.
-      showTrackHint = tracks.some((t) => ELEVATION_MODES.has(t.route_type));
+      // Hint only makes sense when at least one built track has real elevation
+      // (matches the data-driven chart rule, not route_type).
+      showTrackHint = tracks.some((t) => trackHasElevation(t.coords));
     }
 
     if (tracks.length) {

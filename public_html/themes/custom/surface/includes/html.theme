@@ -59,3 +59,45 @@ function surface_preprocess_field(&$variables): void {
 function surface_preprocess(&$variables) {
   $variables['data_menu'] = 'dropdown';
 }
+
+/**
+ * Strips a leading trip-day prefix from a media name for display.
+ *
+ * Removes a leading "<Word> <number><sep>" where Word is one of Day / Leg /
+ * Stop / Part / Stage / Segment (case-insensitive); BOTH a number and a
+ * separator (: - – —) are required, so real names like "Stage Road Loop" or
+ * "Part of the Burren" are left intact. Never returns an empty string.
+ *
+ * The /u flag covers the unicode en/em dashes.
+ */
+function _surface_strip_day_prefix(?string $name): ?string {
+  if ($name === NULL || $name === '') {
+    return $name;
+  }
+  $cleaned = preg_replace('/^(Day|Leg|Stop|Part|Stage|Segment)\s*\d+\s*[:\-–—]\s*/iu', '', $name);
+  return trim($cleaned) !== '' ? trim($cleaned) : $name;
+}
+
+/**
+ * Implements hook_preprocess_node().
+ *
+ * Builds $variables['track_names'] — a map keyed by schema_geoshape media id of
+ * cleaned media names (trip-day prefixes stripped) for the elevation profile
+ * header. Keyed by media id (not delta) so it stays correct regardless of field
+ * order or broken references.
+ *
+ * Done in PHP because Drupal themes cannot register Twig functions (no theme
+ * service container), so a strip_day_prefix() Twig function is not available;
+ * the template reads track_names[media.id] instead.
+ */
+function surface_preprocess_node(array &$variables): void {
+  $node = $variables['node'] ?? NULL;
+  if (!$node || !$node->hasField('schema_geoshape')) {
+    return;
+  }
+  $names = [];
+  foreach ($node->get('schema_geoshape')->referencedEntities() as $media) {
+    $names[$media->id()] = _surface_strip_day_prefix($media->label());
+  }
+  $variables['track_names'] = $names;
+}

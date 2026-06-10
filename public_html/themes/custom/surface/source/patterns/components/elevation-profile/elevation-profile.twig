@@ -4,11 +4,11 @@
      {% if map_id %}data-map-id="{{ map_id }}"{% endif %}
      {% if geojson_url %}data-geojson-url="{{ geojson_url }}"{% endif %}
      {% if elev_data %}data-elev='{{ elev_data|json_encode }}'{% endif %}>
-  {# Header name + stats are filled by elevation-profile.js from the selected
-     track's stored media stats (display-only, unit-converted). #}
+  {# Label ("{name} Stats") and stats chips are filled by elevation-profile.js
+     from the selected track's stored media stats (display-only, unit-converted).
+     The canvas is hidden by JS for tracks with no real elevation. #}
   <div class="elevation-profile__header">
     <span class="elevation-profile__header-label">Elevation Profile</span>
-    <span class="elevation-profile__header-name"></span>
     <div class="elevation-profile__header-stats"></div>
   </div>
   <canvas class="elevation-profile__canvas" id="{{ canvas_id|default('elevation-chart') }}"></canvas>

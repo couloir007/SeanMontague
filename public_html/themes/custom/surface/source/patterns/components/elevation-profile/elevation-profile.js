@@ -11,9 +11,12 @@
  *   4. data-elev                      — inline JSON array (Storybook)
  * Coords format: [lon, lat, elevation_m] — elevation is METERS; cumulative
  * distance is computed in KILOMETERS. Imperial (ft / mi) is display-only.
- * Mode-aware: only walking/hiking/cycling tracks get a profile; a lone track
- * always qualifies. 'surface-track-select' (per map_id) swaps the shown track,
- * hiding the profile when the selected track is ineligible (driving/ferry).
+ * Per-track STATS PANEL shows for every selected track (name + distance +
+ * duration, plus elevation stats when the track has real elevation). The CHART
+ * is DATA-DRIVEN: it renders when the coords carry real (non-zero, finite) Z,
+ * regardless of route_type — not mode-based. 'surface-track-select' (per map_id)
+ * swaps the shown track; the component hides only when a track has neither a
+ * chart nor any stat.
  * Works in Drupal (via Drupal.behaviors) and Storybook (via DOMContentLoaded).
  */
 /* jshint esversion: 6 */
@@ -65,42 +68,71 @@
     });
   }
 
-  // Route types that get an elevation profile. Driving / ferry / etc. do not.
-  const ELEVATION_MODES = new Set(['walking', 'hiking', 'cycling']);
+  // Route types that NEVER get a chart or elevation stats, regardless of data —
+  // a ferry can carry stray non-zero GPS altitude, so the data check alone is
+  // not enough. (driving is NOT here: Gaia-plotted drives have real elevation.)
+  const NO_ELEVATION_MODES = new Set(['ferry']);
 
-  function isEligibleMode(routeType) {
-    return ELEVATION_MODES.has(routeType);
+  // Window (points) for the moving-average that smooths the PLOTTED curve only.
+  const SMOOTH_WINDOW = 7;
+
+  // Moving-average over Z, used only for drawing the chart curve — never for the
+  // hover readout, min/max stats, or the lat/lon → marker mapping.
+  function smoothElev(coords, win) {
+    const half = Math.floor(win / 2);
+    return coords.map((c, i) => {
+      let sum = 0, n = 0;
+      for (let j = Math.max(0, i - half); j <= Math.min(coords.length - 1, i + half); j++) {
+        const z = coords[j][2];
+        if (isFinite(z)) { sum += z; n++; }
+      }
+      return [c[0], c[1], n ? sum / n : c[2]];
+    });
   }
 
-  // First eligible track in a [{ route_type, coords }] array. A lone track is
-  // always eligible (a single-track article may carry no route_type); in a
-  // multi-track array only walking/hiking/cycling qualify.
-  function pickEligibleTrack(tracks) {
+  // First track in array order eligible for a chart: NOT a no-elevation mode
+  // (e.g. ferry) AND its coords carry real elevation; null if none. Used to pick
+  // the initial track so a chart shows on load when one exists.
+  function pickElevationTrack(tracks) {
     if (!Array.isArray(tracks) || !tracks.length) return null;
-    if (tracks.length === 1) return tracks[0];
     for (let i = 0; i < tracks.length; i++) {
       const t = tracks[i];
-      if (t && isEligibleMode(t.route_type)) return t;
+      if (!t || !t.coords) continue;
+      const rt = (t.stats && t.stats.route_type) || t.route_type || null;
+      if (!NO_ELEVATION_MODES.has(rt) && hasElevation(t.coords)) return t;
     }
     return null;
   }
 
-  function clearHeader(el) {
-    const nameEl = el.querySelector('.elevation-profile__header-name');
+  // True when a track has anything to show — distance/duration always, and the
+  // elevation stats only when the coords carry real elevation. Prevents an
+  // empty panel.
+  function hasAnyStats(stats, hasElev) {
+    if (!stats) return false;
+    if (stats.distance != null && stats.distance > 0) return true;
+    if (stats.duration != null && stats.duration > 0) return true;
+    if (hasElev && (stats.min_elev != null || stats.max_elev != null ||
+        stats.ascent != null || stats.descent != null)) return true;
+    return false;
+  }
+
+  function clearStats(el) {
     const statsEl = el.querySelector('.elevation-profile__header-stats');
-    if (nameEl) nameEl.textContent = '';
     if (statsEl) statsEl.textContent = '';
   }
 
-  function renderHeaderName(el, name) {
-    const nameEl = el.querySelector('.elevation-profile__header-name');
-    if (nameEl) nameEl.textContent = name || '';
+  // The header label doubles as the track title: "{name} Stats", or the generic
+  // "Elevation Profile" when there is no name (standalone / Storybook).
+  function renderHeaderLabel(el, name) {
+    const labelEl = el.querySelector('.elevation-profile__header-label');
+    if (labelEl) labelEl.textContent = name ? (name) : 'Elevation Profile';
   }
 
   // Builds the header stat chips from the selected track's stored media stats.
-  // Values are METERS (distance too) — display-only, converted to currentUnit.
-  // Only present (non-null) stats render — imported tracks may lack ascent/descent.
-  function renderHeaderStats(el, stats) {
+  // distance is METERS and unit-converts; duration renders as-is (time is time);
+  // elevation stats (min/max/gain/loss) render only when the track has real
+  // elevation.
+  function renderHeaderStats(el, stats, hasElev) {
     const statsEl = el.querySelector('.elevation-profile__header-stats');
     if (!statsEl) return;
     statsEl.textContent = '';
@@ -108,21 +140,31 @@
 
     const U = UNITS[currentUnit];
     const chips = [];
-    // distance is METERS → km (÷1000), then U.dist (km→mi for imperial).
-    if (stats.distance != null) {
+
+    // distance — present and > 0; METERS → km (÷1000), then U.dist.
+    if (stats.distance != null && stats.distance > 0) {
       chips.push([(stats.distance / 1000 * U.dist).toFixed(1), U.distLabel]);
     }
-    if (stats.ascent != null) {
-      chips.push([String(Math.round(stats.ascent * U.elev)), U.elevLabel + ' gain']);
+    // duration — present and > 0; NOT unit-converted, render with its own unit.
+    if (stats.duration != null && stats.duration > 0) {
+      chips.push([String(stats.duration), stats.duration_unit || '']);
     }
-    if (stats.descent != null) {
-      chips.push([String(Math.round(stats.descent * U.elev)), U.elevLabel + ' loss']);
-    }
-    if (stats.min_elev != null) {
-      chips.push([String(Math.round(stats.min_elev * U.elev)), U.elevLabel + ' min']);
-    }
-    if (stats.max_elev != null) {
-      chips.push([String(Math.round(stats.max_elev * U.elev)), U.elevLabel + ' max']);
+    // elevation group — only when the coords carry real elevation. min/max
+    // always render here (0 is a valid sea-level low); gain/loss only when the
+    // source provided a value (blank = unknown, never computed).
+    if (hasElev) {
+      if (stats.min_elev != null) {
+        chips.push([String(Math.round(stats.min_elev * U.elev)), U.elevLabel + ' min']);
+      }
+      if (stats.max_elev != null) {
+        chips.push([String(Math.round(stats.max_elev * U.elev)), U.elevLabel + ' max']);
+      }
+      if (stats.ascent != null) {
+        chips.push([String(Math.round(stats.ascent * U.elev)), U.elevLabel + ' gain']);
+      }
+      if (stats.descent != null) {
+        chips.push([String(Math.round(stats.descent * U.elev)), U.elevLabel + ' loss']);
+      }
     }
 
     chips.forEach((chip) => {
@@ -142,31 +184,51 @@
 
   function hideProfile(el) {
     el.classList.add('elevation-profile--hidden');
-    clearHeader(el);
+    renderHeaderLabel(el, null);
+    clearStats(el);
   }
 
   function showProfile(el) {
     el.classList.remove('elevation-profile--hidden');
   }
 
-  // meta (optional): { name, stats } for the selected track — display-only.
+  // meta (optional): { name, stats } for the selected track. The stats panel
+  // shows for any track; the chart only when the coords carry real elevation.
   function renderProfile(el, elevData, meta) {
-    if (!hasElevation(elevData)) {
+    const stats = (meta && meta.stats) ? meta.stats : null;
+    const name = (meta && meta.name) ? meta.name : null;
+    const routeType = stats ? stats.route_type : null;
+    // Ferry (and any NO_ELEVATION_MODES) → never a chart or elevation stats, even
+    // if the file carries stray Z. Otherwise gate on real elevation data.
+    const hasElev = !NO_ELEVATION_MODES.has(routeType) && hasElevation(elevData);
+
+    // Hide the whole component only when there is neither a chart nor any stat.
+    if (!hasElev && !hasAnyStats(stats, hasElev)) {
       hideProfile(el);
       return;
     }
-    // Un-hide in case a previous (ineligible) selection hid the profile.
     showProfile(el);
 
-    // Header: route name + stored stats. Remember the stats so a unit flip can
-    // reconvert them without re-fetching.
-    el._elevStats = (meta && meta.stats) ? meta.stats : null;
-    renderHeaderName(el, (meta && meta.name) ? meta.name : null);
-    renderHeaderStats(el, el._elevStats);
+    // Header (always). Remember name/stats/hasElev so a unit flip can reconvert
+    // without re-fetching.
+    el._elevStats = stats;
+    el._elevName = name;
+    el._elevHasElev = hasElev;
+    renderHeaderLabel(el, name);
+    renderHeaderStats(el, stats, hasElev);
 
     const canvas = el.querySelector('.elevation-profile__canvas');
     const tooltip = el.querySelector('.elevation-profile__tooltip');
-    if (!canvas || !tooltip) return;
+
+    // No chart for this track — hide the canvas/tooltip, keep the stats panel.
+    if (!hasElev || !canvas || !tooltip) {
+      if (canvas) canvas.style.display = 'none';
+      if (tooltip) tooltip.style.opacity = '0';
+      el._elevDrawChart = null;
+      el._elevRedraw = () => { renderHeaderStats(el, el._elevStats, el._elevHasElev); };
+      return;
+    }
+    canvas.style.display = '';
 
     // Build cumulative distances
     const cumDist = [0];
@@ -174,6 +236,10 @@
       cumDist.push(cumDist[i - 1] + dist2d(elevData[i - 1], elevData[i]));
     }
     const totalDist = cumDist[cumDist.length - 1];
+
+    // Smoothed Z for the DRAWN curve + scrub-dot y only. Raw elevData stays
+    // authoritative for the hover readout, min/max, and lat/lon dispatch.
+    const smoothed = smoothElev(elevData, SMOOTH_WINDOW);
 
     // The "you are here" marker is owned by map.js as a single shared marker —
     // the profile only dispatches hover position via 'surface-profile-hover'.
@@ -233,16 +299,16 @@
       grad.addColorStop(0, 'rgba(58,90,64,0.22)');
       grad.addColorStop(1, 'rgba(58,90,64,0.02)');
       ctx.beginPath();
-      ctx.moveTo(xS(cumDist[0]), yS(elevData[0][2]));
-      for (let pi = 1; pi < elevData.length; pi++) {
+      ctx.moveTo(xS(cumDist[0]), yS(smoothed[0][2]));
+      for (let pi = 1; pi < smoothed.length; pi++) {
         const cx = (xS(cumDist[pi - 1]) + xS(cumDist[pi])) / 2;
         ctx.bezierCurveTo(
           cx,
-          yS(elevData[pi - 1][2]),
+          yS(smoothed[pi - 1][2]),
           cx,
-          yS(elevData[pi][2]),
+          yS(smoothed[pi][2]),
           xS(cumDist[pi]),
-          yS(elevData[pi][2])
+          yS(smoothed[pi][2])
         );
       }
       ctx.lineTo(xS(totalDist), PAD.top + h);
@@ -253,16 +319,16 @@
 
       // Profile line
       ctx.beginPath();
-      ctx.moveTo(xS(cumDist[0]), yS(elevData[0][2]));
-      for (let li = 1; li < elevData.length; li++) {
+      ctx.moveTo(xS(cumDist[0]), yS(smoothed[0][2]));
+      for (let li = 1; li < smoothed.length; li++) {
         const lcx = (xS(cumDist[li - 1]) + xS(cumDist[li])) / 2;
         ctx.bezierCurveTo(
           lcx,
-          yS(elevData[li - 1][2]),
+          yS(smoothed[li - 1][2]),
           lcx,
-          yS(elevData[li][2]),
+          yS(smoothed[li][2]),
           xS(cumDist[li]),
-          yS(elevData[li][2])
+          yS(smoothed[li][2])
         );
       }
       ctx.strokeStyle = '#3a5a40';
@@ -285,9 +351,10 @@
           cumDist[idx + 1] > cumDist[idx]
             ? (hd - cumDist[idx]) / (cumDist[idx + 1] - cumDist[idx])
             : 0;
-        const next = Math.min(idx + 1, elevData.length - 1);
-        const elev = elevData[idx][2] + t * (elevData[next][2] - elevData[idx][2]);
-        const sy = yS(elev);
+        const next = Math.min(idx + 1, smoothed.length - 1);
+        // Dot sits on the DRAWN (smoothed) curve.
+        const sElev = smoothed[idx][2] + t * (smoothed[next][2] - smoothed[idx][2]);
+        const sy = yS(sElev);
 
         ctx.beginPath();
         ctx.moveTo(sx, PAD.top);
@@ -309,9 +376,10 @@
     }
 
     drawChart();
-    // Expose a redraw hook so a unit change can re-render this profile at base
-    // state (the user is not mid-hover when toggling the nav).
-    el._elevRedraw = () => { drawChart(); renderHeaderStats(el, el._elevStats); };
+    // Expose redraw hooks so a unit change reconverts BOTH the header stats and
+    // the chart labels (the user is not mid-hover when toggling the nav).
+    el._elevDrawChart = drawChart;
+    el._elevRedraw = () => { renderHeaderStats(el, el._elevStats, el._elevHasElev); drawChart(); };
     window.addEventListener('resize', () => {
       drawChart();
     });
@@ -372,15 +440,16 @@
 
     const mapId = el.dataset.mapId;
 
-    // Render the first eligible track from a [{ route_type, coords }] array,
-    // or hide the profile when none qualifies.
+    // Initial track: prefer one with real elevation (so the chart shows on
+    // load); else fall back to the first track (stats panel only). renderProfile
+    // hides the component if that track has neither a chart nor any stat.
     const renderFromTracks = (tracks) => {
-      const track = pickEligibleTrack(tracks);
-      if (track && track.coords && track.coords.length) {
-        renderProfile(el, track.coords, { name: track.name, stats: track.stats });
-      } else {
+      if (!Array.isArray(tracks) || !tracks.length) {
         hideProfile(el);
+        return;
       }
+      const track = pickElevationTrack(tracks) || tracks[0];
+      renderProfile(el, track.coords || [], { name: track.name, stats: track.stats });
     };
 
     // 3 & 4. Fallback: fetch geojson-url or parse inline elev.
@@ -427,15 +496,12 @@
         window.addEventListener('surface-map-ready', onReady);
       }
 
-      // Track selection: clicking a track shows its profile when the route_type
-      // is eligible, or hides the profile entirely (driving/ferry/etc.).
+      // Track selection: show the selected track's stats panel always, and its
+      // chart only when the coords carry real elevation. renderProfile decides
+      // (and hides the component if the track has neither chart nor stat).
       window.addEventListener('surface-track-select', (e) => {
         if (e.detail.map_id !== mapId) return;
-        if (isEligibleMode(e.detail.route_type) && e.detail.coords && e.detail.coords.length) {
-          renderProfile(el, e.detail.coords, { name: e.detail.name, stats: e.detail.stats });
-        } else {
-          hideProfile(el);
-        }
+        renderProfile(el, e.detail.coords || [], { name: e.detail.name, stats: e.detail.stats });
       });
     } else {
       // No map / no _surfaceTracks — standalone Storybook (data-elev) path.

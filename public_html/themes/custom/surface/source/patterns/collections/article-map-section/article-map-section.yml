@@ -13,6 +13,8 @@ track_stats:
     descent: 305
     min_elev: 812
     max_elev: 1117
+    duration: 2
+    duration_unit: 'hours'
     route_type: 'cycling'
     name: 'Demo Loop A'
   - distance: 9012
@@ -20,6 +22,8 @@ track_stats:
     descent: 451
     min_elev: 1217
     max_elev: 1528
+    duration: 4
+    duration_unit: 'hours'
     route_type: 'hiking'
     name: 'Demo Spur B'
 map_lines:

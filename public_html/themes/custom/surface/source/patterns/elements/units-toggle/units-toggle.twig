@@ -1,0 +1,10 @@
+{{ attach_library('surface/units-toggle') }}
+
+{# Two-state metric/imperial control. units-toggle.js reflects the current unit
+   on load (same precedence as elevation-profile.js), persists the choice to
+   localStorage.elevationUnit, and broadcasts 'surface-units-change' so any
+   elevation profiles on the page re-render live. #}
+<div class="units-toggle" role="group" aria-label="Units">
+  <button type="button" class="units-toggle__option" data-unit="imperial" aria-pressed="false">mi/ft</button>
+  <button type="button" class="units-toggle__option" data-unit="metric" aria-pressed="false">km/m</button>
+</div>

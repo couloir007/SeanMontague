@@ -3,14 +3,17 @@
   {% if logo_text %}
     <a href="{{ logo_url|default('/') }}" class="nav__logo">{{ logo_text|raw }}</a>
   {% endif %}
-  {% if links %}
-    <ul class="nav__links">
-      {% for item in links %}
-        <li><a href="{{ item.url }}">{{ item.text }}</a></li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-  {% if back_text %}
-    <a href="{{ back_url|default('#') }}" class="nav__back">{{ back_text }}</a>
-  {% endif %}
+  <div class="nav__right">
+    {% if links %}
+      <ul class="nav__links">
+        {% for item in links %}
+          <li><a href="{{ item.url }}">{{ item.text }}</a></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% if back_text %}
+      <a href="{{ back_url|default('#') }}" class="nav__back">{{ back_text }}</a>
+    {% endif %}
+    {% include '@elements/units-toggle/units-toggle.twig' %}
+  </div>
 </nav>
