@@ -25,13 +25,28 @@ conditions:
       value: Allowed
     - label: Day Pass
       value: $25
-
 poi:
   label: Points of Interest
-  variant: rows
-  rows:
-    - label: '<a href="#7churches">Na Seacht dTeampaill - The Seven Churches</a>'
-    - label: '<a href="#dun_aonghasa">Dún Aonghasa</a>'
+  fig: Fig 06
+  variant: poi
+  pois:
+    - name: East Burke Trailhead
+      type: Parking / Kiosk
+    - mile: "1.8"
+      name: Darling Hill Overlook
+      type: Viewpoint
+    - mile: "3.4"
+      name: Dish Brook Crossing
+      type: Water
+    - mile: "5.1"
+      name: "Heaven's Bench Summit"
+      type: High Point · 1,595 ft
+    - mile: "8.6"
+      name: Kitchel Covered Bridge
+      type: Landmark
+    - mile: "12.7"
+      name: Return to Trailhead
+      type: End
 
 trails:
   label: Trails Ridden

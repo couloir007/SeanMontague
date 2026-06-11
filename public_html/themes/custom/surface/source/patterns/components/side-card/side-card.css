@@ -57,15 +57,6 @@
   text-transform: uppercase;
 }
 
-.side-card__row-label a {
-  color: inherit;
-  text-decoration: underline;
-}
-
-.side-card__row-label a:hover {
-  color: var(--bright);
-}
-
 .side-card__row-value {
   color: var(--bright);
 }
@@ -128,4 +119,58 @@
   background: #000;
   border: 1px solid #000;
   color: var(--bg);
+}
+
+/* ── POI variant ── */
+.side-card__pois {
+  list-style: none;
+  margin: 0;
+  padding: 12px 14px;
+}
+
+.side-card__poi {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.side-card__poi:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.side-card__poi-mile {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--forest);
+  flex-shrink: 0;
+  font-family: var(--font-mono-nek);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  min-width: 38px;
+  padding: 3px 6px;
+  text-align: center;
+}
+
+.side-card__poi-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.side-card__poi-name {
+  color: var(--bright);
+  font-family: var(--font-serif-nek);
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.side-card__poi-type {
+  color: var(--muted);
+  font-family: var(--font-mono-nek);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
 }

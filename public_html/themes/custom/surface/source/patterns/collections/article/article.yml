@@ -178,9 +178,11 @@ sidebar_cards:
         rating: blue
         rating_label: Blue
   poi:
-    label: Points of Interest
-    variant: rows
-    rows:
-      - label: '<a href="#7churches">Na Seacht dTeampaill - The Seven Churches</a>'
-      - label: '<a href="#dun_aonghasa">Dún Aonghasa</a>'
-
+    label: POIs
+    fig: Fig 06
+    variant: poi
+    pois:
+      - name: '<a href="#7churches">Na Seacht dTeampaill - The Seven Churches</a>'
+        type: Parking / Kiosk
+      - name: '<a href="#dun_aonghasa">Dún Aonghasa</a>'
+        type: Viewpoint

@@ -20,14 +20,27 @@
       {% endfor %}
     </ul>
 
+  {% elseif variant == 'poi' and pois %}
+    <ul class="side-card__pois">
+      {% for poi in pois %}
+        <li class="side-card__poi">
+          {% if poi.mile %}<span class="side-card__poi-mile">{{ poi.mile }}</span>{% endif %}
+          <span class="side-card__poi-info">
+            <span class="side-card__poi-name">{{ poi.name }}</span>
+            {% if poi.type %}
+              <span class="side-card__poi-type">{{ poi.type }}</span>
+            {% endif %}
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+
   {% elseif rows %}
     <div class="side-card__body">
       {% for row in rows %}
         <div class="side-card__row">
-          <span class="side-card__row-label">{{ row.label|raw }}</span>
-          {% if row.value %}
-            <span class="side-card__row-value">{{ row.value }}</span>
-          {% endif %}
+          <span class="side-card__row-label">{{ row.label }}</span>
+          <span class="side-card__row-value">{{ row.value }}</span>
         </div>
       {% endfor %}
     </div>
