@@ -1,0 +1,35 @@
+{{ attach_library('surface/side-card') }}
+
+<aside class="side-card{{ modifier ? ' ' ~ modifier }}">
+  <div class="side-card__head">
+    <span class="side-card__label">{{ label }}</span>
+    {% if fig %}
+      <span class="side-card__fig">{{ fig }}</span>
+    {% endif %}
+  </div>
+
+  {% if variant == 'trails' and trails %}
+    <ul class="side-card__trails">
+      {% for trail in trails %}
+        <li class="side-card__trail">
+          <span class="side-card__trail-name">{{ trail.name }}</span>
+          <em class="side-card__rating side-card__rating--{{ trail.rating }}">
+            {{ trail.rating_label|default(trail.rating) }}
+          </em>
+        </li>
+      {% endfor %}
+    </ul>
+
+  {% elseif rows %}
+    <div class="side-card__body">
+      {% for row in rows %}
+        <div class="side-card__row">
+          <span class="side-card__row-label">{{ row.label|raw }}</span>
+          {% if row.value %}
+            <span class="side-card__row-value">{{ row.value }}</span>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</aside>

@@ -10,8 +10,11 @@
  * - schema_geo (geofield)     → map center fallback only, no marker
  * - schema_place (entity ref) → map center fallback only, no marker
  *
- * Manual stat fields (schema_distance etc.) used as display fallback
- * when schema_geoshape is not set.
+ * Stats bar totals are COMPUTED in-template from the referenced track media
+ * (dist_modes, summed per route_type in the schema_geoshape loop below) — the
+ * old schema_distance_* / schema_elev_* node fields have been removed. All track
+ * stats live on data_download media in meters; the stats bar renders a metric
+ * baseline + data-attributes and stats-bar.js converts to the unit preference.
  */
 #}
 
@@ -21,6 +24,7 @@
    the download card; the full list drives the multi-track map. #}
 {% set geojson_urls = [] %}
 {% set track_stats  = [] %}
+{% set dist_modes   = {} %}
 {% set geo_file     = null %}
 {% for item in node.schema_geoshape %}
   {% set media = item.entity %}
@@ -30,6 +34,13 @@
       {% set geo_file = file %}
     {% endif %}
     {% set geojson_urls = geojson_urls|merge([file.fileuri|file_url]) %}
+    {# Per-mode distance totals (METERS), summed by route_type key. Dynamic hash
+       key needs the (rt_key) parenthesis syntax. #}
+    {% set rt_key = media.field_route_type.entity ? media.field_route_type.entity.field_key.value : null %}
+    {% if rt_key and media.field_distance.value is not empty %}
+      {% set prev = dist_modes[rt_key]|default(0) %}
+      {% set dist_modes = dist_modes|merge({ (rt_key): prev + media.field_distance.value }) %}
+    {% endif %}
     {# Index-matched to geojson_urls (same media per index). Values are stored
        in METERS; the map/elevation JS converts for display. null is fine —
        the JS skips null stats. #}
@@ -42,7 +53,7 @@
       'duration':      media.field_duration.value,
       'duration_unit': media.field_duration_units.value,
       'route_type':    media.field_route_type.entity ? media.field_route_type.entity.field_key.value : null,
-      'name':          track_names[media.id]|default(media.name.value),
+      'name':          media.name.value,
     }]) %}
   {% endif %}
 {% endfor %}
@@ -54,53 +65,37 @@
 {% set has_place    = place and place.schema_latitude.value is not empty %}
 {% set has_map      = has_geoshape or has_geo or has_place %}
 
-{# ── Distance fields ── #}
-{% set distances = [] %}
-{% if node.schema_distance_driving.value %}
-  {% set distances = distances|merge([{type: 'Driving', value: node.schema_distance_driving.value, unit: 'mi'}]) %}
-{% endif %}
-{% if node.schema_distance_hiking.value %}
-  {% set distances = distances|merge([{type: 'Hiking', value: node.schema_distance_hiking.value, unit: 'mi'}]) %}
-{% endif %}
-{% if node.schema_distance_walking.value %}
-  {% set distances = distances|merge([{type: 'Walking', value: node.schema_distance_walking.value, unit: 'mi'}]) %}
-{% endif %}
-{% if node.schema_distance_cycling.value %}
-  {% set distances = distances|merge([{type: 'Cycling', value: node.schema_distance_cycling.value, unit: 'mi'}]) %}
-{% endif %}
-
-{# Legacy schema_distance — only show if no new distance fields set #}
-{% if distances is empty and node.schema_distance.value %}
-  {% set distances = distances|merge([{type: '', value: node.schema_distance.value, unit: 'mi'}]) %}
-{% endif %}
-
-{% set multi = distances|length > 1 %}
+{# ── Top summary stats bar — category-gated, COMPUTED from track media ──
+   Only 'trails' and 'travel' categories get a bar. Per-mode distances come from
+   dist_modes (METERS, keyed by route_type field_key, summed in the
+   schema_geoshape loop above). Distance stats carry `meters` and stats-bar.js
+   converts to the unit toggle live. NO elevation here (that lives only in the
+   profile). The old schema_distance_* / schema_elev_* node fields are gone. #}
+{% set category = node.schema_category.entity %}
+{% set cat_key  = category ? category.field_key.value : null %}
 {% set stats = [] %}
-{% for d in distances %}
-  {% set label = multi ? 'Distance ' ~ d.type : 'Distance' %}
-  {% set stats = stats|merge([{label: label, value: d.value, unit: d.unit}]) %}
-{% endfor %}
 
-{# Add elevation stats if present #}
-{% if node.schema_elev_gain.value %}
-  {% set stats = stats|merge([{label: 'Gain', value: node.schema_elev_gain.value, unit: 'ft'}]) %}
-{% endif %}
-{% if node.schema_elev_loss.value %}
-  {% set stats = stats|merge([{label: 'Loss', value: node.schema_elev_loss.value, unit: 'ft'}]) %}
-{% endif %}
-{% if node.schema_elev_min.value %}
-  {% set stats = stats|merge([{label: 'Min Elev', value: node.schema_elev_min.value, unit: 'ft'}]) %}
-{% endif %}
-{% if node.schema_elev_max.value %}
-  {% set stats = stats|merge([{label: 'Max Elev', value: node.schema_elev_max.value, unit: 'ft'}]) %}
-{% endif %}
+{% if cat_key == 'trails' or cat_key == 'travel' %}
+  {# dist_modes (per-mode METERS) was built in the schema_geoshape loop above. #}
+  {# Fixed, sensible mode order. #}
+  {% set mode_labels = { 'driving': 'Driving', 'ferry': 'Ferry', 'cycling': 'Cycling', 'hiking': 'Hiking', 'walking': 'Walking' } %}
+  {% for key, label in mode_labels %}
+    {% if dist_modes[key] is defined and dist_modes[key] > 0 %}
+      {% set stats = stats|merge([{
+        label:  label,
+        value:  dist_modes[key],
+        unit:   'distance',
+        meters: dist_modes[key],
+      }]) %}
+    {% endif %}
+  {% endfor %}
 
-
-{# Count POIs if schema_poi is populated #}
-{% if node.schema_poi is not empty %}
-  {% set poi_count = node.schema_poi|length %}
-  {% if poi_count > 0 %}
-    {% set stats = stats|merge([{label: 'Points of Intrest', value: poi_count, unit: null}]) %}
+  {# Travel only — POI count (unit-agnostic, never converted). #}
+  {% if cat_key == 'travel' and node.schema_poi is not empty %}
+    {% set poi_count = node.schema_poi|length %}
+    {% if poi_count > 0 %}
+      {% set stats = stats|merge([{label: 'Points of Interest', value: poi_count, unit: null}]) %}
+    {% endif %}
   {% endif %}
 {% endif %}
 
@@ -197,10 +192,6 @@
     'geojson_url':         geojson_url,
     'geojson_urls':        geojson_urls,
     'track_stats':         track_stats,
-    'elev_gain':           node.schema_elev_gain.value,
-    'elev_loss':           node.schema_elev_loss.value,
-    'elev_min':            node.schema_elev_min.value,
-    'elev_max':            node.schema_elev_max.value,
     'body':                content.body|field_value,
     'body_modifier':       has_map ? 'article__body--with-map' : '',
     'sidebar_cards':       sidebar_cards,

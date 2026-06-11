@@ -64,17 +64,21 @@
   {% set article = item.entity %}
   {% if article %}
 
-    {# Distance totals across all day articles #}
-    {% if article.schema_distance_driving.value %}
+    {# Distance totals across all day articles.
+       FLAG: the schema_distance_* article fields were removed — per-track stats
+       now live on data_download media. These hasField guards keep the page from
+       crashing; the totals stay 0 until trip-level aggregation is rebuilt from
+       each article's track media (out of scope for the article stats work). #}
+    {% if article.hasField('schema_distance_driving') and article.schema_distance_driving.value %}
       {% set total_driving = total_driving + article.schema_distance_driving.value %}
     {% endif %}
-    {% if article.schema_distance_hiking.value %}
+    {% if article.hasField('schema_distance_hiking') and article.schema_distance_hiking.value %}
       {% set total_hiking = total_hiking + article.schema_distance_hiking.value %}
     {% endif %}
-    {% if article.schema_distance_walking.value %}
+    {% if article.hasField('schema_distance_walking') and article.schema_distance_walking.value %}
       {% set total_walking = total_walking + article.schema_distance_walking.value %}
     {% endif %}
-    {% if article.schema_distance_cycling.value %}
+    {% if article.hasField('schema_distance_cycling') and article.schema_distance_cycling.value %}
       {% set total_cycling = total_cycling + article.schema_distance_cycling.value %}
     {% endif %}
 

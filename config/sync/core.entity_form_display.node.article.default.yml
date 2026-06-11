@@ -16,14 +16,6 @@ dependencies:
     - field.field.node.article.schema_date_published
     - field.field.node.article.schema_destination
     - field.field.node.article.schema_difficulty
-    - field.field.node.article.schema_distance_cycling
-    - field.field.node.article.schema_distance_driving
-    - field.field.node.article.schema_distance_hiking
-    - field.field.node.article.schema_distance_walking
-    - field.field.node.article.schema_elev_gain
-    - field.field.node.article.schema_elev_loss
-    - field.field.node.article.schema_elev_max
-    - field.field.node.article.schema_elev_min
     - field.field.node.article.schema_event_schedule
     - field.field.node.article.schema_geo
     - field.field.node.article.schema_geoshape
@@ -89,14 +81,6 @@ third_party_settings:
     group_trail_stats:
       children:
         - schema_difficulty
-        - schema_elev_gain
-        - schema_elev_loss
-        - schema_elev_min
-        - schema_elev_max
-        - schema_distance_cycling
-        - schema_distance_hiking
-        - schema_distance_walking
-        - schema_distance_driving
       label: 'Activity Stats'
       region: content
       parent_name: ''
@@ -303,62 +287,6 @@ content:
     weight: 13
     region: content
     settings: {  }
-    third_party_settings: {  }
-  schema_distance_cycling:
-    type: number
-    weight: 19
-    region: content
-    settings:
-      placeholder: ''
-    third_party_settings: {  }
-  schema_distance_driving:
-    type: number
-    weight: 22
-    region: content
-    settings:
-      placeholder: ''
-    third_party_settings: {  }
-  schema_distance_hiking:
-    type: number
-    weight: 20
-    region: content
-    settings:
-      placeholder: ''
-    third_party_settings: {  }
-  schema_distance_walking:
-    type: number
-    weight: 21
-    region: content
-    settings:
-      placeholder: ''
-    third_party_settings: {  }
-  schema_elev_gain:
-    type: number
-    weight: 14
-    region: content
-    settings:
-      placeholder: ''
-    third_party_settings: {  }
-  schema_elev_loss:
-    type: number
-    weight: 15
-    region: content
-    settings:
-      placeholder: ''
-    third_party_settings: {  }
-  schema_elev_max:
-    type: number
-    weight: 18
-    region: content
-    settings:
-      placeholder: ''
-    third_party_settings: {  }
-  schema_elev_min:
-    type: number
-    weight: 16
-    region: content
-    settings:
-      placeholder: ''
     third_party_settings: {  }
   schema_event_schedule:
     type: smartdate_inline

@@ -1,0 +1,52 @@
+default:
+  label: At a Glance
+  fig: Fig 01
+  variant: rows
+  rows:
+    - label: Trailhead
+      value: East Burke, VT
+    - label: Basemap
+      value: USGS Topo
+    - label: Loop
+      value: 12.7 mi
+    - label: Surface
+      value: Natural
+    - label: Best in
+      value: Summer
+
+conditions:
+  label: Conditions
+  fig: Fig 05
+  variant: rows
+  rows:
+    - label: Mud Risk
+      value: High Spring
+    - label: Dogs
+      value: Allowed
+    - label: Day Pass
+      value: $25
+
+poi:
+  label: Points of Interest
+  variant: rows
+  rows:
+    - label: '<a href="#7churches">Na Seacht dTeampaill - The Seven Churches</a>'
+    - label: '<a href="#dun_aonghasa">Dún Aonghasa</a>'
+
+trails:
+  label: Trails Ridden
+  fig: Fig 04
+  variant: trails
+  trails:
+    - name: Sidewinder
+      rating: green
+      rating_label: Green
+    - name: "Heaven's Bench"
+      rating: blue
+      rating_label: Blue
+    - name: Coronary Bypass
+      rating: blue
+      rating_label: Blue
+    - name: Kitchel
+      rating: blue
+      rating_label: Blue

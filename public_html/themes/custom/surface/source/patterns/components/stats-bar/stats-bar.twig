@@ -1,11 +1,23 @@
 {{ attach_library('surface/stats-bar') }}
 <div class="stats-bar{{ modifier ? ' ' ~ modifier }}"{% if map_id %} data-map-id="{{ map_id }}"{% endif %}>
   {% for stat in stats %}
-    <div class="stats-bar__item{{ stat.is_small ? ' stats-bar__item--small-value' }}" data-stat="{{ stat.key|default(loop.index) }}">
+    {# A stat with `meters` is a distance: render a metric (km) baseline + a
+       data-meters attribute, and stats-bar.js reconverts it to the unit
+       preference on load and on the live nav toggle. Other stats (e.g. POI
+       count) render statically and are never touched by the JS. #}
+    {% set is_distance = stat.meters is defined and stat.meters is not null %}
+    <div class="stats-bar__item{{ stat.is_small ? ' stats-bar__item--small-value' }}"
+         data-stat="{{ stat.key|default(loop.index) }}"
+         {% if is_distance %}data-meters="{{ stat.meters }}"{% endif %}>
       <span class="stats-bar__label">{{ stat.label }}</span>
-      <span class="stats-bar__value">{{ stat.value }}</span>
-      {% if stat.unit %}
-        <span class="stats-bar__unit">{{ stat.unit }}</span>
+      {% if is_distance %}
+        <span class="stats-bar__value">{{ (stat.meters / 1000)|round(1) }}</span>
+        <span class="stats-bar__unit">km</span>
+      {% else %}
+        <span class="stats-bar__value">{{ stat.value }}</span>
+        {% if stat.unit %}
+          <span class="stats-bar__unit">{{ stat.unit }}</span>
+        {% endif %}
       {% endif %}
     </div>
   {% endfor %}

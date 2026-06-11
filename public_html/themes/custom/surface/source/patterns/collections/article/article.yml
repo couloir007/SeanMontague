@@ -160,14 +160,27 @@ body: |
 
 # ── Sidebar ───────────────────────────────────────────────────────
 sidebar_cards:
-  - heading: 'Trails on This Route'
-    body: |
-      <ul>
-        <li>Sidewinder — Green</li>
-        <li>Coronary Bypass — Blue</li>
-        <li>Kitchel — Blue</li>
-        <li>Burnham — Black</li>
-      </ul>
-  - heading: 'Conditions'
-    body: |
-      <p>Surface: Natural · Best in Summer · Mud Risk: High Spring · Dogs: Allowed</p>
+  trails:
+    label: Trails Ridden
+    fig: Fig 04
+    variant: trails
+    trails:
+      - name: Sidewinder
+        rating: green
+        rating_label: Green
+      - name: "Heaven's Bench"
+        rating: blue
+        rating_label: Blue
+      - name: Coronary Bypass
+        rating: blue
+        rating_label: Blue
+      - name: Kitchel
+        rating: blue
+        rating_label: Blue
+  poi:
+    label: Points of Interest
+    variant: rows
+    rows:
+      - label: '<a href="#7churches">Na Seacht dTeampaill - The Seven Churches</a>'
+      - label: '<a href="#dun_aonghasa">Dún Aonghasa</a>'
+

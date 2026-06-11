@@ -79,25 +79,96 @@ function _surface_strip_day_prefix(?string $name): ?string {
 }
 
 /**
+ * Reads a numeric media field, or NULL when missing / empty / non-numeric.
+ *
+ * @param \Drupal\media\MediaInterface $media
+ *   The media entity.
+ * @param string $field
+ *   Field machine name.
+ *
+ * @return float|null
+ *   The float value, or NULL.
+ */
+function _surface_media_num($media, string $field): ?float {
+  if (!$media->hasField($field) || $media->get($field)->isEmpty()) {
+    return NULL;
+  }
+  $value = $media->get($field)->value;
+  return is_numeric($value) ? (float) $value : NULL;
+}
+
+/**
  * Implements hook_preprocess_node().
  *
- * Builds $variables['track_names'] — a map keyed by schema_geoshape media id of
- * cleaned media names (trip-day prefixes stripped) for the elevation profile
- * header. Keyed by media id (not delta) so it stays correct regardless of field
- * order or broken references.
+ * Builds two variables from the article's schema_geoshape track media:
+ *  - track_names: map keyed by media id of cleaned media labels (trip-day
+ *    prefixes stripped) for the elevation profile header.
+ *  - track_totals: article-level stat totals COMPUTED from the media (the
+ *    former schema_distance_* / schema_elev_* node fields are gone). All values
+ *    are METERS; the stats bar JS converts for display.
+ *      distance => [routeKey => meters]  (summed per route_type)
+ *      gain / loss => summed field_ascent / field_descent (null fields skipped)
+ *      min / max   => min / max field_min_elevation / field_max_elevation
  *
- * Done in PHP because Drupal themes cannot register Twig functions (no theme
- * service container), so a strip_day_prefix() Twig function is not available;
- * the template reads track_names[media.id] instead.
+ * Keyed by media id (not delta) so track_names stays correct regardless of field
+ * order or broken references. Done in PHP because Drupal themes cannot register
+ * Twig functions (no theme service container).
  */
 function surface_preprocess_node(array &$variables): void {
   $node = $variables['node'] ?? NULL;
   if (!$node || !$node->hasField('schema_geoshape')) {
     return;
   }
+
   $names = [];
+  $distance = [];
+  $gain = NULL;
+  $loss = NULL;
+  $min = NULL;
+  $max = NULL;
+
   foreach ($node->get('schema_geoshape')->referencedEntities() as $media) {
     $names[$media->id()] = _surface_strip_day_prefix($media->label());
+
+    // Route-type key for distance grouping.
+    $routeKey = NULL;
+    if ($media->hasField('field_route_type') && !$media->get('field_route_type')->isEmpty()) {
+      $term = $media->get('field_route_type')->entity;
+      if ($term && $term->hasField('field_key')) {
+        $routeKey = $term->get('field_key')->value ?: NULL;
+      }
+    }
+
+    $dist = _surface_media_num($media, 'field_distance');
+    if ($dist !== NULL && $routeKey) {
+      $distance[$routeKey] = ($distance[$routeKey] ?? 0.0) + $dist;
+    }
+
+    $ascent = _surface_media_num($media, 'field_ascent');
+    if ($ascent !== NULL) {
+      $gain = ($gain ?? 0.0) + $ascent;
+    }
+    $descent = _surface_media_num($media, 'field_descent');
+    if ($descent !== NULL) {
+      $loss = ($loss ?? 0.0) + $descent;
+    }
+
+    $mn = _surface_media_num($media, 'field_min_elevation');
+    if ($mn !== NULL) {
+      $min = ($min === NULL) ? $mn : min($min, $mn);
+    }
+    $mx = _surface_media_num($media, 'field_max_elevation');
+    if ($mx !== NULL) {
+      $max = ($max === NULL) ? $mx : max($max, $mx);
+    }
   }
+
   $variables['track_names'] = $names;
+  $variables['track_totals'] = [
+    'distance' => $distance,
+    'gain' => $gain,
+    'loss' => $loss,
+    'min' => $min,
+    'max' => $max,
+  ];
 }

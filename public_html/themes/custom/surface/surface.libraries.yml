@@ -388,6 +388,11 @@ card:
     component:
       dist/css/card.css: {}
 
+side-card:
+  css:
+    component:
+      dist/css/side-card.css: {}
+
 contact:
   css:
     component:

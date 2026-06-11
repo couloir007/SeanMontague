@@ -130,7 +130,10 @@ class SeanMapController extends ControllerBase {
       $actType = $article->schema_activity_type->entity ?? NULL;
       $props['activity_type'] = $actType ? $actType->label() : '';
 
-      if (!$article->get('schema_distance')->isEmpty()) {
+      // schema_distance was removed from the article bundle (per-track distance
+      // now lives on data_download media). Guard so the map endpoint does not
+      // error; the popup distance is simply omitted until rebuilt from media.
+      if ($article->hasField('schema_distance') && !$article->get('schema_distance')->isEmpty()) {
         $props['distance'] = $article->schema_distance->value . ' mi';
       }
 

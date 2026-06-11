@@ -5,9 +5,12 @@
     'image_url':  node.schema_image.entity.uri.value|image_style('large'),
     'category':   node.schema_category.entity.label.value,
     'url':        url,
+    {# FLAG: schema_distance / schema_elev_gain were removed (stats live on
+       data_download media now). hasField guards prevent a crash; these show
+       blank until rebuilt from the article's track media. #}
     'stats': [
-      { 'label': 'Dist', 'value': node.schema_distance.value, 'unit': 'mi' },
-      { 'label': 'Gain', 'value': node.schema_elev_gain.value, 'unit': 'ft' },
+      { 'label': 'Dist', 'value': node.hasField('schema_distance') ? node.schema_distance.value : null, 'unit': 'mi' },
+      { 'label': 'Gain', 'value': node.hasField('schema_elev_gain') ? node.schema_elev_gain.value : null, 'unit': 'ft' },
     ]
   } only %}
 </div>

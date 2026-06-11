@@ -17,14 +17,6 @@ dependencies:
     - field.field.node.article.schema_date_published
     - field.field.node.article.schema_destination
     - field.field.node.article.schema_difficulty
-    - field.field.node.article.schema_distance_cycling
-    - field.field.node.article.schema_distance_driving
-    - field.field.node.article.schema_distance_hiking
-    - field.field.node.article.schema_distance_walking
-    - field.field.node.article.schema_elev_gain
-    - field.field.node.article.schema_elev_loss
-    - field.field.node.article.schema_elev_max
-    - field.field.node.article.schema_elev_min
     - field.field.node.article.schema_event_schedule
     - field.field.node.article.schema_geo
     - field.field.node.article.schema_geoshape
@@ -121,14 +113,6 @@ hidden:
   schema_article_type: true
   schema_audio: true
   schema_destination: true
-  schema_distance_cycling: true
-  schema_distance_driving: true
-  schema_distance_hiking: true
-  schema_distance_walking: true
-  schema_elev_gain: true
-  schema_elev_loss: true
-  schema_elev_max: true
-  schema_elev_min: true
   schema_geo: true
   schema_geoshape: true
   schema_gpx_test: true

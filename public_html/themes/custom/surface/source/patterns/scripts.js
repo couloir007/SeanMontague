@@ -8,4 +8,5 @@
 
 import './components/elevation-profile/elevation-profile.js';
 import './components/map/map.js';
+import './components/stats-bar/stats-bar.js';
 import './elements/units-toggle/units-toggle.js';

@@ -27,7 +27,6 @@
   'elev_data':          elev_data,
   'geojson_url':        geojson_url,
   'geojson_urls':       geojson_urls,
-  'track_stats':        track_stats,
   'drupal_geo_rendered': drupal_geo_rendered,
   'tiles':              tiles,
 } only %}
@@ -40,10 +39,7 @@
   </article>
   <aside class="article__sidebar">
     {% for card in sidebar_cards %}
-      <div class="sidebar-card">
-        <div class="sidebar-card__header">{{ card.heading }}</div>
-        <div class="sidebar-card__body">{{ card.body }}</div>
-      </div>
+      {% include '@components/side-card/side-card.twig' with card only %}
     {% endfor %}
   </aside>
 </div>
