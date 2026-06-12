@@ -18,6 +18,10 @@
  */
 #}
 
+
+
+
+
 {# ── Geo sources ── #}
 {# schema_geoshape is multi-value: collect a URL for every referenced media
    that has a file. The first file drives is_gpx, the elevation profile, and
@@ -163,38 +167,61 @@
   }]) %}
 {% endif %}
 
+
+
+{# Points of Interest sidebar card (side-card poi variant). Name-only: the
+   geo_entity:poi bundle has no field for a category 'type' or a 'mile' marker,
+   so those are omitted (the side-card renders fine with name alone). #}
+{% set poi_items = [] %}
+{% for item in node.schema_poi %}
+  {% set poi = item.entity %}
+  {% if poi %}
+    {% set poi_items = poi_items|merge([{
+      'name': poi.label.value,
+    }]) %}
+  {% endif %}
+{% endfor %}
+{% if poi_items %}
+  {% set sidebar_cards = sidebar_cards|merge([{
+    'label':   'Points of Interest',
+    'variant': 'poi',
+    'pois':    poi_items,
+  }]) %}
+{% endif %}
+
+
+
 {% set category      = node.schema_category.entity %}
 {% set category_key  = category and category.field_key.value ? category.field_key.value : 'default' %}
 {% set category_name = category ? category.label.value : '' %}
 
-{% extends '@layouts/site-container/site-container.twig' %}
-{% block main %}
-  {% include '@collections/article/article.twig' with {
-    'header': {
-      'title':        node.label.value,
-      'date':         node.schema_date_published.value ? node.schema_date_published.value|date('F j, Y') : '',
-      'category':     category_name,
-      'category_key': category_key,
-      'difficulty':   node.schema_difficulty.value,
-      'stats':        stats,
-      'map_id':       map_id,
-    },
-    'map_label':           has_map ? (category_name ?: 'Map') : null,
-    'map_title':           has_map ? node.label.value : null,
-    'map_text':            null,
-    'map_id':              map_id,
-    'map_center':          map_center,
-    'map_zoom':            13,
-    'map_markers':         map_markers,
-    'map_lines':           null,
-    'tiles':               tiles,
-    'drupal_geo_rendered': null,
-    'geojson_url':         geojson_url,
-    'geojson_urls':        geojson_urls,
-    'track_stats':         track_stats,
-    'body':                content.body|field_value,
-    'body_modifier':       has_map ? 'article__body--with-map' : '',
-    'sidebar_cards':       sidebar_cards,
-  } only %}
-{% endblock %}
-
+{# Node renders CONTENT ONLY — page.html.twig owns the header/main/footer shell
+   (it extends site-container). This template must NOT extend site-container too,
+   or the shell nests inside itself. #}
+{% include '@collections/article/article.twig' with {
+  'header': {
+    'title':        node.label.value,
+    'date':         node.schema_date_published.value ? node.schema_date_published.value|date('F j, Y') : '',
+    'category':     category_name,
+    'category_key': category_key,
+    'difficulty':   node.schema_difficulty.value,
+    'stats':        stats,
+    'map_id':       map_id,
+  },
+  'map_label':           has_map ? (category_name ?: 'Map') : null,
+  'map_title':           has_map ? node.label.value : null,
+  'map_text':            null,
+  'map_id':              map_id,
+  'map_center':          map_center,
+  'map_zoom':            13,
+  'map_markers':         map_markers,
+  'map_lines':           null,
+  'tiles':               tiles,
+  'drupal_geo_rendered': null,
+  'geojson_url':         geojson_url,
+  'geojson_urls':        geojson_urls,
+  'track_stats':         track_stats,
+  'body':                content.body|field_value,
+  'body_modifier':       has_map ? 'article__body--with-map' : '',
+  'sidebar_cards':       sidebar_cards,
+} only %}

@@ -1,21 +1,10 @@
+/* In-flow flex row of links + units-toggle. The fixed BAR (background, padding,
+   border, position) is owned by .site-header now — the nav is not a bar itself,
+   so it sits beside the logo inside .site-header__container. */
 .nav {
   align-items: center;
-  background: var(--bg);
-  border-bottom: 1px solid transparent;
   display: flex;
-  inset-block-start: 0;
-  inset-inline-start: 0;
   justify-content: space-between;
-  padding: 22px 48px;
-  position: fixed;
-  transition: border-color 0.3s ease, padding 0.3s ease;
-  width: 100%;
-  z-index: 200;
-}
-
-.nav--scrolled {
-  border-bottom-color: var(--border);
-  padding: 16px 48px;
 }
 
 .nav__logo {
@@ -72,7 +61,5 @@
 .nav__back:hover { color: var(--bright); }
 
 @media (max-width: 960px) {
-  .nav { padding: 18px 24px; }
-  .nav--scrolled { padding: 14px 24px; }
   .nav__links { display: none; }
 }

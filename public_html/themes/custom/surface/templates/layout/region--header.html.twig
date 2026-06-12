@@ -2,10 +2,11 @@
   'modifier':     '',
   'nav_modifier': '',
 } %}
-  {% block primary %}
+  {# Block name must match site-header.twig's {% block navigation %} for this
+     override to apply. No logo_text/logo_url here — the brand link is rendered
+     once by site-header's own .site-header__logo; nav is links only. #}
+  {% block navigation %}
     {% include '@components/nav/nav.twig' with {
-      'logo_text': 'Sean Montague <span>· Burke, VT</span>',
-      'logo_url':  '/',
       'links': [
         { 'text': 'Maps',    'url': '#maps' },
         { 'text': 'Writing', 'url': '#writing' },

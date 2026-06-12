@@ -1,16 +1,5 @@
-# ── Header ────────────────────────────────────────────────────────
+# ── Header (article-header data only; site nav left the article) ──────
 header:
-  logo_text: 'Sean Montague <span>· Burke, VT</span>'
-  logo_url: '/'
-  links:
-    - text: 'Writing'
-      url: '#writing'
-    - text: 'Places'
-      url: '#places'
-    - text: 'About'
-      url: '#about'
-    - text: 'Contact'
-      url: '#contact'
   category: 'Kingdom Trails'
   category_key: 'trails'
   difficulty: 'Intermediate'
@@ -182,7 +171,9 @@ sidebar_cards:
     fig: Fig 06
     variant: poi
     pois:
+      - name: '<a href="#dun_aonghasa">Inis Mór Seal Colony</a>'
+        type: 'Wildlife'
       - name: '<a href="#7churches">Na Seacht dTeampaill - The Seven Churches</a>'
-        type: Parking / Kiosk
+        type: 'Historic Site'
       - name: '<a href="#dun_aonghasa">Dún Aonghasa</a>'
-        type: Viewpoint
+        type: 'Historic Site'

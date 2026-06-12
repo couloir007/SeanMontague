@@ -1,6 +1,7 @@
 <div class="site-container">
   {% block header %}
-    {{ header }}
+    {{ header|default(null) }}
+    {% include '@layouts/site-header/site-header.twig' %}
   {% endblock %}
 
   <main id="main-content" tabindex="-1" role="main" class="main">

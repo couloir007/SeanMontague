@@ -1,8 +1,7 @@
 {{ attach_library('surface/article') }}
-{{ attach_library('surface/article-header') }}
-{% block header %}
-  {% include "@components/nav/nav.twig" with header %}
-{% endblock %}
+
+{# Site nav is rendered by the layout chain (site-container → site-header), not
+   by article content. Article's own header is article-header.twig below. #}
 
 {% include '@elements/reading-progress/reading-progress.twig' %}
 
