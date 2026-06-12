@@ -1,0 +1,9 @@
+{# Storybook-only composition — no Drupal library of its own; the included
+   components (nav, article, footer) each carry their own libraries. #}
+{# Full-page article composition for Storybook: site nav + the article
+   component (content only) + footer, in order. Composed by including (not by
+   extending site-container) to keep the preview free of layout-block coupling.
+   The article component itself stays nav-free; this is where it gains nav. #}
+{% include '@components/nav/nav.twig' with nav only %}
+{% include '@collections/article/article.twig' with article only %}
+{% include '@components/footer/footer.twig' with footer|default({}) only %}

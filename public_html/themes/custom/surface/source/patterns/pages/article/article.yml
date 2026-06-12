@@ -1,0 +1,17 @@
+# Page-level data. The `article` object is spread from the article component's
+# own yml in the story (one source of truth) — not duplicated here.
+nav:
+  logo_text: 'Sean Montague <span>· Burke, VT</span>'
+  logo_url: '/'
+  links:
+    - { text: 'Writing', url: '#writing' }
+    - { text: 'Places',  url: '#places' }
+    - { text: 'About',   url: '#about' }
+    - { text: 'Contact', url: '#contact' }
+footer:
+  brand_text: 'Sean Montague · Burke, VT'
+  copyright_text: '© 2025 Sean Montague'
+  links:
+    - { text: 'GitHub',     url: '#' }
+    - { text: 'Drupal.org', url: '#' }
+    - { text: 'LinkedIn',   url: '#' }
