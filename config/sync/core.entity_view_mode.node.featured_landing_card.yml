@@ -1,0 +1,11 @@
+uuid: f8b25a6a-0595-4efe-aa3c-cdc3b3237962
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.featured_landing_card
+label: 'Featured Landing Card'
+description: ''
+targetEntityType: node
+cache: true

@@ -1,0 +1,192 @@
+uuid: d77fb7c8-5e79-4019-8c10-585fcd25a0e1
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.featured_landing_card
+    - field.field.node.article.body
+    - field.field.node.article.field_editorial
+    - field.field.node.article.field_map_tiles
+    - field.field.node.article.field_metatag
+    - field.field.node.article.field_route_type
+    - field.field.node.article.schema_about
+    - field.field.node.article.schema_activity_type
+    - field.field.node.article.schema_article_type
+    - field.field.node.article.schema_audio
+    - field.field.node.article.schema_category
+    - field.field.node.article.schema_date_published
+    - field.field.node.article.schema_destination
+    - field.field.node.article.schema_difficulty
+    - field.field.node.article.schema_event_schedule
+    - field.field.node.article.schema_geo
+    - field.field.node.article.schema_geoshape
+    - field.field.node.article.schema_image
+    - field.field.node.article.schema_is_part_of
+    - field.field.node.article.schema_lodging
+    - field.field.node.article.schema_place
+    - field.field.node.article.schema_poi
+    - field.field.node.article.schema_related_link
+    - field.field.node.article.schema_significant_link
+    - field.field.node.article.schema_subject_of
+    - field.field.node.article.schema_topic
+    - field.field.node.article.schema_trip
+    - node.type.article
+  module:
+    - datetime
+    - layout_builder
+    - options
+    - smart_date
+    - text
+    - user
+third_party_settings:
+  layout_builder:
+    enabled: false
+    allow_custom: false
+id: node.article.featured_landing_card
+targetEntityType: node
+bundle: article
+mode: featured_landing_card
+content:
+  body:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_map_tiles:
+    type: list_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_route_type:
+    type: entity_reference_label
+    label: hidden
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 5
+    region: content
+  schema_about:
+    type: entity_reference_label
+    label: hidden
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 9
+    region: content
+  schema_article_type:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  schema_date_published:
+    type: datetime_default
+    label: hidden
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 14
+    region: content
+  schema_destination:
+    type: entity_reference_label
+    label: hidden
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 8
+    region: content
+  schema_event_schedule:
+    type: smartdate_default
+    label: hidden
+    settings:
+      timezone_override: ''
+      format_type: medium
+      format: default
+      force_chronological: false
+      add_classes: false
+      time_wrapper: true
+      localize: false
+      parts:
+        - start
+        - end
+      duration:
+        separator: ' | '
+        unit: ''
+        decimals: 2
+        suffix: h
+    third_party_settings: {  }
+    weight: 4
+    region: content
+  schema_geoshape:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 13
+    region: content
+  schema_image:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  schema_is_part_of:
+    type: entity_reference_label
+    label: hidden
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 11
+    region: content
+  schema_lodging:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: side_card
+      link: false
+    third_party_settings: {  }
+    weight: 6
+    region: content
+  schema_poi:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: side_card
+      link: false
+    third_party_settings: {  }
+    weight: 7
+    region: content
+  schema_subject_of:
+    type: entity_reference_label
+    label: hidden
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 10
+    region: content
+hidden:
+  field_editorial: true
+  field_metatag: true
+  langcode: true
+  links: true
+  schema_activity_type: true
+  schema_audio: true
+  schema_category: true
+  schema_difficulty: true
+  schema_geo: true
+  schema_place: true
+  schema_related_link: true
+  schema_significant_link: true
+  schema_topic: true
+  schema_trip: true
