@@ -1,0 +1,70 @@
+uuid: cbfc15cc-3c80-45f2-9b9b-2a6433b4f755
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.front
+    - field.field.node.person.body
+    - field.field.node.person.field_editorial
+    - field.field.node.person.field_metatag
+    - field.field.node.person.schema_additional_name
+    - field.field.node.person.schema_email
+    - field.field.node.person.schema_family_name
+    - field.field.node.person.schema_given_name
+    - field.field.node.person.schema_image
+    - field.field.node.person.schema_knows_about
+    - field.field.node.person.schema_knows_language
+    - field.field.node.person.schema_member_of
+    - field.field.node.person.schema_related_link
+    - field.field.node.person.schema_same_as
+    - field.field.node.person.schema_significant_link
+    - field.field.node.person.schema_subject_of
+    - field.field.node.person.schema_telephone
+    - field.field.node.person.schema_works_for
+    - node.type.person
+  module:
+    - layout_builder
+    - text
+    - user
+third_party_settings:
+  layout_builder:
+    enabled: false
+    allow_custom: false
+id: node.person.front
+targetEntityType: node
+bundle: person
+mode: front
+content:
+  body:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  schema_knows_about:
+    type: string
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  field_editorial: true
+  field_metatag: true
+  langcode: true
+  links: true
+  schema_additional_name: true
+  schema_email: true
+  schema_family_name: true
+  schema_given_name: true
+  schema_image: true
+  schema_knows_language: true
+  schema_member_of: true
+  schema_related_link: true
+  schema_same_as: true
+  schema_significant_link: true
+  schema_subject_of: true
+  schema_telephone: true
+  schema_works_for: true

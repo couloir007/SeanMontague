@@ -36,23 +36,28 @@
   const M_TO_FT = 3.28084;
   const KM_TO_MI = 0.621371;
   const UNITS = {
-    metric:   { elev: 1,       elevLabel: 'm',  dist: 1,       distLabel: 'km' },
+    metric: { elev: 1, elevLabel: 'm', dist: 1, distLabel: 'km' },
     imperial: { elev: M_TO_FT, elevLabel: 'ft', dist: KM_TO_MI, distLabel: 'mi' },
   };
 
   function safeLocalGet(key) {
-    try { return window.localStorage ? window.localStorage.getItem(key) : null; }
-    catch (e) { return null; }
+    try {
+      return window.localStorage ? window.localStorage.getItem(key) : null;
+    } catch (_e) {
+      return null;
+    }
   }
 
   function defaultUnit() {
     const stored = safeLocalGet('elevationUnit');
-    if (stored === 'imperial' || stored === 'metric') return stored;
-    const siteDefault = window.drupalSettings &&
-      window.drupalSettings.trailMapper &&
-      window.drupalSettings.trailMapper.elevationUnit;
-    if (siteDefault === 'imperial' || siteDefault === 'metric') return siteDefault;
-    const loc = (navigator.language || 'en-US');
+    if (stored === 'imperial' || stored === 'metric') {
+      return stored;
+    }
+    const siteDefault = window.drupalSettings?.trailMapper?.elevationUnit;
+    if (siteDefault === 'imperial' || siteDefault === 'metric') {
+      return siteDefault;
+    }
+    const loc = navigator.language || 'en-US';
     const region = (loc.split('-')[1] || '').toUpperCase();
     return ['US', 'LR', 'MM'].includes(region) ? 'imperial' : 'metric';
   }
@@ -65,10 +70,10 @@
    * exported from Google My Maps have Z=0 throughout — skip the profile.
    */
   function hasElevation(elevData) {
-    if (!elevData || !elevData.length) return false;
-    return elevData.some(function(c) {
-      return c.length >= 3 && isFinite(c[2]) && c[2] !== 0;
-    });
+    if (!elevData || !elevData.length) {
+      return false;
+    }
+    return elevData.some((c) => c.length >= 3 && Number.isFinite(c[2]) && c[2] !== 0);
   }
 
   // Route types that NEVER get a chart or elevation stats, regardless of data —
@@ -80,12 +85,18 @@
   // (e.g. ferry) AND its coords carry real elevation; null if none. Used to pick
   // the initial track so a chart shows on load when one exists.
   function pickElevationTrack(tracks) {
-    if (!Array.isArray(tracks) || !tracks.length) return null;
+    if (!Array.isArray(tracks) || !tracks.length) {
+      return null;
+    }
     for (let i = 0; i < tracks.length; i++) {
       const t = tracks[i];
-      if (!t || !t.coords) continue;
-      const rt = (t.stats && t.stats.route_type) || t.route_type || null;
-      if (!NO_ELEVATION_MODES.has(rt) && hasElevation(t.coords)) return t;
+      if (!t || !t.coords) {
+        continue;
+      }
+      const rt = t.stats?.route_type || t.route_type || null;
+      if (!NO_ELEVATION_MODES.has(rt) && hasElevation(t.coords)) {
+        return t;
+      }
     }
     return null;
   }
@@ -94,24 +105,41 @@
   // elevation stats only when the coords carry real elevation. Prevents an
   // empty panel.
   function hasAnyStats(stats, hasElev) {
-    if (!stats) return false;
-    if (stats.distance != null && stats.distance > 0) return true;
-    if (stats.duration != null && stats.duration > 0) return true;
-    if (hasElev && (stats.min_elev != null || stats.max_elev != null ||
-        stats.ascent != null || stats.descent != null)) return true;
+    if (!stats) {
+      return false;
+    }
+    if (stats.distance != null && stats.distance > 0) {
+      return true;
+    }
+    if (stats.duration != null && stats.duration > 0) {
+      return true;
+    }
+    if (
+      hasElev &&
+      (stats.min_elev != null ||
+        stats.max_elev != null ||
+        stats.ascent != null ||
+        stats.descent != null)
+    ) {
+      return true;
+    }
     return false;
   }
 
   function clearStats(el) {
     const statsEl = el.querySelector('.elevation-profile__header-stats');
-    if (statsEl) statsEl.textContent = '';
+    if (statsEl) {
+      statsEl.textContent = '';
+    }
   }
 
   // The header label doubles as the track title: "{name} Stats", or the generic
   // "Elevation Profile" when there is no name (standalone / Storybook).
   function renderHeaderLabel(el, name) {
     const labelEl = el.querySelector('.elevation-profile__header-label');
-    if (labelEl) labelEl.textContent = name ? (name) : 'Elevation Profile';
+    if (labelEl) {
+      labelEl.textContent = name ? name : 'Elevation Profile';
+    }
   }
 
   // Builds the header stat chips from the selected track's stored media stats.
@@ -120,16 +148,20 @@
   // elevation.
   function renderHeaderStats(el, stats, hasElev) {
     const statsEl = el.querySelector('.elevation-profile__header-stats');
-    if (!statsEl) return;
+    if (!statsEl) {
+      return;
+    }
     statsEl.textContent = '';
-    if (!stats) return;
+    if (!stats) {
+      return;
+    }
 
     const U = UNITS[currentUnit];
     const chips = [];
 
     // distance — present and > 0; METERS → km (÷1000), then U.dist.
     if (stats.distance != null && stats.distance > 0) {
-      chips.push([(stats.distance / 1000 * U.dist).toFixed(1), U.distLabel]);
+      chips.push([((stats.distance / 1000) * U.dist).toFixed(1), U.distLabel]);
     }
     // duration — present and > 0; NOT unit-converted, render with its own unit.
     if (stats.duration != null && stats.duration > 0) {
@@ -181,8 +213,8 @@
   // meta (optional): { name, stats } for the selected track. The stats panel
   // shows for any track; the chart only when the coords carry real elevation.
   function renderProfile(el, elevData, meta) {
-    const stats = (meta && meta.stats) ? meta.stats : null;
-    const name = (meta && meta.name) ? meta.name : null;
+    const stats = meta?.stats ? meta.stats : null;
+    const name = meta?.name ? meta.name : null;
     const routeType = stats ? stats.route_type : null;
     // Ferry (and any NO_ELEVATION_MODES) → never a chart or elevation stats, even
     // if the file carries stray Z. Otherwise gate on real elevation data.
@@ -208,10 +240,16 @@
 
     // No chart for this track — hide the canvas/tooltip, keep the stats panel.
     if (!hasElev || !canvas || !tooltip) {
-      if (canvas) canvas.style.display = 'none';
-      if (tooltip) tooltip.style.opacity = '0';
+      if (canvas) {
+        canvas.style.display = 'none';
+      }
+      if (tooltip) {
+        tooltip.style.opacity = '0';
+      }
       el._elevDrawChart = null;
-      el._elevRedraw = () => { renderHeaderStats(el, el._elevStats, el._elevHasElev); };
+      el._elevRedraw = () => {
+        renderHeaderStats(el, el._elevStats, el._elevHasElev);
+      };
       return;
     }
     canvas.style.display = '';
@@ -229,9 +267,8 @@
     // The line is DISPLAY-ONLY — raw elevData stays authoritative for the hover
     // readout, min/max, and the lat/lon → marker dispatch. lineCum/lineTotal
     // scale the line to full width.
-    const profile = (meta && Array.isArray(meta.profile) && meta.profile.length >= 2)
-      ? meta.profile
-      : null;
+    const profile =
+      meta && Array.isArray(meta.profile) && meta.profile.length >= 2 ? meta.profile : null;
     const lineCoords = profile || elevData;
     const lineCum = [0];
     for (let i = 1; i < lineCoords.length; i++) {
@@ -245,7 +282,10 @@
       const d = frac * lineTotal;
       let i = 0;
       for (let k = 0; k < lineCum.length - 1; k++) {
-        if (d >= lineCum[k] && d <= lineCum[k + 1]) { i = k; break; }
+        if (d >= lineCum[k] && d <= lineCum[k + 1]) {
+          i = k;
+          break;
+        }
       }
       const span = lineCum[i + 1] - lineCum[i];
       const lt = span > 0 ? (d - lineCum[i]) / span : 0;
@@ -383,7 +423,10 @@
     // Expose redraw hooks so a unit change reconverts BOTH the header stats and
     // the chart labels (the user is not mid-hover when toggling the nav).
     el._elevDrawChart = drawChart;
-    el._elevRedraw = () => { renderHeaderStats(el, el._elevStats, el._elevHasElev); drawChart(); };
+    el._elevRedraw = () => {
+      renderHeaderStats(el, el._elevStats, el._elevHasElev);
+      drawChart();
+    };
     window.addEventListener('resize', () => {
       drawChart();
     });
@@ -418,28 +461,39 @@
       tooltip.style.top = e.clientY - rect.top - 36 + 'px';
       const U = UNITS[currentUnit];
       tooltip.textContent =
-        (hd * U.dist).toFixed(1) + ' ' + U.distLabel + '  ·  ' +
-        Math.round(elev * U.elev) + ' ' + U.elevLabel;
+        (hd * U.dist).toFixed(1) +
+        ' ' +
+        U.distLabel +
+        '  ·  ' +
+        Math.round(elev * U.elev) +
+        ' ' +
+        U.elevLabel;
 
-      if (isFinite(lat) && isFinite(lon)) {
-        window.dispatchEvent(new CustomEvent('surface-profile-hover', {
-          detail: { map_id: el.dataset.mapId, lat, lon },
-        }));
+      if (Number.isFinite(lat) && Number.isFinite(lon)) {
+        window.dispatchEvent(
+          new CustomEvent('surface-profile-hover', {
+            detail: { map_id: el.dataset.mapId, lat, lon },
+          })
+        );
       }
       drawChart(frac);
     });
 
     canvas.addEventListener('mouseleave', () => {
       tooltip.style.opacity = '0';
-      window.dispatchEvent(new CustomEvent('surface-profile-hover', {
-        detail: { map_id: el.dataset.mapId, clear: true },
-      }));
+      window.dispatchEvent(
+        new CustomEvent('surface-profile-hover', {
+          detail: { map_id: el.dataset.mapId, clear: true },
+        })
+      );
       drawChart();
     });
   }
 
   function initProfile(el) {
-    if (el._elevProfileInit) return;
+    if (el._elevProfileInit) {
+      return;
+    }
     el._elevProfileInit = true;
 
     const mapId = el.dataset.mapId;
@@ -453,7 +507,11 @@
         return;
       }
       const track = pickElevationTrack(tracks) || tracks[0];
-      renderProfile(el, track.coords || [], { name: track.name, stats: track.stats, profile: track.profile });
+      renderProfile(el, track.coords || [], {
+        name: track.name,
+        stats: track.stats,
+        profile: track.profile,
+      });
     };
 
     // 3 & 4. Fallback: fetch geojson-url or parse inline elev.
@@ -463,7 +521,9 @@
       if (geojsonUrl) {
         fetch(geojsonUrl)
           .then((r) => {
-            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            if (!r.ok) {
+              throw new Error(`HTTP ${r.status}`);
+            }
             return r.json();
           })
           .then((geojson) => renderProfile(el, geojson.features[0].geometry.coordinates))
@@ -472,11 +532,13 @@
       }
 
       const raw = el.dataset.elev;
-      if (!raw) return;
+      if (!raw) {
+        return;
+      }
       let elevData;
       try {
         elevData = JSON.parse(raw);
-      } catch (e) {
+      } catch (_e) {
         return;
       }
       renderProfile(el, elevData);
@@ -484,12 +546,14 @@
 
     if (mapId) {
       // 1. map.js already built per-track data — reuse synchronously.
-      if (window._surfaceTracks && window._surfaceTracks[mapId]) {
+      if (window._surfaceTracks?.[mapId]) {
         renderFromTracks(window._surfaceTracks[mapId]);
       } else {
         // 2. Wait for map.js to finish; fall back if it reports no tracks.
         const onReady = (e) => {
-          if (e.detail.map_id !== mapId) return;
+          if (e.detail.map_id !== mapId) {
+            return;
+          }
           window.removeEventListener('surface-map-ready', onReady);
           if (Array.isArray(e.detail.tracks) && e.detail.tracks.length) {
             renderFromTracks(e.detail.tracks);
@@ -504,8 +568,14 @@
       // chart only when the coords carry real elevation. renderProfile decides
       // (and hides the component if the track has neither chart nor stat).
       window.addEventListener('surface-track-select', (e) => {
-        if (e.detail.map_id !== mapId) return;
-        renderProfile(el, e.detail.coords || [], { name: e.detail.name, stats: e.detail.stats, profile: e.detail.profile });
+        if (e.detail.map_id !== mapId) {
+          return;
+        }
+        renderProfile(el, e.detail.coords || [], {
+          name: e.detail.name,
+          stats: e.detail.stats,
+          profile: e.detail.profile,
+        });
       });
     } else {
       // No map / no _surfaceTracks — standalone Storybook (data-elev) path.
@@ -524,11 +594,15 @@
   // Live unit toggle (dispatched by the nav). Update the shared unit and redraw
   // every rendered profile with converted labels/values.
   window.addEventListener('surface-units-change', (e) => {
-    const u = e.detail && e.detail.unit;
-    if (u !== 'imperial' && u !== 'metric') return;
+    const u = e.detail?.unit;
+    if (u !== 'imperial' && u !== 'metric') {
+      return;
+    }
     currentUnit = u;
     document.querySelectorAll('.elevation-profile').forEach((el) => {
-      if (typeof el._elevRedraw === 'function') el._elevRedraw();
+      if (typeof el._elevRedraw === 'function') {
+        el._elevRedraw();
+      }
     });
   });
 

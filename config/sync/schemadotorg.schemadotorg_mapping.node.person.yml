@@ -31,6 +31,7 @@ schema_properties:
   schema_family_name: familyName
   schema_given_name: givenName
   schema_image: image
+  schema_knows_about: knowsAbout
   schema_knows_language: knowsLanguage
   schema_member_of: memberOf
   title: name

@@ -1,0 +1,26 @@
+/* Content + aside — generic two-column reading layout.
+   A main content column beside a sticky aside, collapsing to a single column
+   on narrow viewports. Extracted from the article layout so any content type
+   can reuse it. Structural shell only — includes nothing. */
+.content-aside {
+  align-items: start;
+  display: grid;
+  gap: 64px;
+  grid-template-columns: 720px 1fr;
+  margin: 0 auto;
+  max-width: 1100px;
+  padding: 64px 48px;
+}
+
+.content-aside__main { min-width: 0; }
+
+/* Main column follows a full-width section above (e.g. a map) — lead with a
+   little extra top breathing room. */
+.content-aside__main--with-map { padding-top: 8px; }
+
+.content-aside__aside { position: sticky; top: 80px; }
+
+@media (max-width: 1000px) {
+  .content-aside { gap: 40px; grid-template-columns: 1fr; padding: 40px 24px; }
+  .content-aside__aside { position: static; }
+}

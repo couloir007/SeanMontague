@@ -1,0 +1,19 @@
+uuid: 19a5b651-6822-41b7-833d-70f61fc980fe
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_about_label
+    - node.type.page
+id: node.page.field_about_label
+field_name: field_about_label
+entity_type: node
+bundle: page
+label: 'About Label'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

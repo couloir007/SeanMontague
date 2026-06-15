@@ -1,0 +1,74 @@
+uuid: 23dbce17-ce86-4aa6-85b9-49aea6564ad3
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.geo_entity.mapping
+    - field.field.geo_entity.poi.field_body
+    - field.field.geo_entity.poi.field_day
+    - field.field.geo_entity.poi.field_poi_type
+    - field.field.geo_entity.poi.field_show_on_map
+    - field.field.geo_entity.poi.schema_address
+    - field.field.geo_entity.poi.schema_geo
+    - field.field.geo_entity.poi.schema_image
+    - field.field.geo_entity.poi.schema_place
+    - field.field.geo_entity.poi.schema_same_as
+    - field.field.geo_entity.poi.schema_telephone
+    - geo_entity.geo_entity_type.poi
+  module:
+    - geofield
+    - layout_builder
+    - text
+third_party_settings:
+  layout_builder:
+    enabled: false
+    allow_custom: false
+id: geo_entity.poi.mapping
+targetEntityType: geo_entity
+bundle: poi
+mode: mapping
+content:
+  field_body:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_poi_type:
+    type: entity_reference_label
+    label: hidden
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  schema_geo:
+    type: geofield_default
+    label: hidden
+    settings:
+      output_format: wkt
+      output_escape: true
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  schema_image:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  created: true
+  field_day: true
+  field_show_on_map: true
+  langcode: true
+  schema_address: true
+  schema_place: true
+  schema_same_as: true
+  schema_telephone: true
+  status: true
+  uid: true

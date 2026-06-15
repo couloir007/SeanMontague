@@ -9,9 +9,7 @@
  * Non-interactive — tiles + a small destination marker only.
  */
 
-(function () {
-  'use strict';
-
+(() => {
   var tileUrl = 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png';
   var tileOpts = { maxZoom: 17, attribution: '', zIndex: 1 };
 
@@ -28,14 +26,16 @@
     var root = context || document;
     var cards = root.querySelectorAll('.trip__card-map:not([data-map-init])');
 
-    cards.forEach(function (el) {
+    cards.forEach((el) => {
       el.setAttribute('data-map-init', '1');
 
       var lat = parseFloat(el.dataset.lat);
       var lon = parseFloat(el.dataset.lon);
       var name = el.dataset.name || '';
 
-      if (!isFinite(lat) || !isFinite(lon)) return;
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+        return;
+      }
 
       var m = L.map(el, {
         center: [lat, lon],
@@ -55,15 +55,19 @@
         .bindPopup('<strong>' + name + '</strong>');
 
       // Ensure tiles paint after container is visible
-      setTimeout(function () { m.invalidateSize(); }, 200);
+      setTimeout(() => {
+        m.invalidateSize();
+      }, 200);
     });
   }
 
   // Drupal
   if (typeof Drupal !== 'undefined' && Drupal.behaviors) {
     Drupal.behaviors.surfaceTrip = {
-      attach: function (context) {
-        if (typeof L === 'undefined') return;
+      attach: (context) => {
+        if (typeof L === 'undefined') {
+          return;
+        }
         initCardMaps(context);
       },
     };
@@ -75,15 +79,21 @@
       initCardMaps();
       return;
     }
-    if (attempts > 20) return;
-    setTimeout(function () { waitForLeaflet(attempts + 1); }, 100);
+    if (attempts > 20) {
+      return;
+    }
+    setTimeout(() => {
+      waitForLeaflet(attempts + 1);
+    }, 100);
   }
 
   if (typeof document !== 'undefined') {
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function () { waitForLeaflet(0); });
+      document.addEventListener('DOMContentLoaded', () => {
+        waitForLeaflet(0);
+      });
     } else {
       waitForLeaflet(0);
     }
   }
-}());
+})();

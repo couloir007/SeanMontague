@@ -5,6 +5,8 @@ dependencies:
   config:
     - core.entity_view_mode.node.teaser
     - field.field.node.page.body
+    - field.field.node.page.field_about_label
+    - field.field.node.page.field_about_title
     - field.field.node.page.field_cta_ghost
     - field.field.node.page.field_cta_primary
     - field.field.node.page.field_editorial
@@ -36,9 +38,9 @@ content:
     type: text_summary_or_trimmed
     label: hidden
     settings:
-      trim_length: 600
+      trim_length: 180
     third_party_settings: {  }
-    weight: 18
+    weight: 4
     region: content
   links:
     settings: {  }
@@ -46,6 +48,8 @@ content:
     weight: -100
     region: content
 hidden:
+  field_about_label: true
+  field_about_title: true
   field_cta_ghost: true
   field_cta_primary: true
   field_editorial: true

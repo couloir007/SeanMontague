@@ -82,5 +82,7 @@
 }
 
 @media (width <= 640px) {
-  .article-header { padding: 100px 24px 0; }
+  /* Header clearance now handled once by .main (--site-header-clearance); keep
+     only the 24px internal top (sides drop to 24px for mobile). */
+  .article-header { padding: 24px 24px 0; }
 }

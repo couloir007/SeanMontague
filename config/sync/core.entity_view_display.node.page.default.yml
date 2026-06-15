@@ -4,6 +4,8 @@ status: true
 dependencies:
   config:
     - field.field.node.page.body
+    - field.field.node.page.field_about_label
+    - field.field.node.page.field_about_title
     - field.field.node.page.field_cta_ghost
     - field.field.node.page.field_cta_primary
     - field.field.node.page.field_editorial
@@ -39,7 +41,22 @@ content:
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    weight: 0
+    weight: 1
+    region: content
+  field_about_label:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 10
+    region: content
+  field_about_title:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 11
     region: content
   field_cta_ghost:
     type: link
@@ -106,6 +123,15 @@ content:
     third_party_settings: {  }
     weight: 5
     region: content
+  schema_main_entity:
+    type: entity_reference_entity_view
+    label: above
+    settings:
+      view_mode: front
+      link: false
+    third_party_settings: {  }
+    weight: 9
+    region: content
   schema_topic:
     type: entity_reference_label
     label: above
@@ -122,7 +148,6 @@ hidden:
   schema_has_part: true
   schema_image: true
   schema_is_part_of: true
-  schema_main_entity: true
   schema_related_link: true
   schema_significant_link: true
   schema_subject_of: true

@@ -93,3 +93,32 @@
   font-size: 0.875em;
   padding: 0.1em 0.4em;
 }
+
+/* Drop cap — opt-in via class="drop-cap" on the first <p> in body HTML. */
+.drop-cap::first-letter {
+  color: var(--bright);
+  float: left;
+  font-family: var(--font-display-nek);
+  font-size: 4.2em;
+  line-height: 0.78;
+  margin-right: 8px;
+  margin-top: 6px;
+}
+
+/* Inline image placeholders — opt-in via class="article__image" in body HTML. */
+.article__image {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  display: flex;
+  font-family: var(--font-mono-nek);
+  font-size: 10px;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.15em;
+  margin: 32px 0;
+  width: 100%;
+}
+
+.article__image--tall   { height: 360px; }
+.article__image--medium { height: 260px; }

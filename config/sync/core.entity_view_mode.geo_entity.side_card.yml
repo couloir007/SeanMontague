@@ -1,0 +1,11 @@
+uuid: e2a45387-8558-411a-a2d0-13c4d4b4a284
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+id: geo_entity.side_card
+label: 'Side Card'
+description: ''
+targetEntityType: geo_entity
+cache: true

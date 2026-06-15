@@ -1,0 +1,30 @@
+{% set pois = [] %}
+
+{% for item in element['#items'] %}
+  {% set poi = item.entity %}
+
+  {% if poi %}
+    {% set poi_type = '' %}
+
+    {% if poi.field_poi_type.entity %}
+      {% set poi_type = poi.field_poi_type.entity.label() %}
+    {% endif %}
+
+    {% set pois = pois|merge([
+      {
+        name: poi.label(),
+        url: '#' ~ poi.label()|clean_id,
+        type: poi_type
+      }
+    ]) %}
+  {% endif %}
+{% endfor %}
+
+{% if pois is not empty %}
+  {% include '@components/side-card/side-card.twig' with {
+    label: 'Points of Interest',
+    fig: 'Fig 06',
+    variant: 'poi',
+    pois: pois
+  } only %}
+{% endif %}

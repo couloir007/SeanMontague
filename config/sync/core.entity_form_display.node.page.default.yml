@@ -4,6 +4,8 @@ status: true
 dependencies:
   config:
     - field.field.node.page.body
+    - field.field.node.page.field_about_label
+    - field.field.node.page.field_about_title
     - field.field.node.page.field_cta_ghost
     - field.field.node.page.field_cta_primary
     - field.field.node.page.field_editorial
@@ -38,8 +40,8 @@ third_party_settings:
     group_general:
       children:
         - title
-        - body
         - schema_image
+        - body
       label: General
       region: content
       parent_name: ''
@@ -54,7 +56,7 @@ third_party_settings:
       label: 'Editorial information'
       region: content
       parent_name: ''
-      weight: 11
+      weight: 7
       format_type: details_sidebar
       format_settings:
         description: 'Track the editorial decisions and status of a document.'
@@ -65,7 +67,7 @@ third_party_settings:
       label: References
       region: content
       parent_name: ''
-      weight: 10
+      weight: 5
       format_type: details
       format_settings:
         open: true
@@ -77,7 +79,7 @@ third_party_settings:
       label: Hierarchy
       region: content
       parent_name: ''
-      weight: 9
+      weight: 4
       format_type: details
       format_settings:
         open: true
@@ -116,6 +118,24 @@ third_party_settings:
         open: false
         description: ''
         required_fields: true
+    group_about:
+      children:
+        - field_about_label
+        - field_about_title
+        - schema_main_entity
+      label: About
+      region: content
+      parent_name: ''
+      weight: 6
+      format_type: details
+      format_settings:
+        classes: ''
+        show_empty_fields: false
+        id: ''
+        label_as_html: false
+        open: false
+        description: ''
+        required_fields: true
 id: node.page.default
 targetEntityType: node
 bundle: page
@@ -123,10 +143,10 @@ mode: default
 content:
   body:
     type: text_textarea_with_summary
-    weight: 2
+    weight: 3
     region: content
     settings:
-      rows: 9
+      rows: 12
       summary_rows: 3
       placeholder: ''
       show_summary: false
@@ -134,11 +154,21 @@ content:
       allowed_formats:
         hide_help: '1'
         hide_guidelines: '1'
-  created:
-    type: datetime_timestamp
-    weight: 16
+  field_about_label:
+    type: string_textfield
+    weight: 14
     region: content
-    settings: {  }
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_about_title:
+    type: text_textfield
+    weight: 15
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
   field_cta_ghost:
     type: link_default
@@ -158,7 +188,7 @@ content:
     third_party_settings: {  }
   field_editorial:
     type: inline_entity_form_simple
-    weight: 221
+    weight: 20
     region: content
     settings:
       form_mode: default
@@ -179,7 +209,7 @@ content:
     third_party_settings: {  }
   field_map_markers:
     type: entity_reference_autocomplete
-    weight: 8
+    weight: 9
     region: content
     settings:
       match_operator: CONTAINS
@@ -189,29 +219,22 @@ content:
     third_party_settings: {  }
   field_map_zoom:
     type: number
-    weight: 7
+    weight: 8
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   field_metatag:
     type: metatag_firehose
-    weight: 13
+    weight: 9
     region: content
     settings:
       sidebar: true
       use_details: true
     third_party_settings: {  }
-  langcode:
-    type: language_select
-    weight: 14
-    region: content
-    settings:
-      include_locked: true
-    third_party_settings: {  }
   path:
     type: path
-    weight: 19
+    weight: 11
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -227,7 +250,7 @@ content:
     third_party_settings: {  }
   schema_geo:
     type: leaflet_widget_default
-    weight: 9
+    weight: 10
     region: content
     settings:
       geometry_validation: false
@@ -298,7 +321,7 @@ content:
     third_party_settings: {  }
   schema_has_part:
     type: entity_reference_autocomplete
-    weight: 4
+    weight: 2
     region: content
     settings:
       match_operator: CONTAINS
@@ -308,7 +331,7 @@ content:
     third_party_settings: {  }
   schema_image:
     type: entity_reference_autocomplete
-    weight: 3
+    weight: 2
     region: content
     settings:
       match_operator: CONTAINS
@@ -327,22 +350,14 @@ content:
       placeholder: ''
     third_party_settings: {  }
   schema_main_entity:
-    type: inline_entity_form_complex
-    weight: 21
+    type: entity_reference_autocomplete
+    weight: 16
     region: content
     settings:
-      form_mode: default
-      override_labels: false
-      label_singular: ''
-      label_plural: ''
-      allow_new: true
-      allow_existing: false
       match_operator: CONTAINS
-      allow_duplicate: false
-      collapsible: false
-      collapsed: false
-      revision: false
-      removed_reference: optional
+      match_limit: 10
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
   schema_related_link:
     type: linkit
@@ -391,13 +406,13 @@ content:
     settings: {  }
     third_party_settings: {  }
   simple_sitemap:
-    weight: 20
+    weight: 12
     region: content
     settings: {  }
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 17
+    weight: 8
     region: content
     settings:
       display_label: true
@@ -410,28 +425,17 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-  translation:
-    weight: 18
-    region: content
-    settings: {  }
-    third_party_settings: {  }
-  uid:
-    type: entity_reference_autocomplete
-    weight: 15
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
   url_redirects:
-    weight: 12
+    weight: 10
     region: content
     settings: {  }
     third_party_settings: {  }
 hidden:
+  created: true
+  langcode: true
   promote: true
   publish_on: true
   sticky: true
+  translation: true
+  uid: true
   unpublish_on: true

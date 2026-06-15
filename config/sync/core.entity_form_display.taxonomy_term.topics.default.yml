@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.field.taxonomy_term.topics.field_icon
+    - field.field.taxonomy_term.topics.field_url
     - taxonomy.vocabulary.topics
   module:
     - path
@@ -24,6 +25,14 @@ content:
   field_icon:
     type: string_textfield
     weight: 1
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_url:
+    type: string_textfield
+    weight: 91
     region: content
     settings:
       size: 60

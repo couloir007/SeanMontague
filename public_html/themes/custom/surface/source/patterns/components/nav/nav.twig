@@ -7,7 +7,7 @@
     {% if links %}
       <ul class="nav__links">
         {% for item in links %}
-          <li><a href="{{ item.url }}">{{ item.text }}</a></li>
+          <li><a href="{{ item.url }}"{% if item.active %} aria-current="page"{% endif %}>{{ item.text }}</a></li>
         {% endfor %}
       </ul>
     {% endif %}

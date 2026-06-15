@@ -1,7 +1,9 @@
 /* jshint esversion: 6 */
-(function () {
+(() => {
   const bar = document.getElementById('reading-progress');
-  if (!bar) return;
+  if (!bar) {
+    return;
+  }
   window.addEventListener('scroll', () => {
     const scrollTop = window.scrollY;
     const docHeight = document.documentElement.scrollHeight - window.innerHeight;

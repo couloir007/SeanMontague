@@ -11,6 +11,7 @@ dependencies:
     - field.field.node.person.schema_family_name
     - field.field.node.person.schema_given_name
     - field.field.node.person.schema_image
+    - field.field.node.person.schema_knows_about
     - field.field.node.person.schema_knows_language
     - field.field.node.person.schema_member_of
     - field.field.node.person.schema_related_link
@@ -237,3 +238,4 @@ content:
 hidden:
   field_metatag: true
   langcode: true
+  schema_knows_about: true

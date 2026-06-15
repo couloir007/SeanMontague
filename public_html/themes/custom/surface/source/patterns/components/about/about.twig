@@ -8,6 +8,14 @@
   does not route through the section.twig embed slot).
 
   Depends on surface/section for the frame classes — see surface.libraries.yml.
+
+  Slots:
+    label   eyebrow text (optional)
+    title   aside heading, HTML allowed (printed |raw — e.g. "<em>grower.</em>")
+    skills  list of strings → the aside skill list
+    body    pre-rendered HTML block (Drupal: content.body|field_value|render;
+            Storybook: an HTML string from about.yml). Printed |raw, mirroring
+            the title idiom. Its own <p> tags are styled by .about__body p.
 #}
 
 <section class="about section{{ modifier ? ' ' ~ modifier }}" id="about">
@@ -33,11 +41,7 @@
       {% endif %}
     </div>
     <div class="about__body">
-      {% if paragraphs %}
-        {% for p in paragraphs %}
-          <p>{{ p }}</p>
-        {% endfor %}
-      {% endif %}
+      {{ body|raw }}
     </div>
   </div>
 </section>

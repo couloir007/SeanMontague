@@ -1,0 +1,35 @@
+{#
+/**
+ * @file
+ * Person node template — `front` view mode ONLY.
+ *
+ * Renders the homepage About section. The person node is pulled in as the
+ * homepage's mainEntity: page.schema_main_entity → entity_reference_entity_view
+ * formatter in the `front` view mode (see core.entity_view_display.node.page
+ * .default), which fires this node--person--front suggestion. The page template
+ * prints it via {{ content.schema_main_entity|field_value }} (the field wrapper
+ * + "Main Entity" label are stripped there).
+ *
+ * ╔══════════════════════════════════════════════════════════════════════════╗
+ * ║ PURE MARKUP. label/title/skills are built upstream in the preprocess hook ║
+ * ║   includes/node.theme → surface_preprocess_node__person__front()          ║
+ * ║ into the `about` variable. body is the one value resolved Twig-side (the  ║
+ * ║ documented |field_value|render pattern strips the field wrapper).         ║
+ * ╚══════════════════════════════════════════════════════════════════════════╝
+ *
+ * Why label/title come from the hook (not this template):
+ *   `node` here is the PERSON, which holds the bio (body) + skills
+ *   (schema_knows_about). The About eyebrow + heading live on the PAGE
+ *   (field_about_label / field_about_title) — a person can't see page context,
+ *   so the hook reads them off the routed page node. See the hook for detail.
+ *
+ * @see surface_preprocess_node__person__front()
+ * @see @components/about/about.twig  (slots: label, title, skills[], body)
+ */
+#}
+{% include '@components/about/about.twig' with {
+  'label':  about.label,
+  'title':  about.title,
+  'skills': about.skills,
+  'body':   content.body|field_value,
+} only %}

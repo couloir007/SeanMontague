@@ -1,1 +1,1 @@
-.main{min-width:0;position:relative;width:100%}
+.main{min-width:0;padding-block-start:var(--site-header-clearance, 58px);position:relative;width:100%}

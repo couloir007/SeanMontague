@@ -5,5 +5,5 @@
    extending site-container) to keep the preview free of layout-block coupling.
    The article component itself stays nav-free; this is where it gains nav. #}
 {% include '@components/nav/nav.twig' with nav only %}
-{% include '@collections/article/article.twig' with article only %}
+{% include '@layouts/article/article.twig' with article only %}
 {% include '@components/footer/footer.twig' with footer|default({}) only %}

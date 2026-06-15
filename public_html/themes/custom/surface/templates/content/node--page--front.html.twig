@@ -1,12 +1,12 @@
 {#
 /**
  * @file
- * Front page template for the web_page bundle.
+ * Front page template for the page bundle.
  *
  * Activated via surface_theme_suggestions_node_alter() when
- * node.bundle() === 'web_page' and path.matcher::isFrontPage() is TRUE.
+ * node.bundle() === 'page' and path.matcher::isFrontPage() is TRUE.
  *
- * All hero content is pulled from web_page node fields:
+ * All hero content is pulled from page node fields:
  *   field_eyebrow       → hero eyebrow
  *   title               → hero name
  *   body (summary)      → hero tagline
@@ -26,42 +26,17 @@
  */
 #}
 
-{% extends '@layouts/site-container/site-container.twig' %}
+{# RENDERS CONTENT ONLY. page.html.twig owns the page shell (it extends
+   @layouts/site-container). This template must NOT extend site-container — that
+   would nest the shell inside itself with an empty inner header. #}
 
-{% block main %}
-  {# ── Build map center from schema_geo geofield ────────────────────────── #}
-  {% set has_geo = not node.schema_geo.isEmpty() %}
-  {% set map_center = has_geo
-    ? node.schema_geo.lat.value ~ ',' ~ node.schema_geo.lon.value
-    : '44.593,-71.918' %}
-  {% set map_zoom = node.field_map_zoom.value|default(11) %}
+  {# ── Map data (GROUP A) — map_center, map_zoom, map_markers, has_geo come
+     from the preprocess hook (surface_preprocess_node__page__front →
+     seanmontague_map.article_map_data ->buildPage). The promo map-section below
+     keeps its own hardcoded zoom literal (12). ── #}
 
-  {# ── Build markers from field_map_markers → geo_entity references ─────── #}
-  {% set map_markers = [] %}
-  {% for item in node.field_map_markers %}
-    {% set geo_entity = item.entity %}
-    {% if geo_entity and not geo_entity.schema_geo.isEmpty() %}
-      {% set map_markers = map_markers|merge([{
-        'lat':   geo_entity.schema_geo.lat,
-        'lon':   geo_entity.schema_geo.lon,
-        'color': geo_entity.bundle() == 'lodging' ? '#a05a00' : '#3a5a40',
-        'label': '<strong>' ~ geo_entity.label.value ~ '</strong>',
-      }]) %}
-    {% endif %}
-  {% endfor %}
-
-  {# ── Build categories from schema_topic terms ─────────────────────────── #}
-  {% set categories = [] %}
-  {% for item in node.schema_topic %}
-    {% set term = item.entity %}
-    {% if term %}
-      {% set categories = categories|merge([{
-        'text': term.label,
-        'icon': term.field_icon.value|default(''),
-        'url':  '#places',
-      }]) %}
-    {% endif %}
-  {% endfor %}
+  {# ── Hero categories (GROUP B) come from the preprocess hook
+     (surface_preprocess_node__page__front, from schema_topic terms). ── #}
 
   {# ── CTA links ────────────────────────────────────────────────────────── #}
   {% set cta_primary = not node.field_cta_primary.isEmpty() ? {
@@ -82,42 +57,15 @@
     'map_markers': map_markers,
     'eyebrow':     content.field_eyebrow.field_value|default('Burke, Vermont · Northeast Kingdom'),
     'name':        'Sean <br /> Montague',
-    'tagline':     node.body.summary|default('Maps, trails, and growing things. Web developer at the Smithsonian, living and exploring in the Northeast Kingdom.'),
+    'tagline':     node.body.summary,
     'cta_primary': cta_primary,
     'cta_ghost':   cta_ghost,
-    'categories': [
-      {
-        'text': 'Kingdom Trails',
-        'icon': '🌲',
-        'url': '#places',
-      },
-      {
-        'text': 'Burke Mountain',
-        'icon': '⛷',
-        'url': '#places',
-      },
-      {
-        'text': 'Permaculture',
-        'icon': '🌱',
-        'url': '#places',
-      },
-      {
-        'text': 'Writing',
-        'icon': '✍',
-        'url': '#writing',
-      },
-    ],
+    'categories':  categories,
   } only %}
-
-{#  {#}
-{#  'text': 'Leaflet Maps',#}
-{#  'icon': '🗺',#}
-{#  'url': '#maps',#}
-{#  },#}
 
 
   {# ── Map section ──────────────────────────────────────────────────────── #}
-  {% include '@collections/map-section/map-section.twig' with {
+  {% include '@collections/homepage-map-section/homepage-map-section.twig' with {
     'label':      'Interactive Maps',
     'title':      'The Kingdom, <em>mapped.</em>',
     'text':       '<p>Custom Leaflet maps of the places I know best — Kingdom Trails singletrack, Burke Mountain terrain, back-road touring routes, and the land around Burke.</p><p>Built with Leaflet.js, USGS National Map tiles, and GeoJSON from years of riding, skiing, and wandering.</p>',
@@ -154,28 +102,5 @@
     {% endblock %}
   {% endembed %}
 
-  {# ── About ────────────────────────────────────────────────────────────── #}
-  {% include '@components/about/about.twig' with {
-    'label': 'About',
-    'title': 'Builder, rider, <em>grower.</em>',
-    'skills': [
-      'Smithsonian NMNH',
-      'Drupal & Twig',
-      'Leaflet & GIS / Mapping',
-      'SVG & Data Visualization',
-      'JavaScript / Open Source',
-      'Permaculture Design',
-      'Kingdom Trails regular',
-    ],
-    'paragraphs': [
-      "I'm Sean Montague — a web developer based in Burke, Vermont, in the Northeast Kingdom. I work at the Smithsonian National Museum of Natural History, building Drupal systems, interactive maps, and data visualization tools for one of the world's great natural history institutions.",
-      "This site is a personal outlet for the things I care about outside of work: riding Kingdom Trails, skiing Burke Mountain, building a food forest, and making maps of the places I know well.",
-      "The technical stuff — Leaflet, GeoJSON, Twig, SVG — bleeds into the personal projects too. That's fine by me.",
-    ],
-  } only %}
 
-
-
-{% endblock %}
-
-
+  {{ content.schema_main_entity|field_value }}

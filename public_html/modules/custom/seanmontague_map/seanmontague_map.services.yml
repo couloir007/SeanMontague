@@ -1,0 +1,3 @@
+services:
+  seanmontague_map.article_map_data:
+    class: Drupal\seanmontague_map\Service\ArticleMapData

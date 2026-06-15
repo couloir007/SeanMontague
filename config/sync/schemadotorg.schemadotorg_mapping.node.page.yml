@@ -3,7 +3,6 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.node.page.body
     - field.field.node.page.schema_about
     - field.field.node.page.schema_has_part
     - field.field.node.page.schema_image
@@ -34,5 +33,4 @@ schema_properties:
   schema_related_link: relatedLink
   schema_significant_link: significantLink
   schema_subject_of: subjectOf
-  body: text
 additional_mappings: {  }

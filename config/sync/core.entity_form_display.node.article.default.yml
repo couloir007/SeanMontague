@@ -19,7 +19,6 @@ dependencies:
     - field.field.node.article.schema_event_schedule
     - field.field.node.article.schema_geo
     - field.field.node.article.schema_geoshape
-    - field.field.node.article.schema_gpx_test
     - field.field.node.article.schema_image
     - field.field.node.article.schema_is_part_of
     - field.field.node.article.schema_lodging
@@ -60,16 +59,15 @@ third_party_settings:
         description: ''
     group_location:
       children:
-        - field_map_tiles
-        - schema_place
-        - schema_trip
-        - schema_lodging
-        - schema_poi
-        - field_route_type
-        - schema_geoshape
-        - schema_gpx_test
-        - schema_geo
-        - schema_destination
+        0: field_map_tiles
+        1: schema_place
+        2: schema_trip
+        3: schema_lodging
+        4: schema_poi
+        5: field_route_type
+        6: schema_geoshape
+        8: schema_geo
+        9: schema_destination
       label: 'Location & Trip'
       region: content
       parent_name: ''
@@ -382,16 +380,6 @@ content:
   schema_geoshape:
     type: entity_reference_autocomplete
     weight: 13
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-  schema_gpx_test:
-    type: entity_reference_autocomplete
-    weight: 14
     region: content
     settings:
       match_operator: CONTAINS

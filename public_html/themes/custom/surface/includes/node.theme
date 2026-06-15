@@ -1,0 +1,217 @@
+<?php
+
+/**
+ * @file
+ * Node theme hooks.
+ *
+ * Bundle / view-mode preprocess hooks that keep the node templates pure markup
+ * by shaping their data here, plus the front-page suggestion:
+ *   - surface_preprocess_node__article()       → geo / track / stats + markers,
+ *       the unified has_map, and the article_header object (from the
+ *       trail_mapper.article_geo_data + seanmontague_map.article_map_data
+ *       services).
+ *   - surface_preprocess_node__page__front()   → homepage hero map + categories.
+ *   - surface_preprocess_node__person__front() → About section data.
+ *
+ * Each fires because its node--*.html.twig template registers the theme hook;
+ * no base surface_preprocess_node() is needed.
+ */
+
+use Drupal\node\NodeInterface;
+
+
+/**
+ * Implements hook_theme_suggestions_node_alter().
+ *
+ * Adds a 'node--page--front' template suggestion for the front page node
+ * so the homepage uses node-homepage.twig while other pages render directly.
+ */
+function surface_theme_suggestions_node_alter(array &$suggestions, array $variables): void {
+  $node = $variables['elements']['#node'];
+  if ($node->bundle() === 'page' && \Drupal::service('path.matcher')->isFrontPage()) {
+    $suggestions[] = 'node__page__front';
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for node--article.html.twig.
+ *
+ * Fires for the node__article suggestion (the template registers the hook), so
+ * it only runs for article nodes — no bundle guard needed. Covers marker-only /
+ * track-less articles too; they are the case that exercises the unified has_map.
+ *
+ * @param array $variables
+ *   The node template variables, passed by reference.
+ */
+function surface_preprocess_node__article(array &$variables): void {
+  $node = $variables['node'] ?? NULL;
+  if (!$node instanceof NodeInterface) {
+    return;
+  }
+
+  $geo = \Drupal::service('trail_mapper.article_geo_data')->build($node);
+  $map = \Drupal::service('seanmontague_map.article_map_data')->build($node);
+
+  // Unified has_map — any geo source OR any marker. Folding markers in means a
+  // marker-only article also gets a map.
+  $has_map = $geo['has_geoshape'] || $geo['has_geo'] || $geo['has_place']
+    || !empty($map['map_markers']);
+
+  // has_map-dependent map id — not known to either service, computed here. The
+  // article map-section renders only the map + elevation (no label/title), so
+  // those are intentionally not computed.
+  $map_id = $has_map ? 'article-map-' . $node->id() : '';
+
+  // ── Geo / track / stats values (ArticleGeoData). ──
+  $variables['geojson_urls']      = $geo['geojson_urls'];
+  $variables['geojson_url']       = $geo['geojson_url'];
+  $variables['track_stats']       = $geo['track_stats'];
+  $variables['is_gpx']            = $geo['is_gpx'];
+  $variables['has_geoshape']      = $geo['has_geoshape'];
+  $variables['has_geo']           = $geo['has_geo'];
+  $variables['has_place']         = $geo['has_place'];
+  $variables['cat_key']           = $geo['cat_key'];
+  $variables['map_center']        = $geo['map_center'];
+  $variables['stats']             = $geo['stats'];
+  // category_name now carries the real term label (ArticleGeoData calls
+  // label() directly — the old category.label.value bug is fixed). Consumed by
+  // article_header below; exposed as a variable too for template parity.
+  $variables['category_name']     = $geo['category_name'];
+
+  // ── Markers + base map config (ArticleMapData). ──
+  // map_markers carries the destination-label fix (blank → real names).
+  $variables['map_markers']          = $map['map_markers'];
+  $variables['map_zoom']             = $map['map_zoom'];
+  $variables['tiles']                = $map['tiles'];
+  // The article path has no polylines (tracks come from GeoJSON) and no
+  // Drupal-rendered geo (the map is JS-rendered), but the shared map-section
+  // component reads both — pass explicit NULLs so its truthiness checks are
+  // well-defined. (map_text was dead: map-section never reads `text`.)
+  $variables['map_lines']            = NULL;
+  $variables['drupal_geo_rendered']  = NULL;
+
+  // ── Unified has_map and its dependents. ──
+  // has_map folds in markers, so a marker-only article (no track/geo/place)
+  // still gets a map.
+  $variables['has_map']           = $has_map;
+  $variables['map_id']            = $map_id;
+  // Body-column modifier — also has_map-dependent.
+  $variables['main_modifier']     = $has_map ? 'content-aside__main--with-map' : '';
+
+  // ── Article header object. ──
+  $body_item  = $node->get('body')->first();
+  $date_value = $node->get('schema_date_published')->value;
+  $variables['article_header'] = [
+    'title'        => $node->label(),
+    'subtitle'     => $body_item ? ($body_item->summary ?? '') : '',
+    'date'         => $date_value ? date('F j, Y', strtotime($date_value)) : '',
+    'category'     => $variables['category_name'],
+    'category_key' => $geo['cat_key'] ?: 'default',
+    'difficulty'   => $node->hasField('schema_difficulty') ? $node->get('schema_difficulty')->value : NULL,
+    'stats'        => $geo['stats'],
+    'map_id'       => $map_id,
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for node--page--front.html.twig.
+ *
+ * Builds the homepage hero's map config (marker / center / zoom via
+ * seanmontague_map.article_map_data->buildPage) and the hero categories strip
+ * (from schema_topic terms: field_icon + field_url + label()). Consumed directly
+ * by the template, which stays pure markup.
+ */
+function surface_preprocess_node__page__front(array &$variables): void {
+  $node = $variables['node'] ?? NULL;
+  if (!$node instanceof \Drupal\node\NodeInterface) {
+    return;
+  }
+
+  // Markers + center + zoom (page path).
+  $map = \Drupal::service('seanmontague_map.article_map_data')->buildPage($node);
+
+  // Hero categories from schema_topic terms.
+  $categories = [];
+  if ($node->hasField('schema_topic')) {
+    foreach ($node->get('schema_topic') as $item) {
+      $term = $item->entity;
+      if (!$term) {
+        continue;
+      }
+      $categories[] = [
+        'text' => $term->label(),
+        'icon' => $term->hasField('field_icon') ? ($term->get('field_icon')->value ?? '') : '',
+        'url'  => $term->hasField('field_url') ? ($term->get('field_url')->value ?: '#') : '#',
+      ];
+    }
+  }
+
+  // Map data — consumed directly by the template.
+  $variables['map_markers'] = $map['map_markers'];
+  $variables['map_center']  = $map['map_center'];
+  $variables['map_zoom']    = $map['map_zoom'];
+  $variables['has_geo']     = $map['has_geo'];
+  // Hero categories — consumed directly by the template.
+  $variables['categories']  = $categories;
+}
+
+
+/**
+ * Implements hook_preprocess_node() for node--person--front.
+ *
+ * Builds the `about` variable for the homepage About section. The person node
+ * supplies the editorial CONTENT (skills + bio body); the surrounding PAGE
+ * supplies the FRAMING (eyebrow label + heading title).
+ *
+ * The person is rendered as the homepage's mainEntity (schema_main_entity →
+ * entity_reference_entity_view in the `front` view mode), so `node` here is the
+ * PERSON. field_about_label / field_about_title live on the PAGE, which is the
+ * ROUTED node — read them from the route. The id guard avoids misreading a
+ * person rendered as its own routed page (the about fields don't exist there,
+ * so the defaults hold anyway, but the guard keeps intent explicit).
+ *
+ * body is NOT set here — the template resolves it via content.body|
+ * field_value|render (strips the field wrapper). skills + label + title are
+ * built here; the template stays pure markup.
+ */
+function surface_preprocess_node__person__front(array &$variables): void {
+  $person = $variables['node'] ?? NULL;
+  if (!$person instanceof NodeInterface) {
+    return;
+  }
+
+  // Skills ← person schema_knows_about (multi-value string).
+  $skills = [];
+  if ($person->hasField('schema_knows_about')) {
+    foreach ($person->get('schema_knows_about') as $item) {
+      $value = trim((string) $item->value);
+      if ($value !== '') {
+        $skills[] = $value;
+      }
+    }
+  }
+
+  // Label + title ← the routed PAGE node (field_about_label/title). Fall back to
+  // 'About' / '' when a field is empty or absent.
+  $label = 'About';
+  $title = '';
+  $page = \Drupal::routeMatch()->getParameter('node');
+  if ($page instanceof NodeInterface && $page->id() !== $person->id()) {
+    if ($page->hasField('field_about_label') && !$page->get('field_about_label')->isEmpty()) {
+      $label = $page->get('field_about_label')->value;
+    }
+    if ($page->hasField('field_about_title') && !$page->get('field_about_title')->isEmpty()) {
+      $title = $page->get('field_about_title')->value;
+    }
+  }
+
+  $variables['about'] = [
+    'label'  => $label,
+    'title'  => $title,
+    'skills' => $skills,
+  ];
+}
+
+
+
+

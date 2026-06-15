@@ -11,6 +11,7 @@ dependencies:
     - field.field.node.person.schema_family_name
     - field.field.node.person.schema_given_name
     - field.field.node.person.schema_image
+    - field.field.node.person.schema_knows_about
     - field.field.node.person.schema_knows_language
     - field.field.node.person.schema_member_of
     - field.field.node.person.schema_related_link
@@ -33,29 +34,30 @@ third_party_settings:
   field_group:
     group_general:
       children:
+        - title
+        - schema_given_name
         - schema_additional_name
         - schema_family_name
-        - schema_given_name
-        - schema_image
         - schema_knows_language
+        - schema_knows_about
         - body
-        - title
+        - schema_image
       label: General
       region: content
       parent_name: ''
-      weight: -20
+      weight: 0
       format_type: details
       format_settings:
         open: true
         description: ''
     group_contact:
       children:
-        - schema_email
         - schema_telephone
+        - schema_email
       label: Contact
       region: content
       parent_name: ''
-      weight: -18
+      weight: 1
       format_type: details
       format_settings:
         open: true
@@ -67,20 +69,20 @@ third_party_settings:
       label: Organization
       region: content
       parent_name: ''
-      weight: -13
+      weight: 2
       format_type: details
       format_settings:
         open: true
         description: ''
     group_links:
       children:
-        - schema_same_as
         - schema_related_link
         - schema_significant_link
+        - schema_same_as
       label: Links
       region: content
       parent_name: ''
-      weight: 20
+      weight: 6
       format_type: details
       format_settings:
         open: true
@@ -91,7 +93,7 @@ third_party_settings:
       label: References
       region: content
       parent_name: ''
-      weight: 22
+      weight: 7
       format_type: details
       format_settings:
         open: true
@@ -102,7 +104,7 @@ third_party_settings:
       label: 'Editorial information'
       region: content
       parent_name: ''
-      weight: 220
+      weight: 8
       format_type: details_sidebar
       format_settings:
         description: 'Track the editorial decisions and status of a document.'
@@ -113,7 +115,7 @@ mode: default
 content:
   body:
     type: text_textarea_with_summary
-    weight: 18
+    weight: 7
     region: content
     settings:
       rows: 9
@@ -124,12 +126,6 @@ content:
       allowed_formats:
         hide_help: '1'
         hide_guidelines: '1'
-  created:
-    type: datetime_timestamp
-    weight: 200
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   field_editorial:
     type: inline_entity_form_simple
     weight: 221
@@ -145,7 +141,7 @@ content:
     third_party_settings: {  }
   field_metatag:
     type: metatag_firehose
-    weight: 99
+    weight: 12
     region: content
     settings:
       sidebar: true
@@ -153,27 +149,20 @@ content:
     third_party_settings: {  }
   langcode:
     type: language_select
-    weight: 200
+    weight: 11
     region: content
     settings:
       include_locked: true
     third_party_settings: {  }
   path:
     type: path
-    weight: 220
+    weight: 9
     region: content
     settings: {  }
     third_party_settings: {  }
-  promote:
-    type: boolean_checkbox
-    weight: 210
-    region: content
-    settings:
-      display_label: true
-    third_party_settings: {  }
   schema_additional_name:
     type: string_textfield
-    weight: 10
+    weight: 3
     region: content
     settings:
       size: 60
@@ -189,7 +178,7 @@ content:
     third_party_settings: {  }
   schema_family_name:
     type: string_textfield
-    weight: 11
+    weight: 4
     region: content
     settings:
       size: 60
@@ -197,7 +186,7 @@ content:
     third_party_settings: {  }
   schema_given_name:
     type: string_textfield
-    weight: 9
+    weight: 2
     region: content
     settings:
       size: 60
@@ -205,7 +194,7 @@ content:
     third_party_settings: {  }
   schema_image:
     type: entity_reference_autocomplete
-    weight: 23
+    weight: 8
     region: content
     settings:
       match_operator: CONTAINS
@@ -213,15 +202,23 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+  schema_knows_about:
+    type: string_textfield
+    weight: 6
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   schema_knows_language:
     type: options_select
-    weight: 16
+    weight: 5
     region: content
     settings: {  }
     third_party_settings: {  }
   schema_member_of:
     type: entity_reference_autocomplete
-    weight: 2
+    weight: 6
     region: content
     settings:
       match_operator: CONTAINS
@@ -286,19 +283,10 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-  status:
-    type: boolean_checkbox
-    weight: 220
+  simple_sitemap:
+    weight: 3
     region: content
-    settings:
-      display_label: true
-    third_party_settings: {  }
-  sticky:
-    type: boolean_checkbox
-    weight: 210
-    region: content
-    settings:
-      display_label: true
+    settings: {  }
     third_party_settings: {  }
   title:
     type: string_textfield
@@ -309,13 +297,13 @@ content:
       placeholder: ''
     third_party_settings: {  }
   translation:
-    weight: 10
+    weight: 4
     region: content
     settings: {  }
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 200
+    weight: 10
     region: content
     settings:
       match_operator: CONTAINS
@@ -324,10 +312,14 @@ content:
       placeholder: ''
     third_party_settings: {  }
   url_redirects:
-    weight: 50
+    weight: 13
     region: content
     settings: {  }
     third_party_settings: {  }
 hidden:
+  created: true
+  promote: true
   publish_on: true
+  status: true
+  sticky: true
   unpublish_on: true

@@ -1,10 +1,11 @@
-uuid: fdf412ad-3463-47f5-b255-832be69cdc11
+uuid: c6f7ca6a-ed57-4cdd-973b-17afc754f9f5
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.node.body
     - filter.format.full_html
+    - filter.format.plain_text
     - node.type.page
   module:
     - text
@@ -13,14 +14,15 @@ field_name: body
 entity_type: node
 bundle: page
 label: Text
-description: ''
+description: 'The actual body of the article.'
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:
-  display_summary: false
+  display_summary: true
   required_summary: false
   allowed_formats:
     - full_html
+    - plain_text
 field_type: text_with_summary

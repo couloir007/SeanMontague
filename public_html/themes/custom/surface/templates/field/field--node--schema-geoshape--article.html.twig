@@ -1,0 +1,21 @@
+{% set is_gpx = false %}
+{% set gpx_url = '' %}
+
+{% for item in element['#items'] %}
+  {% set media = item.entity %}
+  {% set file  = media ? media.field_media_file.entity : null %}
+  {% if file and gpx_url == '' and file.filename.value matches '/\\.gpx$/i' %}
+    {% set is_gpx  = true %}
+    {% set gpx_url = file.fileuri|file_url %}
+  {% endif %}
+{% endfor %}
+
+{% if is_gpx %}
+  {% include '@components/side-card/side-card.twig' with {
+    label: 'Download',
+    fig: 'Fig 07',
+    rows: [
+      { label: 'GPX Track', value: '<a href="' ~ gpx_url ~ '" download>Download GPX</a>'|raw }
+    ],
+  } only %}
+{% endif %}

@@ -1,0 +1,14 @@
+main_modifier: ''
+main: |
+  <div class="prose">
+    <h2>Getting There</h2>
+    <p>The main reading column renders rich-text body content via the <strong>prose</strong> pattern — paragraphs, headings, lists, and links all pick up consistent typography with no per-instance styling.</p>
+    <h3>A Subheading</h3>
+    <ul>
+      <li>List items get the dash marker from prose</li>
+      <li>And a hairline divider between rows</li>
+    </ul>
+  </div>
+aside: |
+  <p>Aside content sits in a sticky sidebar on wide viewports and collapses
+  beneath the main column on narrow ones — sidebar cards, related links, or POIs.</p>

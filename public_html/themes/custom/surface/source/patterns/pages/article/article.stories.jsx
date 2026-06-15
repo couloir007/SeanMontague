@@ -1,6 +1,6 @@
 import page from './article.twig';
 import data from './article.yml';
-import articleData from '../../collections/article/article.yml';
+import articleData from '../../layouts/article/article.yml';
 
 const settings = {
   title: 'Pages/Article',

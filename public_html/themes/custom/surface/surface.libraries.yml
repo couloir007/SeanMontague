@@ -420,11 +420,13 @@ map:
     - surface/leaflet
 
 article:
+  dependencies:
+    - surface/map-section
+
+content-aside:
   css:
     component:
-      dist/css/article.css: {}
-  dependencies:
-    - surface/article-map-section
+      dist/css/content-aside.css: {}
 
 trip:
   css:
@@ -440,10 +442,10 @@ article-header:
   dependencies:
     - surface/stats-bar
 
-article-map-section:
+map-section:
   css:
     component:
-      dist/css/article-map-section.css: {}
+      dist/css/map-section.css: {}
   dependencies:
     - surface/map
     - surface/elevation-profile
@@ -469,10 +471,10 @@ links:
     component:
       dist/css/links.css: {}
 
-map-section:
+homepage-map-section:
   css:
     component:
-      dist/css/map-section.css: {}
+      dist/css/homepage-map-section.css: {}
   dependencies:
     - surface/map
     - core/drupal

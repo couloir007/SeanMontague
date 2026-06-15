@@ -6,17 +6,15 @@
  * Dependencies: Leaflet (window.L), surface/map library.
  */
 
-(function (Drupal) {
-  'use strict';
-
+((Drupal) => {
   Drupal.behaviors.destHybrid = {
-    attach: function (context) {
+    attach: (context) => {
       var sections = context.querySelectorAll('[data-dest-hybrid]:not(.dh-processed)');
-      sections.forEach(function (section) {
+      sections.forEach((section) => {
         section.classList.add('dh-processed');
         initDestHybrid(section);
       });
-    }
+    },
   };
 
   function initDestHybrid(section) {
@@ -24,7 +22,9 @@
     var timeline = section.querySelector('[data-dest-timeline]');
     var nodes = section.querySelectorAll('.dest-hybrid__node');
 
-    if (!mapEl || !window.L) return;
+    if (!mapEl || !window.L) {
+      return;
+    }
 
     // Parse map config from data attrs
     var centerStr = mapEl.dataset.center || '53.3,-8.0';
@@ -35,43 +35,48 @@
     // Init Leaflet
     var map = L.map(mapEl, {
       scrollWheelZoom: false,
-      zoomControl: true
+      zoomControl: true,
     }).setView(center, zoom);
 
     L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenTopoMap (CC-BY-SA), © OpenStreetMap',
-      maxZoom: 17
+      maxZoom: 17,
     }).addTo(map);
 
     // Build markers + polyline from node data attrs
     var markers = {};
     var latlngs = [];
 
-    nodes.forEach(function (node, i) {
+    nodes.forEach((node, i) => {
       var slug = node.dataset.slug;
       var lat = parseFloat(node.dataset.lat);
       var lon = parseFloat(node.dataset.lon);
-      if (isNaN(lat) || isNaN(lon)) return;
+      if (Number.isNaN(lat) || Number.isNaN(lon)) {
+        return;
+      }
 
       latlngs.push([lat, lon]);
       var idx = String(i + 1).padStart(2, '0');
 
       var icon = L.divIcon({
         className: 'dest-hybrid-marker',
-        html: '<span class="dest-hybrid-marker__pin"></span><span class="dest-hybrid-marker__num">' + idx + '</span>',
+        html:
+          '<span class="dest-hybrid-marker__pin"></span><span class="dest-hybrid-marker__num">' +
+          idx +
+          '</span>',
         iconSize: [32, 32],
-        iconAnchor: [16, 16]
+        iconAnchor: [16, 16],
       });
 
       var marker = L.marker([lat, lon], { icon: icon })
         .addTo(map)
         .bindTooltip(idx + ' ' + node.querySelector('.dest-hybrid__node-name').textContent, {
           direction: 'top',
-          offset: [0, -12]
+          offset: [0, -12],
         });
 
       // Click marker: activate + scroll timeline
-      marker.on('click', function () {
+      marker.on('click', () => {
         activateNode(node);
         expandNode(node);
         scrollToNode(node);
@@ -86,15 +91,15 @@
     }
 
     // Node hover: fly map
-    nodes.forEach(function (node) {
-      node.addEventListener('mouseenter', function () {
+    nodes.forEach((node) => {
+      node.addEventListener('mouseenter', () => {
         activateNode(node);
       });
 
       // Node click: toggle expand
       var btn = node.querySelector('.dest-hybrid__node-head');
       if (btn) {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', () => {
           var isExpanded = btn.getAttribute('aria-expanded') === 'true';
           if (isExpanded) {
             collapseNode(node);
@@ -111,25 +116,31 @@
       var lon = parseFloat(node.dataset.lon);
 
       // Clear active from all
-      nodes.forEach(function (n) { n.classList.remove('dest-hybrid__node--active'); });
+      nodes.forEach((n) => {
+        n.classList.remove('dest-hybrid__node--active');
+      });
       node.classList.add('dest-hybrid__node--active');
 
       // Clear active from all markers
-      Object.entries(markers).forEach(function (entry) {
+      Object.entries(markers).forEach((entry) => {
         var el = entry[1].getElement();
-        if (el) el.classList.toggle('dest-hybrid-marker--active', entry[0] === slug);
+        if (el) {
+          el.classList.toggle('dest-hybrid-marker--active', entry[0] === slug);
+        }
       });
 
       // Fly map
-      if (!isNaN(lat) && !isNaN(lon)) {
+      if (!Number.isNaN(lat) && !Number.isNaN(lon)) {
         map.flyTo([lat, lon], 9, { duration: 0.8 });
       }
     }
 
     function expandNode(node) {
       // Collapse all others
-      nodes.forEach(function (n) {
-        if (n !== node) collapseNode(n);
+      nodes.forEach((n) => {
+        if (n !== node) {
+          collapseNode(n);
+        }
       });
 
       var btn = node.querySelector('.dest-hybrid__node-head');
@@ -152,10 +163,11 @@
     }
 
     function scrollToNode(node) {
-      if (!timeline) return;
+      if (!timeline) {
+        return;
+      }
       var top = node.offsetTop - timeline.offsetTop - 12;
       timeline.scrollTo({ top: top, behavior: 'smooth' });
     }
   }
-
 })(Drupal);

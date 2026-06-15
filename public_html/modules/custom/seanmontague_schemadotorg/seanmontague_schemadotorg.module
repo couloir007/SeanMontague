@@ -24,6 +24,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\node\NodeInterface;
 use Drupal\seanmontague_schemadotorg\JsonLd\ArticleJsonLd;
 use Drupal\seanmontague_schemadotorg\JsonLd\LodgingJsonLd;
+use Drupal\seanmontague_schemadotorg\JsonLd\PersonJsonLd;
 use Drupal\seanmontague_schemadotorg\JsonLd\PointOfInterestJsonLd;
 use Drupal\seanmontague_schemadotorg\JsonLd\TouristTripJsonLd;
 
@@ -37,6 +38,7 @@ use Drupal\seanmontague_schemadotorg\JsonLd\TouristTripJsonLd;
  * Corrections applied here:
  *   - copyrightYear on the mainEntity, resolved from schema_date_published
  *     (content date) rather than node created time (page date).
+ *   - @url -> url normalization across the entire assembled output (last).
  */
 function seanmontague_schemadotorg_schemadotorg_jsonld_alter(array &$data, RouteMatchInterface $route_match, BubbleableMetadata $bubbleable_metadata): void {
   $node = $route_match->getParameter('node');
@@ -99,6 +101,25 @@ function seanmontague_schemadotorg_schemadotorg_jsonld_alter(array &$data, Route
       unset($data['schemadotorg_jsonld_breadcrumb_schemadotorg_jsonld']);
     }
   }
+
+  // Enrich the mainEntity Person stub. Blueprints emits a referenced mainEntity
+  // as a minimal stub (type/name/url) WITHOUT running it through the per-entity
+  // alter hook, so PersonJsonLd must be applied here, on the assembled output.
+  if (isset($data['schemadotorg_jsonld_entity']['mainEntity']['@type'])
+    && in_array('Person', (array) $data['schemadotorg_jsonld_entity']['mainEntity']['@type'], TRUE)
+    && $node->hasField('schema_main_entity')
+    && !$node->get('schema_main_entity')->isEmpty()
+  ) {
+    $person = $node->get('schema_main_entity')->entity;
+    if ($person instanceof NodeInterface && $person->bundle() === 'person') {
+      PersonJsonLd::alter($data['schemadotorg_jsonld_entity']['mainEntity'], $person, $bubbleable_metadata);
+    }
+  }
+
+  // Normalize @url -> url across the entire assembled output. Runs LAST so it
+  // sweeps the values written by the corrections above (and by Blueprints).
+  _seanmontague_normalize_url_keys($data);
+  _seanmontague_normalize_iso_dates($data);
 }
 
 /**
@@ -115,12 +136,14 @@ function seanmontague_schemadotorg_schemadotorg_jsonld_alter(array &$data, Route
  *   - 'Article'      — the BlogPosting mainEntity for article nodes
  *   - 'TouristTrip'  — the TouristTrip mainEntity for tourist_trip nodes
  *   - 'TouristAttraction' — a referenced geo_entity:poi
+ *   - ['Person','ProfilePage'] — a referenced person node (e.g. mainEntity)
  *
  * Enrichment applied here:
  *   - geo_entity:poi    → TouristAttraction JSON-LD via PointOfInterestJsonLd
  *   - geo_entity:lodging → Lodging JSON-LD via LodgingJsonLd
  *   - tourist_trip (TouristTrip pass) → trip dates via TouristTripJsonLd
  *   - article (Article pass) → mentions, spatialCoverage via ArticleJsonLd
+ *   - person (Person pass) → knowsAbout, description via PersonJsonLd
  *   - WebPage wrapper → isPartOf @url/@id corrected to site root
  */
 function seanmontague_schemadotorg_schemadotorg_jsonld_schema_type_entity_alter(array &$data, EntityInterface $entity, mixed $mapping, BubbleableMetadata $bubbleable_metadata): void {
@@ -156,6 +179,16 @@ function seanmontague_schemadotorg_schemadotorg_jsonld_schema_type_entity_alter(
     return;
   }
 
+  // person fires as ['Person','ProfilePage'] when rendered as the homepage
+  // WebPage's mainEntity (referenced via schema_main_entity). The @type is an
+  // ARRAY here, so match Person within it (not a scalar === check). Enrich with
+  // knowsAbout + description. No return — if a person node is ever the routed
+  // page, the WebPage isPartOf fix below should still run (its @type guard
+  // won't match the Person/ProfilePage array, so this is safe).
+  if ($bundle === 'person' && in_array('Person', (array) ($data['@type'] ?? []), TRUE)) {
+    PersonJsonLd::alter($data, $entity, $bubbleable_metadata);
+  }
+
   // WebPage wrapper — applies to all node bundles.
   // Blueprints wraps every node page in WebPage regardless of Schema.org type.
   // Fix isPartOf @url/@id to point to the site root rather than the web_site
@@ -171,6 +204,10 @@ function seanmontague_schemadotorg_schemadotorg_jsonld_schema_type_entity_alter(
  * Blueprints generates the URL from the web_site node's path (e.g.
  * /node/121). The canonical identifier for a WebSite is the site root —
  * the node path is an implementation detail, not a semantic identifier.
+ *
+ * Note: the @url written here is normalized to `url` later by
+ * _seanmontague_normalize_url_keys() in the page-level alter hook. @id is a
+ * valid JSON-LD keyword and is left as-is.
  *
  * @param array $data
  *   Entity JSON-LD data array containing an isPartOf key.
@@ -189,6 +226,33 @@ function _seanmontague_schema_is_part_of(array $data): array {
   unset($part);
 
   return $data;
+}
+
+/**
+ * Recursively converts date values to strict ISO 8601 (T separator, no space
+ * before the timezone offset).
+ *
+ * Blueprints emits dates like "2026-05-22 12:53:27 -04:00"; valid Schema.org /
+ * ISO 8601 is "2026-05-22T12:53:27-04:00". Only known date-bearing keys are
+ * touched, so non-date strings are never accidentally rewritten.
+ *
+ * @param array $data
+ *   The JSON-LD data array (modified by reference).
+ */
+function _seanmontague_normalize_iso_dates(array &$data): void {
+  $date_keys = ['dateCreated', 'dateModified', 'datePublished', 'startDate', 'endDate', 'uploadDate'];
+  foreach ($data as $key => &$value) {
+    if (is_array($value)) {
+      _seanmontague_normalize_iso_dates($value);
+    }
+    elseif (is_string($value) && in_array($key, $date_keys, TRUE)) {
+      $ts = strtotime($value);
+      if ($ts !== FALSE) {
+        $value = date('c', $ts);
+      }
+    }
+  }
+  unset($value);
 }
 
 /**
@@ -213,4 +277,33 @@ function _seanmontague_copyright_year(NodeInterface $node): int {
     }
   }
   return (int) date('Y', (int) $node->getCreatedTime());
+}
+
+/**
+ * Recursively renames the invalid '@url' key to the valid Schema.org 'url'.
+ *
+ * Schema.org Blueprints emits '@url' in places; '@url' is not a valid JSON-LD
+ * keyword or Schema.org property — 'url' is. This normalizes the entire
+ * assembled JSON-LD tree in one pass so every entity (WebPage, mainEntity,
+ * isPartOf WebSite, etc.) emits 'url' consistently. If 'url' already exists on
+ * a node, the '@url' value is dropped rather than overwriting it. '@id' is a
+ * valid JSON-LD keyword and is intentionally NOT touched.
+ *
+ * @param array $data
+ *   The JSON-LD data array (modified by reference).
+ */
+function _seanmontague_normalize_url_keys(array &$data): void {
+  foreach ($data as $key => &$value) {
+    if (is_array($value)) {
+      _seanmontague_normalize_url_keys($value);
+    }
+  }
+  unset($value);
+
+  if (array_key_exists('@url', $data)) {
+    if (!array_key_exists('url', $data)) {
+      $data['url'] = $data['@url'];
+    }
+    unset($data['@url']);
+  }
 }

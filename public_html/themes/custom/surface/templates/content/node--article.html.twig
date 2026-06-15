@@ -1,227 +1,109 @@
 {#
 /**
  * @file
- * Article node template — handles all post types via schema_category.
+ * Article node template — renders an article node's CONTENT.
  *
- * Map sources (any combination):
- * - schema_geoshape (data_download media) → GeoJSON track + elevation profile
- *                               Stats (distance, gain, loss, min, max)
- *                               computed from GeoJSON Z values by map.js
- * - schema_geo (geofield)     → map center fallback only, no marker
- * - schema_place (entity ref) → map center fallback only, no marker
+ * ╔══════════════════════════════════════════════════════════════════════════╗
+ * ║ THIS TEMPLATE IS PURE MARKUP. It computes almost nothing.                 ║
+ * ║ All data is built upstream in the preprocess hook:                        ║
+ * ║   includes/node.theme → surface_preprocess_node__article()               ║
+ * ║     ├─ trail_mapper.article_geo_data ->build($node)   (geo/track/stats)   ║
+ * ║     │    modules/custom/trail_mapper/src/Service/ArticleGeoData.php       ║
+ * ║     └─ seanmontague_map.article_map_data ->build($node) (markers/config)  ║
+ * ║   The hook also computes the unified `has_map` and `article_header`.      ║
+ * ║   See README-node--article.md for the full variable→source map.          ║
+ * ╚══════════════════════════════════════════════════════════════════════════╝
  *
- * Stats bar totals are COMPUTED in-template from the referenced track media
- * (dist_modes, summed per route_type in the schema_geoshape loop below) — the
- * old schema_distance_* / schema_elev_* node fields have been removed. All track
- * stats live on data_download media in meters; the stats bar renders a metric
- * baseline + data-attributes and stats-bar.js converts to the unit preference.
+ * RENDERS CONTENT ONLY. page.html.twig owns the page shell (it extends
+ * @layouts/site-container). This template must NOT extend site-container (that
+ * nests the shell inside itself) and must NOT render the site nav (nav is page
+ * chrome from the header region → site-header).
+ *
+ * ── Variables this template consumes (all from the hook unless noted) ──
+ *   article_header   object: title/subtitle/date/category/category_key/
+ *                    difficulty/stats/map_id     → article-header include
+ *   stats            top stats bar (inside article_header)  [ArticleGeoData]
+ *   map_id           '' when no map; 'article-map-<nid>' otherwise   [hook]
+ *   map_center       fallback center (overridden by fitBounds)  [ArticleGeoData]
+ *   map_zoom, tiles  base map config                  [ArticleMapData]
+ *   map_markers      destination/POI/lodging pins      [ArticleMapData]
+ *   geojson_url(s)   track file URL(s)                 [ArticleGeoData]
+ *   track_stats      per-track stats (METERS)          [ArticleGeoData]
+ *   map_lines, drupal_geo_rendered   null on the article path (the shared
+ *                    map-section reads both)                         [hook]
+ *   main_modifier    'content-aside__main--with-map' when has_map  [hook]
+ *   body             content.body|field_value  ← THE ONE value set BELOW (Twig)
+ *
+ * ── What makes an article show a map (has_map, computed in the hook) ──
+ *   has_geoshape (GeoJSON track media) OR has_geo (node geofield) OR
+ *   has_place (referenced place) OR map_markers not empty.
+ *   A marker-only article (no track/geo/place) STILL gets a map — intentional.
+ *
+ * ── Sidebar content is rendered by FIELD TEMPLATES, not built here ──
+ *   {{ content.schema_geoshape }} → GPX download (field template/display)
+ *   {{ content.schema_poi }}      → POI side-card
+ *        templates/field/field--node--schema-poi--article.html.twig
  */
 #}
 
+{# `body` is the ONE value still set Twig-side — it is a render array
+   (content.body|field_value), cleaner to resolve here than in the hook.
+   Everything else comes from includes/node.theme (see header above). #}
+{% set body = content.body|field_value %}
 
 
+{# ──────────────────────────────────────────────────────────────────────────
+   COMPONENT COMPOSITION  (rendered in this order)
+   1. reading-progress  — scroll bar (element)
+   2. article-header    — title/date/category/difficulty + stats (collection)
+   3. map-section       — full-width map + elevation profile (collection)
+                          NB: the ARTICLE route block, not homepage-map-section
+   4. content-aside     — two-column body + sidebar shell (layout)
+   Composed directly here (not delegated to @layouts/article). Content only —
+   no site-container extend, no nav.
+   ────────────────────────────────────────────────────────────────────────── #}
 
+{# 1 ─ Reading progress bar #}
+{% include '@elements/reading-progress/reading-progress.twig' %}
 
-{# ── Geo sources ── #}
-{# schema_geoshape is multi-value: collect a URL for every referenced media
-   that has a file. The first file drives is_gpx, the elevation profile, and
-   the download card; the full list drives the multi-track map. #}
-{% set geojson_urls = [] %}
-{% set track_stats  = [] %}
-{% set dist_modes   = {} %}
-{% set geo_file     = null %}
-{% for item in node.schema_geoshape %}
-  {% set media = item.entity %}
-  {% set file  = media ? media.field_media_file.entity : null %}
-  {% if file %}
-    {% if geo_file is null %}
-      {% set geo_file = file %}
-    {% endif %}
-    {% set geojson_urls = geojson_urls|merge([file.fileuri|file_url]) %}
-    {# Per-mode distance totals (METERS), summed by route_type key. Dynamic hash
-       key needs the (rt_key) parenthesis syntax. #}
-    {% set rt_key = media.field_route_type.entity ? media.field_route_type.entity.field_key.value : null %}
-    {% if rt_key and media.field_distance.value is not empty %}
-      {% set prev = dist_modes[rt_key]|default(0) %}
-      {% set dist_modes = dist_modes|merge({ (rt_key): prev + media.field_distance.value }) %}
-    {% endif %}
-    {# Index-matched to geojson_urls (same media per index). Values are stored
-       in METERS; the map/elevation JS converts for display. null is fine —
-       the JS skips null stats. #}
-    {% set track_stats = track_stats|merge([{
-      'distance':      media.field_distance.value,
-      'ascent':        media.field_ascent.value,
-      'descent':       media.field_descent.value,
-      'min_elev':      media.field_min_elevation.value,
-      'max_elev':      media.field_max_elevation.value,
-      'duration':      media.field_duration.value,
-      'duration_unit': media.field_duration_units.value,
-      'route_type':    media.field_route_type.entity ? media.field_route_type.entity.field_key.value : null,
-      'name':          media.name.value,
-    }]) %}
-  {% endif %}
-{% endfor %}
-{% set geojson_url  = geojson_urls[0]|default(null) %}
-{% set is_gpx       = geo_file and geo_file.filename.value matches '/\\.gpx$/i' %}
-{% set has_geoshape = geojson_urls is not empty %}
-{% set has_geo      = not node.schema_geo.isEmpty() %}
-{% set place        = node.schema_place.entity %}
-{% set has_place    = place and place.schema_latitude.value is not empty %}
-{% set has_map      = has_geoshape or has_geo or has_place %}
-
-{# ── Top summary stats bar — category-gated, COMPUTED from track media ──
-   Only 'trails' and 'travel' categories get a bar. Per-mode distances come from
-   dist_modes (METERS, keyed by route_type field_key, summed in the
-   schema_geoshape loop above). Distance stats carry `meters` and stats-bar.js
-   converts to the unit toggle live. NO elevation here (that lives only in the
-   profile). The old schema_distance_* / schema_elev_* node fields are gone. #}
-{% set category = node.schema_category.entity %}
-{% set cat_key  = category ? category.field_key.value : null %}
-{% set stats = [] %}
-
-{% if cat_key == 'trails' or cat_key == 'travel' %}
-  {# dist_modes (per-mode METERS) was built in the schema_geoshape loop above. #}
-  {# Fixed, sensible mode order. #}
-  {% set mode_labels = { 'driving': 'Driving', 'ferry': 'Ferry', 'cycling': 'Cycling', 'hiking': 'Hiking', 'walking': 'Walking' } %}
-  {% for key, label in mode_labels %}
-    {% if dist_modes[key] is defined and dist_modes[key] > 0 %}
-      {% set stats = stats|merge([{
-        label:  label,
-        value:  dist_modes[key],
-        unit:   'distance',
-        meters: dist_modes[key],
-      }]) %}
-    {% endif %}
-  {% endfor %}
-
-  {# Travel only — POI count (unit-agnostic, never converted). #}
-  {% if cat_key == 'travel' and node.schema_poi is not empty %}
-    {% set poi_count = node.schema_poi|length %}
-    {% if poi_count > 0 %}
-      {% set stats = stats|merge([{label: 'Points of Interest', value: poi_count, unit: null}]) %}
-    {% endif %}
-  {% endif %}
+{# 2 ─ Article header: title, date, category, difficulty, stats bar.
+       Built as the `article_header` object in the preprocess hook. #}
+{% if article_header %}
+  {% include '@collections/article-header/article-header.twig' with article_header only %}
 {% endif %}
 
-{# ── Map center fallback — overridden by fitBounds when geojson present ── #}
-{% if has_geo %}
-  {% set map_center = node.schema_geo.lat.value ~ ',' ~ node.schema_geo.lon.value %}
-{% elseif has_place %}
-  {% set map_center = place.schema_latitude.value ~ ',' ~ place.schema_longitude.value %}
-{% else %}
-  {% set map_center = '44.593,-71.918' %}
-{% endif %}
-
-{# ── Map markers ── #}
-{% set map_markers = [] %}
-{# Destination markers — sky blue #}
-{% for item in node.schema_destination %}
-  {% set dest = item.entity %}
-  {% if dest and not dest.schema_geo.isEmpty() %}
-    {% set map_markers = map_markers|merge([{
-      'lat':   dest.schema_geo.lat,
-      'lon':   dest.schema_geo.lon,
-      'type':  'destination',
-      'label': '<strong>' ~ dest.title.value ~ '</strong>',
-    }]) %}
-  {% endif %}
-{% endfor %}
-
-{# POI markers — forest green #}
-{% for item in node.schema_poi %}
-  {% set poi = item.entity %}
-  {% if poi and not poi.schema_geo.isEmpty() %}
-    {% set map_markers = map_markers|merge([{
-      'lat':   poi.schema_geo.lat,
-      'lon':   poi.schema_geo.lon,
-      'type':  'poi',
-      'label': '<strong>' ~ poi.label.value ~ '</strong>',
-    }]) %}
-  {% endif %}
-{% endfor %}
-
-{# Lodging markers — sky blue #}
-{% for item in node.schema_lodging %}
-  {% set dest = item.entity %}
-  {% if dest and not dest.schema_geo.isEmpty() %}
-    {% set map_markers = map_markers|merge([{
-      'lat':   dest.schema_geo.lat,
-      'lon':   dest.schema_geo.lon,
-      'type':  'destination',
-      'label': '<strong>' ~ dest.label.value ~ '</strong>',
-    }]) %}
-  {% endif %}
-{% endfor %}
-
-{# ── Map ID ── #}
-{% set map_id = has_map ? 'article-map-' ~ node.id : '' %}
-
-{% set tiles = node.field_map_tiles.value %}
-
-{# ── Sidebar cards ── #}
-{% set sidebar_cards = [] %}
-{% if is_gpx %}
-  {% set sidebar_cards = sidebar_cards|merge([{
-    'heading': 'Download',
-    'body': '<a href="' ~ geo_file.fileuri|file_url ~ '" download>Download GPX</a>',
-  }]) %}
-{% endif %}
-
-
-
-{# Points of Interest sidebar card (side-card poi variant). Name-only: the
-   geo_entity:poi bundle has no field for a category 'type' or a 'mile' marker,
-   so those are omitted (the side-card renders fine with name alone). #}
-{% set poi_items = [] %}
-{% for item in node.schema_poi %}
-  {% set poi = item.entity %}
-  {% if poi %}
-    {% set poi_items = poi_items|merge([{
-      'name': poi.label.value,
-    }]) %}
-  {% endif %}
-{% endfor %}
-{% if poi_items %}
-  {% set sidebar_cards = sidebar_cards|merge([{
-    'label':   'Points of Interest',
-    'variant': 'poi',
-    'pois':    poi_items,
-  }]) %}
-{% endif %}
-
-
-
-{% set category      = node.schema_category.entity %}
-{% set category_key  = category and category.field_key.value ? category.field_key.value : 'default' %}
-{% set category_name = category ? category.label.value : '' %}
-
-{# Node renders CONTENT ONLY — page.html.twig owns the header/main/footer shell
-   (it extends site-container). This template must NOT extend site-container too,
-   or the shell nests inside itself. #}
-{% include '@collections/article/article.twig' with {
-  'header': {
-    'title':        node.label.value,
-    'date':         node.schema_date_published.value ? node.schema_date_published.value|date('F j, Y') : '',
-    'category':     category_name,
-    'category_key': category_key,
-    'difficulty':   node.schema_difficulty.value,
-    'stats':        stats,
-    'map_id':       map_id,
-  },
-  'map_label':           has_map ? (category_name ?: 'Map') : null,
-  'map_title':           has_map ? node.label.value : null,
-  'map_text':            null,
+{# 3 ─ Article map + elevation section (full width).
+       Renders a map only when map_id is set (has_map). All map data from the
+       hook/services. The article map-section renders map + elevation only — no
+       label/title (those were removed; that's the homepage promo block's job). #}
+{% include '@collections/map-section/map-section.twig' with {
   'map_id':              map_id,
   'map_center':          map_center,
-  'map_zoom':            13,
+  'map_zoom':            map_zoom,
   'map_markers':         map_markers,
-  'map_lines':           null,
-  'tiles':               tiles,
-  'drupal_geo_rendered': null,
+  'map_lines':           map_lines,
   'geojson_url':         geojson_url,
   'geojson_urls':        geojson_urls,
   'track_stats':         track_stats,
-  'body':                content.body|field_value,
-  'body_modifier':       has_map ? 'article__body--with-map' : '',
-  'sidebar_cards':       sidebar_cards,
+  'drupal_geo_rendered': drupal_geo_rendered,
+  'tiles':               tiles,
 } only %}
+
+
+{# 4 ─ Body + sidebar: generic two-column shell (@layouts/content-aside).
+       main  = the article prose body
+       aside = field-rendered cards (GPX download + POI side-card) #}
+{% embed '@layouts/content-aside/content-aside.twig' with {
+  'main_modifier': main_modifier,
+} %}
+  {% block main %}
+    {# Drop cap is opt-in: add class="drop-cap" to the first <p> in the body HTML. #}
+    <div class="prose">{{ body }}</div>
+  {% endblock %}
+  {% block aside %}
+    {# Sidebar cards come from FIELD TEMPLATES (not built in this node):
+       schema_geoshape → GPX download; schema_poi → POI side-card. #}
+    {{ content.schema_geoshape }}
+    {{ content.schema_poi }}
+  {% endblock %}
+{% endembed %}

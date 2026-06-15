@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.field.geo_entity.poi.field_body
     - field.field.geo_entity.poi.field_day
+    - field.field.geo_entity.poi.field_poi_type
     - field.field.geo_entity.poi.field_show_on_map
     - field.field.geo_entity.poi.schema_address
     - field.field.geo_entity.poi.schema_geo
@@ -24,12 +25,6 @@ targetEntityType: geo_entity
 bundle: poi
 mode: default
 content:
-  created:
-    type: datetime_timestamp
-    weight: 12
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   field_body:
     type: text_textarea
     weight: 2
@@ -44,6 +39,12 @@ content:
     region: content
     settings:
       placeholder: ''
+    third_party_settings: {  }
+  field_poi_type:
+    type: options_select
+    weight: 3
+    region: content
+    settings: {  }
     third_party_settings: {  }
   field_show_on_map:
     type: boolean_checkbox
@@ -60,23 +61,16 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-  langcode:
-    type: language_select
-    weight: 13
-    region: content
-    settings:
-      include_locked: true
-    third_party_settings: {  }
   schema_address:
     type: address_default
-    weight: 5
+    weight: 6
     region: content
     settings:
       wrapper_type: fieldset
     third_party_settings: {  }
   schema_geo:
     type: geofield_latlon
-    weight: 3
+    weight: 5
     region: content
     settings:
       html5_geolocation: false
@@ -103,7 +97,7 @@ content:
     third_party_settings: {  }
   schema_same_as:
     type: link_default
-    weight: 7
+    weight: 11
     region: content
     settings:
       placeholder_url: ''
@@ -111,7 +105,7 @@ content:
     third_party_settings: {  }
   schema_telephone:
     type: telephone_default
-    weight: 6
+    weight: 7
     region: content
     settings:
       placeholder: ''
@@ -123,14 +117,7 @@ content:
     settings:
       display_label: false
     third_party_settings: {  }
-  uid:
-    type: entity_reference_autocomplete
-    weight: 11
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-hidden: {  }
+hidden:
+  created: true
+  langcode: true
+  uid: true

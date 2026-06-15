@@ -12,7 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
    * If the header is not present on the page, no behavior is applied.
    */
   const header = document.querySelector('.site-header');
-  if (!header) return;
+  if (!header) {
+    return;
+  }
 
   /**
    * Drupal toolbar container.
@@ -55,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
       fixedHeight += toolbarBar.offsetHeight;
     }
 
-    if (adminTray && adminTray.classList.contains('is-active')) {
+    if (adminTray?.classList.contains('is-active')) {
       fixedHeight += adminTray.offsetHeight;
     }
 
@@ -72,6 +74,23 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       header.style.insetBlockStart = `${fixedHeight}px`;
     }
+
+    // Publish the header's final (toolbar-aware) bottom so in-flow content can
+    // reserve exactly that clearance via --site-header-clearance. Read AFTER the
+    // position above is set so it reflects the new layout.
+    setContentOffset();
+  }
+
+  /**
+   * Exposes the fixed header's current bottom edge as the
+   * --site-header-clearance CSS custom property on :root, so the single .main
+   * top offset always matches the header height in every toolbar state.
+   */
+  function setContentOffset() {
+    document.documentElement.style.setProperty(
+      '--site-header-clearance',
+      `${header.getBoundingClientRect().bottom}px`
+    );
   }
 
   /**

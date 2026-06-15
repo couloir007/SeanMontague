@@ -61,14 +61,14 @@ source/
 
 ### Collections
 
-`article`, `article-header`, `article-map-section`, `map-section`,
+`article`, `article-header`, `map-section`, `homepage-map-section`,
 `destination`, `trip`.
 
 ### Layouts
 
 `site-container`, `site-header` (shell with `{% block navigation %}`),
-`site-navigation`, `site-footer`, `site-homepage`, `page`, `region`, `block`,
-`main`, `media`, `view`, `content-edit`, `layout-container`.
+`site-navigation`, `site-footer`, `site-homepage`, `content-aside`, `page`,
+`region`, `block`, `main`, `media`, `view`, `content-edit`, `layout-container`.
 
 ---
 
@@ -99,13 +99,13 @@ never in a layout or collection stylesheet (see Gotcha #3).
 ```css
 /* CORRECT */
 .map { }
-.article__body { }
+.content-aside__main { }
 .hero--compact { }
 
 /* WRONG */
-.surface-map { }        /* no theme prefix on classes */
-.myComponent { }        /* camelCase */
-.article_body { }       /* snake/underscore block-element */
+.surface-map { }            /* no theme prefix on classes */
+.myComponent { }            /* camelCase */
+.content-aside_main { }     /* snake/underscore block-element */
 ```
 
 The `surface/` prefix appears only in **library names** (`attach_library('surface/map')`)

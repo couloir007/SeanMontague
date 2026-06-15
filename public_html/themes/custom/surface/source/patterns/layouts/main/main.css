@@ -5,6 +5,10 @@
 
 .main {
   min-width: 0;
+  /* Single, toolbar-aware clearance for the fixed .site-header. site-header.js
+     keeps --site-header-clearance in sync with the header's live bottom; the
+     58px fallback covers the pre-JS / no-JS state. */
+  padding-block-start: var(--site-header-clearance, 58px);
   position: relative;
   width: 100%;
 }

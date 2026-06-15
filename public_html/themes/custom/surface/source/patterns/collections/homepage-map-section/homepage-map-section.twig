@@ -1,0 +1,43 @@
+{{ attach_library('surface/homepage-map-section') }}
+
+<section class="homepage-map-section" id="{{ section_id|default('maps') }}">
+
+  {% if label %}
+    <span class="homepage-map-section__label">{{ label }}</span>
+  {% endif %}
+
+  <div class="homepage-map-section__layout">
+
+    <div class="homepage-map-section__content">
+      {% if title %}
+        <h2 class="homepage-map-section__title">{{ title|raw }}</h2>
+      {% endif %}
+      {% if text %}
+        <div class="homepage-map-section__text">{{ text|raw }}</div>
+      {% endif %}
+      {% if links %}
+        <div class="homepage-map-section__links">
+          {% for link in links %}
+            <a href="{{ link.url }}" class="homepage-map-section__link-item">
+              <span>{{ link.text }}</span>
+              <span class="homepage-map-section__arrow">→</span>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="homepage-map-section__map-container">
+      {% include '@components/map/map.twig' with {
+        'map_id':      map_id|default('featured-map'),
+        'center':      map_center,
+        'zoom':        map_zoom|default(13),
+        'interactive': 'true',
+        'markers':     map_markers,
+        'geojson_url':  geojson_url,
+        'geojson_urls': geojson_urls,
+      }|merge(map_lines ? { 'lines': map_lines } : {}) only %}
+    </div>
+
+  </div>
+</section>

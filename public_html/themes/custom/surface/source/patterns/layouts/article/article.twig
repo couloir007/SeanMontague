@@ -1,0 +1,46 @@
+{{ attach_library('surface/article') }}
+
+{# Site nav is rendered by the layout chain (site-container → site-header), not
+   by article content. Article's own header is article-header.twig below. #}
+
+{% include '@elements/reading-progress/reading-progress.twig' %}
+
+{% if article_header %}
+  {% include '@collections/article-header/article-header.twig' with article_header only %}
+{% endif %}
+
+{# Article-level map + elevation section — full width #}
+{% include '@collections/map-section/map-section.twig' with {
+  'label':       map_label,
+  'title':       map_title,
+  'text':        map_text,
+  'map_id':      map_id,
+  'map_center':  map_center,
+  'map_zoom':    map_zoom,
+  'map_markers': map_markers,
+  'map_lines':   map_lines,
+  'elev_gain':   elev_gain,
+  'elev_loss':   elev_loss,
+  'elev_min':    elev_min,
+  'elev_max':    elev_max,
+  'elev_data':          elev_data,
+  'geojson_url':        geojson_url,
+  'geojson_urls':       geojson_urls,
+  'drupal_geo_rendered': drupal_geo_rendered,
+  'tiles':              tiles,
+} only %}
+
+{# Body + sidebar — generic two-column shell #}
+{% embed '@layouts/content-aside/content-aside.twig' with {
+  'main_modifier': main_modifier,
+} %}
+  {% block main %}
+    {# Drop cap is opt-in: add class="drop-cap" to the first <p> in the body HTML. #}
+    <div class="prose">{{ body }}</div>
+  {% endblock %}
+  {% block aside %}
+    {% for card in sidebar_cards %}
+      {% include '@components/side-card/side-card.twig' with card only %}
+    {% endfor %}
+  {% endblock %}
+{% endembed %}

@@ -1,0 +1,50 @@
+uuid: 0f3401ca-6762-4b5d-9de3-560782fd90c1
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.geo_entity.side_card
+    - field.field.geo_entity.poi.field_body
+    - field.field.geo_entity.poi.field_day
+    - field.field.geo_entity.poi.field_poi_type
+    - field.field.geo_entity.poi.field_show_on_map
+    - field.field.geo_entity.poi.schema_address
+    - field.field.geo_entity.poi.schema_geo
+    - field.field.geo_entity.poi.schema_image
+    - field.field.geo_entity.poi.schema_place
+    - field.field.geo_entity.poi.schema_same_as
+    - field.field.geo_entity.poi.schema_telephone
+    - geo_entity.geo_entity_type.poi
+  module:
+    - layout_builder
+third_party_settings:
+  layout_builder:
+    enabled: false
+    allow_custom: false
+id: geo_entity.poi.side_card
+targetEntityType: geo_entity
+bundle: poi
+mode: side_card
+content:
+  field_poi_type:
+    type: entity_reference_label
+    label: hidden
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  created: true
+  field_body: true
+  field_day: true
+  field_show_on_map: true
+  langcode: true
+  schema_address: true
+  schema_geo: true
+  schema_image: true
+  schema_place: true
+  schema_same_as: true
+  schema_telephone: true
+  status: true
+  uid: true

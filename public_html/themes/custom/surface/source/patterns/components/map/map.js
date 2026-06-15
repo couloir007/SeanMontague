@@ -35,13 +35,12 @@
 /* global L, Drupal, console */
 
 (() => {
-  "use strict";
-
   // True when coords carry real (non-zero, finite) elevation. Matches
   // elevation-profile.js's data-driven chart rule — used to decide whether to
   // hint that tracks are clickable for elevation (not mode-based).
   const trackHasElevation = (coords) =>
-    Array.isArray(coords) && coords.some((c) => c.length >= 3 && isFinite(c[2]) && c[2] !== 0);
+    Array.isArray(coords) &&
+    coords.some((c) => c.length >= 3 && Number.isFinite(c[2]) && c[2] !== 0);
 
   // Strip a leading trip-day prefix ("Day 4:", "Leg 2 -", "Stop 3 —") from a
   // track's display name. The shown name is the GeoJSON feature property
@@ -50,8 +49,12 @@
   // Requires both a number and a separator, so "Stage Road Loop" /
   // "Part of the Burren" are left intact; never returns an empty string.
   const stripDayPrefix = (name) => {
-    if (!name) return name;
-    const cleaned = name.replace(/^(Day|Leg|Stop|Part|Stage|Segment)\s*\d+\s*[:\-–—]\s*/iu, '').trim();
+    if (!name) {
+      return name;
+    }
+    const cleaned = name
+      .replace(/^(Day|Leg|Stop|Part|Stage|Segment)\s*\d+\s*[:\-–—]\s*/iu, '')
+      .trim();
     return cleaned !== '' ? cleaned : name;
   };
 
@@ -76,7 +79,7 @@
       attr: 'Tiles &copy; <a href="https://usgs.gov">USGS</a> The National Map',
       maxZoom: 16,
     },
-    'osm': {
+    osm: {
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       attr: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       maxZoom: 19,
@@ -104,7 +107,9 @@
 
     const lookup = (key) => {
       const t = serverSets[key] ?? TILE_SETS[key];
-      if (!t) return null;
+      if (!t) {
+        return null;
+      }
       return { url: t.url, attr: t.attribution ?? t.attr ?? '', maxZoom: t.maxZoom ?? 16 };
     };
 
@@ -112,13 +117,17 @@
     const attrKey = el.dataset.mapTiles;
     if (attrKey) {
       const t = lookup(attrKey);
-      if (t) return t;
+      if (t) {
+        return t;
+      }
     }
 
     // Priority 2 — global admin tile key from drupalSettings
     if (ds?.tileKey) {
       const t = lookup(ds.tileKey);
-      if (t) return t;
+      if (t) {
+        return t;
+      }
     }
     if (ds?.tileUrl) {
       return { url: ds.tileUrl, attr: ds.tileAttribution ?? '', maxZoom: ds.tileMaxZoom ?? 16 };
@@ -134,23 +143,28 @@
   const surfaceMarker = (type, color) => {
     const configs = {
       poi: {
-        ring: '#3a5a40', fill: 'rgba(58,90,64,0.15)',
+        ring: '#3a5a40',
+        fill: 'rgba(58,90,64,0.15)',
         inner: '<polygon points="12,5 19,17 5,17" fill="#3a5a40"/>',
       },
       destination: {
-        ring: '#4a7c9e', fill: 'rgba(74,124,158,0.15)',
+        ring: '#4a7c9e',
+        fill: 'rgba(74,124,158,0.15)',
         inner: '<circle cx="12" cy="12" r="5" fill="#4a7c9e"/>',
       },
       lodging: {
-        ring: '#a05a00', fill: 'rgba(160,90,0,0.15)',
+        ring: '#a05a00',
+        fill: 'rgba(160,90,0,0.15)',
         inner: '<rect x="7.5" y="7.5" width="9" height="9" rx="1.5" fill="#a05a00"/>',
       },
       trail: {
-        ring: '#7a3410', fill: 'rgba(122,52,16,0.15)',
+        ring: '#7a3410',
+        fill: 'rgba(122,52,16,0.15)',
         inner: '<polygon points="12,5 19,12 12,19 5,12" fill="#7a3410"/>',
       },
       place: {
-        ring: '#3a5a40', fill: 'rgba(58,90,64,0.1)',
+        ring: '#3a5a40',
+        fill: 'rgba(58,90,64,0.1)',
         inner: '<circle cx="12" cy="12" r="5" fill="#3a5a40" opacity="0.5"/>',
       },
     };
@@ -165,10 +179,11 @@
         className: '',
       });
     }
-    const svg = `<svg width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">`
-      + `<circle cx="12" cy="12" r="11" fill="${c.fill}" stroke="${c.ring}" stroke-width="2"/>`
-      + c.inner
-      + `</svg>`;
+    const svg =
+      `<svg width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">` +
+      `<circle cx="12" cy="12" r="11" fill="${c.fill}" stroke="${c.ring}" stroke-width="2"/>` +
+      c.inner +
+      `</svg>`;
     return L.divIcon({
       html: svg,
       className: '',
@@ -179,9 +194,14 @@
   };
 
   const parseJSON = (str, fallback) => {
-    if (!str) return fallback;
-    try { return JSON.parse(str); }
-    catch { return fallback; }
+    if (!str) {
+      return fallback;
+    }
+    try {
+      return JSON.parse(str);
+    } catch {
+      return fallback;
+    }
   };
 
   const flattenCoords = (geojson) => {
@@ -189,24 +209,38 @@
     // Handles 4-value coords [lon, lat, ele, time] by ignoring index 3+.
     const pts = [];
     geojson.features?.forEach(({ geometry }) => {
-      if (!geometry) return;
+      if (!geometry) {
+        return;
+      }
       if (geometry.type === 'LineString') {
-        geometry.coordinates.forEach((c) => pts.push(c));
+        geometry.coordinates.forEach((c) => {
+          pts.push(c);
+        });
       } else if (geometry.type === 'MultiLineString') {
-        geometry.coordinates.forEach((line) => line.forEach((c) => pts.push(c)));
+        geometry.coordinates.forEach((line) => {
+          line.forEach((c) => {
+            pts.push(c);
+          });
+        });
       }
       // Skip Point features — those are waypoints, not track coords
     });
     return pts;
   };
 
-  const initLeaflet = async (el, geojson, { lat, lon, zoom, interactive, markers, lines, tile, mapId, geojsonUrls, trackStats = [] }) => {
+  const initLeaflet = async (
+    el,
+    geojson,
+    { lat, lon, zoom, interactive, markers, lines, tile, mapId, geojsonUrls, trackStats = [] }
+  ) => {
     // Guard against double-init (fetch error catch calling initLeaflet twice)
-    if (el._leafletMapInstance) return;
+    if (el._leafletMapInstance) {
+      return;
+    }
     el._leafletMapInstance = true;
 
-    const initLat = isFinite(lat) ? lat : 44.593;
-    const initLon = isFinite(lon) ? lon : -71.918;
+    const initLat = Number.isFinite(lat) ? lat : 44.593;
+    const initLon = Number.isFinite(lon) ? lon : -71.918;
     const map = L.map(el, {
       center: [initLat, initLon],
       zoom,
@@ -223,7 +257,14 @@
     lines.forEach((line) => {
       L.geoJSON(
         { type: 'Feature', geometry: { type: 'LineString', coordinates: line.coords } },
-        { style: { color: line.color ?? '#3a5a40', weight: line.weight ?? 3, opacity: 0.85, dashArray: line.dash ?? null } }
+        {
+          style: {
+            color: line.color ?? '#3a5a40',
+            weight: line.weight ?? 3,
+            opacity: 0.85,
+            dashArray: line.dash ?? null,
+          },
+        }
       ).addTo(map);
     });
 
@@ -231,7 +272,7 @@
     const markerLatLngs = [];
     markers.forEach((m) => {
       // Skip markers with invalid coordinates
-      if (!isFinite(m.lat) || !isFinite(m.lon) || m.lat == null || m.lon == null) {
+      if (!Number.isFinite(m.lat) || !Number.isFinite(m.lon) || m.lat == null || m.lon == null) {
         console.warn('map: skipping marker with invalid coords', m);
         return;
       }
@@ -244,9 +285,17 @@
 
       if (m.entity_type && m.entity_id) {
         marker.on('click', () => {
-          window.dispatchEvent(new CustomEvent('surface-map-marker-click', {
-            detail: { entity_type: m.entity_type, entity_id: m.entity_id, map_id: mapId, lat: m.lat, lon: m.lon },
-          }));
+          window.dispatchEvent(
+            new CustomEvent('surface-map-marker-click', {
+              detail: {
+                entity_type: m.entity_type,
+                entity_id: m.entity_id,
+                map_id: mapId,
+                lat: m.lat,
+                lon: m.lon,
+              },
+            })
+          );
         });
       }
     });
@@ -267,9 +316,18 @@
     // Dispatch a track selection so listeners (e.g. the elevation profile) can
     // swap to the clicked track.
     const selectTrack = (track) => {
-      window.dispatchEvent(new CustomEvent('surface-track-select', {
-        detail: { map_id: mapId, route_type: track.route_type, coords: track.coords, name: track.name, stats: track.stats, profile: track.profile },
-      }));
+      window.dispatchEvent(
+        new CustomEvent('surface-track-select', {
+          detail: {
+            map_id: mapId,
+            route_type: track.route_type,
+            coords: track.coords,
+            name: track.name,
+            stats: track.stats,
+            profile: track.profile,
+          },
+        })
+      );
     };
 
     // Single shared "you are here" marker, driven by the elevation profile's
@@ -277,16 +335,25 @@
     // clear — so it can never leak or appear on two tracks.
     let hoverMarker = null;
     window.addEventListener('surface-profile-hover', (e) => {
-      if (e.detail.map_id !== mapId) return;
-      if (e.detail.clear || !isFinite(e.detail.lat) || !isFinite(e.detail.lon)) {
-        if (hoverMarker) { map.removeLayer(hoverMarker); hoverMarker = null; }
+      if (e.detail.map_id !== mapId) {
+        return;
+      }
+      if (e.detail.clear || !Number.isFinite(e.detail.lat) || !Number.isFinite(e.detail.lon)) {
+        if (hoverMarker) {
+          map.removeLayer(hoverMarker);
+          hoverMarker = null;
+        }
         return;
       }
       const ll = [e.detail.lat, e.detail.lon];
       if (!hoverMarker) {
         hoverMarker = L.circleMarker(ll, {
-          radius: 7, color: '#fff', weight: 2,
-          fillColor: '#3a5a40', fillOpacity: 1, interactive: false,
+          radius: 7,
+          color: '#fff',
+          weight: 2,
+          fillColor: '#3a5a40',
+          fillOpacity: 1,
+          interactive: false,
         }).addTo(map);
       } else {
         hoverMarker.setLatLng(ll);
@@ -298,8 +365,8 @@
       // waypoints that crash Leaflet's marker renderer.
       const trackOnlyGeojson = {
         type: 'FeatureCollection',
-        features: geojson.features.filter(({ geometry }) =>
-          geometry?.type === 'LineString' || geometry?.type === 'MultiLineString'
+        features: geojson.features.filter(
+          ({ geometry }) => geometry?.type === 'LineString' || geometry?.type === 'MultiLineString'
         ),
       };
 
@@ -310,9 +377,9 @@
       // Single track: flatten its coords; route_type + human name from the first
       // track feature (prefer title, then name).
       const trackName = stripDayPrefix(
-        trackOnlyGeojson.features[0]?.properties?.title
-        ?? trackOnlyGeojson.features[0]?.properties?.name
-        ?? null
+        trackOnlyGeojson.features[0]?.properties?.title ??
+          trackOnlyGeojson.features[0]?.properties?.name ??
+          null
       );
       const track = {
         route_type: trackOnlyGeojson.features[0]?.properties?.route_type ?? null,
@@ -331,7 +398,11 @@
     // ── Multi-track GeoJSON (trip page) ───────────────────────────────────
     if (!geojson && geojsonUrls.length) {
       const results = await Promise.all(
-        geojsonUrls.map((url) => fetch(url).then((r) => r.ok ? r.json() : null).catch(() => null))
+        geojsonUrls.map((url) =>
+          fetch(url)
+            .then((r) => (r.ok ? r.json() : null))
+            .catch(() => null)
+        )
       );
 
       // Per-feature styling from properties.route_type. The style map comes from
@@ -353,11 +424,14 @@
       };
 
       results.forEach((gj, i) => {
-        if (!gj) return;
+        if (!gj) {
+          return;
+        }
         const trackOnly = {
           type: 'FeatureCollection',
-          features: gj.features.filter(({ geometry }) =>
-            geometry?.type === 'LineString' || geometry?.type === 'MultiLineString'
+          features: gj.features.filter(
+            ({ geometry }) =>
+              geometry?.type === 'LineString' || geometry?.type === 'MultiLineString'
           ),
         };
         const layer = L.geoJSON(trackOnly, {
@@ -367,14 +441,18 @@
 
         // Tracks are clickable (for their elevation profile) — show a pointer
         // cursor on the path elements. Markers are untouched.
-        layer.eachLayer((p) => { if (p._path) p._path.style.cursor = 'pointer'; });
+        layer.eachLayer((p) => {
+          if (p._path) {
+            p._path.style.cursor = 'pointer';
+          }
+        });
 
         // Keep this track's own coords + route_type + human name (from its first
         // feature; prefer title, then name).
         const trackName = stripDayPrefix(
-          trackOnly.features[0]?.properties?.title
-          ?? trackOnly.features[0]?.properties?.name
-          ?? null
+          trackOnly.features[0]?.properties?.title ??
+            trackOnly.features[0]?.properties?.name ??
+            null
         );
         const track = {
           // File is authoritative for route_type (eligibility + styling); the
@@ -402,19 +480,33 @@
 
     // ── invalidateSize + fitBounds after layout ────────────────────────────
     const fitToData = () => {
-      if (!interactive) return;
+      if (!interactive) {
+        return;
+      }
       if (allTrackLayers.length) {
         const bounds = L.latLngBounds();
-        allTrackLayers.forEach((layer) => bounds.extend(layer.getBounds()));
-        markerLatLngs.forEach((ll) => bounds.extend(ll));
-        if (bounds.isValid()) map.fitBounds(bounds, { padding: [32, 32] });
+        allTrackLayers.forEach((layer) => {
+          bounds.extend(layer.getBounds());
+        });
+        markerLatLngs.forEach((ll) => {
+          bounds.extend(ll);
+        });
+        if (bounds.isValid()) {
+          map.fitBounds(bounds, { padding: [32, 32] });
+        }
       } else if (markerLatLngs.length > 1) {
         map.fitBounds(L.latLngBounds(markerLatLngs), { padding: [32, 32] });
       }
     };
 
-    requestAnimationFrame(() => { map.invalidateSize(); fitToData(); });
-    setTimeout(() => { map.invalidateSize(); fitToData(); }, 150);
+    requestAnimationFrame(() => {
+      map.invalidateSize();
+      fitToData();
+    });
+    setTimeout(() => {
+      map.invalidateSize();
+      fitToData();
+    }, 150);
     setTimeout(() => map.invalidateSize(), 500);
 
     // ── Register ───────────────────────────────────────────────────────────
@@ -424,12 +516,16 @@
 
     // tracks: full per-track array so listeners that load before any click can
     // pick the initial track. coords kept for backward-compat = first track.
-    window.dispatchEvent(new CustomEvent('surface-map-ready', {
-      detail: { map_id: mapId, map, coords: tracks[0]?.coords ?? null, tracks },
-    }));
+    window.dispatchEvent(
+      new CustomEvent('surface-map-ready', {
+        detail: { map_id: mapId, map, coords: tracks[0]?.coords ?? null, tracks },
+      })
+    );
 
     // ── Ctrl+scroll / touch gesture hints ─────────────────────────────────
-    if (!interactive) return;
+    if (!interactive) {
+      return;
+    }
 
     let hintEl = null;
     let hintTimer = null;
@@ -451,7 +547,9 @@
     };
 
     const showHint = (text) => {
-      if (Date.now() - lastHintTime < 3000) return;
+      if (Date.now() - lastHintTime < 3000) {
+        return;
+      }
       const hint = getHint();
       hint.textContent = text;
       hint.style.opacity = '1';
@@ -462,21 +560,31 @@
       }, 1500);
     };
 
-    el.addEventListener('wheel', (e) => {
-      if (e.ctrlKey) {
-        e.preventDefault();
-        map.scrollWheelZoom.enable();
-        clearTimeout(scrollWheelTimer);
-        scrollWheelTimer = setTimeout(() => map.scrollWheelZoom.disable(), 500);
-      } else {
-        showHint('Hold Ctrl to zoom');
-      }
-    }, { passive: false });
+    el.addEventListener(
+      'wheel',
+      (e) => {
+        if (e.ctrlKey) {
+          e.preventDefault();
+          map.scrollWheelZoom.enable();
+          clearTimeout(scrollWheelTimer);
+          scrollWheelTimer = setTimeout(() => map.scrollWheelZoom.disable(), 500);
+        } else {
+          showHint('Hold Ctrl to zoom');
+        }
+      },
+      { passive: false }
+    );
 
     if (window.matchMedia('(pointer: coarse)').matches) {
-      el.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) showHint('Use two fingers to move the map');
-      }, { passive: true });
+      el.addEventListener(
+        'touchstart',
+        (e) => {
+          if (e.touches.length === 1) {
+            showHint('Use two fingers to move the map');
+          }
+        },
+        { passive: true }
+      );
     }
 
     // One-time hint that tracks are clickable for elevation. Only when the
@@ -488,7 +596,9 @@
   };
 
   const initMap = async (el) => {
-    if (el._surfaceMapInit) return;
+    if (el._surfaceMapInit) {
+      return;
+    }
     el._surfaceMapInit = true;
 
     if (typeof L === 'undefined') {
@@ -512,7 +622,18 @@
     const mapId = el.id ?? 'map';
     const tile = resolveTile(el);
 
-    const opts = { lat, lon, zoom, interactive, markers, lines, tile, mapId, geojsonUrls, trackStats };
+    const opts = {
+      lat,
+      lon,
+      zoom,
+      interactive,
+      markers,
+      lines,
+      tile,
+      mapId,
+      geojsonUrls,
+      trackStats,
+    };
 
     // The multi-track array takes precedence: only run the single-URL fetch
     // when there is no geojson_urls array. In the article case both are set
@@ -522,7 +643,9 @@
     if (geojsonUrl && !geojsonUrls.length) {
       try {
         const r = await fetch(geojsonUrl);
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        if (!r.ok) {
+          throw new Error(`HTTP ${r.status}`);
+        }
         const geojson = await r.json();
         initLeaflet(el, geojson, opts);
       } catch (err) {
@@ -536,7 +659,9 @@
 
   const initAll = (context) => {
     const root = context ?? document;
-    root.querySelectorAll('.map').forEach((el) => initMap(el));
+    root.querySelectorAll('.map').forEach((el) => {
+      initMap(el);
+    });
   };
 
   // Drupal
@@ -557,5 +682,5 @@
       return;
     }
     setTimeout(() => waitForLeaflet(attempts + 1), 100);
-  }(0));
+  })(0);
 })();

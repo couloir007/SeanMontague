@@ -1,0 +1,19 @@
+uuid: 5f43f44e-21b1-4459-b82d-1990786df1c3
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_knows_about
+    - node.type.person
+id: node.person.schema_knows_about
+field_name: schema_knows_about
+entity_type: node
+bundle: person
+label: 'Knows about'
+description: 'Skills, areas of expertise, and subjects of knowledge.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

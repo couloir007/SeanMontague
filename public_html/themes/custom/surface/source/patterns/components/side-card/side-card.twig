@@ -26,7 +26,12 @@
         <li class="side-card__poi">
           {% if poi.mile %}<span class="side-card__poi-mile">{{ poi.mile }}</span>{% endif %}
           <span class="side-card__poi-info">
-            <span class="side-card__poi-name">{{ poi.name }}</span>
+            {% if poi.url %}
+              <a href="{{ poi.url }}" class="side-card__poi-name side-card__poi-link">{{ poi.name }}</a>
+            {% else %}
+              <span class="side-card__poi-name">{{ poi.name }}</span>
+            {% endif %}
+
             {% if poi.type %}
               <span class="side-card__poi-type">{{ poi.type }}</span>
             {% endif %}

@@ -22,7 +22,7 @@ templates/
 │   └── block--system-messages-block.html.twig
 ├── content/
 │   ├── node.html.twig
-│   ├── node--article.html.twig            # article + trail_report → @collections/article
+│   ├── node--article.html.twig            # article + trail_report → @layouts/article
 │   ├── node--tourist-trip.html.twig       # tourist_trip → @collections/trip  ✅ active
 │   ├── node--trip.html.twig               # ⚠️ LEGACY — do not use, delete it
 │   ├── node--place.html.twig              # ⚠️ geo fields need updating
@@ -99,7 +99,7 @@ Prevents Drupal context variables (`node`, `content`, `attributes`…) from
 leaking into the pattern scope and causing unexpected rendering.
 
 ```twig
-{% include '@collections/article/article.twig' with { ... } only %}
+{% include '@layouts/article/article.twig' with { ... } only %}
 ```
 
 ### Smart Date — use `[0]`, never `.first`
@@ -169,7 +169,7 @@ fields — this was a bug causing null map coordinates. The rule is:
 Handles both `article` and `trail_report` bundles. Trail-report-specific
 fields (stats, geoshape, elevation) are conditionally included.
 
-**Collection:** `@collections/article/article.twig`
+**Layout:** `@layouts/article/article.twig`
 
 **Key traversals:**
 ```twig
@@ -251,11 +251,12 @@ Place content type's geofield name is confirmed.
 ### `layout--section-two-col.html.twig`
 
 ```twig
-<div{{ attributes.addClass('surface-article-wrap') }}>
-  <div{{ region_attributes.main.addClass('surface-article__body') }}>
+{{ attach_library('surface/content-aside') }}
+<div{{ attributes.addClass('content-aside') }}>
+  <div{{ region_attributes.main.addClass('content-aside__main') }}>
     {{ content.main }}
   </div>
-  <aside{{ region_attributes.aside.addClass('surface-article__sidebar') }}>
+  <aside{{ region_attributes.aside.addClass('content-aside__aside') }}>
     {{ content.aside }}
   </aside>
 </div>
@@ -307,7 +308,7 @@ Drupal uses the most specific template suggestion that exists. As long as
 
 | Template | Bundle(s) | Collection |
 |---|---|---|
-| `node--article.html.twig` | `article`, `trail_report` | `@collections/article/article.twig` |
+| `node--article.html.twig` | `article`, `trail_report` | `@layouts/article/article.twig` |
 | `node--tourist-trip.html.twig` | `tourist_trip` | `@collections/trip/trip.twig` |
 
 ---

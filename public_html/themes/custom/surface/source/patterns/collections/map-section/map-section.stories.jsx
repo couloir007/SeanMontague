@@ -1,15 +1,12 @@
-import mapSection from './map-section.twig';
+import articleMapSection from './map-section.twig';
 import data from './map-section.yml';
 
 const settings = {
   title: 'Collections/Map Section',
-  parameters: {
-    layout: 'fullscreen',
-  },
 };
 
 export const Default = {
-  render: (args) => mapSection(args),
+  render: (args) => articleMapSection(args),
   args: { ...data },
 };
 

@@ -1,0 +1,11 @@
+uuid: 1dd5d9f9-3641-4582-b371-8ebd40803904
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.front
+label: Front
+description: ''
+targetEntityType: node
+cache: true

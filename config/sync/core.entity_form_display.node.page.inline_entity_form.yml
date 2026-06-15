@@ -5,6 +5,8 @@ dependencies:
   config:
     - core.entity_form_mode.node.inline_entity_form
     - field.field.node.page.body
+    - field.field.node.page.field_about_label
+    - field.field.node.page.field_about_title
     - field.field.node.page.field_cta_ghost
     - field.field.node.page.field_cta_primary
     - field.field.node.page.field_editorial
@@ -106,6 +108,8 @@ content:
     third_party_settings: {  }
 hidden:
   body: true
+  field_about_label: true
+  field_about_title: true
   field_cta_ghost: true
   field_cta_primary: true
   field_editorial: true

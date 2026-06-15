@@ -1,0 +1,11 @@
+uuid: a20ddea7-a076-4be0-9d11-0fb33ca02c23
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+id: geo_entity.mapping
+label: Mapping
+description: ''
+targetEntityType: geo_entity
+cache: true
