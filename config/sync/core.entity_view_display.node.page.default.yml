@@ -10,6 +10,7 @@ dependencies:
     - field.field.node.page.field_cta_primary
     - field.field.node.page.field_editorial
     - field.field.node.page.field_eyebrow
+    - field.field.node.page.field_layout_template
     - field.field.node.page.field_map_markers
     - field.field.node.page.field_map_zoom
     - field.field.node.page.field_metatag
@@ -41,7 +42,7 @@ content:
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    weight: 1
+    weight: 0
     region: content
   field_about_label:
     type: string
@@ -142,6 +143,7 @@ content:
     region: content
 hidden:
   field_editorial: true
+  field_layout_template: true
   langcode: true
   links: true
   schema_about: true

@@ -1,0 +1,27 @@
+uuid: 8c980dc4-394b-4a25-85df-525a681a51e5
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_layout_template
+field_name: field_layout_template
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: trips
+      label: Trips
+    -
+      value: trails
+      label: Trails
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

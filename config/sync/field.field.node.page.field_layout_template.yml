@@ -1,0 +1,21 @@
+uuid: bcd9fe33-ab60-42a2-bdd4-32734617aee3
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_layout_template
+    - node.type.page
+  module:
+    - options
+id: node.page.field_layout_template
+field_name: field_layout_template
+entity_type: node
+bundle: page
+label: 'Layout Template'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

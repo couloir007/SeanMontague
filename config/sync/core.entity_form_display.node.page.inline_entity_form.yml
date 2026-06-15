@@ -11,6 +11,7 @@ dependencies:
     - field.field.node.page.field_cta_primary
     - field.field.node.page.field_editorial
     - field.field.node.page.field_eyebrow
+    - field.field.node.page.field_layout_template
     - field.field.node.page.field_map_markers
     - field.field.node.page.field_map_zoom
     - field.field.node.page.field_metatag
@@ -114,6 +115,7 @@ hidden:
   field_cta_primary: true
   field_editorial: true
   field_eyebrow: true
+  field_layout_template: true
   field_map_markers: true
   field_map_zoom: true
   field_metatag: true

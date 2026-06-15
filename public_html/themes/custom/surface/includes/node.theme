@@ -17,17 +17,45 @@
  * no base surface_preprocess_node() is needed.
  */
 
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\node\NodeInterface;
-
 
 /**
  * Implements hook_theme_suggestions_node_alter().
  *
  * Adds a 'node--page--front' template suggestion for the front page node
  * so the homepage uses node-homepage.twig while other pages render directly.
+ *
+ * @throws \Drupal\Core\TypedData\Exception\MissingDataException
  */
 function surface_theme_suggestions_node_alter(array &$suggestions, array $variables): void {
-  $node = $variables['elements']['#node'];
+  $node = $variables['elements']['#node'] ?? NULL;
+  if (!$node instanceof NodeInterface) {
+    return;
+  }
+
+  // Editor-selected layout template (field_layout_template). Pushed first so
+  // the front-page suggestion below can still take precedence on the homepage.
+  $item = $node->get('field_layout_template')->first();
+  $referenced_entity = $item instanceof EntityReferenceItem
+    ? $item->get('entity')->getValue()
+    : NULL;
+
+  $raw = $referenced_entity
+    ? (string) $referenced_entity->label()
+    : (string) ($item->value ?? '');
+  $raw = trim($raw);
+  if ($raw !== '') {
+    $token = str_replace('-', '_', Html::cleanCssIdentifier(mb_strtolower($raw)));
+    if ($token !== '') {
+      $suggestions[] = 'node__' . $token;
+      $suggestions[] = 'node__' . $node->bundle() . '__' . $token;
+    }
+  }
+
+  // Front page keeps its dedicated template — pushed last so it wins on the
+  // homepage even if that page node also has a layout template selected.
   if ($node->bundle() === 'page' && \Drupal::service('path.matcher')->isFrontPage()) {
     $suggestions[] = 'node__page__front';
   }
@@ -211,7 +239,3 @@ function surface_preprocess_node__person__front(array &$variables): void {
     'skills' => $skills,
   ];
 }
-
-
-
-
