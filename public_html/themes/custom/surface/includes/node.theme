@@ -37,20 +37,22 @@ function surface_theme_suggestions_node_alter(array &$suggestions, array $variab
 
   // Editor-selected layout template (field_layout_template). Pushed first so
   // the front-page suggestion below can still take precedence on the homepage.
-  $item = $node->get('field_layout_template')->first();
-  $referenced_entity = $item instanceof EntityReferenceItem
-    ? $item->get('entity')->getValue()
-    : NULL;
+  if ($node->hasField('field_layout_template')) {
+    $item = $node->get('field_layout_template')->first();
+    $referenced_entity = $item instanceof EntityReferenceItem
+      ? $item->get('entity')->getValue()
+      : NULL;
 
-  $raw = $referenced_entity
-    ? (string) $referenced_entity->label()
-    : (string) ($item->value ?? '');
-  $raw = trim($raw);
-  if ($raw !== '') {
-    $token = str_replace('-', '_', Html::cleanCssIdentifier(mb_strtolower($raw)));
-    if ($token !== '') {
-      $suggestions[] = 'node__' . $token;
-      $suggestions[] = 'node__' . $node->bundle() . '__' . $token;
+    $raw = $referenced_entity
+      ? (string) $referenced_entity->label()
+      : (string) ($item->value ?? '');
+    $raw = trim($raw);
+    if ($raw !== '') {
+      $token = str_replace('-', '_', Html::cleanCssIdentifier(mb_strtolower($raw)));
+      if ($token !== '') {
+        $suggestions[] = 'node__' . $token;
+        $suggestions[] = 'node__' . $node->bundle() . '__' . $token;
+      }
     }
   }
 
@@ -138,6 +140,148 @@ function surface_preprocess_node__article(array &$variables): void {
     'difficulty'   => $node->hasField('schema_difficulty') ? $node->get('schema_difficulty')->value : NULL,
     'stats'        => $geo['stats'],
     'map_id'       => $map_id,
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for node--tourist-trip.html.twig.
+ *
+ * @param array $variables
+ *   The node template variables, passed by reference.
+ */
+function surface_preprocess_node__tourist_trip(array &$variables): void {
+  $node = $variables['node'] ?? NULL;
+  if (!$node instanceof NodeInterface) {
+    return;
+  }
+
+  $geo = \Drupal::service('trail_mapper.article_geo_data')->buildTrip($node);
+  $map = \Drupal::service('seanmontague_map.article_map_data')->buildTrip($node);
+
+  // ── Stats bar ──
+  // 1. Days (from schema_itinerary count).
+  $days = $node->get('schema_itinerary')->count();
+  $dates_str = '';
+  if ($node->hasField('schema_trip_dates') && !$node->get('schema_trip_dates')->isEmpty()) {
+    $item = $node->get('schema_trip_dates')[0];
+    $start = (int) $item->value;
+    $end = (int) $item->end_value;
+    if ($start > 0 && $end > 0) {
+      $dates_str = date('F j', $start) . '–' . date('F j, Y', $end);
+      if ($days > 0) {
+        $dates_str .= ' · ' . $days . ' Days';
+      }
+    }
+  }
+
+  $stats = [];
+  if ($days > 0) {
+    $stats[] = [
+      'label' => 'Days',
+      'value' => $days,
+      'unit'  => NULL,
+    ];
+  }
+
+  // 2. Distances (from ArticleGeoData) — aggregate total across all modes (overview granularity;
+  //    the per-mode breakdown stays on the day articles). METERS; the units
+  //    toggle converts at display.
+  $total_dist = array_sum($geo['dist_modes']);
+  if ($total_dist > 0) {
+    $stats[] = [
+      'label'  => 'Distance Traveled',
+      'value'  => $total_dist,
+      'unit'   => 'distance',
+      'meters' => $total_dist,
+    ];
+  }
+
+
+  // 3. Destinations count (deduped across itinerary articles).
+  // ── Itinerary pass: day list + deduped destination/POI ids. ──
+  $dest_list = [];
+  $dest_ids  = [];
+  $poi_ids   = [];
+
+  // Collect unique entity-reference target ids from $field into $ids.
+  $collect_ids = static function (NodeInterface $article, string $field, array &$ids): void {
+    if (!$article->hasField($field)) {
+      return;
+    }
+    foreach ($article->get($field) as $ref) {
+      if ($ref->target_id) {
+        $ids[$ref->target_id] = TRUE;
+      }
+    }
+  };
+
+  if ($node->hasField('schema_itinerary')) {
+    foreach ($node->get('schema_itinerary') as $item) {
+      $article = $item->entity;
+      if (!$article instanceof NodeInterface) {
+        continue;
+      }
+
+      $art_date = '';
+      if ($article->hasField('schema_date_published') && !$article->get('schema_date_published')->isEmpty()) {
+        $art_date = date('M j', strtotime($article->get('schema_date_published')->value));
+      }
+
+      $dest_list[] = [
+        'name'   => $article->label(),
+        'region' => $article->hasField('schema_address') ? $article->get('schema_address')->administrative_area : '',
+        'dates'  => $art_date,
+      ];
+
+      $collect_ids($article, 'schema_destination', $dest_ids);
+      $collect_ids($article, 'schema_poi', $poi_ids);
+    }
+  }
+
+  // Count stats — added only when non-zero.
+  foreach ([
+    'Destinations'       => count($dest_ids),
+    'Points of Interest' => count($poi_ids),
+  ] as $label => $count) {
+    if ($count > 0) {
+      $stats[] = ['label' => $label, 'value' => $count, 'unit' => NULL];
+    }
+  }
+
+  // ── Narrative / Body ──
+  $editorial = $node->hasField('field_editorial') ? $node->get('field_editorial')->view('default') : NULL;
+  $body = $node->hasField('body') ? $node->get('body')->view('default') : NULL;
+
+  // ── Hero Image ──
+  $image_url = NULL;
+  if ($node->hasField('schema_image') && !$node->get('schema_image')->isEmpty()) {
+    $media = $node->get('schema_image')->entity;
+    $file = $media ? $media->get('field_media_image')->entity : NULL;
+    if ($file) {
+      $image_url = \Drupal::service('file_url_generator')->generateString($file->getFileUri());
+    }
+  }
+
+  // ── Trip Data object ──
+  $variables['trip_data'] = [
+    'label'             => 'Travel',
+    'title'             => $node->label(),
+    'dates'             => $dates_str,
+    'image_url'         => $image_url,
+    'stats'             => $stats,
+    'map_id'            => 'trip-map-' . $node->id(),
+    'map_center'        => !empty($map['map_markers']) ? $map['map_markers'][0]['lat'] . ',' . $map['map_markers'][0]['lon'] : '53.0,-8.2',
+    'map_zoom'          => 7,
+    'map_label'         => 'Route Map — ' . $node->label(),
+    'map_note'          => 'Click markers for details',
+    'map_markers'       => $map['map_markers'],
+    'tiles'             => $map['tiles'] ?: 'open-topo',
+    'geojson_urls'      => $geo['geojson_urls'],
+    'track_stats'       => $geo['track_stats'],
+    'body'              => $body,
+    'destinations'      => $dest_list,
+    'narrative_kicker'  => 'Trip Notes',
+    'narrative_heading' => $editorial,
   ];
 }
 

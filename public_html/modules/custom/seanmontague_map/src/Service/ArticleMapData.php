@@ -66,12 +66,7 @@ class ArticleMapData {
     };
 
     $map_markers = [];
-    // Destination markers — type 'destination' (sky blue, styled client-side).
-    $this->collectMarkers($node, 'schema_destination', $map_markers, fn(EntityInterface $e) => $decorate($e, 'destination'));
-    // POI markers — type 'poi' (forest green).
-    $this->collectMarkers($node, 'schema_poi', $map_markers, fn(EntityInterface $e) => $decorate($e, 'poi'));
-    // Lodging markers — rendered as 'destination' type (matching the template).
-    $this->collectMarkers($node, 'schema_lodging', $map_markers, fn(EntityInterface $e) => $decorate($e, 'destination'));
+    $this->collectArticleMarkers($node, $map_markers, $decorate);
 
     $tiles = $node->hasField('field_map_tiles') ? $node->get('field_map_tiles')->value : NULL;
 
@@ -80,6 +75,56 @@ class ArticleMapData {
       'map_zoom'    => self::DEFAULT_MAP_ZOOM,
       'tiles'       => $tiles,
     ];
+  }
+
+  /**
+   * Build marker + map-config data for a TRIP node.
+   *
+   * Aggregates markers across all itinerary articles.
+   *
+   * @param \Drupal\node\NodeInterface $trip
+   *   The tourist_trip node.
+   *
+   * @return array
+   *   Keyed: map_markers, map_zoom, tiles.
+   */
+  public function buildTrip(NodeInterface $trip): array {
+    $decorate = static function (EntityInterface $entity, string $type): array {
+      return [
+        'type'  => $type,
+        'label' => '<strong>' . $entity->label() . '</strong>',
+      ];
+    };
+
+    $map_markers = [];
+    if ($trip->hasField('schema_itinerary')) {
+      foreach ($trip->get('schema_itinerary') as $item) {
+        $article = $item->entity;
+        if ($article instanceof NodeInterface) {
+          $this->collectArticleMarkers($article, $map_markers, $decorate);
+        }
+      }
+    }
+
+    $tiles = $trip->hasField('field_map_tiles') ? $trip->get('field_map_tiles')->value : NULL;
+
+    return [
+      'map_markers' => $map_markers,
+      'map_zoom'    => self::DEFAULT_MAP_ZOOM,
+      'tiles'       => $tiles,
+    ];
+  }
+
+  /**
+   * Internal helper to collect standard article markers.
+   */
+  protected function collectArticleMarkers(NodeInterface $node, array &$map_markers, callable $decorate): void {
+    // Destination markers — type 'destination' (sky blue, styled client-side).
+    $this->collectMarkers($node, 'schema_destination', $map_markers, fn(EntityInterface $e) => $decorate($e, 'destination'));
+    // POI markers — type 'poi' (forest green).
+    $this->collectMarkers($node, 'schema_poi', $map_markers, fn(EntityInterface $e) => $decorate($e, 'poi'));
+    // Lodging markers — rendered as 'destination' type (matching the template).
+    $this->collectMarkers($node, 'schema_lodging', $map_markers, fn(EntityInterface $e) => $decorate($e, 'destination'));
   }
 
   /**

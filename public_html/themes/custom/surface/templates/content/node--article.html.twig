@@ -4,13 +4,13 @@
  * Article node template — renders an article node's CONTENT.
  *
  * ╔══════════════════════════════════════════════════════════════════════════╗
- * ║ THIS TEMPLATE IS PURE MARKUP. It computes almost nothing.                 ║
- * ║ All data is built upstream in the preprocess hook:                        ║
+ * ║ THIS TEMPLATE IS PURE MARKUP. It computes almost nothing.                ║
+ * ║ All data is built upstream in the preprocess hook:                       ║
  * ║   includes/node.theme → surface_preprocess_node__article()               ║
- * ║     ├─ trail_mapper.article_geo_data ->build($node)   (geo/track/stats)   ║
- * ║     │    modules/custom/trail_mapper/src/Service/ArticleGeoData.php       ║
- * ║     └─ seanmontague_map.article_map_data ->build($node) (markers/config)  ║
- * ║   The hook also computes the unified `has_map` and `article_header`.      ║
+ * ║     ├─ trail_mapper.article_geo_data ->build($node)   (geo/track/stats)  ║
+ * ║     │    modules/custom/trail_mapper/src/Service/ArticleGeoData.php      ║
+ * ║     └─ seanmontague_map.article_map_data ->build($node) (markers/config) ║
+ * ║   The hook also computes the unified `has_map` and `article_header`.     ║
  * ║   See README-node--article.md for the full variable→source map.          ║
  * ╚══════════════════════════════════════════════════════════════════════════╝
  *

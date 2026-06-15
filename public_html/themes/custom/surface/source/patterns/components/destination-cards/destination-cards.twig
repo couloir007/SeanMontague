@@ -1,0 +1,37 @@
+{% if items %}
+  <div class="trip__cards-section">
+    <div class="trip__cards-header">
+      <div class="trip__cards-title">Destinations</div>
+      <div class="trip__cards-count">{{ items|length }} places</div>
+    </div>
+    <div class="trip__cards-grid">
+      {% for dest in items %}
+        {% set dest_slug = dest.name|lower|replace({' ': '-', 'é': 'e', 'è': 'e', 'ê': 'e'}) %}
+        <a href="#dest-{{ dest_slug }}" id="dest-{{ dest_slug }}" class="trip__dest-card">
+          {% if dest.lat and dest.lon %}
+            <div class="trip__card-map"
+                 data-lat="{{ dest.lat }}"
+                 data-lon="{{ dest.lon }}"
+                 data-name="{{ dest.name }}"
+                 data-num="{{ loop.index }}">
+            </div>
+          {% else %}
+            <div class="trip__card-map-placeholder"></div>
+          {% endif %}
+          <div class="trip__card-body">
+            <div class="trip__card-num">{{ '%02d'|format(loop.index) }}</div>
+            <div class="trip__card-name">{{ dest.name }}</div>
+            {% if dest.region or dest.dates %}
+              <div class="trip__card-region">
+                {{- dest.region ? dest.region : '' -}}
+                {{- dest.region and dest.dates ? ' · ' : '' -}}
+                {{- dest.dates ? dest.dates : '' -}}
+              </div>
+            {% endif %}
+          </div>
+          <span class="trip__card-arrow" aria-hidden="true">→</span>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}

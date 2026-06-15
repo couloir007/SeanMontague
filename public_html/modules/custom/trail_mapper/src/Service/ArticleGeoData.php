@@ -70,41 +70,13 @@ class ArticleGeoData {
     $geojson_urls = [];
     $track_stats  = [];
     $dist_modes   = [];
+
+    $this->collectTracks($node, $geojson_urls, $track_stats, $dist_modes);
+
     $geo_file     = NULL;
-
-    foreach ($node->get('schema_geoshape') as $item) {
-      $media = $item->entity;
-      $file  = $media ? $media->get('field_media_file')->entity : NULL;
-      if (!$file) {
-        continue;
-      }
-
-      if ($geo_file === NULL) {
-        $geo_file = $file;
-      }
-      $geojson_urls[] = $this->fileUrlGenerator->generateString($file->getFileUri());
-
-      // Per-mode distance totals (METERS), summed by route_type key.
-      $rt_key = $media->get('field_route_type')->entity?->get('field_key')->value;
-      $distance = $media->get('field_distance')->value;
-      if ($rt_key && $this->isNotEmpty($distance)) {
-        $prev = $dist_modes[$rt_key] ?? 0;
-        $dist_modes[$rt_key] = $prev + $distance;
-      }
-
-      // Index-matched to geojson_urls (same media per index). Values in METERS;
-      // JS converts. NULL is fine — JS skips null stats.
-      $track_stats[] = [
-        'distance'      => $media->get('field_distance')->value,
-        'ascent'        => $media->get('field_ascent')->value,
-        'descent'       => $media->get('field_descent')->value,
-        'min_elev'      => $media->get('field_min_elevation')->value,
-        'max_elev'      => $media->get('field_max_elevation')->value,
-        'duration'      => $media->get('field_duration')->value,
-        'duration_unit' => $media->get('field_duration_units')->value,
-        'route_type'    => $rt_key,
-        'name'          => $media->get('name')->value,
-      ];
+    if ($node->hasField('schema_geoshape') && !$node->get('schema_geoshape')->isEmpty()) {
+      $media = $node->get('schema_geoshape')->first()->entity;
+      $geo_file = $media ? $media->get('field_media_file')->entity : NULL;
     }
 
     $geojson_url  = $geojson_urls[0] ?? NULL;
@@ -182,6 +154,106 @@ class ArticleGeoData {
       'stats'         => $stats,
       'map_center'    => $map_center,
     ];
+  }
+
+  /**
+   * Builds the track / geo / stats data array for a TRIP node.
+   *
+   * Aggregates tracks and distances across all itinerary articles.
+   *
+   * @param \Drupal\node\NodeInterface $trip
+   *   The tourist_trip node.
+   *
+   * @return array
+   *   Associative array with: geojson_urls, geojson_url, track_stats,
+   *   dist_modes, distance_stats, has_geoshape.
+   */
+  public function buildTrip(NodeInterface $trip): array {
+    $geojson_urls = [];
+    $track_stats  = [];
+    $dist_modes   = [];
+
+    if ($trip->hasField('schema_itinerary')) {
+      foreach ($trip->get('schema_itinerary') as $item) {
+        $article = $item->entity;
+        if ($article instanceof NodeInterface) {
+          $this->collectTracks($article, $geojson_urls, $track_stats, $dist_modes);
+        }
+      }
+    }
+
+    $distance_stats = [];
+    $multi = count($dist_modes) > 1;
+    foreach (self::MODE_LABELS as $key => $label) {
+      if (isset($dist_modes[$key]) && $dist_modes[$key] > 0) {
+        $distance_stats[] = [
+          'label'    => $multi ? 'Distance ' . $label : 'Distance',
+          'value'    => $dist_modes[$key],
+          'unit'     => 'distance',
+          'meters'   => $dist_modes[$key],
+          'is_small' => $multi,
+        ];
+      }
+    }
+
+    return [
+      'geojson_urls'   => $geojson_urls,
+      'geojson_url'    => $geojson_urls[0] ?? NULL,
+      'track_stats'    => $track_stats,
+      'dist_modes'     => $dist_modes,
+      'distance_stats' => $distance_stats,
+      'has_geoshape'   => !empty($geojson_urls),
+    ];
+  }
+
+  /**
+   * Appends tracks and distance sums from a node to the provided arrays.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   The node to collect from.
+   * @param array $geojson_urls
+   *   The list of track URLs, appended to by reference.
+   * @param array $track_stats
+   *   The list of per-track stats, appended to by reference.
+   * @param array $dist_modes
+   *   The per-mode distance sums, updated by reference.
+   */
+  protected function collectTracks(NodeInterface $node, array &$geojson_urls, array &$track_stats, array &$dist_modes): void {
+    if (!$node->hasField('schema_geoshape')) {
+      return;
+    }
+
+    foreach ($node->get('schema_geoshape') as $item) {
+      $media = $item->entity;
+      $file  = $media ? $media->get('field_media_file')->entity : NULL;
+      if (!$file) {
+        continue;
+      }
+
+      $geojson_urls[] = $this->fileUrlGenerator->generateString($file->getFileUri());
+
+      // Per-mode distance totals (METERS), summed by route_type key.
+      $rt_key = $media->get('field_route_type')->entity?->get('field_key')->value;
+      $distance = $media->get('field_distance')->value;
+      if ($rt_key && $this->isNotEmpty($distance)) {
+        $prev = $dist_modes[$rt_key] ?? 0;
+        $dist_modes[$rt_key] = $prev + $distance;
+      }
+
+      // Index-matched to geojson_urls (same media per index). Values in METERS;
+      // JS converts. NULL is fine — JS skips null stats.
+      $track_stats[] = [
+        'distance'      => $media->get('field_distance')->value,
+        'ascent'        => $media->get('field_ascent')->value,
+        'descent'       => $media->get('field_descent')->value,
+        'min_elev'      => $media->get('field_min_elevation')->value,
+        'max_elev'      => $media->get('field_max_elevation')->value,
+        'duration'      => $media->get('field_duration')->value,
+        'duration_unit' => $media->get('field_duration_units')->value,
+        'route_type'    => $rt_key,
+        'name'          => $media->get('name')->value,
+      ];
+    }
   }
 
   /**

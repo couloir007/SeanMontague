@@ -42,6 +42,7 @@
 }
 
 .nav__links a:hover { color: var(--bright); }
+.nav__links a[aria-current="page"] { color: var(--bright); }
 
 /* Article variant — back link instead of full nav */
 .nav__back {

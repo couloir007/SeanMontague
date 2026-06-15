@@ -435,6 +435,23 @@ trip:
   js:
     dist/js/trip.js: { }
 
+trip-header:
+  css:
+    component:
+      dist/css/trip-header.css: {}
+  dependencies:
+    - surface/stats-bar
+
+itinerary:
+  css:
+    component:
+      dist/css/itinerary.css: {}
+
+destination-cards:
+  css:
+    component:
+      dist/css/destination-cards.css: {}
+
 article-header:
   css:
     component:

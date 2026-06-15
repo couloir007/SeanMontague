@@ -1,0 +1,25 @@
+<aside class="trip__sidebar">
+  <div class="trip__sidebar-header">Itinerary</div>
+  {% if items %}
+    <ul class="trip__itinerary">
+      {% for dest in items %}
+        <li>
+          <a href="#dest-{{ dest.name|lower|replace({' ': '-', 'é': 'e', 'è': 'e', 'ê': 'e'}) }}"
+             class="trip__itinerary-item">
+            <span class="trip__itinerary-num">{{ '%02d'|format(loop.index) }}</span>
+            <span class="trip__itinerary-body">
+              <span class="trip__itinerary-place">{{ dest.name }}</span>
+              {% if dest.dates or dest.region %}
+                <span class="trip__itinerary-meta">
+                  {{- dest.dates ? dest.dates : '' -}}
+                  {{- dest.dates and dest.region ? ' · ' : '' -}}
+                  {{- dest.region ? dest.region : '' -}}
+                </span>
+              {% endif %}
+            </span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</aside>

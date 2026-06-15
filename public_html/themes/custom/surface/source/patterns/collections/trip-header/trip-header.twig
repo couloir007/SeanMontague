@@ -1,0 +1,42 @@
+{# ── Hero image ── #}
+{% if image_url %}
+  <div class="trip__hero-image">
+    <img src="{{ image_url }}" alt="{{ title|striptags }}" loading="lazy">
+  </div>
+{% endif %}
+
+{# ── Title block ── #}
+<div class="trip__header">
+  {% if label %}
+    <span class="trip__label">{{ label }}</span>
+  {% endif %}
+  {% if title %}
+    <h1 class="trip__title">{{ title|raw }}</h1>
+  {% endif %}
+  {% if dates %}
+    <div class="trip__dates">{{ dates }}</div>
+  {% endif %}
+</div>
+
+{# ── Destination strip ── #}
+{% if destinations %}
+  <div class="trip__strip">
+    <div class="trip__strip-inner">
+      {% for dest in destinations %}
+        <a href="#dest-{{ dest.name|lower|replace({' ': '-', 'é': 'e', 'è': 'e', 'ê': 'e'}) }}" class="trip__strip-name">
+          {{- dest.name -}}
+        </a>
+        {% if not loop.last %}
+          <span class="trip__strip-sep" aria-hidden="true">·</span>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+{# ── Stats bar ── #}
+{% if stats %}
+  {% include '@components/stats-bar/stats-bar.twig' with {
+    'stats': stats,
+  } only %}
+{% endif %}
