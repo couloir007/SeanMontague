@@ -92,6 +92,8 @@ function surface_preprocess_node__article(array &$variables): void {
   // those are intentionally not computed.
   $map_id = $has_map ? 'article-map-' . $node->id() : '';
 
+  $variables['map_ratio'] = _surface_map_ratio($node);
+
   // ── Geo / track / stats values (ArticleGeoData). ──
   $variables['geojson_urls']      = $geo['geojson_urls'];
   $variables['geojson_url']       = $geo['geojson_url'];
@@ -282,6 +284,7 @@ function surface_preprocess_node__tourist_trip(array &$variables): void {
     'destinations'      => $dest_list,
     'narrative_kicker'  => 'Trip Notes',
     'narrative_heading' => $editorial,
+    'map_ratio' => _surface_map_ratio($node),
   ];
 }
 
@@ -382,4 +385,34 @@ function surface_preprocess_node__person__front(array &$variables): void {
     'title'  => $title,
     'skills' => $skills,
   ];
+}
+
+
+/**
+ * Resolves a node's map aspect ratio to a CSS `aspect-ratio` value.
+ *
+ * Reads the editorial `field_map_ratio` (list_string) and maps its key to a CSS
+ * ratio string. Falls back to the standard 3/2 web default when the field is
+ * absent, empty, or holds an unknown key — so both bundles resolve the map ratio
+ * identically, and a node without the field still renders the best web default.
+ *
+ * @param \Drupal\node\NodeInterface $node
+ *   The node whose `field_map_ratio` is read.
+ *
+ * @return string
+ *   A CSS aspect-ratio value (e.g. '16 / 9'); defaults to '3 / 2'.
+ */
+function _surface_map_ratio(NodeInterface $node): string {
+  $ratios = [
+    'standard' => '3 / 2',
+    'wide'     => '16 / 9',
+    'tall'     => '4 / 3',
+  ];
+
+  $key = 'standard';
+  if ($node->hasField('field_map_ratio') && !$node->get('field_map_ratio')->isEmpty()) {
+    $key = $node->get('field_map_ratio')->value;
+  }
+
+  return $ratios[$key] ?? '3 / 2';
 }
