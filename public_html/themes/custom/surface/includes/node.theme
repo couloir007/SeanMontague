@@ -264,6 +264,28 @@ function surface_preprocess_node__tourist_trip(array &$variables): void {
     }
   }
 
+  // Map framing — editor-set center/zoom (schema_geo + field_map_zoom), like the
+  // front-page map. When a center is set, suppress fitBounds so the chosen
+  // framing sticks; otherwise fall back to the first marker and auto-fit.
+  $map_center = '53.0,-8.2';
+  $map_fit = 'true';
+  if ($node->hasField('schema_geo') && !$node->get('schema_geo')->isEmpty()) {
+    $lat = $node->get('schema_geo')->lat;   // direct getter — NOT ->value
+    $lon = $node->get('schema_geo')->lon;
+    if ($lat !== NULL && $lon !== NULL) {
+      $map_center = $lat . ',' . $lon;
+      $map_fit = 'false';
+    }
+  }
+  elseif (!empty($map['map_markers'])) {
+    $map_center = $map['map_markers'][0]['lat'] . ',' . $map['map_markers'][0]['lon'];
+  }
+
+  $map_zoom = 7;
+  if ($node->hasField('field_map_zoom') && !$node->get('field_map_zoom')->isEmpty()) {
+    $map_zoom = (int) $node->get('field_map_zoom')->value;
+  }
+
   // ── Trip Data object ──
   $variables['trip_data'] = [
     'label'             => 'Travel',
@@ -272,8 +294,9 @@ function surface_preprocess_node__tourist_trip(array &$variables): void {
     'image_url'         => $image_url,
     'stats'             => $stats,
     'map_id'            => 'trip-map-' . $node->id(),
-    'map_center'        => !empty($map['map_markers']) ? $map['map_markers'][0]['lat'] . ',' . $map['map_markers'][0]['lon'] : '53.0,-8.2',
-    'map_zoom'          => 7,
+    'map_center'        => $map_center,
+    'map_zoom'          => $map_zoom,
+    'map_fit'           => $map_fit,
     'map_label'         => 'Route Map — ' . $node->label(),
     'map_note'          => 'Click markers for details',
     'map_markers'       => $map['map_markers'],
@@ -404,8 +427,8 @@ function surface_preprocess_node__person__front(array &$variables): void {
  */
 function _surface_map_ratio(NodeInterface $node): string {
   $ratios = [
-    'standard' => '3 / 2',
-    'wide'     => '16 / 9',
+    'standard' => '5 / 2',
+    'wide'     => '5 / 2.75',
     'tall'     => '4 / 3',
   ];
 

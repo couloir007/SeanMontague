@@ -38,12 +38,22 @@
   margin-bottom: 16px;
 }
 
+/* Height is driven by aspect ratio (set per node via the --map-ratio custom
+   property; falls back to the 3:2 web default). Replaces the old fixed height
+   so the map sizes responsively to the container at every width. */
 .map-section__map-container {
+  aspect-ratio: var(--map-ratio, 3 / 2);
   border: 1px solid hsl(0deg 0% 70.23%);
   border-bottom: 0;
-  height: 440px;
+  height: auto;
   position: relative;
   width: 100%;
+}
+
+/* When no elevation profile follows (e.g. trips, show_elevation: false), the
+   map container is the last child — restore its bottom edge. */
+.map-section__map-container:last-child {
+  border-bottom: 1px solid hsl(0deg 0% 70.23%);
 }
 
 .map-section__elevation-container {
@@ -52,6 +62,6 @@
 
 @media (width <= 640px) {
   .map-section__map-container {
-    height: 300px;
+    aspect-ratio: 4 / 5;
   }
 }

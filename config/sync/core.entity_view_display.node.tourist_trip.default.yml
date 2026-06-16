@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.field.node.tourist_trip.body
     - field.field.node.tourist_trip.field_editorial
+    - field.field.node.tourist_trip.field_map_ratio
     - field.field.node.tourist_trip.field_metatag
     - field.field.node.tourist_trip.schema_date_published
     - field.field.node.tourist_trip.schema_image
@@ -15,6 +16,7 @@ dependencies:
     - field.field.node.tourist_trip.schema_trip_dates
     - node.type.tourist_trip
   module:
+    - options
     - smart_date
     - text
     - user
@@ -29,6 +31,13 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 19
+    region: content
+  field_map_ratio:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 20
     region: content
   schema_trip_dates:
     type: smartdate_default

@@ -6,6 +6,7 @@ dependencies:
     - core.entity_view_mode.node.landing_card
     - field.field.node.tourist_trip.body
     - field.field.node.tourist_trip.field_editorial
+    - field.field.node.tourist_trip.field_map_ratio
     - field.field.node.tourist_trip.field_metatag
     - field.field.node.tourist_trip.schema_date_published
     - field.field.node.tourist_trip.schema_image
@@ -60,6 +61,7 @@ content:
     region: content
 hidden:
   field_editorial: true
+  field_map_ratio: true
   field_metatag: true
   langcode: true
   links: true

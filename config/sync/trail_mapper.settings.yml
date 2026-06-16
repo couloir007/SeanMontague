@@ -1,6 +1,6 @@
 _core:
   default_config_hash: oGNHOYG16M-w-WqdZ7LDIomSyQzL_m6RIZ8My_Brknk
-tile_key: osm
+tile_key: esri-nat-geo
 tile_url: ''
 tile_attribution: ''
 elevation_unit: feet

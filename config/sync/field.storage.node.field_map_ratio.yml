@@ -1,0 +1,30 @@
+uuid: 7a9086ef-46b1-4a47-a376-3d54842b2a83
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_map_ratio
+field_name: field_map_ratio
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: standard
+      label: Standard
+    -
+      value: wide
+      label: Wide
+    -
+      value: tall
+      label: Tall
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,7 +1,7 @@
 {{ attach_library('surface/map-section') }}
 
 <div class="map-section">
-  <div class="map-section__map-container">
+  <div class="map-section__map-container" style="--map-ratio: {{ map_ratio|default('3 / 2') }};">
     {% if drupal_geo_rendered %}
       {{ drupal_geo_rendered }}
     {% elseif map_id %}
@@ -18,6 +18,7 @@
         'geojson_urls': geojson_urls,
         'track_stats':  track_stats,
         'tiles':       tiles|default('usgs-topo'),
+        'fit':         fit|default('true'),
       }|merge(map_lines ? { 'lines': map_lines } : {}) only %}
     {% endif %}
   </div>

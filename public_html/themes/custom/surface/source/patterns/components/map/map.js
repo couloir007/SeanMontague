@@ -231,7 +231,7 @@
   const initLeaflet = async (
     el,
     geojson,
-    { lat, lon, zoom, interactive, markers, lines, tile, mapId, geojsonUrls, trackStats = [] }
+    { lat, lon, zoom, interactive, fit, markers, lines, tile, mapId, geojsonUrls, trackStats = [] }
   ) => {
     // Guard against double-init (fetch error catch calling initLeaflet twice)
     if (el._leafletMapInstance) {
@@ -480,7 +480,7 @@
 
     // ── invalidateSize + fitBounds after layout ────────────────────────────
     const fitToData = () => {
-      if (!interactive) {
+      if (!interactive || !fit) {
         return;
       }
       if (allTrackLayers.length) {
@@ -611,6 +611,7 @@
     const lon = parseFloat(lonStr);
     const zoom = parseInt(el.dataset.mapZoom ?? '12', 10);
     const interactive = el.dataset.mapInteractive !== 'false';
+    const fit = el.dataset.mapFit !== 'false';
     const markers = parseJSON(el.dataset.mapMarkers, []);
     const lines = parseJSON(el.dataset.mapLines, []);
     const geojsonUrl = el.dataset.mapGeojson ?? null;
@@ -627,6 +628,7 @@
       lon,
       zoom,
       interactive,
+      fit,
       markers,
       lines,
       tile,

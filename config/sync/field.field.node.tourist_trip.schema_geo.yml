@@ -1,0 +1,21 @@
+uuid: 36fd59a4-928b-4e2c-add7-17b556f354b9
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.schema_geo
+    - node.type.tourist_trip
+  module:
+    - geofield
+id: node.tourist_trip.schema_geo
+field_name: schema_geo
+entity_type: node
+bundle: tourist_trip
+label: 'Map Center'
+description: 'Optional. The map opens centered here. When set, the map keeps this framing instead of auto-fitting to all tracks (the user can still pan/zoom).'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: geofield

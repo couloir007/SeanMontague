@@ -31,6 +31,7 @@
        fed the aggregated tracks + markers from the itinerary. #}
 {% include '@collections/map-section/map-section.twig' with {
   'map_id':              trip_data.map_id,
+  'map_ratio':           trip_data.map_ratio,
   'map_center':          trip_data.map_center,
   'map_zoom':            trip_data.map_zoom,
   'tiles':               trip_data.tiles,
@@ -41,6 +42,7 @@
   'track_stats':         trip_data.track_stats,
   'drupal_geo_rendered': null,
   'show_elevation':      false,
+  'fit':                 trip_data.map_fit,
 } only %}
 
 {# 3 ─ Body + itinerary aside — the SAME layout the article uses. #}

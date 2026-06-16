@@ -5,8 +5,11 @@ dependencies:
   config:
     - field.field.node.tourist_trip.body
     - field.field.node.tourist_trip.field_editorial
+    - field.field.node.tourist_trip.field_map_ratio
+    - field.field.node.tourist_trip.field_map_zoom
     - field.field.node.tourist_trip.field_metatag
     - field.field.node.tourist_trip.schema_date_published
+    - field.field.node.tourist_trip.schema_geo
     - field.field.node.tourist_trip.schema_image
     - field.field.node.tourist_trip.schema_itinerary
     - field.field.node.tourist_trip.schema_related_link
@@ -19,6 +22,7 @@ dependencies:
     - datetime
     - field_group
     - inline_entity_form
+    - leaflet
     - linkit
     - metatag
     - path
@@ -28,10 +32,13 @@ third_party_settings:
   field_group:
     group_content:
       children:
-        0: title
-        1: schema_trip_dates
-        2: schema_image
-        4: body
+        - title
+        - schema_trip_dates
+        - schema_image
+        - body
+        - field_map_ratio
+        - field_map_zoom
+        - schema_geo
       label: Content
       region: content
       parent_name: ''
@@ -102,7 +109,7 @@ mode: default
 content:
   body:
     type: text_textarea_with_summary
-    weight: -1
+    weight: -2
     region: content
     settings:
       rows: 12
@@ -132,6 +139,19 @@ content:
       collapsed: false
       revision: false
     third_party_settings: {  }
+  field_map_ratio:
+    type: options_select
+    weight: -1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_map_zoom:
+    type: number
+    weight: 0
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
   field_metatag:
     type: metatag_firehose
     weight: 5
@@ -159,6 +179,77 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
+  schema_geo:
+    type: leaflet_widget_default
+    weight: 1
+    region: content
+    settings:
+      geometry_validation: false
+      map:
+        leaflet_map: openstreetmap
+        height: 400
+        auto_center: 1
+        map_position:
+          force: false
+          center:
+            lat: 0.0
+            lon: 0.0
+          zoomControlPosition: topleft
+          zoom: 5
+          minZoom: 1
+          maxZoom: 18
+          zoomFiner: 0
+        scroll_zoom_enabled: 1
+      input:
+        show: true
+        readonly: false
+      toolbar:
+        position: topright
+        marker: defaultMarker
+        drawPolyline: true
+        drawRectangle: true
+        drawPolygon: true
+        drawCircle: false
+        drawText: false
+        editMode: true
+        dragMode: true
+        cutPolygon: false
+        removalMode: true
+        rotateMode: false
+      reset_map:
+        control: false
+        options: '{"position": "topleft", "title": "Reset View"}'
+      map_scale:
+        control: false
+        options: '{"position":"bottomright","maxWidth":100,"metric":true,"imperial":false,"updateWhenIdle":false}'
+      fullscreen:
+        control: false
+        options: '{"position":"topleft","pseudoFullscreen":false}'
+      path: '{"color":"#3388ff","opacity":"1.0","stroke":true,"weight":3,"fill":"depends","fillColor":"*","fillOpacity":"0.2","radius":"6"}'
+      feature_properties:
+        values: ''
+      locate:
+        control: false
+        options: '{"position": "topright", "setView": "untilPanOrZoom", "returnToPrevBounds":true, "keepCurrentZoomLevel": true, "strings": {"title": "Locate my position"}}'
+        automatic: false
+      geocoder:
+        control: false
+        settings:
+          popup: false
+          position: topright
+          input_size: 20
+          providers: {  }
+          min_terms: 4
+          delay: 800
+          zoom: 16
+          options: ''
+      geojson_overlays:
+        sources:
+          fields: {  }
+        zoom_to_geojson: true
+        path: '{"color":"#f71ed3","opacity":"0.7","stroke":true,"weight":2,"fillColor":"#ffddfe","fillOpacity":"0.1","radius":3,"dashArray":"5, 5"}'
+        snapping: true
+    third_party_settings: {  }
   schema_image:
     type: entity_reference_autocomplete
     weight: -3
@@ -171,7 +262,7 @@ content:
     third_party_settings: {  }
   schema_itinerary:
     type: entity_reference_autocomplete
-    weight: 11
+    weight: -3
     region: content
     settings:
       match_operator: CONTAINS
@@ -201,7 +292,7 @@ content:
     third_party_settings: {  }
   schema_subject_of:
     type: entity_reference_autocomplete
-    weight: 3
+    weight: -3
     region: content
     settings:
       match_operator: CONTAINS
