@@ -1,0 +1,75 @@
+/* Trip layout styling.
+ *
+ * The trip composes shared components/elements (node--article model) and keeps
+ * its identity via MODIFIERS. Element-level modifiers (eyebrow--trip,
+ * title--trip) live WITH their elements (eyebrow.css / title.css) so they load
+ * via those elements' own libraries. This file holds the LAYOUT-level trip
+ * styling, loaded by the node attaching surface/trip.
+ */
+
+/* ── Body framing — @layouts/content-aside, wrapper modifier "content-aside--trip" ── */
+.content-aside--trip {
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  gap: 80px;
+  grid-template-columns: 1fr 300px;
+  max-width: var(--wide-width);
+  padding: 0 48px 80px;
+}
+
+.content-aside--trip .content-aside__main,
+.content-aside--trip .content-aside__aside {
+  padding-top: 64px;
+}
+
+@media (max-width: 1000px) {
+  .content-aside--trip {
+    border-left: 0;
+    border-right: 0;
+    gap: 40px;
+    grid-template-columns: 1fr;
+    padding: 0 24px 64px;
+  }
+}
+
+/* ── Trip prose — bespoke body type + display-font drop cap, SCOPED to the trip
+   body so the shared .prose is untouched elsewhere ── */
+.content-aside--trip .prose:not(blockquote) > p {
+  color: var(--text);
+  font-size: 19px;
+  font-weight: 300;
+  line-height: 1.82;
+  margin-bottom: 26px;
+}
+
+.content-aside--trip .prose:not(blockquote) > p::first-letter {
+  color: var(--bright);
+  float: left;
+  font-family: var(--font-display-nek);
+  font-size: 4em;
+  line-height: 0.8;
+  margin-right: 8px;
+  margin-top: 8px;
+}
+
+.content-aside--trip .prose p + p::first-letter {
+  float: none;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+}
+
+.content-aside--trip .prose hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 48px 0;
+}
+
+.content-aside--trip .prose h3 {
+  color: var(--forest);
+  font-family: var(--font-mono-nek);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  margin: 40px 0 14px;
+  text-transform: uppercase;
+}

@@ -1,0 +1,60 @@
+{{ attach_library('surface/trip') }}
+
+{# Trip header: hero, title, dates, destinations strip, stats #}
+{% include '@collections/trip-header/trip-header.twig' with {
+  'label':        label,
+  'title':        title,
+  'dates':        dates,
+  'image_url':    image_url,
+  'destinations': destinations,
+  'stats':        stats,
+} only %}
+
+{# Map only — no elevation chart (show_chart:false); all itinerary tracks #}
+{% include '@collections/map-section/map-section.twig' with {
+  'map_id':              map_id,
+  'map_ratio':           map_ratio,
+  'map_center':          map_center,
+  'map_zoom':            map_zoom,
+  'tiles':               tiles,
+  'map_markers':         map_markers,
+  'map_lines':           null,
+  'geojson_url':         geojson_urls.0 ?? null,
+  'geojson_urls':        geojson_urls,
+  'track_stats':         track_stats,
+  'drupal_geo_rendered': null,
+  'show_chart':          false,
+  'fit':                 map_fit,
+} only %}
+
+{# Body + itinerary aside — the SAME layout the article uses #}
+{% embed '@layouts/content-aside/content-aside.twig' with {
+  'main_modifier': main_modifier|default(''),
+} %}
+  {% block main %}
+    {% if narrative_heading %}
+      <div class="trip__narrative-kicker">{{ narrative_kicker }}</div>
+      <h2 class="trip__narrative-heading">{{ narrative_heading|raw }}</h2>
+    {% endif %}
+    <div class="prose">{{ body }}</div>
+  {% endblock %}
+  {% block aside %}
+    {% include '@components/itinerary/itinerary.twig' with { 'items': destinations } only %}
+  {% endblock %}
+{% endembed %}
+
+{# Destination cards #}
+{% if destinations is not empty %}
+  {% include '@components/destination-cards/destination-cards.twig' with {
+    'items':        destinations,
+    'map_id':       map_id,
+    'map_center':   map_center,
+    'map_zoom':     map_zoom,
+    'map_markers':  map_markers,
+    'geojson_url':  geojson_url,
+    'geojson_urls': geojson_urls,
+    'track_stats':  track_stats,
+    'tiles':        tiles,
+    'fit':          fit,
+  } only %}
+{% endif %}

@@ -1,3 +1,4 @@
+{{ attach_library('surface/destination-cards') }}
 {% if items %}
   <div class="trip__cards-section">
     <div class="trip__cards-header">
@@ -9,11 +10,16 @@
         {% set dest_slug = dest.name|lower|replace({' ': '-', 'é': 'e', 'è': 'e', 'ê': 'e'}) %}
         <a href="#dest-{{ dest_slug }}" id="dest-{{ dest_slug }}" class="trip__dest-card">
           {% if dest.lat and dest.lon %}
-            <div class="trip__card-map"
-                 data-lat="{{ dest.lat }}"
-                 data-lon="{{ dest.lon }}"
-                 data-name="{{ dest.name }}"
-                 data-num="{{ loop.index }}">
+            <div class="trip__card-map">
+              {% include '@components/map/map.twig' with {
+                'map_id':      'dest-map-' ~ loop.index,
+                'center':      dest.lat ~ ',' ~ dest.lon,
+                'zoom':        dest.zoom|default(10),
+                'interactive': 'false',
+                'fit':         'false',
+                'tiles':       'open-topo',
+                'markers':     [{ 'lat': dest.lat, 'lon': dest.lon, 'label': dest.name }],
+              } only %}
             </div>
           {% else %}
             <div class="trip__card-map-placeholder"></div>

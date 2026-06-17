@@ -1,0 +1,19 @@
+uuid: 71917b3b-3276-42bc-b1e1-95b7882bf4ab
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_narrative_heading
+    - node.type.tourist_trip
+id: node.tourist_trip.field_narrative_heading
+field_name: field_narrative_heading
+entity_type: node
+bundle: tourist_trip
+label: 'Narrative Heading'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

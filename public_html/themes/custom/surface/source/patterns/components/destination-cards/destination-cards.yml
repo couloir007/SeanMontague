@@ -1,0 +1,41 @@
+items:
+  - name: 'Dublin'
+    region: 'Co. Dublin'
+    lat: 53.3418
+    lon: -6.2731
+    zoom: 12
+  - name: 'Sligo'
+    region: 'Co. Sligo'
+    lat: 54.2724
+    lon: -8.4775
+    zoom: 12
+  - name: 'Galway'
+    region: 'Co. Galway'
+    lat: 53.2709
+    lon: -9.0522
+    zoom: 12
+  - name: 'Inishmore'
+    region: 'Aran Islands'
+    lat: 53.1042
+    lon: -9.6563
+    zoom: 12
+  - name: 'Limerick'
+    region: 'Co. Limerick'
+    lat: 52.6627
+    lon: -8.6255
+    zoom: 12
+  - name: 'Killarney'
+    region: 'Co. Kerry'
+    lat: 52.0560
+    lon: -9.4966
+    zoom: 12
+  - name: 'Dingle'
+    region: 'Co. Kerry'
+    lat: 52.1391
+    lon: -10.2719
+    zoom: 12
+  - name: 'Kilkenny'
+    region: 'Co. Kilkenny'
+    lat: 52.6556
+    lon: -7.2487
+    zoom: 12

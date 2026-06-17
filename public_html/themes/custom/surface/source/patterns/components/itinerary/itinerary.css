@@ -6,13 +6,13 @@
 }
 
 .trip__sidebar-header {
-  border-bottom: 1px solid var(--border);
-  color: var(--muted);
   font-family: var(--font-mono-nek);
   font-size: 9px;
   letter-spacing: 0.28em;
-  padding-bottom: 14px;
   text-transform: uppercase;
+  color: var(--muted);
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
 }
 
 .trip__itinerary {
@@ -22,14 +22,14 @@
 }
 
 .trip__itinerary-item {
-  align-items: baseline;
-  border-bottom: 1px solid var(--border);
-  color: inherit;
   display: grid;
-  gap: 0 14px;
   grid-template-columns: 28px 1fr;
+  gap: 0 14px;
+  align-items: baseline;
   padding: 14px 0;
+  border-bottom: 1px solid var(--border);
   text-decoration: none;
+  color: inherit;
   transition: background 0.15s;
 }
 
@@ -37,32 +37,32 @@
 .trip__itinerary-item:hover .trip__itinerary-place { color: var(--forest); }
 
 .trip__itinerary-num {
-  color: var(--border);
   font-family: var(--font-mono-nek);
   font-size: 9px;
   letter-spacing: 0.1em;
-  padding-top: 2px;
+  color: var(--border);
   text-align: right;
+  padding-top: 2px;
 }
 
 .trip__itinerary-place {
-  color: var(--bright);
-  display: block;
   font-family: var(--font-serif-nek);
   font-size: 17px;
+  color: var(--bright);
   line-height: 1.2;
-  margin-bottom: 2px;
   transition: color 0.2s;
+  display: block;
+  margin-bottom: 2px;
 }
 
 .trip__itinerary-meta {
-  color: var(--muted);
-  display: block;
   font-family: var(--font-mono-nek);
   font-size: 9px;
   letter-spacing: 0.12em;
+  color: var(--muted);
+  display: block;
 }
 
-@media (width <= 900px) {
+@media (max-width: 900px) {
   .trip__sidebar { position: static; padding-top: 0; }
 }

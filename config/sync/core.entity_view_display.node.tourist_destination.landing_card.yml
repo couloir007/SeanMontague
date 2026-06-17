@@ -7,12 +7,12 @@ dependencies:
     - field.field.node.tourist_destination.body
     - field.field.node.tourist_destination.field_day
     - field.field.node.tourist_destination.field_editorial
+    - field.field.node.tourist_destination.field_map_zoom
     - field.field.node.tourist_destination.field_metatag
     - field.field.node.tourist_destination.field_subtitle
     - field.field.node.tourist_destination.schema_address
     - field.field.node.tourist_destination.schema_geo
     - field.field.node.tourist_destination.schema_image
-    - field.field.node.tourist_destination.schema_inc_attraction
     - field.field.node.tourist_destination.schema_includes_attraction
     - field.field.node.tourist_destination.schema_latitude
     - field.field.node.tourist_destination.schema_longitude
@@ -61,8 +61,7 @@ third_party_settings:
       format_settings: {  }
     group_tourist_destination:
       children:
-        - schema_inc_attraction
-        - schema_tourist_type
+        1: schema_tourist_type
       label: 'Tourist destination'
       parent_name: ''
       region: content
@@ -168,14 +167,6 @@ content:
     third_party_settings: {  }
     weight: 21
     region: content
-  schema_inc_attraction:
-    type: string
-    label: above
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
-    weight: 110
-    region: content
   schema_includes_attraction:
     type: entity_reference_label
     label: above
@@ -271,5 +262,6 @@ content:
     weight: 111
     region: content
 hidden:
+  field_map_zoom: true
   field_metatag: true
   langcode: true

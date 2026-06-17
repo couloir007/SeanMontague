@@ -2,7 +2,7 @@
   display: block;
   margin: 0 auto;
   max-width: 1200px;
-  padding: 24px 48px 0;
+  padding: 24px 50px 0;
 }
 
 .map-section__content {
@@ -64,4 +64,33 @@
   .map-section__map-container {
     aspect-ratio: 4 / 5;
   }
+}
+
+
+/* ── Optional map header band (rendered when map_label/map_note are passed) ──
+   Add to map-section.css. Mirrors the old trip "Route Map / Scroll to zoom"
+   band; border-bottom:0 so it joins the map container below. */
+.map-section__header {
+  align-items: center;
+  background: var(--surface2);
+  border: 1px solid hsl(0deg 0% 70.23%);
+  border-bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 28px;
+}
+
+.map-section__label {
+  color: var(--muted);
+  font-family: var(--font-mono-nek);
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.map-section__note {
+  color: var(--border);
+  font-family: var(--font-mono-nek);
+  font-size: 9px;
+  letter-spacing: 0.12em;
 }

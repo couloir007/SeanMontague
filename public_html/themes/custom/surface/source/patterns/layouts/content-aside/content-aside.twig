@@ -1,6 +1,6 @@
 {{ attach_library('surface/content-aside') }}
 
-<div class="content-aside">
+<div class="content-aside{{ modifier ? ' ' ~ modifier }}">
   <div class="content-aside__main{{ main_modifier ? ' ' ~ main_modifier }}">
     {% block main %}{{ main|raw }}{% endblock %}
   </div>

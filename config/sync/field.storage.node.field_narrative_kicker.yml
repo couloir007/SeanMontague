@@ -1,0 +1,21 @@
+uuid: a95cef5c-5fd9-42fd-9917-38f54d6f6a23
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.field_narrative_kicker
+field_name: field_narrative_kicker
+entity_type: node
+type: string
+settings:
+  max_length: 255
+  case_sensitive: false
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

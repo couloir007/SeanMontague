@@ -8,6 +8,8 @@ dependencies:
     - field.field.node.tourist_trip.field_map_ratio
     - field.field.node.tourist_trip.field_map_zoom
     - field.field.node.tourist_trip.field_metatag
+    - field.field.node.tourist_trip.field_narrative_heading
+    - field.field.node.tourist_trip.field_narrative_kicker
     - field.field.node.tourist_trip.schema_date_published
     - field.field.node.tourist_trip.schema_geo
     - field.field.node.tourist_trip.schema_image
@@ -35,6 +37,8 @@ third_party_settings:
         - title
         - schema_trip_dates
         - schema_image
+        - field_narrative_kicker
+        - field_narrative_heading
         - body
         - field_map_ratio
         - field_map_zoom
@@ -109,7 +113,7 @@ mode: default
 content:
   body:
     type: text_textarea_with_summary
-    weight: -2
+    weight: 0
     region: content
     settings:
       rows: 12
@@ -122,13 +126,13 @@ content:
         hide_guidelines: '1'
   created:
     type: datetime_timestamp
-    weight: 8
+    weight: 10
     region: content
     settings: {  }
     third_party_settings: {  }
   field_editorial:
     type: inline_entity_form_simple
-    weight: 212
+    weight: 9
     region: content
     settings:
       form_mode: default
@@ -141,13 +145,13 @@ content:
     third_party_settings: {  }
   field_map_ratio:
     type: options_select
-    weight: -1
+    weight: 1
     region: content
     settings: {  }
     third_party_settings: {  }
   field_map_zoom:
     type: number
-    weight: 0
+    weight: 2
     region: content
     settings:
       placeholder: ''
@@ -160,28 +164,44 @@ content:
       sidebar: true
       use_details: true
     third_party_settings: {  }
+  field_narrative_heading:
+    type: string_textarea
+    weight: -1
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_narrative_kicker:
+    type: string_textfield
+    weight: -2
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   langcode:
     type: language_select
-    weight: 7
+    weight: 9
     region: content
     settings:
       include_locked: true
     third_party_settings: {  }
   path:
     type: path
-    weight: 10
+    weight: 12
     region: content
     settings: {  }
     third_party_settings: {  }
   schema_date_published:
     type: datetime_default
-    weight: 211
+    weight: 8
     region: content
     settings: {  }
     third_party_settings: {  }
   schema_geo:
     type: leaflet_widget_default
-    weight: 1
+    weight: 3
     region: content
     settings:
       geometry_validation: false
@@ -321,13 +341,13 @@ content:
       separator: to
     third_party_settings: {  }
   simple_sitemap:
-    weight: 11
+    weight: 13
     region: content
     settings: {  }
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 9
+    weight: 11
     region: content
     settings:
       display_label: true
@@ -340,13 +360,8 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-  translation:
-    weight: 12
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   url_redirects:
-    weight: 6
+    weight: 8
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -354,5 +369,6 @@ hidden:
   promote: true
   publish_on: true
   sticky: true
+  translation: true
   uid: true
   unpublish_on: true

@@ -7,8 +7,12 @@ dependencies:
     - field.field.node.tourist_trip.body
     - field.field.node.tourist_trip.field_editorial
     - field.field.node.tourist_trip.field_map_ratio
+    - field.field.node.tourist_trip.field_map_zoom
     - field.field.node.tourist_trip.field_metatag
+    - field.field.node.tourist_trip.field_narrative_heading
+    - field.field.node.tourist_trip.field_narrative_kicker
     - field.field.node.tourist_trip.schema_date_published
+    - field.field.node.tourist_trip.schema_geo
     - field.field.node.tourist_trip.schema_image
     - field.field.node.tourist_trip.schema_itinerary
     - field.field.node.tourist_trip.schema_related_link
@@ -62,10 +66,14 @@ content:
 hidden:
   field_editorial: true
   field_map_ratio: true
+  field_map_zoom: true
   field_metatag: true
+  field_narrative_heading: true
+  field_narrative_kicker: true
   langcode: true
   links: true
   schema_date_published: true
+  schema_geo: true
   schema_image: true
   schema_itinerary: true
   schema_related_link: true

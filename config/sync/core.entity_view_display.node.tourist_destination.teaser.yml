@@ -7,12 +7,12 @@ dependencies:
     - field.field.node.tourist_destination.body
     - field.field.node.tourist_destination.field_day
     - field.field.node.tourist_destination.field_editorial
+    - field.field.node.tourist_destination.field_map_zoom
     - field.field.node.tourist_destination.field_metatag
     - field.field.node.tourist_destination.field_subtitle
     - field.field.node.tourist_destination.schema_address
     - field.field.node.tourist_destination.schema_geo
     - field.field.node.tourist_destination.schema_image
-    - field.field.node.tourist_destination.schema_inc_attraction
     - field.field.node.tourist_destination.schema_includes_attraction
     - field.field.node.tourist_destination.schema_latitude
     - field.field.node.tourist_destination.schema_longitude
@@ -65,11 +65,11 @@ content:
 hidden:
   field_day: true
   field_editorial: true
+  field_map_zoom: true
   field_metatag: true
   field_subtitle: true
   langcode: true
   schema_geo: true
-  schema_inc_attraction: true
   schema_includes_attraction: true
   schema_latitude: true
   schema_longitude: true

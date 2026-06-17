@@ -11,10 +11,11 @@
 .eyebrow--trail  { color: var(--trail); }
 .eyebrow--sky    { color: var(--sky); }
 
-/* ───────────────────────────────────────────────────────────────────────
-   ADD to elements/eyebrow/eyebrow.css — inverted color modifier.
-   Place after the existing --forest / --trail / --sky modifiers.
-   ─────────────────────────────────────────────────────────────────────── */
-
 /* Dim white — for eyebrows on a dark frame (.section--invert / Contact). */
 .eyebrow--invert { color: rgba(255, 255, 255, 0.28); }
+
+/* Trip narrative kicker — pairs with --forest; tighter tracking + spacing. */
+.eyebrow--trip {
+  letter-spacing: 0.3em;
+  margin-bottom: 20px;
+}

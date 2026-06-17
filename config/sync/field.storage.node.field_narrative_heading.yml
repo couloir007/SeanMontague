@@ -1,17 +1,15 @@
-uuid: 483600ce-83d0-40de-bc62-e988bde68dbc
+uuid: f8df3833-0d0c-4ec5-b592-d177623af65a
 langcode: en
 status: true
 dependencies:
   module:
     - node
-id: node.schema_inc_attraction
-field_name: schema_inc_attraction
+id: node.field_narrative_heading
+field_name: field_narrative_heading
 entity_type: node
-type: string
+type: string_long
 settings:
-  max_length: 255
   case_sensitive: false
-  is_ascii: false
 module: core
 locked: false
 cardinality: 1

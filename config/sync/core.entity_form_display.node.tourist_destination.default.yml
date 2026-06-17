@@ -6,12 +6,12 @@ dependencies:
     - field.field.node.tourist_destination.body
     - field.field.node.tourist_destination.field_day
     - field.field.node.tourist_destination.field_editorial
+    - field.field.node.tourist_destination.field_map_zoom
     - field.field.node.tourist_destination.field_metatag
     - field.field.node.tourist_destination.field_subtitle
     - field.field.node.tourist_destination.schema_address
     - field.field.node.tourist_destination.schema_geo
     - field.field.node.tourist_destination.schema_image
-    - field.field.node.tourist_destination.schema_inc_attraction
     - field.field.node.tourist_destination.schema_includes_attraction
     - field.field.node.tourist_destination.schema_latitude
     - field.field.node.tourist_destination.schema_longitude
@@ -52,10 +52,12 @@ third_party_settings:
         description: ''
     group_general:
       children:
-        - title
-        - field_subtitle
-        - body
-        - schema_image
+        0: title
+        1: schema_topic
+        2: field_day
+        3: field_subtitle
+        6: body
+        7: schema_image
       label: General
       region: content
       parent_name: ''
@@ -66,8 +68,8 @@ third_party_settings:
         description: ''
     group_tourist_destination:
       children:
-        - schema_inc_attraction
         - schema_tourist_type
+        - schema_includes_attraction
       label: 'Tourist destination'
       region: content
       parent_name: ''
@@ -82,18 +84,18 @@ third_party_settings:
       label: References
       region: content
       parent_name: ''
-      weight: 8
+      weight: 7
       format_type: details
       format_settings:
         open: true
         description: ''
     group_editorial:
       children:
-        1: field_editorial
+        - field_editorial
       label: 'Editorial information'
       region: content
       parent_name: ''
-      weight: 11
+      weight: 8
       format_type: details_sidebar
       format_settings:
         description: 'Track the editorial decisions and status of a document.'
@@ -104,11 +106,29 @@ third_party_settings:
       label: Links
       region: content
       parent_name: ''
-      weight: 7
+      weight: 6
       format_type: details
       format_settings:
         open: true
         description: ''
+    group_geo:
+      children:
+        - schema_place
+        - field_map_zoom
+        - schema_geo
+      label: Geo
+      region: content
+      parent_name: ''
+      weight: 5
+      format_type: details
+      format_settings:
+        classes: ''
+        show_empty_fields: false
+        id: ''
+        label_as_html: false
+        open: false
+        description: ''
+        required_fields: true
 id: node.tourist_destination.default
 targetEntityType: node
 bundle: tourist_destination
@@ -116,7 +136,7 @@ mode: default
 content:
   body:
     type: text_textarea_with_summary
-    weight: 3
+    weight: 7
     region: content
     settings:
       rows: 9
@@ -129,20 +149,20 @@ content:
         hide_guidelines: '1'
   created:
     type: datetime_timestamp
-    weight: 15
+    weight: 11
     region: content
     settings: {  }
     third_party_settings: {  }
   field_day:
     type: number
-    weight: 116
+    weight: 3
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   field_editorial:
     type: inline_entity_form_simple
-    weight: 10
+    weight: 6
     region: content
     settings:
       form_mode: default
@@ -153,9 +173,16 @@ content:
       collapsed: false
       revision: false
     third_party_settings: {  }
+  field_map_zoom:
+    type: number
+    weight: 6
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
   field_metatag:
     type: metatag_firehose
-    weight: 13
+    weight: 10
     region: content
     settings:
       sidebar: true
@@ -163,22 +190,15 @@ content:
     third_party_settings: {  }
   field_subtitle:
     type: string_textfield
-    weight: 2
+    weight: 4
     region: content
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-  langcode:
-    type: language_select
-    weight: 14
-    region: content
-    settings:
-      include_locked: true
-    third_party_settings: {  }
   path:
     type: path
-    weight: 17
+    weight: 13
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -191,7 +211,7 @@ content:
     third_party_settings: {  }
   schema_geo:
     type: leaflet_widget_default
-    weight: 6
+    weight: 7
     region: content
     settings:
       geometry_validation: false
@@ -262,7 +282,7 @@ content:
     third_party_settings: {  }
   schema_image:
     type: entity_reference_autocomplete
-    weight: 4
+    weight: 8
     region: content
     settings:
       match_operator: CONTAINS
@@ -270,17 +290,9 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-  schema_inc_attraction:
-    type: string_textfield
-    weight: 110
-    region: content
-    settings:
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
   schema_includes_attraction:
     type: entity_reference_autocomplete
-    weight: 10
+    weight: 112
     region: content
     settings:
       match_operator: CONTAINS
@@ -290,7 +302,7 @@ content:
     third_party_settings: {  }
   schema_latitude:
     type: number
-    weight: 114
+    weight: 115
     region: content
     settings:
       placeholder: ''
@@ -314,7 +326,7 @@ content:
     third_party_settings: {  }
   schema_related_link:
     type: linkit
-    weight: 12
+    weight: 6
     region: content
     settings:
       placeholder_url: ''
@@ -324,7 +336,7 @@ content:
     third_party_settings: {  }
   schema_significant_link:
     type: linkit
-    weight: 13
+    weight: 7
     region: content
     settings:
       placeholder_url: ''
@@ -344,14 +356,14 @@ content:
     third_party_settings: {  }
   schema_telephone:
     type: telephone_default
-    weight: 115
+    weight: 116
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   schema_topic:
     type: entity_reference_autocomplete
-    weight: 3
+    weight: 2
     region: content
     settings:
       match_operator: CONTAINS
@@ -361,20 +373,20 @@ content:
     third_party_settings: {  }
   schema_tourist_type:
     type: string_textfield
-    weight: 112
+    weight: 111
     region: content
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
   simple_sitemap:
-    weight: 18
+    weight: 14
     region: content
     settings: {  }
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 16
+    weight: 12
     region: content
     settings:
       display_label: true
@@ -387,19 +399,16 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-  translation:
-    weight: 5
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   url_redirects:
-    weight: 12
+    weight: 9
     region: content
     settings: {  }
     third_party_settings: {  }
 hidden:
+  langcode: true
   promote: true
   publish_on: true
   sticky: true
+  translation: true
   uid: true
   unpublish_on: true

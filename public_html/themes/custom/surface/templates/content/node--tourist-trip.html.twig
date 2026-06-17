@@ -1,23 +1,24 @@
 {#
 /**
  * @file
- * node--tourist-trip.html.twig
+ * node--tourist-trip.html.twig — renders a TouristTrip node's CONTENT.
  *
- * TouristTrip node template.
+ * PURE MARKUP. Data is built in surface_preprocess_node__tourist_trip()
+ * (includes/node.theme) → trip_data. Composed DIRECTLY here (node--article
+ * model); @layouts/trip is the parallel Storybook composition, kept in sync.
  *
- * All data-shaping is handled in surface_preprocess_node__tourist_trip()
- * (includes/node.theme), which delegates to:
- *   - trail_mapper.article_geo_data->buildTrip()
- *   - seanmontague_map.article_map_data->buildTrip()
- *
- * Variables provided by preprocess:
- *   - trip_data: array matching @collections/trip/trip.twig contract.
+ * Trip-identity styling is applied via MODIFIERS on shared components/elements
+ * (eyebrow--forest/--trip, title--trip, content-aside--trip) and lives in
+ * trip.css. Attaching surface/trip loads trip.css AND every component's CSS via
+ * its dependencies — one attach, fully styled.
  */
 #}
-{% set body = trip_data.body %}
+{{ attach_library('surface/trip') }}
 
-{# 1 ─ Trip header (trip-specific: hero, title, dates, strip, stats) #}
-{{ attach_library('surface/trip-header') }}
+{% set body = content.body|field_value %}
+
+
+{# 1 ─ Trip header: hero, title, dates, destinations strip, stats. #}
 {% include '@collections/trip-header/trip-header.twig' with {
   'label':        trip_data.label,
   'title':        trip_data.title,
@@ -27,8 +28,7 @@
   'stats':        trip_data.stats,
 } only %}
 
-{# 2 ─ Map ONLY (no elevation profile) — the SAME collection the article uses,
-       fed the aggregated tracks + markers from the itinerary. #}
+{# 2 ─ Trip map: all itinerary tracks + markers, labeled header band, no chart. #}
 {% include '@collections/map-section/map-section.twig' with {
   'map_id':              trip_data.map_id,
   'map_ratio':           trip_data.map_ratio,
@@ -41,32 +41,44 @@
   'geojson_urls':        trip_data.geojson_urls,
   'track_stats':         trip_data.track_stats,
   'drupal_geo_rendered': null,
-  'show_elevation':      false,
+  'show_chart':          false,
   'fit':                 trip_data.map_fit,
 } only %}
 
-{# 3 ─ Body + itinerary aside — the SAME layout the article uses. #}
-{{ attach_library('surface/itinerary') }}
+
+{# 3 ─ Body + itinerary aside (content-aside--trip restores the trip framing). #}
 {% embed '@layouts/content-aside/content-aside.twig' with {
+  'modifier':      'content-aside--trip',
   'main_modifier': main_modifier|default(''),
 } %}
   {% block main %}
-    {% if trip_data.narrative_heading %}
-      <div class="trip__narrative-kicker">{{ trip_data.narrative_kicker }}</div>
-      <h2 class="trip__narrative-heading">{{ trip_data.narrative_heading }}</h2>
+    {% if content.field_narrative_heading|field_value %}
+      {% include '@elements/eyebrow/eyebrow.twig' with {
+        'eyebrow': {
+          'text':     content.field_narrative_kicker|field_value,
+          'modifier': 'eyebrow--forest eyebrow--trip',
+        },
+      } only %}
+      {% include '@elements/title/title.twig' with {
+        'title': {
+          'level':    2,
+          'text':     content.field_narrative_heading|field_value,
+          'modifier': 'title--trip',
+        },
+      } only %}
     {% endif %}
     <div class="prose">{{ body }}</div>
   {% endblock %}
   {% block aside %}
     {% include '@components/itinerary/itinerary.twig' with {
-      'items': trip_data.destinations,
+      'items': trip_data.itinerary,
     } only %}
   {% endblock %}
 {% endembed %}
 
-{# 4 ─ Destination cards (KEEP unless Sean drops them) #}
+{% do ray(trip_data.destinations) %}
+{# 4 ─ Destination cards. #}
 {% if trip_data.destinations is not empty %}
-  {{ attach_library('surface/destination-cards') }}
   {% include '@components/destination-cards/destination-cards.twig' with {
     'items': trip_data.destinations,
   } only %}

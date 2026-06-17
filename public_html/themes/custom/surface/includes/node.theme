@@ -198,24 +198,27 @@ function surface_preprocess_node__tourist_trip(array &$variables): void {
     ];
   }
 
-
-  // 3. Destinations count (deduped across itinerary articles).
-  // ── Itinerary pass: day list + deduped destination/POI ids. ──
-  $dest_list = [];
-  $dest_ids  = [];
-  $poi_ids   = [];
-
-  // Collect unique entity-reference target ids from $field into $ids.
-  $collect_ids = static function (NodeInterface $article, string $field, array &$ids): void {
-    if (!$article->hasField($field)) {
-      return;
+  // Resolve a node's schema_image (media → file) to a URL. Used for the trip
+  // hero and per-destination images.
+  $image_url_of = static function (NodeInterface $n): ?string {
+    if (!$n->hasField('schema_image') || $n->get('schema_image')->isEmpty()) {
+      return NULL;
     }
-    foreach ($article->get($field) as $ref) {
-      if ($ref->target_id) {
-        $ids[$ref->target_id] = TRUE;
-      }
-    }
+    $media = $n->get('schema_image')->entity;
+    $file  = $media ? $media->get('field_media_image')->entity : NULL;
+    return $file
+      ? \Drupal::service('file_url_generator')->generateString($file->getFileUri())
+      : NULL;
   };
+
+
+
+  // ── Itinerary pass ──
+  $itinerary    = [];
+  $dest_list    = [];
+  $dest_seen    = [];
+  $poi_ids      = [];
+  $county_cache = [];   // country_code => [code => county name]
 
   if ($node->hasField('schema_itinerary')) {
     foreach ($node->get('schema_itinerary') as $item) {
@@ -228,21 +231,67 @@ function surface_preprocess_node__tourist_trip(array &$variables): void {
       if ($article->hasField('schema_date_published') && !$article->get('schema_date_published')->isEmpty()) {
         $art_date = date('M j', strtotime($article->get('schema_date_published')->value));
       }
-
-      $dest_list[] = [
-        'name'   => $article->label(),
-        'region' => $article->hasField('schema_address') ? $article->get('schema_address')->administrative_area : '',
-        'dates'  => $art_date,
+      $itinerary[] = [
+        'name'  => $article->label(),
+        'dates' => $art_date,
       ];
 
-      $collect_ids($article, 'schema_destination', $dest_ids);
-      $collect_ids($article, 'schema_poi', $poi_ids);
+      if ($article->hasField('schema_destination')) {
+        foreach ($article->get('schema_destination') as $ref) {
+          $dest = $ref->entity;
+          if (!$dest instanceof NodeInterface || !empty($dest_seen[$dest->id()])) {
+            continue;
+          }
+          $dest_seen[$dest->id()] = TRUE;
+
+          // County name from the address subdivision repository.
+          $county = '';
+          if ($dest->hasField('schema_address') && !$dest->get('schema_address')->isEmpty()) {
+            $addr    = $dest->get('schema_address')->first();
+            $code    = $addr->administrative_area;
+            $country = $addr->country_code;
+            if ($code && $country) {
+              if (!isset($county_cache[$country])) {
+                $county_cache[$country] = \Drupal::service('address.subdivision_repository')->getList([$country]);
+              }
+              $county = $county_cache[$country][$code] ?? $code;
+            }
+          }
+
+          $lat = NULL;
+          $lon = NULL;
+          if ($dest->hasField('schema_geo') && !$dest->get('schema_geo')->isEmpty()) {
+            $lat = $dest->get('schema_geo')->lat;
+            $lon = $dest->get('schema_geo')->lon;
+          }
+          $zoom = 12;
+          if ($dest->hasField('field_map_zoom') && !$dest->get('field_map_zoom')->isEmpty()) {
+            $zoom = (int) $dest->get('field_map_zoom')->value;
+          }
+
+          $dest_list[] = [
+            'name'   => $dest->label(),
+            'region' => $county,
+            'lat'    => $lat,
+            'lon'    => $lon,
+            'zoom'   => $zoom,
+          ];
+        }
+      }
+
+      if ($article->hasField('schema_poi')) {
+        foreach ($article->get('schema_poi') as $ref) {
+          if ($ref->target_id) {
+            $poi_ids[$ref->target_id] = TRUE;
+          }
+        }
+      }
     }
   }
 
   // Count stats — added only when non-zero.
   foreach ([
-    'Destinations'       => count($dest_ids),
+    'Destinations'       => count($dest_list),
     'Points of Interest' => count($poi_ids),
   ] as $label => $count) {
     if ($count > 0) {
@@ -305,9 +354,17 @@ function surface_preprocess_node__tourist_trip(array &$variables): void {
     'track_stats'       => $geo['track_stats'],
     'body'              => $body,
     'destinations'      => $dest_list,
+    'itinerary'         => $itinerary,
     'narrative_kicker'  => 'Trip Notes',
     'narrative_heading' => $editorial,
-    'map_ratio' => _surface_map_ratio($node),
+    'map_ratio'         => _surface_map_ratio($node),
+    // Pass map globals for use in sub-components (like destination cards).
+    'map_markers'       => $map['map_markers'],
+    'geojson_url'       => $geo['geojson_url'],
+    'geojson_urls'      => $geo['geojson_urls'],
+    'track_stats'       => $geo['track_stats'],
+    'tiles'             => $map['tiles'] ?: 'open-topo',
+    'fit'               => $map_fit,
   ];
 }
 

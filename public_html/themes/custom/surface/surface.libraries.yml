@@ -430,10 +430,14 @@ content-aside:
 
 trip:
   css:
-    component:
+    layout:
       dist/css/trip.css: {}
-  js:
-    dist/js/trip.js: { }
+  dependencies:
+    - surface/trip-header
+    - surface/map-section
+    - surface/content-aside
+    - surface/itinerary
+    - surface/destination-cards
 
 trip-header:
   css:
@@ -451,6 +455,8 @@ destination-cards:
   css:
     component:
       dist/css/destination-cards.css: {}
+  dependencies:
+    - surface/map
 
 article-header:
   css:
@@ -737,3 +743,7 @@ section:
     theme:
       dist/css/section.css: {}
 
+title:
+  css:
+    component:
+      dist/css/title.css: {}

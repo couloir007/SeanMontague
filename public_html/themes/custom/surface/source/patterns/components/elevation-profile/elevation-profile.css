@@ -4,6 +4,11 @@
   position: relative;
 }
 
+.page-node-type-tourist-trip .elevation-profile,
+.page-node-type-tourist-trip .elevation-profile__header {
+  border-bottom: 0;
+}
+
 /* Toggled by elevation-profile.js when no eligible track exists or an
    ineligible track (driving / ferry) is selected. */
 .elevation-profile--hidden {

@@ -1,0 +1,14 @@
+/* Title element modifiers.
+ * title.twig renders a bare <h{level}> whose ONLY class is the modifier, so
+ * there is no base `.title` rule — modifiers carry all the styling. */
+
+/* Trip narrative heading — italic serif display heading. */
+.title--trip {
+  color: var(--bright);
+  font-family: var(--font-serif-nek);
+  font-size: 36px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.15;
+  margin-bottom: 28px;
+}

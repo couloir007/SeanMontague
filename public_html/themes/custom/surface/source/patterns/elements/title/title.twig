@@ -1,3 +1,4 @@
+{{ attach_library('surface/title') }}
 <h{{ title.level|default(2) }}{% if title.modifier %} class="{{ title.modifier }}"{% endif %}{% if title.selector %} data-drupal-selector="{{ title.selector }}"{% endif %}>
   {% if title.url %}
     <a href="{{ title.url }}" class="title__link">

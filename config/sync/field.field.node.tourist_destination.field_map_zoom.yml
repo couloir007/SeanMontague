@@ -1,0 +1,25 @@
+uuid: 67a6d7b5-8b27-4d01-935d-019adeea4474
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_map_zoom
+    - node.type.tourist_destination
+id: node.tourist_destination.field_map_zoom
+field_name: field_map_zoom
+entity_type: node
+bundle: tourist_destination
+label: 'Map Zoom'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 9
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer
