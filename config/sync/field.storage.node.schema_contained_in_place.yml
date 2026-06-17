@@ -1,0 +1,19 @@
+uuid: 6672aee7-a796-44be-95ef-473e763079a9
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.schema_contained_in_place
+field_name: schema_contained_in_place
+entity_type: node
+type: entity_reference
+settings:
+  target_type: node
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

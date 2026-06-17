@@ -1,0 +1,23 @@
+uuid: 5e887a62-3fe6-4d0d-b9ee-a5beec4f8938
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_num_of_rooms
+    - geo_entity.geo_entity_type.lodging
+id: geo_entity.lodging.schema_num_of_rooms
+field_name: schema_num_of_rooms
+entity_type: geo_entity
+bundle: lodging
+label: 'Number of rooms'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

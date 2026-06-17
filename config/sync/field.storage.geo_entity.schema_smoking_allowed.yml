@@ -1,0 +1,18 @@
+uuid: 85481539-bfd8-43d3-b1f7-98ec1977e8bc
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+id: geo_entity.schema_smoking_allowed
+field_name: schema_smoking_allowed
+entity_type: geo_entity
+type: boolean
+settings: {  }
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,20 @@
+uuid: 9a3b15f8-6da8-41b5-a464-73de2e89d09d
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+id: geo_entity.schema_num_of_rooms
+field_name: schema_num_of_rooms
+entity_type: geo_entity
+type: integer
+settings:
+  unsigned: false
+  size: normal
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

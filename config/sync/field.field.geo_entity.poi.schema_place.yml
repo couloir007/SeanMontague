@@ -6,12 +6,13 @@ dependencies:
     - field.storage.geo_entity.schema_place
     - geo_entity.geo_entity_type.poi
     - node.type.place
+    - node.type.tourist_destination
 id: geo_entity.poi.schema_place
 field_name: schema_place
 entity_type: geo_entity
 bundle: poi
 label: 'Parent Place'
-description: ''
+description: 'Contained In Place'
 required: false
 translatable: false
 default_value: {  }
@@ -21,9 +22,10 @@ settings:
   handler_settings:
     target_bundles:
       place: place
+      tourist_destination: tourist_destination
     sort:
       field: _none
       direction: ASC
     auto_create: false
-    auto_create_bundle: ''
+    auto_create_bundle: place
 field_type: entity_reference

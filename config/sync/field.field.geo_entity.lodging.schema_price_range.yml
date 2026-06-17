@@ -1,0 +1,21 @@
+uuid: aa01cee1-d8d9-4324-99b4-2790783589d9
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_price_range
+    - geo_entity.geo_entity_type.lodging
+  module:
+    - options
+id: geo_entity.lodging.schema_price_range
+field_name: schema_price_range
+entity_type: geo_entity
+bundle: lodging
+label: 'Price range'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

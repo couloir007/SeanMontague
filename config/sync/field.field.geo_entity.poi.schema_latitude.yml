@@ -1,0 +1,23 @@
+uuid: 81aadddd-e3f8-4d1d-8ca0-5c4f50f3a361
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_latitude
+    - geo_entity.geo_entity_type.poi
+id: geo_entity.poi.schema_latitude
+field_name: schema_latitude
+entity_type: geo_entity
+bundle: poi
+label: Latitude
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

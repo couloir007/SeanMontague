@@ -1,0 +1,19 @@
+uuid: 9cda510f-e99a-43e9-b0de-9f0cec3586be
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+    - telephone
+id: geo_entity.schema_fax_number
+field_name: schema_fax_number
+entity_type: geo_entity
+type: telephone
+settings: {  }
+module: telephone
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

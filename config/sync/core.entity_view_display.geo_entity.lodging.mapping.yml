@@ -9,10 +9,29 @@ dependencies:
     - field.field.geo_entity.lodging.field_nights
     - field.field.geo_entity.lodging.field_show_on_map
     - field.field.geo_entity.lodging.schema_address
+    - field.field.geo_entity.lodging.schema_amenity_feature
+    - field.field.geo_entity.lodging.schema_available_language
+    - field.field.geo_entity.lodging.schema_checkin_time
+    - field.field.geo_entity.lodging.schema_checkout_time
+    - field.field.geo_entity.lodging.schema_contact_point
+    - field.field.geo_entity.lodging.schema_description
+    - field.field.geo_entity.lodging.schema_email
+    - field.field.geo_entity.lodging.schema_employee
+    - field.field.geo_entity.lodging.schema_fax_number
     - field.field.geo_entity.lodging.schema_geo
+    - field.field.geo_entity.lodging.schema_has_map
     - field.field.geo_entity.lodging.schema_image
+    - field.field.geo_entity.lodging.schema_latitude
+    - field.field.geo_entity.lodging.schema_longitude
+    - field.field.geo_entity.lodging.schema_name
+    - field.field.geo_entity.lodging.schema_num_of_rooms
+    - field.field.geo_entity.lodging.schema_opening_hours
+    - field.field.geo_entity.lodging.schema_pets_allowed
     - field.field.geo_entity.lodging.schema_place
+    - field.field.geo_entity.lodging.schema_price_range
     - field.field.geo_entity.lodging.schema_same_as
+    - field.field.geo_entity.lodging.schema_smoking_allowed
+    - field.field.geo_entity.lodging.schema_star_rating
     - field.field.geo_entity.lodging.schema_telephone
     - geo_entity.geo_entity_type.lodging
   module:
@@ -156,3 +175,22 @@ content:
     region: content
 hidden:
   langcode: true
+  schema_amenity_feature: true
+  schema_available_language: true
+  schema_checkin_time: true
+  schema_checkout_time: true
+  schema_contact_point: true
+  schema_description: true
+  schema_email: true
+  schema_employee: true
+  schema_fax_number: true
+  schema_has_map: true
+  schema_latitude: true
+  schema_longitude: true
+  schema_name: true
+  schema_num_of_rooms: true
+  schema_opening_hours: true
+  schema_pets_allowed: true
+  schema_price_range: true
+  schema_smoking_allowed: true
+  schema_star_rating: true

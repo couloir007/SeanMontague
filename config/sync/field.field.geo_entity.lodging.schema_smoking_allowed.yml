@@ -1,0 +1,21 @@
+uuid: 9cd83e5a-8e66-4e88-87b6-b9ef21926431
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_smoking_allowed
+    - geo_entity.geo_entity_type.lodging
+id: geo_entity.lodging.schema_smoking_allowed
+field_name: schema_smoking_allowed
+entity_type: geo_entity
+bundle: lodging
+label: 'Smoking allowed'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: 'Yes'
+  off_label: 'No'
+field_type: boolean

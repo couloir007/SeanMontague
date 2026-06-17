@@ -1,0 +1,21 @@
+uuid: 06eb4e2d-baff-4e67-a581-c045654e364c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_available_language
+    - geo_entity.geo_entity_type.poi
+  module:
+    - options
+id: geo_entity.poi.schema_available_language
+field_name: schema_available_language
+entity_type: geo_entity
+bundle: poi
+label: 'Available language'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

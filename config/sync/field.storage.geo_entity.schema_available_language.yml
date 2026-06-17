@@ -1,0 +1,21 @@
+uuid: c7f4a952-27f6-4ac2-aef8-83d9164dc8fd
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+    - options
+id: geo_entity.schema_available_language
+field_name: schema_available_language
+entity_type: geo_entity
+type: list_string
+settings:
+  allowed_values: {  }
+  allowed_values_function: schemadotorg_options_allowed_values_language
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

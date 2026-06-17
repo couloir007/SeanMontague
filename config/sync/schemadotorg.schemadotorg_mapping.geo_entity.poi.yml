@@ -1,0 +1,34 @@
+uuid: 1bd0c6a3-580d-4833-9f5d-2c11aae0d22a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.geo_entity.poi.schema_address
+    - field.field.geo_entity.poi.schema_available_language
+    - field.field.geo_entity.poi.schema_description
+    - field.field.geo_entity.poi.schema_image
+    - field.field.geo_entity.poi.schema_latitude
+    - field.field.geo_entity.poi.schema_longitude
+    - field.field.geo_entity.poi.schema_name
+    - field.field.geo_entity.poi.schema_place
+    - field.field.geo_entity.poi.schema_telephone
+    - field.field.geo_entity.poi.schema_tourist_type
+    - geo_entity.geo_entity_type.poi
+  module:
+    - geo_entity
+id: geo_entity.poi
+target_entity_type_id: geo_entity
+target_bundle: poi
+schema_type: TouristAttraction
+schema_properties:
+  schema_address: address
+  schema_available_language: availableLanguage
+  schema_place: containedInPlace
+  schema_description: description
+  schema_image: image
+  schema_latitude: latitude
+  schema_longitude: longitude
+  schema_name: name
+  schema_telephone: telephone
+  schema_tourist_type: touristType
+additional_mappings: {  }

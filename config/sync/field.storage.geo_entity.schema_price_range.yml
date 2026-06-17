@@ -1,0 +1,33 @@
+uuid: ed484472-0359-4ba3-92af-2f290139e1d5
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+    - options
+id: geo_entity.schema_price_range
+field_name: schema_price_range
+entity_type: geo_entity
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: $
+      label: $
+    -
+      value: $$
+      label: $$
+    -
+      value: $$$
+      label: $$$
+    -
+      value: $$$$
+      label: $$$$
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

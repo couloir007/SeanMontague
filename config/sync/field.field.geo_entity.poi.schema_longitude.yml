@@ -1,0 +1,23 @@
+uuid: 7fdab11f-e2d0-4a4d-b971-e08bf9d9a5c3
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_longitude
+    - geo_entity.geo_entity_type.poi
+id: geo_entity.poi.schema_longitude
+field_name: schema_longitude
+entity_type: geo_entity
+bundle: poi
+label: Longitude
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

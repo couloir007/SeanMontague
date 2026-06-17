@@ -1,0 +1,92 @@
+uuid: fca885f5-a147-40f3-8499-d6888f48d368
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_contact_point
+    - geo_entity.geo_entity_type.lodging
+  module:
+    - custom_field
+id: geo_entity.lodging.schema_contact_point
+field_name: schema_contact_point
+entity_type: geo_entity
+bundle: lodging
+label: 'Contact points'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  add_more_label: ''
+  field_settings:
+    contact_type:
+      type: select
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'Contact type'
+        settings:
+          description: 'A person or organization can have different contact points, for different purposes.'
+          description_display: after
+          required: false
+          empty_option: '- Select -'
+          allowed_values:
+            -
+              key: mobile
+              value: Mobile
+            -
+              key: home
+              value: Home
+            -
+              key: work
+              value: Work
+    telephone:
+      type: text
+      weight: 1
+      check_empty: false
+      widget_settings:
+        label: Telephone
+        settings:
+          description: 'The telephone number.'
+          description_display: after
+          size: 60
+          placeholder: ''
+          maxlength: 255
+          maxlength_js: false
+          prefix: ''
+          suffix: ''
+          required: false
+    email:
+      type: text
+      weight: 2
+      check_empty: false
+      widget_settings:
+        label: Email
+        settings:
+          description: 'Email address.'
+          description_display: after
+          size: 60
+          placeholder: ''
+          maxlength: 255
+          maxlength_js: false
+          prefix: ''
+          suffix: ''
+          required: false
+    description:
+      type: text
+      weight: 3
+      check_empty: false
+      widget_settings:
+        label: Description
+        settings:
+          description: 'A description of the item.'
+          description_display: after
+          size: 60
+          placeholder: ''
+          maxlength: 255
+          maxlength_js: false
+          prefix: ''
+          suffix: ''
+          required: false
+field_type: custom

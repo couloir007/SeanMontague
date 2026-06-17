@@ -7,6 +7,7 @@ dependencies:
     - field.field.node.place.field_editorial
     - field.field.node.place.field_metatag
     - field.field.node.place.schema_address
+    - field.field.node.place.schema_contained_in_place
     - field.field.node.place.schema_image
     - field.field.node.place.schema_latitude
     - field.field.node.place.schema_longitude
@@ -16,10 +17,7 @@ dependencies:
     - field.field.node.place.schema_telephone
     - node.type.place
   module:
-    - address
-    - entity_reference_revisions
     - field_group
-    - link
     - text
     - user
 third_party_settings:
@@ -86,6 +84,14 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 0
+    region: content
+  schema_contained_in_place:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 221
     region: content
 hidden:
   field_editorial: true

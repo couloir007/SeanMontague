@@ -23,6 +23,12 @@ sets:
     label: Place
     types:
       - 'node:Place'
+      - 'node:TouristDestination'
+  geo:
+    label: Geo
+    types:
+      - 'geo_entity:TouristAttraction'
+      - 'geo_entity:LodgingBusiness'
   writing:
     label: Writing
     types:

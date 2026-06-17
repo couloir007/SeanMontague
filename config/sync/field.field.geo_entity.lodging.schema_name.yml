@@ -1,0 +1,19 @@
+uuid: d3146286-f902-4cf7-ac66-3008e052f1f2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_name
+    - geo_entity.geo_entity_type.lodging
+id: geo_entity.lodging.schema_name
+field_name: schema_name
+entity_type: geo_entity
+bundle: lodging
+label: Name
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

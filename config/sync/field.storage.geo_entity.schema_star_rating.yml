@@ -1,0 +1,36 @@
+uuid: c14ddba6-1316-45e1-b5c7-0759992868fd
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+    - options
+id: geo_entity.schema_star_rating
+field_name: schema_star_rating
+entity_type: geo_entity
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: '1'
+      label: ★
+    -
+      value: '2'
+      label: ★★
+    -
+      value: '3'
+      label: ★★★
+    -
+      value: '4'
+      label: ★★★★
+    -
+      value: '5'
+      label: ★★★★★
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

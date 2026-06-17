@@ -8,18 +8,70 @@ dependencies:
     - field.field.geo_entity.lodging.field_nights
     - field.field.geo_entity.lodging.field_show_on_map
     - field.field.geo_entity.lodging.schema_address
+    - field.field.geo_entity.lodging.schema_amenity_feature
+    - field.field.geo_entity.lodging.schema_available_language
+    - field.field.geo_entity.lodging.schema_checkin_time
+    - field.field.geo_entity.lodging.schema_checkout_time
+    - field.field.geo_entity.lodging.schema_contact_point
+    - field.field.geo_entity.lodging.schema_description
+    - field.field.geo_entity.lodging.schema_email
+    - field.field.geo_entity.lodging.schema_employee
+    - field.field.geo_entity.lodging.schema_fax_number
     - field.field.geo_entity.lodging.schema_geo
+    - field.field.geo_entity.lodging.schema_has_map
     - field.field.geo_entity.lodging.schema_image
+    - field.field.geo_entity.lodging.schema_latitude
+    - field.field.geo_entity.lodging.schema_longitude
+    - field.field.geo_entity.lodging.schema_name
+    - field.field.geo_entity.lodging.schema_num_of_rooms
+    - field.field.geo_entity.lodging.schema_opening_hours
+    - field.field.geo_entity.lodging.schema_pets_allowed
     - field.field.geo_entity.lodging.schema_place
+    - field.field.geo_entity.lodging.schema_price_range
     - field.field.geo_entity.lodging.schema_same_as
+    - field.field.geo_entity.lodging.schema_smoking_allowed
+    - field.field.geo_entity.lodging.schema_star_rating
     - field.field.geo_entity.lodging.schema_telephone
     - geo_entity.geo_entity_type.lodging
   module:
     - address
+    - custom_field
+    - entity_reference_override
+    - field_group
     - geofield
     - link
+    - options
     - text
     - user
+third_party_settings:
+  field_group:
+    group_lodging_business:
+      children:
+        - schema_amenity_feature
+        - schema_available_language
+        - schema_checkin_time
+        - schema_checkout_time
+        - schema_contact_point
+        - schema_description
+        - schema_email
+        - schema_employee
+        - schema_fax_number
+        - schema_has_map
+        - schema_latitude
+        - schema_longitude
+        - schema_name
+        - schema_num_of_rooms
+        - schema_opening_hours
+        - schema_pets_allowed
+        - schema_price_range
+        - schema_smoking_allowed
+        - schema_star_rating
+      label: 'Lodging business'
+      parent_name: ''
+      region: content
+      weight: 0
+      format_type: fieldset
+      format_settings: {  }
 id: geo_entity.lodging.default
 targetEntityType: geo_entity
 bundle: lodging
@@ -86,6 +138,75 @@ content:
     third_party_settings: {  }
     weight: 24
     region: content
+  schema_amenity_feature:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 165
+    region: content
+  schema_available_language:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 130
+    region: content
+  schema_checkin_time:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 110
+    region: content
+  schema_checkout_time:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 110
+    region: content
+  schema_contact_point:
+    type: custom_formatter
+    label: above
+    settings:
+      fields: {  }
+    third_party_settings: {  }
+    weight: 155
+    region: content
+  schema_description:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 18
+    region: content
+  schema_email:
+    type: email_mailto
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 26
+    region: content
+  schema_employee:
+    type: entity_reference_override_label
+    label: above
+    settings:
+      link: true
+      override_action: suffix
+    third_party_settings: {  }
+    weight: 155
+    region: content
+  schema_fax_number:
+    type: basic_string
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 150
+    region: content
   schema_geo:
     type: geofield_default
     label: above
@@ -94,6 +215,18 @@ content:
       output_escape: true
     third_party_settings: {  }
     weight: 22
+    region: content
+  schema_has_map:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 146
     region: content
   schema_image:
     type: entity_reference_entity_view
@@ -104,6 +237,63 @@ content:
     third_party_settings: {  }
     weight: 23
     region: content
+  schema_latitude:
+    type: number_decimal
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 110
+    region: content
+  schema_longitude:
+    type: number_decimal
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 110
+    region: content
+  schema_name:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  schema_num_of_rooms:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 110
+    region: content
+  schema_opening_hours:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 39
+    region: content
+  schema_pets_allowed:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 131
+    region: content
   schema_place:
     type: entity_reference_label
     label: above
@@ -111,6 +301,13 @@ content:
       link: true
     third_party_settings: {  }
     weight: 27
+    region: content
+  schema_price_range:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 130
     region: content
   schema_same_as:
     type: link
@@ -123,6 +320,23 @@ content:
       target: ''
     third_party_settings: {  }
     weight: 26
+    region: content
+  schema_smoking_allowed:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 131
+    region: content
+  schema_star_rating:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 130
     region: content
   schema_telephone:
     type: basic_string

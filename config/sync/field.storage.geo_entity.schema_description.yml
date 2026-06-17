@@ -1,0 +1,19 @@
+uuid: eda073d0-0290-457f-b089-bf32f7c8acaa
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+    - text
+id: geo_entity.schema_description
+field_name: schema_description
+entity_type: geo_entity
+type: text_long
+settings: {  }
+module: text
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

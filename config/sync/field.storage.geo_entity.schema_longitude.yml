@@ -1,0 +1,20 @@
+uuid: b67672b3-765f-46a9-924b-2c9f834cdb34
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+id: geo_entity.schema_longitude
+field_name: schema_longitude
+entity_type: geo_entity
+type: decimal
+settings:
+  precision: 10
+  scale: 2
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

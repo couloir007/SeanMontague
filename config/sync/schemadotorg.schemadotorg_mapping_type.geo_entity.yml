@@ -1,0 +1,18 @@
+uuid: b92e4c44-1d29-45a6-bdb6-9c7c5bf71b38
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+id: geo_entity
+target_entity_type_id: geo_entity
+multiple: false
+label_prefix: ''
+id_prefix: ''
+recommended_schema_types: {  }
+default_schema_types: {  }
+default_schema_type_properties: {  }
+default_schema_type_view_displays: {  }
+default_base_fields: {  }
+default_component_weights: {  }
+default_component_weights_update: false

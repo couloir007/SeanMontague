@@ -1,0 +1,19 @@
+uuid: 1505e9ef-b9d0-4f45-92be-2c6c9a5aafb7
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+    - link
+id: geo_entity.schema_has_map
+field_name: schema_has_map
+entity_type: geo_entity
+type: link
+settings: {  }
+module: link
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -8,6 +8,7 @@ dependencies:
     - field.field.node.place.field_editorial
     - field.field.node.place.field_metatag
     - field.field.node.place.schema_address
+    - field.field.node.place.schema_contained_in_place
     - field.field.node.place.schema_image
     - field.field.node.place.schema_latitude
     - field.field.node.place.schema_longitude
@@ -95,6 +96,7 @@ hidden:
   langcode: true
   links: true
   schema_address: true
+  schema_contained_in_place: true
   schema_image: true
   schema_latitude: true
   schema_longitude: true

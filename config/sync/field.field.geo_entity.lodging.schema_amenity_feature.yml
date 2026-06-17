@@ -1,0 +1,25 @@
+uuid: fa68cdd1-d88d-4b3f-a54f-051c0bc22308
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_amenity_feature
+    - geo_entity.geo_entity_type.lodging
+    - taxonomy.vocabulary.amenity
+id: geo_entity.lodging.schema_amenity_feature
+field_name: schema_amenity_feature
+entity_type: geo_entity
+bundle: lodging
+label: 'Amenity features'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      amenity: amenity
+    auto_create: true
+field_type: entity_reference

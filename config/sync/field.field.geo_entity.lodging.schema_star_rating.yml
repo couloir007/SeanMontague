@@ -1,0 +1,21 @@
+uuid: 31ed8366-6246-4dd5-a2a1-a928af2a2f07
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_star_rating
+    - geo_entity.geo_entity_type.lodging
+  module:
+    - options
+id: geo_entity.lodging.schema_star_rating
+field_name: schema_star_rating
+entity_type: geo_entity
+bundle: lodging
+label: 'Star rating'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

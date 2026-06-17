@@ -1,0 +1,21 @@
+uuid: 86414d35-c9ec-465f-bc75-6e9dd8eb777e
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+id: geo_entity.schema_tourist_type
+field_name: schema_tourist_type
+entity_type: geo_entity
+type: string
+settings:
+  max_length: 255
+  case_sensitive: false
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

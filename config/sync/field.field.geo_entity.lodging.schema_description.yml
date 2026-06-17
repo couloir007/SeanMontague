@@ -1,0 +1,22 @@
+uuid: ac8a41b9-bc61-44ec-a321-fc8cb1ee4312
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_description
+    - geo_entity.geo_entity_type.lodging
+  module:
+    - text
+id: geo_entity.lodging.schema_description
+field_name: schema_description
+entity_type: geo_entity
+bundle: lodging
+label: Description
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

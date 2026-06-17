@@ -8,15 +8,39 @@ dependencies:
     - field.field.geo_entity.poi.field_poi_type
     - field.field.geo_entity.poi.field_show_on_map
     - field.field.geo_entity.poi.schema_address
+    - field.field.geo_entity.poi.schema_available_language
+    - field.field.geo_entity.poi.schema_description
     - field.field.geo_entity.poi.schema_geo
     - field.field.geo_entity.poi.schema_image
+    - field.field.geo_entity.poi.schema_latitude
+    - field.field.geo_entity.poi.schema_longitude
+    - field.field.geo_entity.poi.schema_name
     - field.field.geo_entity.poi.schema_place
     - field.field.geo_entity.poi.schema_same_as
     - field.field.geo_entity.poi.schema_telephone
+    - field.field.geo_entity.poi.schema_tourist_type
     - geo_entity.geo_entity_type.poi
   module:
+    - field_group
     - geofield
+    - options
     - text
+third_party_settings:
+  field_group:
+    group_tourist_attraction:
+      children:
+        - schema_available_language
+        - schema_description
+        - schema_latitude
+        - schema_longitude
+        - schema_name
+        - schema_tourist_type
+      label: 'Tourist attraction'
+      parent_name: ''
+      region: content
+      weight: 0
+      format_type: fieldset
+      format_settings: {  }
 id: geo_entity.poi.default
 targetEntityType: geo_entity
 bundle: poi
@@ -37,6 +61,20 @@ content:
     third_party_settings: {  }
     weight: 0
     region: content
+  schema_available_language:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 130
+    region: content
+  schema_description:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 18
+    region: content
   schema_geo:
     type: geofield_default
     label: above
@@ -54,6 +92,44 @@ content:
       link: false
     third_party_settings: {  }
     weight: 1
+    region: content
+  schema_latitude:
+    type: number_decimal
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 110
+    region: content
+  schema_longitude:
+    type: number_decimal
+    label: above
+    settings:
+      thousand_separator: ''
+      decimal_separator: .
+      scale: 2
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 110
+    region: content
+  schema_name:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  schema_tourist_type:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 110
     region: content
 hidden:
   created: true

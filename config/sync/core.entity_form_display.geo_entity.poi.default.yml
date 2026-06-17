@@ -8,18 +8,44 @@ dependencies:
     - field.field.geo_entity.poi.field_poi_type
     - field.field.geo_entity.poi.field_show_on_map
     - field.field.geo_entity.poi.schema_address
+    - field.field.geo_entity.poi.schema_available_language
+    - field.field.geo_entity.poi.schema_description
     - field.field.geo_entity.poi.schema_geo
     - field.field.geo_entity.poi.schema_image
+    - field.field.geo_entity.poi.schema_latitude
+    - field.field.geo_entity.poi.schema_longitude
+    - field.field.geo_entity.poi.schema_name
     - field.field.geo_entity.poi.schema_place
     - field.field.geo_entity.poi.schema_same_as
     - field.field.geo_entity.poi.schema_telephone
+    - field.field.geo_entity.poi.schema_tourist_type
     - geo_entity.geo_entity_type.poi
   module:
     - address
+    - allowed_formats
+    - field_group
     - geofield
     - link
     - telephone
     - text
+third_party_settings:
+  field_group:
+    group_tourist_attraction:
+      children:
+        - schema_available_language
+        - schema_description
+        - schema_latitude
+        - schema_longitude
+        - schema_name
+        - schema_tourist_type
+      label: 'Tourist attraction'
+      region: content
+      parent_name: ''
+      weight: 0
+      format_type: details
+      format_settings:
+        open: true
+        description: ''
 id: geo_entity.poi.default
 targetEntityType: geo_entity
 bundle: poi
@@ -27,7 +53,7 @@ mode: default
 content:
   field_body:
     type: text_textarea
-    weight: 2
+    weight: 1
     region: content
     settings:
       rows: 5
@@ -35,20 +61,20 @@ content:
     third_party_settings: {  }
   field_day:
     type: number
-    weight: 8
+    weight: 10
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
   field_poi_type:
     type: options_select
-    weight: 3
+    weight: 2
     region: content
     settings: {  }
     third_party_settings: {  }
   field_show_on_map:
     type: boolean_checkbox
-    weight: 10
+    weight: 11
     region: content
     settings:
       display_label: true
@@ -63,21 +89,38 @@ content:
     third_party_settings: {  }
   schema_address:
     type: address_default
-    weight: 6
+    weight: 8
     region: content
     settings:
       wrapper_type: fieldset
     third_party_settings: {  }
+  schema_available_language:
+    type: options_select
+    weight: 130
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  schema_description:
+    type: text_textarea
+    weight: 18
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings:
+      allowed_formats:
+        hide_help: '1'
+        hide_guidelines: '1'
   schema_geo:
     type: geofield_latlon
-    weight: 5
+    weight: 7
     region: content
     settings:
       html5_geolocation: false
     third_party_settings: {  }
   schema_image:
     type: entity_reference_autocomplete
-    weight: 4
+    weight: 6
     region: content
     settings:
       match_operator: CONTAINS
@@ -85,9 +128,31 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+  schema_latitude:
+    type: number
+    weight: 110
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  schema_longitude:
+    type: number
+    weight: 110
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  schema_name:
+    type: string_textfield
+    weight: 3
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   schema_place:
     type: entity_reference_autocomplete
-    weight: 9
+    weight: 3
     region: content
     settings:
       match_operator: CONTAINS
@@ -97,7 +162,7 @@ content:
     third_party_settings: {  }
   schema_same_as:
     type: link_default
-    weight: 11
+    weight: 12
     region: content
     settings:
       placeholder_url: ''
@@ -105,14 +170,22 @@ content:
     third_party_settings: {  }
   schema_telephone:
     type: telephone_default
-    weight: 7
+    weight: 9
     region: content
     settings:
       placeholder: ''
     third_party_settings: {  }
+  schema_tourist_type:
+    type: string_textfield
+    weight: 110
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 1
+    weight: 5
     region: content
     settings:
       display_label: false

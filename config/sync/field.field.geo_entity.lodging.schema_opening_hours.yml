@@ -1,0 +1,19 @@
+uuid: ebfc0fc7-8d26-41ae-b0d4-4a38e5c5e877
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_opening_hours
+    - geo_entity.geo_entity_type.lodging
+id: geo_entity.lodging.schema_opening_hours
+field_name: schema_opening_hours
+entity_type: geo_entity
+bundle: lodging
+label: 'Opening hours'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

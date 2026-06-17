@@ -1,0 +1,19 @@
+uuid: 2e32f255-3fb0-4250-95a0-a7f9029dc20f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_checkin_time
+    - geo_entity.geo_entity_type.lodging
+id: geo_entity.lodging.schema_checkin_time
+field_name: schema_checkin_time
+entity_type: geo_entity
+bundle: lodging
+label: 'Checkin time'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

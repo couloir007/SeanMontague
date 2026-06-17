@@ -1,0 +1,22 @@
+uuid: 1cc5bbb4-e67a-4f0a-9ac4-10d391bf9a6a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_description
+    - geo_entity.geo_entity_type.poi
+  module:
+    - text
+id: geo_entity.poi.schema_description
+field_name: schema_description
+entity_type: geo_entity
+bundle: poi
+label: Description
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

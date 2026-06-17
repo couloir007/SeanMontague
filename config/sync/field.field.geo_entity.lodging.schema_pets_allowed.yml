@@ -1,0 +1,21 @@
+uuid: bad209e0-1327-435c-ad61-5c1ba9496f70
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_pets_allowed
+    - geo_entity.geo_entity_type.lodging
+id: geo_entity.lodging.schema_pets_allowed
+field_name: schema_pets_allowed
+entity_type: geo_entity
+bundle: lodging
+label: 'Pets allowed'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: 'Yes'
+  off_label: 'No'
+field_type: boolean

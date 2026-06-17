@@ -1,0 +1,21 @@
+uuid: fae737b8-ba92-4144-8b55-b3436bbeb15a
+langcode: en
+status: true
+dependencies:
+  module:
+    - entity_reference_override
+    - geo_entity
+    - node
+id: geo_entity.schema_employee
+field_name: schema_employee
+entity_type: geo_entity
+type: entity_reference_override
+settings:
+  target_type: node
+module: entity_reference_override
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

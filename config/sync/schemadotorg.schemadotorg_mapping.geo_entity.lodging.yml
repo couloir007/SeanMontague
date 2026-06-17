@@ -1,0 +1,58 @@
+uuid: 891baeb5-7cb2-4bc9-a3ca-864135ae34a8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.geo_entity.lodging.schema_address
+    - field.field.geo_entity.lodging.schema_amenity_feature
+    - field.field.geo_entity.lodging.schema_available_language
+    - field.field.geo_entity.lodging.schema_checkin_time
+    - field.field.geo_entity.lodging.schema_checkout_time
+    - field.field.geo_entity.lodging.schema_contact_point
+    - field.field.geo_entity.lodging.schema_description
+    - field.field.geo_entity.lodging.schema_email
+    - field.field.geo_entity.lodging.schema_employee
+    - field.field.geo_entity.lodging.schema_fax_number
+    - field.field.geo_entity.lodging.schema_has_map
+    - field.field.geo_entity.lodging.schema_image
+    - field.field.geo_entity.lodging.schema_latitude
+    - field.field.geo_entity.lodging.schema_longitude
+    - field.field.geo_entity.lodging.schema_name
+    - field.field.geo_entity.lodging.schema_num_of_rooms
+    - field.field.geo_entity.lodging.schema_opening_hours
+    - field.field.geo_entity.lodging.schema_pets_allowed
+    - field.field.geo_entity.lodging.schema_price_range
+    - field.field.geo_entity.lodging.schema_smoking_allowed
+    - field.field.geo_entity.lodging.schema_star_rating
+    - field.field.geo_entity.lodging.schema_telephone
+    - geo_entity.geo_entity_type.lodging
+  module:
+    - geo_entity
+id: geo_entity.lodging
+target_entity_type_id: geo_entity
+target_bundle: lodging
+schema_type: LodgingBusiness
+schema_properties:
+  schema_address: address
+  schema_amenity_feature: amenityFeature
+  schema_available_language: availableLanguage
+  schema_checkin_time: checkinTime
+  schema_checkout_time: checkoutTime
+  schema_contact_point: contactPoint
+  schema_description: description
+  schema_email: email
+  schema_employee: employee
+  schema_fax_number: faxNumber
+  schema_has_map: hasMap
+  schema_image: image
+  schema_latitude: latitude
+  schema_longitude: longitude
+  schema_name: name
+  schema_num_of_rooms: numberOfRooms
+  schema_opening_hours: openingHours
+  schema_pets_allowed: petsAllowed
+  schema_price_range: priceRange
+  schema_smoking_allowed: smokingAllowed
+  schema_star_rating: starRating
+  schema_telephone: telephone
+additional_mappings: {  }

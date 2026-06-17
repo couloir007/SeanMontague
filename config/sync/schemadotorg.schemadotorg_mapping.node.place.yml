@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.field.node.place.body
     - field.field.node.place.schema_address
+    - field.field.node.place.schema_contained_in_place
     - field.field.node.place.schema_image
     - field.field.node.place.schema_latitude
     - field.field.node.place.schema_longitude
@@ -21,6 +22,7 @@ target_bundle: place
 schema_type: Place
 schema_properties:
   schema_address: address
+  schema_contained_in_place: containedInPlace
   body: description
   schema_image: image
   schema_latitude: latitude

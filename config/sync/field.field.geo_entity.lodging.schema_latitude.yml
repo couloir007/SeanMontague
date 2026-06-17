@@ -1,0 +1,23 @@
+uuid: 413da833-900e-4b6b-aaa2-435efe2ed80d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.geo_entity.schema_latitude
+    - geo_entity.geo_entity_type.lodging
+id: geo_entity.lodging.schema_latitude
+field_name: schema_latitude
+entity_type: geo_entity
+bundle: lodging
+label: Latitude
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

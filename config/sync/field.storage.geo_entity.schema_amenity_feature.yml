@@ -1,0 +1,20 @@
+uuid: 9c7bd22f-bc4c-4e58-af73-890432b9663c
+langcode: en
+status: true
+dependencies:
+  module:
+    - geo_entity
+    - taxonomy
+id: geo_entity.schema_amenity_feature
+field_name: schema_amenity_feature
+entity_type: geo_entity
+type: entity_reference
+settings:
+  target_type: taxonomy_term
+module: core
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

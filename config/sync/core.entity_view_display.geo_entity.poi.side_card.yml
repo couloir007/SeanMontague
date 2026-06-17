@@ -9,11 +9,17 @@ dependencies:
     - field.field.geo_entity.poi.field_poi_type
     - field.field.geo_entity.poi.field_show_on_map
     - field.field.geo_entity.poi.schema_address
+    - field.field.geo_entity.poi.schema_available_language
+    - field.field.geo_entity.poi.schema_description
     - field.field.geo_entity.poi.schema_geo
     - field.field.geo_entity.poi.schema_image
+    - field.field.geo_entity.poi.schema_latitude
+    - field.field.geo_entity.poi.schema_longitude
+    - field.field.geo_entity.poi.schema_name
     - field.field.geo_entity.poi.schema_place
     - field.field.geo_entity.poi.schema_same_as
     - field.field.geo_entity.poi.schema_telephone
+    - field.field.geo_entity.poi.schema_tourist_type
     - geo_entity.geo_entity_type.poi
   module:
     - layout_builder
@@ -41,10 +47,16 @@ hidden:
   field_show_on_map: true
   langcode: true
   schema_address: true
+  schema_available_language: true
+  schema_description: true
   schema_geo: true
   schema_image: true
+  schema_latitude: true
+  schema_longitude: true
+  schema_name: true
   schema_place: true
   schema_same_as: true
   schema_telephone: true
+  schema_tourist_type: true
   status: true
   uid: true
