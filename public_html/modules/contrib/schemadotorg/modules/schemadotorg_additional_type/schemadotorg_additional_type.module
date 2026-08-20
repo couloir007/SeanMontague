@@ -8,7 +8,9 @@
 declare(strict_types=1);
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -31,7 +33,6 @@ function schemadotorg_additional_type_help(string $route_name, RouteMatchInterfa
 
     default:
       return NULL;
-
   }
 }
 
@@ -55,6 +56,41 @@ function schemadotorg_additional_type_form_schemadotorg_mapping_form_alter(array
   /** @var \Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeManagerInterface $additional_type_manager */
   $additional_type_manager = \Drupal::service('schemadotorg_additional_type.manager');
   $additional_type_manager->alterMappingForm($form, $form_state);
+}
+
+/* ************************************************************************** */
+// Entity base field.
+/* ************************************************************************** */
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function schemadotorg_additional_type_entity_base_field_info(EntityTypeInterface $entity_type): array {
+  /** @var \Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeBaseFieldManagerInterface $base_field_manager */
+  $base_field_manager = \Drupal::service('schemadotorg_additional_type.base_field_manager');
+  return $base_field_manager->baseFieldInfo($entity_type);
+}
+
+/**
+ * Implements hook_entity_presave().
+ */
+function schemadotorg_additional_type_entity_presave(EntityInterface $entity): void {
+  if (!$entity instanceof ContentEntityInterface) {
+    return;
+  }
+
+  /** @var \Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeBaseFieldManagerInterface $base_field_manager */
+  $base_field_manager = \Drupal::service('schemadotorg_additional_type.base_field_manager');
+  $base_field_manager->presaveEntity($entity);
+}
+
+/**
+ * Implements hook_views_data_alter().
+ */
+function schemadotorg_additional_type_views_data_alter(array &$data): void {
+  /** @var \Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeBaseFieldManagerInterface $base_field_manager */
+  $base_field_manager = \Drupal::service('schemadotorg_additional_type.base_field_manager');
+  $base_field_manager->viewsDataAlter($data);
 }
 
 /* ************************************************************************** */
@@ -302,6 +338,30 @@ allowed_value:
     '#description' => t('If checked, additional type values will automatically be converted to a snake case values.'),
     '#return_value' => TRUE,
   ];
+  /** @var \Drupal\schemadotorg\SchemaDotOrgMappingTypeInterface[] $mapping_types */
+  $mapping_types = \Drupal::entityTypeManager()
+    ->getStorage('schemadotorg_mapping_type')
+    ->loadMultiple();
+  $mapping_type_options = [];
+  foreach ($mapping_types as $mapping_type) {
+    $mapping_type_options[$mapping_type->id()] = $mapping_type->label();
+  }
+  asort($mapping_type_options);
+  $form['schemadotorg_additional_type']['create_base_fields'] = [
+    '#type' => 'checkboxes',
+    '#title' => t('Create additional type base fields for'),
+    '#description' => t("Select the mapping types that should receive additional type base fields.  (i.e., <code>schemadotorg_additional_type</code> and <code>schemadotorg_full_type</code>).")
+     . '<br/>'
+     . '<strong>' . t('Unchecking an entity type will remove its additional type base fields.') . '</strong>',
+    '#options' => $mapping_type_options,
+  ];
+  // Store the default value of the 'create_base_fields' setting to track changes.
+  $form_state->set(
+    'schemadotorg_additional_type_create_base_field_default_value',
+      \Drupal::config('schemadotorg_additional_type.settings')->get('create_base_fields') ?? [],
+  );
+
+  $form['schemadotorg_additional_type']['apply'] = [];
 
   // Add submit callback.
   $form['#submit'][] = 'schemadotorg_additional_type_settings_form_submit';
@@ -313,6 +373,15 @@ allowed_value:
  * @see schemadotorg_additional_type_form_schemadotorg_types_settings_form_alter()
  */
 function schemadotorg_additional_type_settings_form_submit(array &$form, FormStateInterface $form_state): void {
+  // Get the current and default values for the 'create_base_fields' setting.
+  $create_base_fields = $form_state->getValue(['schemadotorg_additional_type', 'create_base_fields']) ?? [];
+  $default_create_base_fields = $form_state->get('schemadotorg_additional_type_create_base_field_default_value');
+  if ($create_base_fields !== $default_create_base_fields) {
+    /** @var \Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeBaseFieldManagerInterface $base_field_manager */
+    $base_field_manager = \Drupal::service('schemadotorg_additional_type.base_field_manager');
+    $base_field_manager->syncBaseFields($default_create_base_fields, $create_base_fields);
+  }
+
   /** @var \Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeFieldAccessHandlerInterface $additional_type_field_access_handler */
   $additional_type_field_access_handler = \Drupal::service('schemadotorg_additional_type.field_access_handler');
   $additional_type_field_access_handler->resetCache();

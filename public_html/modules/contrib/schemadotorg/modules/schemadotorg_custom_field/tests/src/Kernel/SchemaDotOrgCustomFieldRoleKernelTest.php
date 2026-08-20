@@ -14,6 +14,13 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
  */
 class SchemaDotOrgCustomFieldRoleKernelTest extends SchemaDotOrgEntityKernelTestBase {
 
+  // phpcs:disable
+  /**
+   * Disabled config schema checking until the cer.module has fixed its schema.
+   */
+  protected $strictConfigSchema = FALSE;
+  // phpcs:enable
+
   /**
    * {@inheritdoc}
    */
@@ -45,25 +52,17 @@ class SchemaDotOrgCustomFieldRoleKernelTest extends SchemaDotOrgEntityKernelTest
     /** @var \Drupal\field\Entity\FieldConfig $field_config */
     $field_config = FieldConfig::load('node.organization.schema_member');
     $expected_settings = [
-      'type' => 'entity_reference_autocomplete',
-      'weight' => 0,
+      'label' => 'Member',
       'check_empty' => TRUE,
-      'widget_settings' => [
-        'label' => 'Member',
-        'settings' => [
-          'description' => '',
-          'description_display' => 'after',
-          'size' => 60,
-          'placeholder' => '',
-          'required' => FALSE,
-          'match_operator' => 'CONTAINS',
-          'match_limit' => 10,
-          'handler' => 'schemadotorg:node',
-          'handler_settings' => [
-            'target_type' => 'node',
-            'schema_types' => ['Person'],
-            'target_bundles' => ['person' => 'person'],
-          ],
+      'required' => FALSE,
+      'translatable' => FALSE,
+      'description' => '',
+      'description_display' => 'after',
+      'handler' => 'default:node',
+      'handler_settings' => [
+        'target_type' => 'node',
+        'schema_types' => [
+          'Person',
         ],
       ],
     ];

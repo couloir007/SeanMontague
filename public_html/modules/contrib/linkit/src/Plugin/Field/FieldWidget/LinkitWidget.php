@@ -3,8 +3,10 @@
 namespace Drupal\linkit\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\file\FileInterface;
 use Drupal\link\Plugin\Field\FieldWidget\LinkWidget;
 use Drupal\linkit\Utility\LinkitHelper;
@@ -12,15 +14,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'linkit' widget.
- *
- * @FieldWidget(
- *   id = "linkit",
- *   label = @Translation("Linkit"),
- *   field_types = {
- *     "link"
- *   }
- * )
  */
+#[FieldWidget(
+  id: 'linkit',
+  label: new TranslatableMarkup('Linkit'),
+  field_types: ['link']
+)]
 class LinkitWidget extends LinkWidget {
 
   /**

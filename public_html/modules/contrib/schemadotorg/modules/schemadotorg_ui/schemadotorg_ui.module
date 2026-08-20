@@ -58,3 +58,13 @@ function schemadotorg_ui_schemadotorg_mapping_type_update(): void {
 function schemadotorg_ui_schemadotorg_mapping_type_delete(): void {
   schemadotorg_ui_schemadotorg_mapping_type_insert();
 }
+
+/**
+ * Implements hook_gin_ignore_sticky_form_actions().
+ */
+function schemadotorg_ui_gin_ignore_sticky_form_actions(): array {
+  return [
+    'schemadotorg_mapping_add_form',
+    'schemadotorg_mapping_edit_form',
+  ];
+}

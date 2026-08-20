@@ -104,7 +104,7 @@ abstract class SchemaDotOrgEntityReferenceSelection extends SelectionPluginBase 
   /**
    * {@inheritdoc}
    */
-  public function setConfiguration(array $configuration): void {
+  public function setConfiguration(array $configuration): static {
     // Convert 'schema_types' that are passed as a string to an array.
     // The 'schema_types' will be a string when this handler is validated
     // via form submit.
@@ -121,6 +121,8 @@ abstract class SchemaDotOrgEntityReferenceSelection extends SelectionPluginBase 
     // field config presave.
     // @see schemadotorg_field_config_presave()
     $this->configuration['target_bundles'] = static::getTargetBundles($this->configuration);
+
+    return $this;
   }
 
   /**
@@ -139,21 +141,23 @@ abstract class SchemaDotOrgEntityReferenceSelection extends SelectionPluginBase 
 
     $form['schema_types'] = [
       '#type' => 'schemadotorg_autocomplete',
-      '#title' => $this->t('Schema.org types'),
-      '#description' => $this->t('Enter one or more Schema.org types to filter available content.')
+      '#title' => $this->t('Schema.org types/bundles'),
+      '#description' => $this->t('Enter one or more Schema.org types or bundle machine names to filter available content.')
       . ' ' . $this->t("Enter 'Thing' to include all available content."),
       '#tags' => TRUE,
       '#required' => TRUE,
       '#target_type' => 'Thing',
+      '#include_bundles' => $configuration['target_type'],
       '#default_value' => $configuration['schema_types'],
     ];
 
     $form['excluded_schema_types'] = [
       '#type' => 'schemadotorg_autocomplete',
-      '#title' => $this->t('Excluded Schema.org types'),
-      '#description' => $this->t('Enter one or more Schema.org types to exclude from available content.'),
+      '#title' => $this->t('Excluded Schema.org types/bundles'),
+      '#description' => $this->t('Enter one or more Schema.org types or bundle machine names to exclude from available content.'),
       '#tags' => TRUE,
       '#target_type' => 'Thing',
+      '#include_bundles' => $configuration['target_type'],
       '#default_value' => $configuration['excluded_schema_types'],
     ];
 
@@ -355,26 +359,52 @@ abstract class SchemaDotOrgEntityReferenceSelection extends SelectionPluginBase 
       'ignore_additional_mappings' => $configuration['ignore_additional_mappings'],
     ];
 
+    $bundle_ids = static::getBundleIds($configuration['target_type']);
+    $schema_types = array_diff_key($configuration['schema_types'], $bundle_ids);
+    $included_target_bundles = array_intersect_key($bundle_ids, $configuration['schema_types']);
+    $excluded_schema_types = array_diff_key($configuration['excluded_schema_types'], $bundle_ids);
+    $excluded_target_bundles = array_intersect_key($bundle_ids, $configuration['excluded_schema_types']);
+
     // Get target bundles for the selected Schema.org types.
     $target_bundles = $mapping_storage->getRangeIncludesTargetBundles(
       $configuration['target_type'],
-      $configuration['schema_types'],
+      $schema_types,
       $options,
     );
+    $target_bundles += $included_target_bundles;
 
     // Excluded Schema.org types from target bundles.
-    if ($configuration['excluded_schema_types']) {
+    if ($excluded_schema_types) {
       $exclude_target_bundles = $mapping_storage->getRangeIncludesTargetBundles(
         $configuration['target_type'],
-        $configuration['excluded_schema_types'],
+        $excluded_schema_types,
         $options,
       );
       if (!empty($exclude_target_bundles)) {
         $target_bundles = array_diff_key($target_bundles, $exclude_target_bundles);
       }
     }
+    if ($excluded_target_bundles) {
+      $target_bundles = array_diff_key($target_bundles, $excluded_target_bundles);
+    }
 
     return $target_bundles;
+  }
+
+  /**
+   * Gets valid bundle IDs for an entity type.
+   *
+   * @param string $entity_type_id
+   *   Entity type ID.
+   *
+   * @return array
+   *   Bundle IDs keyed by bundle ID.
+   */
+  protected static function getBundleIds(string $entity_type_id): array {
+    /** @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info */
+    $entity_type_bundle_info = \Drupal::service('entity_type.bundle.info');
+    $bundle_ids = array_keys($entity_type_bundle_info->getBundleInfo($entity_type_id));
+    return array_combine($bundle_ids, $bundle_ids);
   }
 
   /**
@@ -405,12 +435,11 @@ abstract class SchemaDotOrgEntityReferenceSelection extends SelectionPluginBase 
       $has_entity_reference = FALSE;
       foreach ($settings['columns'] as $column_name => $column) {
         if ($column['type'] === 'entity_reference') {
-          $handler = NestedArray::getValue($settings, ['field_settings', $column_name, 'widget_settings', 'settings', 'handler']);
-          if (str_starts_with($handler, 'schemadotorg')) {
+          $handler = NestedArray::getValue($settings, ['field_settings', $column_name, 'handler']);
+          if ($handler && str_starts_with($handler, 'schemadotorg')) {
             $has_entity_reference = TRUE;
-            $handler_settings =& NestedArray::getValue($settings, ['field_settings', $column_name, 'widget_settings', 'settings', 'handler_settings']);
+            $handler_settings =& NestedArray::getValue($settings, ['field_settings', $column_name, 'handler_settings']);
             $handler_settings['target_bundles'] = SchemaDotOrgEntityReferenceSelection::getTargetBundles($handler_settings);
-
           }
         }
       }

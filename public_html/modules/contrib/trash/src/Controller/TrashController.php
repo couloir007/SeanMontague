@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\trash\Controller;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -33,6 +34,7 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
     protected EntityTypeBundleInfoInterface $bundleInfo,
     protected DateFormatterInterface $dateFormatter,
     protected TrashViewBuilder $viewBuilder,
+    protected TimeInterface $time,
   ) {}
 
   /**
@@ -44,6 +46,7 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
       $container->get('entity_type.bundle.info'),
       $container->get('date.formatter'),
       $container->get(TrashViewBuilder::class),
+      $container->get('datetime.time'),
     );
   }
 
@@ -91,6 +94,18 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
    *   \Drupal\Core\Render\RendererInterface::render().
    */
   protected function render(string $entity_type_id): array {
+    $trash_settings = $this->config('trash.settings');
+    if ($trash_settings->get('auto_purge.enabled')) {
+      $timestamp = strtotime(sprintf('+%s', $trash_settings->get('auto_purge.after')));
+      $time_period = $this->dateFormatter->formatDiff($this->time->getCurrentTime(), $timestamp);
+      $build['auto_purge_message'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'p',
+        '#value' => $this->t('Items in the trash will be deleted forever after @time_period.', ['@time_period' => $time_period]),
+        '#weight' => -100,
+      ];
+    }
+
     $options = [];
     foreach ($this->trashManager->getEnabledEntityTypes() as $id) {
       $options[$id] = (string) $this->entityTypeManager()->getDefinition($id)->getLabel();

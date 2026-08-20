@@ -554,7 +554,7 @@ class SchemaDotOrgEntityFieldManager implements SchemaDotOrgEntityFieldManagerIn
     if (!isset($field_type_definitions)) {
       $field_type_definitions = $this->fieldTypePluginManager->getUiDefinitions();
     }
-    return isset($field_type_definitions[$type]);
+    return ($type && isset($field_type_definitions[$type]));
   }
 
   /**

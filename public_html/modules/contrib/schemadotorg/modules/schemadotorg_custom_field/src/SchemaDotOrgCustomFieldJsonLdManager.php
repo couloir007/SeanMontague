@@ -94,11 +94,11 @@ class SchemaDotOrgCustomFieldJsonLdManager implements SchemaDotOrgCustomFieldJso
       }
 
       // Convert allowed values' value to text.
-      $allowed_values = NestedArray::getValue($settings, ['field_settings', $item_key, 'widget_settings', 'settings', 'allowed_values']) ?? [];
+      $allowed_values = NestedArray::getValue($settings, ['field_settings', $item_key, 'allowed_values']) ?? [];
       if ($allowed_values) {
         foreach ($allowed_values as $allowed_value) {
           if ($allowed_value['key'] === $item_value) {
-            $item_value = $allowed_value['value'];
+            $item_value = $allowed_value['label'];
             break;
           }
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\schemadotorg\Kernel;
 
+use Drupal\Component\Utility\DeprecationHelper;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\schemadotorg\Entity\SchemaDotOrgMapping;
 use Drupal\schemadotorg\SchemaDotOrgEntityFieldManagerInterface;
@@ -186,7 +187,13 @@ class SchemaDotOrgMappingManagerKernelTest extends SchemaDotOrgEntityKernelTestB
       'description' => 'The name of the item.',
     ];
     $this->assertEquals($expected, $mapping_defaults['properties']['name']);
-    $this->assertEquals(SchemaDotOrgEntityFieldManagerInterface::ADD_FIELD, $mapping_defaults['properties']['description']['name']);
+    $expected_description_field_name = DeprecationHelper::backwardsCompatibleCall(
+      currentVersion: \Drupal::VERSION,
+      deprecatedVersion: '11.0.0',
+      currentCallable: fn() => 'body',
+      deprecatedCallable: fn() => SchemaDotOrgEntityFieldManagerInterface::ADD_FIELD,
+    );
+    $this->assertEquals($expected_description_field_name, $mapping_defaults['properties']['description']['name']);
     $this->assertEquals('', $mapping_defaults['properties']['alternateName']['name']);
 
     $mapping_defaults = $this->mappingManager->getMappingDefaults(

@@ -4,9 +4,11 @@ namespace Drupal\linkit\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\link\LinkItemInterface;
 use Drupal\link\Plugin\Field\FieldFormatter\LinkFormatter;
 use Drupal\linkit\ProfileInterface;
@@ -16,15 +18,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'linkit' formatter.
- *
- * @FieldFormatter(
- *   id = "linkit",
- *   label = @Translation("Linkit"),
- *   field_types = {
- *     "link"
- *   }
- * )
  */
+#[FieldFormatter(
+  id: 'linkit',
+  label: new TranslatableMarkup('Linkit'),
+  field_types: ['link']
+)]
 class LinkitFormatter extends LinkFormatter {
 
   /**

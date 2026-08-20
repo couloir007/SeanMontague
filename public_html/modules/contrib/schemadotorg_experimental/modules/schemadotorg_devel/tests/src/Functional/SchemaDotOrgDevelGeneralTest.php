@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\msk_devel\Functional;
+namespace Drupal\Tests\schemadotorg_devel\Functional;
 
 use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
 

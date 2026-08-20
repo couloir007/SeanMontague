@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\schemadotorg_report\Functional;
 
 use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
-use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
 
 /**
  * Tests for Schema.org report.
@@ -22,7 +22,7 @@ class SchemaDotOrgReportTest extends SchemaDotOrgBrowserTestBase {
   /**
    * A user with permission to access site reports.
    */
-  protected User $reportUser;
+  protected UserInterface $reportUser;
 
   /**
    * {@inheritdoc}

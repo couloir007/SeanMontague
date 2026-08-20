@@ -108,7 +108,7 @@ class SchemaDotOrgMappingEntityKernelTest extends SchemaDotOrgEntityKernelTestBa
 
     // Check getting the bundle entity type. (i.e. node_type:page)
     $target_entity_bundle_entity = $node_mapping->getTargetEntityBundleEntity();
-    $this->assertInstanceOf(ConfigEntityType::class, $target_entity_type_bundle_definition);
+    $this->assertInstanceOf(NodeType::class, $target_entity_bundle_entity);
     $this->assertEquals('thing', $target_entity_bundle_entity->id());
     $this->assertEquals('Thing', $target_entity_bundle_entity->label());
 
@@ -269,17 +269,17 @@ class SchemaDotOrgMappingEntityKernelTest extends SchemaDotOrgEntityKernelTestBa
     // Check deleting field removes the property mapping.
     $this->assertEquals('alternateName', $node_mapping->getSchemaPropertyMapping('schema_alternate_name'));
     FieldConfig::load('node.thing.schema_alternate_name')->delete();
-    $this->mappingStorage->resetCache();
+    $this->getMappingStorage()->resetCache();
     /** @var \Drupal\schemadotorg\SchemaDotOrgMappingInterface $node_mapping */
-    $node_mapping = $this->mappingStorage->load('node.thing');
+    $node_mapping = $this->getMappingStorage()->load('node.thing');
     $this->assertNull($node_mapping->getSchemaPropertyMapping('schema_alter_name'));
 
     // Check deleting the target type removes the mapping.
     // @see \Drupal\schemadotorg\Entity\SchemaDotOrgMapping::onDependencyRemoval
-    $this->assertNotNull($this->mappingStorage->load('node.thing'));
+    $this->assertNotNull($this->getMappingStorage()->load('node.thing'));
     $node_type->delete();
-    $this->mappingStorage->resetCache();
-    $this->assertNull($this->mappingStorage->load('node.thing'));
+    $this->getMappingStorage()->resetCache();
+    $this->assertNull($this->getMappingStorage()->load('node.thing'));
   }
 
 }

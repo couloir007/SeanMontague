@@ -612,7 +612,7 @@ class SchemaDotOrgInstaller implements SchemaDotOrgInstallerInterface {
     $handle = fopen($filename, 'r');
 
     // Get field names.
-    $fields = fgetcsv($handle);
+    $fields = fgetcsv($handle, escape: '');
     array_walk(
       $fields,
       fn(&$field_name) => ($field_name = $this->schemaNames->camelCaseToSnakeCase($field_name))
@@ -620,7 +620,7 @@ class SchemaDotOrgInstaller implements SchemaDotOrgInstallerInterface {
 
     // Insert multiple records.
     $query = $this->database->insert($table)->fields($fields);
-    while ($row = fgetcsv($handle)) {
+    while ($row = fgetcsv($handle, escape: '')) {
       $values = [];
       foreach ($fields as $index => $field_name) {
         $values[$field_name] = $row[$index] ?? '';

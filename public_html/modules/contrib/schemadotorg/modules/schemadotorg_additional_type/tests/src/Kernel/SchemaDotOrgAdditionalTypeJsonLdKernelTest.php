@@ -10,7 +10,7 @@ use Drupal\Tests\schemadotorg_jsonld\Kernel\SchemaDotOrgJsonLdKernelTestBase;
 /**
  * Tests the functionality of the Schema.org Subtype JSON-LD.
  *
- * @covers schemadotorg_additional_type_schemadotorg_jsonld_schema_type_entity_alter()
+ * @covers \schemadotorg_additional_type_schemadotorg_jsonld_schema_type_entity_alter
  * @group schemadotorg
  */
 class SchemaDotOrgAdditionalTypeJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBase {

@@ -10,8 +10,8 @@ use Drupal\Tests\schemadotorg_jsonld\Kernel\SchemaDotOrgJsonLdKernelTestBase;
 /**
  * Tests the functionality of the Schema.org entity reference override JSON-LD.
  *
- * @covers schemadotorg_entity_reference_override_schemadotorg_property_field_alter()
- * @covers schemadotorg_entity_reference_override_schemadotorg_jsonld_schema_property_alter()
+ * @covers \schemadotorg_entity_reference_override_schemadotorg_property_field_alter
+ * @covers \schemadotorg_entity_reference_override_schemadotorg_jsonld_schema_property_alter
  * @group schemadotorg
  */
 class SchemaDotOrgEntityReferenceOverrideJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBase {

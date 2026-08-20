@@ -66,6 +66,7 @@ schemadotorg.mermaid:
     - core/once
     - schemadotorg/schemadotorg.details
     - schemadotorg/mermaid
+    - schemadotorg/panzoom
 
 ################################################################################
 # External libraries.
@@ -87,23 +88,23 @@ jstree:
     - core/jquery
 
 mermaid:
-  version: '11.4.1'
+  version: '11.16.0'
   remote: https://github.com/mermaid-js/mermaid
   license:
     name: MIT
     gpl-compatible: false
   js:
-    https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js: { type: external, minified: true }
+    https://cdn.jsdelivr.net/npm/mermaid@11.16.0/dist/mermaid.min.js: { type: external, minified: true }
 
-svg-pan-zoom:
-  remote: https://github.com/ariutta/svg-pan-zoom
-  version: '3.6.1'
+panzoom:
+  remote: https://github.com/timmywil/panzoom
+  version: '4.6.2'
   license:
-    name: BDS
-    url: https://github.com/ariutta/svg-pan-zoom/blob/master/LICENSE
+    name: MIT
+    url: https://github.com/timmywil/panzoom/blob/main/MIT-License.txt
     gpl-compatible: true
   js:
-    https://cdn.jsdelivr.net/gh/ariutta/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.js: { type: external, minified: true }
+    https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4.6.2/dist/panzoom.min.js: { type: external, minified: true }
 
 codemirror:
   remote: http://codemirror.net

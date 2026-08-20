@@ -10,7 +10,7 @@ use Drupal\Tests\schemadotorg_jsonld\Kernel\SchemaDotOrgJsonLdKernelTestBase;
 /**
  * Tests the functionality of the Schema.org block content module JSON-LD integration.
  *
- * @covers schemadotorg_block_content_schemadotorg_jsonld_schema_type_entity_alter()
+ * @covers \Drupal\schemadotorg_block_content\SchemaDotOrgBlockContentJsonLdManager
  * @group schemadotorg
  */
 class SchemaDotOrgBlockContentJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBase {

@@ -14,7 +14,7 @@ use Drupal\schemadotorg_jsonld\SchemaDotOrgJsonLdManagerInterface;
 /**
  * Tests the functionality of the Schema.org JSON-LD manager.
  *
- * @covers \Drupal\schemadotorg_jsonld\SchemaDotOrgJsonLdManager;
+ * @covers \Drupal\schemadotorg_jsonld\SchemaDotOrgJsonLdManager
  * @group schemadotorg
  */
 class SchemaDotOrgJsonLdManagerKernelTest extends SchemaDotOrgJsonLdKernelTestBase {

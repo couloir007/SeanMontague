@@ -56,6 +56,7 @@ function schemadotorg_pathauto_form_schemadotorg_types_settings_form_alter(array
     '#token_link' => TRUE,
     '#example' => "
 node--Thing: '[node:schemadotorg:base-path]/[node:title]'
+node--WebPage--landing_page: '[node:title]'
 ",
   ];
   $form['schemadotorg_pathauto']['base_paths'] = [

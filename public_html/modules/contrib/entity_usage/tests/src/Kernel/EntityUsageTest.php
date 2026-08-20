@@ -764,6 +764,34 @@ class EntityUsageTest extends EntityKernelTestBase {
 
     $real_usage = $this->injectedDatabase->select($this->tableName, 'e')->countQuery()->execute()->fetchField();
     $this->assertEquals(3, $real_usage);
+
+    // Verify the dedupe key includes method and field_name.
+    $this->injectedDatabase->truncate($this->tableName);
+    $entity_usage->enableBulkInsert();
+    $target = $this->testEntities[0];
+    // Same entity pair and source_vid=1 (truthy), but different field names.
+    $entity_usage->registerUsage($target->id(), $target->getEntityTypeId(), 1, 'foo', 'en', 1, 'entity_reference', 'field_a', 1);
+    $entity_usage->registerUsage($target->id(), $target->getEntityTypeId(), 1, 'foo', 'en', 1, 'entity_reference', 'field_b', 1);
+    // Same entity pair and source_vid=1, but a different method.
+    $entity_usage->registerUsage($target->id(), $target->getEntityTypeId(), 1, 'foo', 'en', 1, 'typed_data', 'field_a', 1);
+    $entity_usage->bulkInsert();
+    $real_usage = $this->injectedDatabase->select($this->tableName, 'e')->countQuery()->execute()->fetchField();
+    $this->assertEquals(6, $real_usage);
+    $field_names = $this->injectedDatabase->select($this->tableName, 'e')
+      ->fields('e', ['field_name'])
+      ->condition('method', 'entity_reference')
+      ->distinct()
+      ->orderBy('field_name')
+      ->execute()
+      ->fetchCol();
+    $this->assertEquals(['body', 'field_a', 'field_b'], $field_names);
+    $methods = $this->injectedDatabase->select($this->tableName, 'e')
+      ->fields('e', ['method'])
+      ->condition('field_name', 'field_a')
+      ->orderBy('method')
+      ->execute()
+      ->fetchCol();
+    $this->assertEquals(['entity_reference', 'typed_data'], $methods);
   }
 
   /**
@@ -781,6 +809,37 @@ class EntityUsageTest extends EntityKernelTestBase {
 
     $entity_usage->truncateTable();
     $this->assertSame(0, (int) $this->container->get('database')->select('entity_usage')->countQuery()->execute()->fetchField());
+  }
+
+  /**
+   * Tests that __wakeup() refreshes container-derived state after unserialize.
+   *
+   * @covers \Drupal\entity_usage\EntityUsageTrackBase::__wakeup
+   */
+  public function testWakeup(): void {
+    $entity = $this->testEntities[0];
+    $config_factory = $this->container->get('config.factory');
+
+    /** @var \Drupal\entity_usage\EntityUsageTrackBase $plugin */
+    $plugin = $this->container->get('plugin.manager.entity_usage.track')->createInstance('entity_reference');
+    // Base field tracking is disabled by default, and 'entity_test' is not in
+    // the 'always_track_base_fields' container parameter, so the 'user_id'
+    // base field is not returned.
+    $this->assertArrayNotHasKey('user_id', $plugin->getReferencingFields($entity, ['entity_reference']));
+
+    $serialized = serialize($plugin);
+
+    // Enable base field tracking after the plugin was constructed, so the
+    // serialized plugin's state is now stale.
+    $config_factory->getEditable('entity_usage.settings')
+      ->set('track_enabled_base_fields', TRUE)
+      ->save();
+
+    /** @var \Drupal\entity_usage\EntityUsageTrackBase $plugin */
+    $plugin = unserialize($serialized);
+    // __wakeup() re-reads the config from the container, rather than relying
+    // on the stale value captured when the plugin was serialized.
+    $this->assertArrayHasKey('user_id', $plugin->getReferencingFields($entity, ['entity_reference']));
   }
 
   /**

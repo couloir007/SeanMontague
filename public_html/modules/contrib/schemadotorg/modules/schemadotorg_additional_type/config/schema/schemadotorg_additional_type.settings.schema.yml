@@ -20,6 +20,12 @@ schemadotorg_additional_type.settings:
       sequence:
         type: string
         label: 'Schema.org ignored additional type type'
+    create_base_fields:
+      type: sequence
+      label: 'Create additional type base fields'
+      sequence:
+        type: string
+        label: 'Schema.org mapping type'
     use_snake_case:
       type: boolean
       label: 'Use snake case for additional type values'

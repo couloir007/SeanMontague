@@ -75,4 +75,11 @@ abstract class SchemaDotOrgRecipeConfigSnapshotTestBase extends SchemaDotOrgReci
     $this->setUpConfigSnapshot();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function importConfig(?string $directory = NULL, array $names = []): void {
+    parent::importConfig($directory, $names);
+  }
+
 }

@@ -11,7 +11,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org pathauto.
  *
- * @covers schemadotorg_pathauto_schemadotorg_mapping_insert()
+ * @covers \schemadotorg_pathauto_schemadotorg_mapping_insert
  * @group schemadotorg
  */
 class SchemaDotOrgPathautoKernelTest extends SchemaDotOrgEntityKernelTestBase {
@@ -78,6 +78,15 @@ class SchemaDotOrgPathautoKernelTest extends SchemaDotOrgEntityKernelTestBase {
   public function testPathauto(): void {
     $pathauto_pattern_storage = \Drupal::entityTypeManager()->getStorage('pathauto_pattern');
 
+    // Configure a bundle-specific pattern for a landing_page bundle using
+    // the WebPage schema type, alongside the generic WebPage pattern.
+    $this->config('schemadotorg_pathauto.settings')
+      ->set('patterns', [
+        'node--Thing' => '[node:schemadotorg:base-path]/[node:schemadotorg:alternate-name]',
+        'node--WebPage--landing_page' => '[node:title]',
+      ])
+      ->save();
+
     // Create node:Thing.
     $this->createSchemaEntity('node', 'Thing');
 
@@ -85,7 +94,7 @@ class SchemaDotOrgPathautoKernelTest extends SchemaDotOrgEntityKernelTestBase {
     $pathauto_pattern = $pathauto_pattern_storage->load('schema_node_thing');
     $this->assertEquals('schema_node_thing', $pathauto_pattern->id());
     $this->assertEquals('Schema.org: Content - Thing', $pathauto_pattern->label());
-    $this->assertEquals('[node:schemadotorg:base-path]/[node:schemadotorg:alternate-name]', $pathauto_pattern->get('pattern'));
+    $this->assertEquals('/[node:schemadotorg:base-path]/[node:schemadotorg:alternate-name]', $pathauto_pattern->get('pattern'));
 
     // Check that node thing pathauto pattern selection condition bundle
     // includes thing.
@@ -107,16 +116,24 @@ class SchemaDotOrgPathautoKernelTest extends SchemaDotOrgEntityKernelTestBase {
     $selection_condition = $pathauto_pattern->getSelectionConditions()->get($selection_condition_id);
     $configuration = $selection_condition->getConfiguration();
     $this->assertEquals(['event' => 'event', 'thing' => 'thing'], $configuration['bundles']);
-  }
 
-  /**
-   * Test Schema.org pathauto alias.
-   */
-  public function testPathautoAlias(): void {
+    // Check event node path alias.
     $this->createSchemaEntity('node', 'Event');
     $node = Node::create(['type' => 'event', 'title' => 'Some event']);
     $node->save();
     $this->assertEntityAlias($node, '/events/some-event');
+
+    // Create node:WebPage:landing_page.
+    $this->createSchemaEntity('node', 'WebPage', ['entity' => ['id' => 'landing_page', 'label' => 'Landing Page']]);
+
+    // Check that a separate bundle-specific pathauto pattern is created.
+    /** @var \Drupal\pathauto\PathautoPatternInterface $bundle_pattern */
+    $bundle_pattern = $pathauto_pattern_storage->load('schema_node_web_page_landing_page');
+    $this->assertEquals('Schema.org: Content - Web Page (Landing Page)', $bundle_pattern->label());
+    $this->assertEquals('/[node:title]', $bundle_pattern->get('pattern'));
+    $configuration = $bundle_pattern->getSelectionConditions()->getConfiguration();
+    $configuration = reset($configuration);
+    $this->assertEquals(['landing_page' => 'landing_page'], $configuration['bundles']);
   }
 
 }

@@ -187,7 +187,7 @@ non-function decisions behind the Schema.org Blueprints module.
 
 ##### Use external JavasScript libraries as needed to improve UI/UX
 - [JsTree](https://www.jstree.com) to display hierarchical relationships
-- [MermaidJS](https://github.com/mermaid-js/mermaid) and [Svg-Pan-Zoom](https://github.com/ariutta/svg-pan-zoom) for diagrams
+- [MermaidJS](https://github.com/mermaid-js/mermaid) and [Panzoom](https://github.com/timmywil/panzoom) for diagrams
 - [CodeMirror](http://codemirror.net) for editing YAML and JSON \
 
 ##### Use a page builder (i.e., Layout Paragraphs) and an HTML editor (i.e., CKEditor5) depending on the use case.

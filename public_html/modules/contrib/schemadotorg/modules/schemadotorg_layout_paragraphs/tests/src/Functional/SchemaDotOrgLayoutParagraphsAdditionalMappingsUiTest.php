@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\schemadotorg_paragraphs\Functional;
+namespace Drupal\Tests\schemadotorg_layout_paragraphs\Functional;
 
 use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
 
 /**
  * Tests the functionality of the Schema.org layout paragraphs with additional mappings UI.
  *
- * @covers schemadotorg_layout_paragraphs_form_schemadotorg_mapping_form_alter()
+ * @covers \schemadotorg_layout_paragraphs_form_schemadotorg_mapping_form_alter
  * @group schemadotorg
  */
 class SchemaDotOrgLayoutParagraphsAdditionalMappingsUiTest extends SchemaDotOrgBrowserTestBase {

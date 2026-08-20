@@ -9,8 +9,8 @@ use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 /**
  * Tests the functionality of the Schema.org focal point.
  *
- * @covers focal_point_schemadotorg_mapping_insert()
- * @covers focal_point_schemadotorg_property_field_alter()
+ * @covers \focal_point_schemadotorg_mapping_insert
+ * @covers \focal_point_schemadotorg_property_field_alter
  * @group schemadotorg
  */
 class SchemaDotOrgFocalPointKernelTest extends SchemaDotOrgEntityKernelTestBase {

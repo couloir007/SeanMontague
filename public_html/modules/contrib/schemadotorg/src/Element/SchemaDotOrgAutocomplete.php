@@ -49,6 +49,7 @@ class SchemaDotOrgAutocomplete extends Textfield {
     $info['#tags'] = FALSE;
     $info['#action'] = NULL;
     $info['#novalidate'] = FALSE;
+    $info['#include_bundles'] = FALSE;
 
     $info['#element_validate'] = [[$class, 'validateSchemaDotOrgAutocomplete']];
     array_unshift($info['#process'], [$class, 'processSchemaDotOrgAutocomplete']);
@@ -81,6 +82,9 @@ class SchemaDotOrgAutocomplete extends Textfield {
   public static function processSchemaDotOrgAutocomplete(array &$element, FormStateInterface $form_state, array &$complete_form): array {
     $element['#autocomplete_route_name'] = 'schemadotorg.autocomplete';
     $element['#autocomplete_route_parameters'] = ['table' => $element['#target_type']];
+    if ($element['#include_bundles']) {
+      $element['#autocomplete_route_parameters']['entity_type_id'] = $element['#include_bundles'];
+    }
     $element['#attributes']['class'][] = 'schemadotorg-autocomplete';
     if ($element['#action']) {
       $element['#attributes']['data-schemadotorg-autocomplete-action'] = $element['#action'];
@@ -105,8 +109,13 @@ class SchemaDotOrgAutocomplete extends Textfield {
       $table = $target_type === static::SCHEMA_THINGS
         ? static::SCHEMA_TYPES
         : $target_type;
+      $bundle_ids = static::getBundleIds($element);
 
       foreach ($schema_ids as $schema_id) {
+        if (isset($bundle_ids[$schema_id])) {
+          continue;
+        }
+
         // Check if this is valid Schema.org id (type or property)
         if (!$schema_type_manager->isId($table, $schema_id)) {
           $t_args = [
@@ -134,6 +143,26 @@ class SchemaDotOrgAutocomplete extends Textfield {
     if ($element['#tags']) {
       $form_state->setValueForElement($element, array_combine($schema_ids, $schema_ids));
     }
+  }
+
+  /**
+   * Gets valid bundle IDs for an autocomplete element.
+   *
+   * @param array $element
+   *   The form element.
+   *
+   * @return array
+   *   Bundle IDs keyed by bundle ID.
+   */
+  protected static function getBundleIds(array $element): array {
+    if (empty($element['#include_bundles'])) {
+      return [];
+    }
+
+    /** @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info */
+    $entity_type_bundle_info = \Drupal::service('entity_type.bundle.info');
+    $bundle_ids = array_keys($entity_type_bundle_info->getBundleInfo($element['#include_bundles']));
+    return array_combine($bundle_ids, $bundle_ids);
   }
 
 }

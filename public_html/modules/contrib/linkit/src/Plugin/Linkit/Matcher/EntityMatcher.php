@@ -8,9 +8,12 @@ use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\linkit\Attribute\Matcher;
 use Drupal\linkit\ConfigurableMatcherBase;
 use Drupal\linkit\MatcherTokensTrait;
+use Drupal\linkit\Plugin\Derivative\EntityMatcherDeriver;
 use Drupal\linkit\SubstitutionManagerInterface;
 use Drupal\linkit\Suggestion\EntitySuggestion;
 use Drupal\linkit\Suggestion\SuggestionCollection;
@@ -19,13 +22,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides default linkit matchers for all entity types.
- *
- * @Matcher(
- *   id = "entity",
- *   label = @Translation("Entity"),
- *   deriver = "\Drupal\linkit\Plugin\Derivative\EntityMatcherDeriver"
- * )
  */
+#[Matcher(
+  id: "entity",
+  label: new TranslatableMarkup("Entity"),
+  deriver: EntityMatcherDeriver::class,
+)]
 class EntityMatcher extends ConfigurableMatcherBase {
 
   use MatcherTokensTrait;

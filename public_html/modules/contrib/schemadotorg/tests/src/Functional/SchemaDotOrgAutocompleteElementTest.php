@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\schemadotorg\Functional;
 
+use Drupal\node\Entity\NodeType;
+
 /**
  * Tests the functionality of the Schema.org autocomplete element.
  *
@@ -16,7 +18,22 @@ class SchemaDotOrgAutocompleteElementTest extends SchemaDotOrgBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['schemadotorg_autocomplete_element_test'];
+  protected static $modules = [
+    'node',
+    'schemadotorg_autocomplete_element_test',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    NodeType::create([
+      'type' => 'article',
+      'name' => 'Article',
+    ])->save();
+  }
 
   /**
    * Test Schema.org autocomplete form.
@@ -27,29 +44,27 @@ class SchemaDotOrgAutocompleteElementTest extends SchemaDotOrgBrowserTestBase {
     // Check autocomplete submitted values.
     $this->drupalGet('schemadotorg-autocomplete-element-test');
     $this->submitForm([], 'Submit');
-    $expected_data = "schemadotorg_autocomplete_type: Person
-schemadotorg_autocomplete_types:
-  Person: Person
-  Organization: Organization
-schemadotorg_autocomplete_novalidate: Dog
-schemadotorg_autocomplete_thing: Thing
-schemadotorg_autocomplete_property: name
-schemadotorg_autocomplete_properties:
-  name: name
-  additionalName: additionalName
-schemadotorg_autocomplete_action_path: ''
-schemadotorg_autocomplete_action_query: ''";
-    $assert->responseContains($expected_data);
+    $assert->responseContains('schemadotorg_autocomplete_type: Person');
+    $assert->responseContains('Person: Person');
+    $assert->responseContains('Organization: Organization');
+    $assert->responseContains('schemadotorg_autocomplete_novalidate: Dog');
+    $assert->responseContains('schemadotorg_autocomplete_thing: Thing');
+    $assert->responseContains('schemadotorg_autocomplete_property: name');
+    $assert->responseContains('additionalName: additionalName');
+    $assert->responseContains('schemadotorg_autocomplete_bundles:');
+    $assert->responseContains('article: article');
 
     // Check autocomplete Schema.org type validation.
     $this->drupalGet('schemadotorg-autocomplete-element-test');
     $edit = [
       'schemadotorg_autocomplete_type' => 'Cat',
       'schemadotorg_autocomplete_property' => 'paws',
+      'schemadotorg_autocomplete_bundles' => 'Person, not_a_bundle',
     ];
     $this->submitForm($edit, 'Submit');
     $assert->responseContains('The Schema.org type <em class="placeholder">Cat</em> is not valid.');
     $assert->responseContains('The Schema.org property <em class="placeholder">paws</em> is not valid.');
+    $assert->responseContains('The Schema.org type <em class="placeholder">not_a_bundle</em> is not valid.');
 
     // Check autocomplete Schema.org Thing validation.
     $this->drupalGet('schemadotorg-autocomplete-element-test');

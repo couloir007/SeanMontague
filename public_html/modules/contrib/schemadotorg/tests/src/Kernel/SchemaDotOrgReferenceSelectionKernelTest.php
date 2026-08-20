@@ -119,7 +119,7 @@ class SchemaDotOrgReferenceSelectionKernelTest extends SchemaDotOrgEntityKernelT
   /**
    * Test selection target bundles behavior.
    *
-   * @covers schemadotorg_schemadotorg_mapping_insert()
+   * @covers \schemadotorg_schemadotorg_mapping_insert
    */
   public function testSelectionTargetBundles(): void {
     // Set up the memberOf to member entity reference relationship.
@@ -214,6 +214,25 @@ class SchemaDotOrgReferenceSelectionKernelTest extends SchemaDotOrgEntityKernelT
       'organization' => 'organization',
       'page' => 'page',
       'person' => 'person',
+    ];
+    $this->assertEquals($expected_target_bundles, $field_config->getSetting('handler_settings')['target_bundles']);
+
+    // Check that bundle machine names can be included and excluded directly.
+    /** @var \Drupal\Core\Field\FieldConfigInterface $field_config */
+    $field_config = $field_config_storage->load('node.organization.schema_member');
+    $handler_settings = $field_config->getSetting('handler_settings');
+    $handler_settings['schema_types'] = [
+      'Person' => 'Person',
+      'local_business' => 'local_business',
+    ];
+    $handler_settings['excluded_schema_types'] = [
+      'organization' => 'organization',
+    ];
+    $field_config->setSetting('handler_settings', $handler_settings);
+    $field_config->save();
+    $expected_target_bundles = [
+      'person' => 'person',
+      'local_business' => 'local_business',
     ];
     $this->assertEquals($expected_target_bundles, $field_config->getSetting('handler_settings')['target_bundles']);
 

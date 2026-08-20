@@ -9,7 +9,7 @@ use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
 /**
  * Test Schema.org JSON-LD caching.
  *
- * @covers schemadotorg_jsonld_page_attachments_alter()
+ * @covers \schemadotorg_jsonld_page_attachments_alter
  * @group schemadotorg
  */
 class SchemaDotOrgJsonLdPreviewBlockCacheTest extends SchemaDotOrgBrowserTestBase {
@@ -58,7 +58,7 @@ class SchemaDotOrgJsonLdPreviewBlockCacheTest extends SchemaDotOrgBrowserTestBas
     $assert->responseHeaderEquals('X-Drupal-Cache', 'HIT');
 
     // Check that organization 1's cache context and tags.
-    $assert->responseHeaderContains('X-Drupal-Cache-Tags', 'block_view config:block.block.schemadotorg_jsonld_preview config:block_list config:filter.format.plain_text config:filter.settings config:schemadotorg_jsonld.settings config:schemadotorg_mapping_list config:user.role.anonymous http_response node:1 node_view rendered user:0 user_view');
+    $assert->responseHeaderContains('X-Drupal-Cache-Tags', 'config:block_list config:filter.format.plain_text config:filter.settings config:schemadotorg_jsonld.settings config:schemadotorg_mapping_list config:user.role.anonymous http_response node:1 node_view rendered user:0 user_view');
     $assert->responseHeaderContains('X-Drupal-Cache-Contexts', 'languages:language_interface route theme timezone url.query_args:_wrapper_format url.site user.permissions user.roles:authenticated');
 
     // Check that organization 2's page first request is a miss and then a hit.
@@ -68,7 +68,7 @@ class SchemaDotOrgJsonLdPreviewBlockCacheTest extends SchemaDotOrgBrowserTestBas
     $assert->responseHeaderEquals('X-Drupal-Cache', 'HIT');
 
     // Check that organization 2's cache context and tags.
-    $assert->responseHeaderContains('X-Drupal-Cache-Tags', 'block_view config:block.block.schemadotorg_jsonld_preview config:block_list config:filter.format.plain_text config:filter.settings config:schemadotorg_jsonld.settings config:schemadotorg_mapping_list config:user.role.anonymous http_response node:1 node:2 node_view rendered user:0 user_view');
+    $assert->responseHeaderContains('X-Drupal-Cache-Tags', 'config:block_list config:filter.format.plain_text config:filter.settings config:schemadotorg_jsonld.settings config:schemadotorg_mapping_list config:user.role.anonymous http_response node:1 node:2 node_view rendered user:0 user_view');
     $assert->responseHeaderContains('X-Drupal-Cache-Contexts', 'languages:language_interface route theme timezone url.query_args:_wrapper_format url.site user.permissions user.roles:authenticated');
 
     // Check that organization 2's JSON-LD.

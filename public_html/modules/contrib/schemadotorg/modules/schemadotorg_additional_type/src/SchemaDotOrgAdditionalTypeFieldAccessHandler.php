@@ -32,6 +32,11 @@ class SchemaDotOrgAdditionalTypeFieldAccessHandler implements SchemaDotOrgAdditi
   protected array $additionalTypeCache = [];
 
   /**
+   * Cache of admin roles used for USER1.
+   */
+  protected array $adminRolesCache;
+
+  /**
    * Constructs a SchemaDotOrgAdditionalTypeFieldAccessHandler object.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
@@ -274,7 +279,7 @@ class SchemaDotOrgAdditionalTypeFieldAccessHandler implements SchemaDotOrgAdditi
 
       // Check entity access condition.
       case 'entity_access':
-        if (!$entity || !method_exists($entity, 'access')) {
+        if (!$entity) {
           return TRUE;
         }
 
@@ -307,7 +312,19 @@ class SchemaDotOrgAdditionalTypeFieldAccessHandler implements SchemaDotOrgAdditi
 
       // Check user account roles.
       case 'roles':
-        return (bool) array_intersect($account->getRoles(), $values);
+        if ($account->id() == 1) {
+          if (!isset($this->adminRolesCache)) {
+            $this->adminRolesCache = array_keys(array_filter(
+              $this->entityTypeManager->getStorage('user_role')->loadMultiple(),
+              fn($role) => $role->isAdmin()
+            ));
+          }
+          $roles = $this->adminRolesCache;
+        }
+        else {
+          $roles = $account->getRoles();
+        }
+        return (bool) array_intersect($roles, $values);
 
       default:
         return TRUE;

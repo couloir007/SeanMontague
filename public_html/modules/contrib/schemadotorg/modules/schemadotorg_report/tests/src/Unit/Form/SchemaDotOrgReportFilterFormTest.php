@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\schemadotorg_report\Unit\Breadcrumb;
+namespace Drupal\Tests\schemadotorg_report\Unit\Form;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Form\FormState;

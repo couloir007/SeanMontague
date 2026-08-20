@@ -107,8 +107,9 @@ entity.schemadotorg_mapping_type.delete_form:
     _permission: 'administer schemadotorg'
 
 schemadotorg.autocomplete:
-  path: '/schemadotorg/autocomplete/{table}'
+  path: '/schemadotorg/autocomplete/{table}/{entity_type_id}'
   defaults:
     _controller: '\Drupal\schemadotorg\Controller\SchemaDotOrgAutocompleteController::autocomplete'
+    entity_type_id: ''
   requirements:
     _permission: 'access content'

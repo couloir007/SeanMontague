@@ -9,7 +9,7 @@ use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
 /**
  * Tests for Schema.org node title descriptions.
  *
- * @covers schemadotorg_descriptions_form_node_form_alter()
+ * @covers \schemadotorg_descriptions_form_node_form_alter
  * @group schemadotorg
  */
 class SchemaDotOrgDescriptionsNodeTitleTest extends SchemaDotOrgBrowserTestBase {
@@ -24,8 +24,6 @@ class SchemaDotOrgDescriptionsNodeTitleTest extends SchemaDotOrgBrowserTestBase 
 
   /**
    * Test Schema.org node title description.
-   *
-   * @covers schemadotorg_descriptions_form_node_form_alter()
    */
   public function testNodeTitle(): void {
     $assert = $this->assertSession();

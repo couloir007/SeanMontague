@@ -10,7 +10,7 @@ use Drupal\Tests\schemadotorg_jsonld\Kernel\SchemaDotOrgJsonLdKernelTestBase;
 /**
  * Tests the functionality of the Schema.org role JSON-LD.
  *
- * @covers schemadotorg_role_schemadotorg_jsonld_schema_type_entity_load()
+ * @covers \schemadotorg_role_schemadotorg_jsonld_schema_type_entity_load
  * @group schemadotorg
  */
 class SchemaDotOrgRoleFieldJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBase {

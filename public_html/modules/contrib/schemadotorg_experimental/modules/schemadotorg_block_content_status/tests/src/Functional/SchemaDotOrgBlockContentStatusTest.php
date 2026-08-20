@@ -9,7 +9,7 @@ use Drupal\Tests\schemadotorg_block_content\Functional\SchemaDotOrgBlockContentT
 /**
  * Tests the functionality of the Schema.org block content status module.
  *
- * @covers schemadotorg_block_content_status_block_view_alter()
+ * @covers \schemadotorg_block_content_status_block_view_alter
  *
  * @group schemadotorg
  */

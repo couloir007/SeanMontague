@@ -10,8 +10,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org Existing Values Autocomplete Widget.
  *
- * @covers _schemadotorg_existing_values_autocomplete_widget_enabled()
- * @covers schemadotorg_existing_values_autocomplete_widget_schemadotorg_property_field_alter()
+ * @covers \schemadotorg_existing_values_autocomplete_widget_schemadotorg_property_field_alter
  * @group schemadotorg
  */
 class SchemaDotOrgExistingValuesAutocompleteWidgetKernelTest extends SchemaDotOrgEntityKernelTestBase {

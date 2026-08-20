@@ -11,7 +11,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org paragraphs type icon file.
  *
- * @covers schemadotorg_paragraphs_paragraphs_type_presave()
+ * @covers \schemadotorg_paragraphs_paragraphs_type_presave
  * @group schemadotorg
  */
 class SchemaDotOrgParagraphsTypeIconFileKernelTest extends SchemaDotOrgEntityKernelTestBase {
@@ -49,10 +49,11 @@ class SchemaDotOrgParagraphsTypeIconFileKernelTest extends SchemaDotOrgEntityKer
     $this->createSchemaEntity('paragraph', 'Question');
     /** @var \Drupal\paragraphs\ParagraphsTypeInterface $paragraphs_type */
     $paragraphs_type = ParagraphsType::load('question');
-    $this->assertNotNull($paragraphs_type->getIconFile());
+    $icon_file = $paragraphs_type->getIconFile();
+    $this->assertNotFalse($icon_file);
     $this->assertEquals(
       'public://paragraphs_type_icon/question.svg',
-      $paragraphs_type->getIconFile()->getFileUri()
+      $icon_file->getFileUri()
     );
     $this->assertEquals(
       'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48IS0tISBGb250IEF3ZXNvbWUgUHJvIDYuMi4wIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlIChDb21tZXJjaWFsIExpY2Vuc2UpIENvcHlyaWdodCAyMDIyIEZvbnRpY29ucywgSW5jLiAtLT48cGF0aCBkPSJNMjU2IDBDMTE0LjYgMCAwIDExNC42IDAgMjU2czExNC42IDI1NiAyNTYgMjU2czI1Ni0xMTQuNiAyNTYtMjU2UzM5Ny40IDAgMjU2IDB6TTI1NiA0NjRjLTExNC43IDAtMjA4LTkzLjMxLTIwOC0yMDhTMTQxLjMgNDggMjU2IDQ4czIwOCA5My4zMSAyMDggMjA4UzM3MC43IDQ2NCAyNTYgNDY0ek0yNTYgMzM2Yy0xOCAwLTMyIDE0LTMyIDMyczEzLjEgMzIgMzIgMzJjMTcuMSAwIDMyLTE0IDMyLTMyUzI3My4xIDMzNiAyNTYgMzM2ek0yODkuMSAxMjhoLTUxLjFDMTk5IDEyOCAxNjggMTU5IDE2OCAxOThjMCAxMyAxMSAyNCAyNCAyNHMyNC0xMSAyNC0yNEMyMTYgMTg2IDIyNS4xIDE3NiAyMzcuMSAxNzZoNTEuMUMzMDEuMSAxNzYgMzEyIDE4NiAzMTIgMTk4YzAgOC00IDE0LjEtMTEgMTguMUwyNDQgMjUxQzIzNiAyNTYgMjMyIDI2NCAyMzIgMjcyVjI4OGMwIDEzIDExIDI0IDI0IDI0UzI4MCAzMDEgMjgwIDI4OFYyODZsNDUuMS0yOGMyMS0xMyAzNC0zNiAzNC02MEMzNjAgMTU5IDMyOSAxMjggMjg5LjEgMTI4eiIvPjwvc3ZnPg==',
@@ -63,10 +64,11 @@ class SchemaDotOrgParagraphsTypeIconFileKernelTest extends SchemaDotOrgEntityKer
     $this->createSchemaEntity('paragraph', 'MedicalAudience');
     /** @var \Drupal\paragraphs\ParagraphsTypeInterface $paragraphs_type */
     $paragraphs_type = ParagraphsType::load('medical_audience');
-    $this->assertNotNull($paragraphs_type->getIconFile());
+    $icon_file = $paragraphs_type->getIconFile();
+    $this->assertNotFalse($icon_file);
     $this->assertEquals(
       'public://paragraphs_type_icon/medical.svg',
-      $paragraphs_type->getIconFile()->getFileUri()
+      $icon_file->getFileUri()
     );
   }
 

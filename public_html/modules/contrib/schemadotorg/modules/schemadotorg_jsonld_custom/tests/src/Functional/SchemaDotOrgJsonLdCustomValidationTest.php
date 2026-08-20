@@ -9,7 +9,7 @@ use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
 /**
  * Tests the functionality of the Schema.org JSON-LD custom validation.
  *
- * @covers \Drupal\schemadotorg_jsonapi\Form\SchemaDotOrgDemoSettingsForm
+ * @covers \Drupal\schemadotorg_jsonld_custom\SchemaDotOrgJsonLdCustomManager
  * @group schemadotorg
  */
 class SchemaDotOrgJsonLdCustomValidationTest extends SchemaDotOrgBrowserTestBase {

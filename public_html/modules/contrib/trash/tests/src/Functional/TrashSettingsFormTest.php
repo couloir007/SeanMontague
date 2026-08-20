@@ -120,4 +120,39 @@ class TrashSettingsFormTest extends BrowserTestBase {
     $this->assertSession()->statusMessageContains('The configuration options have been saved.', 'status');
   }
 
+  /**
+   * Test that the auto-purge message appears on the trash overview page.
+   *
+   * Verifies that when auto_purge is enabled, a message is shown on the trash
+   * overview page indicating when items will be permanently deleted. When
+   * auto_purge is disabled, no such message should appear.
+   */
+  public function testAutoPurgeMessageOnOverviewPage(): void {
+    $this->drupalLogin($this->adminUser);
+
+    // By default, auto_purge is disabled; no message should appear.
+    $this->drupalGet('admin/content/trash');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextNotContains('Items in the trash will be deleted forever after');
+
+    // Enable auto_purge with a 30-day period via the settings form.
+    $this->drupalGet('admin/config/content/trash');
+    $this->submitForm([
+      'auto_purge[enabled]' => TRUE,
+      'auto_purge[after]' => '30 days',
+    ], 'Save configuration');
+    $this->assertSession()->statusMessageContains('The configuration options have been saved.', 'status');
+
+    // The trash overview page should now display the auto-purge message.
+    $this->drupalGet('admin/content/trash');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Items in the trash will be deleted forever after');
+
+    // Disable auto_purge; the message should no longer appear.
+    $this->drupalGet('admin/config/content/trash');
+    $this->submitForm(['auto_purge[enabled]' => FALSE], 'Save configuration');
+    $this->drupalGet('admin/content/trash');
+    $this->assertSession()->pageTextNotContains('Items in the trash will be deleted forever after');
+  }
+
 }

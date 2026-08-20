@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 use Drupal\content_model_documentation\Entity\CMDocumentInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -82,7 +83,7 @@ function schemadotorg_content_model_documentation_field_widget_single_element_ma
 /**
  * Implements hook_entity_operation().
  */
-function schemadotorg_content_model_documentation_entity_operation(EntityInterface $entity): ?array {
+function schemadotorg_content_model_documentation_entity_operation(EntityInterface $entity, ?CacheableMetadata $cacheability = NULL): ?array {
   /** @var \Drupal\schemadotorg_content_model_documentation\SchemaDotOrgContentModelDocumentationBuilderInterface $documentation_builder */
   $documentation_builder = \Drupal::service('schemadotorg_content_model_documentation.builder');
   return $documentation_builder->entityOperation($entity);

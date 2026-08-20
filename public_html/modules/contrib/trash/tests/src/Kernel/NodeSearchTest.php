@@ -4,13 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\trash\Kernel;
 
+use Drupal\trash\Hook\TrashHandler\NodeTrashHandler;
 use Drupal\trash\Plugin\Search\TrashNodeSearch;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that search indexing handles trashed nodes.
- *
- * @group trash
  */
+#[CoversClass(TrashNodeSearch::class)]
+#[CoversMethod(NodeTrashHandler::class, 'searchPluginAlter')]
+#[Group('trash')]
+#[RunTestsInSeparateProcesses]
 class NodeSearchTest extends TrashKernelTestBase {
 
   /**

@@ -10,7 +10,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org Simple Sitemap.
  *
- * @covers schemadotorg_simple_sitemap_schemadotorg_mapping_insert()
+ * @covers \schemadotorg_simple_sitemap_schemadotorg_mapping_insert
  * @group schemadotorg
  */
 class SchemaDotOrgSimpleSitemapKernelTest extends SchemaDotOrgEntityKernelTestBase {

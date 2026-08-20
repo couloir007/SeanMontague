@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\mapping_set\Kernel;
+namespace Drupal\Tests\schemadotorg_mapping_set\Kernel;
 
 use Drupal\schemadotorg_mapping_set\SchemaDotOrgMappingSetManagerInterface;
 use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
@@ -10,7 +10,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org mapping set manager.
  *
- * @covers \Drupal\mapping_set\SchemaDotOrgTaxonomyPropertyVocabularyManagerTest;
+ * @covers \Drupal\schemadotorg_mapping_set\SchemaDotOrgMappingSetManager
  * @group schemadotorg
  */
 class SchemaDotOrgMappingSetManagerKernelTest extends SchemaDotOrgEntityKernelTestBase {

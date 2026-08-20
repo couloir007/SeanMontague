@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\schemadotorg\Kernel;
 
+use Drupal\Component\Utility\DeprecationHelper;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\schemadotorg\SchemaDotOrgEntityDisplayBuilderInterface;
@@ -95,9 +96,16 @@ class SchemaDotOrgEntityDisplayBuilderKernelTest extends SchemaDotOrgEntityKerne
     \Drupal::entityTypeManager()->getStorage('entity_form_display')->resetCache();
     /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $entity_view_display */
     $entity_form_display = EntityFormDisplay::load('node.thing.default');
+    $entity_form_display->setComponent('promote', [
+      'type' => 'boolean_checkbox',
+      'weight' => -100,
+      'region' => 'content',
+    ]);
     $components = $entity_form_display->getComponents();
     $this->assertEquals(200, $components['uid']['weight']);
-    $this->assertEquals(210, $components['promote']['weight']);
+    $this->schemaEntityDisplayBuilder->updateDisplayComponentWeights($entity_form_display);
+    $component = $entity_form_display->getComponent('promote');
+    $this->assertEquals(210, $component['weight']);
 
     // Get the promote component
     // Check updating the default component weights for an entity display.
@@ -109,15 +117,38 @@ class SchemaDotOrgEntityDisplayBuilderKernelTest extends SchemaDotOrgEntityKerne
     $this->assertNotEquals(-100, $component['weight']);
     $this->assertEquals(210, $component['weight']);
 
+    // Check that hidden default components are not updated.
+    $entity_form_display->setComponent('sticky', [
+      'type' => 'boolean_checkbox',
+      'weight' => -100,
+      'region' => 'content',
+    ]);
+    $hidden_component_names = ['promote', 'sticky'];
+    foreach ($hidden_component_names as $hidden_component_name) {
+      $entity_form_display->removeComponent($hidden_component_name);
+    }
+    $this->schemaEntityDisplayBuilder->updateDisplayComponentWeights($entity_form_display);
+    foreach ($hidden_component_names as $hidden_component_name) {
+      $this->assertNull($entity_form_display->getComponent($hidden_component_name));
+    }
+    $hidden = $entity_form_display->get('hidden');
+    $expected_hidden = array_fill_keys($hidden_component_names, TRUE);
+    $this->assertEquals([
+      'promote' => TRUE,
+      'sticky' => TRUE,
+    ], array_intersect_key($hidden, $expected_hidden));
+
     // Display updating default component weights.
     $mapping_type = $this->loadMappingType('node');
     $mapping_type->set('default_component_weights_update', FALSE);
     $mapping_type->save();
 
     // Check NOT updating the default component weights for an entity display.
-    $entity_form_display->setComponent('promote',
-      ['weight' => -100] + $entity_form_display->getComponent('promote')
-    );
+    $entity_form_display->setComponent('promote', [
+      'type' => 'boolean_checkbox',
+      'weight' => -100,
+      'region' => 'content',
+    ]);
     $this->schemaEntityDisplayBuilder->updateDisplayComponentWeights($entity_form_display);
     $component = $entity_form_display->getComponent('promote');
     $this->assertEquals(-100, $component['weight']);
@@ -139,32 +170,60 @@ class SchemaDotOrgEntityDisplayBuilderKernelTest extends SchemaDotOrgEntityKerne
     // Check Schema.org types default view display properties for Event.
     /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
     $entity_form_display = EntityFormDisplay::load('node.event.default');
-    $expected_components = [
-      'body',
-      'created',
-      'promote',
-      'schema_duration',
-      'schema_end_date',
-      'schema_start_date',
-      'status',
-      'sticky',
-      'title',
-      'uid',
-      'langcode',
-      'revision_log',
-    ];
+    $expected_components = DeprecationHelper::backwardsCompatibleCall(
+      currentVersion: \Drupal::VERSION,
+      deprecatedVersion: '11.1',
+      currentCallable: fn() => [
+        'body',
+        'created',
+        'schema_duration',
+        'schema_end_date',
+        'schema_start_date',
+        'status',
+        'title',
+        'uid',
+        'langcode',
+        'revision_log',
+      ],
+      deprecatedCallable: fn() => [
+        'body',
+        'created',
+        'promote',
+        'schema_duration',
+        'schema_end_date',
+        'schema_start_date',
+        'status',
+        'sticky',
+        'title',
+        'uid',
+        'langcode',
+        'revision_log',
+      ],
+    );
     $this->assertEquals($expected_components, array_keys($entity_form_display->getComponents()));
 
     /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $entity_view_display */
     $entity_view_display = EntityViewDisplay::load('node.event.teaser');
-    $expected_components = [
-      'body',
-      'links',
-      'schema_start_date',
-      'uid',
-      'title',
-      'created',
-    ];
+    $expected_components = DeprecationHelper::backwardsCompatibleCall(
+      currentVersion: \Drupal::VERSION,
+      deprecatedVersion: '11.1',
+      currentCallable: fn() => [
+        'body',
+        'links',
+        'schema_start_date',
+        'uid',
+        'title',
+        'created',
+      ],
+      deprecatedCallable: fn() => [
+        'body',
+        'links',
+        'schema_start_date',
+        'uid',
+        'title',
+        'created',
+      ],
+    );
     $this->assertEquals($expected_components, array_keys($entity_view_display->getComponents()));
   }
 

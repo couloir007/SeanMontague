@@ -109,10 +109,14 @@ function schemadotorg_identifier_jsonapi_resource_config_presave(EntityInterface
   $resource_fields = $entity->get('resourceFields');
   foreach ($identifier_field_definitions as $identifier_name => $identifier_field_definition) {
     $field_name = $identifier_field_definition['field_name'];
-    if (isset($resource_fields[$field_name])) {
-      $resource_fields[$field_name]['publicName'] = $identifier_name;
-      $resource_fields[$field_name]['disabled'] = FALSE;
-    }
+    $resource_fields[$field_name] = $resource_fields[$field_name] ?? [
+      'fieldName' => $field_name,
+      'publicName' => $field_name,
+      'enhancer' => ['id' => ''],
+      'disabled' => TRUE,
+    ];
+    $resource_fields[$field_name]['publicName'] = $identifier_name;
+    $resource_fields[$field_name]['disabled'] = FALSE;
   }
   $entity->set('resourceFields', $resource_fields);
 }

@@ -9,7 +9,7 @@ use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
 /**
  * Tests the functionality of the Schema.org Corresponding Entity Reference form altering.
  *
- * @covers schemadotorg_cer_form_alter()
+ * @covers \schemadotorg_cer_form_alter
  * @group schemadotorg
  */
 class SchemaDotOrgCorrespondingReferenceFormAlterTest extends SchemaDotOrgBrowserTestBase {

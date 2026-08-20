@@ -14,8 +14,8 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org metatag.
  *
- * @covers schemadotorg_metatag_schemadotorg_mapping_presave()
- * @covers schemadotorg_metatag_schemadotorg_mapping_insert()
+ * @covers \schemadotorg_metatag_schemadotorg_mapping_presave
+ * @covers \schemadotorg_metatag_schemadotorg_mapping_insert
  * @group schemadotorg
  */
 class SchemaDotOrgMetatagKernelTest extends SchemaDotOrgEntityKernelTestBase {

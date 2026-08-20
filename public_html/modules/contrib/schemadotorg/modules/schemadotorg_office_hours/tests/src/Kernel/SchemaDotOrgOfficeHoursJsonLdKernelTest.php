@@ -13,8 +13,8 @@ require_once __DIR__ . '/../../../schemadotorg_office_hours.install';
 /**
  * Tests the functionality of the Schema.org Office Hours integration.
  *
- * @covers schemadotorg_office_hours_schemadotorg_property_field_alter()
- * @covers schemadotorg_office_hours_schemadotorg_jsonld_schema_property_alter()
+ * @covers \schemadotorg_office_hours_schemadotorg_property_field_alter
+ * @covers \schemadotorg_office_hours_schemadotorg_jsonld_schema_property_alter
  * @group schemadotorg
  */
 class SchemaDotOrgOfficeHoursJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBase {
@@ -29,8 +29,6 @@ class SchemaDotOrgOfficeHoursJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTe
 
   /**
    * Test Schema.org alter the JSON-LD eventSchedule property.
-   *
-   * @covers schemadotorg_office_hours_schemadotorg_jsonld_schema_property_alter()
    */
   public function testOpening(): void {
     \Drupal::currentUser()->setAccount($this->createUser(['access content']));

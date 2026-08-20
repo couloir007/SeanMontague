@@ -114,11 +114,16 @@ class TrashFileTest extends TrashKernelTestBase {
    */
   public function testUnexpectedTrashFileStates(): void {
     $logger = new BufferingLogger();
+    // File logger will be called after UnrestorableEntityException is thrown.
+    $file_logger = new BufferingLogger();
     $logger_factory = $this->createMock(LoggerChannelFactoryInterface::class);
     $logger_factory->expects($this->atLeastOnce())
       ->method('get')
-      ->with('trash')
-      ->willReturn($logger);
+      ->willReturnCallback(fn (string $channel) => match ($channel) {
+        'trash' => $logger,
+        'file' => $file_logger,
+        default => throw new \LogicException('Unexpected channel: ' . $channel),
+      });
     $this->container->set('logger.factory', $logger_factory);
     $file = $this->createPublicFile('public://report.txt', 'REPORT');
     $this->assertDirectoryDoesNotExist('public://.trashed');
@@ -148,6 +153,54 @@ class TrashFileTest extends TrashKernelTestBase {
     // Ensure the .trashed folder is only deleted if it's truly empty.
     $this->assertFileExists('public://.trashed/extra-file.txt');
 
+    // Simulate a previously interrupted trash attempt: the physical file was
+    // already moved to the trash target, but the entity kept its original
+    // URI. A retried delete must adopt the file at the target instead of
+    // orphaning it.
+    $trashed_directory = dirname($trashed_uri);
+    $this->fileSystem->prepareDirectory($trashed_directory, FileSystemInterface::CREATE_DIRECTORY);
+    $this->fileSystem->move('public://report.txt', $trashed_uri);
+    File::load($file->id())->delete();
+    $logs = $logger->cleanLogs();
+    $this->assertCount(1, $logs);
+    $this->assertEquals('warning', $logs[0][0]);
+    $this->assertEquals('Adopted existing file at @target_uri (size matches entity metadata) as the trash target; the source at @source_uri no longer exists, likely from a previously interrupted trash attempt.', $logs[0][1]);
+    $this->assertEquals([
+      '@target_uri' => $trashed_uri,
+      '@source_uri' => 'public://report.txt',
+    ], $logs[0][2]);
+    $adopted = $this->loadTrashedEntity('file', $file->id());
+    assert($adopted instanceof FileInterface);
+    $this->assertEquals($trashed_uri, $adopted->getFileUri());
+    $this->assertStringEqualsFile($trashed_uri, 'REPORT');
+
+    // Put the file back into a live state for the final scenario below.
+    $this->restoreEntity('file', $file->id());
+    $this->assertEquals('public://report.txt', File::load($file->id())->getFileUri());
+
+    // A look-alike file at the trash target whose size does not match the
+    // entity's metadata must not be adopted; the entity keeps its stale URI.
+    $other_file = $this->createPublicFile('public://other.txt', 'OTHER');
+    $other_file->delete();
+    $other_trashed = $this->loadTrashedEntity('file', $other_file->id());
+    assert($other_trashed instanceof FileInterface);
+    $other_trashed_uri = $other_trashed->getFileUri();
+    $this->restoreEntity('file', $other_file->id());
+    $this->fileSystem->delete('public://other.txt');
+    $other_trashed_directory = dirname($other_trashed_uri);
+    $this->fileSystem->prepareDirectory($other_trashed_directory, FileSystemInterface::CREATE_DIRECTORY);
+    file_put_contents($other_trashed_uri, 'SIZE MISMATCH');
+    File::load($other_file->id())->delete();
+    $logs = $logger->cleanLogs();
+    $this->assertCount(1, $logs);
+    $this->assertEquals('error', $logs[0][0]);
+    $this->assertEquals('Could not move @uri to @target on trash: @message', $logs[0][1]);
+    $this->assertEquals('public://other.txt', $logs[0][2]['@uri']);
+    $this->assertEquals($other_trashed_uri, $logs[0][2]['@target']);
+    $other_trashed = $this->loadTrashedEntity('file', $other_file->id());
+    assert($other_trashed instanceof FileInterface);
+    $this->assertEquals('public://other.txt', $other_trashed->getFileUri());
+
     // Re-trash the restored file, then remove the trashed file too.
     $restored = $this->loadTrashedEntity('file', $file->id());
     assert($restored instanceof FileInterface);
@@ -155,10 +208,19 @@ class TrashFileTest extends TrashKernelTestBase {
     $re_trashed = $this->loadTrashedEntity('file', $file->id());
     assert($re_trashed instanceof FileInterface);
     $this->fileSystem->delete($re_trashed->getFileUri());
-    // With neither the trashed file nor the original URI present, the
-    // restoration has nothing to adopt and must fail.
-    $this->expectException(UnrestorableEntityException::class);
-    $this->restoreEntity('file', $file->id());
+    try {
+      // With neither the trashed file nor the original URI present, the
+      // restoration has nothing to adopt and must fail.
+      $this->restoreEntity('file', $file->id());
+      $this->fail('An UnrestorableEntityException exception should have been thrown');
+    }
+    catch (UnrestorableEntityException) {
+    }
+    $logs = $file_logger->cleanLogs();
+    $this->assertCount(1, $logs);
+    $this->assertEquals('error', $logs[0][0]);
+    $this->assertEquals(UnrestorableEntityException::class, $logs[0][2]['%type']);
+    $this->assertMatchesRegularExpression("{^File .*? could not be copied because it does not exist\.$}", $logs[0][2]['@message']);
   }
 
   /**

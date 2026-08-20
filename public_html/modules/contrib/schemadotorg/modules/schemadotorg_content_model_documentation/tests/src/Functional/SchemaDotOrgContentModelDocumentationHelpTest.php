@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\node\Functional;
+namespace Drupal\Tests\schemadotorg_content_model_documentation\Functional;
 
 use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
 
 /**
  * Tests Schema.org content model documentation help functionality.
  *
- * @covers schemadotorg_content_model_documentation_help()
+ * @covers \schemadotorg_content_model_documentation_help
  * @group schemadotorg
  */
 class SchemaDotOrgContentModelDocumentationHelpTest extends SchemaDotOrgBrowserTestBase {

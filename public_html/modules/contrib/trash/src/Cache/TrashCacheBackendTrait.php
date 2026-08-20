@@ -7,6 +7,7 @@ namespace Drupal\trash\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\trash\Trash;
 
 /**
  * Provides cache backend decorator methods for filtering deleted entities.
@@ -31,7 +32,7 @@ trait TrashCacheBackendTrait {
    * {@inheritdoc}
    */
   public function set($cid, $data, $expire = CacheBackendInterface::CACHE_PERMANENT, array $tags = []) {
-    if ($data instanceof FieldableEntityInterface && $this->entityIsDeleted($data)) {
+    if ($data instanceof FieldableEntityInterface && Trash::entityIsDeleted($data)) {
       return;
     }
     $this->inner->set($cid, $data, $expire, $tags);
@@ -44,7 +45,7 @@ trait TrashCacheBackendTrait {
     foreach ($items as $cid => $item) {
       if (isset($item['data'])
           && $item['data'] instanceof FieldableEntityInterface
-          && $this->entityIsDeleted($item['data'])) {
+          && Trash::entityIsDeleted($item['data'])) {
         unset($items[$cid]);
       }
     }
@@ -127,20 +128,6 @@ trait TrashCacheBackendTrait {
     if (method_exists($this->inner, 'reset')) {
       return $this->inner->reset(...$args);
     }
-  }
-
-  /**
-   * Duplicates trash_entity_is_deleted() to help during module installation.
-   *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
-   *   An entity object.
-   *
-   * @return bool
-   *   TRUE if the entity is deleted, FALSE otherwise.
-   */
-  protected function entityIsDeleted(FieldableEntityInterface $entity): bool {
-    return $entity->getFieldDefinition('deleted')?->getFieldStorageDefinition()->getProvider() === 'trash'
-      && !$entity->get('deleted')->isEmpty();
   }
 
 }

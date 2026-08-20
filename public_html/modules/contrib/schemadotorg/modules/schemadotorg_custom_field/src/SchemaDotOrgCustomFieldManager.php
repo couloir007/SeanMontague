@@ -8,14 +8,14 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\custom_field\Plugin\CustomFieldTypeManager;
-use Drupal\custom_field\Plugin\CustomFieldWidgetManager;
+use Drupal\custom_field\Plugin\CustomFieldFormatterManagerInterface;
+use Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface;
+use Drupal\custom_field\Plugin\CustomFieldWidgetManagerInterface;
 use Drupal\schemadotorg\Entity\SchemaDotOrgMapping;
 use Drupal\schemadotorg\SchemaDotOrgEntityFieldManagerInterface;
 use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
 use Drupal\schemadotorg\SchemaDotOrgNamesInterface;
 use Drupal\schemadotorg\SchemaDotOrgSchemaTypeManagerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\String\Inflector\EnglishInflector;
 
 /**
@@ -43,10 +43,12 @@ class SchemaDotOrgCustomFieldManager implements SchemaDotOrgCustomFieldManagerIn
    *   The Schema.org entity field manager.
    * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface $selectionPluginManager
    *   The entity reference selection manager.
-   * @param \Drupal\custom_field\Plugin\CustomFieldTypeManager $customFieldTypeManager
+   * @param \Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface $customFieldTypeManager
    *   The custom field type manager.
-   * @param \Drupal\custom_field\Plugin\CustomFieldWidgetManager $customFieldWidgetManager
-   *   The custom field type manager.
+   * @param \Drupal\custom_field\Plugin\CustomFieldWidgetManagerInterface $customFieldWidgetManager
+   *   The custom field widget manager.
+   * @param \Drupal\custom_field\Plugin\CustomFieldFormatterManagerInterface $customFieldFormatterManager
+   *   The custom field formatter manager.
    */
   public function __construct(
     protected ConfigFactoryInterface $configFactory,
@@ -54,10 +56,9 @@ class SchemaDotOrgCustomFieldManager implements SchemaDotOrgCustomFieldManagerIn
     protected SchemaDotOrgSchemaTypeManagerInterface $schemaTypeManager,
     protected SchemaDotOrgEntityFieldManagerInterface $schemaEntityFieldManager,
     protected SelectionPluginManagerInterface $selectionPluginManager,
-    #[Autowire(service: 'plugin.manager.custom_field_type')]
-    protected CustomFieldTypeManager $customFieldTypeManager,
-    #[Autowire(service: 'plugin.manager.custom_field_widget')]
-    protected CustomFieldWidgetManager $customFieldWidgetManager,
+    protected CustomFieldTypeManagerInterface $customFieldTypeManager,
+    protected CustomFieldWidgetManagerInterface $customFieldWidgetManager,
+    protected CustomFieldFormatterManagerInterface $customFieldFormatterManager,
   ) {}
 
   /**
@@ -175,10 +176,11 @@ class SchemaDotOrgCustomFieldManager implements SchemaDotOrgCustomFieldManagerIn
       return;
     }
 
+    $entity_type_id = $field_values['entity_type'];
+
     $custom_field_schema_type = $default_schema_properties['schema_type'] ?? '';
     $custom_field_schema_role = $default_schema_properties['schema_role'] ?? '';
     $custom_field_schema_properties = $default_schema_properties['schema_properties'] ?? [];
-
     if ($custom_field_schema_role
       && !isset($custom_field_schema_properties['target_id'])) {
       $custom_field_schema_role_properties = array_keys($this->schemaTypeManager->getTypeProperties($custom_field_schema_role));
@@ -205,92 +207,197 @@ class SchemaDotOrgCustomFieldManager implements SchemaDotOrgCustomFieldManagerIn
       }
     }
 
+    // @see field.storage.ENTITY_TYPE.FIELD_NAME:settings:columns
+    $custom_field_columns = [];
+
+    // @see field.field.ENTITY_TYPE.BUNDLE.FIELD_NAME:settings:field_settings
+    $custom_field_settings = [];
+
+    // @see core.entity_form_display.ENTITY_TYPE.BUNDLE.default:content:FIELD_NAME:settings
+    $custom_field_widget_settings = [];
+
+    // @see core.entity_view_display.ENTITY_TYPE.BUNDLE.default:content:FIELD_NAME:settings
+    $custom_field_formatter_settings = [];
+
+    // Widget and formatter weight.
     $weight = 0;
 
-    $entity_type_id = $field_values['entity_type'];
-    $field_storage_columns = [];
-    $field_settings = [];
     foreach ($custom_field_schema_properties as $schema_property => $settings) {
       $data_type = $settings['data_type'] ?? 'string';
-      /** @var \Drupal\custom_field\Plugin\CustomFieldTypeInterface $field_type */
-      $field_type = $this->customFieldTypeManager->createInstance($data_type);
 
+      // Get the label and description for the field.
       if ($this->schemaTypeManager->isProperty($schema_property)) {
         $default_field = $this->schemaEntityFieldManager->getPropertyDefaultField($entity_type_id, $custom_field_schema_type, $schema_property);
         $name = $default_field['name'];
-        $label = $default_field['label'];
-        $description = $default_field['description'];
+        $settings['label'] = $settings['label'] ?? $default_field['label'];
+        $settings['description'] = $settings['description'] ?? $default_field['description'];
       }
       else {
         $name = $settings['name'] ?? $this->schemaNames->camelCaseToSnakeCase($schema_property);
-        $label = $this->schemaNames->camelCaseToSentenceCase($schema_property);
-        $description = '';
+        $settings['label'] = $settings['label'] ?? $this->schemaNames->camelCaseToSentenceCase($schema_property);
+        $settings['description'] = $settings['description'] ?? '';
       }
 
+      /** @var \Drupal\custom_field\Plugin\CustomFieldTypeInterface $field_type */
+      $field_type = $this->customFieldTypeManager->createInstance($data_type);
       $widget_type = $settings['widget_type'] ?? $field_type->getDefaultWidget();
-      $default_widget_settings = $this->getDefaultWidgetSettings($widget_type, $schema_type, $schema_property, $settings);
+      $formatter_type = $settings['formatter_type'] ?? $field_type->getDefaultFormatter();
 
-      $field_storage_columns[$name] = [
+      // Check for allowed values, if there are allowed values then always
+      // switch the widget type to a 'select' widget.
+      $allowed_values = $settings['allowed_values']
+        ?? $this->getAllowedValues($schema_type, $schema_property)
+        ?? [];
+      if ($allowed_values) {
+        $widget_type = 'select';
+      }
+
+      /* ******************************************************************** */
+      // Column settings.
+      /* ******************************************************************** */
+
+      $custom_field_columns[$name] = [
         'name' => $name,
         'type' => $data_type,
-      ] + $this->getDefaultStorageSettings($data_type);
-
-      $field_settings[$name] = [
-        'type' => $widget_type,
-        'widget_settings' => [
-          'label' => $label,
-          'settings' => [
-            'description' => $description,
-          ] + $default_widget_settings['settings'],
-        ],
-        'check_empty' => $settings['check_empty'] ?? FALSE,
-        'weight' => $weight,
       ];
-
-      // Unset custom allowed values which are handled via widget settings.
-      // @see \Drupal\schemadotorg_custom_field\SchemaDotOrgCustomFieldManager::getDefaultWidgetSettings
-      unset($settings['allowed_values']);
+      // @see \Drupal\custom_field\Plugin\Field\FieldType\CustomItem::storageSettingsForm
+      if (in_array($data_type, ['string', 'telephone'])) {
+        $custom_field_columns[$name]['length'] = ($data_type === 'telephone') ? 256 : 255;
+      }
+      // Size field for supported types.
+      if (in_array($data_type, ['integer', 'float'])) {
+        $custom_field_columns[$name]['size'] = 'normal';
+      }
+      // Unsigned field for supported types.
+      if (in_array($data_type, ['integer', 'float', 'decimal'])) {
+        $custom_field_columns[$name]['unsigned'] = FALSE;
+      }
+      // Decimal field extra settings.
+      if ($data_type === 'decimal') {
+        $custom_field_columns[$name]['precision'] = 10;
+        $custom_field_columns[$name]['scale'] = 2;
+      }
+      // Datetime field extra settings.
+      if ($data_type === 'datetime') {
+        $custom_field_columns[$name]['datetime_type'] = 'datetime';
+      }
+      // Entity reference field extra settings.
+      if ($data_type === 'entity_reference') {
+        $custom_field_columns[$name]['target_type'] = NULL;
+      }
+      // File & Image field extra settings.
+      if ($data_type === 'file' || $data_type === 'image') {
+        $custom_field_columns[$name]['uri_scheme'] = $this->configFactory->get('system.file')->get('default_scheme');
+        $custom_field_columns[$name]['target_type'] = 'file';
+      }
+      // Viewfield extra settings.
+      if ($data_type === 'viewfield') {
+        $custom_field_columns[$name]['target_type'] = 'view';
+      }
 
       // Apply custom settings for field storage.
-      // @todo Determine what other columns settings are not required.
-      $additional_column_settings = [
-        'target_type' => NULL,
-      ];
-      $field_storage_columns[$name] = array_intersect_key($settings, $field_storage_columns[$name] + $additional_column_settings)
-        + $field_storage_columns[$name];
+      $custom_field_columns[$name] = array_intersect_key(
+        $settings,
+        $custom_field_columns[$name]
+      ) + $custom_field_columns[$name];
 
-      // Apply custom settings for widget settings.
-      $settings += ['widget_settings' => []];
-      $field_settings[$name]['widget_settings'] = array_intersect_key($settings['widget_settings'], $field_settings[$name]['widget_settings'])
-        + array_intersect_key($settings, $field_settings[$name]['widget_settings'])
-        + $field_settings[$name]['widget_settings'];
-      $field_settings[$name]['widget_settings']['settings'] = array_intersect_key($settings['widget_settings'], $field_settings[$name]['widget_settings']['settings'])
-        + array_intersect_key($settings, $field_settings[$name]['widget_settings']['settings'])
-        + $field_settings[$name]['widget_settings']['settings'];
+      /* ******************************************************************** */
+      // Field settings.
+      /* ******************************************************************** */
 
-      // Display prefix/suffix.
-      if (!empty($field_settings[$name]['widget_settings']['settings']['prefix'])
-        || !empty($field_settings[$name]['widget_settings']['settings']['suffix'])) {
-        $formatter_settings['fields'][$name]['format_type'] = $field_type->getDefaultFormatter();
-        $formatter_settings['fields'][$name]['wrappers'] = [
-          'field_wrapper_tag' => '',
-          'field_wrapper_classes' => '',
-          'field_tag' => '',
-          'field_classes' => '',
-          'label_tag' => '',
-          'label_classes' => '',
-        ];
-        $formatter_settings['fields'][$name]['formatter_settings']['prefix_suffix'] = TRUE;
+      $custom_field_settings[$name] = array_intersect_key(
+        $settings,
+        $field_type::defaultFieldSettings()
+      ) + $field_type::defaultFieldSettings();
+
+      switch ($widget_type) {
+        case 'entity_reference_autocomplete':
+          $custom_field_settings[$name]['handler'] = $this
+            ->selectionPluginManager
+            ->getPluginId($settings['target_type'], 'default');
+          break;
+
+        case 'select':
+          // Convert key/value pairs to a nested array of key/values.
+          // (i.e, ['key' => 'label'] => [[key => key', label => 'label']).
+          array_walk(
+            $allowed_values,
+            fn(&$value, $key) => $value = ['label' => $value, 'key' => $key]
+          );
+          $allowed_values = array_values($allowed_values);
+          $custom_field_settings[$name]['allowed_values'] = $allowed_values;
+          break;
+
+        case 'textarea':
+          $default_format = $this->configFactory
+            ->get('schemadotorg_custom_field.settings')
+            ->get('default_format');
+          if ($default_format) {
+            $custom_field_settings[$name]['formatted'] = TRUE;
+            $custom_field_settings[$name]['default_format'] = $default_format;
+            $custom_field_settings[$name]['format'] = [
+              'guidelines' => FALSE,
+              'help' => FALSE,
+            ];
+          }
+          break;
       }
+
+      /* ******************************************************************** */
+      // Widget settings.
+      /* ******************************************************************** */
+
+      /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetInterface $widget */
+      $widget = $this->customFieldWidgetManager->createInstance($widget_type);
+      $custom_field_widget_settings[$name] = array_intersect_key(
+        $settings,
+        $widget->defaultSettings()
+      ) + $widget->defaultSettings();
+      // Widget type.
+      $custom_field_widget_settings[$name]['type'] = $widget_type;
+      // Widget weight.
+      $custom_field_widget_settings[$name]['weight'] = $weight;
+
+      /* ******************************************************************** */
+      // Formatter settings.
+      /* ******************************************************************** */
+
+      /** @var \Drupal\custom_field\Plugin\CustomFieldFormatterInterface $formatter */
+      $formatter = $this->customFieldFormatterManager->createInstance($formatter_type);
+      $custom_field_formatter_settings[$name] = array_intersect_key(
+        $settings,
+        $formatter->defaultSettings()
+      ) + $formatter->defaultSettings();
+      // Format type.
+      $custom_field_formatter_settings[$name]['format_type'] = $field_type->getDefaultFormatter();
+      // Format wrappers.
+      // @see \Drupal\custom_field\Plugin\Field\FieldFormatter\BaseFormatter::getFormattedValues
+      $custom_field_formatter_settings[$name]['wrappers'] = [
+        'field_wrapper_tag' => '',
+        'field_wrapper_classes' => '',
+        'field_tag' => '',
+        'field_classes' => '',
+        'label_tag' => '',
+        'label_classes' => '',
+      ];
+      // Formatter settings.
+      $custom_field_formatter_settings[$name]['formatter_settings']['field_label'] = $settings['label'];
+      if (!empty($settings['prefix']) || !empty($settings['suffix'])) {
+        $custom_field_formatter_settings[$name]['formatter_settings']['prefix_suffix'] = TRUE;
+      }
+      // Formatter weight.
+      $custom_field_formatter_settings[$name]['weight'] = $weight;
 
       $weight++;
     }
 
-    $field_storage_values['settings']['columns'] = $field_storage_columns;
+    // Field storage settings.
+    $field_storage_values['settings']['columns'] = $custom_field_columns;
 
+    // Field settings.
     $field_values['settings'] = [
-      'field_settings' => $field_settings,
       'field_type' => 'custom',
+      'field_settings' => $custom_field_settings,
     ];
 
     // Widget id and settings.
@@ -299,10 +406,12 @@ class SchemaDotOrgCustomFieldManager implements SchemaDotOrgCustomFieldManagerIn
     if ($widget_id === 'custom_stacked') {
       $widget_settings += ['wrapper' => 'fieldset'];
     }
+    $widget_settings['fields'] = $custom_field_widget_settings;
 
     // Formatter id and settings.
     $formatter_id = $formatter_id ?? $default_schema_properties['formatter_id'] ?? 'custom_formatter';
     $formatter_settings += $default_schema_properties['formatter_settings'] ?? [];
+    $formatter_settings['fields'] = $custom_field_formatter_settings;
   }
 
   /**
@@ -335,141 +444,15 @@ class SchemaDotOrgCustomFieldManager implements SchemaDotOrgCustomFieldManagerIn
 
   /**
    * {@inheritdoc}
+   *
+   * @param \Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface>|\Drupal\Core\Field\FieldItemInterface $item
+   *   A custom field item or custom field items.
    */
   public function getFieldItemSchemaMapping(FieldItemListInterface|FieldItemInterface $item): ?SchemaDotOrgMappingInterface {
     $field_type = $item->getFieldDefinition()->getType();
     return ($field_type === 'custom')
       ? SchemaDotOrgMapping::loadByEntity($item->getEntity())
       : NULL;
-  }
-
-  /**
-   * Get the default storage settings for a given data type.
-   *
-   * @param string $data_type
-   *   A custom field data type.
-   *
-   * @return array
-   *   An array of default storage settings specific to the given data type.
-   *
-   * @see \Drupal\custom_field\Plugin\Field\FieldType\CustomItem::storageSettingsForm
-   */
-  protected function getDefaultStorageSettings(string $data_type): array {
-    $settings = [];
-    if (in_array($data_type, ['string', 'telephone'])) {
-      $settings['length'] = ($data_type === 'telephone') ? 256 : 255;
-    }
-    // Size field for supported types.
-    if (in_array($data_type, ['integer', 'float'])) {
-      $settings['size'] = 'normal';
-    }
-    // Unsigned field for supported types.
-    if (in_array($data_type, ['integer', 'float', 'decimal'])) {
-      $settings['unsigned'] = FALSE;
-    }
-    // Decimal field extra settings.
-    if ($data_type === 'decimal') {
-      $settings['precision'] = 10;
-      $settings['scale'] = 2;
-    }
-    // Datetime field extra settings.
-    if ($data_type === 'datetime') {
-      $settings['datetime_type'] = 'datetime';
-    }
-    // Entity reference field extra settings.
-    if ($data_type === 'entity_reference') {
-      $settings['target_type'] = NULL;
-    }
-    // File & Image field extra settings.
-    if ($data_type === 'file' || $data_type === 'image') {
-      $settings['uri_scheme'] = $this->configFactory->get('system.file')->get('default_scheme');
-      $settings['target_type'] = 'file';
-    }
-    // Viewfield extra settings.
-    if ($data_type === 'viewfield') {
-      $settings['target_type'] = 'view';
-    }
-    return $settings;
-  }
-
-  /**
-   * Get custom field default widget settings for a custom field widget type.
-   *
-   * @param string $widget_type
-   *   A custom field widget type.
-   * @param string $schema_type
-   *   A Schema.org type.
-   * @param string $schema_property
-   *   A Schema.org property.
-   * @param array $settings
-   *   Custom settings.
-   *
-   * @return array
-   *   An associate array of custom field default widget settings.
-   */
-  protected function getDefaultWidgetSettings(string &$widget_type, string $schema_type, string $schema_property, array $settings): array {
-    // Check for allowed values, if there are allowed values then switch
-    // the widget type to a 'select' widget.
-    $allowed_values = $settings['allowed_values']
-      ?? $this->getAllowedValues($schema_type, $schema_property)
-      ?? [];
-    if ($allowed_values) {
-      $widget_type = 'select';
-    }
-
-    /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetInterface $custom_field_widget */
-    $custom_field_widget = $this->customFieldWidgetManager->createInstance($widget_type);
-    $default_widget_settings = $custom_field_widget::defaultSettings();
-
-    switch ($widget_type) {
-      case 'entity_reference_autocomplete':
-        $default_widget_settings['settings']['handler'] = $this
-          ->selectionPluginManager
-          ->getPluginId($settings['target_type'], 'default');
-        break;
-
-      case 'decimal':
-      case 'float':
-        $default_widget_settings['settings']['scale'] = 2;
-        break;
-
-      case 'select':
-        // Convert key/value pairs to a nested array of key/values.
-        // (i.e, ['key' => 'value'] => [[key => key', value => 'value']).
-        array_walk(
-          $allowed_values,
-          fn(&$value, $key) => $value = ['value' => $value, 'key' => $key]
-        );
-        $allowed_values = array_values($allowed_values);
-        $default_widget_settings['settings']['allowed_values'] = $allowed_values;
-        break;
-
-      case 'text':
-        $default_widget_settings['settings']['maxlength'] = 255;
-        break;
-
-      case 'textarea':
-        $default_format = $this->configFactory
-          ->get('schemadotorg_custom_field.settings')
-          ->get('default_format');
-        if ($default_format) {
-          $default_widget_settings['settings']['formatted'] = TRUE;
-          $default_widget_settings['settings']['default_format'] = $default_format;
-          $default_widget_settings['settings']['format'] = [
-            'guidelines' => FALSE,
-            'help' => FALSE,
-          ];
-        }
-        break;
-    }
-
-    $default_widget_settings['settings'] += [
-      'description_display' => 'after',
-      'required' => FALSE,
-    ];
-
-    // @todo Apply custom default property settings.
-    return $default_widget_settings;
   }
 
   /**

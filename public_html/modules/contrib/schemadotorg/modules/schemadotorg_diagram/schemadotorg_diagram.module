@@ -55,6 +55,15 @@ function schemadotorg_diagram_form_schemadotorg_general_settings_form_alter(arra
     '#title' => t('Display diagrams as a node tab/task.'),
     '#description' => t('If checked, a Diagrams tab/task will be displayed on nodes.'),
   ];
+  $form['schemadotorg_diagram']['max_depth'] = [
+    '#type' => 'select',
+    '#title' => t('Maximum diagram depth'),
+    '#description' => t('Select the number of child relationship levels shown in diagrams.'),
+    '#options' => [
+      2 => 2,
+      3 => 3,
+    ],
+  ];
   $form['schemadotorg_diagram']['diagrams'] = [
     '#title' => t('Diagrams'),
     '#type' => 'schemadotorg_settings',

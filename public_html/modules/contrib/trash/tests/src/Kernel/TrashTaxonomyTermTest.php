@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\trash\Kernel;
 
 use Drupal\taxonomy\Entity\Term;
-use Drupal\taxonomy\TermStorageInterface;
 use Drupal\taxonomy\VocabularyInterface;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
+use Drupal\trash\Trash;
 
 /**
  * Tests trash functionality for taxonomy terms.
@@ -24,14 +26,14 @@ class TrashTaxonomyTermTest extends TrashKernelTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected array $additionalTrashEntityTypes = ['taxonomy_term' => []];
+
+  /**
    * The test vocabulary.
    */
   protected VocabularyInterface $vocabulary;
-
-  /**
-   * The taxonomy term storage.
-   */
-  protected TermStorageInterface $termStorage;
 
   /**
    * {@inheritdoc}
@@ -39,12 +41,15 @@ class TrashTaxonomyTermTest extends TrashKernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->vocabulary = $this->createVocabulary();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function installAdditionalEntitySchemas(): void {
     $this->installEntitySchema('taxonomy_term');
     $this->installConfig(['taxonomy']);
-    $this->enableEntityTypesForTrash(['taxonomy_term']);
-
-    $this->vocabulary = $this->createVocabulary();
-    $this->termStorage = $this->getEntityTypeManager()->getStorage('taxonomy_term');
   }
 
   /**
@@ -57,9 +62,9 @@ class TrashTaxonomyTermTest extends TrashKernelTestBase {
 
     // Trashing parent cascade-trashes children.
     $parent->delete();
-    $this->assertTrue(trash_entity_is_deleted($this->loadTrashedEntity('taxonomy_term', $parent->id())));
-    $this->assertTrue(trash_entity_is_deleted($this->loadTrashedEntity('taxonomy_term', $child1->id())));
-    $this->assertTrue(trash_entity_is_deleted($this->loadTrashedEntity('taxonomy_term', $child2->id())));
+    $this->assertTrue(Trash::entityIsDeleted($this->loadTrashedEntity('taxonomy_term', $parent->id())));
+    $this->assertTrue(Trash::entityIsDeleted($this->loadTrashedEntity('taxonomy_term', $child1->id())));
+    $this->assertTrue(Trash::entityIsDeleted($this->loadTrashedEntity('taxonomy_term', $child2->id())));
 
     // Restoring parent cascade-restores children.
     $this->restoreEntity('taxonomy_term', $parent->id());
@@ -71,9 +76,10 @@ class TrashTaxonomyTermTest extends TrashKernelTestBase {
     // should appear in the taxonomy tree (moved to root).
     $parent->delete();
     $this->restoreEntity('taxonomy_term', $child1->id());
-    $this->assertFalse(trash_entity_is_deleted(Term::load($child1->id())));
-    $this->assertTrue(trash_entity_is_deleted($this->loadTrashedEntity('taxonomy_term', $parent->id())));
-    $tree_tids = array_column($this->termStorage->loadTree($this->vocabulary->id()), 'tid');
+    $this->assertFalse(Trash::entityIsDeleted(Term::load($child1->id())));
+    $this->assertTrue(Trash::entityIsDeleted($this->loadTrashedEntity('taxonomy_term', $parent->id())));
+    $term_storage = $this->getEntityTypeManager()->getStorage('taxonomy_term');
+    $tree_tids = array_column($term_storage->loadTree($this->vocabulary->id()), 'tid');
     $this->assertContains($child1->id(), $tree_tids);
   }
 
@@ -90,11 +96,11 @@ class TrashTaxonomyTermTest extends TrashKernelTestBase {
 
     // Trashing one parent keeps the child active.
     $parent1->delete();
-    $this->assertFalse(trash_entity_is_deleted(Term::load($child->id())));
+    $this->assertFalse(Trash::entityIsDeleted(Term::load($child->id())));
 
     // Trashing the last parent orphans and cascade-trashes the child.
     $parent2->delete();
-    $this->assertTrue(trash_entity_is_deleted($this->loadTrashedEntity('taxonomy_term', $child->id())));
+    $this->assertTrue(Trash::entityIsDeleted($this->loadTrashedEntity('taxonomy_term', $child->id())));
   }
 
   /**
@@ -106,9 +112,9 @@ class TrashTaxonomyTermTest extends TrashKernelTestBase {
     $child = $this->createTerm($this->vocabulary, ['name' => 'Child', 'parent' => $parent->id()]);
 
     $grandparent->delete();
-    $this->assertTrue(trash_entity_is_deleted($this->loadTrashedEntity('taxonomy_term', $grandparent->id())));
-    $this->assertTrue(trash_entity_is_deleted($this->loadTrashedEntity('taxonomy_term', $parent->id())));
-    $this->assertTrue(trash_entity_is_deleted($this->loadTrashedEntity('taxonomy_term', $child->id())));
+    $this->assertTrue(Trash::entityIsDeleted($this->loadTrashedEntity('taxonomy_term', $grandparent->id())));
+    $this->assertTrue(Trash::entityIsDeleted($this->loadTrashedEntity('taxonomy_term', $parent->id())));
+    $this->assertTrue(Trash::entityIsDeleted($this->loadTrashedEntity('taxonomy_term', $child->id())));
 
     $this->restoreEntity('taxonomy_term', $grandparent->id());
     $this->assertNotEmpty(Term::load($grandparent->id()));
@@ -118,7 +124,8 @@ class TrashTaxonomyTermTest extends TrashKernelTestBase {
     $this->assertContains($parent->id(), $this->getParentIds(Term::load($child->id())));
 
     // All terms should be visible in the taxonomy tree.
-    $tree_tids = array_column($this->termStorage->loadTree($this->vocabulary->id()), 'tid');
+    $term_storage = $this->getEntityTypeManager()->getStorage('taxonomy_term');
+    $tree_tids = array_column($term_storage->loadTree($this->vocabulary->id()), 'tid');
     $this->assertContains($grandparent->id(), $tree_tids);
     $this->assertContains($parent->id(), $tree_tids);
     $this->assertContains($child->id(), $tree_tids);
@@ -142,7 +149,7 @@ class TrashTaxonomyTermTest extends TrashKernelTestBase {
 
     $this->restoreEntity('taxonomy_term', $parent->id());
     $this->assertNotEmpty(Term::load($parent->id()));
-    $this->assertTrue(trash_entity_is_deleted($this->loadTrashedEntity('taxonomy_term', $child->id())));
+    $this->assertTrue(Trash::entityIsDeleted($this->loadTrashedEntity('taxonomy_term', $child->id())));
 
     // Multi-parent partial restore: child cascade-trashed with B's timestamp,
     // restoring A should not restore it, restoring B should.
@@ -173,9 +180,10 @@ class TrashTaxonomyTermTest extends TrashKernelTestBase {
     $trashed = $this->createTerm($this->vocabulary, ['name' => 'Trashed']);
 
     $trashed->delete();
+    $term_storage = $this->getEntityTypeManager()->getStorage('taxonomy_term');
 
     // Entity query in active context.
-    $result = $this->termStorage->getQuery()
+    $result = $term_storage->getQuery()
       ->condition('vid', $this->vocabulary->id())
       ->accessCheck(FALSE)
       ->execute();
@@ -184,7 +192,7 @@ class TrashTaxonomyTermTest extends TrashKernelTestBase {
 
     // Entity query in ignore context.
     $result = $this->getTrashManager()->executeInTrashContext('ignore', fn () =>
-      $this->termStorage->getQuery()
+      $term_storage->getQuery()
         ->condition('vid', $this->vocabulary->id())
         ->accessCheck(FALSE)
         ->execute()
@@ -192,7 +200,7 @@ class TrashTaxonomyTermTest extends TrashKernelTestBase {
     $this->assertContains($trashed->id(), $result);
 
     // Taxonomy tree (direct database query with 'taxonomy_term_access' tag).
-    $tree_tids = array_column($this->termStorage->loadTree($this->vocabulary->id()), 'tid');
+    $tree_tids = array_column($term_storage->loadTree($this->vocabulary->id()), 'tid');
     $this->assertContains($active->id(), $tree_tids);
     $this->assertNotContains($trashed->id(), $tree_tids);
   }
@@ -204,9 +212,9 @@ class TrashTaxonomyTermTest extends TrashKernelTestBase {
     // Single term: trash, restore, re-trash, purge.
     $term = $this->createTerm($this->vocabulary, ['name' => 'Term']);
     $term->delete();
-    $this->assertTrue(trash_entity_is_deleted($this->loadTrashedEntity('taxonomy_term', $term->id())));
+    $this->assertTrue(Trash::entityIsDeleted($this->loadTrashedEntity('taxonomy_term', $term->id())));
     $this->restoreEntity('taxonomy_term', $term->id());
-    $this->assertFalse(trash_entity_is_deleted(Term::load($term->id())));
+    $this->assertFalse(Trash::entityIsDeleted(Term::load($term->id())));
     Term::load($term->id())->delete();
     $this->purgeEntity('taxonomy_term', $term->id());
     $this->assertEmpty($this->loadTrashedEntity('taxonomy_term', $term->id()));

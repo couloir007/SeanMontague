@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Sql\DefaultTableMapping;
 use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Order\Order;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -46,11 +47,16 @@ class TrashViewsHooks {
         continue;
       }
 
+      $base_table = $entity_type->getBaseTable();
+      $data_table = $entity_type->getDataTable() ?: $base_table;
+      if ($data_table && isset($data[$data_table]['deleted']['filter'])) {
+        $data[$data_table]['deleted']['filter']['allow empty'] = TRUE;
+      }
+
       if ($entity_type->hasListBuilderClass()) {
         continue;
       }
 
-      $base_table = $entity_type->getBaseTable();
       if ($base_table && isset($data[$base_table])) {
         $data[$base_table]['trash_operations'] = [
           'field' => [
@@ -107,6 +113,22 @@ class TrashViewsHooks {
           'left_table' => $info['base'],
           'left_field' => $id_key,
         ];
+
+        // Restrict the join to the row for the matching translation. Only
+        // translatable entity types have a data table with one row per
+        // translation, so joining on the ID alone there would multiply every
+        // revision row by the number of translations. Non-translatable types
+        // fall back to the base table (one row per ID) where the ID-only join
+        // is already exact; adding a langcode condition there could wrongly
+        // drop rows whose langcode changed across revisions and un-hide a
+        // trashed entity's revision.
+        if ($entity_type->isTranslatable() && ($langcode_key = $entity_type->getKey('langcode'))) {
+          $definition['extra'][] = [
+            'field' => $langcode_key,
+            'left_field' => $langcode_key,
+          ];
+        }
+
         $join = $this->joinHandler->createInstance('standard', $definition);
 
         $deleted_table_alias = $query->addTable($data_table, $info['alias'], $join);
@@ -275,6 +297,37 @@ class TrashViewsHooks {
   public function viewsPostRender(ViewExecutable $view): void {
     // Restore the trash context after the view has been built.
     $this->restoreTrashContext($view);
+  }
+
+  /**
+   * Implements hook_form_views_exposed_form_alter().
+   */
+  #[Hook('form_views_exposed_form_alter')]
+  public function formViewsExposedFormAlter(array &$form, FormStateInterface $form_state): void {
+    $view = $form_state->get('view');
+    if (!$view instanceof ViewExecutable || !str_starts_with($view->id(), 'trash_')) {
+      return;
+    }
+
+    $entity_type_id = substr($view->id(), strlen('trash_'));
+    $entity_type = $this->entityTypeManager->getDefinition($entity_type_id, FALSE);
+    $bundle_key = $entity_type?->getKey('bundle');
+    if (!$bundle_key || !isset($form[$bundle_key]['#options'])) {
+      return;
+    }
+
+    // Remove bundles that are disabled for trash tracking from the exposed
+    // bundle filter, since entities of those bundles never end up in the
+    // trash to filter for.
+    foreach (array_keys($form[$bundle_key]['#options']) as $bundle) {
+      // 'All' is the built-in "- Any -" option, not a real bundle.
+      if ($bundle === 'All') {
+        continue;
+      }
+      if (!$this->trashManager->isEntityTypeEnabled($entity_type_id, $bundle)) {
+        unset($form[$bundle_key]['#options'][$bundle]);
+      }
+    }
   }
 
   /**

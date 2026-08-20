@@ -11,8 +11,8 @@ require_once __DIR__ . '/../../../schemadotorg_geolocation.install';
 /**
  * Tests the functionality of the Schema.org Geolocation install/uninstall.
  *
- * @covers schemadotorg_geolocation_install()
- * @covers schemadotorg_geolocation_uninstall()
+ * @covers \schemadotorg_geolocation_install
+ * @covers \schemadotorg_geolocation_uninstall
  * @group schemadotorg
  */
 class SchemaDotOrgGeolocationInstallTest extends TokenKernelTestBase {

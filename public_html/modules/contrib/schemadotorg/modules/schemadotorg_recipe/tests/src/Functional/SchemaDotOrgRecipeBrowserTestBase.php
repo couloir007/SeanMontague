@@ -34,8 +34,10 @@ abstract class SchemaDotOrgRecipeBrowserTestBase extends BrowserTestBase {
     $this->fileSystem = $this->container->get('file_system');
     $this->configStorage = $this->container->get('config.storage');
 
+    $this->createBodyFieldStorage('node');
     $this->importConfig();
     $this->applyRecipes();
+    $this->normalizeConfig();
   }
 
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\trash\Kernel;
 
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\node\Entity\Node;
 use Drupal\path_alias\Entity\PathAlias;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
@@ -29,22 +28,15 @@ class TrashPathAliasTest extends TrashKernelTestBase {
   ];
 
   /**
-   * The node storage.
+   * {@inheritdoc}
    */
-  protected EntityStorageInterface $nodeStorage;
+  protected array $additionalTrashEntityTypes = ['path_alias' => []];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
-    parent::setUp();
-
+  protected function installAdditionalEntitySchemas(): void {
     $this->installEntitySchema('path_alias');
-
-    // Enable path_alias for trash.
-    $this->enableEntityTypesForTrash(['path_alias']);
-
-    $this->nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
   }
 
   /**
@@ -119,7 +111,7 @@ class TrashPathAliasTest extends TrashKernelTestBase {
     $this->assertEquals($deleted_node->get('deleted')->value, $deleted_alias2->get('deleted')->value);
 
     // Restore the node using the original entity object.
-    $this->nodeStorage->restoreFromTrash([$node]);
+    $this->restoreEntity('node', $node->id());
 
     // Verify all are restored.
     $restored_node = Node::load($node_id);
@@ -150,9 +142,21 @@ class TrashPathAliasTest extends TrashKernelTestBase {
     // Create a second node with the same alias.
     $this->createNodeWithPathAlias([], '/test');
 
+    // Run a validation that fails before attempting the restore: a failed
+    // check must not mark the alias as validated, otherwise the restore below
+    // would skip re-validation and succeed despite the conflict.
+    $trashed_alias = $this->loadTrashedEntity('path_alias', $alias1_id);
+    try {
+      $this->getTrashManager()->getHandler('path_alias')->validateRestore($trashed_alias);
+      $this->fail('Expected exception was not thrown.');
+    }
+    catch (\Exception) {
+      // The conflicting live alias makes validation fail, as expected.
+    }
+
     // Attempt to restore the first node.
     try {
-      $this->nodeStorage->restoreFromTrash([$node1]);
+      $this->restoreEntity('node', $node1_id);
       $this->fail('Expected exception was not thrown.');
     }
     catch (\Exception $e) {
@@ -228,7 +232,7 @@ class TrashPathAliasTest extends TrashKernelTestBase {
     $this->assertEmpty(PathAlias::load($alias10->id()));
 
     // Restore only node1.
-    $this->nodeStorage->restoreFromTrash([$node1]);
+    $this->restoreEntity('node', $node1->id());
 
     // Verify that only node1 and its alias are restored.
     $this->assertNotEmpty(Node::load($node1->id()));

@@ -23,7 +23,6 @@
     },
     "require-dev": {
         "drupal/allowed_formats": "^3.0",
-        "drupal/ckeditor5_embedded_content": "^2.0",
         "drupal/config_rewrite": "^1.0",
         "drupal/devel": "^5.0",
         "drupal/embedded_content": "^2.0",
@@ -36,5 +35,4 @@
         "drupal/paragraphs": "^1.0"
     }
 }
-
 

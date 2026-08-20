@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\schemadotorg;
 
+use Drupal\Core\Entity\ContentEntityInterface;
+
 /**
  * Gets Schema.org type or property items.
  *
@@ -495,7 +497,7 @@ interface SchemaDotOrgSchemaTypeManagerInterface {
    *
    * @param array $settings
    *   An associative array of settings.
-   * @param \Drupal\schemadotorg\SchemaDotOrgMappingInterface|array $parts
+   * @param \Drupal\schemadotorg\SchemaDotOrgMappingInterface|\Drupal\Core\Entity\ContentEntityInterface|array $parts
    *   A Schema.org mapping or an associative array of setting name parts
    *   which includes.
    *   - schema_type: The Schema.org type.
@@ -521,6 +523,6 @@ interface SchemaDotOrgSchemaTypeManagerInterface {
    * @return mixed
    *   A setting from an associative array of settings.
    */
-  public function getSetting(array $settings, SchemaDotOrgMappingInterface|array $parts, array $options = [], ?array $patterns = NULL): mixed;
+  public function getSetting(array $settings, SchemaDotOrgMappingInterface|ContentEntityInterface|array $parts, array $options = [], ?array $patterns = NULL): mixed;
 
 }

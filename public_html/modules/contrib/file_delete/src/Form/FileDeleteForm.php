@@ -151,20 +151,20 @@ class FileDeleteForm extends ContentEntityConfirmFormBase {
         return;
       }
 
-      // Remove existing usage for the file.
+      // Remove the usage records so the file is no longer marked as in use.
+      // Do NOT delete the referencing entity itself — the entity's field may
+      // still point at this (about-to-be-removed) file, but that broken
+      // reference is the documented trade-off of force-delete and is what the
+      // warning shown in buildForm() prepares the user for.
       if (isset($usages['file'])) {
         foreach ($usages['file'] as $type => $entities) {
           foreach ($entities as $id => $usage_count) {
-            $ref_entity = $this->entityTypeManager->getStorage($type)->load($id);
-            if (!empty($ref_entity)) {
-              $ref_entity->delete();
-
-              $this->messenger()
-                ->addMessage($this->t('The reference from entity type %ref_type for file %file_name has been deleted.', [
-                  '%ref_type' => $ref_entity->getEntityType()->id(),
-                  '%file_name' => $this->entity->getFilename(),
-                ]));
-            }
+            $this->fileUsage->delete($this->entity, 'file', $type, $id, $usage_count);
+            $this->messenger()
+              ->addMessage($this->t('The reference from entity type %ref_type for file %file_name has been deleted.', [
+                '%ref_type' => $type,
+                '%file_name' => $this->entity->getFilename(),
+              ]));
           }
         }
       }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\node\Functional;
+namespace Drupal\Tests\schemadotorg_content_model_documentation\Functional;
 
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
@@ -10,7 +10,7 @@ use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
 /**
  * Tests Schema.org content model documentation markup functionality.
  *
- * @covers schemadotorg_content_model_documentation_help()
+ * @covers \schemadotorg_content_model_documentation_help
  * @group schemadotorg
  */
 class SchemaDotOrgContentModelDocumentationMarkupTest extends SchemaDotOrgBrowserTestBase {

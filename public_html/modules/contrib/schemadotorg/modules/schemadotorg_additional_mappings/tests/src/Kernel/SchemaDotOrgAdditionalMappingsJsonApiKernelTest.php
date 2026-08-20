@@ -11,7 +11,6 @@ use Drupal\Tests\schemadotorg_jsonapi\Kernel\SchemaDotOrgJsonApiKernelTestBase;
 /**
  * Tests the functionality of the Schema.org additional mappings JSON:API support.
  *
- * @covers schemadotorg_additional_mappings_jsonapi_resource_config_presave()
  * @group schemadotorg
  */
 class SchemaDotOrgAdditionalMappingsJsonApiKernelTest extends SchemaDotOrgJsonApiKernelTestBase {

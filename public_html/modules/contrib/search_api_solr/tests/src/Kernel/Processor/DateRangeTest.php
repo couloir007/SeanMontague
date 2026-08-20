@@ -167,6 +167,7 @@ class DateRangeTest extends ProcessorTestBase {
    * Tests date range queries.
    *
    * @dataProvider dateRangeFieldQueryDataProvider
+   * @preserveGlobalState disabled
    *
    * @throws \Drupal\search_api\SearchApiException
    */

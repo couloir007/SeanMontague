@@ -6,7 +6,9 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Controller\FormController;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\HtmlEntityFormController;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
+use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
@@ -18,23 +20,28 @@ use Drupal\schemadotorg\Traits\SchemaDotOrgMappingStorageTrait;
 use Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 
 /**
  * The Schema.org additional type node form controller.
  */
-class SchemaDotOrgAdditionalTypeHtmlEntityFormController extends FormController {
+class SchemaDotOrgAdditionalTypeHtmlEntityFormController extends HtmlEntityFormController {
   use StringTranslationTrait;
   use SchemaDotOrgMappingStorageTrait;
 
   /**
-   * Constructs a MercuryEditorHtmlEntityFormController object.
+   * Constructs a SchemaDotOrgAdditionalTypeHtmlEntityFormController object.
    *
    * @param \Drupal\Core\Controller\FormController $entityFormController
    *   The entity form controller being decorated.
+   * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argument_resolver
+   *   The argument resolver.
+   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
+   *   The form builder.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager service.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
    * @param \Drupal\schemadotorg\SchemaDotOrgSchemaTypeManagerInterface $schemaTypeManager
    *   The Schema.org schema type manager.
    * @param \Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeManagerInterface $additionalTypeManager
@@ -42,11 +49,15 @@ class SchemaDotOrgAdditionalTypeHtmlEntityFormController extends FormController 
    */
   public function __construct(
     protected FormController $entityFormController,
+    ArgumentResolverInterface $argument_resolver,
+    FormBuilderInterface $form_builder,
+    EntityTypeManagerInterface $entity_type_manager,
     protected ConfigFactoryInterface $configFactory,
-    protected EntityTypeManagerInterface $entityTypeManager,
     protected SchemaDotOrgSchemaTypeManagerInterface $schemaTypeManager,
     protected SchemaDotOrgAdditionalTypeManagerInterface $additionalTypeManager,
-  ) {}
+  ) {
+    parent::__construct($argument_resolver, $form_builder, $entity_type_manager);
+  }
 
   /**
    * Renders the Schema.org additional type selection page or the entity edit form.
@@ -246,24 +257,6 @@ class SchemaDotOrgAdditionalTypeHtmlEntityFormController extends FormController 
     $query = $request->query->all();
     unset($query[MainContentViewSubscriber::WRAPPER_FORMAT]);
     return $query;
-  }
-
-  /* ************************************************************************ */
-  // Implement required methods for this form controller.
-  /* ************************************************************************ */
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getFormArgument(RouteMatchInterface $route_match) {
-    return $this->entityFormController->getFormArgument($route_match);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getFormObject(RouteMatchInterface $route_match, $form_arg) {
-    return $this->entityFormController->getFormObject($route_match, $form_arg);
   }
 
 }

@@ -140,7 +140,7 @@ class SchemaDotOrgDevelGenerate implements SchemaDotOrgDevelGenerateInterface {
 
     // Alter the Mercury Editor form for new nodes.
     if (str_ends_with($form_id, 'mercury_editor_form')) {
-      /** @var \Drupal\mercury_editor\Entity\MercuryEditorNodeForm $form_object */
+      /** @var \Drupal\Core\Entity\EntityFormInterface $form_object */
       $form_object = $form_state->getFormObject();
       /** @var \Drupal\node\NodeInterface $node */
       $node = $form_object->getEntity();

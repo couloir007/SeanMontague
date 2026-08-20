@@ -315,7 +315,7 @@ class SchemaDotOrgMappingStorage extends ConfigEntityStorage implements SchemaDo
    * {@inheritdoc}
    */
   protected function doPostSave(EntityInterface $entity, $update): void {
-    /** @var \Drupal\schemadotorg\SchemaDotOrgMappingInterface|null $entity */
+    /** @var \Drupal\schemadotorg\SchemaDotOrgMappingInterface $entity */
     parent::doPostSave($entity, $update);
 
     // Issue #2221347: Add hook_entity_postsave hook.

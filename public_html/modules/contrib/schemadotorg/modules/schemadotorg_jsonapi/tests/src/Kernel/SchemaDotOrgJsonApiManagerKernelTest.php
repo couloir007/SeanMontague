@@ -11,7 +11,7 @@ use Drupal\node\Entity\NodeType;
 /**
  * Tests the functionality of the Schema.org JSON:API manager.
  *
- * @covers \Drupal\schemadotorg_jsonapi\SchemaDotOrgJsonApiManager;
+ * @covers \Drupal\schemadotorg_jsonapi\SchemaDotOrgJsonApiManager
  * @group schemadotorg
  */
 class SchemaDotOrgJsonApiManagerKernelTest extends SchemaDotOrgJsonApiKernelTestBase {
@@ -52,7 +52,7 @@ class SchemaDotOrgJsonApiManagerKernelTest extends SchemaDotOrgJsonApiKernelTest
 
     // Check that JSON:API resource was created for Thing.
     /** @var \Drupal\jsonapi_extras\Entity\JsonapiResourceConfig $resource */
-    $resource = $this->resourceStorage->load('node--thing');
+    $resource = $this->getResourceStorage()->load('node--thing');
     $resource_fields = $resource->get('resourceFields');
 
     // Check enabling selected base fields.
@@ -152,7 +152,7 @@ class SchemaDotOrgJsonApiManagerKernelTest extends SchemaDotOrgJsonApiKernelTest
     ]);
     $location_node->save();
     /** @var \Drupal\schemadotorg\SchemaDotOrgMappingInterface $location_mapping */
-    $location_mapping = $this->mappingStorage->create([
+    $location_mapping = $this->getMappingStorage()->create([
       'target_entity_type_id' => 'node',
       'target_bundle' => 'location',
       'schema_type' => 'place',
@@ -185,7 +185,7 @@ class SchemaDotOrgJsonApiManagerKernelTest extends SchemaDotOrgJsonApiKernelTest
     ]);
     $event_node->save();
     /** @var \Drupal\schemadotorg\SchemaDotOrgMappingInterface $event_mapping */
-    $event_mapping = $this->mappingStorage->create([
+    $event_mapping = $this->getMappingStorage()->create([
       'target_entity_type_id' => 'node',
       'target_bundle' => 'event',
       'schema_type' => 'Event',
@@ -198,7 +198,7 @@ class SchemaDotOrgJsonApiManagerKernelTest extends SchemaDotOrgJsonApiKernelTest
 
     // Check that JSON:API resource was created for Event.
     /** @var \Drupal\jsonapi_extras\Entity\JsonapiResourceConfig $resource */
-    $resource = $this->resourceStorage->load('node--event');
+    $resource = $this->getResourceStorage()->load('node--event');
     $resource_fields = $resource->get('resourceFields');
 
     // Check enabled internal fields.
@@ -215,7 +215,7 @@ class SchemaDotOrgJsonApiManagerKernelTest extends SchemaDotOrgJsonApiKernelTest
     $this->appendSchemaTypeDefaultProperties('WebPage', 'primaryImageOfPage');
     $this->createSchemaEntity('node', 'WebPage');
     /** @var \Drupal\jsonapi_extras\Entity\JsonapiResourceConfig $resource */
-    $resource = $this->resourceStorage->load('node--page');
+    $resource = $this->getResourceStorage()->load('node--page');
     $resource_fields = $resource->get('resourceFields');
     $this->assertEquals('text', $resource_fields['body']['publicName']);
     $this->assertEquals('image', $resource_fields['schema_image']['publicName']);

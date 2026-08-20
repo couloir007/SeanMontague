@@ -31,8 +31,8 @@ class SchemaDotOrgHelpTest extends SchemaDotOrgBrowserTestBase {
 
     // Check displaying help topics for all Schema.org Blueprints sub-modules.
     $this->drupalGet('admin/help');
-    $assert->responseContains('<h2><img class="schemadotorg-logo" src="' . $base_path . $module_path . '/logo.png" alt="Logo for the Schema.org Blueprints project" />
-Schema.org Blueprints</h2>');
+    $assert->elementExists('css', 'img.schemadotorg-logo[src="' . $base_path . $module_path . '/logo.png"][alt="Logo for the Schema.org Blueprints project"]');
+    $assert->responseContains('Schema.org Blueprints</h2>');
     $assert->responseContains('<p>The Schema.org Blueprints module uses Schema.org as the blueprint for the content architecture and structured data in a Drupal website.</p>');
     $assert->responseContains('<li><strong><a href="' . $base_path . 'admin/help/schemadotorg/schemadotorg">Schema.org Blueprints</a></strong></li>');
     $assert->responseContains('<li><a href="' . $base_path . 'admin/help/schemadotorg/schemadotorg_diagram">Diagram</a></li>');
@@ -42,7 +42,10 @@ Schema.org Blueprints</h2>');
 
     // Check help topic navigation.
     $this->drupalGet('admin/help/schemadotorg/schemadotorg_help');
-    $assert->responseContains('<div class="dropbutton-wrapper" data-drupal-ajax-container><div class="dropbutton-widget"><ul class="dropbutton"><li><a href="' . $base_path . 'admin/help/schemadotorg/schemadotorg">Learn more about the Schema.org Blueprints modules</a></li><li><a href="' . $base_path . 'admin/help/schemadotorg/schemadotorg_diagram">Diagram</a></li><li><a href="' . $base_path . 'admin/help/schemadotorg/schemadotorg_help">Help</a></li></ul></div></div>');
+    $assert->elementExists('css', '.dropbutton-wrapper[data-drupal-ajax-container]');
+    $assert->responseContains('<a href="' . $base_path . 'admin/help/schemadotorg/schemadotorg">Learn more about the Schema.org Blueprints modules</a>');
+    $assert->responseContains('<a href="' . $base_path . 'admin/help/schemadotorg/schemadotorg_diagram">Diagram</a>');
+    $assert->responseContains('<a href="' . $base_path . 'admin/help/schemadotorg/schemadotorg_help">Help</a>');
     $assert->responseContains('&nbsp; or &nbsp;');
     $assert->responseContains('<a href="' . $base_path . 'admin/help/schemadotorg/videos" class="use-ajax button button--small button--extrasmall" data-dialog-type="modal" data-dialog-options="{&quot;width&quot;:800}">► Watch videos</a>');
 
@@ -56,7 +59,7 @@ Schema.org Blueprints</h2>');
     $this->drupalGet('admin/help/schemadotorg/videos');
     $assert->responseContains('<a href="https://youtu.be/Yo6Vw-s1FtM" target="_blank">');
     $assert->responseContains('<img style="display: block" src="https://img.youtube.com/vi/Yo6Vw-s1FtM/0.jpg" alt="Schema.org Blueprints for Drupal @ Pittsburgh 2023" />');
-    $assert->responseContains('<a href="https://youtu.be/Yo6Vw-s1FtM" target="_blank" class="button button--small button--extrasmall">▶ Watch video</a>');
+    $assert->elementTextEquals('css', 'a.button.button--small.button--extrasmall[href="https://youtu.be/Yo6Vw-s1FtM"][target="_blank"]', '▶ Watch video');
 
     // Check that for each Schema.org Blueprints sub-module's configuration
     // settings the description includes the sub-module's info with

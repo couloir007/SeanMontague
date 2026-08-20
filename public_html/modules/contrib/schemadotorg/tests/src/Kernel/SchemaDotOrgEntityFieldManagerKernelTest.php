@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\schemadotorg\Kernel;
 
+use Drupal\Component\Utility\DeprecationHelper;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\node\Entity\NodeType;
@@ -135,85 +136,167 @@ class SchemaDotOrgEntityFieldManagerKernelTest extends SchemaDotOrgEntityKernelT
     $this->assertEquals($expected_field, $default_field);
 
     // Check getting a Schema.org property's available field types as options.
-    $expected_field_type_options = [
-      'Recommended' => [
-        'string' => 'Text (plain)',
-        'string_long' => 'Text (plain, long)',
-        'list_string' => 'List (text)',
-        'text' => 'Text (formatted)',
-        'text_long' => 'Text (formatted, long)',
-        'text_with_summary' => 'Text (formatted, long, with summary)',
+    $expected_field_type_options = DeprecationHelper::backwardsCompatibleCall(
+      currentVersion: \Drupal::VERSION,
+      deprecatedVersion: '11.0.0',
+      currentCallable: fn() => [
+        'Recommended' => [
+          'string' => 'Short text',
+          'string_long' => 'Long text',
+          'list_string' => 'Text',
+          'text' => 'Short text',
+          'text_long' => 'Long text',
+          'text_with_summary' => 'Long text with summary',
+        ],
+        'General' => [
+          'boolean' => 'Boolean',
+          'email' => 'Email',
+          'internal_property_test' => 'Internal Property (test)',
+          'link' => 'Link',
+          'shape' => 'Shape',
+          'shape_required' => 'Shape (required)',
+          'single_internal_property_test' => 'Single Internal Property (test)',
+          'telephone' => 'Telephone number',
+          'field_test' => 'Test field item',
+          'serialized_item_test' => 'Test serialized field item',
+          'serialized_property_item_test' => 'Test serialized property field item',
+          'nullable_serialized_item_test' => 'Test nullable serialized field item',
+        ],
+        'Address' => [
+          'address' => 'Address',
+          'address_country' => 'Country',
+          'address_zone' => 'Zone',
+        ],
+        'Date and time' => [
+          'datetime' => 'Datetime',
+          'timestamp' => 'Timestamp',
+        ],
+        'File upload' => [
+          'file' => 'File',
+          'image' => 'Image',
+        ],
+        'Number' => [
+          'decimal' => 'Decimal',
+          'integer' => 'Integer',
+        ],
+        'Reference' => [
+          'field_ui:entity_reference:node' => 'Content',
+          'field_ui:entity_reference:block_content' => 'Custom block',
+          'entity_reference' => 'Entity reference',
+          'entity_reference_revisions' => 'Entity reference revisions',
+          'field_ui:entity_reference:media' => 'Media',
+          'field_ui:entity_reference_revisions:paragraph' => 'Paragraphs',
+          'field_ui:entity_reference:user' => 'User',
+        ],
+        'Selection list' => [
+          'list_integer' => 'Integer',
+        ],
       ],
-      'General' => [
-        'boolean' => 'Boolean',
-        'email' => 'Email',
-        'internal_property_test' => 'Internal Property (test)',
-        'link' => 'Link',
-        'shape' => 'Shape',
-        'shape_required' => 'Shape (required)',
-        'single_internal_property_test' => 'Single Internal Property (test)',
-        'telephone' => 'Telephone number',
-        'field_test' => 'Test field item',
-        'serialized_item_test' => 'Test serialized field item',
-        'serialized_property_item_test' => 'Test serialized property field item',
+      deprecatedCallable: fn() => [
+        'Recommended' => [
+          'string' => 'Text (plain)',
+          'string_long' => 'Text (plain, long)',
+          'list_string' => 'List (text)',
+          'text' => 'Text (formatted)',
+          'text_long' => 'Text (formatted, long)',
+          'text_with_summary' => 'Text (formatted, long, with summary)',
+        ],
+        'General' => [
+          'boolean' => 'Boolean',
+          'email' => 'Email',
+          'internal_property_test' => 'Internal Property (test)',
+          'link' => 'Link',
+          'shape' => 'Shape',
+          'shape_required' => 'Shape (required)',
+          'single_internal_property_test' => 'Single Internal Property (test)',
+          'telephone' => 'Telephone number',
+          'field_test' => 'Test field item',
+          'serialized_item_test' => 'Test serialized field item',
+          'serialized_property_item_test' => 'Test serialized property field item',
+        ],
+        'Address' => [
+          'address' => 'Address',
+          'address_country' => 'Country',
+          'address_zone' => 'Zone',
+        ],
+        'Date and time' => [
+          'datetime' => 'Date',
+          'timestamp' => 'Timestamp',
+        ],
+        'File upload' => [
+          'file' => 'File',
+          'image' => 'Image',
+        ],
+        'Number' => [
+          'decimal' => 'Number (decimal)',
+          'float' => 'Number (float)',
+          'integer' => 'Number (integer)',
+        ],
+        'Reference' => [
+          'field_ui:entity_reference:node' => 'Content',
+          'field_ui:entity_reference:block_content' => 'Custom block',
+          'entity_reference' => 'Entity reference',
+          'entity_reference_revisions' => 'Entity reference revisions',
+          'field_ui:entity_reference:media' => 'Media',
+          'field_ui:entity_reference_revisions:paragraph' => 'Paragraphs',
+          'field_ui:entity_reference:user' => 'User',
+        ],
+        'Selection list' => [
+          'list_float' => 'List (float)',
+          'list_integer' => 'List (integer)',
+        ],
       ],
-      'Address' => [
-        'address' => 'Address',
-        'address_country' => 'Country',
-        'address_zone' => 'Zone',
-      ],
-      'Date and time' => [
-        'datetime' => 'Date',
-        'timestamp' => 'Timestamp',
-      ],
-      'File upload' => [
-        'file' => 'File',
-        'image' => 'Image',
-      ],
-      'Number' => [
-        'decimal' => 'Number (decimal)',
-        'float' => 'Number (float)',
-        'integer' => 'Number (integer)',
-      ],
-      'Reference' => [
-        'field_ui:entity_reference:node' => 'Content',
-        'field_ui:entity_reference:block_content' => 'Custom block',
-        'entity_reference' => 'Entity reference',
-        'entity_reference_revisions' => 'Entity reference revisions',
-        'field_ui:entity_reference:media' => 'Media',
-        'field_ui:entity_reference_revisions:paragraph' => 'Paragraphs',
-        'field_ui:entity_reference:user' => 'User',
-      ],
-      'Selection list' => [
-        'list_float' => 'List (float)',
-        'list_integer' => 'List (integer)',
-      ],
-    ];
+    );
     $actual_field_type_options = $this->fieldManager->getPropertyFieldTypeOptions('node', 'Thing', 'alternateName');
     $this->convertArrayValuesToStrings($actual_field_type_options);
     $this->assertEquals($expected_field_type_options, $actual_field_type_options);
 
     // Check getting available fields as options.
-    $expected_field_options = [
-      '_add_' => 'Add a new field…',
-      'Fields' => [
-        'schema_alternate_name' => 'Alternate name [Text (plain)]',
+    $expected_field_options = DeprecationHelper::backwardsCompatibleCall(
+      currentVersion: \Drupal::VERSION,
+      deprecatedVersion: '11.0.0',
+      currentCallable: fn() => [
+        '_add_' => 'Add a new field…',
+        'Fields' => [
+          'schema_alternate_name' => 'Alternate name [Short text]',
+        ],
+        'Base fields' => [
+          'uuid' => 'uuid [UUID]',
+          'revision_uid' => 'revision_uid [Entity reference]',
+          'uid' => 'uid [Entity reference]',
+          'promote' => 'promote [Boolean]',
+          'sticky' => 'sticky [Boolean]',
+          'langcode' => 'langcode [Language]',
+          'title' => 'title [Short text]',
+          'created' => 'created [Created]',
+          'changed' => 'changed [Last changed]',
+        ],
+        'Existing fields' => [
+          'schema_identifier' => 'schema_identifier [Short text]',
+          'body' => 'body [Long text with summary]',
+        ],
       ],
-      'Base fields' => [
-        'uuid' => 'uuid [UUID]',
-        'revision_uid' => 'revision_uid [Entity reference]',
-        'uid' => 'uid [Entity reference]',
-        'promote' => 'promote [Boolean]',
-        'sticky' => 'sticky [Boolean]',
-        'langcode' => 'langcode [Language]',
-        'title' => 'title [Text (plain)]',
-        'created' => 'created [Created]',
-        'changed' => 'changed [Last changed]',
+      deprecatedCallable: fn() => [
+        '_add_' => 'Add a new field…',
+        'Fields' => [
+          'schema_alternate_name' => 'Alternate name [Text (plain)]',
+        ],
+        'Base fields' => [
+          'uuid' => 'uuid [UUID]',
+          'revision_uid' => 'revision_uid [Entity reference]',
+          'uid' => 'uid [Entity reference]',
+          'promote' => 'promote [Boolean]',
+          'sticky' => 'sticky [Boolean]',
+          'langcode' => 'langcode [Language]',
+          'title' => 'title [Text (plain)]',
+          'created' => 'created [Created]',
+          'changed' => 'changed [Last changed]',
+        ],
+        'Existing fields' => [
+          'schema_identifier' => 'schema_identifier [Text (plain)]',
+        ],
       ],
-      'Existing fields' => [
-        'schema_identifier' => 'schema_identifier [Text (plain)]',
-      ],
-    ];
+    );
     $actual_field_options = $this->fieldManager->getFieldOptions('node', 'thing');
     $this->convertArrayValuesToStrings($actual_field_options);
     $this->assertEquals($expected_field_options, $actual_field_options);

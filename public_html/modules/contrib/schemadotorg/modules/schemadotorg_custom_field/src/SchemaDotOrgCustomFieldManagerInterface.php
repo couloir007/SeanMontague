@@ -127,7 +127,7 @@ interface SchemaDotOrgCustomFieldManagerInterface {
   /**
    * Get a custom field's Schema.org mapping.
    *
-   * @param \Drupal\Core\Field\FieldItemListInterface|\Drupal\Core\Field\FieldItemInterface $item
+   * @param \Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface>|\Drupal\Core\Field\FieldItemInterface $item
    *   A custom field item or custom field items.
    *
    * @return \Drupal\schemadotorg\SchemaDotOrgMappingInterface|null

@@ -56,10 +56,6 @@ class TrashHooks {
       return;
     }
 
-    if ($this->trashManager->getTrashContext() !== 'active') {
-      throw new HttpException(Response::HTTP_NOT_ACCEPTABLE, 'Delete operations are not allowed outside a Trash context.');
-    }
-
     $entity_type = $bundle = $entity = NULL;
     if ($is_entity_delete_form) {
       assert($form_object instanceof ContentEntityDeleteForm);
@@ -81,14 +77,28 @@ class TrashHooks {
         return;
       }
 
-      // Get the first item in the VBO form data to check its entity type.
-      $first_item = reset($vbo_form_data['list']);
+      // Get the first item in the VBO form data to check its entity type. An
+      // empty selection has no entity type to check, so there is nothing to
+      // guard or relabel.
+      $list = $vbo_form_data['list'] ?? [];
+      $first_item = reset($list);
+      if (!is_array($first_item) || !isset($first_item[2])) {
+        return;
+      }
       // @see \Drupal\views_bulk_operations\Form\ViewsBulkOperationsFormTrait::calculateEntityBulkFormKey()
       $entity_type = $this->entityTypeManager->getDefinition($first_item[2]);
     }
 
     if ($entity_type && !$this->trashManager->isEntityTypeEnabled($entity_type, $bundle)) {
       return;
+    }
+
+    // Only apply the context guard once we know this form is actually for a
+    // trash-enabled entity type (and, for VBO, actually a delete action): an
+    // unrelated delete form or bulk action must not 406 just because some
+    // other part of the same request left the trash context non-active.
+    if ($this->trashManager->getTrashContext() !== 'active') {
+      throw new HttpException(Response::HTTP_NOT_ACCEPTABLE, 'Delete operations are not allowed outside a Trash context.');
     }
 
     // Change the message of the delete confirmation form to mention the actual
@@ -160,7 +170,12 @@ class TrashHooks {
     }
 
     $trash_handler = $this->trashManager->getHandler($entity_type->id());
-    assert($trash_handler instanceof TrashHandlerInterface);
+    if (!$trash_handler instanceof TrashHandlerInterface) {
+      // No handler is registered for this entity type (e.g. trash was just
+      // enabled for it in the current request, before the container was
+      // rebuilt). Nothing to alter the form with.
+      return;
+    }
     if (isset($form['description']['#markup']) && $form['description']['#markup'] instanceof TranslatableMarkup) {
       if (str_contains($form['description']['#markup']->getUntranslatedString(), 'This action cannot be undone.')) {
         if ($is_entity_delete_form) {

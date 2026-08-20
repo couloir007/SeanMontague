@@ -16,11 +16,26 @@ class SchemaDotOrgStarterkitConfigSnapshotTest extends SchemaDotOrgConfigSnapsho
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['schemadotorg_starterkit_test'];
+  protected static $modules = [
+    'config_rewrite',
+    'schemadotorg_additional_mappings',
+    'schemadotorg_field_group',
+    'schemadotorg_starterkit',
+    'views',
+  ];
 
   /**
    * {@inheritdoc}
    */
   protected string $snapshotDirectory = __DIR__ . '/../../schemadotorg/config/snapshot';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    \Drupal::service('module_installer')->install(['schemadotorg_starterkit_test']);
+  }
 
 }

@@ -12,6 +12,11 @@ use Drupal\trash_test\Entity\TrashTestEntity;
 class TrashUninstallTest extends TrashKernelTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  protected bool $installNode = FALSE;
+
+  /**
    * Tests that Trash cannot be uninstalled if there's an entity in the trash.
    */
   public function testUninstallValidator(): void {

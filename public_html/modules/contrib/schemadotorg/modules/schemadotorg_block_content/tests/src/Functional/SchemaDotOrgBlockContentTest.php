@@ -11,10 +11,7 @@ use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
 /**
  * Tests the functionality of the Schema.org block content module.
  *
- * @covers schemadotorg_block_content_block_view_alter()
- * @covers schemadotorg_block_content_schemadotorg_jsonld_schema_type_entity_alter()
- * @covers schemadotorg_block_content_schemadotorg_jsonld()
- *
+ * @covers \schemadotorg_block_content_schemadotorg_jsonld
  * @group schemadotorg
  */
 class SchemaDotOrgBlockContentTest extends SchemaDotOrgBrowserTestBase {
@@ -39,12 +36,14 @@ class SchemaDotOrgBlockContentTest extends SchemaDotOrgBrowserTestBase {
     ])->save();
 
     // Create the Statement block type and Schema.org mapping.
+    $this->createBodyFieldStorage('block_content');
     $this->createSchemaEntity('block_content', 'Statement');
 
     // Create a content block.
     $block_content = BlockContent::create([
       'type' => 'statement',
       'info' => 'Test',
+      'status' => TRUE,
       'body' => [
         'value' => 'This is a test',
         'format' => 'full_html',
@@ -66,7 +65,7 @@ class SchemaDotOrgBlockContentTest extends SchemaDotOrgBrowserTestBase {
 
     // Check that the content block is displayed.
     // @see schemadotorg_block_content_block_view_alter()
-    $this->drupalGet('<front>');
+    $this->drupalGet('user/1');
     $assert->responseContains('<div>This is a test</div>');
   }
 

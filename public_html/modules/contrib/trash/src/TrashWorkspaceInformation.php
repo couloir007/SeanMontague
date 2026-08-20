@@ -58,7 +58,7 @@ class TrashWorkspaceInformation implements WorkspaceInformationInterface {
    * {@inheritdoc}
    */
   public function isEntityDeletable(EntityInterface $entity, WorkspaceInterface $workspace): bool {
-    if ($this->trashManager->isEntityTypeEnabled($entity->getEntityType(), $entity->bundle()) && !trash_entity_is_deleted($entity)) {
+    if ($this->trashManager->isEntityTypeEnabled($entity->getEntityType(), $entity->bundle()) && !Trash::entityIsDeleted($entity)) {
       return TRUE;
     }
 

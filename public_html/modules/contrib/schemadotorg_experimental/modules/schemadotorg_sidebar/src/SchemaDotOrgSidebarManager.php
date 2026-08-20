@@ -118,26 +118,24 @@ class SchemaDotOrgSidebarManager implements SchemaDotOrgSidebarManagerInterface 
     // If the field's config exists, do not create the field, and update its
     // form and view display.
     $field_config = $field_config_storage->load("node.$bundle.$field_name");
-    if ($field_config) {
-      return;
-    }
-
-    // Create the field instance.
-    $field_config_storage->create([
-      'field_storage' => $field_storage,
-      'bundle' => $bundle,
-      'label' => $field_label,
-      'settings' => [
-        'handler' => 'default:paragraph',
-        'handler_settings' => [
-          'target_bundles' => [$paragraph_type_id => $paragraph_type_id],
-          'negate' => 0,
-          'target_bundles_drag_drop' => [
-            $paragraph_type_id => ['weight' => 0, 'enabled' => TRUE],
+    if (!$field_config) {
+      // Create the field instance.
+      $field_config_storage->create([
+        'field_storage' => $field_storage,
+        'bundle' => $bundle,
+        'label' => $field_label,
+        'settings' => [
+          'handler' => 'default:paragraph',
+          'handler_settings' => [
+            'target_bundles' => [$paragraph_type_id => $paragraph_type_id],
+            'negate' => 0,
+            'target_bundles_drag_drop' => [
+              $paragraph_type_id => ['weight' => 0, 'enabled' => TRUE],
+            ],
           ],
         ],
-      ],
-    ])->save();
+      ])->save();
+    }
 
     // Create the form display component.
     $form_display = $this->entityDisplayRepository->getFormDisplay($entity_type, $bundle);

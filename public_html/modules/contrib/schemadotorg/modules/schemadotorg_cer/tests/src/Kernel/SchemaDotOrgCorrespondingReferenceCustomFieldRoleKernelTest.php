@@ -69,8 +69,8 @@ class SchemaDotOrgCorrespondingReferenceCustomFieldRoleKernelTest extends Schema
 
     /* ********************************************************************** */
 
-    $this->assertNull($person_node->schema_member_of->target_id);
-    $this->assertNull($organization_node->schema_member->target_id);
+    $this->assertEmpty($person_node->schema_member_of->target_id);
+    $this->assertEmpty($organization_node->schema_member->target_id);
 
     // Add the person to the organization member fields.
     $organization_node->schema_member->target_id = $person_node->id();

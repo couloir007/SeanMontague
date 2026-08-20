@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\schemadotorg_jsonld_embed\Kernel;
+namespace Drupal\Tests\schemadotorg_custom_field\Kernel;
 
 use Drupal\node\Entity\Node;
 use Drupal\Tests\schemadotorg_jsonld\Kernel\SchemaDotOrgJsonLdKernelTestBase;

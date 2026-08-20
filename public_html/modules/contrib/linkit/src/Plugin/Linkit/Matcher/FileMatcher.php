@@ -5,22 +5,23 @@ namespace Drupal\linkit\Plugin\Linkit\Matcher;
 use Drupal\Component\Utility\DeprecationHelper;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\image\ImageDerivativeUtilities;
+use Drupal\linkit\Attribute\Matcher;
 use Drupal\linkit\Utility\LinkitXss;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides specific linkit matchers for the file entity type.
- *
- * @Matcher(
- *   id = "entity:file",
- *   label = @Translation("File"),
- *   target_entity = "file",
- *   provider = "file"
- * )
  */
+#[Matcher(
+  id: "entity:file",
+  label: new TranslatableMarkup('File'),
+  target_entity: "file",
+  provider: "file",
+)]
 class FileMatcher extends EntityMatcher {
 
   /**

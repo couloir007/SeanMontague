@@ -29,6 +29,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class TrashIgnoreSubscriber implements EventSubscriberInterface {
 
+  /**
+   * The trash context to restore once the paired "restore" event fires.
+   *
+   * NULL when no ignoreTrashContext()/restoreTrashContext() bracket is open.
+   */
+  protected ?string $previousTrashContext = NULL;
+
   public function __construct(
     protected HttpKernelInterface $httpKernel,
     #[AutowireServiceClosure('entity_type.manager')]
@@ -93,9 +100,12 @@ class TrashIgnoreSubscriber implements EventSubscriberInterface {
       // to use it. This stops the leakage of whether an entity is trashed or
       // not to anonymous users through the response's status code.
       if (
-        $account->hasPermission('administer trash') ||
-        $account->hasPermission('access trash') ||
-        $account->hasPermission('view deleted entities')
+        (
+          $account->hasPermission('administer trash') ||
+          $account->hasPermission('access trash') ||
+          $account->hasPermission('view deleted entities')
+        )
+        && !$this->isUnsafeNonTrashRequest($request)
       ) {
         $this->trashManager->setTrashContext('ignore');
       }
@@ -108,6 +118,27 @@ class TrashIgnoreSubscriber implements EventSubscriberInterface {
   }
 
   /**
+   * Checks if honoring "in_trash" here would let a request skip soft-delete.
+   *
+   * ::onRequest() already downgrades the context to 'active' for a
+   * state-changing request outside the trash UI, but setDefaultTrashContext()
+   * also runs on every account switch (via ::onSetAccount()), which would
+   * otherwise re-escalate the context back to 'ignore' and re-open the
+   * hard-delete path. Applying the same guard here keeps the downgrade
+   * durable across account switches.
+   *
+   * Returns TRUE only once routing has run, so the pre-routing pass (where the
+   * route is not known yet) still grants 'ignore' and lets the param converter
+   * upcast the trashed entity. Trash routes keep 'ignore' either way.
+   */
+  protected function isUnsafeNonTrashRequest(Request $request): bool {
+    $route = $this->routeMatch->getRouteObject();
+    return $route !== NULL
+      && !$request->isMethodSafe()
+      && !$route->getOption('_trash_route');
+  }
+
+  /**
    * Sets the trash context to ignore if needed.
    *
    * @param \Symfony\Component\HttpKernel\Event\KernelEvent $event
@@ -116,6 +147,26 @@ class TrashIgnoreSubscriber implements EventSubscriberInterface {
   public function onRequest(KernelEvent $event): void {
     if (!$event->isMainRequest()) {
       return;
+    }
+
+    // The 'in_trash' query parameter grants the whole request the 'ignore'
+    // context before routing, so route parameters can be upcast to trashed
+    // entities. Once the route is known, drop that context back to 'active'
+    // for state-changing requests outside the trash UI: with 'ignore' still
+    // set, adding the parameter to a plain entity delete form would
+    // hard-delete the entity, skipping both the soft-delete and the purge
+    // permission. Trash routes keep the context, their forms rely on it, and
+    // so does the update kernel. The route-based grants below run after this
+    // and re-apply theirs.
+    $request = $event->getRequest();
+    if (
+      !$request->isMethodSafe()
+      && $request->query->has('in_trash')
+      && !$event->getKernel() instanceof UpdateKernel
+      && $this->trashManager->getTrashContext() === 'ignore'
+      && !$this->routeMatch->getRouteObject()?->getOption('_trash_route')
+    ) {
+      $this->trashManager->setTrashContext('active');
     }
 
     // Some entity types that act as bundles for other entities have a custom
@@ -155,14 +206,34 @@ class TrashIgnoreSubscriber implements EventSubscriberInterface {
    * Sets the trash context to 'ignore'.
    */
   public function ignoreTrashContext(): void {
+    $this->previousTrashContext = $this->trashManager->getTrashContext();
     $this->trashManager->setTrashContext('ignore');
   }
 
   /**
-   * Sets the trash context to 'active'.
+   * Restores the trash context to what it was before ignoreTrashContext().
    */
   public function restoreTrashContext(): void {
-    $this->trashManager->setTrashContext('active');
+    $this->trashManager->setTrashContext($this->previousTrashContext ?? 'active');
+    $this->previousTrashContext = NULL;
+  }
+
+  /**
+   * Resets a trash context left stuck at 'ignore' by an uncaught exception.
+   *
+   * The ignoreTrashContext()/restoreTrashContext() pair is wired to paired
+   * events (workspace pre/post-publish, migrate pre/post-row-delete) on the
+   * assumption that the closing event always fires. If the bracketed
+   * operation throws, the closing event never runs and the context stays at
+   * 'ignore' for the rest of the request, so every later entity query or
+   * access check stops filtering trashed entities. Restore it here so the
+   * damage is contained to the request that failed.
+   */
+  public function onException(): void {
+    if ($this->previousTrashContext !== NULL) {
+      $this->trashManager->setTrashContext($this->previousTrashContext);
+      $this->previousTrashContext = NULL;
+    }
   }
 
   /**
@@ -189,6 +260,11 @@ class TrashIgnoreSubscriber implements EventSubscriberInterface {
     // Add another subscriber for setting the ignore trash context when the
     // current route is known.
     $events[KernelEvents::REQUEST][] = ['onRequest'];
+
+    // Safety net: reset a context left stuck at 'ignore' by an exception that
+    // escaped one of the ignoreTrashContext()/restoreTrashContext() brackets
+    // below.
+    $events[KernelEvents::EXCEPTION][] = ['onException'];
 
     if (class_exists(WorkspacePublishEvent::class)) {
       $events[WorkspacePrePublishEvent::class][] = ['ignoreTrashContext'];

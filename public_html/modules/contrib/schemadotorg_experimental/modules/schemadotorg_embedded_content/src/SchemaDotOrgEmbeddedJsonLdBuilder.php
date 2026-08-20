@@ -84,7 +84,6 @@ class SchemaDotOrgEmbeddedJsonLdBuilder implements SchemaDotOrgEmbeddedJsonLdBui
           $plugin_config = Json::decode($node->getAttribute('data-plugin-config'));
           $plugin_id = $node->getAttribute('data-plugin-id');
 
-          /** @var \Drupal\schemadotorg_embedded_content\Plugin\SchemaDotOrgEmbeddedContentInterface $embedded_plugin */
           $embedded_plugin = $this->embeddedContentManager->createInstance(
             $plugin_id,
             $plugin_config

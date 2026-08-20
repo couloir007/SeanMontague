@@ -12,7 +12,7 @@ use Drupal\node\Entity\Node;
 /**
  * Tests the functionality of the Schema.org JSON-LD builder.
  *
- * @covers \Drupal\schemadotorg_jsonld\SchemaDotOrgJsonLdBuilder;
+ * @covers \Drupal\schemadotorg_jsonld\SchemaDotOrgJsonLdBuilder
  * @group schemadotorg
  */
 class SchemaDotOrgJsonLdBuilderKernelTest extends SchemaDotOrgJsonLdKernelTestBase {

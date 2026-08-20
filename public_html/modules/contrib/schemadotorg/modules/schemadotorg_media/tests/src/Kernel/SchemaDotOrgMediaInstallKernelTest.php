@@ -11,7 +11,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org media installation.
  *
- * @covers \schemadotorg_media_install()
+ * @covers \schemadotorg_media_install
  * @group schemadotorg
  */
 class SchemaDotOrgMediaInstallKernelTest extends SchemaDotOrgEntityKernelTestBase {

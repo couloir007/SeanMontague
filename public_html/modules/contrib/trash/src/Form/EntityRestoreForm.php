@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Drupal\trash\Form;
 
 use Drupal\Core\Entity\ContentEntityConfirmFormBase;
+use Drupal\Core\File\Exception\InvalidStreamWrapperException;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Url;
+use Drupal\file\FileInterface;
 use Drupal\trash\Exception\UnrestorableEntityException;
+use Drupal\trash\Trash;
 use Drupal\trash\TrashManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -93,6 +96,8 @@ class EntityRestoreForm extends ContentEntityConfirmFormBase implements Workspac
   public function submitForm(array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->getEntity();
+    // Not all entities support URL links.
+    $supports_url = $entity->hasLinkTemplate('canonical') || $entity->hasLinkTemplate('edit-form');
     $args = [
       '@entity-type' => $entity->getEntityType()->getSingularLabel(),
       '@bundle' => $this->entityTypeBundleInfo->getBundleInfo($entity->getEntityTypeId())[$entity->bundle()]['label'],
@@ -100,7 +105,7 @@ class EntityRestoreForm extends ContentEntityConfirmFormBase implements Workspac
     ];
 
     try {
-      trash_restore_entity($entity);
+      Trash::restoreEntity($entity);
     }
     catch (UnrestorableEntityException $e) {
       $this->messenger()->addError($this->t('The @entity-type %label could not be restored from trash.', $args));
@@ -113,7 +118,35 @@ class EntityRestoreForm extends ContentEntityConfirmFormBase implements Workspac
 
     $form_state->setRedirectUrl($this->getRedirectUrl());
 
-    $this->messenger()->addStatus($this->t('The @entity-type %label has been restored from trash.', $args));
+    if ($supports_url) {
+      $args[':entity_url'] = $entity->toUrl()->toString();
+    }
+    elseif ($entity->getEntityTypeId() === 'file') {
+      // Provide a link to the publicly restored file. Building the URL is
+      // best-effort: a file on a stream wrapper that can not produce an
+      // external URL throws, and the restore has already committed, so fall
+      // back to the plain message instead of turning a successful restore
+      // into an error.
+      assert($entity instanceof FileInterface);
+      $restored_file = $this->entityTypeManager->getStorage('file')->load($entity->id());
+      if ($restored_file instanceof FileInterface) {
+        try {
+          $args[':entity_url'] = $restored_file->createFileUrl();
+          $supports_url = TRUE;
+        }
+        catch (InvalidStreamWrapperException) {
+          // Leave $supports_url FALSE so the plain message is used below.
+        }
+      }
+    }
+    if ($supports_url) {
+      $message = $this->t('The @entity-type <a href=":entity_url">%label</a> has been restored from trash.', $args);
+    }
+    else {
+      $message = $this->t('The @entity-type %label has been restored from trash.', $args);
+    }
+
+    $this->messenger()->addStatus($message);
     $this->getLogger('trash')->info('@entity-type (@bundle): restored %label.', [
       '@entity-type' => $entity->getEntityType()->getLabel(),
     ] + $args);

@@ -11,7 +11,7 @@ use Drupal\workflows\Entity\Workflow;
 /**
  * Tests the functionality of the Schema.org content moderation.
  *
- * @covers schemadotorg_content_moderation_schemadotorg_mapping_insert()
+ * @covers \schemadotorg_content_moderation_schemadotorg_mapping_insert
  * @group schemadotorg
  */
 class SchemaDotOrgContentModerationKernelTest extends SchemaDotOrgEntityKernelTestBase {

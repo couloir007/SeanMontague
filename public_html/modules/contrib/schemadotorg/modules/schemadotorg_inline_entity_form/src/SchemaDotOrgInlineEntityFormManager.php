@@ -8,7 +8,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\schemadotorg\SchemaDotOrgSchemaTypeManagerInterface;
@@ -52,7 +51,6 @@ class SchemaDotOrgInlineEntityFormManager implements SchemaDotOrgInlineEntityFor
 
     // Make sure we get the entity type bundle of.
     if (!$entity instanceof ConfigEntityInterface
-      || !$entity->getEntityType() instanceof EntityTypeInterface
       || empty($entity->getEntityType()->getBundleOf())) {
       return;
     }

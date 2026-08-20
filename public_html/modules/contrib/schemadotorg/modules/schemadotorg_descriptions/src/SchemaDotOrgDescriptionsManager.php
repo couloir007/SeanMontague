@@ -119,7 +119,7 @@ class SchemaDotOrgDescriptionsManager implements SchemaDotOrgDescriptionsManager
       return;
     }
 
-    /** @var \Drupal\node\NodeForm $form_object */
+    /** @var \Drupal\Core\Entity\EntityFormInterface $form_object */
     $form_object = $form_state->getFormObject();
     /** @var \Drupal\node\NodeInterface $node */
     $node = $form_object->getEntity();

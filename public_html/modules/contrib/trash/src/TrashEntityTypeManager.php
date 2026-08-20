@@ -5,7 +5,7 @@ namespace Drupal\trash;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManager;
-use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
+use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\Core\PhpStorage\PhpStorageFactory;
 
 /**
@@ -83,9 +83,10 @@ class TrashEntityTypeManager extends EntityTypeManager {
    * {@inheritdoc}
    */
   public function createHandlerInstance($class, ?EntityTypeInterface $definition = NULL) {
-    // @phpstan-ignore-next-line
-    if (\Drupal::service('trash.manager')->isEntityTypeEnabled($definition)
-      && is_subclass_of($class, SqlEntityStorageInterface::class)) {
+    if ($definition !== NULL
+      // @phpstan-ignore globalDrupalDependencyInjection.useDependencyInjection
+      && \Drupal::service('trash.manager')->isEntityTypeEnabled($definition)
+      && is_a($class, SqlContentEntityStorage::class, TRUE)) {
       $class = _trash_generate_storage_class($class);
     }
 

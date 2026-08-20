@@ -11,8 +11,8 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org JSON-LD datetime_range.module integration.
  *
- * @covers \Drupal\schemadotorg_jsonld\SchemaDotOrgJsonLdManager::getSchemaPropertyValue;
- * @covers datetime_range_schemadotorg_jsonld_schema_type_field_alter()
+ * @covers \Drupal\schemadotorg_jsonld\SchemaDotOrgJsonLdManager::getSchemaPropertyValue
+ * @covers \datetime_range_schemadotorg_jsonld_schema_type_field_alter
  * @group schemadotorg
  */
 class SchemaDotOrgJsonLdDateTimeRangeKernelTest extends SchemaDotOrgEntityKernelTestBase {

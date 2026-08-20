@@ -67,8 +67,10 @@ class SchemaDotOrgParagraphsManager implements SchemaDotOrgParagraphsManagerInte
       return;
     }
 
-    /** @var \Drupal\paragraphs\ParagraphsTypeInterface $paragraph_type */
     $paragraph_type = $mapping->getTargetEntityBundleEntity();
+    if (!$paragraph_type instanceof ParagraphsTypeInterface) {
+      return;
+    }
     $paragraph_type->setThirdPartySetting('paragraphs_library', 'allow_library_conversion', TRUE);
     $paragraph_type->save();
   }

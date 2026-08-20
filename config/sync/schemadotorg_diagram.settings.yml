@@ -2,6 +2,7 @@ _core:
   default_config_hash: 6q4OvTz-WZG5mvLHnzQZjqvRyZVqN7mePhlfr7r76zg
 langcode: en
 node_task: true
+max_depth: 3
 diagrams:
   subjectOf:
     title: 'Subject of / About'

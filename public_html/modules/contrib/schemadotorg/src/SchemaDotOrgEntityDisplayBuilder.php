@@ -385,8 +385,13 @@ class SchemaDotOrgEntityDisplayBuilder implements SchemaDotOrgEntityDisplayBuild
     }
 
     $components = $display->getComponents();
+    $hidden = $display->get('hidden') ?: [];
     foreach ($weights as $name => $weight) {
       if (isset($components[$name])) {
+        if (isset($hidden[$name])) {
+          continue;
+        }
+
         $component = $display->getComponent($name);
         $component['weight'] = $weight;
         $display->setComponent($name, $component);

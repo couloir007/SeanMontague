@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\schemadotorg_webpage\Kernel;
+namespace Drupal\Tests\schemadotorg_options\Kernel;
 
 use Drupal\node\Entity\Node;
 use Drupal\Tests\schemadotorg_jsonld\Kernel\SchemaDotOrgJsonLdKernelTestBase;
@@ -10,7 +10,7 @@ use Drupal\Tests\schemadotorg_jsonld\Kernel\SchemaDotOrgJsonLdKernelTestBase;
 /**
  * Tests the functionality of the Schema.org Options JSON-LD.
  *
- * @covers schemadotorg_options_schemadotorg_jsonld_schema_property_alter
+ * @covers \schemadotorg_options_schemadotorg_jsonld_schema_property_alter
  * @group schemadotorg
  */
 class SchemaDotOrgOptionsJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBase {

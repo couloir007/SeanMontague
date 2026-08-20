@@ -1,5 +1,6 @@
 langcode: en
 node_task: true
+max_depth: 3
 diagrams:
   subjectOf:
     title: 'Subject of / About'

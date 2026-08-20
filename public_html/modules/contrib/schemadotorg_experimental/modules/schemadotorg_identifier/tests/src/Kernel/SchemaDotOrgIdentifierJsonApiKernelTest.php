@@ -9,7 +9,7 @@ use Drupal\Tests\schemadotorg_jsonapi\Kernel\SchemaDotOrgJsonApiKernelTestBase;
 /**
  * Tests the functionality of the Schema.org identifier JSON:API support.
  *
- * @covers schemadotorg_identifier_jsonapi_resource_config_presave()
+ * @covers \schemadotorg_identifier_jsonapi_resource_config_presave
  * @group schemadotorg
  */
 class SchemaDotOrgIdentifierJsonApiKernelTest extends SchemaDotOrgJsonApiKernelTestBase {
@@ -37,7 +37,7 @@ class SchemaDotOrgIdentifierJsonApiKernelTest extends SchemaDotOrgJsonApiKernelT
 
     // Check that JSON:API resource was created for Thing.
     /** @var \Drupal\jsonapi_extras\Entity\JsonapiResourceConfig $resource */
-    $resource = $this->resourceStorage->load('node--medical_trial');
+    $resource = $this->loadResource('node--medical_trial');
     $resource_fields = $resource->get('resourceFields');
     $expected_result = [
       'disabled' => FALSE,

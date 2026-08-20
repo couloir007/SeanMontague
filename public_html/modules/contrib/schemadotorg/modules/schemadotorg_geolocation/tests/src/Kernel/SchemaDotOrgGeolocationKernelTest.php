@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\schemadotorg_geolocation\Kernel;
 
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
+use Drupal\Core\Field\WidgetPluginManager;
 use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 
 require_once __DIR__ . '/../../../schemadotorg_geolocation.install';
@@ -12,7 +13,7 @@ require_once __DIR__ . '/../../../schemadotorg_geolocation.install';
 /**
  * Tests the functionality of the Schema.org Geolocation.
  *
- * @covers schemadotorg_geolocation_schemadotorg_property_field_alter()
+ * @covers \schemadotorg_geolocation_schemadotorg_property_field_alter
  * @group schemadotorg
  */
 class SchemaDotOrgGeolocationKernelTest extends SchemaDotOrgEntityKernelTestBase {
@@ -34,6 +35,11 @@ class SchemaDotOrgGeolocationKernelTest extends SchemaDotOrgEntityKernelTestBase
   protected EntityDisplayRepositoryInterface $entityDisplayRepository;
 
   /**
+   * The field widget plugin manager.
+   */
+  protected WidgetPluginManager $fieldWidgetPluginManager;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -41,6 +47,7 @@ class SchemaDotOrgGeolocationKernelTest extends SchemaDotOrgEntityKernelTestBase
     $this->installConfig(static::$modules);
 
     $this->entityDisplayRepository = $this->container->get('entity_display.repository');
+    $this->fieldWidgetPluginManager = $this->container->get('plugin.manager.field.widget');
 
     schemadotorg_geolocation_install(FALSE);
   }
@@ -55,7 +62,14 @@ class SchemaDotOrgGeolocationKernelTest extends SchemaDotOrgEntityKernelTestBase
     // Check geolocation form display component.
     $form_display = $this->entityDisplayRepository->getFormDisplay('node', 'place');
     $form_component = $form_display->getComponent('schema_geo');
-    $this->assertEquals('geolocation_leaflet', $form_component['type']);
+    $this->assertNotNull($form_component);
+    $expected_widget_id = $this->fieldWidgetPluginManager->hasDefinition('geolocation_leaflet')
+      ? 'geolocation_leaflet'
+      : 'geolocation_map';
+    $this->assertEquals($expected_widget_id, $form_component['type']);
+    if ($expected_widget_id === 'geolocation_map') {
+      $this->assertEquals('leaflet', $form_component['settings']['map_provider_id']);
+    }
     $expected_values = [
       'enable' => TRUE,
       'address_field' => 'schema_address',

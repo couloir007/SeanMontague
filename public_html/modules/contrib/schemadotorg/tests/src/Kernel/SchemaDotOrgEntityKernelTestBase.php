@@ -8,8 +8,6 @@ use Drupal\file\Entity\File;
 use Drupal\media\MediaTypeInterface;
 use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
 use Drupal\schemadotorg\SchemaDotOrgMappingManagerInterface;
-use Drupal\schemadotorg\SchemaDotOrgMappingStorageInterface;
-use Drupal\schemadotorg\SchemaDotOrgMappingTypeStorageInterface;
 use Drupal\schemadotorg\Traits\SchemaDotOrgMappingStorageTrait;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\TestFileCreationTrait;
@@ -82,16 +80,6 @@ abstract class SchemaDotOrgEntityKernelTestBase extends SchemaDotOrgKernelTestBa
   ];
 
   /**
-   * The Schema.org mapping type storage.
-   */
-  protected SchemaDotOrgMappingTypeStorageInterface $mappingTypeStorage;
-
-  /**
-   * The Schema.org mapping storage.
-   */
-  protected SchemaDotOrgMappingStorageInterface $mappingStorage;
-
-  /**
    * The Schema.org mapping manager.
    */
   protected SchemaDotOrgMappingManagerInterface $mappingManager;
@@ -107,9 +95,7 @@ abstract class SchemaDotOrgEntityKernelTestBase extends SchemaDotOrgKernelTestBa
     // Always install the user entity which is required by all entities.
     $this->installEntitySchema('user');
 
-    // Set commonly user Schema.org mapping services.
-    $this->mappingTypeStorage = $this->getMappingTypeStorage();
-    $this->mappingStorage = $this->getMappingStorage();
+    $this->createBodyFieldStorage('node');
 
     /** @var \Drupal\schemadotorg\SchemaDotOrgMappingManagerInterface $mapping_manager */
     $mapping_manager = $this->container->get('schemadotorg.mapping_manager');
@@ -172,9 +158,10 @@ abstract class SchemaDotOrgEntityKernelTestBase extends SchemaDotOrgKernelTestBa
     $bundle = $defaults['entity']['id'] ?? NULL;
 
     // Load the newly created Schema.org mapping by bundle or Schema.org type.
+    $mapping_storage = $this->getMappingStorage();
     return ($bundle)
-      ? $this->mappingStorage->loadByBundle($entity_type_id, $bundle)
-      : $this->mappingStorage->loadBySchemaType($entity_type_id, $schema_type);
+      ? $mapping_storage->loadByBundle($entity_type_id, $bundle)
+      : $mapping_storage->loadBySchemaType($entity_type_id, $schema_type);
   }
 
   /**

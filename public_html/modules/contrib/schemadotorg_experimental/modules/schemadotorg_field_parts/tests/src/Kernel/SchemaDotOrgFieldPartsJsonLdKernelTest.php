@@ -10,7 +10,7 @@ use Drupal\Tests\schemadotorg_jsonld\Kernel\SchemaDotOrgJsonLdKernelTestBase;
 /**
  * Tests the functionality of the Schema.org field parts JSON-LD.
  *
- * @covers schemadotorg_field_parts_schemadotorg_jsonld_schema_type_entity_load()
+ * @covers \schemadotorg_field_parts_schemadotorg_jsonld_schema_type_entity_load
  * @group schemadotorg
  */
 class SchemaDotOrgFieldPartsJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBase {

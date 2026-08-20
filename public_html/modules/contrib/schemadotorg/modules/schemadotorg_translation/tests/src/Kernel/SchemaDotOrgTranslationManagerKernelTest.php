@@ -17,7 +17,7 @@ use Drupal\Tests\schemadotorg_translation\Traits\SchemaDotOrgTranslationTestTrai
 /**
  * Tests the functionality of the Schema.org translation manager.
  *
- * @covers \Drupal\schemadotorg_translation\SchemaDotOrgTaxonomyPropertyVocabularyManagerTest;
+ * @covers \Drupal\schemadotorg_translation\SchemaDotOrgTranslationManager
  * @group schemadotorg
  */
 class SchemaDotOrgTranslationManagerKernelTest extends SchemaDotOrgEntityKernelTestBase {

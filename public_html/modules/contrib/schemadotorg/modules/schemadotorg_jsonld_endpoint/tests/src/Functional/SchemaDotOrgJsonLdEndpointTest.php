@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\SchemaDotOrgJsonLdEndpoint\Functional;
+namespace Drupal\Tests\schemadotorg_jsonld_endpoint\Functional;
 
 use Drupal\schemadotorg\Entity\SchemaDotOrgMapping;
 use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;

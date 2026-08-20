@@ -12,9 +12,9 @@ use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
 /**
  * Tests the functionality of the Schema.org sidebar form.
  *
- * @covers schemadotorg_sidebar_schemadotorg_mapping_insert()
- * @covers schemadotorg_sidebar_field_widget_inline_entity_form_simple_form_alter()
- * @covers schemadotorg_sidebar_node_view_alter()
+ * @covers \schemadotorg_sidebar_schemadotorg_mapping_insert
+ * @covers \schemadotorg_sidebar_field_widget_single_element_inline_entity_form_simple_form_alter
+ * @covers \schemadotorg_sidebar_node_view_alter
  * @group schemadotorg
  */
 class SchemaDotOrgSidebarTest extends SchemaDotOrgBrowserTestBase {
@@ -31,7 +31,17 @@ class SchemaDotOrgSidebarTest extends SchemaDotOrgBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['schemadotorg_sidebar_test'];
+  protected static $modules = ['schemadotorg_sidebar'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    \Drupal::service('module_installer')->install(['schemadotorg_sidebar_test']);
+    $this->rebuildContainer();
+    $this->mappingManager = $this->container->get('schemadotorg.mapping_manager');
+  }
 
   /**
    * Test Schema.org sidebar.
@@ -41,6 +51,8 @@ class SchemaDotOrgSidebarTest extends SchemaDotOrgBrowserTestBase {
 
     // Create a Place.
     $this->createSchemaEntity('node', 'Place');
+    \Drupal::entityTypeManager()->getStorage('entity_form_display')->resetCache();
+    \Drupal::entityTypeManager()->getStorage('entity_view_display')->resetCache();
 
     // Check that the field storage is created.
     $this->assertNotNull(FieldStorageConfig::loadByName('node', 'field_sidebar_test'));
@@ -53,7 +65,6 @@ class SchemaDotOrgSidebarTest extends SchemaDotOrgBrowserTestBase {
 
     // Create that the form display and component are created.
     $form_display = $entity_display_repository->getFormDisplay('node', 'place');
-    $this->assertNotNull($form_display);
     $form_component = $form_display->getComponent('field_sidebar_test');
     $this->assertEquals('inline_entity_form_simple', $form_component['type']);
     $form_group = $form_display->getThirdPartySetting('field_group', 'group_sidebar_test');
@@ -68,7 +79,6 @@ class SchemaDotOrgSidebarTest extends SchemaDotOrgBrowserTestBase {
 
     // Create that the view display and component are created.
     $view_display = $entity_display_repository->getViewDisplay('node', 'place');
-    $this->assertNotNull($view_display);
     $view_component = $view_display->getComponent('field_sidebar_test');
     $this->assertEquals('entity_reference_revisions_entity_view', $view_component['type']);
     $this->assertEquals('hidden', $view_component['label']);

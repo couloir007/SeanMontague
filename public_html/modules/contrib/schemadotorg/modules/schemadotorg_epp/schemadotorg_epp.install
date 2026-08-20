@@ -38,3 +38,12 @@ function schemadotorg_epp_update_10002(): void {
     ->clear('node_links_dropdown')
     ->save();
 }
+
+/**
+ * Add use_exact_match setting to schemadotorg_epp settings.
+ */
+function schemadotorg_epp_update_10003(): void {
+  \Drupal::configFactory()->getEditable('schemadotorg_epp.settings')
+    ->set('use_exact_match', FALSE)
+    ->save();
+}

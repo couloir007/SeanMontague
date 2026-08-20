@@ -11,8 +11,8 @@ require_once __DIR__ . '/../../../schemadotorg_office_hours.install';
 /**
  * Tests the functionality of the Schema.org Office Hours install/uninstall.
  *
- * @covers schemadotorg_office_hours_install()
- * @covers schemadotorg_office_hours_uninstall()
+ * @covers \schemadotorg_office_hours_install
+ * @covers \schemadotorg_office_hours_uninstall
  * @group schemadotorg
  */
 class SchemaDotOrgOfficeHoursInstallTest extends TokenKernelTestBase {

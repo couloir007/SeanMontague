@@ -10,8 +10,8 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org address module.
  *
- * @covers schemadotorg_address_install()
- * @covers schemadotorg_address_uninstall()
+ * @covers \schemadotorg_address_install
+ * @covers \schemadotorg_address_uninstall
  * @group schemadotorg
  */
 class SchemaDotOrgAddressKernelTest extends SchemaDotOrgEntityKernelTestBase {

@@ -11,11 +11,13 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeRunner;
+use Drupal\Tests\schemadotorg\Traits\SchemaDotOrgTestTrait;
 
 /**
  * Defines an abstract test base for Schema.org recipe tests.
  */
 trait SchemaDotOrgRecipeTestTrait {
+  use SchemaDotOrgTestTrait;
 
   /**
    * The path to the configuration directory.
@@ -125,6 +127,71 @@ trait SchemaDotOrgRecipeTestTrait {
       $recipe = Recipe::createFromDirectory("$directory/$name");
       RecipeRunner::processRecipe($recipe);
       drupal_flush_all_caches();
+    }
+  }
+
+  /**
+   * Normalizes configuration so Drupal 10 and 11 snapshots are similar.
+   */
+  protected function normalizeConfig(): void {
+    $node_types = $this->entityTypeManager
+      ->getStorage('node_type')
+      ->loadMultiple();
+    foreach ($node_types as $node_type) {
+      $form_display = $this->entityTypeManager
+        ->getStorage('entity_form_display')
+        ->load('node.' . $node_type->id() . '.default');
+      if ($form_display) {
+        $form_display->removeComponent('promote');
+        $form_display->removeComponent('sticky');
+        $form_display->save();
+      }
+    }
+
+    if (version_compare(\Drupal::VERSION, '11.0.0', '<')) {
+      // @todo Remove Drupal 10 compatibility normalization once only Drupal 11 is supported.
+      $this->normalizeDrupal10NodeViewDisplays();
+      $this->removeDrupal10NodeSearchViewModes();
+      \Drupal::configFactory()->reset();
+    }
+  }
+
+  /**
+   * Normalizes Drupal 10 node view displays to match Drupal 11 snapshots.
+   */
+  protected function normalizeDrupal10NodeViewDisplays(): void {
+    $config_names = $this->configStorage->listAll('core.entity_view_display.node.');
+    foreach ($config_names as $config_name) {
+      $config_data = $this->configStorage->read($config_name);
+      if (!is_array($config_data)) {
+        continue;
+      }
+
+      $config_changed = FALSE;
+      foreach (($config_data['content'] ?? []) as $component_name => $component) {
+        if (array_key_exists('link_to_entity', ($component['settings'] ?? [])) && !isset($component['settings']['link_rel'])) {
+          $config_data['content'][$component_name]['settings']['link_rel'] = 'canonical';
+          $config_changed = TRUE;
+        }
+      }
+
+      if ($config_changed) {
+        $this->configStorage->write($config_name, $config_data);
+      }
+    }
+  }
+
+  /**
+   * Removes Drupal 10 node search view modes that Drupal 11 no longer creates.
+   */
+  protected function removeDrupal10NodeSearchViewModes(): void {
+    foreach ([
+      'core.entity_view_mode.node.search_index',
+      'core.entity_view_mode.node.search_result',
+    ] as $config_name) {
+      if ($this->configStorage->read($config_name) !== FALSE) {
+        $this->configStorage->delete($config_name);
+      }
     }
   }
 

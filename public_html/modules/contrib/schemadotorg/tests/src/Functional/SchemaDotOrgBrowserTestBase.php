@@ -6,7 +6,7 @@ namespace Drupal\Tests\schemadotorg\Functional;
 
 use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
 use Drupal\schemadotorg\SchemaDotOrgMappingManagerInterface;
-use Drupal\schemadotorg\SchemaDotOrgMappingStorage;
+use Drupal\schemadotorg\SchemaDotOrgMappingStorageInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\schemadotorg\Traits\SchemaDotOrgTestTrait;
 
@@ -28,11 +28,6 @@ abstract class SchemaDotOrgBrowserTestBase extends BrowserTestBase {
 
 
   /**
-   * The Schema.org mapping storage.
-   */
-  protected SchemaDotOrgMappingStorage $mappingStorage;
-
-  /**
    * The Schema.org mapping manager.
    */
   protected SchemaDotOrgMappingManagerInterface $mappingManager;
@@ -42,7 +37,8 @@ abstract class SchemaDotOrgBrowserTestBase extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->mappingStorage = $this->container->get('entity_type.manager')->getStorage('schemadotorg_mapping');
+
+    $this->createBodyFieldStorage('node');
     $this->mappingManager = $this->container->get('schemadotorg.mapping_manager');
   }
 
@@ -62,12 +58,25 @@ abstract class SchemaDotOrgBrowserTestBase extends BrowserTestBase {
     $this->mappingManager->createType($entity_type_id, $schema_type);
 
     // Load the newly created Schema.org mapping.
+    $mapping_storage = $this->getMappingStorage();
     /** @var \Drupal\schemadotorg\SchemaDotOrgMappingInterface[] $mappings */
-    $mappings = $this->mappingStorage->loadByProperties([
+    $mappings = $mapping_storage->loadByProperties([
       'target_entity_type_id' => $entity_type_id,
       'schema_type' => $schema_type,
     ]);
     return ($mappings) ? reset($mappings) : NULL;
+  }
+
+  /**
+   * Gets the Schema.org mapping storage.
+   *
+   * @return \Drupal\schemadotorg\SchemaDotOrgMappingStorageInterface
+   *   The Schema.org mapping storage.
+   */
+  protected function getMappingStorage(): SchemaDotOrgMappingStorageInterface {
+    /** @var \Drupal\schemadotorg\SchemaDotOrgMappingStorageInterface $mapping_storage */
+    $mapping_storage = $this->container->get('entity_type.manager')->getStorage('schemadotorg_mapping');
+    return $mapping_storage;
   }
 
   /* ************************************************************************ */

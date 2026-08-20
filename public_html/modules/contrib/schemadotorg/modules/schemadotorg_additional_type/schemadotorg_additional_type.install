@@ -88,3 +88,53 @@ function schemadotorg_additional_type_update_10006(): void {
     ->set('field_access', [])
     ->save();
 }
+
+/**
+ * Issue #3582293: Add optional derived node base fields for additional types.
+ */
+function schemadotorg_additional_type_update_10007(): void {
+  \Drupal::configFactory()
+    ->getEditable('schemadotorg_additional_type.settings')
+    ->set('create_base_fields', [])
+    ->save();
+}
+
+/**
+ * Issue #3583306: Change full type derived values to use double dashes.
+ */
+function schemadotorg_additional_type_update_10008(): void {
+  $database = \Drupal::database();
+  $schema = $database->schema();
+  $entity_type_manager = \Drupal::entityTypeManager();
+  $entity_type_ids = \Drupal::config('schemadotorg_additional_type.settings')
+    ->get('create_base_fields') ?? [];
+
+  foreach ($entity_type_ids as $entity_type_id) {
+    $entity_type = $entity_type_manager->getDefinition($entity_type_id);
+    $data_table = $entity_type->getDataTable() ?: $entity_type->getBaseTable();
+    $tables = $data_table ? [$data_table] : [];
+
+    if ($entity_type->isRevisionable()) {
+      $revision_table = $entity_type->getRevisionDataTable() ?: $entity_type->getRevisionTable();
+      if ($revision_table) {
+        $tables[] = $revision_table;
+      }
+    }
+
+    foreach ($tables as $table) {
+      if (!$schema->fieldExists($table, 'schemadotorg_full_type')) {
+        continue;
+      }
+
+      $database->update($table)
+        ->expression(
+          'schemadotorg_full_type',
+          'REPLACE(schemadotorg_full_type, :search, :replace)',
+          [':search' => ':', ':replace' => '--'],
+        )
+        ->isNotNull('schemadotorg_full_type')
+        ->condition('schemadotorg_full_type', '%:%', 'LIKE')
+        ->execute();
+    }
+  }
+}

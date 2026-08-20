@@ -8,7 +8,7 @@ dependencies:
   - 'config_rewrite:config_rewrite'
   - 'schemadotorg:schemadotorg_sidebar'
 
-# Information added by Drupal.org packaging script on 2026-03-05
-version: '1.0.0-alpha37'
+# Information added by Drupal.org packaging script on 2026-07-15
+version: '1.0.0-alpha38'
 project: 'schemadotorg_experimental'
-datestamp: 1772717179
+datestamp: 1784130207

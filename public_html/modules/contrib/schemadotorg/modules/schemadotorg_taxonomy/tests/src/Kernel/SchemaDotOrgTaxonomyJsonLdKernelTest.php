@@ -11,7 +11,7 @@ use Drupal\Tests\schemadotorg_jsonld\Kernel\SchemaDotOrgJsonLdKernelTestBase;
 /**
  * Tests the functionality of the Schema.org taxonomy JSON-LD.
  *
- * @covers schemadotorg_taxonomy_schemadotorg_jsonld_schema_property_alter();
+ * @covers \schemadotorg_taxonomy_schemadotorg_jsonld_schema_property_alter
  * @group schemadotorg
  */
 class SchemaDotOrgTaxonomyJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBase {

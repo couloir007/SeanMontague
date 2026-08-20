@@ -18,6 +18,6 @@
         "source": "https://git.drupalcode.org/project/file_delete"
     },
   "require": {
-    "drupal/core": "^10.3 || ^11"
-  }
+        "drupal/core": "^10.3 || ^11 || ^12"
+    }
 }

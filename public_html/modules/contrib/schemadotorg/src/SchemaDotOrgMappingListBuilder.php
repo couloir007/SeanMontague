@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\schemadotorg;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -71,7 +72,7 @@ class SchemaDotOrgMappingListBuilder extends SchemaDotOrgConfigEntityListBuilder
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity): array {
-    /** @var \Drupal\schemadotorg\SchemaDotOrgMappingInterface|null $entity */
+    /** @var \Drupal\schemadotorg\SchemaDotOrgMappingInterface $entity */
 
     $target_entity_type_definition = $entity->getTargetEntityTypeDefinition();
     $target_entity_type_bundle_definition = $entity->getTargetEntityTypeBundleDefinition();
@@ -158,7 +159,7 @@ class SchemaDotOrgMappingListBuilder extends SchemaDotOrgConfigEntityListBuilder
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOperations(EntityInterface $entity): array {
+  public function getDefaultOperations(EntityInterface $entity, ?CacheableMetadata $cacheability = NULL): array {
     $operations = parent::getDefaultOperations($entity);
     if (!$this->moduleHandler()->moduleExists('schemadotorg_ui')) {
       $operations['edit']['title'] = $this->t('View');

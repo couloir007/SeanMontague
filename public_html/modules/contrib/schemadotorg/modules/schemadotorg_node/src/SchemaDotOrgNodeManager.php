@@ -6,6 +6,7 @@ namespace Drupal\schemadotorg_node;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\node\NodeTypeInterface;
 use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
 use Drupal\schemadotorg\SchemaDotOrgSchemaTypeManagerInterface;
 
@@ -43,8 +44,10 @@ class SchemaDotOrgNodeManager implements SchemaDotOrgNodeManagerInterface {
       return;
     }
 
-    /** @var \Drupal\node\NodeTypeInterface $node_type */
     $node_type = $mapping->getTargetEntityBundleEntity();
+    if (!$node_type instanceof NodeTypeInterface) {
+      return;
+    }
 
     $config = $this->configFactory->get('schemadotorg_node.settings');
     $parts = [

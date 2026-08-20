@@ -16,7 +16,7 @@ use Drupal\Tests\schemadotorg_jsonld\Kernel\SchemaDotOrgJsonLdKernelTestBase;
 /**
  * Tests the functionality of the Schema.org translation JSON-LD.
  *
- * @covers schemadotorg_translation_schemadotorg_jsonld_schema_type_entity_alter()
+ * @covers \schemadotorg_translation_schemadotorg_jsonld_schema_type_entity_alter
  * @group schemadotorg
  */
 class SchemaDotOrgTranslationJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBase {

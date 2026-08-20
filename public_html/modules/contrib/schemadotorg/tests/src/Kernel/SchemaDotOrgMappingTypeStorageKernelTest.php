@@ -34,7 +34,7 @@ class SchemaDotOrgMappingTypeStorageKernelTest extends SchemaDotOrgEntityKernelT
       'paragraph' => 'paragraph',
       'user' => 'user',
     ];
-    $actual_entity_types = $this->mappingTypeStorage->getEntityTypes();
+    $actual_entity_types = $this->getMappingTypeStorage()->getEntityTypes();
     $this->assertEquals($expected_entity_types, $actual_entity_types);
 
     // Check getting entity types with bundles that implement Schema.org.
@@ -42,16 +42,16 @@ class SchemaDotOrgMappingTypeStorageKernelTest extends SchemaDotOrgEntityKernelT
       'node' => 'node',
       'paragraph' => 'paragraph',
     ];
-    $actual_bundle_entity_types = $this->mappingTypeStorage->getEntityTypesWithBundles();
+    $actual_bundle_entity_types = $this->getMappingTypeStorage()->getEntityTypesWithBundles();
     $this->assertEquals($expected_bundle_entity_types, $actual_bundle_entity_types);
 
     // Check getting entity type bundles. (i.e node).
-    $actual_entity_type_bundles = $this->mappingTypeStorage->getEntityTypeBundles();
+    $actual_entity_type_bundles = $this->getMappingTypeStorage()->getEntityTypeBundles();
     $this->assertArrayHasKey('paragraph', $actual_entity_type_bundles);
     $this->assertInstanceOf(ContentEntityType::class, $actual_entity_type_bundles['paragraph']);
 
     // Check getting entity type bundle definitions. (i.e node_type).
-    $actual_entity_type_bundle_definitions = $this->mappingTypeStorage->getEntityTypeBundleDefinitions();
+    $actual_entity_type_bundle_definitions = $this->getMappingTypeStorage()->getEntityTypeBundleDefinitions();
     $this->assertArrayHasKey('paragraph', $actual_entity_type_bundle_definitions);
     $this->assertInstanceOf(ConfigEntityType::class, $actual_entity_type_bundle_definitions['paragraph']);
   }

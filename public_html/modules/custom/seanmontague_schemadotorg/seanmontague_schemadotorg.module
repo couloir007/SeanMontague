@@ -65,8 +65,20 @@ function seanmontague_schemadotorg_schemadotorg_jsonld_alter(array &$data, Route
   // Set copyrightYear on the mainEntity from schema_date_published.
   // Blueprints defaults to node created time — for content dated to a past
   // trip or article, schema_date_published is the correct year.
+  //
+  // copyrightYear is a CreativeWork property, so it must NOT be set on the
+  // Intangible/Thing types used as mainEntities here (TouristTrip, Place,
+  // Event, Person, …). Only CreativeWork entities (BlogPosting, WebPage,
+  // WebSite, PodcastEpisode/Series) legitimately carry it.
+  $non_creative_works = [
+    'TouristTrip', 'Place', 'TouristDestination', 'TouristAttraction',
+    'LodgingBusiness', 'Event', 'EventSeries', 'Person',
+  ];
   if (isset($data['schemadotorg_jsonld_entity']) && is_array($data['schemadotorg_jsonld_entity'])) {
-    $data['schemadotorg_jsonld_entity']['copyrightYear'] = _seanmontague_copyright_year($node);
+    $entity_types = (array) ($data['schemadotorg_jsonld_entity']['@type'] ?? []);
+    if ($entity_types && !array_intersect($entity_types, $non_creative_works)) {
+      $data['schemadotorg_jsonld_entity']['copyrightYear'] = _seanmontague_copyright_year($node);
+    }
   }
 
 
@@ -95,6 +107,10 @@ function seanmontague_schemadotorg_schemadotorg_jsonld_alter(array &$data, Route
       $item['position'] = $i + 1;
     }
     unset($item);
+
+    // The breadcrumb is nested inside the WebPage graph, which already declares
+    // @context at the root — its own @context is redundant noise.
+    unset($data['schemadotorg_jsonld_breadcrumb_schemadotorg_jsonld']['@context']);
 
 
     if ($is_front) {
@@ -191,10 +207,17 @@ function seanmontague_schemadotorg_schemadotorg_jsonld_schema_type_entity_alter(
 
   // WebPage wrapper — applies to all node bundles.
   // Blueprints wraps every node page in WebPage regardless of Schema.org type.
-  // Fix isPartOf @url/@id to point to the site root rather than the web_site
-  // node path — the web_site node is a data anchor, not a routable page.
-  if (isset($data['isPartOf']) && ($data['@type'] ?? NULL) === 'WebPage') {
-    $data = _seanmontague_schema_is_part_of($data);
+  // This pass runs while Blueprints is assembling the WebPage entity, so its
+  // own keys (@url, dateCreated, dateModified) are present here even when they
+  // aren't yet on the page-level tree the sweep at the end of the page alter
+  // walks. Fix isPartOf, then normalize @url -> url and ISO dates on the
+  // WebPage's own keys.
+  if (($data['@type'] ?? NULL) === 'WebPage') {
+    if (isset($data['isPartOf'])) {
+      $data = _seanmontague_schema_is_part_of($data);
+    }
+    _seanmontague_normalize_url_keys($data);
+    _seanmontague_normalize_iso_dates($data);
   }
 }
 
@@ -246,9 +269,12 @@ function _seanmontague_normalize_iso_dates(array &$data): void {
       _seanmontague_normalize_iso_dates($value);
     }
     elseif (is_string($value) && in_array($key, $date_keys, TRUE)) {
-      $ts = strtotime($value);
-      if ($ts !== FALSE) {
-        $value = date('c', $ts);
+      // date_create() preserves the value's own offset (e.g. -04:00); a
+      // strtotime()/date('c') round-trip would re-express it in the server
+      // timezone instead, silently shifting the displayed local time.
+      $dt = date_create($value);
+      if ($dt instanceof \DateTimeInterface) {
+        $value = $dt->format('c');
       }
     }
   }

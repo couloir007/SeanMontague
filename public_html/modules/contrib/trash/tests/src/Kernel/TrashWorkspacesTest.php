@@ -6,6 +6,7 @@ namespace Drupal\Tests\trash\Kernel;
 
 use Drupal\Tests\workspaces\Kernel\WorkspaceTestTrait;
 use Drupal\trash\EntityQuery\Workspaces\QueryFactory;
+use Drupal\trash\Trash;
 use Drupal\workspaces\Entity\Workspace;
 
 /**
@@ -70,8 +71,13 @@ class TrashWorkspacesTest extends TrashKernelTestBase {
     $live_node->delete();
     $ws_node->delete();
 
-    $this->assertTrue(trash_entity_is_deleted($live_node));
-    $this->assertTrue(trash_entity_is_deleted($ws_node));
+    // delete() acts on freshly loaded entities, so the passed objects are
+    // left untouched; reload to observe the trashed state.
+    $live_node = $this->loadTrashedEntity('node', $live_node->id());
+    $ws_node = $this->loadTrashedEntity('node', $ws_node->id());
+
+    $this->assertTrue(Trash::entityIsDeleted($live_node));
+    $this->assertTrue(Trash::entityIsDeleted($ws_node));
 
     // Check loading the deleted nodes in a workspace.
     $storage = $this->entityTypeManager->getStorage('node');
@@ -89,13 +95,13 @@ class TrashWorkspacesTest extends TrashKernelTestBase {
     $this->assertNotEmpty($live_node);
     $this->assertTrue($live_node->isPublished());
     $this->assertNotEmpty($storage->loadRevision($live_node->getRevisionId()));
-    $this->assertFalse(trash_entity_is_deleted($live_node));
+    $this->assertFalse(Trash::entityIsDeleted($live_node));
 
     $ws_node = $storage->load($ws_node->id());
     $this->assertNotEmpty($ws_node);
     $this->assertFalse($ws_node->isPublished());
     $this->assertNotEmpty($storage->loadRevision($ws_node->getRevisionId()));
-    $this->assertFalse(trash_entity_is_deleted($ws_node));
+    $this->assertFalse(Trash::entityIsDeleted($ws_node));
 
     // Publish the workspace and check that both nodes are now deleted in Live.
     $this->workspaces['stage']->publish();
@@ -125,6 +131,11 @@ class TrashWorkspacesTest extends TrashKernelTestBase {
 
     $live_node->delete();
     $ws_node->delete();
+
+    // delete() acts on freshly loaded entities, so the passed objects are
+    // left untouched; reload to observe the trashed state.
+    $live_node = $this->loadTrashedEntity('node', $live_node->id());
+    $ws_node = $this->loadTrashedEntity('node', $ws_node->id());
 
     $this->assertFalse($live_node->access('purge'));
     $this->assertTrue($ws_node->access('purge'));

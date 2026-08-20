@@ -56,37 +56,59 @@ class SchemaDotOrgPathautoManager implements SchemaDotOrgPathautoManagerInterfac
       return;
     }
 
-    $entity_type_id = $mapping->getTargetEntityTypeId();
-    $bundle = $mapping->getTargetBundle();
-    $schema_type = $mapping->getSchemaType();
-
     $patterns = $this->configFactory->get('schemadotorg_pathauto.settings')->get('patterns');
-    $parts = ['entity_type_id' => $entity_type_id, 'schema_type' => $schema_type];
-    $pattern = $this->schemaTypeManager->getSetting($patterns, $parts);
-    if (!$pattern) {
+    $matched_patterns = $this->schemaTypeManager->getSetting($patterns, $mapping, ['multiple' => TRUE]);
+    if (empty($matched_patterns)) {
       return;
     }
 
-    $pattern_name = array_search($pattern, $patterns);
-    [, $pattern_schema_type] = explode('--', $pattern_name);
+    // The first entry is the most specific match.
+    // $pathauto_pattern holds the matched settings key (e.g. 'node--Thing').
+    // $pathauto_settings holds the token pattern string (e.g. '[node:title]').
+    $pathauto_pattern = array_key_first($matched_patterns);
+    $pathauto_settings = $matched_patterns[$pathauto_pattern];
 
-    // Define pathauto pattern id and label.
+    // The entity type id and bundle come from the mapping (ground truth).
+    // The remaining key segment (not entity_type_id, not bundle) is the Schema.org type.
+    $entity_type_id = $mapping->getTargetEntityTypeId();
+    $bundle = $mapping->getTargetBundle();
+
+    $pathauto_pattern_key_parts = explode('--', $pathauto_pattern);
+    $pattern_schema_type = NULL;
+    foreach ($pathauto_pattern_key_parts as $part) {
+      if ($part !== $entity_type_id && $part !== $bundle) {
+        $pattern_schema_type = $part;
+        break;
+      }
+    }
+
+    // Define the pathauto pattern entity id and label.
     $entity_type_definition = $mapping->getTargetEntityTypeDefinition();
-    $schema_type_definition = $this->schemaTypeManager->getType($pattern_schema_type);
-    $pathauto_pattern_id = 'schema_' . $entity_type_id . '_' . $schema_type_definition['drupal_name'];
-    $pathauto_pattern_label = 'Schema.org: ' . $entity_type_definition->getCollectionLabel() . ' - ' . $schema_type_definition['drupal_label'];
+    $schema_type_definition = $this->schemaTypeManager->getType($pattern_schema_type ?? $mapping->getSchemaType());
+    $pathauto_pattern_entity_id = 'schema_' . $entity_type_id . '_' . $schema_type_definition['drupal_name'];
+    $pathauto_pattern_entity_label = 'Schema.org: ' . $entity_type_definition->getCollectionLabel() . ' - ' . $schema_type_definition['drupal_label'];
 
-    // Load or create initial pathauto pattern with a selection condition.
-    $pathauto_pattern = PathautoPattern::load($pathauto_pattern_id);
-    if (!$pathauto_pattern) {
-      $pathauto_pattern = PathautoPattern::create([
-        'id' => $pathauto_pattern_id,
-        'label' => $pathauto_pattern_label,
+    // When the matched pattern is bundle-specific, include the bundle in the
+    // pathauto pattern entity id and label so it does not conflict with the
+    // generic schema type pattern.
+    if (in_array($bundle, $pathauto_pattern_key_parts)) {
+      $bundle_entity = $mapping->getTargetEntityBundleEntity();
+      $bundle_label = $bundle_entity ? $bundle_entity->label() : $bundle;
+      $pathauto_pattern_entity_id .= '_' . $bundle;
+      $pathauto_pattern_entity_label .= ' (' . $bundle_label . ')';
+    }
+
+    // Load or create initial pathauto pattern entity with a selection condition.
+    $pathauto_pattern_entity = PathautoPattern::load($pathauto_pattern_entity_id);
+    if (!$pathauto_pattern_entity) {
+      $pathauto_pattern_entity = PathautoPattern::create([
+        'id' => $pathauto_pattern_entity_id,
+        'label' => $pathauto_pattern_entity_label,
         'type' => 'canonical_entities:' . $entity_type_id,
-        'pattern' => $pattern,
+        'pattern' => $pathauto_settings,
         'weight' => -10,
       ]);
-      $pathauto_pattern->addSelectionCondition([
+      $pathauto_pattern_entity->addSelectionCondition([
         'id' => 'entity_bundle:' . $entity_type_id,
         'negate' => FALSE,
         'context_mapping' => [
@@ -96,9 +118,9 @@ class SchemaDotOrgPathautoManager implements SchemaDotOrgPathautoManagerInterfac
     }
 
     // Get the default selection condition.
-    $selection_conditions_configuration = $pathauto_pattern->getSelectionConditions()->getConfiguration();
+    $selection_conditions_configuration = $pathauto_pattern_entity->getSelectionConditions()->getConfiguration();
     $selection_condition_id = array_key_first($selection_conditions_configuration);
-    $selection_condition = $pathauto_pattern->getSelectionConditions()->get($selection_condition_id);
+    $selection_condition = $pathauto_pattern_entity->getSelectionConditions()->get($selection_condition_id);
 
     // Append the Schema.org mapping bundle to the selection condition.
     $configuration = $selection_condition->getConfiguration();
@@ -106,7 +128,7 @@ class SchemaDotOrgPathautoManager implements SchemaDotOrgPathautoManagerInterfac
     ksort($configuration['bundles']);
     $selection_condition->setConfiguration($configuration);
 
-    $pathauto_pattern->save();
+    $pathauto_pattern_entity->save();
   }
 
   /**

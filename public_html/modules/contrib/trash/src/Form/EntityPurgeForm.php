@@ -8,7 +8,7 @@ use Drupal\Core\Entity\ContentEntityConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Url;
-use Drupal\trash\TrashManager;
+use Drupal\trash\TrashManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -19,7 +19,7 @@ class EntityPurgeForm extends ContentEntityConfirmFormBase implements WorkspaceS
   /**
    * The trash manager.
    */
-  protected TrashManager $trashManager;
+  protected TrashManagerInterface $trashManager;
 
   /**
    * {@inheritdoc}
@@ -52,7 +52,7 @@ class EntityPurgeForm extends ContentEntityConfirmFormBase implements WorkspaceS
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
-    $this->trashManager->getHandler($this->getEntity()->getEntityTypeId())?->restoreFormAlter($form, $form_state);
+    $this->trashManager->getHandler($this->getEntity()->getEntityTypeId())?->purgeFormAlter($form, $form_state);
 
     return $form;
   }

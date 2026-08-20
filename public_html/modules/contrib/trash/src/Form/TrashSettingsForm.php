@@ -8,7 +8,7 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
+use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -67,16 +67,18 @@ class TrashSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('trash.settings');
     $enabled_entity_types = $config->get('enabled_entity_types') ?? [];
-    $unsupported_entity_types = $this->getUnsupportedEntityTypes();
+    $unsupported_entity_types = static::getUnsupportedEntityTypes();
 
-    // Get all applicable entity types.
+    // Get all applicable entity types. Unsupported entity types are only shown
+    // when Trash is already enabled for them, so the integration can still be
+    // disabled and the form saved.
     $applicable_entity_types = array_map(
       fn (EntityTypeInterface $entity_type): string => (string) $entity_type->getLabel(),
       array_filter(
         $this->entityTypeManager->getDefinitions(),
         fn (EntityTypeInterface $entity_type): bool =>
-          is_subclass_of($entity_type->getStorageClass(), SqlEntityStorageInterface::class)
-          && !in_array($entity_type->id(), $unsupported_entity_types, TRUE),
+          is_a($entity_type->getStorageClass(), SqlContentEntityStorage::class, TRUE)
+          && (!in_array($entity_type->id(), $unsupported_entity_types, TRUE) || isset($enabled_entity_types[$entity_type->id()])),
       )
     );
     asort($applicable_entity_types);
@@ -97,6 +99,10 @@ class TrashSettingsForm extends ConfigFormBase {
         '#default_value' => isset($field_definitions['deleted']) && isset($enabled_entity_types[$entity_type_id]),
         '#disabled' => isset($field_definitions['deleted']) && ($field_definitions['deleted']->getProvider() !== 'trash'),
       ];
+
+      if (in_array($entity_type_id, $unsupported_entity_types, TRUE)) {
+        $form['enabled_entity_types'][$entity_type_id]['enabled']['#description'] = $this->t('Trash is not supported for this entity type and can cause errors. Disable it and save the form to remove the integration.');
+      }
 
       $bundles = array_map(
         fn (array $bundle): string => (string) $bundle['label'],
@@ -220,16 +226,20 @@ class TrashSettingsForm extends ConfigFormBase {
 
   /**
    * Returns an array of entity types that are not supported by Trash.
+   *
+   * These are only shown on the settings form when Trash is already enabled
+   * for them, so the integration can be disabled and the form saved.
    */
-  protected function getUnsupportedEntityTypes(): array {
-    // Disallow enabling trash on entity types that haven't been tested enough.
-    $unsupported_entity_types = [
+  public static function getUnsupportedEntityTypes(): array {
+    return [
+      // Not tested enough to be supported.
       'comment',
       'user',
       'workspace',
+      // Paragraphs are referenced by revision; soft-deleting one leaves a
+      // dangling reference that breaks the host entity edit form.
+      'paragraph',
     ];
-
-    return $unsupported_entity_types;
   }
 
 }

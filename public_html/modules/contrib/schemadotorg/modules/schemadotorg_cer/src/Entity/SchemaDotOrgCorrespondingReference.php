@@ -51,10 +51,22 @@ class SchemaDotOrgCorrespondingReference extends CorrespondingReference {
 
   /**
    * {@inheritdoc}
+   *
+   * @phpstan-ignore-next-line
    */
   protected function calculateDifferences(FieldableEntityInterface $entity, $fieldName, $deleted = FALSE) {
     $this->setCustomFieldEntityReferences($entity, $fieldName);
     return parent::calculateDifferences($entity, $fieldName, $deleted);
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @phpstan-ignore-next-line
+   */
+  public function synchronizeCorrespondingField(FieldableEntityInterface $entity, FieldableEntityInterface $correspondingEntity, $correspondingFieldName, $operation = NULL) {
+    $this->setCustomFieldEntityReferences($correspondingEntity, $correspondingFieldName);
+    parent::synchronizeCorrespondingField($entity, $correspondingEntity, $correspondingFieldName, $operation);
   }
 
   /**

@@ -11,7 +11,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org block content installation.
  *
- * @covers \schemadotorg_block_content_install()
+ * @covers \schemadotorg_block_content_install
  * @group schemadotorg
  */
 class SchemaDotOrgBlockContentInstallKernelTest extends SchemaDotOrgEntityKernelTestBase {

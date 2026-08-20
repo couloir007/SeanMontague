@@ -106,9 +106,12 @@ function schemadotorg_field_parts_jsonapi_resource_config_presave(EntityInterfac
 
     foreach (SchemaDotOrgFieldPartsManagerInterface::PARTS as $part) {
       $part_field_name = $field_name . '_' . $part;
-      if (!isset($resource_fields[$part_field_name])) {
-        continue;
-      }
+      $resource_fields[$part_field_name] = $resource_fields[$part_field_name] ?? [
+        'fieldName' => $part_field_name,
+        'publicName' => $part_field_name,
+        'enhancer' => ['id' => ''],
+        'disabled' => TRUE,
+      ];
       $part_public_name = $resource_fields[$field_name]['publicName'] . '_' . $part;
       $resource_fields[$part_field_name]['publicName'] = $part_public_name;
       $resource_fields[$part_field_name]['disabled'] = FALSE;

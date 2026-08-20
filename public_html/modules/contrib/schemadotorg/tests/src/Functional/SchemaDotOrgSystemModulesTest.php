@@ -7,7 +7,7 @@ namespace Drupal\Tests\schemadotorg\Functional;
 /**
  * Tests Schema.org sub modules configure link on the system modules form.
  *
- * @covers schemadotorg_form_system_modules_alter()
+ * @covers \schemadotorg_form_system_modules_alter
  * @group schemadotorg
  */
 class SchemaDotOrgSystemModulesTest extends SchemaDotOrgBrowserTestBase {

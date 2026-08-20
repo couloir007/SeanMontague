@@ -11,7 +11,7 @@ use Drupal\Tests\schemadotorg_jsonld\Kernel\SchemaDotOrgJsonLdKernelTestBase;
 /**
  * Tests the functionality of the Schema.org media module JSON-LD integration.
  *
- * @covers schemadotorg_media_schemadotorg_jsonld_schema_type_entity_alter()
+ * @covers \Drupal\schemadotorg_media\SchemaDotOrgMediaManager
  * @group schemadotorg
  */
 class SchemaDotOrgMediaJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBase {

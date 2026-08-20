@@ -12,12 +12,14 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\linkit\Tests\ProfileCreationTrait;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the widget and formatter for Link fields.
  *
  * @group linkit
  */
+#[RunTestsInSeparateProcesses]
 class LinkFieldTest extends WebDriverTestBase {
 
   use ProfileCreationTrait;

@@ -512,7 +512,10 @@ class SchemaDotOrgReportRelationshipsController extends ControllerBase {
       ];
       $build['mermaid']['categories'] = [
         '#type' => 'container',
-        '#attributes' => ['class' => ['mermaid', 'schemadotorg-mermaid', 'schemadotorg-report-relationships-categories']],
+        '#attributes' => [
+          'class' => ['mermaid', 'schemadotorg-mermaid', 'schemadotorg-report-relationships-categories'],
+          'data-schemadotorg-mermaid-panzoom' => 'false',
+        ],
         '#markup' => $mermaid_categories,
       ];
       $build['mermaid']['code'] = [
@@ -531,7 +534,6 @@ class SchemaDotOrgReportRelationshipsController extends ControllerBase {
         ],
       ];
       $build['#attached']['library'][] = 'schemadotorg/schemadotorg.mermaid';
-      $build['#attached']['library'][] = 'schemadotorg/svg-pan-zoom';
     }
     else {
       $build['mermaid'] = [

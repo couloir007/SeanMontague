@@ -9,8 +9,3 @@ hidden: true
 name: Diff tests
 package: Testing
 type: module
-
-# Information added by Drupal.org packaging script on 2026-01-20
-version: '8.x-1.10'
-project: 'diff'
-datestamp: 1768951006

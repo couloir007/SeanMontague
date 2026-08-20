@@ -11,7 +11,7 @@ use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
 /**
  * Tests the functionality of the Schema.org Entity Prepopulate node links.
  *
- * @covers schemadotorg_epp_node_links_alter()
+ * @covers \schemadotorg_epp_node_links_alter
  * @group schemadotorg
  */
 class SchemaDotOrgEntityPrepopulateNodeLinksTest extends SchemaDotOrgBrowserTestBase {
@@ -91,6 +91,49 @@ class SchemaDotOrgEntityPrepopulateNodeLinksTest extends SchemaDotOrgBrowserTest
     $this->drupalGet($organization_node->toUrl());
     $assert->responseNotContains('<div class="schemadotorg-epp-node-links-dropdown">');
     $assert->responseContains('<ul class="links inline">');
+
+    /* ********************************************************************** */
+    // Test use_exact_match setting.
+    /* ********************************************************************** */
+
+    // Enable use_exact_match directly via config.
+    $this->config('schemadotorg_epp.settings')
+      ->set('use_exact_match', TRUE)
+      ->save();
+    foreach (['dynamic_page_cache', 'render'] as $bin) {
+      \Drupal::cache($bin)->deleteAll();
+    }
+
+    // Check that LocalBusiness node no longer shows inherited Organization links.
+    $this->drupalGet($local_business_node->toUrl());
+    $assert->linkNotExists('Add Organization');
+    $assert->linkNotExists('Add Local Business');
+    $assert->linkNotExists('Add Person as member');
+    $assert->linkNotExists('Add Person as employee');
+
+    // Check that Organization node still shows its own links.
+    $this->drupalGet($organization_node->toUrl());
+    $this->assertLinkExists('Add Organization', '/node/add/organization?parent_organization=' . $organization_node->id());
+    $this->assertLinkExists('Add Local Business', '/node/add/local_business?parent_organization=' . $organization_node->id());
+    $this->assertLinkExists('Add Person as member', '/node/add/person?member_of=' . $organization_node->id());
+    $this->assertLinkExists('Add Person as employee', '/node/add/person?works_for=' . $organization_node->id());
+
+    // Add a LocalBusiness-specific node link config.
+    $this->config('schemadotorg_epp.settings')
+      ->set('node_links.LocalBusiness', [
+        'Organization?parentOrganization' => 'Add @label (exact)',
+      ])
+      ->save();
+
+    // Clear render caches so the config change is reflected on the next request.
+    foreach (['dynamic_page_cache', 'render'] as $bin) {
+      \Drupal::cache($bin)->deleteAll();
+    }
+
+    // Check that LocalBusiness node shows the exact-match link.
+    $this->drupalGet($local_business_node->toUrl());
+    $this->assertLinkExists('Add Organization (exact)', '/node/add/organization?parent_organization=' . $local_business_node->id());
+    $this->assertLinkExists('Add Local Business (exact)', '/node/add/local_business?parent_organization=' . $local_business_node->id());
   }
 
 }

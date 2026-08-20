@@ -3,11 +3,14 @@ includes:
 
 parameters:
   level: 2
+  bootstrapFiles:
+    - phpstan-bootstrap.php
   paths:
     - .
   excludePaths:
     - src/EntityQuery/Workspaces/QueryFactory.php
     - src/Plugin/search_api/processor/TrashStatus.php
+    - src/ProxyClass
     - src/TrashWorkspaceInformation.php
   ignoreErrors:
     # new static() is a best practice in Drupal, so we cannot fix that.
@@ -21,5 +24,3 @@ parameters:
       reportUnmatched: false
     # Ignore restoreFromTrash() method calls - dynamically added by TrashStorageTrait.
     - '#Call to an undefined method .+::restoreFromTrash\(\)#'
-  scanDirectories:
-    - ../../../../vendor/drush/drush/src-symfony-compatibility

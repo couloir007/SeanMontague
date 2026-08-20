@@ -7,7 +7,6 @@ namespace Drupal\schemadotorg_autocomplete_element_test\Form;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Markup;
 use Drupal\schemadotorg\Element\SchemaDotOrgAutocomplete;
 
 /**
@@ -64,6 +63,14 @@ class SchemaDotOrgAutocompleteElementTestForm extends FormBase {
       '#tags' => TRUE,
       '#default_value' => ['name', 'additionalName'],
     ];
+    $form['schemadotorg_autocomplete_bundles'] = [
+      '#type' => 'schemadotorg_autocomplete',
+      '#title' => $this->t('Schema.org types and bundles'),
+      '#target_type' => 'Thing',
+      '#include_bundles' => 'node',
+      '#tags' => TRUE,
+      '#default_value' => ['Person', 'article'],
+    ];
     $form['schemadotorg_autocomplete_action_path'] = [
       '#type' => 'schemadotorg_autocomplete',
       '#title' => $this->t('Schema.org action path'),
@@ -88,7 +95,7 @@ class SchemaDotOrgAutocompleteElementTestForm extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
     $values = $form_state->cleanValues()->getValues();
-    $this->messenger()->addStatus(Markup::create('<pre>' . Yaml::encode($values) . '</pre>'));
+    $this->messenger()->addStatus(Yaml::encode($values));
   }
 
 }

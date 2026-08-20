@@ -26,7 +26,13 @@ class SchemaDotOrgStarterkitTest extends SchemaDotOrgBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['schemadotorg_starterkit_dependency_test'];
+  protected static $modules = [
+    'config_rewrite',
+    'schemadotorg_additional_mappings',
+    'schemadotorg_field_group',
+    'schemadotorg_starterkit',
+    'views',
+  ];
 
   /**
    * The Schema.org starter kit manager.
@@ -38,13 +44,15 @@ class SchemaDotOrgStarterkitTest extends SchemaDotOrgBrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+
+    \Drupal::service('module_installer')->install(['schemadotorg_starterkit_dependency_test']);
     $this->schemaStarterkitManager = $this->container->get('schemadotorg_starterkit.manager');
   }
 
   /**
    * Test Schema.org actions before a module is installed.
    *
-   * @covers schemadotorg_starterkit_module_preinstall()
+   * @covers \schemadotorg_starterkit_module_preinstall
    */
   public function testPreInstall(): void {
     // Check that rewritten schema_types.default_properties in

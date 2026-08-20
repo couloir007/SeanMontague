@@ -9,7 +9,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org taxonomy installation.
  *
- * @covers \schemadotorg_taxonomy_install()
+ * @covers \schemadotorg_taxonomy_install
  * @group schemadotorg
  */
 class SchemaDotOrgTaxonomyInstallKernelTest extends SchemaDotOrgEntityKernelTestBase {

@@ -6,7 +6,9 @@ namespace Drupal\schemadotorg_geolocation;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Field\WidgetPluginManager;
 use Drupal\schemadotorg\SchemaDotOrgNamesInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * The Schema.org geolocation manager.
@@ -18,6 +20,8 @@ class SchemaDotOrgGeolocationManager implements SchemaDotOrgGeolocationManagerIn
    */
   public function __construct(
     protected ModuleHandlerInterface $moduleHandler,
+    #[Autowire(service: 'plugin.manager.field.widget')]
+    protected WidgetPluginManager $fieldWidgetPluginManager,
     protected EntityTypeManagerInterface $entityTypeManager,
     protected SchemaDotOrgNamesInterface $schemaNames,
   ) {}
@@ -61,24 +65,31 @@ class SchemaDotOrgGeolocationManager implements SchemaDotOrgGeolocationManagerIn
 
     // Set the form widget.
     if (empty($widget_id)) {
-      $widget_id = 'geolocation_leaflet';
-      $widget_settings['third_party_settings']['geolocation_address'] = [
-        'enable' => TRUE,
-        'address_field' => 'schema_address',
-        'geocoder' => 'photon',
-        'sync_mode' => 'manual',
-        'direction' => 'one_way',
-        'button_position' => 'topleft',
-        'ignore' => [
-          'organization' => TRUE,
-          'address-line1' => FALSE,
-          'address-line2' => FALSE,
-          'locality' => FALSE,
-          'administrative-area' => FALSE,
-          'postal-code' => FALSE,
-        ],
-      ];
+      if ($this->fieldWidgetPluginManager->hasDefinition('geolocation_leaflet')) {
+        $widget_id = 'geolocation_leaflet';
+      }
+      else {
+        $widget_id = 'geolocation_map';
+        $widget_settings['map_provider_id'] = 'leaflet';
+        $widget_settings['map_provider_settings'] = [];
+      }
     }
+    $widget_settings['third_party_settings']['geolocation_address'] = [
+      'enable' => TRUE,
+      'address_field' => 'schema_address',
+      'geocoder' => 'photon',
+      'sync_mode' => 'manual',
+      'direction' => 'one_way',
+      'button_position' => 'topleft',
+      'ignore' => [
+        'organization' => TRUE,
+        'address-line1' => FALSE,
+        'address-line2' => FALSE,
+        'locality' => FALSE,
+        'administrative-area' => FALSE,
+        'postal-code' => FALSE,
+      ],
+    ];
 
     // Set the view display.
     if (empty($formatter_id)) {

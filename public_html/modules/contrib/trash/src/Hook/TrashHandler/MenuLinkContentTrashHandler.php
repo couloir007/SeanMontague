@@ -6,8 +6,8 @@ namespace Drupal\trash\Hook\TrashHandler;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\trash\Handler\DefaultTrashHandler;
+use Drupal\trash\Trash;
 use Drupal\workspaces\Event\WorkspacePostPublishEvent;
 use Drupal\workspaces\WorkspaceManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -18,7 +18,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class MenuLinkContentTrashHandler extends DefaultTrashHandler implements EventSubscriberInterface {
 
   public function __construct(
-    protected MenuLinkManagerInterface $menuLinkManager,
     protected ?WorkspaceManagerInterface $workspaceManager = NULL,
   ) {}
 
@@ -85,8 +84,14 @@ class MenuLinkContentTrashHandler extends DefaultTrashHandler implements EventSu
           ->loadMultipleRevisions(array_keys($menu_link_ids));
 
         foreach ($menu_links as $menu_link) {
-          if (trash_entity_is_deleted($menu_link)) {
-            $this->menuLinkManager->removeDefinition($menu_link->getPluginId(), FALSE);
+          if (Trash::entityIsDeleted($menu_link)) {
+            // The menu link manager's dependency chain can reach trash.manager,
+            // for example through a decorated menu tree storage, so it cannot
+            // be constructor-injected without a container cycle. It also cannot
+            // be stored as a lazy closure property, since that breaks
+            // serializing this handler.
+            // @phpstan-ignore globalDrupalDependencyInjection.useDependencyInjection
+            \Drupal::service('plugin.manager.menu.link')->removeDefinition($menu_link->getPluginId(), FALSE);
           }
         }
       });

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\schemadotorg_identifier\Kernel;
+namespace Drupal\Tests\schemadotorg_field_parts\Kernel;
 
 use Drupal\Tests\schemadotorg_jsonapi\Kernel\SchemaDotOrgJsonApiKernelTestBase;
 
 /**
  * Tests the functionality of the Schema.org field parts JSON:API support.
  *
- * @covers schemadotorg_field_parts_jsonapi_resource_config_presave()
+ * @covers \schemadotorg_field_parts_jsonapi_resource_config_presave
  * @group schemadotorg
  */
 class SchemaDotOrgFieldPartsJsonApiKernelTest extends SchemaDotOrgJsonApiKernelTestBase {
@@ -37,7 +37,7 @@ class SchemaDotOrgFieldPartsJsonApiKernelTest extends SchemaDotOrgJsonApiKernelT
 
     // Check that JSON:API resource was created for WebContent with field parts.
     /** @var \Drupal\jsonapi_extras\Entity\JsonapiResourceConfig $resource */
-    $resource = $this->resourceStorage->load('node--web_content');
+    $resource = $this->loadResource('node--web_content');
     $resource_fields = $resource->get('resourceFields');
     $expected_result = [
       'disabled' => FALSE,

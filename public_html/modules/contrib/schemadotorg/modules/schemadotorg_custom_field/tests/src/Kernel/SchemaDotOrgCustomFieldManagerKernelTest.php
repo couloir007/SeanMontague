@@ -13,7 +13,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org custom field manager.
  *
- * @covers \Drupal\schemadotorg_custom_field\SchemaDotOrgCustomFieldDefaultVocabularyManager
+ * @covers \Drupal\schemadotorg_custom_field\SchemaDotOrgCustomFieldManager
  * @group schemadotorg
  */
 class SchemaDotOrgCustomFieldManagerKernelTest extends SchemaDotOrgEntityKernelTestBase {
@@ -143,42 +143,29 @@ class SchemaDotOrgCustomFieldManagerKernelTest extends SchemaDotOrgEntityKernelT
     $field_config = FieldConfig::loadByName('node', 'recipe', 'schema_nutrition');
     $settings = $field_config->getSettings();
     $expected_settings_serving_size = [
-      'type' => 'text',
-      'widget_settings' => [
-        'label' => 'Serving size',
-        'settings' => [
-          'description' => 'The serving size, in terms of the number of volume or mass.',
-          'size' => 60,
-          'placeholder' => '',
-          'maxlength' => 255,
-          'maxlength_js' => FALSE,
-          'description_display' => 'after',
-          'required' => FALSE,
-          'prefix' => '',
-          'suffix' => '',
-        ],
-      ],
+      'label' => 'Serving size',
       'check_empty' => FALSE,
-      'weight' => 0,
+      'required' => FALSE,
+      'translatable' => FALSE,
+      'description' => 'The serving size, in terms of the number of volume or mass.',
+      'description_display' => 'after',
+      'prefix' => '',
+      'suffix' => '',
+      'allowed_values' => [],
     ];
     $this->assertEquals($expected_settings_serving_size, $settings['field_settings']['serving_size']);
     $expected_settings_calories = [
-      'type' => 'integer',
-      'widget_settings' => [
-        'label' => 'Calories',
-        'settings' => [
-          'description' => 'The number of calories.',
-          'description_display' => 'after',
-          'placeholder' => '',
-          'min' => 0,
-          'max' => 1000,
-          'prefix' => '',
-          'suffix' => ' calories',
-          'required' => FALSE,
-        ],
-      ],
+      'label' => 'Calories',
       'check_empty' => FALSE,
-      'weight' => 1,
+      'required' => FALSE,
+      'translatable' => FALSE,
+      'description' => 'The number of calories.',
+      'description_display' => 'after',
+      'prefix' => '',
+      'suffix' => ' calories',
+      'allowed_values' => [],
+      'min' => 0,
+      'max' => 1000,
     ];
     $this->assertEquals($expected_settings_calories, $settings['field_settings']['calories']);
 
@@ -191,9 +178,89 @@ class SchemaDotOrgCustomFieldManagerKernelTest extends SchemaDotOrgEntityKernelT
       'weight' => 150,
       'region' => 'content',
       'settings' => [
-        'label' => TRUE,
-        'wrapper' => 'fieldset',
-        'open' => TRUE,
+          'wrapper' => 'fieldset',
+          'label_value' => '',
+          'label_limit' => 60,
+          'label_prefix' => 'Item',
+          'auto_collapse' => FALSE,
+          'open' => TRUE,
+          'fields' => [
+              'serving_size' => [
+                  'weight' => 0,
+                  'label' => 'Serving size',
+                  'size' => 60,
+                  'placeholder' => '',
+                  'maxlength' => NULL,
+                  'maxlength_js' => FALSE,
+                  'type' => 'text',
+              ],
+              'calories' => [
+                  'weight' => 1,
+                  'label' => 'Calories',
+                  'placeholder' => '',
+                  'type' => 'integer',
+              ],
+              'carbohydrate_content' => [
+                  'weight' => 2,
+                  'label' => 'Carbohydrate content',
+                  'placeholder' => '',
+                  'type' => 'integer',
+              ],
+              'cholesterol_content' => [
+                  'weight' => 3,
+                  'label' => 'Cholesterol',
+                  'placeholder' => '',
+                  'type' => 'integer',
+              ],
+              'fat_content' => [
+                  'weight' => 4,
+                  'label' => 'Fat',
+                  'placeholder' => '',
+                  'type' => 'integer',
+              ],
+              'fiber_content' => [
+                  'weight' => 5,
+                  'label' => 'Fiber',
+                  'placeholder' => '',
+                  'type' => 'integer',
+              ],
+              'protein_content' => [
+                  'weight' => 6,
+                  'label' => 'Protein',
+                  'placeholder' => '',
+                  'type' => 'integer',
+              ],
+              'saturated_fat_content' => [
+                  'weight' => 7,
+                  'label' => 'Saturated Fat',
+                  'placeholder' => '',
+                  'type' => 'integer',
+              ],
+              'sodium_content' => [
+                  'weight' => 8,
+                  'label' => 'Sodium',
+                  'placeholder' => '',
+                  'type' => 'integer',
+              ],
+              'sugar_content' => [
+                  'weight' => 9,
+                  'label' => 'Sugar',
+                  'placeholder' => '',
+                  'type' => 'integer',
+              ],
+              'trans_fat_content' => [
+                  'weight' => 10,
+                  'label' => 'Trans fat',
+                  'placeholder' => '',
+                  'type' => 'integer',
+              ],
+              'unsaturated_fat_content' => [
+                  'weight' => 11,
+                  'label' => 'Unsaturated fat',
+                  'placeholder' => '',
+                  'type' => 'integer',
+              ],
+          ],
       ],
       'third_party_settings' => [],
     ];
@@ -203,57 +270,259 @@ class SchemaDotOrgCustomFieldManagerKernelTest extends SchemaDotOrgEntityKernelT
     /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $entity_form_display */
     $entity_view_display = EntityViewDisplay::load('node.recipe.default');
     $components = $entity_view_display->getComponents();
-    $component_defaults = [
-      'wrappers' => [
-        'field_wrapper_tag' => '',
-        'field_wrapper_classes' => '',
-        'field_tag' => '',
-        'field_classes' => '',
-        'label_tag' => '',
-        'label_classes' => '',
-      ],
-      'formatter_settings' => [
-        'prefix_suffix' => TRUE,
-      ],
-    ];
     $expected_component = [
       'type' => 'custom_formatter',
       'label' => 'above',
       'settings' => [
         'fields' => [
+          'serving_size' => [
+            'weight' => 0,
+            'format_type' => 'string',
+            'wrappers' => [
+              'field_wrapper_tag' => '',
+              'field_wrapper_classes' => '',
+              'field_tag' => '',
+              'field_classes' => '',
+              'label_tag' => '',
+              'label_classes' => '',
+            ],
+            'formatter_settings' => [
+              'field_label' => 'Serving size',
+            ],
+            'prefix_suffix' => FALSE,
+            'key_label' => 'label',
+          ],
           'calories' => [
+            'weight' => 1,
             'format_type' => 'number_integer',
-          ] + $component_defaults,
+            'wrappers' => [
+              'field_wrapper_tag' => '',
+              'field_wrapper_classes' => '',
+              'field_tag' => '',
+              'field_classes' => '',
+              'label_tag' => '',
+              'label_classes' => '',
+            ],
+            'formatter_settings' => [
+              'field_label' => 'Calories',
+              'prefix_suffix' => TRUE,
+            ],
+            'scale' => 0,
+            'thousand_separator' => ',',
+            'prefix_suffix' => FALSE,
+            'decimal_separator' => '.',
+            'key_label' => 'label',
+          ],
           'carbohydrate_content' => [
+            'weight' => 2,
             'format_type' => 'number_integer',
-          ] + $component_defaults,
+            'wrappers' => [
+              'field_wrapper_tag' => '',
+              'field_wrapper_classes' => '',
+              'field_tag' => '',
+              'field_classes' => '',
+              'label_tag' => '',
+              'label_classes' => '',
+            ],
+            'formatter_settings' => [
+              'field_label' => 'Carbohydrate content',
+              'prefix_suffix' => TRUE,
+            ],
+            'scale' => 0,
+            'thousand_separator' => ',',
+            'prefix_suffix' => FALSE,
+            'decimal_separator' => '.',
+            'key_label' => 'label',
+          ],
           'cholesterol_content' => [
+            'weight' => 3,
             'format_type' => 'number_integer',
-          ] + $component_defaults,
+            'wrappers' => [
+              'field_wrapper_tag' => '',
+              'field_wrapper_classes' => '',
+              'field_tag' => '',
+              'field_classes' => '',
+              'label_tag' => '',
+              'label_classes' => '',
+            ],
+            'formatter_settings' => [
+              'field_label' => 'Cholesterol',
+              'prefix_suffix' => TRUE,
+            ],
+            'scale' => 0,
+            'thousand_separator' => ',',
+            'prefix_suffix' => FALSE,
+            'decimal_separator' => '.',
+            'key_label' => 'label',
+          ],
           'fat_content' => [
+            'weight' => 4,
             'format_type' => 'number_integer',
-          ] + $component_defaults,
+            'wrappers' => [
+              'field_wrapper_tag' => '',
+              'field_wrapper_classes' => '',
+              'field_tag' => '',
+              'field_classes' => '',
+              'label_tag' => '',
+              'label_classes' => '',
+            ],
+            'formatter_settings' => [
+              'field_label' => 'Fat',
+              'prefix_suffix' => TRUE,
+            ],
+            'scale' => 0,
+            'thousand_separator' => ',',
+            'prefix_suffix' => FALSE,
+            'decimal_separator' => '.',
+            'key_label' => 'label',
+          ],
           'fiber_content' => [
+            'weight' => 5,
             'format_type' => 'number_integer',
-          ] + $component_defaults,
+            'wrappers' => [
+              'field_wrapper_tag' => '',
+              'field_wrapper_classes' => '',
+              'field_tag' => '',
+              'field_classes' => '',
+              'label_tag' => '',
+              'label_classes' => '',
+            ],
+            'formatter_settings' => [
+              'field_label' => 'Fiber',
+              'prefix_suffix' => TRUE,
+            ],
+            'scale' => 0,
+            'thousand_separator' => ',',
+            'prefix_suffix' => FALSE,
+            'decimal_separator' => '.',
+            'key_label' => 'label',
+          ],
           'protein_content' => [
+            'weight' => 6,
             'format_type' => 'number_integer',
-          ] + $component_defaults,
+            'wrappers' => [
+              'field_wrapper_tag' => '',
+              'field_wrapper_classes' => '',
+              'field_tag' => '',
+              'field_classes' => '',
+              'label_tag' => '',
+              'label_classes' => '',
+            ],
+            'formatter_settings' => [
+              'field_label' => 'Protein',
+              'prefix_suffix' => TRUE,
+            ],
+            'scale' => 0,
+            'thousand_separator' => ',',
+            'prefix_suffix' => FALSE,
+            'decimal_separator' => '.',
+            'key_label' => 'label',
+          ],
           'saturated_fat_content' => [
+            'weight' => 7,
             'format_type' => 'number_integer',
-          ] + $component_defaults,
+            'wrappers' => [
+              'field_wrapper_tag' => '',
+              'field_wrapper_classes' => '',
+              'field_tag' => '',
+              'field_classes' => '',
+              'label_tag' => '',
+              'label_classes' => '',
+            ],
+            'formatter_settings' => [
+              'field_label' => 'Saturated Fat',
+              'prefix_suffix' => TRUE,
+            ],
+            'scale' => 0,
+            'thousand_separator' => ',',
+            'prefix_suffix' => FALSE,
+            'decimal_separator' => '.',
+            'key_label' => 'label',
+          ],
           'sodium_content' => [
+            'weight' => 8,
             'format_type' => 'number_integer',
-          ] + $component_defaults,
+            'wrappers' => [
+              'field_wrapper_tag' => '',
+              'field_wrapper_classes' => '',
+              'field_tag' => '',
+              'field_classes' => '',
+              'label_tag' => '',
+              'label_classes' => '',
+            ],
+            'formatter_settings' => [
+              'field_label' => 'Sodium',
+              'prefix_suffix' => TRUE,
+            ],
+            'scale' => 0,
+            'thousand_separator' => ',',
+            'prefix_suffix' => FALSE,
+            'decimal_separator' => '.',
+            'key_label' => 'label',
+          ],
           'sugar_content' => [
+            'weight' => 9,
             'format_type' => 'number_integer',
-          ] + $component_defaults,
+            'wrappers' => [
+              'field_wrapper_tag' => '',
+              'field_wrapper_classes' => '',
+              'field_tag' => '',
+              'field_classes' => '',
+              'label_tag' => '',
+              'label_classes' => '',
+            ],
+            'formatter_settings' => [
+              'field_label' => 'Sugar',
+              'prefix_suffix' => TRUE,
+            ],
+            'scale' => 0,
+            'thousand_separator' => ',',
+            'prefix_suffix' => FALSE,
+            'decimal_separator' => '.',
+            'key_label' => 'label',
+          ],
           'trans_fat_content' => [
+            'weight' => 10,
             'format_type' => 'number_integer',
-          ] + $component_defaults,
+            'wrappers' => [
+              'field_wrapper_tag' => '',
+              'field_wrapper_classes' => '',
+              'field_tag' => '',
+              'field_classes' => '',
+              'label_tag' => '',
+              'label_classes' => '',
+            ],
+            'formatter_settings' => [
+              'field_label' => 'Trans fat',
+              'prefix_suffix' => TRUE,
+            ],
+            'scale' => 0,
+            'thousand_separator' => ',',
+            'prefix_suffix' => FALSE,
+            'decimal_separator' => '.',
+            'key_label' => 'label',
+          ],
           'unsaturated_fat_content' => [
+            'weight' => 11,
             'format_type' => 'number_integer',
-          ] + $component_defaults,
+            'wrappers' => [
+              'field_wrapper_tag' => '',
+              'field_wrapper_classes' => '',
+              'field_tag' => '',
+              'field_classes' => '',
+              'label_tag' => '',
+              'label_classes' => '',
+            ],
+            'formatter_settings' => [
+              'field_label' => 'Unsaturated fat',
+              'prefix_suffix' => TRUE,
+            ],
+            'scale' => 0,
+            'thousand_separator' => ',',
+            'prefix_suffix' => FALSE,
+            'decimal_separator' => '.',
+            'key_label' => 'label',
+          ],
         ],
       ],
       'third_party_settings' => [],
@@ -290,27 +559,18 @@ class SchemaDotOrgCustomFieldManagerKernelTest extends SchemaDotOrgEntityKernelT
     $field_config = FieldConfig::loadByName('node', 'faq', 'schema_faq_main_entity');
     $settings = $field_config->getSettings();
     $expected_settings_serving_size = [
-      'type' => 'textarea',
-      'widget_settings' => [
-        'label' => 'Question',
-        'settings' => [
-          'description' => 'The name of the item.',
-          'rows' => 5,
-          'placeholder' => '',
-          'maxlength' => '',
-          'maxlength_js' => FALSE,
-          'formatted' => TRUE,
-          'default_format' => 'basic_html',
-          'format' => [
-            'guidelines' => FALSE,
-            'help' => FALSE,
-          ],
-          'description_display' => 'after',
-          'required' => FALSE,
-        ],
-      ],
+      'label' => 'Question',
       'check_empty' => FALSE,
-      'weight' => 0,
+      'required' => FALSE,
+      'translatable' => FALSE,
+      'description' => 'The name of the item.',
+      'description_display' => 'after',
+      'formatted' => TRUE,
+      'default_format' => 'basic_html',
+      'format' => [
+        'guidelines' => FALSE,
+        'help' => FALSE,
+      ],
     ];
     $this->assertEquals($expected_settings_serving_size, $settings['field_settings']['name']);
 
@@ -355,29 +615,58 @@ class SchemaDotOrgCustomFieldManagerKernelTest extends SchemaDotOrgEntityKernelT
     $field_config = FieldConfig::loadByName('node', 'dietary_supplement', 'schema_max_intake');
     $settings = $field_config->getSettings();
     $expected_settings_frequency = [
-      'type' => 'select',
-      'weight' => 3,
+      'label' => 'Frequency',
       'check_empty' => FALSE,
-      'widget_settings' => [
-        'label' => 'Frequency',
-        'settings' => [
-          'description' => 'How often the dose is taken, e.g. \'daily\'.',
-          'description_display' => 'after',
-          'required' => FALSE,
-          'empty_option' => '- Select -',
-          'allowed_values' => [
-            ['key' => 'daily', 'value' => 'Daily'],
-            ['key' => '2_times_a_day', 'value' => '2 times a day'],
-            ['key' => '3_times_a_day', 'value' => '3 times a day'],
-            ['key' => '4_times_a_day', 'value' => '4 times a day'],
-            ['key' => '5_times_a_day', 'value' => '5 times a day'],
-            ['key' => 'every_3_hours', 'value' => 'Every 3 hours'],
-            ['key' => 'every_6_hours', 'value' => 'Every 6 hours'],
-            ['key' => 'every_8_hours', 'value' => 'Every 8 hours'],
-            ['key' => 'every_12_hours', 'value' => 'Every 12 hours'],
-            ['key' => 'every_24_hours', 'value' => 'Every 24 hours'],
-            ['key' => 'bedtime', 'value' => 'Bedtime'],
-          ],
+      'required' => FALSE,
+      'translatable' => FALSE,
+      'description' => "How often the dose is taken, e.g. 'daily'.",
+      'description_display' => 'after',
+      'prefix' => '',
+      'suffix' => '',
+      'allowed_values' => [
+        [
+          'key' => 'daily',
+          'label' => 'Daily',
+        ],
+        [
+          'key' => '2_times_a_day',
+          'label' => '2 times a day',
+        ],
+        [
+          'key' => '3_times_a_day',
+          'label' => '3 times a day',
+        ],
+        [
+          'key' => '4_times_a_day',
+          'label' => '4 times a day',
+        ],
+        [
+          'key' => '5_times_a_day',
+          'label' => '5 times a day',
+        ],
+        [
+          'key' => 'every_3_hours',
+          'label' => 'Every 3 hours',
+        ],
+        [
+          'key' => 'every_6_hours',
+          'label' => 'Every 6 hours',
+        ],
+        [
+          'key' => 'every_8_hours',
+          'label' => 'Every 8 hours',
+        ],
+        [
+          'key' => 'every_12_hours',
+          'label' => 'Every 12 hours',
+        ],
+        [
+          'key' => 'every_24_hours',
+          'label' => 'Every 24 hours',
+        ],
+        [
+          'key' => 'bedtime',
+          'label' => 'Bedtime',
         ],
       ],
     ];
@@ -491,107 +780,87 @@ class SchemaDotOrgCustomFieldManagerKernelTest extends SchemaDotOrgEntityKernelT
     $settings = $field_config->getSettings();
     $expected_settings = [
       'integer' => [
-        'type' => 'integer',
-        'weight' => 0,
+        'label' => 'Integer',
         'check_empty' => FALSE,
-        'widget_settings' => [
-          'label' => 'Integer',
-          'settings' => [
-            'description' => '',
-            'description_display' => 'after',
-            'placeholder' => '',
-            'min' => 99,
-            'max' => 999,
-            'prefix' => '',
-            'suffix' => '',
-            'required' => FALSE,
-          ],
-        ],
+        'required' => FALSE,
+        'translatable' => FALSE,
+        'description' => '',
+        'description_display' => 'after',
+        'prefix' => '',
+        'suffix' => '',
+        'allowed_values' => [],
+        'min' => 99,
+        'max' => 999,
       ],
       'custom_string' => [
-        'type' => 'select',
-        'weight' => 1,
+        'label' => 'Custom string',
         'check_empty' => FALSE,
-        'widget_settings' => [
-          'label' => 'Custom string',
-          'settings' => [
-            'description' => 'Custom description',
-            'description_display' => 'after',
-            'required' => TRUE,
-            'empty_option' => '- Select -',
-            'allowed_values' => [],
-          ],
-        ],
+        'required' => TRUE,
+        'translatable' => FALSE,
+        'description' => 'Custom description',
+        'description_display' => 'after',
+        'prefix' => 'Custom prefix',
+        'suffix' => 'Custom suffix',
+        'allowed_values' => [],
       ],
       'allowed_values' => [
-        'type' => 'select',
-        'weight' => 2,
+        'label' => 'Allowed_values',
         'check_empty' => FALSE,
-        'widget_settings' => [
-          'label' => 'Allowed_values',
-          'settings' => [
-            'description' => '',
-            'description_display' => 'after',
-            'required' => FALSE,
-            'empty_option' => 'Custom empty option',
-            'allowed_values' => [
-              ['value' => 'One', 'key' => 'one'],
-              ['value' => 'Two', 'key' => 'two'],
-              ['value' => 'Three', 'key' => 'three'],
-            ],
+        'required' => FALSE,
+        'translatable' => FALSE,
+        'description' => '',
+        'description_display' => 'after',
+        'prefix' => '',
+        'suffix' => '',
+        'allowed_values' => [
+          [
+            'key' => 'one',
+            'label' => 'One',
+          ],
+          [
+            'key' => 'two',
+            'label' => 'Two',
+          ],
+          [
+            'key' => 'three',
+            'label' => 'Three',
           ],
         ],
       ],
       'entity_reference' => [
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 3,
+        'label' => 'Entity_reference',
         'check_empty' => FALSE,
-        'widget_settings' => [
-          'label' => 'Entity_reference',
-          'settings' => [
-            'description' => '',
-            'description_display' => 'after',
-            'size' => 60,
-            'placeholder' => '',
-            'required' => FALSE,
-            'match_operator' => 'CONTAINS',
-            'match_limit' => 10,
-            'handler' => 'default:media',
-            'handler_settings' => [
-              'target_bundles' => [
-                'image' => 'image',
-              ],
-            ],
+        'required' => FALSE,
+        'translatable' => FALSE,
+        'description' => '',
+        'description_display' => 'after',
+        'handler' => 'default:media',
+        'handler_settings' => [
+          'target_bundles' => [
+            'image' => 'image',
           ],
         ],
       ],
       'link' => [
-        'type' => 'link_default',
-        'weight' => 4,
+        'label' => 'Link',
         'check_empty' => FALSE,
-        'widget_settings' => [
-          'label' => 'Link',
-          'settings' => [
-            'description' => '',
-            'description_display' => 'after',
-            'required' => FALSE,
-            'link_type' => 17,
-            'field_prefix' => 'default',
-            'field_prefix_custom' => '',
-            'title' => 1,
-            'enabled_attributes' => [
-              'id' => FALSE,
-              'name' => FALSE,
-              'target' => TRUE,
-              'rel' => TRUE,
-              'class' => TRUE,
-              'accesskey' => FALSE,
-            ],
-            'widget_default_open' => 'expandIfValuesSet',
-            'placeholder_url' => '',
-            'placeholder_title' => '',
-          ],
+        'required' => FALSE,
+        'translatable' => FALSE,
+        'description' => '',
+        'description_display' => 'after',
+        'link_type' => 17,
+        'field_prefix' => 'default',
+        'field_prefix_custom' => '',
+        'title' => 1,
+        'enabled_attributes' => [
+          'id' => FALSE,
+          'name' => FALSE,
+          'target' => TRUE,
+          'rel' => TRUE,
+          'class' => TRUE,
+          'accesskey' => FALSE,
         ],
+        'widget_default_open' => 'expandIfValuesSet',
       ],
     ];
     $this->assertEquals($expected_settings, $settings['field_settings']);

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\schemadotorg\Kernel;
 
 use Drupal\schemadotorg\SchemaDotOrgInstallerInterface;
-use Drupal\schemadotorg\SchemaDotOrgMappingTypeStorageInterface;
 
 /**
  * Tests the Schema.org installer service.
@@ -26,11 +25,6 @@ class SchemaDotOrgInstallerKernelTest extends SchemaDotOrgKernelTestBase {
   protected SchemaDotOrgInstallerInterface $installer;
 
   /**
-   * The Schema.org mapping type storage.
-   */
-  protected SchemaDotOrgMappingTypeStorageInterface $mappingTypeStorage;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -39,7 +33,6 @@ class SchemaDotOrgInstallerKernelTest extends SchemaDotOrgKernelTestBase {
     $this->installSchemaDotOrg();
 
     $this->installer = $this->container->get('schemadotorg.installer');
-    $this->mappingTypeStorage = $this->container->get('entity_type.manager')->getStorage('schemadotorg_mapping_type');
   }
 
   /**

@@ -67,8 +67,8 @@ class SchemaDotOrgCorrespondingReferenceKernelTest extends SchemaDotOrgEntityKer
     $page_node->save();
 
     // Check that there are no entity reference btw the person and page.
-    $this->assertNull($person_node->schema_subject_of->target_id);
-    $this->assertNull($page_node->schema_about->target_id);
+    $this->assertEmpty($person_node->schema_subject_of->target_id);
+    $this->assertEmpty($page_node->schema_about->target_id);
 
     // Add the person to the page's about field.
     $page_node->schema_about->target_id = $person_node->id();
@@ -89,8 +89,8 @@ class SchemaDotOrgCorrespondingReferenceKernelTest extends SchemaDotOrgEntityKer
     $page_node = Node::load($page_node->id());
 
     // Check that there are no entity reference btw the person and page.
-    $this->assertNull($person_node->schema_subject_of->target_id);
-    $this->assertNull($page_node->schema_about->target_id);
+    $this->assertEmpty($person_node->schema_subject_of->target_id);
+    $this->assertEmpty($page_node->schema_about->target_id);
   }
 
 }

@@ -11,6 +11,9 @@ schemadotorg_epp.settings:
         sequence:
           type: string
           label: 'Schema.org type node link'
+    use_exact_match:
+      type: boolean
+      label: 'Use exact match for node links'
     node_links_display:
       type: string
       label: 'Node links display'

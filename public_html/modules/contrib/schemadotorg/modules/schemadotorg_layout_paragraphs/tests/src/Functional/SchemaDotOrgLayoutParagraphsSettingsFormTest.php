@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\schemadotorg_paragraphs\Functional;
+namespace Drupal\Tests\schemadotorg_layout_paragraphs\Functional;
 
 use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
 

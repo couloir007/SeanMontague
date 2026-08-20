@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\trash\Kernel;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\RevisionableStorageInterface;
+use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\trash\Trash;
 use Drupal\trash\TrashManagerInterface;
 
 /**
@@ -42,6 +47,24 @@ abstract class TrashKernelTestBase extends KernelTestBase {
   protected bool $usesSuperUserAccessPolicy = FALSE;
 
   /**
+   * Whether to install the node entity schema and the article/page bundles.
+   *
+   * Tests that only exercise trash_test_entity can set this to FALSE to skip
+   * the node schema and content type setup.
+   */
+  protected bool $installNode = TRUE;
+
+  /**
+   * Additional entity types to enable for trash, keyed by entity type ID.
+   *
+   * Subclasses set this (and install the matching schema in
+   * self::installAdditionalEntitySchemas()) so that everything is enabled in
+   * the single container rebuild performed by self::setUp(). The value is an
+   * array of bundle names to enable, or an empty array for all bundles.
+   */
+  protected array $additionalTrashEntityTypes = [];
+
+  /**
    * The entity type manager.
    */
   protected EntityTypeManagerInterface $entityTypeManager;
@@ -52,20 +75,59 @@ abstract class TrashKernelTestBase extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->installEntitySchema('node');
     $this->installEntitySchema('user');
     $this->installEntitySchema('trash_test_entity');
-    $this->installSchema('node', ['node_access']);
     $this->installSchema('user', ['users_data']);
-    $this->installConfig(['node', 'filter', 'trash_test']);
+    $this->installConfig(['filter', 'trash_test']);
 
-    $this->createContentType(['type' => 'article']);
-    $this->createContentType(['type' => 'page']);
+    $entity_types = ['trash_test_entity' => []];
+    if ($this->installNode) {
+      $this->installEntitySchema('node');
+      $this->installSchema('node', ['node_access']);
+      $this->installConfig(['node']);
+      $this->createContentType(['type' => 'article']);
+      $this->createContentType(['type' => 'page']);
+      $entity_types['node'] = ['article'];
+    }
 
-    $this->enableEntityTypesForTrash([
-      'trash_test_entity' => [],
-      'node' => ['article'],
-    ]);
+    $this->installAdditionalEntitySchemas();
+
+    // Enable everything in a single pass so only one container rebuild is
+    // needed during setup.
+    $this->enableEntityTypesForTrash($entity_types + $this->additionalTrashEntityTypes);
+  }
+
+  /**
+   * Loads an entity in the 'ignored' trash context.
+   *
+   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   *   The entity storage.
+   * @param string $id
+   *   The entity ID.
+   * @param string|null $langcode
+   *   (optional) A translation to return instead of the default one.
+   * @param string|null $revision_id
+   *   (optional) A specific revision to load instead of the default revision.
+   *
+   * @return ($storage is \Drupal\Core\Entity\ContentEntityStorageInterface ?
+   *   \Drupal\Core\Entity\ContentEntityInterface :
+   *   \Drupal\Core\Entity\EntityInterface|null) An entity or NULL if the
+   *   entity was truly not found.
+   */
+  protected function forceLoadEntity(EntityStorageInterface $storage, string $id, ?string $langcode = NULL, ?string $revision_id = NULL): EntityInterface|ContentEntityInterface|null {
+    $entity = $this->getTrashManager()->executeInTrashContext('ignore', function () use ($storage, $id, $revision_id) {
+      if ($revision_id === NULL) {
+        return $storage->load($id);
+      }
+      assert($storage instanceof RevisionableStorageInterface);
+      return $storage->loadRevision($revision_id);
+    });
+
+    if (NULL !== $langcode && $entity instanceof TranslatableInterface && $entity->language()->getId() !== $langcode) {
+      $entity = $entity->getTranslation($langcode);
+    }
+
+    return $entity;
   }
 
   /**
@@ -168,7 +230,7 @@ abstract class TrashKernelTestBase extends KernelTestBase {
   protected function restoreEntity(string $entity_type_id, int|string $entity_id): void {
     $this->getTrashManager()->executeInTrashContext('ignore', function () use ($entity_type_id, $entity_id): void {
       if ($entity = $this->getEntityTypeManager()->getStorage($entity_type_id)->load($entity_id)) {
-        trash_restore_entity($entity);
+        Trash::restoreEntity($entity);
       }
     });
   }
@@ -188,5 +250,14 @@ abstract class TrashKernelTestBase extends KernelTestBase {
       }
     });
   }
+
+  /**
+   * Installs the schema for the additional trash-enabled entity types.
+   *
+   * Installs schema for the types in self::$additionalTrashEntityTypes before
+   * the single trash-enabling container rebuild, so the relevant tables exist
+   * when the 'deleted' field is installed on them.
+   */
+  protected function installAdditionalEntitySchemas(): void {}
 
 }

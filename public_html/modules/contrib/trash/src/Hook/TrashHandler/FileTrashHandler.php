@@ -93,12 +93,34 @@ class FileTrashHandler extends DefaultTrashHandler {
       $moved_uri = $this->fileSystem->move($source_uri, $target_uri, FileExists::Rename);
     }
     catch (FileException $e) {
-      $this->loggerFactory->get('trash')->error('Could not move @uri to @target on trash: @message', [
-        '@uri' => $source_uri,
-        '@target' => $target_uri,
-        '@message' => $e->getMessage(),
+      // If a previous trash attempt moved the file but was interrupted before
+      // the entity was saved (e.g. a later presave hook threw, or the retried
+      // delete re-reads the still-original URI from the database), the source
+      // is gone and the target already holds it. Adopt it only when the size
+      // matches the file entity's metadata; otherwise a look-alike file at
+      // that path could silently be claimed as the trashed content. Without
+      // this, the retry would silently give up and save the entity with its
+      // stale original URI, permanently orphaning the moved file: it would no
+      // longer match the trashed-URI pattern postTrashDelete() and a later
+      // restore look for.
+      $can_adopt = $e instanceof FileNotExistsException
+        && !file_exists($source_uri)
+        && file_exists($target_uri)
+        && $entity->getSize() !== NULL
+        && (int) $entity->getSize() === @filesize($target_uri);
+      if (!$can_adopt) {
+        $this->loggerFactory->get('trash')->error('Could not move @uri to @target on trash: @message', [
+          '@uri' => $source_uri,
+          '@target' => $target_uri,
+          '@message' => $e->getMessage(),
+        ]);
+        return;
+      }
+      $moved_uri = $target_uri;
+      $this->loggerFactory->get('trash')->warning('Adopted existing file at @target_uri (size matches entity metadata) as the trash target; the source at @source_uri no longer exists, likely from a previously interrupted trash attempt.', [
+        '@target_uri' => $target_uri,
+        '@source_uri' => $source_uri,
       ]);
-      return;
     }
 
     $entity->setFileUri($moved_uri);

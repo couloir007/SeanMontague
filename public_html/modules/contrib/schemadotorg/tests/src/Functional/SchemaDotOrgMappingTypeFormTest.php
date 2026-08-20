@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\schemadotorg\Functional;
 
-use Drupal\schemadotorg\SchemaDotOrgMappingTypeStorage;
+use Drupal\Component\Utility\DeprecationHelper;
 
 /**
  * Tests the functionality of the Schema.org mapping type form.
@@ -20,22 +20,6 @@ class SchemaDotOrgMappingTypeFormTest extends SchemaDotOrgBrowserTestBase {
   protected static $modules = ['user', 'node', 'field_ui'];
 
   /**
-   * The Schema.org mapping type storage.
-   */
-  protected SchemaDotOrgMappingTypeStorage $storage;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
-    // Set Schema.org mapping type storage.
-    $this->storage = $this->container->get('entity_type.manager')->getStorage('schemadotorg_mapping_type');
-
-  }
-
-  /**
    * Test Schema.org mapping type form.
    */
   public function testSchemaDotOrgMappingTypeForm(): void {
@@ -46,13 +30,14 @@ class SchemaDotOrgMappingTypeFormTest extends SchemaDotOrgBrowserTestBase {
 
     // Check that editing and re-saving the mapping type does not alter the
     // expected values.
-    $mapping_type = $this->storage->load('node');
+    $mapping_type_storage = $this->container->get('entity_type.manager')->getStorage('schemadotorg_mapping_type');
+    $mapping_type = $mapping_type_storage->load('node');
     $mapping_type_value = $mapping_type->toArray();
     $this->drupalGet('admin/config/schemadotorg/types/node');
     $this->submitForm([], 'Save');
     $assert->responseContains('Updated <em class="placeholder">Content</em> mapping type.');
-    $this->storage->resetCache();
-    $mapping_type = $this->storage->load('node');
+    $mapping_type_storage->resetCache();
+    $mapping_type = $mapping_type_storage->load('node');
     $this->assertEquals($mapping_type_value, $mapping_type->toArray());
 
     // Create a node:Thing Schema.org mapping.
@@ -66,13 +51,19 @@ class SchemaDotOrgMappingTypeFormTest extends SchemaDotOrgBrowserTestBase {
     $this->drupalLogin($this->rootUser);
 
     // Check default component weights warning message.
+    $hard_code_weights_message = DeprecationHelper::backwardsCompatibleCall(
+      currentVersion: \Drupal::VERSION,
+      deprecatedVersion: '11.0.0',
+      currentCallable: fn() => 'The following components have hard code weights: <em class="placeholder">Authored by; Authored on; Published</em>.',
+      deprecatedCallable: fn() => 'The following components have hard code weights: <em class="placeholder">Authored by; Authored on; Promoted to front page; Sticky at top of lists; Published</em>.',
+    );
     $this->drupalGet('admin/structure/types/manage/thing/form-display');
-    $assert->responseContains('The following components have hard code weights: <em class="placeholder">Authored by; Authored on; Promoted to front page; Sticky at top of lists; Published</em>.');
+    $assert->responseContains($hard_code_weights_message);
     $assert->responseContains('<td>Published<div><small>(Weight: 220)</small></div></td>');
 
     $this->drupalGet('/admin/config/schemadotorg/types/node', ['query' => ['destination' => '/admin/structure/types/manage/thing/form-display']]);
     $this->submitForm(['default_component_weights_update' => FALSE], 'Save');
-    $assert->responseNotContains('The following components have hard code weights: <em class="placeholder">Authored by; Authored on; Promoted to front page; Sticky at top of lists; Published</em>.');
+    $assert->responseNotContains($hard_code_weights_message);
     $assert->responseNotContains('<td>Published<div><small>(Weight: 220)</small></div></td>');
   }
 

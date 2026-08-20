@@ -11,7 +11,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org JSON-LD range.module integration.
  *
- * @covers range_schemadotorg_jsonld_schema_property_alter()
+ * @covers \range_schemadotorg_jsonld_schema_property_alter
  * @group schemadotorg
  */
 class SchemaDotOrgJsonLdRangeKernelTest extends SchemaDotOrgEntityKernelTestBase {

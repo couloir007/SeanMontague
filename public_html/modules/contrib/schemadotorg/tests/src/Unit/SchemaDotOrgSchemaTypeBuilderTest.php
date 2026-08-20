@@ -11,7 +11,7 @@ use Drupal\schemadotorg\SchemaDotOrgSchemaTypeManager;
 use Drupal\Tests\UnitTestCase;
 
 /**
- * @coversDefaultClass \Drupal\schemadotorg\SchemaDotOrgSchemaTypeBuilder::getItemUrl
+ * @coversDefaultClass \Drupal\schemadotorg\SchemaDotOrgSchemaTypeBuilder
  * @group schemadotorg
  */
 class SchemaDotOrgSchemaTypeBuilderTest extends UnitTestCase {

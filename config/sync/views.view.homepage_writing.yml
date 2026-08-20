@@ -448,7 +448,8 @@ display:
           entity_type: node
           plugin_id: entity_queue
           required: false
-          limit_queue: featured_articles
+          limit_queue:
+            - featured_articles
       header: {  }
       footer: {  }
       display_extenders: {  }

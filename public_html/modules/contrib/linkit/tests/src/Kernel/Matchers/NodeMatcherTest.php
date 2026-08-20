@@ -8,12 +8,14 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\linkit\Kernel\LinkitKernelTestBase;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests node matcher.
  *
  * @group linkit
  */
+#[RunTestsInSeparateProcesses]
 class NodeMatcherTest extends LinkitKernelTestBase {
 
   /**

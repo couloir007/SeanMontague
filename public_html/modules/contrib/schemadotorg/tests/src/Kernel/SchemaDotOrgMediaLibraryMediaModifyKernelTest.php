@@ -11,8 +11,8 @@ use Drupal\field\Entity\FieldStorageConfig;
 /**
  * Tests the functionality of the Schema.org inline entity form.
  *
- * @covers schemadotorg_media_library_media_modify_schemadotorg_property_field_type_alter()
- * @covers schemadotorg_media_library_media_modify_schemadotorg_property_field_alter()
+ * @covers \media_library_media_modify_schemadotorg_property_field_type_alter
+ * @covers \media_library_media_modify_schemadotorg_property_field_alter
  * @group schemadotorg
  */
 class SchemaDotOrgMediaLibraryMediaModifyKernelTest extends SchemaDotOrgEntityKernelTestBase {

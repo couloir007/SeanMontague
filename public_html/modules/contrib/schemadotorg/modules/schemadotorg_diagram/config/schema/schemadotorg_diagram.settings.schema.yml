@@ -5,6 +5,9 @@ schemadotorg_diagram.settings:
     node_task:
       type: boolean
       label: 'Display diagrams as a node tab/task.'
+    max_depth:
+      type: integer
+      label: 'Maximum diagram depth'
     diagrams:
       type: sequence
       label: Diagrams

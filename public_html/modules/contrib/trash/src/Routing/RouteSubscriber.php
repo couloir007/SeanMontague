@@ -99,11 +99,16 @@ class RouteSubscriber extends RouteSubscriberBase {
         // Ensure that entity delete forms never load the latest revision.
         if ($route = $collection->get("entity.$entity_type_id.delete_form")) {
           $parameters = $route->getOption('parameters') ?? [];
+          $changed = FALSE;
           foreach ($parameters as &$parameter) {
             if (isset($parameter['type']) && $parameter['type'] === "entity:$entity_type_id") {
               unset($parameter['load_latest_revision']);
-              $route->setOption('parameters', $parameters);
+              $changed = TRUE;
             }
+          }
+          unset($parameter);
+          if ($changed) {
+            $route->setOption('parameters', $parameters);
           }
         }
       }

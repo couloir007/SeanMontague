@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\schemadotorg\Kernel;
 
+use Drupal\node\Entity\NodeType;
 use Drupal\schemadotorg\Controller\SchemaDotOrgAutocompleteController;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -16,6 +17,13 @@ use Symfony\Component\HttpFoundation\Request;
 class SchemaDotOrgAutocompleteControllerKernelTest extends SchemaDotOrgKernelTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  protected static $modules = [
+    'node',
+  ];
+
+  /**
    * The Schema.org autocomplete controller.
    */
   protected SchemaDotOrgAutocompleteController $controller;
@@ -26,6 +34,11 @@ class SchemaDotOrgAutocompleteControllerKernelTest extends SchemaDotOrgKernelTes
   protected function setUp(): void {
     parent::setUp();
     $this->installSchemaDotOrg();
+    $this->installEntitySchema('node');
+    NodeType::create([
+      'type' => 'article',
+      'name' => 'Article',
+    ])->save();
     $this->controller = SchemaDotOrgAutocompleteController::create($this->container);
   }
 
@@ -54,6 +67,11 @@ class SchemaDotOrgAutocompleteControllerKernelTest extends SchemaDotOrgKernelTes
     // return Gender enumeration values.
     $result = $this->controller->autocomplete(new Request(['q' => 'Male']), 'Thing');
     $this->assertEquals('[]', $result->getContent());
+
+    // Check searching Schema.org types can include entity bundle matches.
+    $result = $this->controller->autocomplete(new Request(['q' => 'article']), 'Thing', 'node');
+    $labels = json_decode($result->getContent(), TRUE);
+    $this->assertEquals(['value' => 'article', 'label' => 'article'], reset($labels));
   }
 
 }

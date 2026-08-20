@@ -112,18 +112,28 @@ class SchemaDotOrgEppManager implements SchemaDotOrgEppManagerInterface {
    *   An array of links with title and url.
    */
   public function getNodeLinks(NodeInterface $node): array {
-    // Check that the node is mapped to a Schema.org type.
-    $mapping = $this->getMappingStorage()->loadByEntity($node);
-    if (!$mapping) {
-      return [];
-    }
-
     // Get the node's node links settings.
-    $settings = $this->schemaTypeManager->getSetting(
-      $this->configFactory->get('schemadotorg_epp.settings')->get('node_links'),
-      $mapping,
-      ['multiple' => TRUE],
-    ) ?? [];
+    $use_exact_match = $this->configFactory
+      ->get('schemadotorg_epp.settings')
+      ->get('use_exact_match');
+    $node_links_config = $this->configFactory
+      ->get('schemadotorg_epp.settings')
+      ->get('node_links');
+    if ($use_exact_match) {
+      $setting = $this->schemaTypeManager->getSetting(
+        $node_links_config,
+        $node,
+        ['parents' => FALSE],
+      );
+      $settings = $setting ? [$setting] : [];
+    }
+    else {
+      $settings = $this->schemaTypeManager->getSetting(
+        $node_links_config,
+        $node,
+        ['multiple' => TRUE],
+      ) ?? [];
+    }
 
     // Create the node links.
     $node_links = [];
@@ -182,7 +192,7 @@ class SchemaDotOrgEppManager implements SchemaDotOrgEppManagerInterface {
           }
 
           // Build the node link.
-          $key = $target_bundle . '--' . implode('--', array_keys($query));
+          $key = $target_bundle . '?' . http_build_query($query);
           $node_links[$key] = [
             'title' => $this->t($title, ['@label' => $target_label]),
             'url' => Url::fromRoute(

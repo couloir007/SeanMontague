@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\trash_test\EventSubscriber;
 
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;

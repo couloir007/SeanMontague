@@ -130,12 +130,28 @@ class EntityPurgeMultipleForm extends ConfirmFormBase implements BaseFormIdInter
     $this->entityType = $this->entityTypeManager->getDefinition($this->entityTypeId);
     $entities = $this->entityTypeManager->getStorage($entity_type_id)->loadMultiple(array_keys($this->selection));
 
+    // Entities may have been purged (by auto-purge cron, another user, or
+    // another tab) between the bulk operation and this confirm page, since
+    // the tempstore selection survives across requests. Drop them from the
+    // selection, and bail out if nothing is left to confirm.
+    $this->selection = array_intersect_key($this->selection, $entities);
+    if (empty($this->selection)) {
+      return new RedirectResponse($this->getCancelUrl()->setAbsolute()->toString());
+    }
+
     $items = [];
     foreach ($this->selection as $id => $selected_langcodes) {
       $entity = $entities[$id];
       foreach ($selected_langcodes as $langcode) {
         $key = $id . ':' . $langcode;
         if ($entity instanceof TranslatableInterface) {
+          // A single translation may have been purged since the confirm page
+          // selection was built (another user or tab, or the
+          // delete_translations path below); skip it instead of fatally
+          // erroring in getTranslation().
+          if (!$entity->hasTranslation($langcode)) {
+            continue;
+          }
           $entity = $entity->getTranslation($langcode);
           $default_key = $id . ':' . $entity->getUntranslated()->language()->getId();
 
@@ -195,6 +211,11 @@ class EntityPurgeMultipleForm extends ConfirmFormBase implements BaseFormIdInter
     $entities = $this->entityTypeManager->getStorage($this->entityTypeId)->loadMultiple(array_keys($this->selection));
 
     foreach ($this->selection as $id => $selected_langcodes) {
+      // The entity may have been purged since the confirm page was built;
+      // skip it instead of fatally erroring on the missing array key.
+      if (!isset($entities[$id])) {
+        continue;
+      }
       $entity = $entities[$id];
       if (!$entity->access('purge', $this->currentUser)) {
         $inaccessible_entities[] = $entity;
@@ -202,6 +223,11 @@ class EntityPurgeMultipleForm extends ConfirmFormBase implements BaseFormIdInter
       }
       foreach ($selected_langcodes as $langcode) {
         if ($entity instanceof TranslatableInterface) {
+          // A single translation may have been purged since the confirm page
+          // was built; skip it instead of fatally erroring in getTranslation().
+          if (!$entity->hasTranslation($langcode)) {
+            continue;
+          }
           $entity = $entity->getTranslation($langcode);
           if ($entity->isDefaultTranslation()) {
             $delete_entities[$id] = $entity;

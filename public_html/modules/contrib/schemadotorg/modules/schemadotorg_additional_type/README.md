@@ -10,12 +10,12 @@ Table of contents
 Introduction
 ------------
 
-The **Schema.org Blueprints Additional Type module** enhances the Schema.org 
-additional type property to allow additional type specificity without having 
+The **Schema.org Blueprints Additional Type module** enhances the Schema.org
+additional type property to allow additional type specificity without having
 to create dedicated entity types for every appropriate Schema.org type.
 
-For example, the sub types for <http://schema.org/Event> are mainly for adding a 
-little extra specificity about an Event. Most event additional types do not need to 
+For example, the sub types for <http://schema.org/Event> are mainly for adding a
+little extra specificity about an Event. Most event additional types do not need to
 have dedicated content types created.
 
 
@@ -23,7 +23,7 @@ Features
 --------
 
 - Adds 'Enable Schema.org additional type' to Schema.org mapping UI.
-- Site builders can alter additional type field names, labels, descriptions, 
+- Site builders can alter additional type field names, labels, descriptions,
   and allowed values.
 - Alters the Schema.org mapping list builder and adds a 'Additional type' column.
 - Replaces @type in JSON-LD for valid additional types or uses the additional type value
@@ -31,8 +31,9 @@ Features
 - Alters the node add/edit form to require that a node's additional type be defined
   before a form is built and altered.
 - Alters node add links to prompt for additional type to be defined.
-- Handles field access control for additional type fields as well as 
+- Handles field access control for additional type fields as well as
   field access by entity, roles, and permissions.
+- Adds optional additional type base fields to selected entity types.  (i.e., `schemadotorg_additional_type` and `schemadotorg_full_type`)
 
 
 Configuration
@@ -45,10 +46,12 @@ Configuration
 - Enter Schema.org types and bundles whose additional type field should be required.
 - Enter Schema.org additional types that should be ignored.
 - Enter default additional type allowed values for Schema.org types.
-- Enter rules to control field access for entity types and bundles based on 
+- Enter rules to control field access for entity types and bundles based on
   additional types, roles, and permissions.
 - Enter @type and https://schema.org/additionalType values for JSON-LD.
 - Check/uncheck use snake case for additional type values.
+- Select the mapping types that should create additional type base fields
+
 
 References
 ----------

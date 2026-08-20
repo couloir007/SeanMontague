@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\trash\Kernel;
 
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\node\Entity\Node;
@@ -26,9 +25,9 @@ class TrashMenuLinkTest extends TrashKernelTestBase {
   ];
 
   /**
-   * The menu link content storage.
+   * {@inheritdoc}
    */
-  protected EntityStorageInterface $menuLinkStorage;
+  protected array $additionalTrashEntityTypes = ['menu_link_content' => []];
 
   /**
    * {@inheritdoc}
@@ -36,15 +35,17 @@ class TrashMenuLinkTest extends TrashKernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->installEntitySchema('menu_link_content');
-
     Menu::create([
       'id' => 'test-menu',
       'label' => 'Test menu',
     ])->save();
+  }
 
-    $this->enableEntityTypesForTrash(['menu_link_content']);
-    $this->menuLinkStorage = $this->getEntityTypeManager()->getStorage('menu_link_content');
+  /**
+   * {@inheritdoc}
+   */
+  protected function installAdditionalEntitySchemas(): void {
+    $this->installEntitySchema('menu_link_content');
   }
 
   /**

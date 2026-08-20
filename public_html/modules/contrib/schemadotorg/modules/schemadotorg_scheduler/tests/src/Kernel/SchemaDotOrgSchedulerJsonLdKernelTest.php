@@ -11,7 +11,7 @@ use Drupal\Tests\schemadotorg_jsonld\Kernel\SchemaDotOrgJsonLdKernelTestBase;
 /**
  * Tests the functionality of the Schema.org Scheduler module JSON-LD integration.
  *
- * @covers schemadotorg_scheduler_schemadotorg_jsonld_schema_type_entity_load()
+ * @covers \schemadotorg_scheduler_schemadotorg_jsonld_schema_type_entity_load
  * @group schemadotorg
  */
 class SchemaDotOrgSchedulerJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBase {

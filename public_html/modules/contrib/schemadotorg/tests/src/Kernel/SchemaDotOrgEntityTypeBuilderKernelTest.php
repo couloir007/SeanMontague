@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\schemadotorg\Kernel;
 
+use Drupal\Component\Utility\DeprecationHelper;
 use Drupal\Core\Entity\Entity\EntityFormMode;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
@@ -79,6 +80,7 @@ class SchemaDotOrgEntityTypeBuilderKernelTest extends SchemaDotOrgEntityKernelTe
     $bundle_entity = $this->schemaEntityTypeBuilder->addEntityBundle('node_type', 'Thing', $values);
     $this->assertEquals('thing', $bundle_entity->id());
     $this->assertEquals('Thing', $bundle_entity->label());
+    // @phpstan-ignore-next-line property.notFound
     $this->assertEquals('Thing', $bundle_entity->schemaDotOrgType);
     $this->assertEquals([], $this->entityDisplayRepository->getFormModeOptionsByBundle('node', 'thing'));
     $this->assertEquals(['teaser' => 'Teaser'], $this->entityDisplayRepository->getViewModeOptionsByBundle('node', 'thing'));
@@ -128,7 +130,14 @@ class SchemaDotOrgEntityTypeBuilderKernelTest extends SchemaDotOrgEntityKernelTe
     $form_components = $this->entityDisplayRepository->getFormDisplay('node', 'thing', 'default')->getComponents();
     $this->assertArrayHasKey('title', $form_components);
     $this->assertArrayHasKey('status', $form_components);
-    $this->assertArrayHasKey('sticky', $form_components);
+    DeprecationHelper::backwardsCompatibleCall(
+      currentVersion: \Drupal::VERSION,
+      deprecatedVersion: '11.0.0',
+      currentCallable: fn() => NULL,
+      deprecatedCallable: function () use ($form_components): void {
+        $this->assertArrayHasKey('sticky', $form_components);
+      },
+    );
     $this->assertArrayHasKey('schema_alternate_name', $form_components);
 
     // Check the Thing custom form display mode.

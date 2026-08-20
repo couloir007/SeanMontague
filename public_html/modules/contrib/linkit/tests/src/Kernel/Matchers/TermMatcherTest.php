@@ -9,6 +9,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\taxonomy\VocabularyInterface;
 use Drupal\Tests\linkit\Kernel\LinkitKernelTestBase;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests term matcher.
@@ -17,6 +18,7 @@ use Drupal\Tests\linkit\Kernel\LinkitKernelTestBase;
  *
  * @group linkit
  */
+#[RunTestsInSeparateProcesses]
 class TermMatcherTest extends LinkitKernelTestBase {
 
   /**

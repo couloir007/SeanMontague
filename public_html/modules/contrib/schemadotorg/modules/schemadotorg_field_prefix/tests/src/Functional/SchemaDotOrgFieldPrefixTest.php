@@ -11,7 +11,7 @@ use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
 /**
  * Tests the functionality of the Schema.org field prefix.
  *
- * @covers schemadotorg_field_prefix_form_field_ui_field_storage_add_form_alter()
+ * @covers \schemadotorg_field_prefix_form_field_ui_field_storage_add_form_alter
  * @group schemadotorg
  */
 class SchemaDotOrgFieldPrefixTest extends SchemaDotOrgBrowserTestBase {

@@ -14,6 +14,11 @@ use Drupal\trash_test\Entity\TrashTestEntity;
 class EntityQueryTest extends TrashKernelTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  protected bool $installNode = FALSE;
+
+  /**
    * Tests that deleted entities are excluded from entity query results.
    */
   public function testQueryWithoutDeletedAccess(): void {
@@ -53,6 +58,16 @@ class EntityQueryTest extends TrashKernelTestBase {
     // Check that we can also manually set the trash context on the query.
     $result = $entity_storage->getQuery()->accessCheck(FALSE)->addMetaData('trash', 'ignore')->execute();
     $this->assertCount(5, $result);
+
+    // An explicit 'deleted' condition inside a nested condition group must
+    // also opt the query out of the default trash filtering.
+    $query = $entity_storage->getQuery()->accessCheck(FALSE);
+    $query->condition($query->andConditionGroup()->exists('deleted'));
+    $this->assertCount(3, $query->execute());
+
+    // Same for a condition using a property path on the 'deleted' field.
+    $result = $entity_storage->getQuery()->accessCheck(FALSE)->condition('deleted.value', 0, '>')->execute();
+    $this->assertCount(3, $result);
   }
 
   /**

@@ -9,7 +9,7 @@ use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
 /**
  * Tests the functionality of the Schema.org action.
  *
- * @covers \Drupal\schemadotorg_custom_field\SchemaDotOrgCustomFieldBuilder
+ * @covers \Drupal\schemadotorg_custom_field\SchemaDotOrgCustomFieldManager
  * @group schemadotorg
  */
 class SchemaDotOrgCustomFieldBuilderTest extends SchemaDotOrgBrowserTestBase {

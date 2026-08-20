@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\recipe\Kernel;
+namespace Drupal\Tests\schemadotorg_recipe\Kernel;
 
 use Drupal\schemadotorg_recipe\SchemaDotOrgRecipeManagerInterface;
 use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
@@ -10,7 +10,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org recipe manager.
  *
- * @covers \Drupal\recipe\SchemaDotOrgTaxonomyPropertyVocabularyManagerTest;
+ * @covers \Drupal\schemadotorg_recipe\SchemaDotOrgRecipeManager
  * @group schemadotorg
  */
 class SchemaDotOrgRecipeManagerKernelTest extends SchemaDotOrgEntityKernelTestBase {

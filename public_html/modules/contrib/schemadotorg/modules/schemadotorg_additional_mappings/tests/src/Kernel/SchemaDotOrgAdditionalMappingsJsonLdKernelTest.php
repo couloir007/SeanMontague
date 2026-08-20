@@ -11,7 +11,7 @@ use Drupal\Tests\schemadotorg_jsonld\Kernel\SchemaDotOrgJsonLdKernelTestBase;
 /**
  * Tests the functionality of the Schema.org additional mappings JSON-LD.
  *
- * @covers schemadotorg_additional_mappings_schemadotorg_jsonld_alter
+ * @covers \schemadotorg_additional_mappings_schemadotorg_jsonld_alter
  * @group schemadotorg
  */
 class SchemaDotOrgAdditionalMappingsJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBase {
@@ -22,8 +22,8 @@ class SchemaDotOrgAdditionalMappingsJsonLdKernelTest extends SchemaDotOrgJsonLdK
   protected static $modules = [
     'schemadotorg_paragraphs',
     'schemadotorg_jsonld_custom',
-    'schemadotorg_jsonld_breadcrumb',
     'schemadotorg_additional_mappings',
+    'schemadotorg_jsonld_breadcrumb',
   ];
 
   /**
@@ -44,6 +44,7 @@ class SchemaDotOrgAdditionalMappingsJsonLdKernelTest extends SchemaDotOrgJsonLdK
 
     module_set_weight('schemadotorg_additional_mappings', 10);
     module_set_weight('schemadotorg_jsonld_breadcrumb', 11);
+    \Drupal::moduleHandler()->resetImplementations();
   }
 
   /**
@@ -70,6 +71,7 @@ class SchemaDotOrgAdditionalMappingsJsonLdKernelTest extends SchemaDotOrgJsonLdK
     $recipe_node = Node::create([
       'type' => 'recipe',
       'title' => 'Some recipe',
+      'status' => TRUE,
     ]);
     $recipe_node->save();
 
@@ -90,6 +92,7 @@ class SchemaDotOrgAdditionalMappingsJsonLdKernelTest extends SchemaDotOrgJsonLdK
     $study_node = Node::create([
       'type' => 'medical_study',
       'title' => 'Medical study',
+      'status' => TRUE,
     ]);
     $study_node->save();
 
@@ -117,6 +120,7 @@ class SchemaDotOrgAdditionalMappingsJsonLdKernelTest extends SchemaDotOrgJsonLdK
     $study_node = Node::create([
       'type' => 'substance',
       'title' => 'Substance',
+      'status' => TRUE,
       'schema_phonetic_text' => '[substance]',
     ]);
     $study_node->save();
@@ -179,6 +183,7 @@ class SchemaDotOrgAdditionalMappingsJsonLdKernelTest extends SchemaDotOrgJsonLdK
     $organization_node = Node::create([
       'type' => 'organization',
       'title' => 'Organization',
+      'status' => TRUE,
     ]);
     $organization_node->save();
 
@@ -186,6 +191,7 @@ class SchemaDotOrgAdditionalMappingsJsonLdKernelTest extends SchemaDotOrgJsonLdK
     $page_node = Node::create([
       'type' => 'page',
       'title' => 'Page',
+      'status' => TRUE,
       'schema_is_part_of' => [
         'target_id' => $organization_node->id(),
       ],
@@ -227,6 +233,7 @@ class SchemaDotOrgAdditionalMappingsJsonLdKernelTest extends SchemaDotOrgJsonLdK
     $event_node = Node::create([
       'type' => 'event',
       'title' => 'Some event',
+      'status' => TRUE,
       'schema_actor' => [$person_paragraph],
     ]);
     $event_node->save();

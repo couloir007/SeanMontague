@@ -56,6 +56,8 @@ services:
 
   Drupal\trash\TrashViewBuilder: ~
 
+  Drupal\trash\TrashCliActions: ~
+
   # Trash handlers.
   trash.handler_configurator:
     class: Drupal\trash\Handler\TrashHandlerConfigurator

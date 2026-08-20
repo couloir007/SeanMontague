@@ -173,7 +173,7 @@ class SchemaDotOrgEntityKernelTest extends SchemaDotOrgEntityKernelTestBase {
     FieldConfig::loadByName('node', 'person', 'schema_related_link')->delete();
     FieldConfig::loadByName('node', 'person', 'schema_significant_link')->delete();
     /** @var \Drupal\schemadotorg\SchemaDotOrgMappingInterface $mapping */
-    $mapping = $this->mappingStorage->loadUnchanged($mapping->id());
+    $mapping = $this->getMappingStorage()->loadUnchanged($mapping->id());
     $expected_dependencies = [
       'config' => [
         'field.field.node.person.body',

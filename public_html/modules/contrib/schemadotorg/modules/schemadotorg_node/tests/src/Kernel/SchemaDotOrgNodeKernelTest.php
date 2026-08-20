@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\schemadotorg_metatag\Kernel;
+namespace Drupal\Tests\schemadotorg_node\Kernel;
 
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
@@ -10,7 +10,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org node.
  *
- * @covers schemadotorg_node_schemadotorg_mapping_insert()
+ * @covers \schemadotorg_node_schemadotorg_mapping_insert
  * @group schemadotorg
  */
 class SchemaDotOrgNodeKernelTest extends SchemaDotOrgEntityKernelTestBase {

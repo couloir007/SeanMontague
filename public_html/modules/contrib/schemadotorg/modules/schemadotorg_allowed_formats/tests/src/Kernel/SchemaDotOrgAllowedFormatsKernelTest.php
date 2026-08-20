@@ -12,7 +12,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org allowed formats.
  *
- * @covers schemadotorg_allowed_formats_schemadotorg_property_field_alter()
+ * @covers \schemadotorg_allowed_formats_schemadotorg_property_field_alter
  * @group schemadotorg
  */
 class SchemaDotOrgAllowedFormatsKernelTest extends SchemaDotOrgEntityKernelTestBase {

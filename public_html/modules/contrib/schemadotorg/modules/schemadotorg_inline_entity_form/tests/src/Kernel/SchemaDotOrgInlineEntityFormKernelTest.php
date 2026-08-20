@@ -10,8 +10,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org inline entity form.
  *
- * @covers _schemadotorg_inline_entity_form_enabled()
- * @covers schemadotorg_inline_entity_form_schemadotorg_property_field_alter()
+ * @covers \schemadotorg_inline_entity_form_schemadotorg_property_field_alter
  * @group schemadotorg
  */
 class SchemaDotOrgInlineEntityFormKernelTest extends SchemaDotOrgEntityKernelTestBase {

@@ -60,11 +60,9 @@ class SchemaDotOrgSmartDateJsonLdManagerKernelTest extends SchemaDotOrgEntityKer
   /**
    * Test Schema.org alter the JSON-LD eventSchedule property.
    *
-   * @covers ::alterProperty
+   * @covers \Drupal\schemadotorg_smart_date\SchemaDotOrgSmartDateJsonLdManager::alterEventScheduleProperties
    */
   public function testEventSchedule(): void {
-    $this->assertTrue(TRUE);
-
     /*
     \Drupal::currentUser()->setAccount($this->createUser(['access content']));
 
@@ -143,11 +141,9 @@ class SchemaDotOrgSmartDateJsonLdManagerKernelTest extends SchemaDotOrgEntityKer
   /**
    * Test Schema.org alter the JSON-LD startDate property.
    *
-   * @covers ::alterProperties
+   * @covers \Drupal\schemadotorg_smart_date\SchemaDotOrgSmartDateJsonLdManager::alterStartDateProperties
    */
   public function testEventStartDate(): void {
-    $this->assertTrue(TRUE);
-
     /*
     \Drupal::currentUser()->setAccount($this->createUser(['access content']));
 

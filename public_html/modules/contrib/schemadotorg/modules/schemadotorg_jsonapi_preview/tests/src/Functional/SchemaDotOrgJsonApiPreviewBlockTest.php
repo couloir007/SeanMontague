@@ -26,6 +26,7 @@ class SchemaDotOrgJsonApiPreviewBlockTest extends SchemaDotOrgBrowserTestBase {
 
     $this->drupalPlaceBlock('schemadotorg_jsonapi_preview');
 
+    $account_without_permission = $this->createUser(['access content']);
     $account = $this->createUser(['access content', 'view schemadotorg jsonapi']);
 
     // Create Thing content type with a Schema.org mapping.
@@ -41,8 +42,10 @@ class SchemaDotOrgJsonApiPreviewBlockTest extends SchemaDotOrgBrowserTestBase {
     $node->save();
 
     // Check that JSON:API preview is not displayed for users without permission.
+    $this->drupalLogin($account_without_permission);
     $this->drupalGet($node->toUrl());
     $assert->responseNotContains('Schema.org JSON:API');
+    drupal_flush_all_caches();
 
     // Clear all plugin caches.
     /** @var \Drupal\module_test\PluginManagerCacheClearer $plugin_cache_clearer */

@@ -134,10 +134,14 @@ function schemadotorg_role_jsonapi_resource_config_presave(EntityInterface $enti
   $resource_fields = $entity->get('resourceFields');
   foreach ($role_field_definitions as $role_name => $role_field_definition) {
     $field_name = $role_field_definition['field_name'];
-    if (isset($resource_fields[$field_name])) {
-      $resource_fields[$field_name]['publicName'] = $role_name;
-      $resource_fields[$field_name]['disabled'] = FALSE;
-    }
+    $resource_fields[$field_name] = $resource_fields[$field_name] ?? [
+      'fieldName' => $field_name,
+      'publicName' => $field_name,
+      'enhancer' => ['id' => ''],
+      'disabled' => TRUE,
+    ];
+    $resource_fields[$field_name]['publicName'] = $role_name;
+    $resource_fields[$field_name]['disabled'] = FALSE;
   }
   $entity->set('resourceFields', $resource_fields);
 }

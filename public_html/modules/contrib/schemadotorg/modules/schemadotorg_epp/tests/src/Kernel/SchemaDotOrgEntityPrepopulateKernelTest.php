@@ -101,15 +101,15 @@ class SchemaDotOrgEntityPrepopulateKernelTest extends SchemaDotOrgEntityKernelTe
     $node_links = $this->schemaEppManager->getNodeLinks($node);
     $this->convertArrayValuesToStrings($node_links);
     $expected_node_links = [
-      'organization--parent_organization' => [
+      'organization?parent_organization=1' => [
           'title' => 'Add Organization',
           'url' => $base_path . 'node/add/organization?parent_organization=1',
       ],
-      'person--member_of' => [
+      'person?member_of=1' => [
           'title' => 'Add Person as member',
           'url' => $base_path . 'node/add/person?member_of=1',
       ],
-      'person--works_for' => [
+      'person?works_for=1' => [
           'title' => 'Add Person as employee',
           'url' => $base_path . 'node/add/person?works_for=1',
       ],
@@ -152,25 +152,25 @@ class SchemaDotOrgEntityPrepopulateKernelTest extends SchemaDotOrgEntityKernelTe
     $node_links = $this->schemaEppManager->getNodeLinks($node);
     $this->convertArrayValuesToStrings($node_links);
     $expected_node_links = [
-      'hotel--contains_place' => [
-          'title' => 'Add Hotel',
-          'url' => $base_path . 'node/add/hotel?contains_place=2',
+      'hotel?contains_place=2' => [
+        'title' => 'Add Hotel',
+        'url' => '/node/add/hotel?contains_place=2',
       ],
-      'hotel--parent_organization' => [
-          'title' => 'Add Hotel',
-          'url' => $base_path . 'node/add/hotel?parent_organization=2',
+      'hotel?parent_organization=2' => [
+        'title' => 'Add Hotel',
+        'url' => '/node/add/hotel?parent_organization=2',
       ],
-      'organization--parent_organization' => [
-          'title' => 'Add Organization',
-          'url' => $base_path . 'node/add/organization?parent_organization=2',
+      'organization?parent_organization=2' => [
+        'title' => 'Add Organization',
+        'url' => '/node/add/organization?parent_organization=2',
       ],
-      'person--member_of' => [
-          'title' => 'Add Person as member',
-          'url' => $base_path . 'node/add/person?member_of=2',
+      'person?member_of=2' => [
+        'title' => 'Add Person as member',
+        'url' => '/node/add/person?member_of=2',
       ],
-      'person--works_for' => [
-          'title' => 'Add Person as employee',
-          'url' => $base_path . 'node/add/person?works_for=2',
+      'person?works_for=2' => [
+        'title' => 'Add Person as employee',
+        'url' => '/node/add/person?works_for=2',
       ],
     ];
     $this->assertEquals($expected_node_links, $node_links);

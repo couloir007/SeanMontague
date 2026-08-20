@@ -76,6 +76,7 @@ _The below manual JavaScript tests should be moved to automated tests._
 @see /admin/help/schemadotorg/schemadotorg_diagram
 
 - Check that diagrams display as expected.
+- Check that diagrams can be panned and zoomed.
 
 **schemadotorg.settings.element.js**
 

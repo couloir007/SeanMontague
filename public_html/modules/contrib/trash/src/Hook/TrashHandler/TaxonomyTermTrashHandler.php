@@ -13,6 +13,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Url;
 use Drupal\trash\Handler\DefaultTrashHandler;
+use Drupal\trash\Trash;
 
 /**
  * Provides a trash handler for the 'taxonomy_term' entity type.
@@ -95,7 +96,7 @@ class TaxonomyTermTrashHandler extends DefaultTrashHandler {
         return TRUE;
       }
       $parent = $storage->load($item->target_id);
-      return $parent && !trash_entity_is_deleted($parent);
+      return $parent && !Trash::entityIsDeleted($parent);
     });
   }
 

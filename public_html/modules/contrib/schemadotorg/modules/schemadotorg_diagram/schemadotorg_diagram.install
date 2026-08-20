@@ -16,3 +16,13 @@ function schemadotorg_diagram_update_10000(): void {
     ->set('node_task', FALSE)
     ->save();
 }
+
+/**
+ * Issue #3605775: Make the maximum diagram depth configurable.
+ */
+function schemadotorg_diagram_update_10001(): void {
+  \Drupal::configFactory()
+    ->getEditable('schemadotorg_diagram.settings')
+    ->set('max_depth', 3)
+    ->save();
+}

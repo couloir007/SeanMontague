@@ -30,6 +30,10 @@ generate_values:
   containedInPlace: {  }
   offeredBy: {  }
   healthCondition: {  }
+  usNpi:
+    values:
+      - '1679576722'
+      - '1588667638'
   revision_log:
     sentences: 10
   schema_name_prefix:

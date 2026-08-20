@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\schemadotorg_additional_type\Controller;
 
+use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Url;
 use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
 use Drupal\schemadotorg\SchemaDotOrgSchemaTypeManagerInterface;

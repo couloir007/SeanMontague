@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\trash\Functional;
 
+use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\trash\Trash;
+use Drupal\trash_test\Entity\TrashTestEntity;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 
 /**
@@ -57,11 +60,13 @@ class TrashIgnoreTest extends BrowserTestBase {
 
     $trash_user = $this->drupalCreateUser([
       'access content',
+      'edit own page content',
       'delete own page content',
       'access trash',
       'view deleted entities',
       'access administration pages',
       'view the administration theme',
+      'administer trash_test',
     ]);
 
     // Create a trashed node.
@@ -108,6 +113,59 @@ class TrashIgnoreTest extends BrowserTestBase {
     ]));
     // The user can now view the trashed content.
     $this->assertSession()->statusCodeEquals(200);
+
+    // The 'in_trash' context must not open up editing or deleting the trashed
+    // content, even though the user could do both while it was live. A plain
+    // delete would also bypass the purge permission, because the storage
+    // hard-deletes outside of the 'active' trash context.
+    $this->drupalGet($node->toUrl('edit-form', [
+      'query' => [
+        'in_trash' => '1',
+      ],
+    ]));
+    $this->assertSession()->statusCodeEquals(403);
+
+    $this->drupalGet($node->toUrl('delete-form', [
+      'query' => [
+        'in_trash' => '1',
+      ],
+    ]));
+    $this->assertSession()->statusCodeEquals(403);
+
+    // Deleting a live entity with the 'in_trash' parameter appended must not
+    // hard-delete it: the request-wide 'ignore' context granted by the
+    // parameter makes the storage skip the soft-delete, without the purge
+    // permission. Delete forms are blocked outright by the formAlter() guard.
+    $live_node = $this->drupalCreateNode();
+    $live_node->setOwner($trash_user)->save();
+    $this->drupalGet($live_node->toUrl('delete-form', ['query' => ['in_trash' => '1']]));
+    $this->assertSession()->statusCodeEquals(406);
+
+    // The guard only applies to trash-enabled entity types: a delete form for
+    // any other entity type must keep working in a non-active trash context.
+    $trash_test_entity = TrashTestEntity::create(['label' => 'Not trash enabled']);
+    $trash_test_entity->save();
+    $this->drupalGet($trash_test_entity->toUrl('delete-form', ['query' => ['in_trash' => '1']]));
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Non-form delete paths have no such guard, so the 'ignore' context has
+    // to be dropped for state-changing requests outside the trash routes,
+    // making this POST soft-delete the entity.
+    $url = Url::fromRoute('trash_test.node_delete', ['node' => $live_node->id()], [
+      'query' => ['in_trash' => '1'],
+      'absolute' => TRUE,
+    ]);
+    $response = $this->getHttpClient()->request('POST', $url->toString(), [
+      'cookies' => $this->getSessionCookies(),
+      'http_errors' => FALSE,
+    ]);
+    $this->assertEquals(200, $response->getStatusCode());
+
+    $storage = $this->container->get('entity_type.manager')->getStorage('node');
+    $reloaded = $this->container->get('trash.manager')
+      ->executeInTrashContext('ignore', fn () => $storage->loadUnchanged($live_node->id()));
+    $this->assertNotNull($reloaded, 'The node still exists after being deleted with in_trash=1.');
+    $this->assertTrue(Trash::entityIsDeleted($reloaded));
   }
 
 }

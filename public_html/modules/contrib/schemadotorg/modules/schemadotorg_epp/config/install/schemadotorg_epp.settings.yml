@@ -17,4 +17,5 @@ node_links:
   Place:
     'Place?containsPlace': 'Add @label'
     'Person?workLocation': 'Add @label'
+use_exact_match: false
 node_links_display: dropdown

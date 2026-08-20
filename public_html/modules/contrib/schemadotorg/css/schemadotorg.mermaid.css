@@ -5,3 +5,21 @@
 .mermaid[data-processed="true"] {
   opacity: 100;
 }
+
+.schemadotorg-mermaid,
+.language-mermaid {
+  position: relative;
+  overflow: hidden;
+  max-width: 100%;
+  text-align: center;
+}
+
+.schemadotorg-mermaid-panzoom-canvas {
+  display: inline-block;
+  max-width: 100%;
+  text-align: initial;
+}
+
+.schemadotorg-mermaid-panzoom-canvas > svg {
+  display: block;
+}

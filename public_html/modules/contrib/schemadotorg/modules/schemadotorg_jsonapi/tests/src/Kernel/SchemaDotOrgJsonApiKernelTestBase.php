@@ -33,11 +33,6 @@ abstract class SchemaDotOrgJsonApiKernelTestBase extends SchemaDotOrgEntityKerne
   protected SchemaDotOrgInstallerInterface $installer;
 
   /**
-   * The JSON:API resource storage.
-   */
-  protected ConfigEntityStorageInterface $resourceStorage;
-
-  /**
    * Schema.org JSON:API manager.
    */
   protected SchemaDotOrgJsonApiManagerInterface $manager;
@@ -50,7 +45,6 @@ abstract class SchemaDotOrgJsonApiKernelTestBase extends SchemaDotOrgEntityKerne
 
     $this->installConfig(['schemadotorg_jsonapi']);
 
-    $this->resourceStorage = $this->container->get('entity_type.manager')->getStorage('jsonapi_resource_config');
     $this->manager = $this->container->get('schemadotorg_jsonapi.manager');
 
     // Set the Schema.org Blueprints JSON:API weight.
@@ -68,10 +62,23 @@ abstract class SchemaDotOrgJsonApiKernelTestBase extends SchemaDotOrgEntityKerne
    *   A JSON:API resource.
    */
   protected function loadResource(string $id): JsonapiResourceConfig {
-    $this->resourceStorage->resetCache([$id]);
+    $resource_storage = $this->getResourceStorage();
+    $resource_storage->resetCache([$id]);
     /** @var \Drupal\jsonapi_extras\Entity\JsonapiResourceConfig $resource_config */
-    $resource_config = $this->resourceStorage->load($id);
+    $resource_config = $resource_storage->load($id);
     return $resource_config;
+  }
+
+  /**
+   * Gets the JSON:API resource storage.
+   *
+   * @return \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
+   *   The JSON:API resource storage.
+   */
+  protected function getResourceStorage(): ConfigEntityStorageInterface {
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $resource_storage */
+    $resource_storage = $this->container->get('entity_type.manager')->getStorage('jsonapi_resource_config');
+    return $resource_storage;
   }
 
 }

@@ -334,3 +334,5 @@ Recurr
 redcued
 Viewfield
 viewfield
+Panzoom
+panzoom

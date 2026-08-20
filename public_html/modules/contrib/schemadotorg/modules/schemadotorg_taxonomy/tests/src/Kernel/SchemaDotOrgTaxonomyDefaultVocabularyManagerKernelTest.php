@@ -105,7 +105,6 @@ class SchemaDotOrgTaxonomyDefaultVocabularyManagerKernelTest extends SchemaDotOr
 
     // Create that the form display and component are created.
     $form_display = $entity_display_repository->getFormDisplay('node', 'article');
-    $this->assertNotNull($form_display);
     $form_component = $form_display->getComponent('field_tags');
     $this->assertEquals('entity_reference_autocomplete_tags', $form_component['type']);
     $form_component = $form_display->getComponent('field_article_tags');
@@ -117,7 +116,6 @@ class SchemaDotOrgTaxonomyDefaultVocabularyManagerKernelTest extends SchemaDotOr
 
     // Check that the view display and component are created.
     $view_display = $entity_display_repository->getViewDisplay('node', 'article');
-    $this->assertNotNull($view_display);
     $view_component = $view_display->getComponent('field_tags');
     $this->assertEquals('entity_reference_label', $view_component['type']);
     $view_component = $view_display->getComponent('field_article_tags');

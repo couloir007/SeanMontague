@@ -283,15 +283,13 @@ class DiffRevisionTest extends DiffTestBase {
     if (\Drupal::moduleHandler()->moduleExists('content_moderation')) {
       // With content moderation, the new revision will not be current.
       // @see https://www.drupal.org/node/2899719
-      // @todo uncomment when https://www.drupal.org/project/drupal/issues/3535230 is committed.
-      // $text = $this->xpath('//tbody/tr[1]/td[4]/div/div/ul/li/a');
-      // $this->assertEquals($text[0]->getText(), 'Set as current revision');
+      $text = $this->xpath('//tbody/tr[1]/td[4]/div/div/ul/li/a');
+      $this->assertEquals($text[0]->getText(), 'Set as current revision');
     }
     else {
       // Check the last revision is set as current.
-      // @todo uncomment when https://www.drupal.org/project/drupal/issues/3535230 is committed.
-      // $text = $this->xpath('//tbody/tr[1]/td[4]/em');
-      // $this->assertEquals($text[0]->getText(), 'Current revision');
+      $text = $this->xpath('//tbody/tr[1]/td[4]/em');
+      $this->assertEquals($text[0]->getText(), 'Current revision');
       $this->assertSession()->linkNotExists('Set as current revision');
     }
 
@@ -315,8 +313,8 @@ class DiffRevisionTest extends DiffTestBase {
     // Check the revisions overview.
     $this->clickLink(t('Revisions'));
     $rows = $this->xpath('//tbody/tr');
-    // Make sure there are 5 revisions.
-    $this->assertCount(5, $rows);
+    // Make sure there are 6 revisions.
+    $this->assertCount(6, $rows);
 
     // Assert the submit buttons.
     $this->assertSession()->elementExists('xpath', '//input[@type="submit" and @id="edit-submit-top" and @value="Compare selected revisions"]');

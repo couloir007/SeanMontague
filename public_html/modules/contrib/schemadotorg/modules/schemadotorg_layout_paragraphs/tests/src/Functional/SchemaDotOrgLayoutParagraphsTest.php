@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\schemadotorg_paragraphs\Functional;
+namespace Drupal\Tests\schemadotorg_layout_paragraphs\Functional;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -12,8 +12,8 @@ use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
 /**
  * Tests the functionality of the Schema.org layout paragraphs.
  *
- * @covers schemadotorg_layout_paragraphs_schemadotorg_mapping_defaults_alter()
- * @covers schemadotorg_layout_paragraphs_schemadotorg_property_field_alter()
+ * @covers \schemadotorg_layout_paragraphs_schemadotorg_mapping_defaults_alter
+ * @covers \schemadotorg_layout_paragraphs_schemadotorg_property_field_alter
  * @group schemadotorg
  */
 class SchemaDotOrgLayoutParagraphsTest extends SchemaDotOrgBrowserTestBase {

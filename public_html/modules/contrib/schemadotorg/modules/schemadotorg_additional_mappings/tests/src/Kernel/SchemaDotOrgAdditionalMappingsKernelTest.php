@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\schemadotorg_additional_mappings\Kernel;
 
+use Drupal\Component\Utility\DeprecationHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 
@@ -195,23 +196,44 @@ class SchemaDotOrgAdditionalMappingsKernelTest extends SchemaDotOrgEntityKernelT
     $this->assertEquals('Links', $field_config->getLabel());
 
     // Check that the expected Recipe and WebPage fields are created.
-    $expected_configs = [
-      'node.recipe.schema_cooking_method',
-      'node.recipe.schema_cook_time',
-      'node.recipe.schema_image',
-      'node.recipe.schema_is_family_friendly',
-      'node.recipe.schema_nutrition',
-      'node.recipe.schema_prep_time',
-      'node.recipe.schema_recipe_category',
-      'node.recipe.schema_recipe_cuisine',
-      'node.recipe.schema_recipe_ingredient',
-      'node.recipe.schema_recipe_instructions',
-      'node.recipe.schema_recipe_yield',
-      'node.recipe.schema_related_link',
-      'node.recipe.schema_suitable_for_diet',
-      'node.recipe.schema_text',
-      'node.recipe.schema_total_time',
-    ];
+    $expected_configs = DeprecationHelper::backwardsCompatibleCall(
+      currentVersion: \Drupal::VERSION,
+      deprecatedVersion: '11.0.0',
+      currentCallable: fn() => [
+        'node.recipe.body',
+        'node.recipe.schema_cooking_method',
+        'node.recipe.schema_cook_time',
+        'node.recipe.schema_image',
+        'node.recipe.schema_is_family_friendly',
+        'node.recipe.schema_nutrition',
+        'node.recipe.schema_prep_time',
+        'node.recipe.schema_recipe_category',
+        'node.recipe.schema_recipe_cuisine',
+        'node.recipe.schema_recipe_ingredient',
+        'node.recipe.schema_recipe_instructions',
+        'node.recipe.schema_recipe_yield',
+        'node.recipe.schema_related_link',
+        'node.recipe.schema_suitable_for_diet',
+        'node.recipe.schema_total_time',
+      ],
+      deprecatedCallable: fn() => [
+        'node.recipe.schema_cooking_method',
+        'node.recipe.schema_cook_time',
+        'node.recipe.schema_image',
+        'node.recipe.schema_is_family_friendly',
+        'node.recipe.schema_nutrition',
+        'node.recipe.schema_prep_time',
+        'node.recipe.schema_recipe_category',
+        'node.recipe.schema_recipe_cuisine',
+        'node.recipe.schema_recipe_ingredient',
+        'node.recipe.schema_recipe_instructions',
+        'node.recipe.schema_recipe_yield',
+        'node.recipe.schema_related_link',
+        'node.recipe.schema_suitable_for_diet',
+        'node.recipe.schema_text',
+        'node.recipe.schema_total_time',
+      ],
+    );
     $this->assertEquals($expected_configs, array_keys(FieldConfig::loadMultiple()));
 
     // Check getting Schema.org mapping entity default values with

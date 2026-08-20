@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Drupal\Tests\schemadotorg\Traits;
 
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Component\Utility\DeprecationHelper;
 use Drupal\Core\Url;
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Provides convenience methods for Schema.org assertions.
@@ -66,6 +68,53 @@ trait SchemaDotOrgTestTrait {
     $schema_entity_type_builder = $this->container->get('schemadotorg.entity_type_builder');
     $schema_entity_type_builder->addFieldToEntity($entity_type_id, $bundle, $field);
 
+  }
+
+  /**
+   * Creates body field storage for tests.
+   *
+   * @param string $entity_type_id
+   *   The entity type ID.
+   */
+  protected function createBodyFieldStorage(string $entity_type_id): void {
+    if ($entity_type_id === 'node') {
+      DeprecationHelper::backwardsCompatibleCall(
+        currentVersion: \Drupal::VERSION,
+        deprecatedVersion: '11.0.0',
+        currentCallable: fn() => $this->doCreateBodyFieldStorage($entity_type_id),
+        deprecatedCallable: fn() => NULL,
+      );
+      return;
+    }
+
+    $this->doCreateBodyFieldStorage($entity_type_id);
+  }
+
+  /**
+   * Creates body field storage for tests.
+   *
+   * @param string $entity_type_id
+   *   The entity type ID.
+   */
+  protected function doCreateBodyFieldStorage(string $entity_type_id): void {
+    $field_storage = FieldStorageConfig::load($entity_type_id . '.body');
+    if ($field_storage) {
+      if ($field_storage->getType() === 'text_with_summary') {
+        return;
+      }
+      $field_storage->delete();
+    }
+
+    FieldStorageConfig::create([
+      'entity_type' => $entity_type_id,
+      'field_name' => 'body',
+      'type' => 'text_with_summary',
+      'settings' => [],
+      'module' => 'text',
+      'cardinality' => 1,
+      'translatable' => TRUE,
+      'persist_with_no_fields' => TRUE,
+    ])->save();
   }
 
   /**

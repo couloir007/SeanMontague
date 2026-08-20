@@ -17,7 +17,7 @@ interface SchemaDotOrgJsonApiPreviewBuilderInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   An entity.
    *
-   * @return array[]|null
+   * @return array|null
    *   A renderable array containing a JSON:API preview
    *   for an entity.
    */

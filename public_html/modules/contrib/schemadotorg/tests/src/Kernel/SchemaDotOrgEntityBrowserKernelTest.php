@@ -9,7 +9,7 @@ use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 /**
  * Tests the functionality of the Schema.org Entity Browser integration.
  *
- * @covers entity_browser_schemadotorg_property_field_alter()
+ * @covers \entity_browser_schemadotorg_property_field_alter
  * @group MskPHPUnit
  */
 class SchemaDotOrgEntityBrowserKernelTest extends SchemaDotOrgEntityKernelTestBase {

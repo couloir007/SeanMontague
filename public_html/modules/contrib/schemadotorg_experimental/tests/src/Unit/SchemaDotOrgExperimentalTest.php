@@ -17,7 +17,7 @@ class SchemaDotOrgExperimentalTest extends UnitTestCase {
    * Test to trigger Drupal GitLab CI pipeline.
    */
   public function test(): void {
-    $this->assertTrue(TRUE);
+    $this->assertFileExists(__DIR__ . '/../../../composer.json');
   }
 
 }

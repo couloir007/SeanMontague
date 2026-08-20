@@ -9,7 +9,7 @@ use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
 /**
  * Tests the functionality of the Schema.org report settings form.
  *
- * @covers \Drupal\schemadotorg\Form\SchemaDotOrgReportSettingsForm
+ * @covers \Drupal\schemadotorg_report\Form\SchemaDotOrgReportSettingsForm
  * @group schemadotorg
  */
 class SchemaDotOrgReportSettingsFormTest extends SchemaDotOrgBrowserTestBase {

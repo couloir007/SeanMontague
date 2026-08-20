@@ -149,7 +149,7 @@ class SchemaDotOrgAdditionalTypeTest extends SchemaDotOrgBrowserTestBase {
     ];
     $this->submitForm($edit, 'Save');
     /** @var \Drupal\schemadotorg\SchemaDotOrgMappingInterface $mapping */
-    $mapping = $this->mappingStorage->load('node.person');
+    $mapping = $this->getMappingStorage()->load('node.person');
     $this->assertEquals('schema_person_type', $mapping->getSchemaPropertyFieldName('additionalType'));
 
     // Check creating another 'Person' with additional type enabled.
@@ -160,7 +160,7 @@ class SchemaDotOrgAdditionalTypeTest extends SchemaDotOrgBrowserTestBase {
     ];
     $this->submitForm($edit, 'Save');
     /** @var \Drupal\schemadotorg\SchemaDotOrgMappingInterface $mapping */
-    $mapping = $this->mappingStorage->load('node.another_person');
+    $mapping = $this->getMappingStorage()->load('node.another_person');
     $this->assertEquals('schema_person_type', $mapping->getSchemaPropertyFieldName('additionalType'));
 
     // Check creating other 'Person' with other additional type enabled.
@@ -172,7 +172,7 @@ class SchemaDotOrgAdditionalTypeTest extends SchemaDotOrgBrowserTestBase {
     ];
     $this->submitForm($edit, 'Save');
     /** @var \Drupal\schemadotorg\SchemaDotOrgMappingInterface $mapping */
-    $mapping = $this->mappingStorage->load('node.other_person');
+    $mapping = $this->getMappingStorage()->load('node.other_person');
     $this->assertEquals('schema_other_person_type', $mapping->getSchemaPropertyFieldName('additionalType'));
 
     /* ********************************************************************** */

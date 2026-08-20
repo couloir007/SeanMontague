@@ -10,7 +10,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org auto entity label.
  *
- * @covers schemadotorg_auto_entitylabel_schemadotorg_mapping_insert()
+ * @covers \schemadotorg_auto_entitylabel_schemadotorg_mapping_insert
  * @group schemadotorg
  */
 class SchemaDotOrgAutoEntityLabelKernelTest extends SchemaDotOrgEntityKernelTestBase {

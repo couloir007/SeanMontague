@@ -2,8 +2,7 @@
  * @file
  * Schema.org Diagram styles.
  */
-.schemadotorg-diagram-mermaid svg {
-  min-height: 400px;
+.schemadotorg-diagram-mermaid {
   border: 1px solid #ccc;
 }
 

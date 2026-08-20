@@ -9,7 +9,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org mercury editor.
  *
- * @covers schemadotorg_mercury_editor_schemadotorg_mapping_insert()
+ * @covers \Drupal\schemadotorg_mercury_editor\SchemaDotOrgMercuryEditorManager
  * @group schemadotorg
  */
 class SchemaDotOrgMercuryEditorKernelTest extends SchemaDotOrgEntityKernelTestBase {

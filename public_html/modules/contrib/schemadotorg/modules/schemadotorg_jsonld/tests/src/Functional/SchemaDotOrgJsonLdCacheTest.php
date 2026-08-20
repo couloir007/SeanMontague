@@ -9,7 +9,7 @@ use Drupal\Tests\schemadotorg\Functional\SchemaDotOrgBrowserTestBase;
 /**
  * Test Schema.org JSON-LD caching.
  *
- * @covers schemadotorg_jsonld_page_attachments_alter()
+ * @covers \schemadotorg_jsonld_page_attachments_alter
  * @group schemadotorg
  */
 class SchemaDotOrgJsonLdCacheTest extends SchemaDotOrgBrowserTestBase {

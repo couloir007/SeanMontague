@@ -15,8 +15,8 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org paragraphs.
  *
- * @covers schemadotorg_paragraphs_schemadotorg_property_field_alter()
- * @covers schemadotorg_paragraphs_schemadotorg_mapping_presave()
+ * @covers \schemadotorg_paragraphs_schemadotorg_property_field_alter
+ * @covers \schemadotorg_paragraphs_schemadotorg_mapping_presave
  * @group schemadotorg
  */
 class SchemaDotOrgParagraphsKernelTest extends SchemaDotOrgEntityKernelTestBase {

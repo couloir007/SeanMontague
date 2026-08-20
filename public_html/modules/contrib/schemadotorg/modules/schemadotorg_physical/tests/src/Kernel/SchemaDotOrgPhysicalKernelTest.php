@@ -9,8 +9,8 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org Physical module.
  *
- * @covers schemadotorg_physical_install()
- * @covers schemadotorg_physical_uninstall()
+ * @covers \schemadotorg_physical_install
+ * @covers \schemadotorg_physical_uninstall
  * @group schemadotorg
  */
 class SchemaDotOrgPhysicalKernelTest extends SchemaDotOrgEntityKernelTestBase {

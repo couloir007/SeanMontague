@@ -12,7 +12,7 @@ require_once __DIR__ . '/../../../schemadotorg_geolocation.install';
 /**
  * Tests the functionality of the Schema.org Geolocation JSON-LD integration.
  *
- * @covers schemadotorg_geolocation_schemadotorg_jsonld_schema_property_alter()
+ * @covers \schemadotorg_geolocation_schemadotorg_jsonld_schema_property_alter
  * @group schemadotorg
  */
 class SchemaDotOrgGeolocationJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBase {

@@ -11,7 +11,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the Schema.org field validation.
  *
- * @coversClass schemadotorg_field_validation_field_config_insert()
+ * @covers \schemadotorg_field_validation_field_config_insert
  * @group schemadotorg
  */
 class SchemaDotOrgFieldValidationKernelTest extends SchemaDotOrgEntityKernelTestBase {
@@ -67,7 +67,7 @@ class SchemaDotOrgFieldValidationKernelTest extends SchemaDotOrgEntityKernelTest
       ->resetCache();
 
     // Check that the ruleset still exists.
-    /** @var \Drupal\field_validation\FieldValidationRuleSetInterface $ruleset */
+    /** @var \Drupal\field_validation\FieldValidationRuleSetInterface|null $ruleset */
     $ruleset = FieldValidationRuleSet::load('node_organization');
     $this->assertNotNull($ruleset);
     $this->assertCount(1, $ruleset->getFieldValidationRules());

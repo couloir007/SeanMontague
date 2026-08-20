@@ -21,6 +21,7 @@ content:
     label: above
     settings:
       link_to_entity: false
+      link_rel: canonical
     third_party_settings: {  }
     weight: 110
     region: content
@@ -52,6 +53,7 @@ content:
     label: above
     settings:
       link_to_entity: false
+      link_rel: canonical
     third_party_settings: {  }
     weight: 3
     region: content

@@ -54,17 +54,17 @@ class SchemaDotOrgFieldPartsKernelTest extends SchemaDotOrgEntityKernelTestBase 
     $this->assertEquals('Title suffix', $title_suffix->label());
     $this->assertEquals('The text which appears after the title.', $title_suffix->getDescription());
 
-    // Check that the name's field prefix is placed in the expected field group.
+    // Check that the name's field parts have matching form display weight.
     /** @var \Drupal\Core\Entity\Entity\EntityFormDisplay $form_display */
     $form_display = $this->entityDisplayRepository->getFormDisplay('node', 'web_content');
-    $this->assertEquals(2, $form_display->getComponent('title_prefix')['weight']);
-    $this->assertEquals(2, $form_display->getComponent('title_suffix')['weight']);
+    $this->assertIsInt($form_display->getComponent('title_prefix')['weight']);
+    $this->assertEquals($form_display->getComponent('title_prefix')['weight'], $form_display->getComponent('title_suffix')['weight']);
 
-    // Check that the name's field prefix is placed in the expected field group.
+    // Check that the name's field parts have matching view display weight.
     /** @var \Drupal\Core\Entity\Entity\EntityViewDisplay $view_display */
     $view_display = $this->entityDisplayRepository->getViewDisplay('node', 'web_content');
-    $this->assertEquals(2, $view_display->getComponent('title_prefix')['weight']);
-    $this->assertEquals(2, $view_display->getComponent('title_suffix')['weight']);
+    $this->assertIsInt($view_display->getComponent('title_prefix')['weight']);
+    $this->assertEquals($view_display->getComponent('title_prefix')['weight'], $view_display->getComponent('title_suffix')['weight']);
   }
 
 }

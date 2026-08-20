@@ -71,9 +71,18 @@ function schemadotorg_epp_form_schemadotorg_properties_settings_form_alter(array
     '#example' => "
 SchemaType:
   'SchemaType?schemaProperty': 'Add @label'
+SchemaType--additionalType:
+  'SchemaType?schemaProperty': 'Add @label as additional type'
 bundle:
   'bundle?schemaProperty01': 'Add @label as something'
+bundle--additional_type:
+  'bundle?schemaProperty01': 'Add @label as additional type'
 ",
+  ];
+  $form['schemadotorg_epp']['use_exact_match'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Use exact match for node links'),
+    '#description' => t('If checked, node links will only be shown for the exact Schema.org type or bundle configured in the node links settings, not for parent types in the type hierarchy.'),
   ];
   $form['schemadotorg_epp']['node_links_display'] = [
     '#type' => 'select',

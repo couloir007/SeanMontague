@@ -21,6 +21,7 @@ use Drupal\schemadotorg\SchemaDotOrgMappingInterface;
  */
 function schemadotorg_cer_entity_type_alter(array &$entity_types): void {
   $entity_types['corresponding_reference']->setClass('\Drupal\schemadotorg_cer\Entity\SchemaDotOrgCorrespondingReference');
+  $entity_types['corresponding_reference']->set('provider', 'cer');
 }
 
 /**

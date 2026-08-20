@@ -10,7 +10,7 @@ use Drupal\Tests\schemadotorg_jsonld\Kernel\SchemaDotOrgJsonLdKernelTestBase;
 /**
  * Tests the functionality of the Schema.org identifier JSON-LD.
  *
- * @covers schemadotorg_identifier_schemadotorg_jsonld_schema_type_entity_load()
+ * @covers \schemadotorg_identifier_schemadotorg_jsonld_schema_type_entity_load
  * @group schemadotorg
  */
 class SchemaDotOrgIdentifierJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBase {

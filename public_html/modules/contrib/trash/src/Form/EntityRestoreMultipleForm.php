@@ -14,6 +14,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
 use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\Core\Url;
+use Drupal\trash\Trash;
 use Drupal\trash\TrashManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -137,12 +138,27 @@ class EntityRestoreMultipleForm extends ConfirmFormBase implements BaseFormIdInt
     $this->entityType = $this->entityTypeManager->getDefinition($this->entityTypeId);
     $entities = $this->entityTypeManager->getStorage($entity_type_id)->loadMultiple(array_keys($this->selection));
 
+    // Entities may have been purged (by auto-purge cron, another user, or
+    // another tab) between the bulk operation and this confirm page, since
+    // the tempstore selection survives across requests. Drop them from the
+    // selection, and bail out if nothing is left to confirm.
+    $this->selection = array_intersect_key($this->selection, $entities);
+    if (empty($this->selection)) {
+      return new RedirectResponse($this->getCancelUrl()->setAbsolute()->toString());
+    }
+
     $items = [];
     foreach ($this->selection as $id => $selected_langcodes) {
       $entity = $entities[$id];
       foreach ($selected_langcodes as $langcode) {
         $key = $id . ':' . $langcode;
         if ($entity instanceof TranslatableInterface) {
+          // A single translation may have been purged since the confirm page
+          // selection was built; skip it instead of fatally erroring in
+          // getTranslation().
+          if (!$entity->hasTranslation($langcode)) {
+            continue;
+          }
           $entity = $entity->getTranslation($langcode);
           $default_key = $id . ':' . $entity->getUntranslated()->language()->getId();
 
@@ -201,6 +217,11 @@ class EntityRestoreMultipleForm extends ConfirmFormBase implements BaseFormIdInt
 
     // Collect entities to restore (restore always restores the full entity).
     foreach ($this->selection as $id => $selected_langcodes) {
+      // The entity may have been purged since the confirm page was built;
+      // skip it instead of fatally erroring on the missing array key.
+      if (!isset($entities[$id])) {
+        continue;
+      }
       $entity = $entities[$id];
       if (!$entity->access('restore', $this->currentUser)) {
         $inaccessible_entities[] = $entity;
@@ -213,7 +234,7 @@ class EntityRestoreMultipleForm extends ConfirmFormBase implements BaseFormIdInt
 
     foreach ($restore_entities as $entity) {
       try {
-        trash_restore_entity($entity);
+        Trash::restoreEntity($entity);
         $total_count++;
         $this->logger('trash')->info('Restored @entity-type %label from trash.', [
           '@entity-type' => $entity->getEntityType()->getSingularLabel(),

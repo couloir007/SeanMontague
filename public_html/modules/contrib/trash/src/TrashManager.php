@@ -7,8 +7,9 @@ namespace Drupal\trash;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
+use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\trash\Handler\TrashHandlerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -44,7 +45,7 @@ class TrashManager implements TrashManagerInterface {
    * {@inheritdoc}
    */
   public function isEntityTypeSupported(EntityTypeInterface $entity_type): bool {
-    return is_subclass_of($entity_type->getStorageClass(), SqlEntityStorageInterface::class);
+    return is_a($entity_type->getStorageClass(), SqlContentEntityStorage::class, TRUE);
   }
 
   /**
@@ -95,8 +96,8 @@ class TrashManager implements TrashManagerInterface {
     }
 
     $storage_definition = BaseFieldDefinition::create('timestamp')
-      ->setLabel(t('Deleted'))
-      ->setDescription(t('Time when the item got deleted'))
+      ->setLabel(new TranslatableMarkup('Deleted'))
+      ->setDescription(new TranslatableMarkup('Time when the item got deleted'))
       ->setInternal(TRUE)
       ->setTranslatable(FALSE)
       ->setRevisionable(TRUE);
@@ -115,6 +116,9 @@ class TrashManager implements TrashManagerInterface {
     $field_storage_definitions = $entity_schema_repository->getLastInstalledFieldStorageDefinitions($entity_type->id());
 
     if (isset($field_storage_definitions['deleted'])) {
+      if ($field_storage_definitions['deleted']->getProvider() !== 'trash') {
+        throw new \InvalidArgumentException("The {$entity_type->id()} entity type's 'deleted' field does not belong to Trash; refusing to uninstall it.");
+      }
       /** @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface $entity_definition_update_manager */
       $entity_definition_update_manager = ($this->entityDefinitionUpdateManager)();
       $entity_definition_update_manager->uninstallFieldStorageDefinition($field_storage_definitions['deleted']);
@@ -172,11 +176,12 @@ class TrashManager implements TrashManagerInterface {
     $previous = $this->trashContext;
     $this->setTrashContext($context);
 
-    $result = $function();
-
-    $this->setTrashContext($previous);
-
-    return $result;
+    try {
+      return $function();
+    }
+    finally {
+      $this->setTrashContext($previous);
+    }
   }
 
   /**

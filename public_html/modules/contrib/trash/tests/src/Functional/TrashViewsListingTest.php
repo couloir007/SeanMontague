@@ -132,11 +132,17 @@ class TrashViewsListingTest extends BrowserTestBase {
     $entity2->save();
     $entity3 = TrashTestEntity::create(['label' => 'Bulk Entity 3']);
     $entity3->save();
+    $entity4 = TrashTestEntity::create(['label' => 'Bulk Entity 4']);
+    $entity4->save();
+    $entity5 = TrashTestEntity::create(['label' => 'Bulk Entity 5']);
+    $entity5->save();
 
     // Delete them.
     $entity1->delete();
     $entity2->delete();
     $entity3->delete();
+    $entity4->delete();
+    $entity5->delete();
 
     // Visit the trash overview.
     $this->drupalGet('/admin/content/trash/trash_test_entity');
@@ -150,30 +156,52 @@ class TrashViewsListingTest extends BrowserTestBase {
     $this->assertSession()->optionExists('action', 'trash_test_entity_restore_action');
     $this->assertSession()->optionExists('action', 'trash_test_entity_purge_action');
 
-    // Test bulk restore: select Entity 1 and Entity 2 by finding their rows.
+    // Test bulk restore: select Entity 1, Entity 2 and Entity 4 by finding
+    // their rows.
     $this->checkRowByLabel('Bulk Entity 1');
     $this->checkRowByLabel('Bulk Entity 2');
+    $this->checkRowByLabel('Bulk Entity 4');
     $this->getSession()->getPage()->selectFieldOption('action', 'trash_test_entity_restore_action');
     $this->getSession()->getPage()->pressButton('Apply to selected items');
-
-    // Confirm the bulk restore.
     $this->assertSession()->pageTextContains('Are you sure you want to restore');
+
+    // Purge Entity 4 behind the form's back: the tempstore selection survives
+    // across requests, so the confirm form must skip entities that no longer
+    // exist (auto-purge cron, another user, another tab) instead of crashing.
+    $this->purgeOutOfBand($entity4->id());
+    $this->drupalGet($this->getUrl());
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Bulk Entity 1');
+    $this->assertSession()->pageTextContains('Bulk Entity 2');
+    $this->assertSession()->pageTextNotContains('Bulk Entity 4');
+
+    // Confirm the bulk restore; only the two surviving entities count.
     $this->submitForm([], 'Restore');
     $this->assertSession()->statusMessageContains('Restored 2 items from trash', 'status');
 
-    // Verify only entity3 remains in trash.
+    // Verify only entity3 and entity5 remain in trash.
     $this->drupalGet('/admin/content/trash/trash_test_entity');
     $this->assertSession()->pageTextNotContains('Bulk Entity 1');
     $this->assertSession()->pageTextNotContains('Bulk Entity 2');
     $this->assertSession()->pageTextContains('Bulk Entity 3');
+    $this->assertSession()->pageTextNotContains('Bulk Entity 4');
+    $this->assertSession()->pageTextContains('Bulk Entity 5');
 
-    // Test bulk purge: select Entity 3.
+    // Test bulk purge: select Entity 3 and Entity 5.
     $this->checkRowByLabel('Bulk Entity 3');
+    $this->checkRowByLabel('Bulk Entity 5');
     $this->getSession()->getPage()->selectFieldOption('action', 'trash_test_entity_purge_action');
     $this->getSession()->getPage()->pressButton('Apply to selected items');
-
-    // Confirm the bulk purge.
     $this->assertSession()->pageTextContains('Are you sure you want to permanently delete');
+
+    // Same stale-selection guard on the purge confirm form.
+    $this->purgeOutOfBand($entity5->id());
+    $this->drupalGet($this->getUrl());
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Bulk Entity 3');
+    $this->assertSession()->pageTextNotContains('Bulk Entity 5');
+
+    // Confirm the bulk purge; only the surviving entity counts.
     $this->submitForm([], 'Permanently delete');
     $this->assertSession()->statusMessageContains('Permanently deleted 1 item', 'status');
 
@@ -223,6 +251,21 @@ class TrashViewsListingTest extends BrowserTestBase {
     $this->drupalGet('/admin/content/trash/trash_test_entity');
     $this->assertSession()->pageTextNotContains('Entity To Purge');
     $this->assertSession()->pageTextContains('There are no deleted');
+  }
+
+  /**
+   * Hard-deletes a trashed entity outside the browser session.
+   *
+   * @param int|string $entity_id
+   *   The ID of the trashed entity to purge.
+   */
+  protected function purgeOutOfBand(int|string $entity_id): void {
+    $storage = \Drupal::entityTypeManager()->getStorage('trash_test_entity');
+    \Drupal::service('trash.manager')->executeInTrashContext('ignore', function () use ($storage, $entity_id): void {
+      if ($entity = $storage->load($entity_id)) {
+        $storage->delete([$entity]);
+      }
+    });
   }
 
   /**

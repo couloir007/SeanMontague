@@ -141,7 +141,7 @@ class SchemaDotOrgAdditionalMappingsMappingUiFormTest extends SchemaDotOrgBrowse
     }
     $this->submitForm($edit, 'Save');
     /** @var \Drupal\schemadotorg\SchemaDotOrgMappingInterface $mapping */
-    $mapping = $this->mappingStorage->loadUnchanged('node.recipe');
+    $mapping = $this->getMappingStorage()->loadUnchanged('node.recipe');
     $additional_mapping = $mapping->getAdditionalMapping('WebPage');
     $expected_additional_mapping = [
       'schema_type' => 'WebPage',
@@ -154,7 +154,7 @@ class SchemaDotOrgAdditionalMappingsMappingUiFormTest extends SchemaDotOrgBrowse
     $edit = ['mapping[additional_mappings][WebPage][schema_type]' => FALSE];
     $this->submitForm($edit, 'Save');
     /** @var \Drupal\schemadotorg\SchemaDotOrgMappingInterface $mapping */
-    $mapping = $this->mappingStorage->loadUnchanged('node.recipe');
+    $mapping = $this->getMappingStorage()->loadUnchanged('node.recipe');
     $this->assertNull($mapping->getAdditionalMapping('WebPage'));
   }
 

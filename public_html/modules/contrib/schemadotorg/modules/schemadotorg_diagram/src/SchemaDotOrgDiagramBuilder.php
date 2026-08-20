@@ -105,6 +105,9 @@ class SchemaDotOrgDiagramBuilder implements SchemaDotOrgDiagramBuilderInterface 
   public function buildDiagram(NodeInterface $node, ?string $parent_property, ?string $child_property, ?string $title): ?array {
     $this->parentProperty = $parent_property;
     $this->childProperty = $child_property;
+    $this->maxDepth = $this->configFactory
+      ->get('schemadotorg_diagram.settings')
+      ->get('max_depth');
 
     // The current node's depth is 1, the parent nodes' depth is 0,
     // and child nodes' depth starts at 2.
@@ -284,7 +287,6 @@ class SchemaDotOrgDiagramBuilder implements SchemaDotOrgDiagramBuilderInterface 
       ?? NULL;
     $entities = [];
     foreach ($node->get($field_name) as $item) {
-      // @phpstan-ignore-next-line
       $target_id = $item->target_id ?? NULL;
       if (!$target_id) {
         continue;
@@ -319,7 +321,7 @@ class SchemaDotOrgDiagramBuilder implements SchemaDotOrgDiagramBuilderInterface 
     $node_uri = $node_url->setAbsolute()->toString();
 
     // Title with Schema.org type.
-    $node_title = '**' . $node->label() . '**';
+    $node_title = '**' . trim($node->label()) . '**';
     $schema_type = $this->getNodeSchemaType($node);
     if ($schema_type) {
       $node_title .= PHP_EOL . '(' . $schema_type . ')';

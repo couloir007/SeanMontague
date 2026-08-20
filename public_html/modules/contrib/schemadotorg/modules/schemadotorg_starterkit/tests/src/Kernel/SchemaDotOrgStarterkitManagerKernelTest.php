@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\starterkit\Kernel;
+namespace Drupal\Tests\schemadotorg_starterkit\Kernel;
 
 use Drupal\schemadotorg_starterkit\SchemaDotOrgStarterkitManagerInterface;
 use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
@@ -10,7 +10,7 @@ use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 /**
  * Tests the functionality of the Schema.org starter kit manager.
  *
- * @covers \Drupal\starterkit\SchemaDotOrgTaxonomyPropertyVocabularyManagerTest;
+ * @covers \Drupal\schemadotorg_starterkit\SchemaDotOrgStarterkitManager
  * @group schemadotorg
  */
 class SchemaDotOrgStarterkitManagerKernelTest extends SchemaDotOrgEntityKernelTestBase {

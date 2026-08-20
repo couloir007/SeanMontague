@@ -12,7 +12,7 @@ use Drupal\Tests\schemadotorg_jsonld\Kernel\SchemaDotOrgJsonLdKernelTestBase;
 /**
  * Tests the functionality of the Schema.org Physical module JSON-LD integration.
  *
- * @covers schemadotorg_physical_schemadotorg_jsonld_schema_property_alter(()
+ * @covers \schemadotorg_physical_schemadotorg_jsonld_schema_property_alter
  * @group schemadotorg
  */
 class SchemaDotOrgPhysicalJsonLdKernelTest extends SchemaDotOrgJsonLdKernelTestBase {

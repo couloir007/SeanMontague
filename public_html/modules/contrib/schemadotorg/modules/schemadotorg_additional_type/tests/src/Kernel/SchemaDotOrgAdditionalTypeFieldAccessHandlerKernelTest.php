@@ -11,6 +11,8 @@ use Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeFieldAccessHan
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\schemadotorg\Kernel\SchemaDotOrgEntityKernelTestBase;
 use Drupal\Tests\schemadotorg_additional_type\Traits\SchemaDotOrgAdditionalTypeTestTrait;
+use Drupal\user\Entity\Role;
+use Drupal\user\Entity\User;
 
 /**
  * Tests Schema.org additional type field access handler.
@@ -95,8 +97,12 @@ class SchemaDotOrgAdditionalTypeFieldAccessHandlerKernelTest extends SchemaDotOr
     $this->account = $this->createUser(['view own unpublished content']);
 
     $this->createAdminRole('admin');
+    Role::load('admin')->setIsAdmin(TRUE)->save();
+
     $this->admin = $this->createUser();
-    $this->admin->addRole('admin')->save();
+    $this->admin
+      ->addRole('admin')
+      ->save();
   }
 
   /**
@@ -237,6 +243,13 @@ class SchemaDotOrgAdditionalTypeFieldAccessHandlerKernelTest extends SchemaDotOr
 
     $this->assertFieldAccess('view', $this->admin);
     $this->assertFieldAccess('edit', $this->admin);
+
+    // Check that user 1 is treated as having the admin role even without it
+    // explicitly assigned.
+    $user1 = User::load(1);
+    $this->assertNotContains('admin', $user1->getRoles());
+    $this->assertFieldAccess('view', $user1);
+    $this->assertFieldAccess('edit', $user1);
 
     /* ********************************************************************** */
     // Schema.org types.

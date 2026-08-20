@@ -45,7 +45,8 @@ class SchemaDotOrgJsonLdEndpointRoutes implements ContainerInjectionInterface {
 
     /** @var \Drupal\schemadotorg\SchemaDotOrgMappingTypeStorageInterface $mapping_type_storage */
     $mapping_type_storage = $this->entityTypeManager->getStorage('schemadotorg_mapping_type');
-    $endpoints = $config->get('entity_type_endpoints') + $mapping_type_storage->getEntityTypes();
+    $entity_type_endpoints = $config->get('entity_type_endpoints') ?? [];
+    $endpoints = $entity_type_endpoints + $mapping_type_storage->getEntityTypes();
     foreach ($endpoints as $entity_type_id => $entity_type_path) {
       if (!$this->entityTypeManager->hasDefinition($entity_type_id)) {
         continue;

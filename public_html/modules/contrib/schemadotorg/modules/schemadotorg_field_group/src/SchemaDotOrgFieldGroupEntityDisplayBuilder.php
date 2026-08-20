@@ -363,7 +363,7 @@ class SchemaDotOrgFieldGroupEntityDisplayBuilder implements SchemaDotOrgFieldGro
     if ($config->get('update_default_field_groups')
       && !$this->getDefaultFieldGroupName($entity_type_id, $bundle, $field_name, $schema_type, $schema_property)) {
       $default_group_name = str_replace(FieldGroupAddForm::GROUP_PREFIX, '', $group_name);
-      $default_field_groups = $config->get('default_field_groups.' . $entity_type_id);
+      $default_field_groups = $config->get('default_field_groups.' . $entity_type_id) ?? [];
       $default_field_groups += [$default_group_name => []];
       $default_field_groups[$default_group_name] += [
         'label' => $group_label,

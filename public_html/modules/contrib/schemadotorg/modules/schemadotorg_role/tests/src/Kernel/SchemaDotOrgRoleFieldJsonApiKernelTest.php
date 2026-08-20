@@ -10,7 +10,7 @@ use Drupal\Tests\schemadotorg_jsonapi\Kernel\SchemaDotOrgJsonApiKernelTestBase;
 /**
  * Tests the functionality of the Schema.org role JSON:API support.
  *
- * @covers schemadotorg_role_jsonapi_resource_config_presave()
+ * @covers \schemadotorg_role_jsonapi_resource_config_presave
  * @group schemadotorg
  */
 class SchemaDotOrgRoleFieldJsonApiKernelTest extends SchemaDotOrgJsonApiKernelTestBase {
@@ -47,7 +47,7 @@ class SchemaDotOrgRoleFieldJsonApiKernelTest extends SchemaDotOrgJsonApiKernelTe
 
     // Check that JSON:API resource was created for Thing.
     /** @var \Drupal\jsonapi_extras\Entity\JsonapiResourceConfig $resource */
-    $resource = $this->resourceStorage->load('node--podcast_episode');
+    $resource = $this->getResourceStorage()->load('node--podcast_episode');
     $resource_fields = $resource->get('resourceFields');
     $expected_result = [
       'disabled' => FALSE,

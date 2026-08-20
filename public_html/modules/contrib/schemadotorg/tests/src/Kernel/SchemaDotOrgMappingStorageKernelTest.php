@@ -81,82 +81,82 @@ class SchemaDotOrgMappingStorageKernelTest extends SchemaDotOrgEntityKernelTestB
     $image_node->save();
 
     // Check determining if an entity is mapped to a Schema.org type.
-    $this->assertFalse($this->mappingStorage->isEntityMapped($page_node));
-    $this->assertTrue($this->mappingStorage->isEntityMapped($thing_node));
+    $this->assertFalse($this->getMappingStorage()->isEntityMapped($page_node));
+    $this->assertTrue($this->getMappingStorage()->isEntityMapped($thing_node));
 
     // Check determining if an entity type and bundle are mapped to Schema.org.
-    $this->assertFalse($this->mappingStorage->isBundleMapped('node', 'page'));
-    $this->assertTrue($this->mappingStorage->isBundleMapped('node', 'thing'));
+    $this->assertFalse($this->getMappingStorage()->isBundleMapped('node', 'page'));
+    $this->assertTrue($this->getMappingStorage()->isBundleMapped('node', 'thing'));
 
     // Check determining if a mapping type definition is valid.
-    $this->assertFalse($this->mappingStorage->isValidType('test'));
-    $this->assertFalse($this->mappingStorage->isValidType('node:Test'));
-    $this->assertFalse($this->mappingStorage->isValidType('test:Thing'));
-    $this->assertTrue($this->mappingStorage->isValidType('node:Thing'));
+    $this->assertFalse($this->getMappingStorage()->isValidType('test'));
+    $this->assertFalse($this->getMappingStorage()->isValidType('node:Test'));
+    $this->assertFalse($this->getMappingStorage()->isValidType('test:Thing'));
+    $this->assertTrue($this->getMappingStorage()->isValidType('node:Thing'));
 
     // Check getting the Schema.org type for an entity and bundle.
-    $this->assertEquals('Thing', $this->mappingStorage->getSchemaType('node', 'thing'));
+    $this->assertEquals('Thing', $this->getMappingStorage()->getSchemaType('node', 'thing'));
 
     // Check getting the Schema.org property name for an entity field mapping.
-    $this->assertEquals('name', $this->mappingStorage->getSchemaPropertyName('node', 'thing', 'title'));
-    $this->assertNull($this->mappingStorage->getSchemaPropertyName('node', 'thing', 'not_field'));
-    $this->assertNull($this->mappingStorage->getSchemaPropertyName('node', 'not_thing', 'thing'));
+    $this->assertEquals('name', $this->getMappingStorage()->getSchemaPropertyName('node', 'thing', 'title'));
+    $this->assertNull($this->getMappingStorage()->getSchemaPropertyName('node', 'thing', 'not_field'));
+    $this->assertNull($this->getMappingStorage()->getSchemaPropertyName('node', 'not_thing', 'thing'));
 
     // Check getting a Schema.org property's range includes.
-    $this->assertEquals(['Question' => 'Question'], $this->mappingStorage->getSchemaPropertyRangeIncludes('FAQPage', 'mainEntity'));
+    $this->assertEquals(['Question' => 'Question'], $this->getMappingStorage()->getSchemaPropertyRangeIncludes('FAQPage', 'mainEntity'));
 
     // Check getting a Schema.org property's target bundles.
-    $this->assertEquals(['image_object' => 'image_object'], $this->mappingStorage->getSchemaPropertyTargetBundles('node', 'Thing', 'image'));
-    $this->assertEquals([], $this->mappingStorage->getSchemaPropertyTargetBundles('media', 'Thing', 'image'));
+    $this->assertEquals(['image_object' => 'image_object'], $this->getMappingStorage()->getSchemaPropertyTargetBundles('node', 'Thing', 'image'));
+    $this->assertEquals([], $this->getMappingStorage()->getSchemaPropertyTargetBundles('media', 'Thing', 'image'));
 
-    $this->assertEquals(['image_object' => 'image_object'], $this->mappingStorage->getSchemaPropertyTargetBundles('node', 'Thing', 'image'));
-    $this->assertEquals([], $this->mappingStorage->getSchemaPropertyTargetBundles('media', 'Thing', 'image'));
+    $this->assertEquals(['image_object' => 'image_object'], $this->getMappingStorage()->getSchemaPropertyTargetBundles('node', 'Thing', 'image'));
+    $this->assertEquals([], $this->getMappingStorage()->getSchemaPropertyTargetBundles('media', 'Thing', 'image'));
 
     // Check getting Schema.org range includes target bundles.
-    $this->assertEquals([], $this->mappingStorage->getRangeIncludesTargetBundles('node', ['Thing' => 'Thing']));
-    $this->assertEquals(['image_object' => 'image_object'], $this->mappingStorage->getRangeIncludesTargetBundles('node', ['MediaObject' => 'MediaObject']));
-    $this->assertEquals(['image_object' => 'image_object'], $this->mappingStorage->getRangeIncludesTargetBundles('node', ['ImageObject' => 'ImageObject']));
-    $this->assertEquals(['thing' => 'thing'], $this->mappingStorage->getRangeIncludesTargetBundles('node', ['WebPage' => 'WebPage'], ['ignore_thing' => FALSE]));
-    $this->assertEquals([], $this->mappingStorage->getRangeIncludesTargetBundles('node', ['WebPage' => 'WebPage'], ['ignore_additional_mappings' => TRUE]));
+    $this->assertEquals([], $this->getMappingStorage()->getRangeIncludesTargetBundles('node', ['Thing' => 'Thing']));
+    $this->assertEquals(['image_object' => 'image_object'], $this->getMappingStorage()->getRangeIncludesTargetBundles('node', ['MediaObject' => 'MediaObject']));
+    $this->assertEquals(['image_object' => 'image_object'], $this->getMappingStorage()->getRangeIncludesTargetBundles('node', ['ImageObject' => 'ImageObject']));
+    $this->assertEquals(['thing' => 'thing'], $this->getMappingStorage()->getRangeIncludesTargetBundles('node', ['WebPage' => 'WebPage'], ['ignore_thing' => FALSE]));
+    $this->assertEquals([], $this->getMappingStorage()->getRangeIncludesTargetBundles('node', ['WebPage' => 'WebPage'], ['ignore_additional_mappings' => TRUE]));
 
     // Check parsing a type.
     $this->assertEquals(
       ['node', NULL, 'Thing'],
-      $this->mappingStorage->parseType('node:Thing')
+      $this->getMappingStorage()->parseType('node:Thing')
     );
     $this->assertEquals(
       ['node', 'custom_thing', 'Thing'],
-      $this->mappingStorage->parseType('node:custom_thing:Thing')
+      $this->getMappingStorage()->parseType('node:custom_thing:Thing')
     );
 
     // Check loading Schema.org by type.
-    $this->assertEquals('node.thing', $this->mappingStorage->loadByType('node:Thing')->id());
-    $this->assertEquals('node.thing', $this->mappingStorage->loadByType('node:thing:Thing')->id());
+    $this->assertEquals('node.thing', $this->getMappingStorage()->loadByType('node:Thing')->id());
+    $this->assertEquals('node.thing', $this->getMappingStorage()->loadByType('node:thing:Thing')->id());
 
     // Check loading by target entity id and bundle.
-    $this->assertEquals('node.thing', $this->mappingStorage->loadByBundle('node', 'thing')->id());
-    $this->assertNull($this->mappingStorage->loadByBundle('node', 'not_thing'));
+    $this->assertEquals('node.thing', $this->getMappingStorage()->loadByBundle('node', 'thing')->id());
+    $this->assertNull($this->getMappingStorage()->loadByBundle('node', 'not_thing'));
 
     // Check loading by target entity id and Schema.org type.
-    $this->assertEquals('node.thing', $this->mappingStorage->loadBySchemaType('node', 'Thing')->id());
-    $this->assertNull($this->mappingStorage->loadBySchemaType('node', 'NotThing'));
+    $this->assertEquals('node.thing', $this->getMappingStorage()->loadBySchemaType('node', 'Thing')->id());
+    $this->assertNull($this->getMappingStorage()->loadBySchemaType('node', 'NotThing'));
 
     // Check loading multiple with children by target entity id and Schema.org type.
     $expected_types = [
       'node.image_object',
       'node.thing',
     ];
-    $actual_types = array_keys($this->mappingStorage->loadMultipleBySchemaType('node', 'Thing'));
+    $actual_types = array_keys($this->getMappingStorage()->loadMultipleBySchemaType('node', 'Thing'));
     $this->assertEquals($expected_types, $actual_types);
     $expected_types = [
       'node.thing',
     ];
-    $actual_types = array_keys($this->mappingStorage->loadMultipleBySchemaType('node', 'WebPage'));
+    $actual_types = array_keys($this->getMappingStorage()->loadMultipleBySchemaType('node', 'WebPage'));
     $this->assertEquals($expected_types, $actual_types);
 
     // Check loading by entity.
-    $this->assertEquals('node.thing', $this->mappingStorage->loadByEntity($thing_node)->id());
-    $this->assertNull($this->mappingStorage->loadByEntity($page_node));
+    $this->assertEquals('node.thing', $this->getMappingStorage()->loadByEntity($thing_node)->id());
+    $this->assertNull($this->getMappingStorage()->loadByEntity($page_node));
   }
 
 }

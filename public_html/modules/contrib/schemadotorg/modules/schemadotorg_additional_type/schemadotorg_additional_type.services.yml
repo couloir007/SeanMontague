@@ -7,6 +7,10 @@ services:
     class: Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeManager
   Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeManagerInterface: '@schemadotorg_additional_type.manager'
 
+  schemadotorg_additional_type.base_field_manager:
+    class: Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeBaseFieldManager
+  Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeBaseFieldManagerInterface: '@schemadotorg_additional_type.base_field_manager'
+
   schemadotorg_additional_type.field_access_handler:
     class: Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeFieldAccessHandler
   Drupal\schemadotorg_additional_type\SchemaDotOrgAdditionalTypeFieldAccessHandlerInterface: '@schemadotorg_additional_type.field_access_handler'
@@ -17,7 +21,7 @@ services:
 
   schemadotorg_additional_type.event_subscriber:
     class: Drupal\schemadotorg_additional_type\EventSubscriber\SchemaDotOrgAdditionalTypeEventSubscriber
-    arguments: ['@current_route_match', '@entity_type.manager']
+    arguments: ['@current_route_match', '@entity_type.manager', '@config.storage.sync', '@config.storage.snapshot', '@schemadotorg_additional_type.base_field_manager']
 
   schemadotorg_additional_type.controller.entity_form:
     # Override the entity form controller to handle the node entity's
@@ -25,5 +29,3 @@ services:
     decorates: controller.entity_form
     class: Drupal\schemadotorg_additional_type\Controller\SchemaDotOrgAdditionalTypeHtmlEntityFormController
     public: false
-    arguments: ['@schemadotorg_additional_type.controller.entity_form.inner', '@config.factory', '@entity_type.manager', '@schemadotorg.schema_type_manager']
-

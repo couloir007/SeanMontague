@@ -32,6 +32,7 @@ class SchemaDotOrgDiagramSettingsFormTest extends SchemaDotOrgBrowserTestBase {
    * Test Schema.org Diagram settings form.
    */
   public function testSettingsForm(): void {
+    // Check that saving the settings form preserves configuration.
     $this->assertSaveSettingsConfigForm('schemadotorg_diagram.settings', '/admin/config/schemadotorg/settings/general');
   }
 

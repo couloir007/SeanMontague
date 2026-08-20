@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\trash\Functional;
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\trash\Exception\UnrestorableEntityException;
 use Drupal\trash_test\Entity\TrashTestEntity;
 
 /**
@@ -105,6 +107,22 @@ class TrashUniqueFieldTest extends BrowserTestBase {
     // Verify that entity1 is still in the trash.
     $this->drupalGet('/admin/content/trash/trash_test_entity');
     $this->assertSession()->pageTextContains('Entity 1');
+
+    // Restoring through the storage API (the path used by bulk restore and
+    // Drush) must run the same conflict validation as the restore form.
+    $trash_manager = \Drupal::service('trash.manager');
+    $storage = \Drupal::entityTypeManager()->getStorage('trash_test_entity');
+    $trashed = $trash_manager->executeInTrashContext('ignore', fn () => $storage->load($entity1->id()));
+    try {
+      $storage->restoreFromTrash([$trashed]);
+      $this->fail('Restoring a conflicting entity via the API should throw.');
+    }
+    catch (UnrestorableEntityException $e) {
+      $this->assertStringContainsString('already exists', $e->getMessage());
+    }
+    $reloaded = $trash_manager->executeInTrashContext('ignore', fn () => $storage->load($entity1->id()));
+    assert($reloaded instanceof ContentEntityInterface);
+    $this->assertNotNull($reloaded->get('deleted')->value);
   }
 
   /**
