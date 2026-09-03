@@ -3,22 +3,23 @@
 namespace Drupal\flags\Mapping;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Template\Attribute;
 
 /**
- * Provides generic mapping service to map values to flags using config entities.
- *
- * Class BaseMapping
+ * Provides generic mapping to map values to flags using config entities.
  */
 abstract class BaseMapping implements FlagMappingInterface {
 
   /**
-   * @var ImmutableConfig[]
+   * Array of configuration objects.
+   *
+   * @var \Drupal\Core\Config\ImmutableConfig[]
    */
   protected $config;
 
   /**
+   * Array of extra CSS classes to add to flags.
+   *
    * @var string[]
    */
   protected $extraClasses = [];
@@ -27,13 +28,15 @@ abstract class BaseMapping implements FlagMappingInterface {
    * Gets config key that holds list of mapping entities.
    *
    * @return string
+   *   The config key.
    */
-  protected abstract function getConfigKey();
+  abstract protected function getConfigKey();
 
   /**
    * Creates new instance of BaseMapping class.
    *
-   * @param ConfigFactoryInterface $config
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config
+   *   The config factory service.
    */
   public function __construct(ConfigFactoryInterface $config) {
     $ids = $config->listAll($this->getConfigKey());
@@ -41,12 +44,11 @@ abstract class BaseMapping implements FlagMappingInterface {
     $this->config = $config->loadMultiple($ids);
   }
 
-
   /**
    * {@inheritdoc}
    */
-  function map($value) {
-    // Unify input data
+  public function map($value) {
+    // Unify input data.
     $code = trim(strtolower($value));
 
     $key = $this->getConfigKey() . '.' . $code;

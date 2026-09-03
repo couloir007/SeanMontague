@@ -1,13 +1,12 @@
 <?php
 
-
 namespace Drupal\flags\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a listing of flag mapping entities.
@@ -22,6 +21,8 @@ class FlagMappingListBuilder extends ConfigEntityListBuilder {
   protected $flags;
 
   /**
+   * Array of all countries with their names.
+   *
    * @var string[]
    */
   protected $countries;
@@ -32,7 +33,7 @@ class FlagMappingListBuilder extends ConfigEntityListBuilder {
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
       $entity_type,
-      $container->get('entity_type.manager')->getStorage($entity_type->id()),
+      $container->get('entity_type.manager'),
       $container->get('country_manager')->getList(),
       $container->get('flags.manager')->getList()
     );
@@ -43,13 +44,20 @@ class FlagMappingListBuilder extends ConfigEntityListBuilder {
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity storage class.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param string[] $countries
+   *   Array of all countries with their names.
    * @param string[] $flags
+   *   Array of all flags with their names.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, $countries, $flags) {
-    parent::__construct($entity_type, $storage);
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    EntityTypeManagerInterface $entity_type_manager,
+    $countries,
+    $flags,
+  ) {
+    parent::__construct($entity_type, $entity_type_manager->getStorage($entity_type->id()));
     $this->flags = $flags;
     $this->countries = $countries;
   }
@@ -73,7 +81,7 @@ class FlagMappingListBuilder extends ConfigEntityListBuilder {
     /** @var FlagMapping $entity */
     $id = strtoupper($entity->getSource());
 
-    $row['country'] = isset($this->countries[$id]) ? $this->countries[$id] : $id;
+    $row['country'] = $this->countries[$id] ?? $id;
     $row['flag']['data'] = [
       '#theme' => 'flags',
       '#code' => strtolower($entity->getFlag()),
@@ -88,13 +96,11 @@ class FlagMappingListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function render() {
-    $build['description'] = array(
-      '#markup' => $this->t("<p>Country to flag mapping allows you to display"
-        . " flags from Flags module next to your country fields or"
-        . " country select forms.</p><p>Default mappings can be changed"
-        . " by adding configurations. You can also use the"
-        . " 'Operations' column to edit and delete mappings.</p>"),
-    );
+    $build['description'] = [
+      '#markup' => $this->t(
+        '<p>Country to flag mapping allows you to display flags from Flags module next to your country fields or country select forms.</p><p>Default mappings can be changed by adding configurations. You can also use the Operations column to edit and delete mappings.</p>'
+      ),
+    ];
     $build[] = parent::render();
     return $build;
   }

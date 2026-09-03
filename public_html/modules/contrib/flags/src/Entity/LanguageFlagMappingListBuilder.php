@@ -1,15 +1,13 @@
 <?php
 
-
 namespace Drupal\flags\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\flags\Entity\FlagMapping;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\flags\FullLanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Provides a listing of flag mapping entities.
@@ -26,7 +24,7 @@ class LanguageFlagMappingListBuilder extends ConfigEntityListBuilder {
   /**
    * The configurable language manager.
    *
-   * @var FullLanguageManagerInterface
+   * @var \Drupal\flags\FullLanguageManagerInterface
    */
   protected $languageManager;
 
@@ -36,7 +34,7 @@ class LanguageFlagMappingListBuilder extends ConfigEntityListBuilder {
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
       $entity_type,
-      $container->get('entity_type.manager')->getStorage($entity_type->id()),
+      $container->get('entity_type.manager'),
       $container->get('flags.language_helper'),
       $container->get('flags.manager')->getList()
     );
@@ -47,14 +45,20 @@ class LanguageFlagMappingListBuilder extends ConfigEntityListBuilder {
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity storage class.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\flags\FullLanguageManagerInterface $fullLanguageManager
+   *   The full language manager service.
    * @param string[] $flags
    *   Array of all available flags with their names.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, FullLanguageManagerInterface $fullLanguageManager, $flags) {
-    parent::__construct($entity_type, $storage);
+  public function __construct(
+    EntityTypeInterface $entity_type,
+    EntityTypeManagerInterface $entity_type_manager,
+    FullLanguageManagerInterface $fullLanguageManager,
+    $flags,
+  ) {
+    parent::__construct($entity_type, $entity_type_manager->getStorage($entity_type->id()));
     $this->languageManager = $fullLanguageManager;
     $this->flags = $flags;
   }
@@ -73,11 +77,11 @@ class LanguageFlagMappingListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    /** @var FlagMapping $entity */
+    /** @var \Drupal\flags\Entity\FlagMapping $entity */
     $allLanguages = $this->languageManager->getAllDefinedLanguages();
     $id = $entity->getSource();
 
-    $row['language'] = isset($allLanguages[$id]) ? $allLanguages[$id] : $id;
+    $row['language'] = $allLanguages[$id] ?? $id;
     $row['flag']['data'] = [
       '#theme' => 'flags',
       '#code' => strtolower($entity->getFlag()),
@@ -92,13 +96,11 @@ class LanguageFlagMappingListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function render() {
-    $build['description'] = array(
-      '#markup' => $this->t("<p>Language to flag mapping allows you to display"
-        . " flags from Flags module next to your language fields, language"
-        . " select form or language switcher links.</p><p>Default mappings"
-        . " can be changed by adding configurations. You can also use the"
-        . " 'Operations' column to edit and delete mappings.</p>"),
-    );
+    $build['description'] = [
+      '#markup' => $this->t(
+        '<p>Language to flag mapping allows you to display flags from Flags module next to your language fields, language select form or language switcher links.</p><p>Default mappings can be changed by adding configurations. You can also use the Operations column to edit and delete mappings.</p>'
+      ),
+    ];
     $build[] = parent::render();
     return $build;
   }

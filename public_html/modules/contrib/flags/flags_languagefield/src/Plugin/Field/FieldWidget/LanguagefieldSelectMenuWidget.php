@@ -7,7 +7,6 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\Plugin\Field\FieldWidget\LanguageSelectWidget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\flags\Mapping\Language;
-use Drupal\flags_language\Plugin\Field\FieldWidget\LanguageSelectMenuWidget;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -44,7 +43,14 @@ class LanguagefieldSelectMenuWidget extends LanguageSelectWidget {
    * @param \Drupal\flags\Mapping\Language $flags_mapping_language
    *   The flags.mapping.language service.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, Language $flags_mapping_language) {
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    array $third_party_settings,
+    Language $flags_mapping_language,
+  ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $this->flagsMappingLanguage = $flags_mapping_language;
   }
@@ -52,7 +58,12 @@ class LanguagefieldSelectMenuWidget extends LanguageSelectWidget {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(
+    ContainerInterface $container,
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+  ) {
     return new static($plugin_id, $plugin_definition, $configuration['field_definition'],
       $configuration['settings'], $configuration['third_party_settings'],
       $container->get('flags.mapping.language')
@@ -69,7 +80,7 @@ class LanguagefieldSelectMenuWidget extends LanguageSelectWidget {
     $element['value']['#options_attributes'] = $this->flagsMappingLanguage->getOptionAttributes(
       array_keys($element['value']['#options'])
     );
-    $element['value']['#attached'] = array('library' => array('flags/flags'));
+    $element['value']['#attached'] = ['library' => ['flags/flags']];
 
     return $element;
   }

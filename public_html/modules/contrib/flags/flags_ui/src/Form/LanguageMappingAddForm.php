@@ -35,7 +35,7 @@ class LanguageMappingAddForm extends LanguageConfigEntityFormBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
@@ -50,6 +50,5 @@ class LanguageMappingAddForm extends LanguageConfigEntityFormBase {
       );
     }
   }
-
 
 }

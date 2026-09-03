@@ -24,7 +24,7 @@ class CountryFlagAutocompleteWidget extends CountryAutocompleteWidget {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
     $element['value']['#autocomplete_route_name'] = 'flags_country.country_autocomplete';
-    $element['value']['#attached'] = array('library' => array('flags/flags'));
+    $element['value']['#attached'] = ['library' => ['flags/flags']];
     return $element;
   }
 

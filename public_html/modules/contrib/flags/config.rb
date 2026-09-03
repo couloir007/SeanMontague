@@ -29,5 +29,5 @@ line_comments = false
 # and then run:
 # sass-convert -R --from scss --to sass sass scss && rm -rf sass && mv scss sass
 
-# Disable cach buster
+# Disable cache buster
 asset_cache_buster :none

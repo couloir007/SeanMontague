@@ -7,11 +7,13 @@ use Drupal\flags\Entity\FlagMapping;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @inheritDoc
+ * Provides a form for creating and editing country flag mappings.
  */
 class CountryMappingForm extends ConfigEntityFormBase {
 
   /**
+   * Array of all available countries.
+   *
    * @var string[]
    */
   protected $countries;
@@ -20,6 +22,7 @@ class CountryMappingForm extends ConfigEntityFormBase {
    * Sets array of all available countries.
    *
    * @param string[] $countries
+   *   Array of country codes and names.
    */
   protected function setCountries($countries) {
     $this->countries = $countries;
@@ -41,7 +44,7 @@ class CountryMappingForm extends ConfigEntityFormBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function getSourceFormItem(FlagMapping $mapping) {
     return [
@@ -51,32 +54,32 @@ class CountryMappingForm extends ConfigEntityFormBase {
       '#empty_value' => '',
       // Unfortunately countries are indexed with uppercase letters,
       // make sure our ids are correct.
-      '#default_value' => strtoupper($mapping->getFlag()),
+      '#default_value' => strtoupper((string) $mapping->getSource()),
       '#description' => $this->t('Select a target territory flag.'),
       '#required' => TRUE,
     ];
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function getRedirectRoute() {
     return 'entity.country_flag_mapping.list';
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    // Countries use uppercase but we want to be consistent and always use lowercase for all mappings.
-    /** @var FlagMapping $mapping */
+    // Countries use uppercase but we want to be consistent and always
+    // use lowercase for all mappings.
+    /** @var \Drupal\flags\Entity\FlagMapping $mapping */
     $mapping = $this->getEntity();
 
-    // TODO: Consider doing this on earlier stage of form submission.
+    // @todo Consider doing this on earlier stage of form submission.
     $mapping->setSource(strtolower($mapping->getSource()));
 
     return parent::save($form, $form_state);
   }
-
 
 }

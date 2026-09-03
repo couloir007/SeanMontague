@@ -44,7 +44,7 @@ entity.country_flag_mapping.edit_form:
   defaults:
     _title: 'Edit flag mapping for country'
     # List our add entry above, this _entity_form entry instructs Drupal to
-    # read our entity type's annonation, and look for the "edit" entry under
+    # read our entity type's annotation, and look for the "edit" entry under
     # "form".
     _entity_form: country_flag_mapping.edit
   requirements:
@@ -101,7 +101,7 @@ entity.language_flag_mapping.edit_form:
   defaults:
     _title: 'Edit flag mapping'
     # List our add entry above, this _entity_form entry instructs Drupal to
-    # read our entity type's annonation, and look for the "edit" entry under
+    # read our entity type's annotation, and look for the "edit" entry under
     # "form".
     _entity_form: language_flag_mapping.edit
   requirements:

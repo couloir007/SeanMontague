@@ -2,10 +2,8 @@
 
 namespace Drupal\flags\Entity;
 
-
 /**
  * Defines the flag mapping entity.
- *
  *
  * @ConfigEntityType(
  *   id = "country_flag_mapping",

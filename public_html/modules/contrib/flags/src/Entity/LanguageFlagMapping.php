@@ -1,13 +1,9 @@
 <?php
 
-
 namespace Drupal\flags\Entity;
-
-use Drupal\Core\Config\Entity\ConfigEntityBase;
 
 /**
  * Defines the flag mapping entity.
- *
  *
  * @ConfigEntityType(
  *   id = "language_flag_mapping",

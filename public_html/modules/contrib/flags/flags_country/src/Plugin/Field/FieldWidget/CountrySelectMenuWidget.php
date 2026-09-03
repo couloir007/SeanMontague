@@ -28,12 +28,27 @@ class CountrySelectMenuWidget extends CountryDefaultWidget {
    */
   protected $flagsMappingCountry;
 
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, Country $flags_mapping_country) {
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    array $third_party_settings,
+    Country $flags_mapping_country,
+  ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $this->flagsMappingCountry = $flags_mapping_country;
   }
 
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(
+    ContainerInterface $container,
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+  ) {
     return new static($plugin_id, $plugin_definition, $configuration['field_definition'],
       $configuration['settings'], $configuration['third_party_settings'],
       $container->get('flags.mapping.country')
@@ -46,12 +61,14 @@ class CountrySelectMenuWidget extends CountryDefaultWidget {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
-    $element['value']['#type'] = 'select_icons';
-
-    $element['value']['#options_attributes'] = $this->flagsMappingCountry->getOptionAttributes(
-      array_keys($element['value']['#options'])
+    // OptionsSelectWidget::formElement() returns the select directly on
+    // $element (no 'value' sub-element), so set the type, attributes and
+    // attached library at the top level.
+    $element['#type'] = 'select_icons';
+    $element['#options_attributes'] = $this->flagsMappingCountry->getOptionAttributes(
+      array_keys($element['#options'] ?? [])
     );
-    $element['value']['#attached'] = array('library' => array('flags/flags'));
+    $element['#attached']['library'][] = 'flags/flags';
 
     return $element;
   }

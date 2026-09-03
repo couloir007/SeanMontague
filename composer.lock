@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2d363f97778fd3315b1094d6d93b97b0",
+    "content-hash": "30812d11e100c79a5a2bf14181397681",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -3747,67 +3747,6 @@
             }
         },
         {
-            "name": "drupal/devel_entity_updates",
-            "version": "4.2.1",
-            "source": {
-                "type": "git",
-                "url": "https://git.drupalcode.org/project/devel_entity_updates.git",
-                "reference": "4.2.1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/devel_entity_updates-4.2.1.zip",
-                "reference": "4.2.1",
-                "shasum": "4f7cdf2884fa838a8dc20dfd159b27bf68853f5e"
-            },
-            "require": {
-                "drupal/core": "^9.2 || ^10",
-                "drupal/devel": "*",
-                "drush/drush": "^11 || ^12 || ^13"
-            },
-            "require-dev": {
-                "drupal/devel": "*"
-            },
-            "type": "drupal-module",
-            "extra": {
-                "drupal": {
-                    "version": "4.2.1",
-                    "datestamp": "1756475373",
-                    "security-coverage": {
-                        "status": "covered",
-                        "message": "Covered by Drupal's security advisory policy"
-                    }
-                },
-                "drush": {
-                    "services": {
-                        "drush.services.yml": "^11 || ^12 || ^13"
-                    }
-                }
-            },
-            "notification-url": "https://packages.drupal.org/8/downloads",
-            "license": [
-                "GPL-2.0+"
-            ],
-            "authors": [
-                {
-                    "name": "Francesco Placella (plach)",
-                    "homepage": "https://www.drupal.org/u/plach",
-                    "role": "Maintainer"
-                },
-                {
-                    "name": "plach",
-                    "homepage": "https://www.drupal.org/user/183211"
-                }
-            ],
-            "description": "Provides developers an API and drush command to perform automatic entity updates.",
-            "homepage": "http://drupal.org/project/devel_entity_updates",
-            "support": {
-                "source": "https://cgit.drupalcode.org/devel_entity_updates",
-                "issues": "https://drupal.org/project/issues/devel_entity_updates",
-                "irc": "irc://irc.freenode.org/drupal-contribute"
-            }
-        },
-        {
             "name": "drupal/diff",
             "version": "dev-1.x",
             "source": {
@@ -5347,33 +5286,33 @@
         },
         {
             "name": "drupal/flags",
-            "version": "1.0.0-beta4",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/flags.git",
-                "reference": "8.x-1.0-beta4"
+                "reference": "2.1.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/flags-8.x-1.0-beta4.zip",
-                "reference": "8.x-1.0-beta4",
-                "shasum": "79c47fd82c88dbd87d30735be3a1a195fd7e2601"
+                "url": "https://ftp.drupal.org/files/projects/flags-2.1.0.zip",
+                "reference": "2.1.0",
+                "shasum": "ffa9a1f3b8ed222cbc65748ad56090361c865aee"
             },
             "require": {
-                "drupal/core": "^8 || ^9 || ^10"
+                "drupal/core": "^9 || ^10 || ^11 || ^12"
             },
             "require-dev": {
-                "drupal/country": "*",
+                "drupal/country": "^2 || ^3",
                 "drupal/languagefield": "*"
             },
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "8.x-1.0-beta4",
-                    "datestamp": "1681554383",
+                    "version": "2.1.0",
+                    "datestamp": "1787931586",
                     "security-coverage": {
-                        "status": "not-covered",
-                        "message": "Beta releases are not covered by Drupal security advisories."
+                        "status": "covered",
+                        "message": "Covered by Drupal's security advisory policy"
                     }
                 }
             },
@@ -19050,7 +18989,6 @@
         "drupal/components": 10,
         "drupal/default_content": 15,
         "drupal/existing_values_autocomplete_widget": 5,
-        "drupal/flags": 10,
         "drupal/inline_entity_form": 5,
         "drupal/local_tasks_more": 10,
         "drupal/login_destination": 10,

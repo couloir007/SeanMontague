@@ -1,0 +1,5 @@
+
+services:
+  Drupal\flags_language\Hook\FlagsLanguageHooks:
+    class: Drupal\flags_language\Hook\FlagsLanguageHooks
+    autowire: true

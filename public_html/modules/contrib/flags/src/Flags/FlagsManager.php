@@ -18,13 +18,16 @@ class FlagsManager implements FlagsManagerInterface {
 
   /**
    * An array of country code => country name pairs.
+   *
+   * @var string[]
    */
   protected $flags;
 
   /**
-   * Constructor.
+   * Constructs a FlagsManager object.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler service.
    */
   public function __construct(ModuleHandlerInterface $module_handler) {
     $this->moduleHandler = $module_handler;

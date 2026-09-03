@@ -14,3 +14,7 @@ services:
   flags.manager:
     class: Drupal\flags\Flags\FlagsManager
     arguments: ['@module_handler']
+
+  Drupal\flags\Hook\FlagsHooks:
+    class: Drupal\flags\Hook\FlagsHooks
+    autowire: true

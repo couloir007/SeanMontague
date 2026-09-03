@@ -1,22 +1,22 @@
 <?php
 
-
 namespace Drupal\flags\Mapping;
 
 /**
  * Interface for flag mapping service to map different values to flag codes.
- *
- * Interface FlagMappingInterface
  */
 interface FlagMappingInterface {
 
   /**
    * Maps provided string to a flag code.
+   *
    * Returned string should be lower case flag code.
    *
-   * @param string $value   Value of the source data.
+   * @param string $value
+   *   Value of the source data.
    *
    * @return string
+   *   The mapped flag code.
    */
   public function map($value);
 
@@ -35,6 +35,7 @@ interface FlagMappingInterface {
    * Returns array of extra classes for specific mapper.
    *
    * @return string[]
+   *   Array of CSS class names.
    */
   public function getExtraClasses();
 

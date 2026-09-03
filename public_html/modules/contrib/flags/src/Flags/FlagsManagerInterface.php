@@ -3,7 +3,7 @@
 namespace Drupal\flags\Flags;
 
 /**
- * Defines a common interface for country managers.
+ * Defines a common interface for flags managers.
  */
 interface FlagsManagerInterface {
 

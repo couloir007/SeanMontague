@@ -1,13 +1,13 @@
 name: Flags UI
 type: module
 description: Provides UI for mapping flags with countries and languages.
-core_version_requirement: ^8 || ^9 || ^10
-package: Flags
+core_version_requirement: ^11.3 || ^12
+package: Field types
 dependencies:
   - flags:flags
 configure: flags.menu
 
-# Information added by Drupal.org packaging script on 2023-04-15
-version: '8.x-1.0-beta4'
+# Information added by Drupal.org packaging script on 2026-08-28
+version: '2.1.0'
 project: 'flags'
-datestamp: 1681554385
+datestamp: 1787931588

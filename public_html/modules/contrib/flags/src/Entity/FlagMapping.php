@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Drupal\flags\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
@@ -34,9 +33,17 @@ abstract class FlagMapping extends ConfigEntityBase {
   protected $flag;
 
   /**
-   * @inheritDoc
+   * {@inheritdoc}
+   */
+  public function label() {
+    return $this->source;
+  }
+
+  /**
+   * {@inheritdoc}
    *
-   * This method is required because for some reason entity_keys in config entity annotation are ignored.
+   * This method is required because for some reason entity_keys in config
+   * entity annotation are ignored.
    */
   public function id() {
     return $this->source;
@@ -45,11 +52,14 @@ abstract class FlagMapping extends ConfigEntityBase {
   /**
    * Sets ID.
    *
-   * This method is required because for some reason entity_keys in config entity annotation are ignored.
+   * This method is required because for some reason entity_keys in config
+   * entity annotation are ignored.
    *
    * @param string $id
+   *   The entity ID.
    *
    * @return $this
+   *   Returns this entity.
    */
   public function setId($id) {
     $this->source = $id;
@@ -61,6 +71,7 @@ abstract class FlagMapping extends ConfigEntityBase {
    * Gets source of the mapping.
    *
    * @return string
+   *   The source value.
    */
   public function getSource() {
     return $this->source;
@@ -70,8 +81,10 @@ abstract class FlagMapping extends ConfigEntityBase {
    * Sets source for the mapping.
    *
    * @param string $source
+   *   The source value to set.
    *
    * @return FlagMapping
+   *   Returns this entity.
    */
   public function setSource($source) {
     $this->source = $source;
@@ -83,6 +96,7 @@ abstract class FlagMapping extends ConfigEntityBase {
    * Gets uuid.
    *
    * @return string
+   *   The UUID.
    */
   public function getUuid() {
     return $this->uuid;
@@ -92,8 +106,10 @@ abstract class FlagMapping extends ConfigEntityBase {
    * Sets uuid.
    *
    * @param string $uuid
+   *   The UUID to set.
    *
    * @return FlagMapping
+   *   Returns this entity.
    */
   public function setUuid($uuid) {
     $this->uuid = $uuid;
@@ -105,6 +121,7 @@ abstract class FlagMapping extends ConfigEntityBase {
    * Gets target flag.
    *
    * @return string
+   *   The flag code.
    */
   public function getFlag() {
     return $this->flag;
@@ -114,8 +131,10 @@ abstract class FlagMapping extends ConfigEntityBase {
    * Sets target flag.
    *
    * @param string $flag
+   *   The flag code to set.
    *
    * @return FlagMapping
+   *   Returns this entity.
    */
   public function setFlag($flag) {
     // Make sure that the flag is lowercase.

@@ -1,7 +1,15 @@
 <?php
 
+/**
+ * @file
+ * Provides UI for managing flag mappings.
+ */
+
+/**
+ * Implements hook_entity_type_alter().
+ */
 function flags_ui_entity_type_alter(array &$entity_types) {
-  /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
+  /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
   $entity_types['country_flag_mapping']->setFormClass('add', 'Drupal\flags_ui\Form\CountryMappingAddForm');
   $entity_types['country_flag_mapping']->setFormClass('edit', 'Drupal\flags_ui\Form\CountryMappingEditForm');
   $entity_types['country_flag_mapping']->setFormClass('delete', 'Drupal\flags_ui\Form\CountryMappingDeleteForm');

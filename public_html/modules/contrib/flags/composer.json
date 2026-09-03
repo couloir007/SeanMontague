@@ -1,0 +1,13 @@
+{
+  "name": "drupal/flags",
+  "description": "Provides flags for countries and languages along with simple API.",
+  "type": "drupal-module",
+  "homepage": "https://www.drupal.org/project/flags",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "drupal/core": "^9 || ^10 || ^11 || ^12"
+  },
+  "require-dev": {
+    "drupal/country": "^2 || ^3"
+  }
+}

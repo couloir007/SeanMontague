@@ -7,9 +7,10 @@ use Drupal\Core\Url;
 /**
  * Class FlagMappingDeleteForm.
  *
- * Provides a confirm form for deleting the entity. This is different from the
- * add and edit forms as it does not inherit from ConfigEntityFormBase. The reason for
- * this is that we do not need to build the same form. Instead, we present the
+ * Provides a confirm form for deleting the entity. This is different from
+ * the add and edit forms as it does not inherit from
+ * ConfigEntityFormBase. The reason for this is that we do not need to
+ * build the same form. Instead, we present the
  * user with a simple yes/no question. For this reason, we derive from
  * EntityConfirmFormBase instead.
  *

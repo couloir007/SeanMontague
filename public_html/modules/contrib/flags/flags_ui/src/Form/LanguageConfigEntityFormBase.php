@@ -6,8 +6,6 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\flags\FullLanguageManagerInterface;
 use Drupal\Core\Link;
-use Drupal\flags\Entity\FlagMapping;
-use Drupal\Core\Template\Attribute;
 use Drupal\flags\Mapping\Language;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -70,7 +68,7 @@ class LanguageConfigEntityFormBase extends EntityForm {
     FullLanguageManagerInterface $language_manager,
     array $flags,
     Language $flags_mapping_language,
-    ModuleHandlerInterface $module_handler
+    ModuleHandlerInterface $module_handler,
   ) {
     $this->languageManager = $language_manager;
     $this->flags = $flags;
@@ -97,8 +95,9 @@ class LanguageConfigEntityFormBase extends EntityForm {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param FormStateInterface $form_state
-   *   An instance of FormStateInterface containing the current state of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   An instance of FormStateInterface containing the current state
+   *   of the form.
    *
    * @return array
    *   An associative array containing the FlagMapping add/edit form.
@@ -112,7 +111,7 @@ class LanguageConfigEntityFormBase extends EntityForm {
     // variables. If this is a new entity, it will be a new object with the
     // class of our entity. Drupal knows which class to call from the
     // annotation on our FlagMapping class.
-    /** @var FlagMapping $mapping */
+    /** @var \Drupal\flags\Entity\FlagMapping $mapping */
     $mapping = $this->entity;
 
     $languages = $this->languageManager->getAllDefinedLanguages();
@@ -129,7 +128,7 @@ class LanguageConfigEntityFormBase extends EntityForm {
       $form['flag'] = [
         '#type' => 'select_icons',
         '#options_attributes' => $flagAttributes,
-        '#attached' => array('library' => array('flags/flags')),
+        '#attached' => ['library' => ['flags/flags']],
       ];
 
     }
@@ -200,7 +199,7 @@ class LanguageConfigEntityFormBase extends EntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     // EntityForm provides us with the entity we're working on.
-    /** @var FlagMapping $mapping */
+    /** @var \Drupal\flags\Entity\FlagMapping $mapping */
     $mapping = $this->getEntity();
 
     // Drupal already populated the form values in the entity object. Each
@@ -217,13 +216,25 @@ class LanguageConfigEntityFormBase extends EntityForm {
 
     if ($status == SAVED_UPDATED) {
       // If we edited an existing entity...
-      $this->messenger()->addStatus($this->t('Mapping %label has been updated.', array('%label' => $mapping->label())));
-      $this->logger('flags_languages')->notice('Mapping %label has been updated.', ['%label' => $mapping->label(), 'link' => $edit_link]);
+      $message = $this->t('Mapping %label has been updated.', [
+        '%label' => $mapping->label(),
+      ]);
+      $this->messenger()->addStatus($message);
+      $this->logger('flags_languages')->notice(
+        'Mapping %label has been updated.',
+        ['%label' => $mapping->label(), 'link' => $edit_link]
+      );
     }
     else {
       // If we created a new entity...
-      $this->messenger()->addStatus($this->t('Mapping %label has been added.', array('%label' => $mapping->label())));
-      $this->logger('flags_languages')->notice('Mapping %label has been added.', ['%label' => $mapping->label(), 'link' => $edit_link]);
+      $message = $this->t('Mapping %label has been added.', [
+        '%label' => $mapping->label(),
+      ]);
+      $this->messenger()->addStatus($message);
+      $this->logger('flags_languages')->notice(
+        'Mapping %label has been added.',
+        ['%label' => $mapping->label(), 'link' => $edit_link]
+      );
     }
 
     // Redirect the user back to the listing route after the save operation.
@@ -235,7 +246,11 @@ class LanguageConfigEntityFormBase extends EntityForm {
   /**
    * Gets array with attributes for each option element.
    *
-   * @return Attribute[]
+   * @param array $items
+   *   Array of items to get attributes for.
+   *
+   * @return \Drupal\Core\Template\Attribute[]
+   *   Array of attributes for each option.
    */
   protected function getAttributes($items) {
     $attributes = $this->flagsMappingLanguage->getOptionAttributes($items);

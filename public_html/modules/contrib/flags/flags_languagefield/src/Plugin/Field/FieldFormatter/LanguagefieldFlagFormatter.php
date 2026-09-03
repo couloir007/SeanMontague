@@ -39,12 +39,12 @@ class LanguagefieldFlagFormatter extends LanguageFormatter {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
 
-    $form['flag_display'] = array(
+    $form['flag_display'] = [
       '#type' => 'select',
       '#title' => $this->t('Output format'),
       '#default_value' => $this->getSetting('flag_display'),
       '#options' => $this->getOutputFormats(),
-    );
+    ];
 
     return $form;
   }
@@ -67,13 +67,14 @@ class LanguagefieldFlagFormatter extends LanguageFormatter {
    * Gets available view formats.
    *
    * @return string[]
+   *   Array of format options.
    */
   protected function getOutputFormats() {
-    return array(
+    return [
       'flag-before' => $this->t('Flag before language name'),
       'flag-after' => $this->t('Flag after language name'),
       'flag-instead' => $this->t('Replace language name with flag'),
-    );
+    ];
   }
 
   /**
@@ -88,24 +89,25 @@ class LanguagefieldFlagFormatter extends LanguageFormatter {
     $text = $languagefield_view['#text'];
 
     $format = $this->getSetting('flag_display');
-    $attributes = new Attribute(array('class' => array($format)));
+    $attributes = new Attribute(['class' => [$format]]);
 
-    $view = array();
+    $view = [];
 
     if ('flag-instead' != $format) {
-      $view['language'] = array('#plain_text' => $text);
+      $view['language'] = ['#plain_text' => $text];
     }
 
-    $view['flag'] = array(
+    $view['flag'] = [
       '#theme' => 'flags',
       '#code' => strtolower($code),
       '#attributes' => $attributes,
       '#source' => 'language',
-    );
+    ];
 
     $view['#prefix'] = '<div class="field__flags__item">';
     $view['#suffix'] = '</div>';
 
     return $view;
   }
+
 }

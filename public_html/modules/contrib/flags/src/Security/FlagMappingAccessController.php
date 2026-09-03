@@ -10,7 +10,8 @@ use Drupal\Core\Session\AccountInterface;
 /**
  * Defines an access controller for the flag mapping entity.
  *
- * We set this class to be the access controller in FlagMapping's entity annotation.
+ * We set this class to be the access controller in FlagMapping's
+ * entity annotation.
  *
  * @see \Drupal\flags\Entity\FlagMapping
  *

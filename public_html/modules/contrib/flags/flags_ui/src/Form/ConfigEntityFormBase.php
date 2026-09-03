@@ -6,7 +6,6 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\flags\Entity\FlagMapping;
-use Drupal\Core\Template\Attribute;
 use Drupal\flags\Mapping\Language;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -49,18 +48,21 @@ abstract class ConfigEntityFormBase extends EntityForm {
   /**
    * Gets FAPI element array for mapping source field.
    *
-   * @param FlagMapping $mapping
+   * @param \Drupal\flags\Entity\FlagMapping $mapping
+   *   The flag mapping entity.
    *
    * @return array
+   *   Form element array for the source field.
    */
-  protected abstract function getSourceFormItem(FlagMapping $mapping);
+  abstract protected function getSourceFormItem(FlagMapping $mapping);
 
   /**
-   * Gets route name that should be used to redirect user after mapping is saved.
+   * Gets route name to redirect user after mapping is saved.
    *
    * @return string
+   *   The route name for the redirect.
    */
-  protected abstract function getRedirectRoute();
+  abstract protected function getRedirectRoute();
 
   /**
    * Constructs a ContentEntityForm object.
@@ -72,7 +74,11 @@ abstract class ConfigEntityFormBase extends EntityForm {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
    */
-  public function __construct(array $flags, Language $flags_mapping_language, ModuleHandlerInterface $module_handler) {
+  public function __construct(
+    array $flags,
+    Language $flags_mapping_language,
+    ModuleHandlerInterface $module_handler,
+  ) {
     $this->flags = $flags;
     $this->flagsMappingLanguage = $flags_mapping_language;
     $this->moduleHandler = $module_handler;
@@ -97,7 +103,8 @@ abstract class ConfigEntityFormBase extends EntityForm {
    * @param array $form
    *   An associative array containing the structure of the form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   An instance of FormStateInterface containing the current state of the form.
+   *   An instance of FormStateInterface containing the current state
+   *   of the form.
    *
    * @return array
    *   An associative array containing the FlagMapping add/edit form.
@@ -111,7 +118,7 @@ abstract class ConfigEntityFormBase extends EntityForm {
     // variables. If this is a new entity, it will be a new object with the
     // class of our entity. Drupal knows which class to call from the
     // annotation on our FlagMapping class.
-    /** @var FlagMapping $mapping */
+    /** @var \Drupal\flags\Entity\FlagMapping $mapping */
     $mapping = $this->entity;
 
     // Build the form.
@@ -123,7 +130,7 @@ abstract class ConfigEntityFormBase extends EntityForm {
       $form['flag'] = [
         '#type' => 'select_icons',
         '#options_attributes' => $attributes,
-        '#attached' => array('library' => array('flags/flags')),
+        '#attached' => ['library' => ['flags/flags']],
       ];
     }
     else {
@@ -184,7 +191,7 @@ abstract class ConfigEntityFormBase extends EntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     // EntityForm provides us with the entity we're working on.
-    /** @var FlagMapping $mapping */
+    /** @var \Drupal\flags\Entity\FlagMapping $mapping */
     $mapping = $this->getEntity();
 
     // Drupal already populated the form values in the entity object. Each
@@ -201,13 +208,25 @@ abstract class ConfigEntityFormBase extends EntityForm {
 
     if ($status == SAVED_UPDATED) {
       // If we edited an existing entity...
-      $this->messenger()->addStatus($this->t('Mapping %label has been updated.', array('%label' => $mapping->label())));
-      $this->logger('flags')->notice('Mapping %label has been updated.', ['%label' => $mapping->label(), 'link' => $edit_link]);
+      $message = $this->t('Mapping %label has been updated.', [
+        '%label' => $mapping->label(),
+      ]);
+      $this->messenger()->addStatus($message);
+      $this->logger('flags')->notice(
+        'Mapping %label has been updated.',
+        ['%label' => $mapping->label(), 'link' => $edit_link]
+      );
     }
     else {
       // If we created a new entity...
-      $this->messenger()->addStatus($this->t('Mapping %label has been added.', array('%label' => $mapping->label())));
-      $this->logger('flags')->notice('Mapping %label has been added.', ['%label' => $mapping->label(), 'link' => $edit_link]);
+      $message = $this->t('Mapping %label has been added.', [
+        '%label' => $mapping->label(),
+      ]);
+      $this->messenger()->addStatus($message);
+      $this->logger('flags')->notice(
+        'Mapping %label has been added.',
+        ['%label' => $mapping->label(), 'link' => $edit_link]
+      );
     }
 
     // Redirect the user back to the listing route after the save operation.

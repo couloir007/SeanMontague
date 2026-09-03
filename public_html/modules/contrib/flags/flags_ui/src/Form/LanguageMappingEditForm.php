@@ -3,10 +3,9 @@
 namespace Drupal\flags_ui\Form;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\flags\Entity\FlagMapping;
 
 /**
- * Class FlagMappingEditForm
+ * Class FlagMappingEditForm.
  *
  * Provides the edit form for our FlagMapping entity.
  *
@@ -36,10 +35,10 @@ class LanguageMappingEditForm extends LanguageConfigEntityFormBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    /** @var FlagMapping $mapping */
+    /** @var \Drupal\flags\Entity\FlagMapping $mapping */
     $mapping = $this->entity;
     $allLanguages = $this->languageManager->getAllDefinedLanguages();
     $id = $mapping->getSource();
@@ -48,7 +47,7 @@ class LanguageMappingEditForm extends LanguageConfigEntityFormBase {
 
     $form['title'] = [
       '#type' => 'item',
-      '#markup' =>isset($allLanguages[$id]) ? $allLanguages[$id] : $id,
+      '#markup' => $allLanguages[$id] ?? $id,
     ];
 
     $form = parent::buildForm($form, $form_state);
@@ -61,6 +60,5 @@ class LanguageMappingEditForm extends LanguageConfigEntityFormBase {
 
     return $form;
   }
-
 
 }

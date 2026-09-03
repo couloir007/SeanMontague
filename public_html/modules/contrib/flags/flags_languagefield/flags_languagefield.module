@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * @file
+ * Provides flag integration for languagefield fields.
+ */
+
+/**
+ * Implements hook_field_widget_info_alter().
+ */
 function flags_languagefield_field_widget_info_alter(array &$info) {
   // Allow to use widget language_select_menu only when select_icons enabled.
   if (\Drupal::moduleHandler()->moduleExists('select_icons')) {

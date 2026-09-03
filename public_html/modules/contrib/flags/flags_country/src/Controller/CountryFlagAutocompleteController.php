@@ -2,7 +2,6 @@
 
 namespace Drupal\flags_country\Controller;
 
-use Drupal\Core\Locale\CountryManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\country\Controller\CountryAutocompleteController;
 use Drupal\country\CountryFieldManager;
@@ -16,7 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class CountryFlagAutocompleteController extends CountryAutocompleteController {
 
-
   /**
    * The renderer service.
    *
@@ -26,22 +24,28 @@ class CountryFlagAutocompleteController extends CountryAutocompleteController {
 
   /**
    * CountryFlagAutocompleteController constructor.
-   * @param \Drupal\Core\Locale\CountryManagerInterface $country_manager
+   *
    * @param \Drupal\country\CountryFieldManager $country_field_manager
+   *   The country field manager service.
    * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
    */
-  public function __construct(CountryManagerInterface $country_manager, CountryFieldManager $country_field_manager, RendererInterface $renderer) {
+  public function __construct(
+    CountryFieldManager $country_field_manager,
+    RendererInterface $renderer,
+  ) {
     $this->renderer = $renderer;
-    parent::__construct($country_manager, $country_field_manager);
+    parent::__construct($country_field_manager);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('country_manager'),
       $container->get('country.field.manager'),
-      $container->get('renderer')
+      $container->get('renderer'),
     );
-
   }
 
   /**
@@ -49,28 +53,39 @@ class CountryFlagAutocompleteController extends CountryAutocompleteController {
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request object containing the search string.
+   * @param string $entity_type
+   *   The entity type.
+   * @param string $bundle
+   *   The bundle name.
+   * @param string $field_name
+   *   The field name.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing the autocomplete suggestions for countries.
    */
-  public function autocomplete(Request $request, $entity_type, $bundle, $field_name) {
-    $matches = array();
+  public function autocomplete(
+    Request $request,
+    $entity_type,
+    $bundle,
+    $field_name,
+  ) {
+    $matches = [];
     $string = $request->query->get('q');
     if ($string) {
       $field_definition = FieldConfig::loadByName($entity_type, $bundle, $field_name);
       $countries = $this->countryFieldManager->getSelectableCountries($field_definition);
       foreach ($countries as $iso2 => $country) {
         if (strpos(mb_strtolower($country), mb_strtolower($string)) !== FALSE) {
-          $label = array(
-            'country' => array('#markup' => $country),
-            'flag' => array(
+          $label = [
+            'country' => ['#markup' => $country],
+            'flag' => [
               '#theme' => 'flags',
               '#code' => strtolower($iso2),
               '#source' => 'country',
-            ),
-          );
+            ],
+          ];
 
-          $matches[] = array('value' => $country, 'label' => $this->renderer->render($label));
+          $matches[] = ['value' => $country, 'label' => $this->renderer->render($label)];
         }
       }
     }

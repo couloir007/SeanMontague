@@ -8,9 +8,10 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Class FlagMappingDeleteForm.
  *
- * Provides a confirm form for deleting the entity. This is different from the
- * add and edit forms as it does not inherit from ConfigEntityFormBase. The reason for
- * this is that we do not need to build the same form. Instead, we present the
+ * Provides a confirm form for deleting the entity. This is different from
+ * the add and edit forms as it does not inherit from
+ * ConfigEntityFormBase. The reason for this is that we do not need to
+ * build the same form. Instead, we present the
  * user with a simple yes/no question. For this reason, we derive from
  * EntityConfirmFormBase instead.
  *
@@ -31,9 +32,9 @@ abstract class FlagMappingDeleteForm extends EntityConfirmFormBase {
    *   Translated string.
    */
   public function getQuestion() {
-    return $this->t('Are you sure you want to delete mapping %label?', array(
-        '%label' => $this->entity->label(),
-    ));
+    return $this->t('Are you sure you want to delete mapping %label?', [
+      '%label' => $this->entity->label(),
+    ]);
   }
 
   /**
@@ -65,9 +66,9 @@ abstract class FlagMappingDeleteForm extends EntityConfirmFormBase {
     $this->entity->delete();
 
     // Set a message that the entity was deleted.
-    $this->messenger()->addStatus($this->t('Mapping %label was deleted.', array(
+    $this->messenger()->addStatus($this->t('Mapping %label was deleted.', [
       '%label' => $this->entity->label(),
-    )));
+    ]));
 
     // Redirect the user to the list controller when complete.
     $form_state->setRedirectUrl($this->getCancelUrl());
