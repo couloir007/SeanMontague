@@ -2,33 +2,64 @@
 
 namespace Drupal\geolocation\Plugin\geolocation\MapCenter;
 
-use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\geolocation\Attribute\MapCenter;
 use Drupal\geolocation\MapCenterBase;
 use Drupal\geolocation\MapCenterInterface;
 
 /**
- * Fixed coordinates map center.
- *
- * @MapCenter(
- *   id = "client_location",
- *   name = @Translation("Client location"),
- *   description = @Translation("Automatically fit map to client location. Might not be available."),
- * )
+ * Fixed boundaries map center.
  */
+#[MapCenter(
+  id: 'client_location',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('Client Location'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('If client allows, set location. Optionally follow continously.')
+)]
 class ClientLocation extends MapCenterBase implements MapCenterInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function alterMap(array $map, $center_option_id, array $center_option_settings, $context = NULL) {
-    $map = parent::alterMap($map, $center_option_id, $center_option_settings, $context);
-    $map['#attached'] = BubbleableMetadata::mergeAttachments($map['#attached'], [
-      'library' => [
-        'geolocation/map_center.client_location',
-      ],
-    ]);
+  public static function getDefaultSettings(): array {
+    return [
+      'initial_latitude' => 0,
+      'initial_longitude' => 0,
+      'follow_client' => FALSE,
+    ];
+  }
 
-    return $map;
+  /**
+   * {@inheritdoc}
+   */
+  public function getSettingsForm(?string $option_id = NULL, array $settings = [], array $context = []): array {
+    $form = parent::getSettingsForm($option_id, $settings, $context);
+    $settings = $this->getSettings($settings);
+
+    $form['initial_latitude'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Initial Latitude'),
+      '#default_value' => $settings['initial_latitude'] ?? 0,
+      '#description' => $this->t('Before client location becomes available, if at all.'),
+      '#size' => 60,
+      '#maxlength' => 128,
+    ];
+
+    $form['initial_longitude'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Initial Longitude'),
+      '#default_value' => $settings['initial_longitude'] ?? 0,
+      '#description' => $this->t('Before client location becomes available, if at all.'),
+      '#size' => 60,
+      '#maxlength' => 128,
+    ];
+
+    $form['follow_client'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Follow client location'),
+      '#default_value' => $settings['follow_client'],
+      '#description' => $this->t('Continuously update center by client location if available.'),
+    ];
+
+    return $form;
   }
 
 }

@@ -5,13 +5,34 @@
  * Google places required hooks.
  */
 
+use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\field\FieldStorageConfigInterface;
+use Drupal\geolocation_geometry\Hook\Views;
+use Drupal\geolocation_geometry\Hook\GoogleMaps;
+
 /**
  * Implements hook_geolocation_google_maps_parameters().
  */
-function geolocation_geometry_geolocation_google_maps_parameters() {
-  return [
-    'libraries' => [
-      'drawing',
-    ],
-  ];
+#[LegacyHook]
+function geolocation_geometry_geolocation_google_maps_parameters(): array {
+  $google = new GoogleMaps();
+  return $google->addParameters();
+}
+
+/**
+ * Implements hook_field_views_data().
+ */
+#[LegacyHook]
+function geolocation_geometry_field_views_data(FieldStorageConfigInterface $field_storage): array {
+  $views = new Views();
+  return $views->fieldViewsData($field_storage);
+}
+
+/**
+ * Implements hook_field_views_data_views_data_alter().
+ */
+#[LegacyHook]
+function geolocation_geometry_field_views_data_views_data_alter(array &$data, FieldStorageConfigInterface $field_storage): void {
+  $views = new Views();
+  $views->fieldViewsDataViewsDataAlter($data, $field_storage);
 }

@@ -2,6 +2,7 @@
 
 namespace Drupal\geolocation\Plugin\views\field;
 
+use Drupal\views\Attribute\ViewsField;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\geolocation\LocationManager;
@@ -14,42 +15,28 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Field handler for geolocation field.
  *
  * @ingroup views_field_handlers
- *
- * @ViewsField("geolocation_field_proximity")
  */
+#[ViewsField(id: 'geolocation_field_proximity')]
 class ProximityField extends NumericField implements ContainerFactoryPluginInterface {
 
   use ProximityTrait;
 
   /**
-   * Location manager.
-   *
-   * @var \Drupal\geolocation\LocationManager
+   * {@inheritdoc}
    */
-  protected $locationManager;
-
-  /**
-   * Constructs a Handler object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\geolocation\LocationManager $location_manager
-   *   Location manager.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LocationManager $location_manager) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected LocationManager $locationManager,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    $this->locationManager = $location_manager;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): ProximityField {
     return new static(
       $configuration,
       $plugin_id,
@@ -61,7 +48,7 @@ class ProximityField extends NumericField implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  protected function defineOptions() {
+  protected function defineOptions(): array {
     $options = parent::defineOptions();
 
     $options['center'] = ['default' => []];
@@ -72,10 +59,15 @@ class ProximityField extends NumericField implements ContainerFactoryPluginInter
 
   /**
    * {@inheritdoc}
+   *
+   * @param array $form
+   *   Form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   Form state.
    */
-  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+  public function buildOptionsForm(&$form, FormStateInterface $form_state): void {
     parent::buildOptionsForm($form, $form_state);
-    $form['center'] = $this->locationManager->getLocationOptionsForm($this->options['center'], $this);
+    $form['center'] = $this->locationManager->getLocationOptionsForm($this->options['center'], ['views_field' => $this]);
 
     $form['display_unit'] = [
       '#title' => $this->t('Distance unit'),
@@ -99,14 +91,14 @@ class ProximityField extends NumericField implements ContainerFactoryPluginInter
    * @return array
    *   Center value.
    */
-  protected function getCenter() {
-    return $this->locationManager->getLocation($this->options['center'], $this);
+  protected function getCenter(): array {
+    return $this->locationManager->getLocation($this->options['center'], ['views_field' => $this]);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function query() {
+  public function query(): void {
     /** @var \Drupal\views\Plugin\views\query\Sql $query */
     $query = $this->query;
 
@@ -120,32 +112,27 @@ class ProximityField extends NumericField implements ContainerFactoryPluginInter
 
     // Get a placeholder for this query and save the field_alias for it.
     // Remove the initial ':' from the placeholder and avoid collision with
-    // original field name.
+    // the original field name.
     $this->field_alias = $query->addField(NULL, $expression, substr($this->placeholder(), 1));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getValue(ResultRow $values, $field = NULL) {
+  public function getValue(ResultRow $values, $field = NULL): int|null|float {
     $value = parent::getValue($values, $field);
-    $value = self::convertDistance((float) $value, $this->options['display_unit'], TRUE);
 
-    return $value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function render(ResultRow $row) {
-
-    // Remove once https://www.drupal.org/node/1232920 lands.
-    $value = $this->getValue($row);
-    // Hiding should happen before rounding or adding prefix/suffix.
-    if ($this->options['hide_empty'] && empty($value) && ($value !== 0 || $this->options['empty_zero'])) {
-      return '';
+    // NULL means no proximity calculated, 0 means 0m distance.
+    if (is_null($value)) {
+      return NULL;
     }
-    return parent::render($row);
+
+    $value = self::convertDistance((float) $value, $this->options['display_unit'], TRUE);
+    // Views empty check only respects int 0, not float 0.
+    if ($value === 0.0) {
+      return 0;
+    }
+    return $value;
   }
 
 }

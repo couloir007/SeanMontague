@@ -1,6 +1,7 @@
-Spatial fields:
-  label: 'Spatial fields'
-  description: 'Geolocation geometry fields.'
+geo_spatial:
+  label: 'Geo Spatial'
+  description: 'Geolocation coordinate, geometry & auxiliary fields.'
   weight: -15
   libraries:
     - options/drupal.options-icon
+    - geolocation/geolocation.geo-spatial-icon

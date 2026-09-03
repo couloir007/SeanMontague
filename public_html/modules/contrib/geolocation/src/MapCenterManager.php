@@ -6,15 +6,19 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Search plugin manager.
+ *
+ * @method MapCenterInterface createInstance($plugin_id, array $configuration = [])
  */
 class MapCenterManager extends DefaultPluginManager {
 
   use StringTranslationTrait;
+  use LoggerChannelTrait;
 
   /**
    * Constructs an MapCenterManager object.
@@ -28,7 +32,7 @@ class MapCenterManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/geolocation/MapCenter', $namespaces, $module_handler, 'Drupal\geolocation\MapCenterInterface', 'Drupal\geolocation\Annotation\MapCenter');
+    parent::__construct('Plugin/geolocation/MapCenter', $namespaces, $module_handler, 'Drupal\geolocation\MapCenterInterface', 'Drupal\geolocation\Attribute\MapCenter');
     $this->alterInfo('geolocation_mapcenter_info');
     $this->setCacheBackend($cache_backend, 'geolocation_mapcenter');
   }
@@ -41,41 +45,38 @@ class MapCenterManager extends DefaultPluginManager {
    * @param array $configuration
    *   Configuration.
    *
-   * @return \Drupal\geolocation\MapCenterInterface|false
+   * @return \Drupal\geolocation\MapCenterInterface|null
    *   MapCenter instance.
    */
-  public function getMapCenter($id, array $configuration = []) {
+  public function getMapCenter(string $id, array $configuration = []): ?MapCenterInterface {
     if (!$this->hasDefinition($id)) {
-      return FALSE;
+      return NULL;
     }
+
     try {
-      /** @var \Drupal\geolocation\MapCenterInterface $instance */
-      $instance = $this->createInstance($id, $configuration);
-      if ($instance) {
-        return $instance;
-      }
+      return $this->createInstance($id, $configuration);
     }
     catch (\Exception $e) {
-      return FALSE;
+      $this->getLogger('geolocation')->warning($e->getMessage());
+      return NULL;
     }
-    return FALSE;
   }
 
   /**
-   * Get form render array.
+   * Get option form.
    *
    * @param array $settings
    *   Settings.
-   * @param mixed $context
-   *   Optional context.
+   * @param array $context
+   *   Context.
    *
    * @return array
-   *   Form.
+   *   Render array.
    */
-  public function getCenterOptionsForm(array $settings, $context = NULL) {
+  public function getCenterOptionsForm(array $settings, array $context = []): array {
     $form = [
       '#type' => 'table',
-      '#prefix' => $this->t('<h3>Centre override</h3>These options allow to override the default map centre. Each option will, if it can be applied, supersede any following option.'),
+      '#prefix' => $this->t('These options allow to override the default map centre. Each option will, if it can be applied, supersede any following option.'),
       '#header' => [
         [
           'data' => $this->t('Enable'),
@@ -95,7 +96,6 @@ class MapCenterManager extends DefaultPluginManager {
     ];
 
     foreach ($this->getDefinitions() as $map_center_id => $map_center_definition) {
-      /** @var \Drupal\geolocation\MapCenterInterface $map_center */
       $map_center = $this->createInstance($map_center_id);
       foreach ($map_center->getAvailableMapCenterOptions($context) as $option_id => $label) {
         $option_enable_id = HTML::getUniqueId($option_id . '_enabled');
@@ -170,64 +170,31 @@ class MapCenterManager extends DefaultPluginManager {
    *   Map render array.
    * @param array $settings
    *   Center option settings.
-   * @param mixed $context
+   * @param array $context
    *   Context.
    *
    * @return array
    *   Altered map render array.
    */
-  public function alterMap(array $map, array $settings, $context = NULL) {
-    $map = array_replace_recursive($map, [
-      '#attached' => [
-        'drupalSettings' => [
-          'geolocation' => [
-            'maps' => [
-              $map['#id'] => [
-                'map_center' => [],
-              ],
-            ],
-          ],
-        ],
-      ],
-    ]);
+  public function alterMap(array $map, array $settings = [], array $context = []): array {
 
-    /*
-     * Centre handling.
-     */
+    uasort($settings, [SortArray::class, 'sortByWeightProperty']);
+
     foreach ($settings as $option_id => $option) {
-      if (!empty($map['#centre'])) {
-        continue;
-      }
 
       // Ignore if not enabled.
       if (empty($option['enable'])) {
         continue;
       }
 
-      // Compatibility to v1.
-      if (empty($option['map_center_id'])) {
-        $option['map_center_id'] = $option_id;
-      }
-
-      if (!$this->hasDefinition($option['map_center_id'])) {
+      if (!$this->hasDefinition($option['map_center_id'] ?? '')) {
         continue;
       }
 
-      if (empty($option['weight'])) {
-        $option['weight'] = 1;
-      }
-
-      /** @var \Drupal\geolocation\MapCenterInterface $map_center_plugin */
       $map_center_plugin = $this->createInstance($option['map_center_id']);
-      $map_center_plugin_settings = $option['settings'] ?? [];
-      $map_center_plugin_settings = $map_center_plugin->getSettings($map_center_plugin_settings);
-      $map['#attached']['drupalSettings']['geolocation']['maps'][$map['#id']]['map_center'][$option['map_center_id']] = [
-        'map_center_id' => $option['map_center_id'],
-        'option_id' => $option_id,
-        'settings' => $map_center_plugin_settings,
-        'weight' => $option['weight'],
-      ];
-      $map = $map_center_plugin->alterMap($map, $option_id, $map_center_plugin_settings, $context);
+      $map_center_plugin_settings = $map_center_plugin->getSettings($option['settings'] ?? []);
+
+      $map = $map_center_plugin->alterMap($map, $option_id, $option['weight'], $map_center_plugin_settings, $context);
     }
 
     if (empty($map['#centre'])) {

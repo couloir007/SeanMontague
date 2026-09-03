@@ -28,21 +28,12 @@ class TextareaWidget extends CustomFieldWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    $settings = parent::defaultSettings();
-    $settings['settings'] = [
+    return [
       'rows' => 5,
       'placeholder' => '',
       'maxlength' => '',
       'maxlength_js' => FALSE,
-      'formatted' => FALSE,
-      'default_format' => '',
-      'format' => [
-        'guidelines' => TRUE,
-        'help' => TRUE,
-      ],
-    ] + $settings['settings'];
-
-    return $settings;
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -50,15 +41,16 @@ class TextareaWidget extends CustomFieldWidgetBase {
    */
   public function widget(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
-    // Add our widget type and additional properties and return.
-    $type = isset($settings['formatted']) && $settings['formatted'] ? 'text_format' : 'textarea';
+    $field_settings = $field->getFieldSettings();
+    $settings = $this->getSettings() + static::defaultSettings();
+    $type = isset($field_settings['formatted']) && $field_settings['formatted'] ? 'text_format' : 'textarea';
 
-    if (isset($settings['formatted']) && $settings['formatted'] && !empty($settings['default_format'])) {
-      $element['#format'] = $settings['default_format'];
-      $element['#allowed_formats'] = [$settings['default_format']];
+    if (isset($field_settings['formatted']) && $field_settings['formatted'] && !empty($field_settings['default_format'])) {
+      $element['#format'] = $field_settings['default_format'];
+      $element['#allowed_formats'] = [$field_settings['default_format']];
+      // Pass settings via #after_build_data to avoid serializing $this.
       $element['#after_build'][] = [static::class, 'unsetFilters'];
-      $element['#after_build_data'] = $settings;
+      $element['#after_build_data'] = $field_settings;
     }
 
     if (isset($settings['maxlength'])) {
@@ -81,15 +73,9 @@ class TextareaWidget extends CustomFieldWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $formats = filter_formats();
-    $format_options = [];
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
 
-    foreach ($formats as $key => $format) {
-      $format_options[$key] = $format->get('name');
-    }
-
-    $element['settings']['rows'] = [
+    $element['rows'] = [
       '#type' => 'number',
       '#title' => $this->t('Rows'),
       '#description' => $this->t('Text editors (like CKEditor) may override this setting.'),
@@ -97,48 +83,13 @@ class TextareaWidget extends CustomFieldWidgetBase {
       '#required' => TRUE,
       '#min' => 1,
     ];
-    $element['settings']['placeholder'] = [
-      '#type' => 'textfield',
+    $element['placeholder'] = [
+      '#type' => 'textarea',
       '#title' => $this->t('Placeholder'),
       '#default_value' => $settings['placeholder'],
       '#description' => $this->t('Text that will be shown inside the field until a value is entered. This hint is usually a sample value or a brief description of the expected format.'),
     ];
-    $element['settings']['formatted'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Enable wysiwyg'),
-      '#default_value' => $settings['formatted'],
-    ];
-    $element['settings']['default_format'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Default format'),
-      '#options' => $format_options,
-      '#default_value' => $settings['default_format'],
-      '#states' => [
-        'visible' => [
-          ':input[name="settings[field_settings][' . $field->getName() . '][widget_settings][settings][formatted]"]' => ['checked' => TRUE],
-        ],
-      ],
-    ];
-    $element['settings']['format'] = [
-      '#type' => 'fieldset',
-      '#title' => $this->t('Format settings'),
-      '#states' => [
-        'visible' => [
-          ':input[name="settings[field_settings][' . $field->getName() . '][widget_settings][settings][formatted]"]' => ['checked' => TRUE],
-        ],
-      ],
-    ];
-    $element['settings']['format']['guidelines'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Show format guidelines'),
-      '#default_value' => $settings['format']['guidelines'],
-    ];
-    $element['settings']['format']['help'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Show format help'),
-      '#default_value' => $settings['format']['help'],
-    ];
-    $element['settings']['maxlength'] = [
+    $element['maxlength'] = [
       '#type' => 'number',
       '#title' => $this->t('Max length'),
       '#description' => $this->t('The maximum amount of characters in the field'),
@@ -147,7 +98,7 @@ class TextareaWidget extends CustomFieldWidgetBase {
     ];
     // Add additional setting if maxlength module is enabled.
     if ($this->moduleHandler->moduleExists('maxlength')) {
-      $element['settings']['maxlength_js'] = [
+      $element['maxlength_js'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Show max length character count'),
         '#default_value' => $settings['maxlength_js'],
@@ -185,7 +136,7 @@ class TextareaWidget extends CustomFieldWidgetBase {
    */
   public static function unsetFilters(array $element, FormStateInterface $formState): array {
     // Retrieve settings from #after_build_data.
-    $settings = $element['#after_build_data'] ?? static::defaultSettings()['settings'];
+    $settings = $element['#after_build_data'] ?? static::defaultSettings();
     $hide_guidelines = FALSE;
     $hide_help = FALSE;
     if (!$settings['format']['guidelines']) {

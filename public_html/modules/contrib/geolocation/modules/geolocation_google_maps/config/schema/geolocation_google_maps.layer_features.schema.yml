@@ -1,0 +1,71 @@
+plugin.plugin_configuration.geolocation.layer_feature.marker_clusterer:
+  type: geolocation.layer_feature_settings
+  label: 'Marker clusterer'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        image_path:
+          type: string
+          label: 'Image path'
+        styles:
+          type: string
+          label: 'Styles'
+        max_zoom:
+          type: integer
+          label: 'Max Zoom'
+        minimum_cluster_size:
+          type: integer
+          label: 'Minimum Cluster Size'
+        zoom_on_click:
+          type: boolean
+          label: 'Zoom on Click'
+        average_center:
+          type: boolean
+          label: 'Average Center'
+        grid_size:
+          type: integer
+          label: 'Grid Size'
+
+plugin.plugin_configuration.geolocation.layer_feature.marker_infowindow:
+  type: geolocation.layer_feature_settings
+  label: 'Marker InfoWindow'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        info_window_solitary:
+          type: boolean
+          label: 'Show only one window at a time'
+        disable_auto_pan:
+          type: boolean
+          label: 'Do not move map on window open'
+        info_auto_display:
+          type: boolean
+          label: 'Show info window on map start'
+        max_width:
+          type: integer
+          label: 'Max width'
+
+plugin.plugin_configuration.geolocation.layer_feature.marker_label:
+  type: geolocation.layer_feature_settings
+  label: 'Marker Label'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        color:
+          type: string
+          label: 'Color'
+        font_family:
+          type: string
+          label: 'Font Family'
+        font_size:
+          type: string
+          label: 'Font Size'
+        font_weight:
+          type: string
+          label: 'Font Weight'

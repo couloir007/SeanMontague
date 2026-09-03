@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\custom_field\Plugin;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
-use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Defines an interface for custom field formatter plugins.
@@ -42,37 +41,22 @@ interface CustomFieldFormatterManagerInterface extends PluginManagerInterface {
   public function getDefaultSettings(string $type): array;
 
   /**
-   * Return the value keys in formatter settings form for format_type selection.
+   * Return the input path string for states api.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state.
-   * @param string $field_name
-   *   The field name of the parent custom field.
-   * @param string $property
-   *   The property name of the custom field.
-   *
-   * @return array<int, string>
-   *   An array of value keys.
-   */
-  public function getFormatterValueKeys(FormStateInterface $form_state, string $field_name, string $property): array;
-
-  /**
-   * Return the input path structure in formatter settings form for states api.
-   *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state.
-   * @param string $field_name
-   *   The field name of the parent custom field.
+   * @param array $parents
+   *   The array of parent elements.
    * @param string $property
    *   The property name of the custom field.
    * @param bool $is_views_subfield
    *   A boolean to indicate if the settings form is an individual views
    *   subfield.
+   * @param string|null $wrapper
+   *   An optional wrapper string to include in the path.
    *
    * @return string
    *   The input path.
    */
-  public function getInputPathForStatesApi(FormStateInterface $form_state, string $field_name, string $property, bool $is_views_subfield = FALSE): string;
+  public function getInputPathStates(array $parents, string $property, bool $is_views_subfield = FALSE, ?string $wrapper = NULL): string;
 
   /**
    * Gets an instance of a formatter plugin.

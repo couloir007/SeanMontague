@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\custom_field\Plugin\CustomField\FeedsType;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Datetime\TimeZoneFormHelper;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -23,18 +23,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class DatetimeTarget extends BaseTarget {
 
   /**
-   * The config factory service.
+   * The system date configuration.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var \Drupal\Core\Config\ImmutableConfig
    */
-  protected ConfigFactoryInterface $configFactory;
+  protected ImmutableConfig $systemDateConfig;
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
-    $instance->configFactory = $container->get('config.factory');
+    $instance->systemDateConfig = $container->get('config.factory')->get('system.date');
 
     return $instance;
   }
@@ -150,9 +150,7 @@ class DatetimeTarget extends BaseTarget {
    *   The timezone configuration.
    */
   public function getTimezoneConfiguration(string $timezone): mixed {
-    $default_timezone = $this->configFactory->get('system.date')->get('timezone.default');
-    return ($timezone == '__SITE__') ?
-      $default_timezone : $timezone;
+    return ($timezone == '__SITE__') ? $this->systemDateConfig->get('timezone.default') : $timezone;
   }
 
 }

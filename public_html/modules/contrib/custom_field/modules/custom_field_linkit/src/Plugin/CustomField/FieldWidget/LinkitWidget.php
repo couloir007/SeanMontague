@@ -11,6 +11,7 @@ use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
+use Drupal\custom_field\Plugin\CustomField\FieldType\LinkTypeInterface;
 use Drupal\custom_field\Plugin\CustomField\FieldWidget\LinkWidget;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\file\FileInterface;
@@ -18,7 +19,7 @@ use Drupal\linkit\Utility\LinkitHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the 'linkit_url' widget.
+ * Plugin implementation of the 'linkit' widget.
  */
 #[CustomFieldWidget(
   id: 'linkit',
@@ -59,13 +60,10 @@ class LinkitWidget extends LinkWidget {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    $settings = parent::defaultSettings();
-    $settings['settings'] = [
+    return [
       'linkit_profile' => 'default',
       'linkit_auto_link_text' => FALSE,
-    ] + $settings['settings'];
-
-    return $settings;
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -73,20 +71,20 @@ class LinkitWidget extends LinkWidget {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
     $profile_storage = $this->entityTypeManager->getStorage('linkit_profile');
 
     $options = array_map(function ($linkit_profile) {
       return $linkit_profile->label();
     }, $profile_storage->loadMultiple());
 
-    $element['settings']['linkit_profile'] = [
+    $element['linkit_profile'] = [
       '#type' => 'select',
       '#title' => $this->t('Linkit profile'),
       '#options' => $options,
       '#default_value' => $settings['linkit_profile'],
     ];
-    $element['settings']['linkit_auto_link_text'] = [
+    $element['linkit_auto_link_text'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Automatically populate link text from entity label'),
       '#default_value' => $settings['linkit_auto_link_text'],
@@ -102,7 +100,8 @@ class LinkitWidget extends LinkWidget {
    */
   public function widget(FieldItemListInterface $items, int $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    assert($field instanceof LinkTypeInterface);
+    $settings = $this->getSettings() + static::defaultSettings();
     /** @var \Drupal\Core\Field\FieldItemInterface $item */
     $item = $items[$delta];
     $uri = $item->{$field->getName()} ?? NULL;
@@ -189,6 +188,7 @@ class LinkitWidget extends LinkWidget {
     if (empty($value['uri'])) {
       return NULL;
     }
+
     $value['uri'] = LinkitHelper::uriFromUserInput($value['uri']);
     $value += ['options' => []];
     if (isset($value['options']['attributes'])) {
@@ -196,13 +196,14 @@ class LinkitWidget extends LinkWidget {
       $value['options']['attributes'] = array_filter($attributes, function ($attribute) {
         return $attribute !== "";
       });
-      // Convert a class string to an array so that it can be merged reliable.
+      // Convert a class string to an array so that it can be merged reliably.
       if (isset($value['options']['attributes']['class']) && is_string($value['options']['attributes']['class'])) {
         $value['options']['attributes']['class'] = explode(' ', $value['options']['attributes']['class']);
       }
     }
+
     // Merge the linkit attributes.
-    $value['options']['attributes'] += $value['attributes'];
+    $value['options'] += $value['attributes'];
 
     return $value;
   }

@@ -5,6 +5,7 @@ geolocation_address.geocoder.geocode:
     _title: 'Geolocation Address Widget Geocode'
   requirements:
     _permission: 'access content'
+    _csrf_token: 'TRUE'
 
 geolocation_address.geocoder.reverse:
   path: '/geolocation/address/geocoder/reverse'
@@ -13,3 +14,4 @@ geolocation_address.geocoder.reverse:
     _title: 'Geolocation Address Widget Reverse'
   requirements:
     _permission: 'access content'
+    _csrf_token: 'TRUE'

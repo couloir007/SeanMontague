@@ -53,7 +53,6 @@ class DateTimeCustomFormatter extends DateTimeFormatterBase {
    * {@inheritdoc}
    */
   public function formatValue(FieldItemInterface $item, mixed $value): ?array {
-    $datetime_type = $this->customFieldDefinition->getDatetimeType();
 
     /** @var \Drupal\Core\Datetime\DrupalDateTime $date */
     $date = $value['date'];
@@ -71,13 +70,13 @@ class DateTimeCustomFormatter extends DateTimeFormatterBase {
         '#theme' => 'item_list',
         '#list_type' => 'ul',
         '#items' => [
-          $this->buildDate($date, $datetime_type, $timezone),
-          $this->buildDate($date, $datetime_type),
+          $this->buildDate($date, $timezone),
+          $this->buildDate($date),
         ],
       ];
     }
 
-    return $this->buildDate($date, $datetime_type, $timezone);
+    return $this->buildDate($date, $timezone);
   }
 
   /**

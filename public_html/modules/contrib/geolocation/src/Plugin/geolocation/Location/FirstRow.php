@@ -2,19 +2,21 @@
 
 namespace Drupal\geolocation\Plugin\geolocation\Location;
 
+use Drupal\geolocation\Attribute\Location;
+use Drupal\geolocation\DataProviderManager;
 use Drupal\geolocation\LocationBase;
 use Drupal\geolocation\LocationInterface;
 use Drupal\geolocation\ViewsContextTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Derive center from first row.
- *
- * @Location(
- *   id = "first_row",
- *   name = @Translation("View first row"),
- *   description = @Translation("Use geolocation field value from first row."),
- * )
  */
+#[Location(
+  id: 'first_row',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('View first row'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('Use geolocation field value from first row.')
+)]
 class FirstRow extends LocationBase implements LocationInterface {
 
   use ViewsContextTrait;
@@ -22,7 +24,31 @@ class FirstRow extends LocationBase implements LocationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getAvailableLocationOptions($context) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected DataProviderManager $dataProviderManager,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): LocationInterface {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('plugin.manager.geolocation.dataprovider')
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAvailableLocationOptions(array $context = []): array {
     $options = [];
 
     if ($displayHandler = self::getViewsDisplayHandler($context)) {
@@ -37,17 +63,18 @@ class FirstRow extends LocationBase implements LocationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCoordinates($location_option_id, array $location_option_settings, $context = NULL) {
+  public function getCoordinates(string $location_option_id, array $location_option_settings, mixed $context = NULL): ?array {
     if (!($displayHandler = self::getViewsDisplayHandler($context))) {
       return parent::getCoordinates($location_option_id, $location_option_settings, $context);
     }
+    /** @var \Drupal\geolocation\Plugin\views\style\GeolocationStyleBase $views_style */
     $views_style = $displayHandler->getPlugin('style');
 
     if (empty($views_style->options['geolocation_field'])) {
       return parent::getCoordinates($location_option_id, $location_option_settings, $context);
     }
 
-    /** @var \Drupal\geolocation\Plugin\views\field\GeolocationField $source_field */
+    /** @var \Drupal\geolocation\Plugin\views\field\GeolocationField|null $source_field */
     $source_field = $views_style->view->field[$views_style->options['geolocation_field']];
 
     if (empty($source_field)) {
@@ -58,13 +85,16 @@ class FirstRow extends LocationBase implements LocationInterface {
       return parent::getCoordinates($location_option_id, $location_option_settings, $context);
     }
 
-    /** @var \Drupal\geolocation\DataProviderInterface $data_provider */
-    $data_provider = \Drupal::service('plugin.manager.geolocation.dataprovider')->getDataProviderByViewsField($source_field);
+    $data_provider = $this->dataProviderManager->getDataProviderByViewsField($source_field);
 
-    $positions = $data_provider->getPositionsFromViewsRow($views_style->view->result[0], $source_field);
+    if (empty($data_provider)) {
+      return parent::getCoordinates($location_option_id, $location_option_settings, $context);
+    }
 
-    if (!empty($positions[0])) {
-      return $positions[0];
+    $locations = $data_provider->getLocationsFromViewsRow($views_style->view->result[0], $source_field);
+
+    if (!empty($locations[0])) {
+      return $locations[0]['#coordinates'];
     }
 
     return parent::getCoordinates($location_option_id, $location_option_settings, $context);

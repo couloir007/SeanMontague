@@ -127,6 +127,21 @@ class IntegrationTest extends SortsFunctionalBase {
   }
 
   /**
+   * Tests that the weight column is the last one of the sorts table.
+   *
+   * Tabledrag hides the weight column and puts the drag handle in the first
+   * cell, so a leading weight column leaves the table without handles.
+   */
+  public function testWeightColumnIsLast() {
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet('admin/config/search/search-api/index/' . $this->indexId . '/sorts/' . $this->escapedDisplayId);
+
+    $weight_in_cell = '//table[@id="edit-sorts"]//tr[contains(@class, "draggable")]/td[%s]//*[contains(@class, "search-api-sort-order-weight")]';
+    $this->assertSession()->elementNotExists('xpath', sprintf($weight_in_cell, '1'));
+    $this->assertSession()->elementExists('xpath', sprintf($weight_in_cell, 'last()'));
+  }
+
+  /**
    * Tests that only enabled configs are saved.
    */
   public function testSavedConfigs() {

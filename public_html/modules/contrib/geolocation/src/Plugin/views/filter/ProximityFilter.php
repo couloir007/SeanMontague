@@ -2,6 +2,7 @@
 
 namespace Drupal\geolocation\Plugin\views\filter;
 
+use Drupal\views\Attribute\ViewsFilter;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\geolocation\LocationInputManager;
@@ -13,42 +14,28 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Filter handler for search keywords.
  *
  * @ingroup views_filter_handlers
- *
- * @ViewsFilter("geolocation_filter_proximity")
  */
+#[ViewsFilter(id: 'geolocation_filter_proximity')]
 class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInterface {
 
   use ProximityTrait;
 
   /**
-   * Proximity center manager.
-   *
-   * @var \Drupal\geolocation\LocationInputManager
+   * {@inheritdoc}
    */
-  protected $locationInputManager;
-
-  /**
-   * Constructs a Handler object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\geolocation\LocationInputManager $location_input_manager
-   *   Proximity center manager.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LocationInputManager $location_input_manager) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected LocationInputManager $locationInputManager,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    $this->locationInputManager = $location_input_manager;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): ProximityFilter {
     return new static(
       $configuration,
       $plugin_id,
@@ -74,8 +61,13 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
 
   /**
    * {@inheritdoc}
+   *
+   * @param array $form
+   *   Form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   Form state.
    */
-  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+  public function buildOptionsForm(&$form, FormStateInterface $form_state): void {
     parent::buildOptionsForm($form, $form_state);
 
     $form['unit'] = [
@@ -99,16 +91,22 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
       $location_options = $this->options['location_input'];
     }
 
-    $form['location_input'] = $this->locationInputManager->getOptionsForm($location_options, $this);
+    $form['location_input'] = $this->locationInputManager->getOptionsForm($location_options, ['views_filter' => $this], $this->t('<label class="form-item__label">Proximity - Center source</label>'));
+    $form['location_input']['#weight'] = 20;
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @param array $form
+   *   Form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   Form state.
    */
-  public function groupForm(&$form, FormStateInterface $form_state) {
+  public function groupForm(&$form, FormStateInterface $form_state): void {
     parent::groupForm($form, $form_state);
 
-    $center_form = $this->locationInputManager->getForm($this->options['location_input'], $this, empty($this->value['center']) ? NULL : $this->value['center']);
+    $center_form = $this->locationInputManager->getForm($this->options['location_input'], ['views_filter' => $this], empty($this->value['center']) ? NULL : $this->value['center']);
     if (!empty($center_form)) {
       $identifier = $this->options['expose']['identifier'];
       $form[$identifier . '_center'] = $center_form;
@@ -118,8 +116,13 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
 
   /**
    * {@inheritdoc}
+   *
+   * @param array $form
+   *   Form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   Form state.
    */
-  public function valueForm(&$form, FormStateInterface $form_state) {
+  public function valueForm(&$form, FormStateInterface $form_state): void {
     parent::valueForm($form, $form_state);
 
     if (!isset($form['value']['value'])) {
@@ -145,14 +148,19 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
 
     $identifier = $this->options['expose']['identifier'];
 
-    $form[$identifier . '_center'] = $this->locationInputManager->getForm($this->options['location_input'], $this, empty($this->value['center']) ? NULL : $this->value['center']);
+    $form[$identifier . '_center'] = $this->locationInputManager->getForm($this->options['location_input'], ['views_filter' => $this], empty($this->value['center']) ? NULL : $this->value['center'], $this->t('Center Coordinates'));
     $form[$identifier . '_center']['#tree'] = TRUE;
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @param array $form
+   *   Form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   Form state.
    */
-  protected function valueSubmit($form, FormStateInterface $form_state) {
+  protected function valueSubmit($form, FormStateInterface $form_state): void {
     $distance = (float) $form_state->getValue(['options', 'value', 'value']);
     $form_state->setValue(['options', 'value', 'value'], $distance);
 
@@ -167,8 +175,13 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
 
   /**
    * {@inheritdoc}
+   *
+   * @param array $input
+   *   Input.
+   * @param bool $status
+   *   Status.
    */
-  public function storeExposedInput($input, $status) {
+  public function storeExposedInput($input, $status): void {
     parent::storeExposedInput($input, $status);
 
     $identifier = $this->options['expose']['identifier'];
@@ -177,18 +190,17 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
       return;
     }
 
-    $display_id = ($this->view->display_handler->isDefaulted('filters')) ? 'default' : $this->view->current_display;
     $request = $this->view->getRequest();
     $session = $request->hasSession() ? $request->getSession() : NULL;
-    $views_session = $session ? $session->get('views', []) : [];
+    $views_session = $session?->get('views', []) ?? [];
+    $display_id = ($this->view->display_handler->isDefaulted('filters')) ? 'default' : $this->view->current_display;
+
     if (empty($views_session[$this->view->storage->id()][$display_id])) {
       return;
     }
 
     $views_session[$this->view->storage->id()][$display_id]['center'] = $input[$identifier . '_center'];
-    if ($session) {
-      $session->set('views', $views_session);
-    }
+    $session?->set('views', $views_session);
   }
 
   /**
@@ -211,11 +223,11 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
   /**
    * {@inheritdoc}
    */
-  public function query() {
+  public function query(): void {
     $table = $this->ensureMyTable();
     $this->value['value'] = self::convertDistance($this->value['value'], $this->options['unit']);
 
-    $center = $this->locationInputManager->getCoordinates((array) $this->value['center'], $this->options['location_input'], $this);
+    $center = $this->locationInputManager->getCoordinates((array) $this->value['center'], $this->options['location_input'], ['views_filter' => $this]);
 
     if (
       empty($center)
@@ -242,33 +254,39 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
   /**
    * {@inheritdoc}
    */
-  protected function opBetween($expression) {
+  protected function opBetween($field): void {
     /** @var \Drupal\views\Plugin\views\query\Sql $query */
     $query = $this->query;
-    $args = [':geoloc_min' => (float) $this->value['min'], ':geoloc_max' => (float) $this->value['max']];
+    $args = [':min' => (float) $this->value['min'], ':max' => (float) $this->value['max']];
     if ($this->operator == 'between') {
-      $query->addWhereExpression($this->options['group'], $expression . ' BETWEEN :geoloc_min AND :geoloc_max', $args);
+      $query->addWhereExpression($this->options['group'], $field . ' BETWEEN :min AND :max', $args);
     }
     else {
-      $query->addWhereExpression($this->options['group'], $expression . ' NOT BETWEEN :geoloc_min AND :geoloc_max', $args);
+      $query->addWhereExpression($this->options['group'], $field . ' NOT BETWEEN :min AND :max', $args);
     }
   }
 
   /**
-   * {@inheritdoc}
+   * Condition Simple.
+   *
+   * @param string $field
+   *   Field.
    */
-  protected function opSimple($expression) {
+  protected function opSimple($field): void {
     /** @var \Drupal\views\Plugin\views\query\Sql $query */
     $query = $this->query;
-    $allowed_operators = ['<', '<=', '=', '>=', '>'];
-    $op = in_array($this->operator, $allowed_operators, TRUE) ? $this->operator : '<';
-    $query->addWhereExpression($this->options['group'], $expression . ' ' . $op . ' :geoloc_val', [':geoloc_val' => (float) $this->value['value']]);
+    $allowed = ['<', '>', '<=', '>=', '=', '!=', '<>'];
+    $operator = in_array($this->operator, $allowed, TRUE) ? $this->operator : '=';
+    $query->addWhereExpression($this->options['group'], $field . ' ' . $operator . ' :value', [':value' => (float) $this->value['value']]);
   }
 
   /**
-   * {@inheritdoc}
+   * Condition empty.
+   *
+   * @param string $field
+   *   Field.
    */
-  protected function opEmpty($expression) {
+  protected function opEmpty($field): void {
     /** @var \Drupal\views\Plugin\views\query\Sql $query */
     $query = $this->query;
     if ($this->operator == 'empty') {
@@ -278,16 +296,16 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
       $operator = "IS NOT NULL";
     }
 
-    $query->addWhereExpression($this->options['group'], $expression . ' ' . $operator);
+    $query->addWhereExpression($this->options['group'], $field . ' ' . $operator);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function opRegex($expression) {
+  protected function opRegex($field): void {
     /** @var \Drupal\views\Plugin\views\query\Sql $query */
     $query = $this->query;
-    $query->addWhereExpression($this->options['group'], $expression . ' ~* :geoloc_regex', [':geoloc_regex' => $this->value['value']]);
+    $query->addWhereExpression($this->options['group'], $field . ' ~* :value', [':value' => $this->value['value']]);
   }
 
 }

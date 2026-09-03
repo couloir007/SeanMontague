@@ -2,36 +2,37 @@
 
 namespace Drupal\geolocation_google_maps\Plugin\geolocation\Geocoder;
 
+use Drupal\geolocation\Attribute\Geocoder;
 use Drupal\Component\Serialization\Json;
-use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Utility\Error;
 use Drupal\geolocation\KeyProvider;
 use Drupal\geolocation_google_maps\GoogleGeocoderBase;
-use Drupal\geolocation_google_maps\Plugin\geolocation\MapProvider\GoogleMaps;
 use GuzzleHttp\Exception\RequestException;
 
 /**
  * Provides the Google Geocoding API.
- *
- * @Geocoder(
- *   id = "google_geocoding_api",
- *   name = @Translation("Google Geocoding API"),
- *   description = @Translation("You do require an API key for this plugin to work."),
- *   locationCapable = true,
- *   boundaryCapable = true,
- *   frontendCapable = true,
- *   reverseCapable = true,
- * )
  */
+#[Geocoder(
+  id: 'google_geocoding_api',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('Google Geocoding API'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('You do require an API key for this plugin to work.'),
+  locationCapable: TRUE,
+  boundaryCapable: TRUE,
+  frontendCapable: TRUE,
+  reverseCapable: TRUE
+)]
 class GoogleGeocodingAPI extends GoogleGeocoderBase {
-
-  const API_PATH = '/maps/api/geocode/json';
 
   /**
    * {@inheritdoc}
    */
-  protected function getDefaultSettings() {
+  protected function getDefaultSettings(): array {
+    $config = \Drupal::config('geolocation_google_maps.settings');
+
     $default_settings = parent::getDefaultSettings();
-    $default_settings['region'] = '';
+    if (!empty($config->get('google_map_custom_url_parameters')['region'])) {
+      $default_settings['region'] = $config->get('google_map_custom_url_parameters')['region'];
+    }
 
     return $default_settings;
   }
@@ -39,7 +40,27 @@ class GoogleGeocodingAPI extends GoogleGeocoderBase {
   /**
    * {@inheritdoc}
    */
-  public function getOptionsForm() {
+  public function getSettings(array $settings = []): array {
+    $settings = parent::getSettings($settings);
+
+    $parameters = [
+      'callback' => 'DrupalGeolocationGoogleLoader',
+      'loading' => 'async',
+    ];
+
+    if (!empty($settings['region'])) {
+      $parameters['region'] = $settings['region'];
+    }
+
+    $settings['google_api_url'] = $this->googleMapsService->getGoogleMapsApiUrl($parameters, '/js');
+
+    return $settings;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOptionsForm(): array {
     $settings = $this->getSettings();
     $form = parent::getOptionsForm();
 
@@ -48,7 +69,7 @@ class GoogleGeocodingAPI extends GoogleGeocoderBase {
         '#type' => 'textfield',
         '#title' => $this->t('Region'),
         '#description' => $this->t('Make a region biasing by providing a ccTLD country code. See <a href="https://developers.google.com/maps/documentation/geocoding/intro#RegionCodes">Region Biasing</a>'),
-        '#default_value' => $settings['region'],
+        '#default_value' => $settings['region'] ?? '',
         '#size' => 5,
       ],
     ];
@@ -59,48 +80,16 @@ class GoogleGeocodingAPI extends GoogleGeocoderBase {
   /**
    * {@inheritdoc}
    */
-  public function formAttachGeocoder(array &$render_array, $element_name) {
-    parent::formAttachGeocoder($render_array, $element_name);
-
-    $config = \Drupal::config('geolocation_google_maps.settings');
-
-    $render_array['#attached'] = BubbleableMetadata::mergeAttachments(
-      $render_array['#attached'],
-      [
-        'library' => [
-          'geolocation_google_maps/geocoder.googlegeocodingapi',
-        ],
-      ]
-    );
-
-    if (!empty($config->get('google_map_custom_url_parameters')['region'])) {
-      $render_array['#attached']['drupalSettings']['geolocation']['geocoder'][$this->getPluginId()]['region'] = $config->get('google_map_custom_url_parameters')['region'];
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function geocode($address) {
+  public function geocode(string $address): ?array {
     if (empty($address)) {
-      return FALSE;
+      return NULL;
     }
 
     $config = \Drupal::config('geolocation_google_maps.settings');
+
     $query_params = [
       'address' => $address,
     ];
-
-    if (!empty($config->get('google_maps_base_url'))) {
-      $request_url = $config->get('google_maps_base_url');
-    }
-    elseif ($config->get('china_mode')) {
-      $request_url = GoogleMaps::$googleMapsApiUrlBaseChina;
-    }
-    else {
-      $request_url = GoogleMaps::$googleMapsApiUrlBase;
-    }
-    $request_url .= self::API_PATH;
 
     if (!empty($config->get('google_map_api_server_key'))) {
       $query_params['key'] = KeyProvider::getKeyValue($config->get('google_map_api_server_key'));
@@ -138,12 +127,13 @@ class GoogleGeocodingAPI extends GoogleGeocoderBase {
 
     try {
       $result = Json::decode(\Drupal::httpClient()
-        ->get($request_url, ['query' => $query_params])
+        ->get($this->googleMapsService->getGoogleMapsApiUrl($query_params, '/geocode/json'))
         ->getBody());
     }
     catch (RequestException $e) {
-      \Drupal::logger('geolocation')->warning($e->getMessage());
-      return FALSE;
+      $logger = \Drupal::logger('geolocation');
+      Error::logException($logger, $e);
+      return NULL;
     }
 
     if (
@@ -154,10 +144,9 @@ class GoogleGeocodingAPI extends GoogleGeocoderBase {
         \Drupal::logger('geolocation')->error(t('Unable to geocode "@address" with error: "@error". Request URL: @url', [
           '@address' => $address,
           '@error' => $result['error_message'],
-          '@url' => $request_url,
         ]));
       }
-      return FALSE;
+      return NULL;
     }
 
     return [
@@ -165,7 +154,6 @@ class GoogleGeocodingAPI extends GoogleGeocoderBase {
         'lat' => $result['results'][0]['geometry']['location']['lat'],
         'lng' => $result['results'][0]['geometry']['location']['lng'],
       ],
-      // @todo Add viewport or build it if missing.
       'boundary' => [
         'lat_north_east' => empty($result['results'][0]['geometry']['viewport']) ? $result['results'][0]['geometry']['location']['lat'] + 0.005 : $result['results'][0]['geometry']['viewport']['northeast']['lat'],
         'lng_north_east' => empty($result['results'][0]['geometry']['viewport']) ? $result['results'][0]['geometry']['location']['lng'] + 0.005 : $result['results'][0]['geometry']['viewport']['northeast']['lng'],
@@ -180,32 +168,33 @@ class GoogleGeocodingAPI extends GoogleGeocoderBase {
   /**
    * {@inheritdoc}
    */
-  public function reverseGeocode($latitude, $longitude) {
+  public function reverseGeocode(float $latitude, float $longitude): ?array {
     $config = \Drupal::config('geolocation_google_maps.settings');
 
-    $request_url = GoogleMaps::$googleMapsApiUrlBase;
-    if ($config->get('china_mode')) {
-      $request_url = GoogleMaps::$googleMapsApiUrlBaseChina;
-    }
-    $request_url .= '/maps/api/geocode/json?latlng=' . (float) $latitude . ',' . (float) $longitude;
+    $query_params = [
+      'latlng' => $latitude . ',' . $longitude,
+    ];
 
     if (!empty($config->get('google_map_api_server_key'))) {
-      $request_url .= '&key=' . KeyProvider::getKeyValue($config->get('google_map_api_server_key'));
+      $query_params['key'] = KeyProvider::getKeyValue($config->get('google_map_api_server_key'));
     }
     elseif (!empty($config->get('google_map_api_key'))) {
-      $request_url .= '&key=' . KeyProvider::getKeyValue($config->get('google_map_api_key'));
+      $query_params['key'] = KeyProvider::getKeyValue($config->get('google_map_api_key'));
     }
 
     if (!empty($config->get('google_map_custom_url_parameters')['language'])) {
-      $request_url .= '&language=' . $config->get('google_map_custom_url_parameters')['language'];
+      $query_params['language'] = $config->get('google_map_custom_url_parameters')['language'];
     }
 
     try {
-      $result = Json::decode(\Drupal::httpClient()->request('GET', $request_url)->getBody());
+      $result = Json::decode(\Drupal::httpClient()
+        ->get($this->googleMapsService->getGoogleMapsApiUrl($query_params, '/geocode/json'))
+        ->getBody());
     }
     catch (RequestException $e) {
-      \Drupal::logger('geolocation')->warning($e->getMessage());
-      return FALSE;
+      $logger = \Drupal::logger('geolocation');
+      Error::logException($logger, $e);
+      return NULL;
     }
 
     if (
@@ -217,10 +206,9 @@ class GoogleGeocodingAPI extends GoogleGeocoderBase {
           '@latitude' => $latitude,
           '@$longitude' => $longitude,
           '@error' => $result['error_message'],
-          '@url' => $request_url,
         ]));
       }
-      return FALSE;
+      return NULL;
     }
 
     if (empty($result['results'][0]['address_components'])) {

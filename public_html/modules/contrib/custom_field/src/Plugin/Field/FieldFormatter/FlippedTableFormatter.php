@@ -53,15 +53,24 @@ class FlippedTableFormatter extends BaseFormatter {
       '#title' => $this->t('Hide rows with empty columns'),
       '#default_value' => $this->getSetting('hide_empty'),
     ];
-    foreach ($this->getCustomFieldItems() as $name => $custom_item) {
-      // Remove non-applicable settings.
-      $label_options = $form['fields'][$name]['content']['formatter_settings']['label_display']['#options'];
-      unset($label_options['inline']);
-      $label_options['above'] = $this->t('Default');
-      $form['fields'][$name]['content']['formatter_settings']['label_display']['#options'] = $label_options;
-    }
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function processFields(array $element, FormStateInterface $form_state, array $form): array {
+    $element = parent::processFields($element, $form_state, $form);
+    foreach ($this->getCustomFieldItems() as $name => $custom_item) {
+      // Remove non-applicable settings for flipped table row headers.
+      $label_options = $element[$name]['content']['formatter_settings']['label_display']['#options'];
+      unset($label_options['inline']);
+      $label_options['above'] = $this->t('Default');
+      $element[$name]['content']['formatter_settings']['label_display']['#options'] = $label_options;
+    }
+
+    return $element;
   }
 
   /**
@@ -134,7 +143,7 @@ class FlippedTableFormatter extends BaseFormatter {
               '#theme' => 'custom_field_item',
               '#field_name' => $name,
               '#name' => $value['name'],
-              '#value' => $value['value']['#markup'],
+              '#value' => $value['value'],
               '#label' => $value['label'],
               '#label_display' => 'hidden',
               '#type' => $value['type'],

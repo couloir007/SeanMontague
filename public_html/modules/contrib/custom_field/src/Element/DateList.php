@@ -18,11 +18,6 @@ class DateList extends CoreDatelist {
     $info = parent::getInfo();
     $info['#theme'] = NULL;
     $info['#theme_wrappers'] = [];
-    $info['#attached'] = [
-      'library' => [
-        'custom_field/custom-field-datetime',
-      ],
-    ];
 
     return $info;
   }

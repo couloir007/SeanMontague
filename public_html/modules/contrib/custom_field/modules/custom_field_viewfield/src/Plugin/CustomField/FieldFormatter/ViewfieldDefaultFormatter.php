@@ -72,9 +72,8 @@ class ViewfieldDefaultFormatter extends CustomFieldFormatterBase implements Cont
    * {@inheritdoc}
    */
   public function formatValue(FieldItemInterface $item, mixed $value): ?array {
-    $widget_settings = $this->customFieldDefinition->getWidgetSetting('settings');
     $cacheability = new CacheableMetadata();
-    $force_default = $widget_settings['force_default'] ?? FALSE;
+    $force_default = $this->customFieldDefinition->getFieldSetting('force_default') ?? FALSE;
     $always_build_output = $this->getSetting('always_build_output');
     $entity = $item->getEntity();
     $name = $this->customFieldDefinition->getName();

@@ -91,7 +91,8 @@ class CustomFieldTest extends FeedsKernelTestBase {
     $this->customFieldTypeManager = $this->container->get('plugin.manager.custom_field_type');
     $this->feedsManager = $this->container->get('plugin.manager.custom_field_feeds');
     $fieldStorageConfig = FieldStorageConfig::loadByName($this->entityTypeId, $this->fieldName);
-    $columns = $fieldStorageConfig->getSetting('columns');
+    $settings = $fieldStorageConfig->getSettings();
+    $custom_items = $this->customFieldTypeManager->getCustomFieldItems($settings);
 
     // Create and configure feed type.
     $sources = [
@@ -119,9 +120,14 @@ class CustomFieldTest extends FeedsKernelTestBase {
       'target' => $this->fieldName,
       'map' => [],
     ];
-    foreach ($columns as $name => $column) {
+    foreach ($custom_items as $name => $custom_item) {
       $sources[$name] = $name;
       $custom_field_map['map'][$name] = $name;
+      if (in_array($custom_item->getDataType(), ['daterange', 'time_range'])) {
+        $end = $name . '__end';
+        $sources[$end] = $end;
+        $custom_field_map['map'][$end] = $end;
+      }
     }
 
     $mappings[] = $custom_field_map;
@@ -154,18 +160,18 @@ class CustomFieldTest extends FeedsKernelTestBase {
     $this->assertNodeCount(3);
     $expected_values = [
       1 => [
-        'string_test' => 'String 1',
-        'string_long_test' => 'Long string 1',
-        'integer_test' => '42',
-        'decimal_test' => '3.14',
-        'float_test' => '2.718',
-        'email_test' => 'test@example.com',
-        'telephone_test' => '+1234567890',
-        'uri_test' => 'http://www.example.com',
-        'link_test' => 'http://www.example.com',
-        'boolean_test' => '1',
-        'color_test' => '#FFA500',
-        'map_test' => [
+        'string' => 'String 1',
+        'string_long' => 'Long string 1',
+        'integer' => '42',
+        'decimal' => '3.14',
+        'float' => '2.718',
+        'email' => 'test@example.com',
+        'telephone' => '+1234567890',
+        'uri' => 'http://www.example.com',
+        'link' => 'http://www.example.com',
+        'boolean' => '1',
+        'color' => '#FFA500',
+        'map' => [
           [
             'key' => 'key1',
             'value' => 'value1',
@@ -175,47 +181,59 @@ class CustomFieldTest extends FeedsKernelTestBase {
             'value' => 'value2',
           ],
         ],
-        'map_string_test' => [
+        'map_string' => [
           'value1',
           'value2',
           'value3',
         ],
-        'datetime_test' => '2023-01-01T00:00:00',
-        'time_test' => '24205',
+        'datetime' => '2023-01-01T00:00:00',
+        'daterange' => '2023-01-01T00:00:00',
+        'daterange__end' => '2024-01-01T00:00:00',
+        'time' => '24205',
+        'time_range' => '24205',
+        'time_range__end' => '27805',
       ],
       2 => [
-        'string_test' => 'String 2',
-        'string_long_test' => 'Long string 2',
-        'integer_test' => NULL,
-        'decimal_test' => '-1.62',
-        'float_test' => '0.5778',
-        'email_test' => NULL,
-        'telephone_test' => '-9876543210',
-        'uri_test' => 'internal:/',
-        'link_test' => 'internal:/',
-        'boolean_test' => '1',
-        'color_test' => NULL,
-        'map_test' => NULL,
-        'map_string_test' => NULL,
-        'datetime_test' => '2009-09-03T00:12:00',
-        'time_test' => '45000',
+        'string' => 'String 2',
+        'string_long' => 'Long string 2',
+        'integer' => NULL,
+        'decimal' => '-1.62',
+        'float' => '0.5778',
+        'email' => NULL,
+        'telephone' => '-9876543210',
+        'uri' => 'internal:/',
+        'link' => 'internal:/',
+        'boolean' => '1',
+        'color' => NULL,
+        'map' => NULL,
+        'map_string' => NULL,
+        'datetime' => '2009-09-03T00:12:00',
+        'daterange' => '2009-09-03T00:12:00',
+        'daterange__end' => '2009-12-27T17:58:40',
+        'time' => '45000',
+        'time_range' => '45000',
+        'time_range__end' => '48600',
       ],
       3 => [
-        'string_test' => 'String 3',
-        'string_long_test' => NULL,
-        'integer_test' => '1234',
-        'decimal_test' => '1.62',
-        'float_test' => '0.577',
-        'email_test' => NULL,
-        'telephone_test' => NULL,
-        'uri_test' => 'route:<nolink>',
-        'link_test' => 'route:<nolink>',
-        'boolean_test' => '1',
-        'color_test' => '#FFFFFF',
-        'map_test' => NULL,
-        'map_string_test' => NULL,
-        'datetime_test' => '2018-02-09T00:00:00',
-        'time_test' => '34220',
+        'string' => 'String 3',
+        'string_long' => NULL,
+        'integer' => '1234',
+        'decimal' => '1.62',
+        'float' => '0.577',
+        'email' => NULL,
+        'telephone' => NULL,
+        'uri' => 'route:<nolink>',
+        'link' => 'route:<nolink>',
+        'boolean' => '1',
+        'color' => '#FFFFFF',
+        'map' => NULL,
+        'map_string' => NULL,
+        'datetime' => '2018-02-09T00:00:00',
+        'daterange' => '2018-02-09T00:00:00',
+        'daterange__end' => '2019-02-09T00:00:00',
+        'time' => '34220',
+        'time_range' => '34220',
+        'time_range__end' => '37820',
       ],
     ];
     foreach ($expected_values as $nid => $data) {
@@ -228,14 +246,14 @@ class CustomFieldTest extends FeedsKernelTestBase {
     }
     // Check if mappings can be unique.
     $unique_types = [
-      'string_test',
-      'string_long_test',
-      'integer_test',
-      'decimal_test',
-      'email_test',
-      'uri_test',
-      'link_test',
-      'telephone_test',
+      'string',
+      'string_long',
+      'integer',
+      'decimal',
+      'email',
+      'uri',
+      'link',
+      'telephone',
     ];
     $unique_count = count($unique_types);
     $mappings = $this->feedType->getMappings();

@@ -27,14 +27,11 @@ class DateTimeDatelistWidget extends DateTimeWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    $settings = parent::defaultSettings();
-    $settings['settings'] = [
+    return [
       'increment' => '15',
       'date_order' => 'YMD',
       'time_type' => '24',
-    ] + $settings['settings'];
-
-    return $settings;
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -42,10 +39,10 @@ class DateTimeDatelistWidget extends DateTimeWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
     $datetime_type = $field->getDatetimeType();
 
-    $element['settings']['date_order'] = [
+    $element['date_order'] = [
       '#type' => 'select',
       '#title' => $this->t('Date part order'),
       '#default_value' => $settings['date_order'],
@@ -57,7 +54,7 @@ class DateTimeDatelistWidget extends DateTimeWidgetBase {
     ];
 
     if ($datetime_type == 'datetime') {
-      $element['settings']['time_type'] = [
+      $element['time_type'] = [
         '#type' => 'select',
         '#title' => $this->t('Time type'),
         '#default_value' => $settings['time_type'],
@@ -67,7 +64,7 @@ class DateTimeDatelistWidget extends DateTimeWidgetBase {
         ],
       ];
 
-      $element['settings']['increment'] = [
+      $element['increment'] = [
         '#type' => 'select',
         '#title' => $this->t('Time increments'),
         '#default_value' => $settings['increment'],
@@ -81,12 +78,12 @@ class DateTimeDatelistWidget extends DateTimeWidgetBase {
       ];
     }
     else {
-      $element['settings']['time_type'] = [
+      $element['time_type'] = [
         '#type' => 'hidden',
         '#value' => 'none',
       ];
 
-      $element['settings']['increment'] = [
+      $element['increment'] = [
         '#type' => 'hidden',
         '#value' => $settings['increment'],
       ];
@@ -100,7 +97,7 @@ class DateTimeDatelistWidget extends DateTimeWidgetBase {
    */
   public function widget(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
     $datetime_type = $field->getDatetimeType();
     $date_order = $settings['date_order'];
     $time_type = $datetime_type == 'datetime' ? $settings['time_type'] : '';
@@ -143,8 +140,8 @@ class DateTimeDatelistWidget extends DateTimeWidgetBase {
     }
 
     // Wrap all the select elements with a fieldset.
-    $element['#theme_wrappers'] = ['container', 'fieldset', 'container'];
-    $element['#attributes']['class'][] = 'custom-field-datetime-grid';
+    $element['#theme'] = 'custom_field_flex_wrapper';
+    $element['#theme_wrappers'] = ['fieldset', 'container'];
     $element['value']['#type'] = 'custom_field_datelist';
     $element['value']['#date_increment'] = $increment;
     $element['value'] += [

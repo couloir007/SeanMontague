@@ -3,7 +3,7 @@ wicket:
   version: 1.x
   license:
     name: GNU General Public License version 3, GPLv3
-    url: http://www.gnu.org/licenses/gpl.html
+    url: https://www.gnu.org/licenses/gpl.html
     gpl-compatible: true
   js:
     https://cdn.rawgit.com/arthur-e/Wicket/master/wicket.js: { type: external }
@@ -13,7 +13,7 @@ wicket-leaflet:
   version: 1.x
   license:
     name: GNU General Public License version 3, GPLv3
-    url: http://www.gnu.org/licenses/gpl.html
+    url: https://www.gnu.org/licenses/gpl.html
     gpl-compatible: true
   js:
     https://cdn.rawgit.com/arthur-e/Wicket/master/wicket-leaflet.js: { type: external }
@@ -25,7 +25,7 @@ wicket-googlemaps:
   version: 1.x
   license:
     name: GNU General Public License version 3, GPLv3
-    url: http://www.gnu.org/licenses/gpl.html
+    url: https://www.gnu.org/licenses/gpl.html
     gpl-compatible: true
   js:
     https://cdn.rawgit.com/arthur-e/Wicket/master/wicket-gmap3.js: { type: external }

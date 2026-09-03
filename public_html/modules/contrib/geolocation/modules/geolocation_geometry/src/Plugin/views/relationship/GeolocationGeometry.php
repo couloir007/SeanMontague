@@ -2,9 +2,11 @@
 
 namespace Drupal\geolocation_geometry\Plugin\views\relationship;
 
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\views\Plugin\views\relationship\RelationshipPluginBase;
+use Drupal\views\Attribute\ViewsRelationship;
 use Drupal\views\Plugin\ViewsHandlerManager;
+use Drupal\views\Plugin\views\relationship\RelationshipPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -14,14 +16,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @ViewsRelationship("geolocation_geometry")
  */
+#[ViewsRelationship(id: 'geolocation_geometry')]
 class GeolocationGeometry extends RelationshipPluginBase {
 
   /**
-   * Join Manager.
+   * Join plugin.
    *
    * @var \Drupal\Component\Plugin\PluginManagerInterface
    */
-  public $joinManager;
+  public PluginManagerInterface $joinManager;
 
   /**
    * Query.
@@ -41,7 +44,7 @@ class GeolocationGeometry extends RelationshipPluginBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     return new static(
       $configuration,
       $plugin_id,
@@ -53,7 +56,7 @@ class GeolocationGeometry extends RelationshipPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function defineOptions() {
+  public function defineOptions(): array {
     $options = parent::defineOptions();
 
     $options['geometry_join_type'] = ['default' => 'geolocation_geometry_within'];
@@ -63,8 +66,13 @@ class GeolocationGeometry extends RelationshipPluginBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @param array $form
+   *   Form render array.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   Form state.
    */
-  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+  public function buildOptionsForm(&$form, FormStateInterface $form_state): void {
     parent::buildOptionsForm($form, $form_state);
 
     $form['geometry_join_type'] = [
@@ -83,7 +91,7 @@ class GeolocationGeometry extends RelationshipPluginBase {
   /**
    * Called to implement a relationship in a query.
    */
-  public function query() {
+  public function query(): void {
     $this->ensureMyTable();
 
     $first = [

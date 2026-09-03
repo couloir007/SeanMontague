@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\custom_field\Plugin\Validation\Constraint;
 
-use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
+use Drupal\custom_field\Plugin\CustomField\FieldType\LinkTypeInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -32,10 +32,10 @@ class LinkTypeConstraintValidator extends ConstraintValidator {
       $custom_items = $item->getCustomFieldManager()->getCustomFieldItems($item->getFieldDefinition()->getSettings());
       $subfield = $custom_items[$name] ?? NULL;
       $url = NULL;
-      if (!$subfield) {
+      if (!$subfield instanceof LinkTypeInterface) {
         return;
       }
-      $link_type = $subfield->getWidgetSetting('settings')['link_type'];
+      $link_type = $subfield->getFieldSetting('link_type');
       if (!$link_type) {
         return;
       }
@@ -51,11 +51,11 @@ class LinkTypeConstraintValidator extends ConstraintValidator {
       // If the link field doesn't support both internal and external links,
       // check whether the URL (a resolved URI) is in fact violating either
       // restriction.
-      if ($uri_is_valid && $link_type !== CustomFieldTypeInterface::LINK_GENERIC) {
-        if (!($link_type & CustomFieldTypeInterface::LINK_EXTERNAL) && $url->isExternal()) {
+      if ($uri_is_valid && $link_type !== LinkTypeInterface::LINK_GENERIC) {
+        if (!($link_type & LinkTypeInterface::LINK_EXTERNAL) && $url->isExternal()) {
           $uri_is_valid = FALSE;
         }
-        if (!($link_type & CustomFieldTypeInterface::LINK_INTERNAL) && !$url->isExternal()) {
+        if (!($link_type & LinkTypeInterface::LINK_INTERNAL) && !$url->isExternal()) {
           $uri_is_valid = FALSE;
         }
       }

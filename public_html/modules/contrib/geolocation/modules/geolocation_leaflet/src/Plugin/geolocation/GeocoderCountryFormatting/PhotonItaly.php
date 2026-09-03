@@ -2,23 +2,23 @@
 
 namespace Drupal\geolocation_leaflet\Plugin\geolocation\GeocoderCountryFormatting;
 
+use Drupal\geolocation\Attribute\GeocoderCountryFormatting;
 use Drupal\geolocation_leaflet\NominatimRoadFirstFormattingBase;
 
 /**
  * Provides address formatting.
- *
- * @GeocoderCountryFormatting(
- *   id = "photon_it",
- *   country_code = "it",
- *   geocoder = "photon",
- * )
  */
+#[GeocoderCountryFormatting(
+  id: 'photon_it',
+  countryCode: 'it',
+  geocoder: 'photon'
+)]
 class PhotonItaly extends NominatimRoadFirstFormattingBase {
 
   /**
    * {@inheritdoc}
    */
-  public function format(array $atomics) {
+  public function format(array $atomics): ?array {
     $address_elements = parent::format($atomics);
     if (\Drupal::hasService('address.subdivision_repository')) {
       $subdivisions = \Drupal::service('address.subdivision_repository')->getList(['it']);

@@ -2,6 +2,7 @@
 
 namespace Drupal\geolocation_geometry\Plugin\views\join;
 
+use Drupal\views\Attribute\ViewsJoin;
 use Drupal\views\Plugin\views\join\JoinPluginBase;
 use Drupal\views\Plugin\views\join\JoinPluginInterface;
 
@@ -9,15 +10,21 @@ use Drupal\views\Plugin\views\join\JoinPluginInterface;
  * Geometry joins.
  *
  * @ingroup views_join_handlers
- *
- * @ViewsJoin("geolocation_geometry_within")
  */
+#[ViewsJoin(id: 'geolocation_geometry_within')]
 class GeolocationGeometryWithin extends JoinPluginBase implements JoinPluginInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @param \Drupal\Core\Database\Query\SelectInterface $select_query
+   *   Select query.
+   * @param string|array $table
+   *   Table data.
+   * @param \Drupal\views\Plugin\views\query\QueryPluginBase $view_query
+   *   View query.
    */
-  public function buildJoin($select_query, $table, $view_query) {
+  public function buildJoin($select_query, $table, $view_query): void {
     /** @var \Drupal\Core\Database\Query\Select $select_query */
 
     $geometry_field = ($table['alias'] ?: $this->table) . '.' . $this->field . '_geometry';

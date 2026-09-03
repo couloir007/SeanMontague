@@ -2,6 +2,7 @@
 
 namespace Drupal\geolocation\Plugin\geolocation\Location;
 
+use Drupal\geolocation\Attribute\Location;
 use Drupal\geolocation\LocationBase;
 use Drupal\geolocation\LocationInputManager;
 use Drupal\geolocation\LocationInterface;
@@ -10,37 +11,32 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Derive center from proximity filter.
- *
- * @Location(
- *   id = "views_proximity_filter",
- *   name = @Translation("Proximity filter"),
- *   description = @Translation("Set map center from proximity filter."),
- * )
  */
+#[Location(
+  id: 'views_proximity_filter',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('Proximity filter'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('Set map center from proximity filter.')
+)]
 class ViewsProximityFilter extends LocationBase implements LocationInterface {
 
   use ViewsContextTrait;
 
   /**
-   * Proximity center manager.
-   *
-   * @var \Drupal\geolocation\LocationInputManager
-   */
-  protected $locationInputManager;
-
-  /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LocationInputManager $location_input_manager) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected LocationInputManager $locationInputManager,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    $this->locationInputManager = $location_input_manager;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): LocationInterface {
     return new static(
       $configuration,
       $plugin_id,
@@ -52,15 +48,19 @@ class ViewsProximityFilter extends LocationBase implements LocationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getAvailableLocationOptions($context): array {
+  public function getAvailableLocationOptions(array $context = []): array {
     $options = [];
+
+    if (empty($context['views_filter'])) {
+      return $options;
+    }
 
     if ($displayHandler = self::getViewsDisplayHandler($context)) {
       /** @var \Drupal\views\Plugin\views\filter\FilterPluginBase $filter */
       foreach ($displayHandler->getHandlers('filter') as $delta => $filter) {
         if (
           $filter->getPluginId() === 'geolocation_filter_proximity'
-          && $filter !== $context
+          && $filter !== $context['views_filter']
         ) {
           $options[$delta] = $this->t('Proximity filter') . ' - ' . $filter->adminLabel();
         }
@@ -93,7 +93,7 @@ class ViewsProximityFilter extends LocationBase implements LocationInterface {
       ];
     }
 
-    return $this->locationInputManager->getCoordinates((array) $filter->value['center'], $filter->options['location_input'], $filter);
+    return $this->locationInputManager->getCoordinates((array) $filter->value['center'], $filter->options['location_input'], ['views_filter' => $filter]);
   }
 
 }

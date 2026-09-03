@@ -2,149 +2,117 @@
 
 namespace Drupal\geolocation_google_places_api\Plugin\geolocation\Geocoder;
 
+use Drupal\geolocation\Attribute\Geocoder;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Render\BubbleableMetadata;
-use Drupal\geolocation\KeyProvider;
+use Drupal\Core\Utility\Error;
 use Drupal\geolocation_google_maps\GoogleGeocoderBase;
-use Drupal\geolocation_google_maps\Plugin\geolocation\MapProvider\GoogleMaps;
 use GuzzleHttp\Exception\RequestException;
 
 /**
  * Provides the Google Places API.
- *
- * @Geocoder(
- *   id = "google_places_api",
- *   name = @Translation("Google Places API"),
- *   description = @Translation("Attention: This Plugin needs you to follow Google Places API TOS and either use the Attribution Block or provide it yourself."),
- *   locationCapable = true,
- *   boundaryCapable = true,
- *   frontendCapable = true,
- *   reverseCapable = false,
- * )
  */
+#[Geocoder(
+  id: 'google_places_api',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('Google Places API'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('Attention: This Plugin needs you to follow Google Places API TOS and either use the Attribution Block or provide it yourself.'),
+  locationCapable: TRUE,
+  boundaryCapable: TRUE,
+  frontendCapable: TRUE,
+  reverseCapable: FALSE
+)]
 class GooglePlacesAPI extends GoogleGeocoderBase {
 
   /**
    * {@inheritdoc}
    */
-  public function formAttachGeocoder(array &$render_array, $element_name) {
-    parent::formAttachGeocoder($render_array, $element_name);
+  public function alterRenderArray(array &$render_array, string $identifier): ?array {
+    parent::alterRenderArray($render_array, $identifier);
 
     $render_array['#attached'] = BubbleableMetadata::mergeAttachments(
-      $render_array['#attached'],
+      $render_array['#attached'] ?? [],
       [
         'library' => [
-          'geolocation_google_places_api/geolocation_google_places_api.geocoder.googleplacesapi',
+          'geolocation_google_places_api/geolocation_google_places_api.googleplacesicons',
         ],
       ]
     );
+
+    return $render_array;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function geocode($address) {
+  public function geocode($address): ?array {
 
     if (empty($address)) {
-      return FALSE;
+      return NULL;
     }
 
     $config = \Drupal::config('geolocation_google_maps.settings');
 
-    $request_url = GoogleMaps::$googleMapsApiUrlBase;
-    if ($config->get('china_mode')) {
-      $request_url = GoogleMaps::$googleMapsApiUrlBaseChina;
-    }
-    $request_url .= '/maps/api/place/autocomplete/json?input=' . $address;
+    $params = ['input' => $address];
 
-    $google_key = '';
-
-    if (!empty($config->get('google_map_api_server_key'))) {
-      $google_key = KeyProvider::getKeyValue($config->get('google_map_api_server_key'));
-    }
-    elseif (!empty($config->get('google_map_api_key'))) {
-      $google_key = KeyProvider::getKeyValue($config->get('google_map_api_key'));
-    }
-
-    if (!empty($google_key)) {
-      $request_url .= '&key=' . $google_key;
-    }
     if (!empty($this->configuration['component_restrictions']['country'])) {
-      $data = explode(',', $this->configuration['component_restrictions']['country']);
-      if (is_array($data)) {
-        foreach ($data as $country) {
-          $request_url .= '&components[]=country:' . $country;
-        }
-      }
-      else {
-        $request_url .= '&components=country:' . $this->configuration['component_restrictions']['country'];
+      foreach (explode(',', $this->configuration['component_restrictions']['country']) as $country) {
+        $params['components[]'] = 'country:' . $country;
       }
     }
     if (!empty($config->get('google_map_custom_url_parameters')['language'])) {
-      $request_url .= '&language=' . $config->get('google_map_custom_url_parameters')['language'];
+      $params['language'] = $config->get('google_map_custom_url_parameters')['language'];
     }
 
-
-    // Adding session token as per Google Places API to combine both api calls in a single session to reduce billing.
-    // @see https://developers.google.com/maps/documentation/places/web-service/details#sessiontoken and
-    // https://developers.google.com/maps/documentation/places/web-service/autocomplete#sessiontokenfor for more details.
+    // Adding session token as per Google Places API to combine both api calls
+    // in a single session to reduce billing.
+    // @see https://developers.google.com/maps/documentation/places/web-service/details#sessiontoken
+    // and
+    // @see https://developers.google.com/maps/documentation/places/web-service/autocomplete#sessiontoken
+    // for more details.
     $session_token = \Drupal::service('uuid')->generate();
-    $request_url .= '&sessiontoken=' . $session_token;
+    $params['sessiontoken'] = $session_token;
+    $request_url = $this->googleMapsService->getGoogleMapsApiUrl($params, '/maps/api/place/autocomplete/json');
 
     try {
       $result = Json::decode(\Drupal::httpClient()->request('GET', $request_url)->getBody());
     }
     catch (RequestException $e) {
-      \Drupal::logger('geolocation')->warning($e->getMessage());
-      return FALSE;
+      $logger = \Drupal::logger('geolocation');
+      Error::logException($logger, $e);
+      return NULL;
     }
 
     if (
       $result['status'] != 'OK'
       || empty($result['predictions'][0]['place_id'])
     ) {
-      return FALSE;
+      return NULL;
     }
 
     try {
-      if (!empty($config->get('google_maps_base_url'))) {
-        $details_url = $config->get('google_maps_base_url');
-      }
-      elseif ($config->get('china_mode')) {
-        $details_url = GoogleMaps::$googleMapsApiUrlBaseChina;
-      }
-      else {
-        $details_url = GoogleMaps::$googleMapsApiUrlBase;
-      }
-
-      // Including the same session token and place_id retrieved for place details API call.
-      // @see https://developers.google.com/maps/documentation/places/web-service/details for details.
-      $details_url .= '/maps/api/place/details/json';
-      $details_query = [
+      // Including the same session token and place_id retrieved for place
+      // details API call.
+      // @see https://developers.google.com/maps/documentation/places/web-service/details
+      // for details.
+      $params = [
         'place_id' => $result['predictions'][0]['place_id'],
         'fields' => "geometry,formatted_address",
         'sessiontoken' => $session_token,
       ];
-
-      if (!empty($google_key)) {
-        $details_query['key'] = $google_key;
-      }
-
-      $details = Json::decode(\Drupal::httpClient()->request('GET', $details_url, [
-        'query' => $details_query,
-      ])->getBody());
-
+      $details_url = $this->googleMapsService->getGoogleMapsApiUrl($params, '/maps/api/place/details/json');
+      $details = Json::decode(\Drupal::httpClient()->request('GET', $details_url)->getBody());
     }
     catch (RequestException $e) {
-      \Drupal::logger('geolocation')->warning($e->getMessage());
-      return FALSE;
+      $logger = \Drupal::logger('geolocation');
+      Error::logException($logger, $e);
+      return NULL;
     }
 
     if (
       $details['status'] != 'OK'
       || empty($details['result']['geometry']['location'])
     ) {
-      return FALSE;
+      return NULL;
     }
 
     return [

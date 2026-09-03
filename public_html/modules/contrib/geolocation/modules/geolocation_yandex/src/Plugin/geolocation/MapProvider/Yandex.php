@@ -2,26 +2,24 @@
 
 namespace Drupal\geolocation_yandex\Plugin\geolocation\MapProvider;
 
+use Drupal\geolocation\Attribute\MapProvider;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\geolocation\MapProviderBase;
 
 /**
  * Provides Yandex Maps API.
- *
- * @MapProvider(
- *   id = "yandex",
- *   name = @Translation("Yandex Maps"),
- *   description = @Translation("Yandex support."),
- * )
  */
+#[MapProvider(
+  id: 'yandex',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('Yandex Maps'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('Yandex support.')
+)]
 class Yandex extends MapProviderBase {
 
   /**
-   * Yandex API Url.
-   *
-   * @var string
+   * {@inheritdoc}
    */
-  public static $apiBaseUrl = 'https://api-maps.yandex.ru/2.1/';
+  public static string $apiBaseUrl = 'https://api-maps.yandex.ru/v3/';
 
   /**
    * {@inheritdoc}
@@ -54,10 +52,6 @@ class Yandex extends MapProviderBase {
    * {@inheritdoc}
    */
   public function getSettingsSummary(array $settings): array {
-    $settings = array_replace_recursive(
-      self::getDefaultSettings(),
-      $settings
-    );
     $summary = parent::getSettingsSummary($settings);
     $summary[] = $this->t('Zoom level: @zoom', ['@zoom' => $settings['zoom']]);
     $summary[] = $this->t('Height: @height', ['@height' => $settings['height']]);
@@ -68,7 +62,7 @@ class Yandex extends MapProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function getSettingsForm(array $settings, array $parents = []): array {
+  public function getSettingsForm(array $settings, array $parents = [], array $context = []): array {
     $settings += self::getDefaultSettings();
     if ($parents) {
       $parents_string = implode('][', $parents);
@@ -77,7 +71,7 @@ class Yandex extends MapProviderBase {
       $parents_string = NULL;
     }
 
-    $form = parent::getSettingsForm($settings, $parents);
+    $form = parent::getSettingsForm($settings, $parents, $context);
 
     $form['height'] = [
       '#group' => $parents_string,
@@ -103,11 +97,11 @@ class Yandex extends MapProviderBase {
       '#description' => $this->t('The initial resolution at which to display the map, where zoom 0 corresponds to a map of the Earth fully zoomed out, and higher zoom levels zoom in at a higher resolution.'),
       '#default_value' => $settings['zoom'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
         ['\Drupal\Core\Render\Element\Select', 'processSelect'],
       ],
       '#pre_render' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
 
@@ -119,11 +113,11 @@ class Yandex extends MapProviderBase {
       '#description' => $this->t('Minimum map zoom level.'),
       '#default_value' => $settings['min_zoom'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
         ['\Drupal\Core\Render\Element\Select', 'processSelect'],
       ],
       '#pre_render' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
 
@@ -135,11 +129,11 @@ class Yandex extends MapProviderBase {
       '#description' => $this->t('Maximum map zoom level.'),
       '#default_value' => $settings['max_zoom'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
         ['\Drupal\Core\Render\Element\Select', 'processSelect'],
       ],
       '#pre_render' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
 
@@ -149,93 +143,17 @@ class Yandex extends MapProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function alterRenderArray(array $render_array, array $map_settings, array $context = []): array {
-    $yandex_url_parts = parse_url(self::$apiBaseUrl);
-
-    $render_array['#attached'] = BubbleableMetadata::mergeAttachments(
-      empty($render_array['#attached']) ? [] : $render_array['#attached'],
-      [
-        'library' => [
-          'geolocation_yandex/geolocation.yandex',
-        ],
-        'drupalSettings' => [
-          'geolocation' => [
-            'maps' => [
-              $render_array['#id'] => [
-                'settings' => [
-                  'yandex_settings' => $map_settings,
-                ],
-              ],
-            ],
-          ],
-        ],
-        // Add 'preconnect' resource hint.
-        'html_head' => [
-          [
-            [
-              '#tag' => 'link',
-              '#attributes' => [
-                'rel' => 'preconnect',
-                'href' => $yandex_url_parts['scheme'] . "://" . $yandex_url_parts['host'],
-              ],
-            ],
-            'geolocation_yandex_link_preconnect_map',
-          ],
-        ],
-      ]
-    );
-
-    return parent::alterRenderArray($render_array, $map_settings, $context);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getControlPositions() {
+  public static function getControlPositions(): array {
     return [
       'top' => t('Top'),
+      'top right' => t('Top Right'),
+      'top left' => t('Top Left'),
       'right' => t('Right'),
       'left' => t('Left'),
       'bottom' => t('Bottom'),
+      'bottom right' => t('Bottom Right'),
+      'bottom left' => t('Bottom Left'),
     ];
-  }
-
-  /**
-   * Selection of Yandex API packages.
-   *
-   * @see https://tech.yandex.ru/maps/archive/doc/jsapi/2.0/ref/reference/packages-docpage/
-   */
-  public static function getPackages(): array {
-    return [
-      'full' => t('Full'),
-      'standard' => t('Standard'),
-      'map' => t('Map'),
-      'controls' => t('Controls'),
-      'search' => t('Search'),
-      'geoObjects' => t('GeoObjects'),
-      'clusters' => t('Clusters'),
-      'traffic' => t('Traffic'),
-      'route' => t('Route'),
-      'geoXml' => t('GeoXml'),
-      'editor' => t('Editor'),
-      'overlays' => t('Overlays'),
-    ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function alterCommonMap(array $render_array, array $map_settings, array $context): array {
-    $render_array['#attached'] = BubbleableMetadata::mergeAttachments(
-      empty($render_array['#attached']) ? [] : $render_array['#attached'],
-      [
-        'library' => [
-          'geolocation_yandex/commonmap.yandex',
-        ],
-      ]
-    );
-
-    return $render_array;
   }
 
   /**
@@ -256,7 +174,7 @@ class Yandex extends MapProviderBase {
 
     $base_url = self::$apiBaseUrl;
     $langcode = self::getApiUrlLangcode();
-    return "$base_url?apikey=$api_key&load=$packages_str&lang=$langcode&coordorder=longlat";
+    return "$base_url?apikey=$api_key&lang=$langcode";
   }
 
   /**
@@ -287,6 +205,34 @@ class Yandex extends MapProviderBase {
     }
 
     return $langcode;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function alterRenderArray(array $render_array, array $map_settings = [], array $context = []): array {
+    $render_array['#attached'] = BubbleableMetadata::mergeAttachments(
+      $render_array['#attached'] ?? [],
+      [
+        'drupalSettings' => [
+          'geolocation' => [
+            'maps' => [
+              $render_array['#id'] => [
+                'scripts' => [
+                  $this->getApiUrl(),
+                ],
+                'yandex_settings' => $map_settings,
+              ],
+            ],
+          ],
+        ],
+        'library' => [
+          'geolocation_yandex/geolocation.yandex',
+        ],
+      ]
+    );
+
+    return parent::alterRenderArray($render_array, $map_settings, $context);
   }
 
 }

@@ -1,0 +1,4 @@
+services:
+  geolocation_google_maps.google:
+    class: Drupal\geolocation_google_maps\GoogleMapsService
+    arguments: ['@config.factory', '@module_handler', '@language_manager']

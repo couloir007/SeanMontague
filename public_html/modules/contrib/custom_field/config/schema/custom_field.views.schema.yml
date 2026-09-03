@@ -43,3 +43,6 @@ views.sort_expose.custom_field_datetime:
 
 views.field.custom_field:
   type: views.field.field
+  mapping:
+    settings:
+      type: custom_field.formatter_settings

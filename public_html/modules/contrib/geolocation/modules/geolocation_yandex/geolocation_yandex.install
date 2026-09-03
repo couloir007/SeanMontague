@@ -8,11 +8,9 @@
 use Drupal\Core\Url;
 
 /**
- * {@inheritdoc}
- *
  * Implements hook_requirements().
  */
-function geolocation_yandex_requirements($phase) {
+function geolocation_yandex_requirements(string $phase): array {
   $requirements = [];
   if ($phase == 'runtime') {
     $requirements['geolocation_yandex_api_key'] = [
@@ -35,26 +33,31 @@ function geolocation_yandex_requirements($phase) {
 /**
  * Move settings to new configuration.
  */
-function geolocation_yandex_update_8001(&$sandbox) {
+function geolocation_yandex_update_8001(array &$sandbox): ?string {
   $config_factory = \Drupal::configFactory();
+  /** @var ?\Drupal\Core\Config\Config $old_config */
   $old_config = $config_factory->getEditable('yandex_maps.settings');
   if (!$old_config) {
-    return;
+    return NULL;
   }
 
   $new_config = $config_factory->getEditable('geolocation_yandex.settings');
   $new_config->set('api_key', $old_config->get('key'));
   $new_config->save();
   $old_config->delete();
-  return \Drupal::translation()->translate('Settings from old configuration moved to new one.');
+  return (string) \Drupal::translation()->translate('Settings from old configuration moved to new one.');
 }
 
 /**
  * Setting new config "packages" to "full".
+ *
+ * @phpstan-ignore-next-line
  */
-function geolocation_yandex_update_8002(&$sandbox) {
+function geolocation_yandex_update_8002(array &$sandbox): ?string {
   $config_factory = \Drupal::configFactory();
   $config = $config_factory->getEditable('geolocation_yandex.settings');
   $config->set('packages', ['full']);
   $config->save();
+
+  return NULL;
 }

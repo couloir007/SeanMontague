@@ -57,7 +57,7 @@ class LocationGeolocationFieldWidget extends FieldInstancePerFormDisplay {
   /**
    * {@inheritdoc}
    */
-  public function prepareRow(Row $row, $keep = TRUE) {
+  public function prepareRow(Row $row): bool {
     if (!parent::prepareRow($row)) {
       return FALSE;
     }

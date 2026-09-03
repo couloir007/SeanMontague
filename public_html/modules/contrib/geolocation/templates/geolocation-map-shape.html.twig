@@ -1,0 +1,14 @@
+<div {{ attributes.addClass('geolocation-geometry') }} typeof="Place">
+
+  <script class="geometry" type="application/json">
+    {{ geometry|raw }}
+  </script>
+
+  {% if title is not empty %}
+    <h2 class="title" property="name">{{ title }}</h2>
+  {% endif %}
+
+  {% if children is not empty %}
+    <div class="content">{{ children }}</div>
+  {% endif %}
+</div>

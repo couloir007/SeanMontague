@@ -20,13 +20,6 @@ class CustomFieldTypeManager extends DefaultPluginManager implements CustomField
   use StringTranslationTrait;
 
   /**
-   * The custom field type manager.
-   *
-   * @var \Drupal\custom_field\Plugin\CustomFieldWidgetManagerInterface
-   */
-  protected CustomFieldWidgetManagerInterface $customFieldWidgetManager;
-
-  /**
    * Constructs a new CustomFieldTypeManager object.
    *
    * @param \Traversable $namespaces
@@ -36,10 +29,8 @@ class CustomFieldTypeManager extends DefaultPluginManager implements CustomField
    *   Cache backend instance to use.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
-   * @param \Drupal\custom_field\Plugin\CustomFieldWidgetManagerInterface $custom_field_widget_manager
-   *   The custom field widget manager.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, CustomFieldWidgetManagerInterface $custom_field_widget_manager) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     parent::__construct(
       'Plugin/CustomField/FieldType',
       $namespaces,
@@ -51,7 +42,6 @@ class CustomFieldTypeManager extends DefaultPluginManager implements CustomField
 
     $this->alterInfo('custom_field_info');
     $this->setCacheBackend($cache_backend, 'custom_field_type_plugins');
-    $this->customFieldWidgetManager = $custom_field_widget_manager;
   }
 
   /**
@@ -80,29 +70,11 @@ class CustomFieldTypeManager extends DefaultPluginManager implements CustomField
   public function createOptionsForInstance(array $settings, array $column): array {
     $type = $column['type'];
     $definition = $this->getDefinitions()[$type];
-    $default_widget = $definition['default_widget'];
-    $widget_settings = $settings['widget_settings'] ?? [];
-    $widget_type = $settings['type'] ?? $default_widget;
-    if (empty($widget_settings)) {
-      try {
-        /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetInterface $plugin */
-        $plugin = $this->customFieldWidgetManager->createInstance($widget_type);
-        $widget_settings = [
-          'settings' => $plugin->defaultSettings()['settings'],
-          'label' => ucfirst(str_replace(['-', '_'], ' ', $column['name'])),
-        ];
-      }
-      catch (PluginException $e) {
-        // Plugin not found.
-      }
-    }
     return [
       'configuration' => [
         'settings' => $column + [
-          'check_empty' => $settings['check_empty'] ?? FALSE,
+          'field_settings' => $settings,
           'never_check_empty' => $definition['never_check_empty'] ?? FALSE,
-          'widget_settings' => $widget_settings,
-          'widget_plugin' => $widget_type,
         ],
       ],
     ];

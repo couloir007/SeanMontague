@@ -73,15 +73,21 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
    */
   public function settingsForm(array $form, FormStateInterface $form_state): array {
     $visibility_path = $form['#visibility_path'];
-    $elements['timezone_override'] = [
+    $parents = $form['#field_parents'];
+    $elements['timezone'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Time zone'),
+    ];
+    $elements['timezone']['timezone_override'] = [
       '#type' => 'select',
       '#title' => $this->t('Time zone override'),
       '#description' => $this->t('The time zone selected here will always be used'),
       '#options' => TimeZoneFormHelper::getOptionsListByRegion(TRUE),
       '#default_value' => $this->getSetting('timezone_override'),
+      '#parents' => [...$parents, 'timezone_override'],
     ];
     if ($this->customFieldDefinition->getDatetimeType() === DateTimeType::DATETIME_TYPE_DATETIME) {
-      $elements['timezone_stored'] = [
+      $elements['timezone']['timezone_stored'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Use stored time zone'),
         '#description' => $this->t('If checked, the time zone of the field will be used if available instead of the time zone of the user.'),
@@ -91,14 +97,16 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
             ':input[name="' . $visibility_path . '[timezone_override]"]' => ['value' => ''],
           ],
         ],
+        '#parents' => [...$parents, 'timezone_stored'],
       ];
-      $elements['display_timezone'] = [
+      $elements['timezone']['display_timezone'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Display time zone'),
         '#description' => $this->t('If checked, the time zone of the field will be displayed along with the date/time.'),
         '#default_value' => $this->getSetting('display_timezone'),
+        '#parents' => [...$parents, 'display_timezone'],
       ];
-      $elements['timezone_format'] = [
+      $elements['timezone']['timezone_format'] = [
         '#type' => 'select',
         '#title' => $this->t('Time zone format'),
         '#description' => $this->t('The format of the time zone to display.'),
@@ -113,12 +121,14 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
             ':input[name="' . $visibility_path . '[display_timezone]"]' => ['checked' => TRUE],
           ],
         ],
+        '#parents' => [...$parents, 'timezone_format'],
       ];
-      $elements['user_timezone'] = [
+      $elements['timezone']['user_timezone'] = [
         '#type' => 'checkbox',
         '#title' => $this->t("Append date/time in user's time zone"),
         '#description' => $this->t("If checked, the date/time in the user's time zone will also be displayed."),
         '#default_value' => $this->getSetting('user_timezone'),
+        '#parents' => [...$parents, 'user_timezone'],
       ];
     }
 
@@ -129,8 +139,6 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
    * {@inheritdoc}
    */
   public function formatValue(FieldItemInterface $item, mixed $value): ?array {
-    $datetime_type = $this->customFieldDefinition->getDatetimeType();
-
     /** @var \Drupal\Core\Datetime\DrupalDateTime $date */
     $date = $value['date'];
 
@@ -148,13 +156,13 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
         '#theme' => 'item_list',
         '#list_type' => 'ul',
         '#items' => [
-          $this->buildDateWithIsoAttribute($date, $datetime_type, $timezone),
-          $this->buildDateWithIsoAttribute($date, $datetime_type),
+          $this->buildDateWithIsoAttribute($date, TRUE, $timezone),
+          $this->buildDateWithIsoAttribute($date),
         ],
       ];
     }
 
-    return $this->buildDateWithIsoAttribute($date, $datetime_type, $timezone);
+    return $this->buildDateWithIsoAttribute($date, TRUE, $timezone);
   }
 
   /**
@@ -179,12 +187,11 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
    *
    * @param \Drupal\Component\Datetime\DateTimePlus $date
    *   A DrupalDateTime object.
-   * @param string $datetime_type
-   *   The date type.
    * @param string|null $timezone
    *   The stored timezone.
    */
-  protected function setTimeZone(DateTimePlus $date, string $datetime_type, ?string $timezone = NULL): void {
+  protected function setTimeZone(DateTimePlus $date, ?string $timezone = NULL): void {
+    $datetime_type = $this->customFieldDefinition->getDatetimeType();
     if ($datetime_type === DateTimeType::DATETIME_TYPE_DATE) {
       // A date without time has no timezone conversion.
       $timezone = DateTimeTypeInterface::STORAGE_TIMEZONE;
@@ -201,19 +208,19 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
    *
    * @param \Drupal\Core\Datetime\DrupalDateTime $date
    *   A date object.
-   * @param string $datetime_type
-   *   The date type.
    * @param string|null $timezone
    *   The stored timezone.
    *
    * @return array<string, mixed>
    *   A render array.
    */
-  protected function buildDate(DrupalDateTime $date, string $datetime_type, ?string $timezone = NULL): array {
-    $this->setTimeZone($date, $datetime_type, $timezone);
+  protected function buildDate(DrupalDateTime $date, ?string $timezone = NULL): array {
+    $datetime_type = $this->customFieldDefinition->getDatetimeType();
+    $data_type = $this->customFieldDefinition->getDataType();
+    $this->setTimeZone($date, $timezone);
     $formatted_date = $this->formatDate($date, $timezone);
 
-    if ($datetime_type === DateTimeType::DATETIME_TYPE_DATETIME && $this->getSetting('display_timezone')) {
+    if ($data_type === 'datetime' && $datetime_type === DateTimeType::DATETIME_TYPE_DATETIME && $this->getSetting('display_timezone')) {
       $formatted_date .= ' ' . $this->formatTimezoneDisplay($date);
     }
     return [
@@ -231,22 +238,23 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
    *
    * @param \Drupal\Core\Datetime\DrupalDateTime $date
    *   A date object.
-   * @param string $datetime_type
-   *   The date type.
+   * @param bool $format_timezone
+   *   A boolean indicating whether to format and append the timezone.
    * @param string|null $timezone
    *   The stored timezone.
    *
    * @return array<string, mixed>
    *   A render array.
    */
-  protected function buildDateWithIsoAttribute(DrupalDateTime $date, string $datetime_type, ?string $timezone = NULL): array {
+  protected function buildDateWithIsoAttribute(DrupalDateTime $date, bool $format_timezone = TRUE, ?string $timezone = NULL): array {
+    $datetime_type = $this->customFieldDefinition->getDatetimeType();
     // Create the ISO date in Universal Time.
     $iso_date = $date->format("Y-m-d\TH:i:s") . 'Z';
 
-    $this->setTimeZone($date, $datetime_type, $timezone);
+    $this->setTimeZone($date, $timezone);
     $formatted_date = $this->formatDate($date, $timezone);
 
-    if ($datetime_type === DateTimeType::DATETIME_TYPE_DATETIME && $this->getSetting('display_timezone')) {
+    if ($format_timezone && $datetime_type === DateTimeType::DATETIME_TYPE_DATETIME && $this->getSetting('display_timezone')) {
       $formatted_date .= ' ' . $this->formatTimezoneDisplay($date);
     }
 

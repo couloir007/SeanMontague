@@ -10,7 +10,7 @@ use Drupal\Core\Url;
 /**
  * Implements hook_requirements().
  */
-function geolocation_geocodio_requirements($phase) {
+function geolocation_geocodio_requirements(string $phase): array {
   $requirements = [];
   $requirements['geolocation_geocodio_composer'] = [
     'title' => t('Geolocation Geocodio - Composer dependency'),

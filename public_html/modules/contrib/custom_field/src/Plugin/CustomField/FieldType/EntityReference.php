@@ -5,17 +5,26 @@ declare(strict_types=1);
 namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\InvokeCommand;
+use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Entity\ContentEntityStorageInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\Field\FieldException;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataReferenceDefinition;
 use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'entity_reference' field type.
@@ -29,6 +38,23 @@ use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
   default_formatter: 'entity_reference_label',
 )]
 class EntityReference extends CustomFieldTypeBase {
+
+  /**
+   * The entity reference selection plugin manager.
+   *
+   * @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface
+   */
+  protected SelectionPluginManagerInterface $selectionPluginManager;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
+    $instance->selectionPluginManager = $container->get('plugin.manager.entity_reference_selection');
+
+    return $instance;
+  }
 
   /**
    * {@inheritdoc}
@@ -116,12 +142,214 @@ class EntityReference extends CustomFieldTypeBase {
   /**
    * {@inheritdoc}
    */
+  public static function defaultFieldSettings(): array {
+    return [
+      'handler_settings' => [],
+    ] + parent::defaultFieldSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldSettingsForm(array &$form, FormStateInterface $form_state): array {
+    $element = parent::fieldSettingsForm($form, $form_state);
+    $settings = $this->getFieldSettings();
+    $target_type = $this->getTargetType();
+    if (!isset($settings['handler'])) {
+      $settings['handler'] = 'default:' . $target_type;
+    }
+    // Get all selection plugins for this entity type.
+    $selection_plugins = $this->selectionPluginManager->getSelectionGroups($target_type);
+    $handlers_options = [];
+    foreach (array_keys($selection_plugins) as $selection_group_id) {
+      // We only display base plugins (e.g. 'default', 'views', ...) and not
+      // entity type specific plugins (e.g. 'default:node', 'default:user',
+      // ...).
+      if (array_key_exists($selection_group_id, $selection_plugins[$selection_group_id])) {
+        $label = $selection_plugins[$selection_group_id][$selection_group_id]['label'];
+        $handlers_options[$selection_group_id] = Html::escape((string) $label);
+      }
+      elseif (array_key_exists($selection_group_id . ':' . $target_type, $selection_plugins[$selection_group_id])) {
+        $selection_group_plugin = $selection_group_id . ':' . $target_type;
+        $label = $selection_plugins[$selection_group_id][$selection_group_plugin]['base_plugin_label'] ?? '';
+        $handlers_options[$selection_group_plugin] = Html::escape((string) $label);
+      }
+    }
+    $wrapper_id = 'reference-wrapper-' . $this->getName();
+    $element['handler'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Reference type'),
+      '#open' => TRUE,
+      '#tree' => TRUE,
+      '#process' => [[static::class, 'formProcessMergeParent']],
+      '#prefix' => '<div id="' . $wrapper_id . '">',
+      '#suffix' => '</div>',
+    ];
+
+    $element['handler']['handler'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Reference method'),
+      '#options' => $handlers_options,
+      '#default_value' => $settings['handler'],
+      '#required' => TRUE,
+      '#ajax' => [
+        'wrapper' => $wrapper_id,
+        'callback' => [static::class, 'actionCallback'],
+      ],
+    ];
+
+    $element['handler']['handler_submit'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Change handler'),
+      '#limit_validation_errors' => [],
+      '#attributes' => [
+        'class' => ['js-hide'],
+      ],
+      '#submit' => [[static::class, 'settingsAjaxSubmit']],
+    ];
+
+    $element['handler']['handler_settings'] = [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['entity_reference-settings']],
+    ];
+
+    $handler = $this->getSelectionHandler($settings, $target_type);
+    $configuration_form = $handler ? $handler->buildConfigurationForm([], $form_state) : [];
+
+    // Alter configuration to use our custom callback.
+    foreach ($configuration_form as $key => $item) {
+      if (isset($item['#limit_validation_errors'])) {
+        unset($item['#limit_validation_errors']);
+      }
+      if (isset($item['#ajax'])) {
+        $item['#ajax'] = [
+          'wrapper' => $wrapper_id,
+          'callback' => [static::class, 'actionCallback'],
+        ];
+      }
+      if (is_array($item)) {
+        foreach ($item as $prop_key => $prop) {
+          if (!is_array($prop)) {
+            continue;
+          }
+          if (isset($prop['#limit_validation_errors'])) {
+            unset($prop['#limit_validation_errors']);
+          }
+          if (isset($prop['#ajax'])) {
+            $prop['#ajax'] = [
+              'wrapper' => $wrapper_id,
+              'callback' => [static::class, 'actionCallback'],
+            ];
+          }
+          $item[(string) $prop_key] = $prop;
+        }
+      }
+      $configuration_form[(string) $key] = $item;
+    }
+
+    $element['handler']['handler_settings'] += $configuration_form;
+
+    return $element;
+  }
+
+  /**
+   * Render API callback that moves entity reference elements up a level.
+   *
+   * The elements (i.e. 'handler_settings') are moved for easier processing by
+   * the validation and submission handlers.
+   *
+   * @param array<string, mixed> $element
+   *   The form element.
+   *
+   * @return array<string, mixed>
+   *   The modified form element.
+   *
+   * @see _entity_reference_field_settings_process()
+   */
+  public static function formProcessMergeParent(array $element): array {
+    $parents = $element['#parents'];
+    array_pop($parents);
+    $element['#parents'] = $parents;
+    return $element;
+  }
+
+  /**
+   * Ajax callback for the handler settings form.
+   *
+   * @param array|array<string, mixed> $form
+   *   The form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   The form element.
+   */
+  public static function actionCallback(array &$form, FormStateInterface $form_state): AjaxResponse {
+    $triggering_element = $form_state->getTriggeringElement();
+    $wrapper_id = $triggering_element['#ajax']['wrapper'];
+    $parents = $triggering_element['#array_parents'];
+    $sliced_parents = array_slice($parents, 0, 4, TRUE);
+    $element = NestedArray::getValue($form, $sliced_parents);
+    $response = new AjaxResponse();
+    $response->addCommand(new ReplaceCommand('#' . $wrapper_id, $element));
+    if (end($parents) === 'handler') {
+      $focus_input = $element['handler']['#name'];
+      $response->addCommand(new InvokeCommand(':input[name="' . $focus_input . '"]', 'focus'));
+    }
+
+    return $response;
+  }
+
+  /**
+   * Submit handler for the non-JS case.
+   *
+   * @param array<string, mixed> $form
+   *   The form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @see static::fieldSettingsForm()
+   */
+  public static function settingsAjaxSubmit(array $form, FormStateInterface $form_state): void {
+    $form_state->setRebuild();
+  }
+
+  /**
+   * Gets the selection handler for a given entity_reference field.
+   *
+   * @param array<string, mixed> $settings
+   *   An array of field settings.
+   * @param string|null $target_type
+   *   The target entity type.
+   * @param \Drupal\Core\Entity\EntityInterface|null $entity
+   *   The entity containing the reference field.
+   *
+   * @return mixed
+   *   The selection handler.
+   */
+  public function getSelectionHandler(array $settings, ?string $target_type = NULL, ?EntityInterface $entity = NULL): mixed {
+    if (!$target_type) {
+      return NULL;
+    }
+    $options = $settings['handler_settings'] ?: [];
+    $options += [
+      'target_type' => $target_type,
+      'handler' => $settings['handler'] ?? 'default:' . $target_type,
+      'entity' => $entity,
+    ];
+
+    return $this->selectionPluginManager->getInstance($options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function calculateDependencies(CustomFieldTypeInterface $item, array $default_value): array {
     $entity_type_manager = \Drupal::entityTypeManager();
     $target_entity_type_id = $item->getTargetType();
     $target_entity_type = $entity_type_manager->getDefinition($target_entity_type_id);
-    $widget_settings = $item->getWidgetSetting('settings') ?? [];
-    $target_bundles = $widget_settings['handler_settings']['target_bundles'] ?? [];
+    $field_settings = $item->getFieldSettings();
+    $target_bundles = $field_settings['handler_settings']['target_bundles'] ?? [];
     $dependencies = [];
     $field_name = $item->getName();
     // Depend on default values entity types configurations.
@@ -159,8 +387,8 @@ class EntityReference extends CustomFieldTypeBase {
     $bundles_changed = FALSE;
     $target_entity_type_id = $item->getTargetType();
     $target_entity_type = $entity_type_manager->getDefinition($target_entity_type_id);
-    $widget_settings = $item->getWidgetSetting('settings') ?? [];
-    $handler_settings = $widget_settings['handler_settings'] ?? [];
+    $field_settings = $item->getFieldSettings();
+    $handler_settings = $field_settings['handler_settings'] ?? [];
     $changed_settings = [];
 
     if (!empty($handler_settings['target_bundles'])) {
@@ -185,8 +413,8 @@ class EntityReference extends CustomFieldTypeBase {
       }
     }
     if ($bundles_changed) {
-      $widget_settings['handler_settings'] = $handler_settings;
-      $changed_settings = $widget_settings;
+      $field_settings['handler_settings'] = $handler_settings;
+      $changed_settings = $field_settings;
     }
 
     return $changed_settings;
@@ -200,8 +428,8 @@ class EntityReference extends CustomFieldTypeBase {
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public static function generateSampleValue(CustomFieldTypeInterface $field, string $target_entity_type): mixed {
-    $widget_settings = $field->getWidgetSetting('settings');
-    $handler_settings = $widget_settings['handler_settings'] ?? [];
+    $field_settings = $field->getFieldSettings();
+    $handler_settings = $field_settings['handler_settings'] ?? [];
 
     // If the field hasn't been configured yet, return early.
     if (empty($handler_settings)) {
@@ -219,7 +447,7 @@ class EntityReference extends CustomFieldTypeBase {
     // replicate the behavior to be able to override the sorting settings.
     $options = [
       'target_type' => $target_type,
-      'handler' => $widget_settings['handler'],
+      'handler' => $field_settings['handler'],
       'entity' => NULL,
     ] + $handler_settings;
 

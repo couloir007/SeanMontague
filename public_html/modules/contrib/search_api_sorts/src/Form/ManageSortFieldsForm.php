@@ -44,11 +44,11 @@ class ManageSortFieldsForm extends FormBase {
   protected $moduleHandler;
 
   /**
-   * The search api sorts field storage.
+   * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $searchApiSortsFieldStorage;
+  protected $entityTypeManager;
 
   /**
    * The index this search api display is attached to.
@@ -80,7 +80,7 @@ class ManageSortFieldsForm extends FormBase {
     $this->displayPluginManager = $display_plugin_manager;
     $this->languageManager = $languageManager;
     $this->moduleHandler = $moduleHandler;
-    $this->searchApiSortsFieldStorage = $entity_type_manager->getStorage('search_api_sorts_field');
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -105,7 +105,7 @@ class ManageSortFieldsForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, IndexInterface $search_api_index = NULL, $search_api_display = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?IndexInterface $search_api_index = NULL, $search_api_display = NULL) {
     $original_search_api_display = $this->getOriginalConfigId($search_api_display);
     $this->display = $this->displayPluginManager->createInstance($original_search_api_display);
     $this->index = $search_api_index;
@@ -130,7 +130,6 @@ class ManageSortFieldsForm extends FormBase {
     }
 
     $header = [
-      $this->t('Weight'),
       $this->t('Enabled'),
       $this->t('Default sort'),
       $this->t('Default order'),
@@ -143,6 +142,10 @@ class ManageSortFieldsForm extends FormBase {
     if ($sort_fields_are_translatable) {
       $header[] = $this->t('Translate');
     }
+
+    // Weight goes last: tabledrag hides its column and puts the drag handle
+    // in the first cell of the row.
+    $header[] = $this->t('Weight');
 
     $form['sorts'] = [
       '#type' => 'table',
@@ -161,14 +164,6 @@ class ManageSortFieldsForm extends FormBase {
 
     foreach ($fields as $key => $field) {
       $form['sorts'][$key]['#attributes']['class'][] = 'draggable';
-      $form['sorts'][$key]['weight'] = [
-        '#type' => 'weight',
-        '#default_value' => $field['weight'],
-        '#delta' => 100,
-        '#attributes' => [
-          'class' => ['search-api-sort-order-weight'],
-        ],
-      ];
       $form['sorts'][$key]['status'] = [
         '#type' => 'checkbox',
         '#default_value' => $field['status'],
@@ -210,13 +205,22 @@ class ManageSortFieldsForm extends FormBase {
         '#size' => 30,
         '#default_value' => $field['label'],
       ];
-      if ($sort_fields_are_translatable && $field['status'] === TRUE) {
-        $form['sorts'][$key]['translate'] = [
+      if ($sort_fields_are_translatable) {
+        // The cell is needed in every row, otherwise the columns shift.
+        $form['sorts'][$key]['translate'] = $field['status'] === TRUE ? [
           '#type' => 'link',
           '#title' => $this->t('Translate'),
           '#url' => Url::fromRoute('entity.search_api_sorts_field.config_translation_overview', ['search_api_sorts_field' => $this->getEscapedConfigId($this->display->getPluginId()) . '_' . $key]),
-        ];
+        ] : ['#markup' => ''];
       }
+      $form['sorts'][$key]['weight'] = [
+        '#type' => 'weight',
+        '#default_value' => $field['weight'],
+        '#delta' => 100,
+        '#attributes' => [
+          'class' => ['search-api-sort-order-weight'],
+        ],
+      ];
     }
 
     $form['submit'] = [
@@ -287,7 +291,7 @@ class ManageSortFieldsForm extends FormBase {
    *   An array of fields, filled with data from the index.
    */
   private function fillSearchApiSortsFieldsValues(array &$fields) {
-    $search_api_sorts_fields = $this->searchApiSortsFieldStorage->loadByProperties(['display_id' => $this->getEscapedConfigId($this->display->getPluginId())]);
+    $search_api_sorts_fields = $this->entityTypeManager->getStorage('search_api_sorts_field')->loadByProperties(['display_id' => $this->getEscapedConfigId($this->display->getPluginId())]);
     foreach ($search_api_sorts_fields as $search_api_sorts_field) {
       if (isset($fields[$search_api_sorts_field->getFieldIdentifier()])) {
         $fields[$search_api_sorts_field->getFieldIdentifier()]['status'] = $search_api_sorts_field->getStatus();
@@ -326,7 +330,7 @@ class ManageSortFieldsForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $search_api_sorts_fields = $this->searchApiSortsFieldStorage->loadByProperties(['display_id' => $this->getEscapedConfigId($this->display->getPluginId())]);
+    $search_api_sorts_fields = $this->entityTypeManager->getStorage('search_api_sorts_field')->loadByProperties(['display_id' => $this->getEscapedConfigId($this->display->getPluginId())]);
     foreach ($form_state->getValue('sorts') as $key => $v) {
       $config_id = $this->getEscapedConfigId($this->display->getPluginId()) . '_' . $key;
       $search_api_sorts_field = NULL;

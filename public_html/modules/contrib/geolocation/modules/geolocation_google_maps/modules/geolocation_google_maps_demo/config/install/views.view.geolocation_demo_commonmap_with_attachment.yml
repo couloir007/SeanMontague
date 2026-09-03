@@ -1,0 +1,810 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.storage.node.field_geolocation_demo_body
+    - field.storage.node.field_geolocation_demo_single
+    - field.storage.node.field_geolocation_demo_taxonomy
+    - node.type.geolocation_default_article
+    - system.menu.geolocation-demo
+    - taxonomy.vocabulary.geolocation_demo_taxonomy
+  module:
+    - geolocation
+    - geolocation_google_maps
+    - node
+    - taxonomy
+    - text
+    - user
+  enforced:
+    module:
+      - geolocation_google_maps_demo
+id: geolocation_demo_commonmap_with_attachment
+label: 'Geolocation Demo - CommonMap with updating attachment'
+module: views
+description: ''
+tag: 'Geolocation Demo'
+base_table: node_field_data
+base_field: nid
+display:
+  default:
+    id: default
+    display_title: Master
+    display_plugin: default
+    position: 0
+    display_options:
+      title: 'Geolocation Demo - CommonMap with Attachment & AJAX'
+      fields:
+        title:
+          id: title
+          table: node_field_data
+          field: title
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: node
+          entity_field: title
+          plugin_id: field
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            make_link: false
+            absolute: false
+            word_boundary: false
+            ellipsis: false
+            strip_tags: false
+            trim: false
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: string
+          settings:
+            link_to_entity: true
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+        field_geolocation_demo_body:
+          id: field_geolocation_demo_body
+          table: node__field_geolocation_demo_body
+          field: field_geolocation_demo_body
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: field
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: text_default
+          settings: {  }
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+        field_geolocation_demo_single:
+          id: field_geolocation_demo_single
+          table: node__field_geolocation_demo_single
+          field: field_geolocation_demo_single
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: geolocation_field
+          label: Location
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: ''
+          type: geolocation_latlng
+          settings: {  }
+          group_column: ''
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+        field_geolocation_demo_taxonomy:
+          id: field_geolocation_demo_taxonomy
+          table: node__field_geolocation_demo_taxonomy
+          field: field_geolocation_demo_taxonomy
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: field
+          label: 'Taxonomy Terms'
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: target_id
+          type: entity_reference_label
+          settings:
+            link: false
+          group_column: target_id
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+      pager:
+        type: full
+        options:
+          offset: 0
+          items_per_page: 10
+          total_pages: null
+          id: 0
+          tags:
+            next: 'Next ›'
+            previous: '‹ Previous'
+            first: '« First'
+            last: 'Last »'
+          expose:
+            items_per_page: false
+            items_per_page_label: 'Items per page'
+            items_per_page_options: '5, 10, 25, 50'
+            items_per_page_options_all: false
+            items_per_page_options_all_label: '- All -'
+            offset: false
+            offset_label: Offset
+          quantity: 9
+      exposed_form:
+        type: basic
+        options:
+          submit_button: Apply
+          reset_button: true
+          reset_button_label: Reset
+          exposed_sorts_label: 'Sort by'
+          expose_sort_order: true
+          sort_asc_label: Asc
+          sort_desc_label: Desc
+      access:
+        type: perm
+        options:
+          perm: 'access content'
+      cache:
+        type: tag
+        options: {  }
+      empty: {  }
+      sorts:
+        type:
+          id: type
+          table: node_field_data
+          field: type
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: node
+          entity_field: type
+          plugin_id: standard
+          order: ASC
+          expose:
+            label: ''
+          exposed: false
+        created:
+          id: created
+          table: node_field_data
+          field: created
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: node
+          entity_field: created
+          plugin_id: date
+          order: DESC
+          expose:
+            label: ''
+          exposed: false
+          granularity: second
+      arguments: {  }
+      filters:
+        type_1:
+          id: type_1
+          table: node_field_data
+          field: type
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: node
+          entity_field: type
+          plugin_id: bundle
+          operator: in
+          value:
+            geolocation_default_article: geolocation_default_article
+          group: 1
+          exposed: false
+          expose:
+            operator_id: type_1_op
+            label: 'Content type'
+            description: ''
+            use_operator: false
+            operator: type_1_op
+            identifier: type_1
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              administrator: '0'
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+        field_geolocation_demo_taxonomy_target_id:
+          id: field_geolocation_demo_taxonomy_target_id
+          table: node__field_geolocation_demo_taxonomy
+          field: field_geolocation_demo_taxonomy_target_id
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: taxonomy_index_tid
+          operator: or
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: field_geolocation_demo_taxonomy_target_id_op
+            label: 'Geolocation Demo Taxonomy (field_geolocation_demo_taxonomy)'
+            description: ''
+            use_operator: false
+            operator: field_geolocation_demo_taxonomy_target_id_op
+            identifier: field_geolocation_demo_taxonomy_target_id
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              administrator: '0'
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          reduce_duplicates: false
+          vid: geolocation_demo_taxonomy
+          type: select
+          hierarchy: false
+          limit: true
+          error_message: true
+      filter_groups:
+        operator: AND
+        groups:
+          1: AND
+      style:
+        type: default
+        options:
+          row_class: ''
+          default_row_class: true
+          uses_fields: false
+      row:
+        type: 'entity:node'
+        options:
+          relationship: none
+          view_mode: teaser
+      query:
+        type: views_query
+        options:
+          query_comment: ''
+          disable_sql_rewrite: false
+          distinct: false
+          replica: false
+          query_tags: {  }
+      relationships: {  }
+      use_ajax: true
+      header: {  }
+      footer: {  }
+      display_extenders: {  }
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url
+        - url.query_args
+        - user
+        - 'user.node_grants:view'
+        - user.permissions
+      tags:
+        - 'config:field.storage.node.field_geolocation_demo_body'
+        - 'config:field.storage.node.field_geolocation_demo_single'
+        - 'config:field.storage.node.field_geolocation_demo_taxonomy'
+  attachment_1:
+    id: attachment_1
+    display_title: Map
+    display_plugin: attachment
+    position: 2
+    display_options:
+      style:
+        type: maps_common
+        options:
+          data_provider_id: geolocation_field_provider
+          geolocation_field: field_geolocation_demo_single
+          title_field: title
+          label_field: none
+          marker_row_number: 0
+          marker_icon_path: ''
+          even_empty: 0
+          centre:
+            fit_bounds:
+              enable: true
+              weight: -9
+              settings:
+                min_zoom: null
+              map_center_id: fit_bounds
+            first_row:
+              enable: false
+              weight: -8
+              settings:
+                location_option_id: first_row
+              map_center_id: location_plugins
+            fixed_value:
+              enable: false
+              weight: -7
+              settings:
+                location_option_id: fixed_value
+                latitude: 0.0
+                longitude: 0.0
+              map_center_id: location_plugins
+            ipstack:
+              enable: false
+              weight: 0
+              settings:
+                location_option_id: ipstack
+                access_key: ''
+              map_center_id: location_plugins
+            fixed_boundaries:
+              enable: false
+              weight: 0
+              settings:
+                south: ''
+                west: ''
+                north: ''
+                east: ''
+              map_center_id: fixed_boundaries
+          map_provider_id: google_maps
+          map_provider_settings:
+            conditional_initialization: 'no'
+            conditional_description: 'Clicking this button will embed a map.'
+            conditional_label: 'Show map'
+            map_features:
+              google_maps_layer_bicycling:
+                enabled: false
+                weight: 0
+              client_location_indicator:
+                enabled: false
+                weight: 0
+              context_popup:
+                enabled: false
+                weight: 0
+                settings:
+                  content:
+                    value: ''
+                    format: basic_html
+              geolocation_google_maps_control_directions:
+                enabled: false
+                weight: 0
+                settings:
+                  position: RIGHT_CENTER
+                  origin_source: exposed
+                  origin_static_value: ''
+                  destination_source: exposed
+                  destination_static_value: ''
+                  travel_mode: exposed
+                  directions_container: below
+                  directions_container_custom_id: ''
+              map_disable_tilt:
+                enabled: false
+                weight: 0
+              map_disable_user_interaction:
+                enabled: false
+                weight: 0
+              geolocation_shapes:
+                enabled: false
+                weight: 0
+                settings:
+                  remove_markers: false
+                  polyline: true
+                  polyline_title: ''
+                  strokeColor: '#FF0000'
+                  strokeOpacity: 0.8
+                  strokeWidth: '2'
+                  polygon: false
+                  polygon_title: ''
+                  fillColor: '#FF0000'
+                  fillOpacity: 0.35
+              control_fullscreen:
+                enabled: false
+                weight: 0
+                settings:
+                  position: RIGHT_CENTER
+              control_geocoder:
+                enabled: false
+                weight: 0
+                settings:
+                  position: TOP_LEFT
+                  geocoder: google_geocoding_api
+                  geocoder_settings:
+                    label: Address
+                    description: 'Enter an address to be localized.'
+                    autocomplete_min_length: 1
+                    component_restrictions:
+                      route: ''
+                      country: ''
+                      administrative_area: ''
+                      locality: ''
+                      postal_code: ''
+                    boundary_restriction:
+                      south: ''
+                      west: ''
+                      north: ''
+                      east: ''
+                    region: ''
+              control_loading_indicator:
+                enabled: false
+                weight: 0
+                settings:
+                  position: TOP_LEFT
+                  loading_label: Loading
+              control_locate:
+                enabled: false
+                weight: 0
+                settings:
+                  position: TOP_LEFT
+              control_maptype:
+                enabled: true
+                weight: 0
+                settings:
+                  position: RIGHT_BOTTOM
+                  style: DEFAULT
+              control_recenter:
+                enabled: false
+                weight: 0
+                settings:
+                  position: TOP_LEFT
+              control_rotate:
+                enabled: false
+                weight: 0
+                settings:
+                  position: RIGHT_CENTER
+              control_streetview:
+                enabled: false
+                weight: 0
+                settings:
+                  position: TOP_LEFT
+              control_zoom:
+                enabled: true
+                weight: 0
+                settings:
+                  position: RIGHT_CENTER
+              map_restriction:
+                enabled: false
+                weight: 0
+                settings:
+                  north: ''
+                  south: ''
+                  east: ''
+                  west: ''
+                  strict: true
+              google_maps_layer_traffic:
+                enabled: false
+                weight: 0
+              google_maps_layer_transit:
+                enabled: false
+                weight: 0
+            type: ROADMAP
+            zoom: 10
+            minZoom: 0
+            maxZoom: 18
+            height: 400px
+            width: 100%
+            gestureHandling: auto
+            data_layers:
+              'geolocation_debug:default':
+                enabled: false
+                weight: 0
+                settings:
+                  features:
+                    marker_clusterer:
+                      enabled: false
+                      weight: 0
+                    marker_infowindow:
+                      enabled: false
+                      weight: 0
+                      settings:
+                        info_window_solitary: true
+                        disable_auto_pan: true
+                        info_auto_display: false
+                        max_width: null
+                    marker_label:
+                      enabled: false
+                      weight: 0
+                      settings:
+                        color: ''
+                        font_family: ''
+                        font_size: ''
+                        font_weight: ''
+                    marker_zoom_by_anchor:
+                      enabled: false
+                      weight: 0
+                      settings:
+                        marker_zoom_anchor_id: ''
+              'geolocation_test:default':
+                enabled: false
+                weight: 0
+                settings:
+                  features:
+                    marker_clusterer:
+                      enabled: false
+                      weight: 0
+                    marker_infowindow:
+                      enabled: false
+                      weight: 0
+                      settings:
+                        info_window_solitary: true
+                        disable_auto_pan: true
+                        info_auto_display: false
+                        max_width: null
+                    marker_label:
+                      enabled: false
+                      weight: 0
+                      settings:
+                        color: ''
+                        font_family: ''
+                        font_size: ''
+                        font_weight: ''
+                    marker_zoom_by_anchor:
+                      enabled: false
+                      weight: 0
+                      settings:
+                        marker_zoom_anchor_id: ''
+              'geolocation_default_layer:default':
+                enabled: true
+                weight: 1
+                settings:
+                  features:
+                    marker_clusterer:
+                      enabled: false
+                      weight: 0
+                    marker_infowindow:
+                      enabled: false
+                      weight: 0
+                      settings:
+                        info_window_solitary: true
+                        disable_auto_pan: true
+                        info_auto_display: false
+                        max_width: null
+                    marker_label:
+                      enabled: false
+                      weight: 0
+                      settings:
+                        color: ''
+                        font_family: ''
+                        font_size: ''
+                        font_weight: ''
+                    marker_zoom_by_anchor:
+                      enabled: false
+                      weight: 0
+                      settings:
+                        marker_zoom_anchor_id: ''
+      row:
+        type: 'entity:node'
+        options:
+          relationship: none
+          view_mode: teaser
+      defaults:
+        style: false
+        row: false
+      display_description: ''
+      display_extenders: {  }
+      displays:
+        common_map_ajax_page: common_map_ajax_page
+      inherit_exposed_filters: true
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url
+        - user
+        - 'user.node_grants:view'
+        - user.permissions
+      tags:
+        - 'config:field.storage.node.field_geolocation_demo_body'
+        - 'config:field.storage.node.field_geolocation_demo_single'
+        - 'config:field.storage.node.field_geolocation_demo_taxonomy'
+  common_map_ajax_page:
+    id: common_map_ajax_page
+    display_title: 'Page with article list'
+    display_plugin: page
+    position: 1
+    display_options:
+      defaults:
+        filters: true
+        filter_groups: true
+      display_description: ''
+      display_extenders: {  }
+      path: geolocation-demo/common-map-ajax-with-attachment
+      menu:
+        type: normal
+        title: 'CommonMap with updating Attachment'
+        description: ''
+        weight: 0
+        expanded: false
+        menu_name: geolocation-demo
+        parent: ''
+        context: '0'
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url
+        - url.query_args
+        - user
+        - 'user.node_grants:view'
+        - user.permissions
+      tags:
+        - 'config:field.storage.node.field_geolocation_demo_body'
+        - 'config:field.storage.node.field_geolocation_demo_single'
+        - 'config:field.storage.node.field_geolocation_demo_taxonomy'

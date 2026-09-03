@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Feeds\Target;
 
 use Drupal\Component\Render\FormattableMarkup;
@@ -32,7 +34,7 @@ class CustomField extends FieldTargetBase implements ConfigurableTargetInterface
   protected $feedsManager;
 
   /**
-   * Constructs a new CustomField object.
+   * Constructs a new CustomField feeds target object.
    *
    * @param array $configuration
    *   The plugin configuration.
@@ -161,13 +163,14 @@ class CustomField extends FieldTargetBase implements ConfigurableTargetInterface
    * @return array<string, mixed>
    *   The array of values.
    */
-  protected function prepareValue($delta, array &$values) {
+  protected function prepareValue($delta, array &$values): array {
     $langcode = $this->getLangcode();
     if (!empty($values)) {
       $targets = $this->feedsManager->getFeedsTargets($this->settings);
       foreach ($values as $name => $value) {
         if (isset($targets[$name])) {
-          $values[$name] = !is_null($value) ? $targets[$name]->prepareValue($value, $this->configuration, $langcode) : NULL;
+          $configuration = $this->configuration[$name] ?? [];
+          $values[$name] = !is_null($value) ? $targets[$name]->prepareValue($value, $configuration, $langcode) : NULL;
         }
         else {
           $values[$name] = NULL;

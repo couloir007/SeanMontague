@@ -101,20 +101,6 @@ abstract class CustomFieldFormatterBase extends PluginSettingsBase implements Cu
   }
 
   /**
-   * Returns the value of a field widget setting.
-   *
-   * @param string $setting_name
-   *   The setting name.
-   *
-   * @return mixed|null
-   *   The setting value.
-   */
-  protected function getFieldWidgetSetting(string $setting_name): mixed {
-    $widget_settings = $this->customFieldDefinition->getWidgetSetting('settings');
-    return \array_key_exists($setting_name, $widget_settings) ? $widget_settings[$setting_name] : NULL;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public static function isApplicable(CustomFieldTypeInterface $custom_item): bool {

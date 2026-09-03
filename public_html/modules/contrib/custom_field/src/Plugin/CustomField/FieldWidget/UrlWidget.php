@@ -8,7 +8,6 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
-use Drupal\custom_field\Plugin\CustomField\UrlWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
@@ -28,12 +27,9 @@ class UrlWidget extends UrlWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    $settings = parent::defaultSettings();
-    $settings['settings'] = [
+    return [
       'placeholder' => '',
-    ] + $settings['settings'];
-
-    return $settings;
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -41,9 +37,9 @@ class UrlWidget extends UrlWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
 
-    $element['settings']['placeholder'] = [
+    $element['placeholder'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Placeholder'),
       '#default_value' => $settings['placeholder'],
@@ -58,7 +54,7 @@ class UrlWidget extends UrlWidgetBase {
    */
   public function widget(FieldItemListInterface $items, int $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
 
     // Overrides for this widget.
     $element['#type'] = 'container';

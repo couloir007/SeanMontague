@@ -2,9 +2,14 @@
 
 namespace Drupal\geolocation_google_maps;
 
-use Drupal\Core\Url;
-use Drupal\geolocation\KeyProvider;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\File\FileSystemInterface;
+use Drupal\geolocation\DataLayerProviderManager;
+use Drupal\geolocation\MapFeatureManager;
 use Drupal\geolocation\MapProviderBase;
+use Drupal\geolocation\MapProviderInterface;
+use Drupal\geolocation\TileLayerProviderManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class GoogleMapsProvider Base.
@@ -18,118 +23,70 @@ abstract class GoogleMapsProviderBase extends MapProviderBase {
    *
    * @var string
    */
-  public static $roadmap = 'ROADMAP';
+  public static string $roadmap = 'ROADMAP';
 
   /**
    * Google map style - Satellite.
    *
    * @var string
    */
-  public static $satellite = 'SATELLITE';
+  public static string $satellite = 'SATELLITE';
 
   /**
    * Google map style - Hybrid.
    *
    * @var string
    */
-  public static $hybrid = 'HYBRID';
+  public static string $hybrid = 'HYBRID';
 
   /**
    * Google map style - Terrain.
    *
    * @var string
    */
-  public static $terrain = 'TERRAIN';
+  public static string $terrain = 'TERRAIN';
 
   /**
-   * Google maps url.
-   *
-   * @var string
+   * {@inheritdoc}
    */
-  public static $googleMapsApiUrlBase = 'https://maps.googleapis.com';
-
-  /**
-   * Google maps url from PR China.
-   *
-   * @var string
-   */
-  public static $googleMapsApiUrlBaseChina = 'https://maps.google.cn';
-
-  /**
-   * Google maps url from PR China.
-   *
-   * @var string
-   */
-  public static $googleMapsApiUrlPath = '/maps/api';
-
-  /**
-   * Return all module and custom defined parameters.
-   *
-   * @param array $additional_parameters
-   *   Additional parameters.
-   *
-   * @return array
-   *   Parameters
-   */
-  public function getGoogleMapsApiParameters(array $additional_parameters = []) {
-    $config = \Drupal::config('geolocation_google_maps.settings');
-    $geolocation_parameters = [
-      'key' => KeyProvider::getKeyValue($config->get('google_map_api_key')),
-    ];
-
-    $module_parameters = \Drupal::moduleHandler()->invokeAll('geolocation_google_maps_parameters') ?: [];
-    $custom_parameters = $config->get('google_map_custom_url_parameters') ?: [];
-
-    // Set the map language to site language if desired and possible.
-    if ($config->get('use_current_language') && \Drupal::moduleHandler()->moduleExists('language')) {
-      $custom_parameters['language'] = \Drupal::languageManager()->getCurrentLanguage()->getId();
-    }
-
-    $parameters = array_replace_recursive($additional_parameters, $custom_parameters, $module_parameters, $geolocation_parameters);
-
-    foreach ($parameters as $key => $value) {
-      if (
-        is_string($value)
-        && $value === ''
-      ) {
-        unset($parameters[$key]);
-      }
-    }
-
-    return $parameters;
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected MapFeatureManager $map_feature_manager,
+    protected ModuleHandlerInterface $module_handler,
+    protected FileSystemInterface $file_system,
+    protected DataLayerProviderManager $dataLayerProviderManager,
+    protected TileLayerProviderManager $tileLayerProviderManager,
+    protected GoogleMapsService $googleMapsService,
+  ) {
+    parent::__construct(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $map_feature_manager,
+      $module_handler,
+      $file_system,
+      $dataLayerProviderManager,
+      $tileLayerProviderManager
+    );
   }
 
   /**
-   * Return the fully build URL to load Google Maps API.
-   *
-   * @param array $additional_parameters
-   *   Additional parameters.
-   *
-   * @return string
-   *   Google Maps API URL
+   * {@inheritdoc}
    */
-  public function getGoogleMapsApiUrl(array $additional_parameters = []) {
-    $config = \Drupal::config('geolocation_google_maps.settings');
-
-    if (!empty($config->get('google_maps_base_url'))) {
-      $google_url = $config->get('google_maps_base_url');
-    }
-    elseif ($config->get('china_mode')) {
-      $google_url = static::$googleMapsApiUrlBaseChina;
-    }
-    else {
-      $google_url = static::$googleMapsApiUrlBase;
-    }
-
-    $parameters = [];
-    foreach ($this->getGoogleMapsApiParameters($additional_parameters) as $parameter => $value) {
-      $parameters[$parameter] = is_array($value) ? implode(',', $value) : $value;
-    }
-    $url = Url::fromUri($google_url . static::$googleMapsApiUrlPath, [
-      'query' => $parameters,
-      'https' => TRUE,
-    ]);
-    return $url->toString();
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): MapProviderInterface {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('plugin.manager.geolocation.mapfeature'),
+      $container->get('module_handler'),
+      $container->get('file_system'),
+      $container->get('plugin.manager.geolocation.datalayerprovider'),
+      $container->get('plugin.manager.geolocation.tilelayerprovider'),
+      $container->get('geolocation_google_maps.google')
+    );
   }
 
   /**
@@ -138,7 +95,7 @@ abstract class GoogleMapsProviderBase extends MapProviderBase {
    * @return array
    *   The map types.
    */
-  private function getMapTypes() {
+  private function getMapTypes(): array {
     $mapTypes = [
       static::$roadmap => 'Road map view',
       static::$satellite => 'Google Earth satellite images',
@@ -152,7 +109,7 @@ abstract class GoogleMapsProviderBase extends MapProviderBase {
   /**
    * {@inheritdoc}
    */
-  public static function getDefaultSettings() {
+  public static function getDefaultSettings(): array {
     return array_replace_recursive(
       parent::getDefaultSettings(),
       [
@@ -167,7 +124,7 @@ abstract class GoogleMapsProviderBase extends MapProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function getSettings(array $settings) {
+  public function getSettings(array $settings): array {
     $settings = parent::getSettings($settings);
 
     $settings['zoom'] = (int) $settings['zoom'];
@@ -178,14 +135,11 @@ abstract class GoogleMapsProviderBase extends MapProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function getSettingsSummary(array $settings) {
+  public function getSettingsSummary(array $settings): array {
     $types = $this->getMapTypes();
-    $settings = array_replace_recursive(
-      self::getDefaultSettings(),
-      $settings
-    );
+    $settings = $this->getSettings($settings);
     $summary = parent::getSettingsSummary($settings);
-    $summary[] = $this->t('Map Type: @type', ['@type' => $types[$settings['type']]]);
+    $summary[] = $this->t('Map Type: @type', ['@type' => $types[$settings['type']] ?? '']);
     $summary[] = $this->t('Zoom level: @zoom', ['@zoom' => $settings['zoom']]);
     $summary[] = $this->t('Height: @height', ['@height' => $settings['height']]);
     $summary[] = $this->t('Width: @width', ['@width' => $settings['width']]);
@@ -196,14 +150,14 @@ abstract class GoogleMapsProviderBase extends MapProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function getSettingsForm(array $settings, array $parents = []) {
+  public function getSettingsForm(array $settings, array $parents = [], array $context = []): array {
     $settings = $this->getSettings($settings);
     $parents_string = '';
     if ($parents) {
       $parents_string = implode('][', $parents) . '][';
     }
 
-    $form = parent::getSettingsForm($settings, $parents);
+    $form = parent::getSettingsForm($settings, $parents, $context);
 
     /*
      * General settings.
@@ -235,11 +189,11 @@ abstract class GoogleMapsProviderBase extends MapProviderBase {
       '#options' => $this->getMapTypes(),
       '#default_value' => $settings['type'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
         ['\Drupal\Core\Render\Element\Select', 'processSelect'],
       ],
       '#pre_render' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
     $form['zoom'] = [
@@ -249,11 +203,11 @@ abstract class GoogleMapsProviderBase extends MapProviderBase {
       '#description' => $this->t('The initial resolution at which to display the map, where zoom 0 corresponds to a map of the Earth fully zoomed out, and higher zoom levels zoom in at a higher resolution up to 20 for streetlevel.'),
       '#default_value' => $settings['zoom'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\Number', 'preRenderNumber'],
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
     if ($parents_string) {

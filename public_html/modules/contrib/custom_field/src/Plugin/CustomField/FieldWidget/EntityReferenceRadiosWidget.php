@@ -8,7 +8,6 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
-use Drupal\custom_field\Plugin\CustomField\EntityReferenceOptionsWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
@@ -28,10 +27,9 @@ class EntityReferenceRadiosWidget extends EntityReferenceOptionsWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    $settings = parent::defaultSettings();
-    $settings['settings']['empty_option'] = 'N/A';
-
-    return $settings;
+    return [
+      'empty_option' => 'N/A',
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -39,7 +37,8 @@ class EntityReferenceRadiosWidget extends EntityReferenceOptionsWidgetBase {
    */
   public function widget(FieldItemListInterface $items, int $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
+
     // Prevent default value form rendering unset options.
     if (!isset($element['#options'])) {
       return [];
@@ -57,16 +56,13 @@ class EntityReferenceRadiosWidget extends EntityReferenceOptionsWidgetBase {
       }
     }
 
-    // Sanitize the options to prevent XSS vulnerabilities.
-    $safe_options = array_map('Drupal\Component\Utility\Html::escape', $flattened_options);
-
     // Add an empty option if the field is not required.
-    if (!$settings['required']) {
-      $safe_options = ['' => $settings['empty_option']] + $safe_options;
+    if (!$field->getFieldSetting('required')) {
+      $flattened_options = ['' => $settings['empty_option']] + $flattened_options;
     }
 
     $element['#type'] = 'radios';
-    $element['#options'] = $safe_options;
+    $element['#options'] = $flattened_options;
 
     return ['target_id' => $element];
   }

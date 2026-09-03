@@ -13,7 +13,7 @@ class NominatimRoadFirstFormattingBase extends NominatimCountryFormattingBase {
   /**
    * {@inheritdoc}
    */
-  public function format(array $atomics) {
+  public function format(array $atomics): ?array {
     $address_elements = parent::format($atomics);
     if (!empty($atomics['road'])) {
       $address_elements['addressLine1'] = $atomics['road'];

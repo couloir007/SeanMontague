@@ -2,38 +2,50 @@
 
 namespace Drupal\geolocation_leaflet\Plugin\geolocation\MapFeature;
 
+use Drupal\geolocation\Attribute\MapFeature;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\geolocation\MapFeatureBase;
+use Drupal\geolocation\MapProviderInterface;
 use Drupal\geolocation_leaflet\LeafletTileLayerProviders;
 
 /**
  * Provides map tile layer support.
- *
- * @MapFeature(
- *   id = "leaflet_tile_layer",
- *   name = @Translation("Tile Layer - Providers"),
- *   description = @Translation("Select a map tile layer."),
- *   type = "leaflet",
- * )
  */
+#[MapFeature(
+  id: 'leaflet_tile_layer',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('Tile Layer - Providers'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('Select a map tile layer.'),
+  type: 'leaflet'
+)]
 class LeafletTileLayer extends MapFeatureBase {
+
   use LeafletTileLayerProviders;
 
   /**
    * {@inheritdoc}
    */
-  public static function getDefaultSettings() {
-    return [
-      'tile_layer_provider' => 'OpenStreetMap Mapnik',
-      'tile_provider_options' => [],
-    ];
+  protected array $scripts = [
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet-providers/1.13.0/leaflet-providers.min.js',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getDefaultSettings(): array {
+    return array_replace_recursive(
+      parent::getDefaultSettings(),
+      [
+        'tile_layer_provider' => 'OpenStreetMap Mapnik',
+        'tile_provider_options' => [],
+      ]
+    );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getSettingsForm(array $settings, array $parents) {
-    $form = parent::getSettingsForm($settings, $parents);
+  public function getSettingsForm(array $settings, array $parents = [], ?MapProviderInterface $mapProvider = NULL): array {
+    $form = parent::getSettingsForm($settings, $parents, $mapProvider);
 
     if ($parents) {
       $first = array_shift($parents);
@@ -67,25 +79,21 @@ class LeafletTileLayer extends MapFeatureBase {
   /**
    * {@inheritdoc}
    */
-  public function alterMap(array $render_array, array $feature_settings, array $context = []) {
-    $render_array = parent::alterMap($render_array, $feature_settings, $context);
+  public function alterMap(array $render_array, array $feature_settings = [], array $context = [], ?MapProviderInterface $mapProvider = NULL): array {
+    $render_array = parent::alterMap($render_array, $feature_settings, $context, $mapProvider);
 
     $tileLayer = [
-      'enable' => TRUE,
       'tileLayerProvider' => str_replace(' ', '.', $feature_settings['tile_layer_provider']),
     ];
 
     $provider = explode('.', $feature_settings['tile_layer_provider'])[0];
     if (isset($feature_settings['tile_provider_options'][$provider])) {
-      $tileLayer['tileLayerOptions'] = $feature_settings['tile_provider_options'][$provider];
+      $tileLayer['tile_provider_options'] = $feature_settings['tile_provider_options'][$provider];
     }
 
     $render_array['#attached'] = BubbleableMetadata::mergeAttachments(
-      empty($render_array['#attached']) ? [] : $render_array['#attached'],
+      $render_array['#attached'] ?? [],
       [
-        'library' => [
-          'geolocation_leaflet/mapfeature.' . $this->getPluginId(),
-        ],
         'drupalSettings' => [
           'geolocation' => [
             'maps' => [

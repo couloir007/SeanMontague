@@ -1,0 +1,7 @@
+test_behavior:
+  version: 1.x
+  js:
+    js/test-leaflet-countries-view.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.message

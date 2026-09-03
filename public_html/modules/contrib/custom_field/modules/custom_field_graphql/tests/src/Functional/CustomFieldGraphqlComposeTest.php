@@ -8,7 +8,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\graphql_compose\Functional\GraphQLComposeBrowserTestBase;
-use Drupal\custom_field\CustomFieldGenerateDataInterface;
+use Drupal\custom_field\Service\GenerateDataInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\node\NodeInterface;
 
@@ -51,9 +51,9 @@ class CustomFieldGraphqlComposeTest extends GraphQLComposeBrowserTestBase {
   /**
    * The custom field generate data service.
    *
-   * @var \Drupal\custom_field\CustomFieldGenerateDataInterface
+   * @var \Drupal\custom_field\Service\GenerateDataInterface
    */
-  protected CustomFieldGenerateDataInterface $customFieldDataGenerator;
+  protected GenerateDataInterface $customFieldDataGenerator;
 
   /**
    * File URL generator service.
@@ -79,7 +79,7 @@ class CustomFieldGraphqlComposeTest extends GraphQLComposeBrowserTestBase {
 
     // Set the graphql views in the widget settings.
     $field_settings = $field_config->getSetting('field_settings');
-    $field_settings['viewfield_test']['widget_settings']['settings']['allowed_views'] = [
+    $field_settings['viewfield']['allowed_views'] = [
       'custom_field_graphql_test' => [
         'graphql_1' => 'graphql_1',
       ],
@@ -93,8 +93,8 @@ class CustomFieldGraphqlComposeTest extends GraphQLComposeBrowserTestBase {
     $field_data = $this->customFieldDataGenerator->generateFieldData($field_config->getSettings(), $field_config->getTargetEntityTypeId());
 
     // Set a graphql view display.
-    $field_data['viewfield_test'] = 'custom_field_graphql_test';
-    $field_data['viewfield_test__display'] = 'graphql_1';
+    $field_data['viewfield'] = 'custom_field_graphql_test';
+    $field_data['viewfield__display'] = 'graphql_1';
 
     $this->node = $this->createNode([
       'type' => 'custom_field_entity_test',
@@ -168,31 +168,47 @@ class CustomFieldGraphqlComposeTest extends GraphQLComposeBrowserTestBase {
         node(id: "{$this->node->uuid()}") {
           ... on NodeCustomFieldEntityTest {
             test {
-              boolean_test
-              color_test
-              datetime_test {
+              boolean
+              color
+              datetime {
                 offset
                 time
                 timestamp
                 timezone
               }
-              decimal_test
-              email_test
-              entity_reference_test {
+              daterange {
+                start {
+                  offset
+                  time
+                  timestamp
+                  timezone
+                }
+                end {
+                  offset
+                  time
+                  timestamp
+                  timezone
+                }
+                duration
+              }
+              decimal
+              duration
+              email
+              entity_reference {
                 __typename
                 ... on NodeArticle {
                   id
                 }
               }
-              file_test {
+              file {
                 description
                 mime
                 name
                 size
                 url
               }
-              float_test
-              image_test {
+              float
+              image {
                 alt
                 height
                 mime
@@ -201,8 +217,8 @@ class CustomFieldGraphqlComposeTest extends GraphQLComposeBrowserTestBase {
                 url
                 width
               }
-              integer_test
-              link_test {
+              integer
+              link {
                 internal
                 title
                 url
@@ -217,22 +233,27 @@ class CustomFieldGraphqlComposeTest extends GraphQLComposeBrowserTestBase {
                   title
                 }
               }
-              map_test
-              map_string_test
-              string_test
-              string_long_test {
+              map
+              map_string
+              string
+              string_long {
                 value
                 processed
                 format
               }
-              telephone_test
-              time_test
-              uri_test {
+              telephone
+              time
+              time_range {
+                start
+                end
+                duration
+              }
+              uri {
                 internal
                 title
                 url
               }
-              viewfield_test {
+              viewfield {
                 views {
                   __typename
                   ... on CustomFieldTestGraphqlResult {
@@ -258,78 +279,98 @@ class CustomFieldGraphqlComposeTest extends GraphQLComposeBrowserTestBase {
     /** @var \Drupal\Core\Field\FieldItemInterface $item */
     $item = $node->get('field_test')->first();
 
-    $this->assertEquals($item->get('boolean_test')->getValue(), $custom_field['boolean_test']);
-    $this->assertEquals($item->get('color_test')->getValue(), $custom_field['color_test']);
-    $this->assertEquals($item->get('decimal_test')->getValue(), $custom_field['decimal_test']);
-    $this->assertEquals($item->get('email_test')->getValue(), $custom_field['email_test']);
+    $this->assertEquals($item->get('boolean')->getValue(), $custom_field['boolean']);
+    $this->assertEquals($item->get('color')->getValue(), $custom_field['color']);
+    $this->assertEquals($item->get('decimal')->getValue(), $custom_field['decimal']);
+    $this->assertEquals($item->get('duration')->getValue(), $custom_field['duration']);
+    $this->assertEquals($item->get('email')->getValue(), $custom_field['email']);
 
     // Entity reference type.
-    $reference = $custom_field['entity_reference_test'];
+    $reference = $custom_field['entity_reference'];
     /** @var \Drupal\node\NodeInterface $reference_entity */
-    $reference_entity = $item->get('entity_reference_test__entity')->getValue();
+    $reference_entity = $item->get('entity_reference__entity')->getValue();
     $this->assertEquals('NodeArticle', $reference['__typename']);
     $this->assertEquals($reference_entity->uuid(), $reference['id']);
 
     // Datetime type.
-    $date_value = $item->get('datetime_test')->getValue();
-    $date_time = is_numeric($date_value)
-      ? DrupalDateTime::createFromTimestamp($date_value)
-      : new DrupalDateTime($date_value, new \DateTimeZone('UTC'));
-    $this->assertEquals($date_time->getTimestamp(), $custom_field['datetime_test']['timestamp']);
-    $this->assertEquals($date_time->getTimezone()->getName(), $custom_field['datetime_test']['timezone']);
-    $this->assertEquals($date_time->format('P'), $custom_field['datetime_test']['offset']);
-    $this->assertEquals($date_time->format(\DateTime::RFC3339), $custom_field['datetime_test']['time']);
+    $date_value = $item->get('datetime')->getValue();
+    $date = new DrupalDateTime($date_value, new \DateTimeZone('UTC'));
+    $this->assertEquals($date->getTimestamp(), $custom_field['datetime']['timestamp']);
+    $this->assertEquals($date->getTimezone()->getName(), $custom_field['datetime']['timezone']);
+    $this->assertEquals($date->format('P'), $custom_field['datetime']['offset']);
+    $this->assertEquals($date->format(\DateTime::RFC3339), $custom_field['datetime']['time']);
+
+    // Daterange type.
+    $start_date_value = $item->get('daterange')->getValue();
+    $start_date = new DrupalDateTime($start_date_value, new \DateTimeZone('UTC'));
+    $this->assertEquals($start_date->getTimestamp(), $custom_field['daterange']['start']['timestamp']);
+    $this->assertEquals($start_date->getTimezone()->getName(), $custom_field['daterange']['start']['timezone']);
+    $this->assertEquals($start_date->format('P'), $custom_field['daterange']['start']['offset']);
+    $this->assertEquals($start_date->format(\DateTime::RFC3339), $custom_field['daterange']['start']['time']);
+    $end_date_value = $item->get('daterange__end')->getValue();
+    $end_date = new DrupalDateTime($end_date_value, new \DateTimeZone('UTC'));
+    $this->assertEquals($end_date->getTimestamp(), $custom_field['daterange']['end']['timestamp']);
+    $this->assertEquals($end_date->getTimezone()->getName(), $custom_field['daterange']['end']['timezone']);
+    $this->assertEquals($end_date->format('P'), $custom_field['daterange']['end']['offset']);
+    $this->assertEquals($end_date->format(\DateTime::RFC3339), $custom_field['daterange']['end']['time']);
+    $duration = $item->get('daterange__duration')->getValue();
+    $this->assertEquals($duration, $custom_field['daterange']['duration']);
 
     // File.
     /** @var \Drupal\file\FileInterface $file */
-    $file = $item->get('file_test__entity')->getValue();
+    $file = $item->get('file__entity')->getValue();
     $file_url = $this->fileUrlGenerator->generateAbsoluteString($file->getFileUri());
-    $this->assertEquals($file->getMimeType(), $custom_field['file_test']['mime']);
-    $this->assertEquals($file->getSize(), $custom_field['file_test']['size']);
-    $this->assertEquals($file->getFilename(), $custom_field['file_test']['name']);
-    $this->assertEquals($file_url, $custom_field['file_test']['url']);
+    $this->assertEquals($file->getMimeType(), $custom_field['file']['mime']);
+    $this->assertEquals($file->getSize(), $custom_field['file']['size']);
+    $this->assertEquals($file->getFilename(), $custom_field['file']['name']);
+    $this->assertEquals($file_url, $custom_field['file']['url']);
 
     // Why are float values slightly off in comparison?
-    $this->assertTrue(is_numeric($custom_field['float_test']));
+    $this->assertTrue(is_numeric($custom_field['float']));
 
     // Image type.
     /** @var \Drupal\file\FileInterface $image */
-    $image = $item->get('image_test__entity')->getValue();
+    $image = $item->get('image__entity')->getValue();
     $image_url = $this->fileUrlGenerator->generateAbsoluteString($image->getFileUri());
-    $this->assertEquals($item->get('image_test__alt')->getValue(), $custom_field['image_test']['alt']);
-    $this->assertEquals($item->get('image_test__height')->getValue(), $custom_field['image_test']['height']);
-    $this->assertEquals($image->getMimeType(), $custom_field['image_test']['mime']);
-    $this->assertEquals($image->getSize(), $custom_field['image_test']['size']);
-    $this->assertEquals($item->get('image_test__title')->getValue(), $custom_field['image_test']['title']);
-    $this->assertEquals($item->get('image_test__width')->getValue(), $custom_field['image_test']['width']);
-    $this->assertEquals($image_url, $custom_field['image_test']['url']);
+    $this->assertEquals($item->get('image__alt')->getValue(), $custom_field['image']['alt']);
+    $this->assertEquals($item->get('image__height')->getValue(), $custom_field['image']['height']);
+    $this->assertEquals($image->getMimeType(), $custom_field['image']['mime']);
+    $this->assertEquals($image->getSize(), $custom_field['image']['size']);
+    $this->assertEquals($item->get('image__title')->getValue(), $custom_field['image']['title']);
+    $this->assertEquals($item->get('image__width')->getValue(), $custom_field['image']['width']);
+    $this->assertEquals($image_url, $custom_field['image']['url']);
 
     // Link type.
-    $link_url = Url::fromUri($item->get('link_test')->getValue());
-    $this->assertEquals($link_url->toString(), $custom_field['link_test']['url']);
-    $this->assertEquals(!$link_url->isExternal(), (bool) $custom_field['link_test']['internal']);
-    $this->assertEquals($item->get('link_test__title')->getValue(), (bool) $custom_field['link_test']['title']);
+    $link_url = Url::fromUri($item->get('link')->getValue());
+    $this->assertEquals($link_url->toString(), $custom_field['link']['url']);
+    $this->assertEquals(!$link_url->isExternal(), (bool) $custom_field['link']['internal']);
+    $this->assertEquals($item->get('link__title')->getValue(), (bool) $custom_field['link']['title']);
 
-    $this->assertEquals($item->get('map_string_test')->getValue(), $custom_field['map_string_test']);
-    $this->assertEquals($item->get('map_test')->getValue(), $custom_field['map_test']);
-    $this->assertEquals($item->get('integer_test')->getValue(), $custom_field['integer_test']);
-    $this->assertEquals($item->get('string_test')->getValue(), $custom_field['string_test']);
+    $this->assertEquals($item->get('map_string')->getValue(), $custom_field['map_string']);
+    $this->assertEquals($item->get('map')->getValue(), $custom_field['map']);
+    $this->assertEquals($item->get('integer')->getValue(), $custom_field['integer']);
+    $this->assertEquals($item->get('string')->getValue(), $custom_field['string']);
 
     // String long type.
-    $this->assertEquals($item->get('string_long_test')->getValue(), $custom_field['string_long_test']['value']);
-    $this->assertNotEmpty($custom_field['string_long_test']['format']);
-    $this->assertNotEmpty($custom_field['string_long_test']['processed']);
+    $this->assertEquals($item->get('string_long')->getValue(), $custom_field['string_long']['value']);
+    $this->assertNotEmpty($custom_field['string_long']['format']);
+    $this->assertNotEmpty($custom_field['string_long']['processed']);
 
-    $this->assertEquals($item->get('telephone_test')->getValue(), $custom_field['telephone_test']);
-    $this->assertEquals($item->get('time_test')->getValue(), $custom_field['time_test']);
+    $this->assertEquals($item->get('telephone')->getValue(), $custom_field['telephone']);
+    $this->assertEquals($item->get('time')->getValue(), $custom_field['time']);
+
+    // Time range type.
+    $this->assertEquals($item->get('time_range')->getValue(), $custom_field['time_range']['start']);
+    $this->assertEquals($item->get('time_range__end')->getValue(), $custom_field['time_range']['end']);
+    $this->assertEquals($item->get('time_range__duration')->getValue(), $custom_field['time_range']['duration']);
 
     // Uri type.
-    $uri_url = Url::fromUri($item->get('uri_test')->getValue());
-    $this->assertEquals($uri_url->toString(), $custom_field['uri_test']['url']);
-    $this->assertEquals(!$uri_url->isExternal(), (bool) $custom_field['uri_test']['internal']);
+    $uri_url = Url::fromUri($item->get('uri')->getValue());
+    $this->assertEquals($uri_url->toString(), $custom_field['uri']['url']);
+    $this->assertEquals(!$uri_url->isExternal(), (bool) $custom_field['uri']['internal']);
 
     // Viewfield type.
-    $viewfield = $custom_field['viewfield_test'];
+    $viewfield = $custom_field['viewfield'];
     $this->assertEquals('CustomFieldTestGraphqlResult', $viewfield['views']['__typename']);
     $this->assertEquals('NodeArticle', $viewfield['views']['results'][0]['__typename']);
   }
@@ -349,7 +390,7 @@ class CustomFieldGraphqlComposeTest extends GraphQLComposeBrowserTestBase {
     $config_path = "field_config.$entity_type_id.$bundle.$field_name.subfields";
     $settings = $config->get($config_path);
     // Set a field's name_sdl and verify it works.
-    $settings['string_test'] = [
+    $settings['string'] = [
       'enabled' => TRUE,
       'name_sdl' => 'someCustomName',
     ];
@@ -375,7 +416,7 @@ class CustomFieldGraphqlComposeTest extends GraphQLComposeBrowserTestBase {
     /** @var \Drupal\Core\Field\FieldItemInterface $item */
     $item = $node->get('field_test')->first();
 
-    $this->assertEquals($item->get('string_test')->getValue(), $custom_field['someCustomName']);
+    $this->assertEquals($item->get('string')->getValue(), $custom_field['someCustomName']);
   }
 
 }

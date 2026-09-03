@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\custom_field\Plugin\Validation\Constraint;
 
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\custom_field\Plugin\CustomField\FieldType\LinkTypeInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -30,7 +31,7 @@ class LinkExternalProtocolsConstraintValidator extends ConstraintValidator {
       $name = $object->getName();
       $custom_items = $item->getCustomFieldManager()->getCustomFieldItems($item->getFieldDefinition()->getSettings());
       $subfield = $custom_items[$name] ?? NULL;
-      if (!$subfield) {
+      if (!$subfield instanceof LinkTypeInterface) {
         return;
       }
       try {

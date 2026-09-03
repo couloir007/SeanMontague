@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\custom_field\Hook;
 
+use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -21,8 +23,10 @@ use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
 use Drupal\Core\Utility\Token;
-use Drupal\custom_field\Plugin\CustomField\FieldType\DateTimeType;
+use Drupal\custom_field\Plugin\CustomField\FieldType\LinkTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface;
 use Drupal\token\TokenEntityMapperInterface;
 use Drupal\token\TokenModuleProvider;
@@ -32,6 +36,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * Implements token hooks for the Custom Field module.
  */
 class TokenHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Constructs a TokenHooks object.
@@ -86,14 +92,14 @@ class TokenHooks {
 
         // Generate a description for the token.
         $labels = $this->tokenFieldLabel($entity_type_id, $field_name);
-        $label = array_shift($labels);
+        $label = \array_shift($labels);
         $params['@type'] = $type_info[$field->getType()]['label'];
         if (!empty($labels)) {
           $params['%labels'] = implode(', ', $labels);
-          $description = t('@type field. Also known as %labels.', $params);
+          $description = $this->t('@type field. Also known as %labels.', $params);
         }
         else {
-          $description = t('@type field.', $params);
+          $description = $this->t('@type field.', $params);
         }
 
         $cardinality = $field->getCardinality();
@@ -109,7 +115,7 @@ class TokenHooks {
         // Field token type.
         $info['types'][$field_token_name] = [
           'name' => Html::escape($label),
-          'description' => t('@label tokens.', ['@label' => $field->getLabel()]),
+          'description' => $this->t('@label tokens.', ['@label' => $field->getLabel()]),
           'needs-data' => $field_token_name,
           'module' => 'custom_field',
           'nested' => TRUE,
@@ -118,8 +124,8 @@ class TokenHooks {
         if ($cardinality > 1) {
           // Field list token type.
           $info['types']["list<$field_token_name>"] = [
-            'name' => t('List of @type values', ['@type' => Html::escape($label)]),
-            'description' => t('Tokens for lists of @type values.', ['@type' => Html::escape($label)]),
+            'name' => $this->t('List of @type values', ['@type' => Html::escape($label)]),
+            'description' => $this->t('Tokens for lists of @type values.', ['@type' => Html::escape($label)]),
             'needs-data' => "list<$field_token_name>",
             'module' => 'custom_field',
             'nested' => TRUE,
@@ -127,7 +133,7 @@ class TokenHooks {
           // Show a different token for each field delta.
           for ($delta = 0; $delta < $cardinality; $delta++) {
             $info['tokens']["list<$field_token_name>"][$delta] = [
-              'name' => t('@type type with delta @delta', ['@type' => Html::escape($label), '@delta' => $delta]),
+              'name' => $this->t('@type type with delta @delta', ['@type' => Html::escape($label), '@delta' => $delta]),
               'module' => 'custom_field',
               'type' => $field_token_name,
             ];
@@ -138,33 +144,35 @@ class TokenHooks {
         $settings = $field->getSettings();
         $custom_fields = $this->customFieldTypeManager->getCustomFieldItems($settings);
         foreach ($custom_fields as $name => $custom_field) {
+          $label = $custom_field->getLabel();
           $type = $custom_field->getDataType();
           $subfield_token_name = $field_token_name . '-' . $name;
           // Subfield token type.
           $info['types'][$subfield_token_name] = [
-            'name' => t('@label', ['@label' => $name]),
+            'name' => $this->t('@label', ['@label' => $label]),
             'needs-data' => $subfield_token_name,
             'module' => 'custom_field',
             'nested' => TRUE,
           ];
           // Define tokens for subfield values.
           $info['tokens'][$field_token_name][$name] = [
-            'name' => $name,
-            'description' => t('The value of the @label subfield.', ['@label' => $name]),
+            'name' => $this->t('@label', ['@label' => $label]),
+            'description' => $this->t('The %label subfield.', ['%label' => $label]),
             'type' => $subfield_token_name,
           ];
           // The field label token.
           $info['tokens'][$subfield_token_name]['field_label'] = [
-            'name' => t('Field label'),
-            'description' => t('The field label of the @label subfield.', ['@label' => $name]),
+            'name' => $this->t('Field label'),
+            'description' => $this->t('The field label of the subfield.'),
           ];
           // Handle specific data types.
           if ($type === 'entity_reference' && $target_type = $custom_field->getTargetType()) {
+            // @phpstan-ignore-next-line nullsafe.neverNull
             $entity_token_type = $this->tokenEntityMapper?->getTokenTypeForEntityType($target_type);
             if ($entity_token_type) {
               $info['tokens'][$subfield_token_name]['entity'] = [
-                'name' => t('Referenced entity'),
-                'description' => t('The referenced entity.'),
+                'name' => $this->t('Referenced entity'),
+                'description' => $this->t('The referenced entity.'),
                 'type' => $entity_token_type,
                 'nested' => TRUE,
               ];
@@ -172,24 +180,24 @@ class TokenHooks {
           }
           if ($type === 'image') {
             $info['tokens'][$subfield_token_name]['alt'] = [
-              'name' => t('Alternative text'),
-              'description' => t("Alternative image text, for the image's 'alt' attribute."),
+              'name' => $this->t('Alternative text'),
+              'description' => $this->t("Alternative image text, for the image's 'alt' attribute."),
             ];
             $info['tokens'][$subfield_token_name]['title'] = [
-              'name' => t('Title'),
-              'description' => t("Image title text, for the image's 'title' attribute."),
+              'name' => $this->t('Title'),
+              'description' => $this->t("Image title text, for the image's 'title' attribute."),
             ];
             $info['tokens'][$subfield_token_name]['height'] = [
-              'name' => t('Height'),
-              'description' => t('The height of the image in pixels.'),
+              'name' => $this->t('Height'),
+              'description' => $this->t('The height of the image in pixels.'),
             ];
             $info['tokens'][$subfield_token_name]['width'] = [
-              'name' => t('Width'),
-              'description' => t('The width of the image in pixels.'),
+              'name' => $this->t('Width'),
+              'description' => $this->t('The width of the image in pixels.'),
             ];
             $info['tokens'][$subfield_token_name]['entity'] = [
-              'name' => t('File'),
-              'description' => t('The referenced entity'),
+              'name' => $this->t('File'),
+              'description' => $this->t('The referenced entity'),
               'type' => 'file',
               'nested' => TRUE,
             ];
@@ -197,38 +205,96 @@ class TokenHooks {
             foreach ($image_styles as $style => $description) {
               $info['tokens'][$subfield_token_name][$style] = [
                 'name' => $description,
-                'description' => t('Represents the image in the given image style.'),
+                'description' => $this->t('Represents the image in the given image style.'),
                 'type' => 'image_with_image_style',
               ];
             }
           }
           if ($type === 'file') {
             $info['tokens'][$subfield_token_name]['entity'] = [
-              'name' => t('File'),
-              'description' => t('The referenced entity'),
+              'name' => $this->t('File'),
+              'description' => $this->t('The referenced entity'),
               'type' => 'file',
               'nested' => TRUE,
             ];
           }
           if ($type === 'datetime') {
             $info['tokens'][$subfield_token_name]['formatted'] = [
-              'name' => t('Formatted date'),
-              'description' => t('The formatted datetime value.'),
+              'name' => $this->t('Formatted date'),
+              'description' => $this->t('The formatted datetime value.'),
               'type' => 'date',
               'nested' => TRUE,
             ];
           }
-          else {
+          if ($type === 'daterange') {
+            $info['tokens'][$field_token_name][$name]['nested'] = TRUE;
+            $info['tokens'][$field_token_name][$name]['description'] = $this->t('Date range field');
             $info['tokens'][$subfield_token_name]['value'] = [
-              'name' => t('Value'),
-              'description' => t('The raw value of the subfield.'),
+              'name' => $this->t('Start date value'),
+              'description' => $this->t('The raw value of the start date.'),
+            ];
+            $info['tokens'][$subfield_token_name]['start_date'] = [
+              'name' => $this->t('Start date format'),
+              'description' => $this->t('The formatted datetime value.'),
+              'type' => 'date',
+              'nested' => TRUE,
+            ];
+            $info['tokens'][$subfield_token_name]['end_value'] = [
+              'name' => $this->t('End date value'),
+              'description' => $this->t('The raw value of the end date.'),
+            ];
+            $info['tokens'][$subfield_token_name]['end_date'] = [
+              'name' => $this->t('End date format'),
+              'description' => $this->t('The formatted datetime value.'),
+              'type' => 'date',
+              'nested' => TRUE,
+            ];
+            $info['tokens'][$subfield_token_name]['duration'] = [
+              'name' => $this->t('Duration'),
+              'description' => $this->t('The total duration in seconds between the start and end dates.'),
             ];
           }
+          if ($type === 'time_range') {
+            $info['tokens'][$field_token_name][$name]['description'] = $this->t('Time range field');
+            $info['tokens'][$subfield_token_name]['value'] = [
+              'name' => $this->t('Start time value'),
+              'description' => $this->t('The raw value of the start time.'),
+            ];
+            $info['tokens'][$subfield_token_name]['end_value'] = [
+              'name' => $this->t('End time value'),
+              'description' => $this->t('The raw value of the end time.'),
+            ];
+            $info['tokens'][$subfield_token_name]['duration'] = [
+              'name' => $this->t('Duration'),
+              'description' => $this->t('The total duration in seconds between the start and end times.'),
+            ];
+          }
+          else {
+            $info['tokens'][$subfield_token_name]['value'] = [
+              'name' => $this->t('Value'),
+              'description' => $this->t('The raw value of the subfield.'),
+            ];
+          }
+          if ($type === 'link') {
+            $info['tokens'][$subfield_token_name]['title'] = [
+              'name' => $this->t('Link text'),
+              'description' => $this->t('The link title text.'),
+            ];
+          }
+          if (\in_array($type, ['uri', 'link'])) {
+            $info['tokens'][$subfield_token_name]['value']['name'] = $this->t('URI');
+            $info['tokens'][$subfield_token_name]['value']['description'] = $this->t('The URI of the link.');
+            // Add URL tokens.
+            $info['tokens'][$subfield_token_name]['url'] = $info['tokens'][$subfield_token_name]['value'];
+            $info['tokens'][$subfield_token_name]['url']['name'] = $this->t('URL');
+            $info['tokens'][$subfield_token_name]['url']['description'] = $this->t('The URL of the link.');
+            $info['tokens'][$subfield_token_name]['url']['type'] = 'url';
+          }
           // Add a list label token for fields that allow it.
-          if (in_array($type, ['string', 'integer', 'float'])) {
+          if (\in_array($type, ['string', 'integer', 'float'])) {
             $info['tokens'][$subfield_token_name]['label'] = [
-              'name' => t('Label'),
-              'description' => t('The label from widget settings allowed values (if applicable).'),
+              'name' => $this->t('Label'),
+              'description' => $this->t('The label from widget settings allowed values (if applicable).'),
             ];
           }
         }
@@ -341,7 +407,7 @@ class TokenHooks {
           // With multiple nested tokens for the same field name, this might
           // match the same field multiple times. Filter out those that have
           // already been replaced.
-          $field_tokens = array_filter($field_tokens, function ($token) use ($replacements) {
+          $field_tokens = \array_filter($field_tokens, function ($token) use ($replacements) {
             return !isset($replacements[$token]);
           });
 
@@ -364,18 +430,22 @@ class TokenHooks {
           $nested_array = [];
           // Process the tokens into a structured array by delta.
           foreach ($field_tokens as $key => $value) {
-            $parts = explode(':', $key);
+            $parts = explode(':', (string) $key);
             $current = &$nested_array;
-            foreach ($parts as $part) {
-              // Ensure the current level is an array before assigning deeper
-              // levels.
-              if (!isset($current[$part])) {
+            // Traverse all parts except the last one to build the nested
+            // structure.
+            for ($i = 0; $i < count($parts) - 1; $i++) {
+              $part = $parts[$i];
+              // Ensure the current level is an array.
+              if (!isset($current[$part]) || !\is_array($current[$part])) {
                 $current[$part] = [];
               }
               $current = &$current[$part];
             }
             // Assign the value at the deepest level.
-            $current = $value;
+            $last_part = end($parts);
+            $current[$last_part] = $value;
+
             // Break the reference.
             unset($current);
           }
@@ -457,7 +527,7 @@ class TokenHooks {
   private function findValueByKey(array $array, mixed $value): mixed {
     foreach ($array as $item) {
       if (isset($item['key']) && $item['key'] === $value) {
-        return $item['value'] ?? $value;
+        return $item['label'] ?? $value;
       }
     }
 
@@ -496,7 +566,8 @@ class TokenHooks {
       $data_type = $custom_item->getDataType();
       $raw_value = $item->{$property};
       $referenced_entity = NULL;
-      $is_reference = in_array($data_type, [
+      $link_url = NULL;
+      $is_reference = \in_array($data_type, [
         'entity_reference',
         'image',
         'file',
@@ -504,34 +575,39 @@ class TokenHooks {
       if ($is_reference && $referenced_entity = $item->{$property . '__entity'}) {
         $referenced_entity = $this->entityRepository->getTranslationFromContext($referenced_entity, $langcode);
       }
-      if (is_array($properties)) {
+      if ($custom_item instanceof LinkTypeInterface && !empty($item->{$property})) {
+        $link_url = $custom_item->getUrl($item);
+      }
+      if (\is_array($properties)) {
         foreach ($properties as $sub_property => $property_value) {
           if ($sub_property === 'value') {
+            // Convert map types to JSON.
+            if (\in_array($data_type, ['map', 'map_string'])) {
+              $raw_value = !empty($raw_value) ? Json::encode($raw_value) : NULL;
+            }
             $replacements[$property_value] = $raw_value;
+          }
+          // Account for the daterange | time_range end_value property.
+          elseif ($sub_property === 'end_value') {
+            $replacements[$property_value] = $item->{$property . '__end'};
+          }
+          // Account for the daterange | time_range duration property.
+          elseif ($sub_property === 'duration') {
+            $replacements[$property_value] = $item->{$property . '__duration'};
           }
           elseif ($sub_property === 'field_label') {
             $replacements[$property_value] = $custom_item->getLabel();
           }
           elseif ($sub_property === 'label') {
-            $allowed_values = $custom_item->getWidgetSetting('settings')['allowed_values'] ?? [];
+            $allowed_values = $custom_item->getFieldSetting('allowed_values') ?? [];
             $replacements[$property_value] = $this->findValueByKey($allowed_values, $raw_value);
           }
           elseif ($sub_property === 'entity' && $referenced_entity) {
             $token_type = $this->tokenEntityMapper?->getTokenTypeForEntityType($referenced_entity->getEntityTypeId(), TRUE);
-            if (is_array($property_value)) {
-              $term_properties = [];
-              // @todo Figure out what to do with field values not replaced here.
-              $field_properties = [];
-              foreach ($property_value as $property_value_key => $property_value_value) {
-                if (!is_array($property_value_value)) {
-                  $term_properties[$property_value_key] = $property_value_value;
-                }
-                else {
-                  $field_properties[$property_value_key] = $property_value_value;
-                }
-              }
-              if ($token_type && !empty($term_properties)) {
-                $replacements += $this->token->generate($token_type, $term_properties, [$token_type => $referenced_entity], $options, $bubbleable_metadata);
+            if (\is_array($property_value)) {
+              if ($token_type) {
+                $entity_tokens = $this->buildTokenReplacement($property_value);
+                $replacements += $this->token->generate($token_type, $entity_tokens, [$token_type => $referenced_entity], $options, $bubbleable_metadata);
               }
             }
             else {
@@ -541,7 +617,7 @@ class TokenHooks {
           // Image replacements.
           elseif ($data_type === 'image') {
             $image_style_storage = $this->entityTypeManager->getStorage('image_style');
-            if (in_array($sub_property, ['alt', 'title', 'width', 'height'])) {
+            if (\in_array($sub_property, ['alt', 'title', 'width', 'height'])) {
               $replacement_value = $this->getComputedValue($item, $property, $sub_property);
               $replacements[$property_value] = $replacement_value;
             }
@@ -549,7 +625,7 @@ class TokenHooks {
             elseif ($style = $image_style_storage->load($sub_property)) {
               /** @var \Drupal\image\Entity\ImageStyle $style */
               $original_uri = $referenced_entity->getFileUri();
-              if (is_array($property_value)) {
+              if (\is_array($property_value)) {
                 $image_width = $item->{$property . '__width'} ?? NULL;
                 $image_height = $item->{$property . '__height'} ?? NULL;
                 foreach ($property_value as $image_property => $image_value) {
@@ -600,22 +676,57 @@ class TokenHooks {
               }
             }
           }
-          // Datetime replacements.
-          elseif ($data_type === 'datetime' && $sub_property === 'formatted') {
-            if (is_array($property_value)) {
-              assert($custom_item instanceof DateTimeType);
-              $timestamp = $custom_item->getTimestamp($item);
-              // Flatten nested properties for custom formatted date.
-              if (isset($property_value['custom'])) {
-                $property_value = array_combine(
-                  array_map(fn($k, $v) => "$k:$v", array_keys($property_value), array_map('key', $property_value)),
-                  array_map('current', $property_value)
-                );
+          // Datetime & Daterange replacements.
+          elseif (\in_array($data_type, ['daterange', 'datetime'])) {
+            foreach (['formatted', 'start_date', 'end_date'] as $computed_property) {
+              if ($sub_property !== $computed_property) {
+                continue;
               }
-              $replacements += $this->token->generate('date', $property_value, ['date' => $timestamp], $options, $bubbleable_metadata);
+              // Datetime fields have different token structure.
+              if ($sub_property === 'formatted') {
+                $computed_property = 'date';
+              }
+              // Get the computed date object.
+              $date = $item->{$property . '__' . $computed_property};
+              // If we don't have a valid date, we can't replace anything.
+              if (!$date instanceof DrupalDateTime) {
+                continue;
+              }
+              $timestamp = $date->getTimestamp();
+              // If no sub-parts to the token, return timestamp.
+              if (!\is_array($property_value)) {
+                $replacements[$property_value] = $timestamp;
+              }
+              else {
+                if (isset($property_value['custom'])) {
+                  if (!\is_array($property_value['custom'])) {
+                    // If no sub-parts to the token, return timestamp.
+                    $replacements[$property_value['custom']] = $timestamp;
+                  }
+                  else {
+                    // Flatten nested properties for custom formatted date.
+                    $property_value = $this->buildTokenReplacement($property_value);
+                  }
+                }
+                $replacements += $this->token->generate('date', $property_value, ['date' => $timestamp], $options, $bubbleable_metadata);
+              }
             }
-            else {
-              $replacements[$property_value] = $raw_value;
+          }
+
+          // Uri & Link replacements.
+          elseif ($link_url instanceof Url) {
+            // The link title.
+            if ($data_type === 'link' && $sub_property === 'title') {
+              $replacements[$property_value] = $item->{$property . '__title'};
+            }
+            if ($sub_property === 'url') {
+              if (\is_array($property_value)) {
+                $url_tokens = $this->buildTokenReplacement($property_value);
+                $replacements += $this->token->generate('url', $url_tokens, ['url' => $link_url], $options, $bubbleable_metadata);
+              }
+              else {
+                $replacements[$property_value] = $link_url->toString();
+              }
             }
           }
         }
@@ -673,7 +784,7 @@ class TokenHooks {
   private function tokenFieldLabel(string $entity_type_id, string $field_name): array {
     $labels = [];
     // Count the number of instances per label per field.
-    foreach (array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id)) as $bundle) {
+    foreach (\array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id)) as $bundle) {
       $bundle_instances = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle);
       if (isset($bundle_instances[$field_name])) {
         $instance = $bundle_instances[$field_name];
@@ -688,7 +799,34 @@ class TokenHooks {
 
     // Sort the field labels by it most used label and return the labels.
     arsort($labels);
-    return array_keys($labels);
+    return \array_keys($labels);
+  }
+
+  /**
+   * Helper function to recursively build replacements.
+   *
+   * @param array<string, mixed> $input
+   *   An array of token parts.
+   *
+   * @return array<string, mixed>
+   *   The flattened token output.
+   */
+  private function buildTokenReplacement(array $input): array {
+    $result = [];
+    foreach ($input as $key => $value) {
+      if (\is_array($value)) {
+        // Recursively process nested arrays, prefixing the key.
+        foreach ($this->buildTokenReplacement($value) as $subKey => $subValue) {
+          $result[$key . ':' . $subKey] = $subValue;
+        }
+      }
+      else {
+        // Leaf node: add directly to result.
+        $result[$key] = $value;
+      }
+    }
+
+    return $result;
   }
 
 }

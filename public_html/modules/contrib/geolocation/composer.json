@@ -1,23 +1,33 @@
 {
-  "name": "drupal/geolocation",
-  "description": "Provides a simple geolocation Drupal field type to store and display location data (lat, lng).",
-  "type": "drupal-module",
-  "license": "GPL-2.0-or-later",
-  "authors": [
-    {
-      "name": "derjochenmeyer",
-      "homepage": "https://www.drupal.org/u/derjochenmeyer"
-    },{
-      "name": "cadamski",
-      "homepage": "https://www.drupal.org/u/cadamski"
+    "name": "drupal/geolocation",
+    "description": "Provides a simple geolocation Drupal field type to store and display location data (lat, lng).",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "derjochenmeyer",
+            "homepage": "https://www.drupal.org/u/derjochenmeyer"
+        },{
+            "name": "cadamski",
+            "homepage": "https://www.drupal.org/u/cadamski"
+        }
+    ],
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/geolocation",
+        "source": "https://git.drupal.org/project/geolocation.git"
+    },
+    "require-dev": {
+        "drupal/address": "^2",
+        "drupal/feeds": "^3.0",
+        "drupal/geocoder": "^4.29",
+        "drupal/geofield": "^1.64",
+        "drupal/search_api": "^1.38",
+        "drupal/search_api_location": "^1.x-dev@dev",
+        "drupal/migrate_tools": "^6.0",
+        "drupal/migrate_plus": "^6.0",
+        "drupal/tamper": "^1.0@beta",
+        "gasparesganga/php-shapefile": "^3",
+        "geocodio/geocodio-library-php": "^3.0",
+        "sibyx/phpgpx": "^1.1"
     }
-  ],
-  "support": {
-    "issues": "https://www.drupal.org/project/issues/geolocation",
-    "source": "https://git.drupal.org/project/geolocation.git"
-  },
-  "require": {
-    "drupal/jquery_ui_autocomplete": "^2.0",
-    "php": "^8.0"
-  }
 }

@@ -22,13 +22,13 @@ class Geolocation extends DefaultField {
   /**
    * {@inheritdoc}
    */
-  public function getSettingsForm(FieldConfigInterface $field, array $form, FormStateInterface &$form_state) {
+  public function getSettingsForm(FieldConfigInterface $field, array $form, FormStateInterface &$form_state): array {
     $element = parent::getSettingsForm($field, $form, $form_state);
     // Hard-wire the dumper for geolocation fields, but make multiple
     // geolocation dumpers possible.
     $options = $element['dumper']['#options'];
     foreach ($options as $key => $option) {
-      if (strpos($key, 'geolocation') !== 0) {
+      if (!str_starts_with($key, 'geolocation')) {
         unset($options[$key]);
       }
     }

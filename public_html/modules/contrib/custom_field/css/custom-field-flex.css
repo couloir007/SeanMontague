@@ -2,10 +2,6 @@
  * @file
  * Stylesheet for the custom_field custom form display settings.
  */
-.custom-field-row-wrapper {
-  padding: 0 0.75rem;
-}
-
 .custom-field-row {
   --custom-field-gutter-x: 1.5rem;
 
@@ -24,17 +20,17 @@
   padding-left: calc(var(--custom-field-gutter-x) * 0.5);
 }
 
-.custom-field-col.form-type--number input,
-.custom-field-col.form-type--textfield input,
+.custom-field-col.form-type--number:not(:has(span)) input,
+.custom-field-col.form-type--textfield:not(:has(span)) input,
 .custom-field-col.form-type--email input,
 .custom-field-col.form-type--textarea input,
 .custom-field-col.form-type--url input,
-.custom-field-col.form-type--tel input,
+.custom-field-col.form-type--tel:not(:has(span)) input,
 .custom-field-col.form-type--entity-autocomplete input,
 .custom-field-col.form-type--select select,
-.custom-field-col.media-library-widget
-  .media-library-selection
-  .media-library-item--grid {
+.custom-field-col.form-type--date input,
+.custom-field-col.form-type--time-cf input,
+.custom-field-col.media-library-widget .media-library-selection .media-library-item--grid {
   width: 100%;
 }
 
@@ -115,30 +111,14 @@
   width: 100%;
 }
 
-.custom-field-col.media-library-widget
-  .media-library-selection
-  .media-library-item--grid,
-.custom-field-col-6.media-library-widget
-  .media-library-selection
-  .media-library-item--grid,
-.custom-field-col-7.media-library-widget
-  .media-library-selection
-  .media-library-item--grid,
-.custom-field-col-8.media-library-widget
-  .media-library-selection
-  .media-library-item--grid,
-.custom-field-col-9.media-library-widget
-  .media-library-selection
-  .media-library-item--grid,
-.custom-field-col-10.media-library-widget
-  .media-library-selection
-  .media-library-item--grid,
-.custom-field-col-11.media-library-widget
-  .media-library-selection
-  .media-library-item--grid,
-.custom-field-col-12.media-library-widget
-  .media-library-selection
-  .media-library-item--grid {
+.custom-field-col.media-library-widget .media-library-selection .media-library-item--grid,
+.custom-field-col-6.media-library-widget .media-library-selection .media-library-item--grid,
+.custom-field-col-7.media-library-widget .media-library-selection .media-library-item--grid,
+.custom-field-col-8.media-library-widget .media-library-selection .media-library-item--grid,
+.custom-field-col-9.media-library-widget .media-library-selection .media-library-item--grid,
+.custom-field-col-10.media-library-widget .media-library-selection .media-library-item--grid,
+.custom-field-col-11.media-library-widget .media-library-selection .media-library-item--grid,
+.custom-field-col-12.media-library-widget .media-library-selection .media-library-item--grid {
   max-width: 50%;
 }
 
@@ -148,9 +128,7 @@
     flex: 0 0 auto;
     width: 100%;
   }
-  .custom-field-col.media-library-widget
-    .media-library-selection
-    .media-library-item--grid {
+  .custom-field-col.media-library-widget .media-library-selection .media-library-item--grid {
     max-width: initial;
   }
 }

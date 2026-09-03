@@ -1,0 +1,16 @@
+chart.js:
+  header: true
+  remote: https://www.chartjs.org
+  version: 'latest'
+  license:
+    name: MIT-LICENSE
+    gpl-compatible: true
+  js:
+    'https://cdn.jsdelivr.net/npm/chart.js': { type: external, minified: true }
+
+elevation-chart:
+  version: 4.x-1.x
+  js:
+    js/geolocation-elevation-chart.js: {}
+  dependencies:
+    - geolocation_gpx/chart.js

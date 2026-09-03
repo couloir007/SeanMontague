@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\custom_field\Attribute\CustomFieldType;
@@ -58,25 +59,28 @@ class DecimalType extends NumericTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function getConstraints(array $settings): array {
-    $constraints = parent::getConstraints($settings);
-    $constraints['Regex']['pattern'] = '/^[+-]?((\d+(\.\d*)?)|(\.\d+))$/i';
+  public function fieldSettingsForm(array &$form, FormStateInterface $form_state): array {
+    $element = parent::fieldSettingsForm($form, $form_state);
+    $scale = $this->getScale();
 
-    return $constraints;
+    $element['min']['#step'] = pow(0.1, $scale);
+    $element['max']['#step'] = pow(0.1, $scale);
+
+    return $element;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function generateSampleValue(CustomFieldTypeInterface $field, string $target_entity_type): float {
-    $widget_settings = $field->getWidgetSetting('settings');
+    $field_settings = $field->getFieldSettings();
     $precision = $field->getPrecision() ?: 10;
     $scale = $field->getScale() ?: 2;
 
     $default_min = $field->isUnsigned() ? 0 : -pow(10, ($precision - $scale)) + 1;
     $default_max = pow(10, ($precision - $scale)) - 1;
-    $min = isset($widget_settings['min']) && is_numeric($widget_settings['min']) ? $widget_settings['min'] : $default_min;
-    $max = isset($widget_settings['max']) && is_numeric($widget_settings['max']) ? $widget_settings['max'] : $default_max;
+    $min = isset($field_settings['min']) && is_numeric($field_settings['min']) ? $field_settings['min'] : $default_min;
+    $max = isset($field_settings['max']) && is_numeric($field_settings['max']) ? $field_settings['max'] : $default_max;
 
     // Get the number of decimal digits for the $max.
     $decimal_digits = self::getDecimalDigits($max);

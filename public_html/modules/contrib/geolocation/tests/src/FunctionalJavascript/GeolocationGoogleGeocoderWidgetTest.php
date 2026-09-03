@@ -6,6 +6,7 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\user\Entity\User;
 
 /**
  * Tests the Google Geocoder Widget functionality.
@@ -15,9 +16,14 @@ use Drupal\field\Entity\FieldStorageConfig;
 class GeolocationGoogleGeocoderWidgetTest extends GeolocationJavascriptTestBase {
 
   /**
+   * Admin User.
+   */
+  public User $adminUser;
+
+  /**
    * {@inheritdoc}
    */
-  public $adminUser;
+  protected $profile = 'minimal';
 
   /**
    * {@inheritdoc}
@@ -26,6 +32,7 @@ class GeolocationGoogleGeocoderWidgetTest extends GeolocationJavascriptTestBase 
     'node',
     'field',
     'geolocation',
+    'geolocation_test_views',
     'geolocation_google_maps',
   ];
 
@@ -35,12 +42,12 @@ class GeolocationGoogleGeocoderWidgetTest extends GeolocationJavascriptTestBase 
   protected function setUp(): void {
     parent::setUp();
 
+    $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
+
     $this->adminUser = $this->drupalCreateUser([
       'bypass node access',
       'administer nodes',
     ]);
-
-    $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
 
     // Add the geolocation field to the article content type.
     FieldStorageConfig::create([
@@ -57,9 +64,9 @@ class GeolocationGoogleGeocoderWidgetTest extends GeolocationJavascriptTestBase 
 
     EntityFormDisplay::load('node.article.default')
       ->setComponent('field_geolocation', [
-        'type' => 'geolocation_googlegeocoder',
+        'type' => 'geolocation_map',
         'settings' => [
-          'allow_override_map_settings' => TRUE,
+          'map_provider_id' => 'google_maps',
         ],
       ])
       ->save();
@@ -67,10 +74,6 @@ class GeolocationGoogleGeocoderWidgetTest extends GeolocationJavascriptTestBase 
     EntityViewDisplay::load('node.article.default')
       ->setComponent('field_geolocation', [
         'type' => 'geolocation_map',
-        'settings' => [
-          'use_overridden_map_settings' => TRUE,
-        ],
-        'weight' => 1,
       ])
       ->save();
 
@@ -126,10 +129,13 @@ class GeolocationGoogleGeocoderWidgetTest extends GeolocationJavascriptTestBase 
   /**
    * Tests the Google Maps widget.
    */
-  public function testGeocoderWidgetMapPresent() {
+  public function testGeocoderWidgetMapPresent(): void {
     $this->drupalLogin($this->adminUser);
 
     $this->drupalGet('node/3/edit');
+
+    $anchor = $this->assertSession()->waitForElement('css', 'a[href^="https://maps.google.com"][href*="hl="]');
+    $this->assertNotEmpty($anchor, "Wait for GoogleMaps to be loaded.");
 
     $this->assertSession()->elementExists('css', '.geolocation-map-container');
 
@@ -140,10 +146,10 @@ class GeolocationGoogleGeocoderWidgetTest extends GeolocationJavascriptTestBase 
   /**
    * Tests the Google Maps widget.
    */
-  public function testGeocoderWidgetEmptyValuePreserved() {
+  public function testGeocoderWidgetEmptyValuePreserved(): void {
     EntityFormDisplay::load('node.article.default')
       ->setComponent('field_geolocation', [
-        'type' => 'geolocation_googlegeocoder',
+        'type' => 'geolocation_map',
         'settings' => [
           'default_latitude' => 12,
           'default_longitude' => 24,
@@ -156,12 +162,12 @@ class GeolocationGoogleGeocoderWidgetTest extends GeolocationJavascriptTestBase 
     $this->drupalGet('node/add/article');
 
     $page = $this->getSession()->getPage();
-    $page->findField('Title')->setValue('I am new');
+    $page->fillField('title[0][value]', 'I am new');
     $page->pressButton('Save');
 
     /** @var \Drupal\node\NodeInterface $new_node */
     $new_node = \Drupal::entityTypeManager()->getStorage('node')->load(5);
-    $this->assertTrue($new_node->get('field_geolocation')->isEmpty());
+    $this->assertSession()->assert($new_node->get('field_geolocation')->isEmpty(), "Node geolocation field empty after saving from predefined location widget");
   }
 
 }

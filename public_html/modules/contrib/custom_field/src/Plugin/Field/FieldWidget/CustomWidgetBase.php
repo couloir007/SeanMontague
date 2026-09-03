@@ -5,10 +5,19 @@ declare(strict_types=1);
 namespace Drupal\custom_field\Plugin\Field\FieldWidget;
 
 use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\Component\Render\PlainTextOutput;
+use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\NestedArray;
+use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface;
 use Drupal\custom_field\Plugin\CustomFieldWidgetManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -21,39 +30,55 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 abstract class CustomWidgetBase extends WidgetBase {
 
   /**
-   * The custom field type manager.
-   *
-   * @var \Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface
-   */
-  protected CustomFieldTypeManagerInterface $customFieldTypeManager;
-
-  /**
-   * The custom field widget manager.
-   *
-   * @var \Drupal\custom_field\Plugin\CustomFieldWidgetManagerInterface
-   */
-  protected CustomFieldWidgetManagerInterface $customFieldWidgetManager;
-
-  /**
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
     return [
-      'label' => TRUE,
-      'wrapper' => 'div',
+      'wrapper' => 'details',
+      'label_value' => '',
+      'label_limit' => 60,
+      'label_prefix' => 'Item',
+      'auto_collapse' => FALSE,
       'open' => TRUE,
+      'fields' => [],
     ] + parent::defaultSettings();
+  }
+
+  /**
+   * Constructs a custom field widget.
+   *
+   * @param string $plugin_id
+   *   The plugin ID for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The definition of the field to which the widget is associated.
+   * @param array $settings
+   *   The widget settings.
+   * @param array $third_party_settings
+   *   Any third party settings.
+   * @param \Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface $customFieldTypeManager
+   *   The custom field type manager.
+   * @param \Drupal\custom_field\Plugin\CustomFieldWidgetManagerInterface $customFieldWidgetManager
+   *   The custom field widget manager.
+   */
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, protected CustomFieldTypeManagerInterface $customFieldTypeManager, protected CustomFieldWidgetManagerInterface $customFieldWidgetManager) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
-    $instance->customFieldTypeManager = $container->get('plugin.manager.custom_field_type');
-    $instance->customFieldWidgetManager = $container->get('plugin.manager.custom_field_widget');
-
-    return $instance;
+    return new static(
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['third_party_settings'],
+      $container->get('plugin.manager.custom_field_type'),
+      $container->get('plugin.manager.custom_field_widget')
+    );
   }
 
   /**
@@ -61,56 +86,282 @@ abstract class CustomWidgetBase extends WidgetBase {
    */
   public function settingsForm(array $form, FormStateInterface $form_state): array {
     $definition = $this->fieldDefinition;
+    $is_multiple = $definition->getFieldStorageDefinition()->isMultiple();
+    $field_name = $definition->getName();
+    $settings = $this->getSettings() + static::defaultSettings();
+    $field_settings = $this->getSetting('fields') ?? [];
+    $custom_items = $this->getCustomFieldItems($form_state);
+    $values = $form_state->getValues();
+    $form_id = $form_state->getFormObject()->getFormId();
 
     $elements = parent::settingsForm($form, $form_state);
     $elements['#tree'] = TRUE;
+    $elements['#attached']['library'][] = 'custom_field/custom-field-admin';
 
-    $elements['label'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Show field label?'),
-      '#default_value' => $this->getSetting('label'),
-    ];
     $elements['wrapper'] = [
       '#type' => 'select',
       '#title' => $this->t('Wrapper'),
-      '#default_value' => $this->getSetting('wrapper'),
+      '#default_value' => $settings['wrapper'],
       '#options' => [
-        'div' => $this->t('Default'),
+        'div' => $this->t('Default (div)'),
         'fieldset' => $this->t('Fieldset'),
         'details' => $this->t('Details'),
       ],
+    ];
+    $textual_custom_items = array_filter($custom_items, static function (CustomFieldTypeInterface $custom_item) {
+      return in_array($custom_item->getDataType(), ['string', 'email', 'telephone']);
+    });
+    $elements['label_value'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Label value'),
+      '#description' => $this->t('Select a textual property that will be used as the label for the details summary element. If not provided or if property contains no data, the label will use the default numeric label.'),
+      '#required' => FALSE,
+      '#default_value' => $settings['label_value'],
+      '#options' => array_map(static function (CustomFieldTypeInterface $custom_item) {
+        return $custom_item->getLabel();
+      }, $textual_custom_items),
+      '#empty_option' => $this->t('- None -'),
       '#states' => [
         'visible' => [
-          'input[name="fields[' . $definition->getName() . '][settings_edit_form][settings][label]"]' => ['checked' => TRUE],
+          'select[name="fields[' . $field_name . '][settings_edit_form][settings][wrapper]"]' => ['value' => 'details'],
         ],
       ],
+    ];
+    $elements['label_limit'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Label limit'),
+      '#description' => $this->t('The maximum number of characters to display in the label.'),
+      '#default_value' => $settings['label_limit'],
+      '#required' => TRUE,
+      '#max' => 255,
+      '#min' => 10,
+      '#states' => [
+        'visible' => [
+          'select[name="fields[' . $field_name . '][settings_edit_form][settings][wrapper]"]' => ['value' => 'details'],
+          0 => 'AND',
+          'select[name="fields[' . $field_name . '][settings_edit_form][settings][label_value]"]' => ['!value' => ''],
+        ],
+      ],
+    ];
+    $elements['label_prefix'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Label prefix'),
+      '#description' => $this->t('The label prefix for the details summary element. E.g. <em>Item (1)</em>, <em>Item (2)</em>, <em>Item (3)</em>. Leave empty for default functionality.'),
+      '#default_value' => $settings['label_prefix'],
+      '#maxlength' => 30,
+      '#states' => [
+        'visible' => [
+          'select[name="fields[' . $field_name . '][settings_edit_form][settings][wrapper]"]' => ['value' => 'details'],
+          0 => 'AND',
+          'select[name="fields[' . $field_name . '][settings_edit_form][settings][label_value]"]' => ['value' => ''],
+        ],
+      ],
+      '#access' => $is_multiple,
     ];
     $elements['open'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Show open by default?'),
-      '#default_value' => $this->getSetting('open'),
+      '#default_value' => $settings['open'],
       '#states' => [
         'visible' => [
-          'input[name="fields[' . $definition->getName() . '][settings_edit_form][settings][label]"]' => ['checked' => TRUE],
-          0 => 'AND',
-          'select[name="fields[' . $definition->getName() . '][settings_edit_form][settings][wrapper]"]' => ['value' => 'details'],
+          'select[name="fields[' . $field_name . '][settings_edit_form][settings][wrapper]"]' => ['value' => 'details'],
         ],
       ],
     ];
+    $elements['auto_collapse'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Auto-collapse'),
+      '#description' => $this->t('When one item is opened, close all others.'),
+      '#default_value' => $settings['auto_collapse'],
+      '#states' => [
+        'visible' => [
+          'select[name="fields[' . $field_name . '][settings_edit_form][settings][wrapper]"]' => ['value' => 'details'],
+          0 => 'AND',
+          'input[name="fields[' . $field_name . '][settings_edit_form][settings][open]"]' => ['checked' => FALSE],
+        ],
+      ],
+      '#access' => $is_multiple,
+    ];
+    $elements['fields'] = [
+      '#type' => 'table',
+      '#header' => [
+        $this->t('Field settings'),
+        $this->t('Weight'),
+      ],
+      '#tableselect' => FALSE,
+      '#tabledrag' => [
+        [
+          'action' => 'order',
+          'relationship' => 'sibling',
+          'group' => 'field-settings-order-weight',
+        ],
+      ],
+      '#responsive' => FALSE,
+      '#sticky' => FALSE,
+      '#weight' => 10,
+      '#attributes' => [
+        'class' => ['form-fields-settings-table'],
+      ],
+    ];
+
+    foreach ($custom_items as $name => $custom_item) {
+      $plugin_id = $custom_item->getPluginId();
+      $value_keys = [
+        'fields',
+        $field_name,
+        'settings_edit_form',
+        'settings',
+        'fields',
+        $name,
+      ];
+      // Account for views_entity_form module.
+      if ($form_id === 'views_ui_config_item_form') {
+        $value_keys = [
+          'options',
+          'plugin',
+          'settings_edit_form',
+          'settings',
+          'fields',
+          $name,
+        ];
+      }
+      $wrapper_id = 'field-' . $field_name . '-' . $name;
+
+      // UUid fields have no configuration.
+      if ($plugin_id === 'uuid') {
+        continue;
+      }
+      $settings = $field_settings[$name] ?? [];
+      $weight = $settings['weight'] ?? 0;
+      $options = self::getCustomFieldWidgetOptions($custom_item);
+      $options_count = count($options);
+      $widget_type = $settings['type'] ?? NULL;
+
+      if (!empty($widget_type) && in_array($widget_type, $this->customFieldWidgetManager->getWidgetsForField($plugin_id))) {
+        $type = $widget_type;
+      }
+      else {
+        $type = $custom_item->getDefaultWidget();
+      }
+      if (!empty($values)) {
+        $type = NestedArray::getValue($values, [...$value_keys, 'type']) ?? $type;
+      }
+      $open = FALSE;
+      // Keep details open when type changes.
+      if ($form_state->isRebuilding()) {
+        $trigger = $form_state->getTriggeringElement();
+        if (in_array($name, $trigger['#parents']) && end($trigger['#parents']) === 'type') {
+          $open = TRUE;
+        }
+      }
+
+      $elements['fields'][$name] = [
+        '#attributes' => [
+          'class' => ['draggable'],
+        ],
+        '#weight' => $weight,
+      ];
+      $elements['fields'][$name]['settings'] = [
+        '#type' => 'details',
+        '#title' => $this->t('@label', ['@label' => $custom_item->getLabel()]),
+        '#parents' => $value_keys,
+        '#open' => $open,
+        '#prefix' => '<div id="' . $wrapper_id . '">',
+        '#suffix' => '</div>',
+      ];
+      $elements['fields'][$name]['settings']['type'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Widget'),
+        '#options' => $options,
+        '#default_value' => $type,
+        '#value' => $type,
+        '#ajax' => [
+          'callback' => [$this, 'widgetTypeCallback'],
+          'wrapper' => $wrapper_id,
+        ],
+        '#attributes' => [
+          'disabled' => $options_count <= 1,
+        ],
+      ];
+
+      $plugin_options = $this->customFieldWidgetManager->createOptionsForInstance(
+        $field_name,
+        $custom_item,
+        $type,
+        $settings,
+        'default'
+      );
+      /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetInterface $widget */
+      $widget = $this->customFieldWidgetManager->getInstance($plugin_options);
+      $elements['fields'][$name]['settings'] += $widget->widgetSettingsForm($form_state, $custom_item);
+      $elements['fields'][$name]['weight'] = [
+        '#type' => 'weight',
+        '#title' => $this->t('Weight for @label', ['@label' => $custom_item->getLabel()]),
+        '#title_display' => 'invisible',
+        '#default_value' => $weight,
+        '#attributes' => ['class' => ['field-settings-order-weight']],
+      ];
+    }
 
     return $elements;
+  }
+
+  /**
+   * Ajax callback for changing widget type.
+   *
+   * Selects and returns the fieldset with the names in it.
+   *
+   * @param array<string, mixed> $form
+   *   The form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   The updated form element.
+   */
+  public function widgetTypeCallback(array $form, FormStateInterface $form_state): AjaxResponse {
+    $trigger = $form_state->getTriggeringElement();
+    $wrapper_id = $trigger['#ajax']['wrapper'];
+
+    // Get the current parent array for this widget.
+    $parents = $trigger['#array_parents'];
+    $sliced_parents = array_slice($parents, 0, -1, TRUE);
+
+    // Get the updated element from the form structure.
+    $updated_element = NestedArray::getValue($form, $sliced_parents);
+
+    // Create an AjaxResponse.
+    $response = new AjaxResponse();
+    $response->addCommand(new ReplaceCommand('#' . $wrapper_id, $updated_element));
+
+    return $response;
   }
 
   /**
    * {@inheritdoc}
    */
   public function settingsSummary(): array {
+    $settings = $this->getSettings() + static::defaultSettings();
+    $is_multiple = $this->getFieldStorageDefinition()->isMultiple();
     $summary = [];
-
-    $summary[] = $this->t('Show field label?: @label', ['@label' => $this->getSetting('label') ? 'Yes' : 'No']);
-    $summary[] = $this->t('Wrapper: @wrapper', ['@wrapper' => $this->getSetting('wrapper')]);
-    if ($this->getSetting('wrapper') === 'details') {
-      $summary[] = $this->t('Open: @open', ['@open' => $this->getSetting('open') ? 'Yes' : 'No']);
+    $summary[] = $this->t('Wrapper: @wrapper', ['@wrapper' => $settings['wrapper']]);
+    if ($settings['wrapper'] === 'details') {
+      if ($is_multiple) {
+        $label_value = $settings['label_value'];
+        $label_limit = $settings['label_limit'];
+        if (!empty($label_value)) {
+          $summary[] = $this->t('Label value: @label_value', ['@label_value' => $label_value]);
+          $summary[] = $this->t('Label limit: @label_limit', ['@label_limit' => $label_limit]);
+        }
+        else {
+          $label_prefix = $settings['label_prefix'] ?? '';
+          $summary[] = $this->t('Label prefix: @label', ['@label' => empty($label_prefix) ? 'Default' : $label_prefix]);
+        }
+      }
+      $summary[] = $this->t('Open: @open', ['@open' => $settings['open'] ? 'Yes' : 'No']);
+      if ($is_multiple && !$settings['open']) {
+        $summary[] = $this->t('Auto-collapse: @auto_collapse', ['@auto_collapse' => $settings['auto_collapse'] ? 'Yes' : 'No']);
+      }
     }
 
     return $summary;
@@ -123,14 +374,50 @@ abstract class CustomWidgetBase extends WidgetBase {
     $element['#attached']['library'][] = 'custom_field/custom-field-widget';
     $element['#attributes']['class'][] = 'custom-field-widget-wrapper';
     $element['#type'] = 'container';
-    if ($this->getSetting('label')) {
-      $wrapper = $this->getSetting('wrapper');
-      if ($wrapper === 'fieldset') {
-        $element['#type'] = 'fieldset';
+    $field_name = $items->getName();
+    $parents = $element['#field_parents'] ?? [];
+    $is_multiple = $this->getFieldStorageDefinition()->isMultiple();
+    $settings = $this->getSettings() + static::defaultSettings();
+    $wrapper = $settings['wrapper'];
+
+    if ($wrapper === 'fieldset') {
+      $element['#type'] = 'fieldset';
+    }
+    elseif ($wrapper === 'details') {
+      $field_state = static::getWidgetState($parents, $field_name, $form_state);
+      $open = $settings['open'] ?? FALSE;
+      $label_value = $settings['label_value'];
+      $label_limit = $settings['label_limit'];
+      $label_prefix = $settings['label_prefix'];
+
+      if (!$open && $trigger = $form_state->getTriggeringElement()) {
+        $trigger_parents = $trigger['#parents'] ?? [];
+        // Set a new item to open when triggered by the 'add more' button.
+        if (in_array($field_name, $trigger_parents, TRUE) && end($trigger_parents) === 'add_more') {
+          if ($field_state['items_count'] === $delta) {
+            $open = TRUE;
+          }
+        }
       }
-      elseif ($wrapper === 'details') {
-        $element['#type'] = 'details';
-        $element['#open'] = $this->getSetting('open');
+
+      $element['#type'] = 'details';
+      $element['#open'] = $open;
+      if ($is_multiple) {
+        $element['#attributes']['class'][] = 'custom-field-collapsible';
+
+        // Set the default details label value.
+        $raw_label = $items->get($delta)->getValue()[$label_value] ?? '';
+        if (!empty($label_value) && !empty($raw_label)) {
+          $plain = Html::escape(Html::decodeEntities(strip_tags($raw_label)));
+          $truncated = Unicode::truncate($plain, (int) $label_limit, TRUE, TRUE);
+          $element['#title'] = PlainTextOutput::renderFromHtml($truncated);
+        }
+        elseif (!empty($label_prefix)) {
+          $element['#title'] = $this->t('@prefix (@delta)', [
+            '@prefix' => $label_prefix,
+            '@delta' => $delta + 1,
+          ]);
+        }
       }
     }
 
@@ -150,11 +437,30 @@ abstract class CustomWidgetBase extends WidgetBase {
   /**
    * Get the custom field items for this field.
    *
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
    * @return \Drupal\custom_field\Plugin\CustomFieldTypeInterface[]
    *   An array of custom field items.
    */
-  public function getCustomFieldItems(): array {
-    return $this->customFieldTypeManager->getCustomFieldItems($this->fieldDefinition->getSettings());
+  public function getCustomFieldItems(FormStateInterface $form_state): array {
+    $settings = $this->fieldDefinition->getSettings();
+    $fields = $this->getSetting('fields') ?? [];
+
+    // Account for unsaved fields in field config default values form.
+    if (!empty($form_state->get('current_settings'))) {
+      $settings = $form_state->get('current_settings');
+    }
+    $custom_items = $this->customFieldTypeManager->getCustomFieldItems($settings);
+
+    // Sort items by weight.
+    uasort($custom_items, function (CustomFieldTypeInterface $a, CustomFieldTypeInterface $b) use ($fields) {
+      $weight_a = $fields[$a->getName()]['weight'] ?? 0;
+      $weight_b = $fields[$b->getName()]['weight'] ?? 0;
+      return $weight_a <=> $weight_b;
+    });
+
+    return $custom_items;
   }
 
   /**
@@ -162,23 +468,35 @@ abstract class CustomWidgetBase extends WidgetBase {
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state): array {
     $columns = $this->getFieldSetting('columns');
-    $custom_items = $this->getCustomFieldItems();
-    foreach ($values as &$value) {
-      foreach ($value as $name => $field_value) {
-        if (isset($custom_items[$name])) {
-          $custom_item = $custom_items[$name];
-          try {
-            $widget_plugin = $this->customFieldWidgetManager->createInstance($custom_item->getWidgetPluginId());
-            if (method_exists($widget_plugin, 'massageFormValue')) {
-              $value[$name] = $widget_plugin->massageFormValue($field_value, $columns[$name]);
-            }
-          }
-          catch (PluginException $e) {
-            continue;
+    $plugins = $this->getWidgetPlugins();
+    foreach ($values as &$item) {
+      $additions = [];
+      foreach ($item as $field_name => &$field_value) {
+        $plugin = $plugins[$field_name] ?? NULL;
+
+        if ($plugin && method_exists($plugin, 'massageFormValue')) {
+          $field_value = $plugin->massageFormValue($field_value, $columns[$field_name] ?? '');
+        }
+
+        // Some custom field types (e.g. link, image) store additional data
+        // on sibling properties (e.g. link__title, image__alt). Promote each
+        // nested sub-value to an explicit top-level key matching its sibling
+        // property name so it's always present when the item's values get
+        // applied by Drupal core, rather than relying solely on side-effect
+        // writes inside the data type's setValue() method, whose ordering
+        // against core's property resync isn't guaranteed. Any promoted key
+        // that doesn't correspond to an actual sibling property is simply
+        // never looked up by core, so this is safe to do unconditionally.
+        if (is_array($field_value)) {
+          foreach ($field_value as $sub_key => $sub_value) {
+            $additions[$field_name . '__' . $sub_key] = $sub_value;
           }
         }
       }
+      unset($field_value);
+      $item += $additions;
     }
+    unset($item);
 
     return $values;
   }
@@ -189,8 +507,11 @@ abstract class CustomWidgetBase extends WidgetBase {
   protected function formMultipleElements(FieldItemListInterface $items, array &$form, FormStateInterface $form_state): array {
     $parents = $form['#parents'];
     $field_name = $this->fieldDefinition->getName();
-    $cardinality = $this->fieldDefinition->getFieldStorageDefinition()->getCardinality();
+    $storage_definition = $this->getFieldStorageDefinition();
+    $cardinality = $storage_definition->getCardinality();
+    $is_multiple = $storage_definition->isMultiple();
     $processed_flag = "custom_field_{$field_name}_processed";
+    $settings = $this->getSettings() + static::defaultSettings();
     if (!empty($parents)) {
       $id_suffix = implode('_', $parents);
       $processed_flag .= "_{$id_suffix}";
@@ -212,7 +533,46 @@ abstract class CustomWidgetBase extends WidgetBase {
       }
     }
 
-    return parent::formMultipleElements($items, $form, $form_state);
+    $elements = parent::formMultipleElements($items, $form, $form_state);
+    if ($is_multiple && $settings['wrapper'] === 'details') {
+      $open = $settings['open'];
+      $label_value = $settings['label_value'];
+      $label_limit = $settings['label_limit'];
+      $auto_collapse = !$open && $settings['auto_collapse'];
+      $table_class = implode('-', [...$parents, $field_name]);
+      $elements['#custom_field_header'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'button',
+        '#value' => $this->t('@label', ['@label' => $open ? 'Collapse all' : 'Edit all']),
+        '#table_class' => $table_class,
+        '#attributes' => [
+          'type' => 'button',
+          'class' => [
+            'button',
+            'button--extrasmall',
+            'expand-all-details',
+          ],
+        ],
+      ];
+      $elements['#attached']['drupalSettings']['custom_field']['auto_collapse'][$table_class] = $auto_collapse;
+      $elements['#attached']['library'][] = 'custom_field/custom-field-widget';
+      $elements['#attached']['library'][] = 'custom_field/custom-field-table-header';
+      $elements['#attached']['library'][] = 'custom_field/custom-field-widget-details-label';
+      if (!empty($label_value)) {
+        $elements['#attached']['drupalSettings']['custom_field']['label_limit'] = $label_limit;
+        foreach (Element::children($elements) as $key) {
+          if (!is_int($key)) {
+            continue;
+          }
+          $elements[$key]['#attributes']['data-details-label-target'] = TRUE;
+          if (isset($elements[$key][$label_value])) {
+            $elements[$key][$label_value]['#attributes']['data-details-label-provider'] = TRUE;
+          }
+        }
+      }
+    }
+
+    return $elements;
   }
 
   /**
@@ -220,18 +580,12 @@ abstract class CustomWidgetBase extends WidgetBase {
    */
   public function errorElement(array $element, ConstraintViolationInterface $error, array $form, FormStateInterface $form_state) {
     $path = explode('.', $error->getPropertyPath());
-    $field_name = end($path);
-    $custom_items = $this->getCustomFieldItems();
-    if (!empty($element[$field_name]) && isset($custom_items[$field_name])) {
-      $custom_item = $custom_items[$field_name];
-      try {
-        $widget_plugin = $this->customFieldWidgetManager->createInstance($custom_item->getWidgetPluginId());
-        if (method_exists($widget_plugin, 'errorElement')) {
-          return $widget_plugin->errorElement($element, $error, $form, $form_state);
-        }
-      }
-      catch (PluginException $e) {
-        // Plugin not found.
+    $field_name = (string) end($path);
+    $plugins = $this->getWidgetPlugins();
+    if (!empty($element[$field_name]) && isset($plugins[$field_name])) {
+      $plugin = $plugins[$field_name];
+      if (method_exists($plugin, 'errorElement')) {
+        return $plugin->errorElement($element, $error, $form, $form_state);
       }
     }
     return isset($error->arrayPropertyPath[0]) ? $element[$error->arrayPropertyPath[0]] : $element;
@@ -242,24 +596,34 @@ abstract class CustomWidgetBase extends WidgetBase {
    */
   public function calculateDependencies(): array {
     $dependencies = parent::calculateDependencies();
-    $custom_items = $this->getCustomFieldItems();
-    foreach ($custom_items as $custom_item) {
-      $widget_settings = $custom_item->getWidgetSettings() ?? [];
-      if (empty($widget_settings)) {
-        continue;
-      }
-      try {
-        /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetInterface $plugin */
-        $plugin = $this->customFieldWidgetManager->createInstance($custom_item->getWidgetPluginId());
-        $plugin_dependencies = $plugin->calculateWidgetDependencies($widget_settings);
-        $dependencies = array_merge($dependencies, $plugin_dependencies);
-      }
-      catch (PluginException $e) {
-        // No dependencies applicable if we somehow have invalid plugin.
-      }
+    $plugins = $this->getWidgetPlugins();
+    foreach ($plugins as $plugin) {
+      $plugin_dependencies = $plugin->calculateWidgetDependencies();
+      $dependencies = array_merge_recursive($dependencies, $plugin_dependencies);
     }
 
     return $dependencies;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function onDependencyRemoval(array $dependencies): bool {
+    $changed = parent::onDependencyRemoval($dependencies);
+    $plugins = $this->getWidgetPlugins();
+    $fields = $this->getSetting('fields');
+    foreach ($plugins as $name => $plugin) {
+      $changed_settings = $plugin->onWidgetDependencyRemoval($dependencies);
+      if (!empty($changed_settings) && isset($fields[$name])) {
+        $fields[$name] = $changed_settings;
+        $changed = TRUE;
+      }
+    }
+    if ($changed) {
+      $this->setSetting('fields', $fields);
+    }
+
+    return $changed;
   }
 
   /**
@@ -276,21 +640,90 @@ abstract class CustomWidgetBase extends WidgetBase {
    *   The form state.
    */
   public function flagErrors(FieldItemListInterface $items, ConstraintViolationListInterface $violations, array $form, FormStateInterface $form_state): void {
-    $custom_items = $this->getCustomFieldItems();
-    foreach ($custom_items as $custom_item) {
-      try {
-        /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetInterface $plugin */
-        $plugin = $this->customFieldWidgetManager->createInstance($custom_item->getWidgetPluginId());
-        if (method_exists($plugin, 'flagErrors')) {
-          $plugin->flagErrors($items, $violations, $form, $form_state);
-        }
-      }
-      catch (PluginException $e) {
-        // No errors applicable if we somehow have invalid plugin.
+    $plugins = $this->getWidgetPlugins();
+    foreach ($plugins as $plugin) {
+      if (method_exists($plugin, 'flagErrors')) {
+        $plugin->flagErrors($items, $violations, $form, $form_state);
       }
     }
 
     parent::flagErrors($items, $violations, $form, $form_state);
+  }
+
+  /**
+   * Return the available widget plugins as an array keyed by plugin_id.
+   *
+   * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $custom_item
+   *   The Custom field type interface.
+   *
+   * @return array<string, mixed>
+   *   The array of widget options.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   */
+  private static function getCustomFieldWidgetOptions(CustomFieldTypeInterface $custom_item): array {
+    $options = [];
+    /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetManager $plugin_service */
+    $plugin_service = \Drupal::service('plugin.manager.custom_field_widget');
+    $definitions = $plugin_service->getDefinitions();
+    $type = $custom_item->getPluginId();
+    // Remove undefined widgets for data_type.
+    foreach ($definitions as $key => $definition) {
+      /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetInterface $instance */
+      $instance = $plugin_service->createInstance($definition['id']);
+      if (!$instance::isApplicable($custom_item)) {
+        unset($definitions[$key]);
+      }
+      if (!in_array($type, $definition['field_types'])) {
+        unset($definitions[$key]);
+      }
+    }
+    // Sort the widgets by category and then by name.
+    uasort($definitions, function ($a, $b) {
+      if ($a['category'] != $b['category']) {
+        return strnatcasecmp((string) $a['category'], (string) $b['category']);
+      }
+      return strnatcasecmp((string) $a['label'], (string) $b['label']);
+    });
+    foreach ($definitions as $id => $definition) {
+      $category = $definition['category'];
+      // Add category grouping for multiple options.
+      $options[(string) $category][$id] = $definition['label'];
+    }
+    if (count($options) <= 1) {
+      $options = array_values($options)[0];
+    }
+
+    return $options;
+  }
+
+  /**
+   * Helper function to fetch field widget plugins.
+   *
+   * @return array<string, \Drupal\custom_field\Plugin\CustomFieldWidgetInterface>
+   *   An array of widget plugins.
+   */
+  protected function getWidgetPlugins(): array {
+    $plugins = [];
+    $fields = $this->getSetting('fields');
+    $custom_items = $this->customFieldTypeManager->getCustomFieldItems($this->fieldDefinition->getSettings());
+    foreach ($custom_items as $name => $custom_item) {
+      if ($custom_item->getDataType() === 'uuid') {
+        continue;
+      }
+      $widget = $fields[$name]['type'] ?? $custom_item->getDefaultWidget();
+      $options = $this->customFieldWidgetManager->createOptionsForInstance($this->fieldDefinition->getName(), $custom_item, $widget, $fields[$name] ?? [], 'default');
+      try {
+        /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetInterface $plugin */
+        $plugin = $this->customFieldWidgetManager->getInstance($options);
+        $plugins[(string) $name] = $plugin;
+      }
+      catch (PluginException $e) {
+        // No errors applicable if we somehow have an invalid plugin.
+      }
+    }
+
+    return $plugins;
   }
 
 }

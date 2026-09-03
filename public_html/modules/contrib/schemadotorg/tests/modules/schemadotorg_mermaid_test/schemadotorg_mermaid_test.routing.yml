@@ -1,0 +1,8 @@
+schemadotorg_mermaid_test.diagram:
+  path: '/schemadotorg-mermaid-test'
+  defaults:
+    _title: 'Schema.org Mermaid Test'
+    _controller: 'Drupal\schemadotorg_mermaid_test\Controller\SchemaDotOrgMermaidTestController::diagram'
+  requirements:
+    # Needs to be accessed by an anonymous user.
+    _access: 'TRUE'

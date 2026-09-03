@@ -8,7 +8,6 @@ use Drupal\Core\Entity\ContentEntityConfirmFormBase;
 use Drupal\Core\File\Exception\InvalidStreamWrapperException;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
-use Drupal\Core\Url;
 use Drupal\file\FileInterface;
 use Drupal\trash\Exception\UnrestorableEntityException;
 use Drupal\trash\Trash;
@@ -19,6 +18,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides a generic base class for a content entity restore form.
  */
 class EntityRestoreForm extends ContentEntityConfirmFormBase implements WorkspaceSafeFormInterface {
+
+  use TrashOperationRedirectTrait;
 
   /**
    * The trash manager.
@@ -48,9 +49,8 @@ class EntityRestoreForm extends ContentEntityConfirmFormBase implements Workspac
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return Url::fromRoute('trash.admin_content_trash_entity_type', [
-      'entity_type_id' => $this->getEntity()->getEntityTypeId(),
-    ]);
+    // Cancelling leaves the entity in the trash, so it can still be viewed.
+    return $this->getTrashedEntityUrl() ?? $this->getTrashListingUrl();
   }
 
   /**
@@ -161,14 +161,11 @@ class EntityRestoreForm extends ContentEntityConfirmFormBase implements Workspac
   protected function getRedirectUrl() {
     $entity = $this->getEntity();
     if ($entity->hasLinkTemplate('canonical')) {
-      // Otherwise fall back to the default link template.
+      // The entity is back, so it can be viewed outside the trash context.
       return $entity->toUrl();
     }
-    else {
-      return Url::fromRoute('trash.admin_content_trash_entity_type', [
-        'entity_type_id' => $entity->getEntityTypeId(),
-      ]);
-    }
+
+    return $this->getTrashListingUrl();
   }
 
 }

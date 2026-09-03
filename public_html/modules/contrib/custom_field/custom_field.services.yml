@@ -19,6 +19,10 @@ services:
     class: Drupal\custom_field\Hook\ViewsHooks
     autowire: true
 
+  Drupal\custom_field\Hook\EntityHooks:
+    class: Drupal\custom_field\Hook\EntityHooks
+    autowire: true
+
   logger.channel.custom_field:
     parent: logger.channel_base
     arguments:
@@ -28,8 +32,6 @@ services:
     class: Drupal\custom_field\Plugin\CustomFieldTypeManager
     autowire: true
     parent: default_plugin_manager
-    arguments:
-      - '@plugin.manager.custom_field_widget'
 
   # Alias to CustomFieldTypeManager.
   Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface:
@@ -38,6 +40,8 @@ services:
   plugin.manager.custom_field_widget:
     class: Drupal\custom_field\Plugin\CustomFieldWidgetManager
     parent: default_plugin_manager
+    arguments:
+      - '@plugin.manager.custom_field_type'
 
   # Alias to CustomFieldWidgetManager.
   Drupal\custom_field\Plugin\CustomFieldWidgetManagerInterface:
@@ -59,8 +63,16 @@ services:
     arguments:
       - '@plugin.manager.custom_field_type'
 
+  plugin.manager.custom_field_component_prop_widget:
+    class: Drupal\custom_field\PluginManager\PropWidgetManager
+    parent: default_plugin_manager
+
+  #Alias to PropWidgetManager.
+  Drupal\custom_field\PluginManager\PropWidgetManagerInterface:
+    alias: plugin.manager.custom_field_component_prop_widget
+
   custom_field.update_manager:
-    class: Drupal\custom_field\CustomFieldUpdateManager
+    class: Drupal\custom_field\Service\UpdateManager
     arguments:
       - '@entity.definition_update_manager'
       - '@entity_type.manager'
@@ -74,10 +86,17 @@ services:
       - '@logger.channel.custom_field'
       - '@messenger'
 
+  # Alias to UpdateManager.
+  Drupal\custom_field\Service\UpdateManagerInterface:
+    alias: custom_field.update_manager
+
   custom_field.generate_data:
-    class: Drupal\custom_field\CustomFieldGenerateData
-    arguments:
-      - '@plugin.manager.custom_field_type'
+    class: Drupal\custom_field\Service\GenerateData
+    autowire: true
+
+  # Alias to GenerateData.
+  Drupal\custom_field\Service\GenerateDataInterface:
+    alias: custom_field.generate_data
 
   custom_field.tag_manager:
     class: Drupal\custom_field\TagManager

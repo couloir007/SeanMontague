@@ -34,7 +34,7 @@ class GeolocationLeafletJavascriptTest extends GeolocationJavascriptTestBase {
    *
    * @var array
    */
-  public static $testViews = ['geolocation_leaflet_test'];
+  public static array $testViews = ['geolocation_leaflet_test'];
 
   /**
    * {@inheritdoc}
@@ -110,7 +110,7 @@ class GeolocationLeafletJavascriptTest extends GeolocationJavascriptTestBase {
   /**
    * Tests the CommonMap style.
    */
-  public function testLeafletMap() {
+  public function testLeafletMap(): void {
     $this->drupalGet('geolocation-leaflet-test');
 
     $this->assertSession()->elementExists('css', '.geolocation-map-container');

@@ -231,7 +231,7 @@ class TrashSettingsForm extends ConfigFormBase {
    * for them, so the integration can be disabled and the form saved.
    */
   public static function getUnsupportedEntityTypes(): array {
-    return [
+    $unsupported_entity_types = [
       // Not tested enough to be supported.
       'comment',
       'user',
@@ -240,6 +240,22 @@ class TrashSettingsForm extends ConfigFormBase {
       // dangling reference that breaks the host entity edit form.
       'paragraph',
     ];
+
+    // Custom menu links can only be trashed inside a workspace if a module
+    // lifts the MenuTreeHierarchy constraint so the hierarchy can change in a
+    // pending revision (wse_menu does this). Without one there is a single
+    // shared menu tree, so trashing a link in a workspace would also drop it
+    // from the published menu. The constraint is the signal rather than a
+    // specific module, so anything providing the same support works.
+    $entity_type_manager = \Drupal::entityTypeManager();
+    if (\Drupal::hasService('workspaces.manager') && $entity_type_manager->hasDefinition('menu_link_content')) {
+      $constraints = $entity_type_manager->getDefinition('menu_link_content')->getConstraints();
+      if (isset($constraints['MenuTreeHierarchy'])) {
+        $unsupported_entity_types[] = 'menu_link_content';
+      }
+    }
+
+    return $unsupported_entity_types;
   }
 
 }

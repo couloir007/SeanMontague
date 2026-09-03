@@ -8,7 +8,6 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
-use Drupal\custom_field\Plugin\CustomField\EntityReferenceWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\user\EntityOwnerInterface;
 
@@ -29,15 +28,12 @@ class EntityReferenceAutocompleteWidget extends EntityReferenceWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    $settings = parent::defaultSettings();
-    $settings['settings'] = [
+    return [
       'match_operator' => 'CONTAINS',
       'match_limit' => 10,
       'size' => 60,
       'placeholder' => '',
-    ] + $settings['settings'];
-
-    return $settings;
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -45,30 +41,30 @@ class EntityReferenceAutocompleteWidget extends EntityReferenceWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
 
-    $element['settings']['match_operator'] = [
+    $element['match_operator'] = [
       '#type' => 'radios',
       '#title' => $this->t('Autocomplete matching'),
       '#default_value' => $settings['match_operator'],
       '#options' => $this->getMatchOperatorOptions(),
       '#description' => $this->t('Select the method used to collect autocomplete suggestions. Note that <em>Contains</em> can cause performance issues on sites with thousands of entities.'),
     ];
-    $element['settings']['match_limit'] = [
+    $element['match_limit'] = [
       '#type' => 'number',
       '#title' => $this->t('Number of results'),
       '#default_value' => $settings['match_limit'],
       '#min' => 0,
       '#description' => $this->t('The number of suggestions that will be listed. Use <em>0</em> to remove the limit.'),
     ];
-    $element['settings']['size'] = [
+    $element['size'] = [
       '#type' => 'number',
       '#title' => $this->t('Size of textfield'),
       '#default_value' => $settings['size'],
       '#min' => 1,
       '#required' => TRUE,
     ];
-    $element['settings']['placeholder'] = [
+    $element['placeholder'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Placeholder'),
       '#default_value' => $settings['placeholder'],
@@ -83,15 +79,16 @@ class EntityReferenceAutocompleteWidget extends EntityReferenceWidgetBase {
    */
   public function widget(FieldItemListInterface $items, int $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
+    $field_settings = $field->getFieldSettings();
     $entity = $items->getEntity();
     $target_type = $field->getTargetType();
-    if (!isset($settings['handler'])) {
-      $settings['handler'] = 'default:' . $target_type;
+    if (!isset($field_settings['handler'])) {
+      $field_settings['handler'] = 'default:' . $target_type;
     }
 
     // Append the match operation to the selection settings.
-    $selection_settings = $settings['handler_settings'] + [
+    $selection_settings = $field_settings['handler_settings'] + [
       'match_operator' => $settings['match_operator'],
       'match_limit' => $settings['match_limit'],
     ];
@@ -108,7 +105,7 @@ class EntityReferenceAutocompleteWidget extends EntityReferenceWidgetBase {
     $element += [
       '#type' => 'entity_autocomplete',
       '#target_type' => $target_type,
-      '#selection_handler' => $settings['handler'],
+      '#selection_handler' => $field_settings['handler'],
       '#selection_settings' => $selection_settings,
       // Entity reference field items are handling validation themselves via
       // the 'ValidReference' constraint.
@@ -126,7 +123,7 @@ class EntityReferenceAutocompleteWidget extends EntityReferenceWidgetBase {
       $element['#default_value'] = $referenced_entity;
     }
 
-    if ($bundle = $this->getAutocreateBundle($settings['handler_settings'], $target_type, $field)) {
+    if ($bundle = $this->getAutocreateBundle($field_settings['handler_settings'], $target_type, $field)) {
       $element['#autocreate'] = [
         'bundle' => $bundle,
         'uid' => ($entity instanceof EntityOwnerInterface) ? $entity->getOwnerId() : $this->currentUser->id(),

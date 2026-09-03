@@ -6,6 +6,7 @@ namespace Drupal\custom_field\Plugin\Validation\Constraint;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\custom_field\Plugin\CustomField\FieldType\LinkTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -58,7 +59,7 @@ class LinkAccessConstraintValidator extends ConstraintValidator implements Conta
       $name = $object->getName();
       $custom_items = $item->getCustomFieldManager()->getCustomFieldItems($item->getFieldDefinition()->getSettings());
       $subfield = $custom_items[$name] ?? NULL;
-      if (!$subfield) {
+      if (!$subfield instanceof LinkTypeInterface) {
         return;
       }
       try {

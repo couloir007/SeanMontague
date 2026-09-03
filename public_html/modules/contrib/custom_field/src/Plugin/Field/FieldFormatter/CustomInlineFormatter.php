@@ -65,13 +65,22 @@ class CustomInlineFormatter extends BaseFormatter {
       '#title' => $this->t('Item separator'),
       '#default_value' => $this->getSetting('item_separator'),
     ];
-    foreach ($this->getCustomFieldItems() as $name => $item) {
-      // Remove non-applicable settings.
-      unset($form['fields'][$name]['content']['formatter_settings']['label_display']);
-      unset($form['fields'][$name]['content']['wrappers']);
-    }
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function processFields(array $element, FormStateInterface $form_state, array $form): array {
+    $element = parent::processFields($element, $form_state, $form);
+    foreach ($this->getCustomFieldItems() as $name => $item) {
+      // Remove non-applicable settings.
+      unset($element[$name]['content']['formatter_settings']['label_display']);
+      unset($element[$name]['content']['wrappers']);
+    }
+
+    return $element;
   }
 
   /**
@@ -80,11 +89,18 @@ class CustomInlineFormatter extends BaseFormatter {
   public function settingsSummary(): array {
     $summary = parent::settingsSummary();
 
-    $summary[] = $this->t('Show labels: @show_labels', ['@show_labels' => $this->getSetting('label_display') ? 'Yes' : 'No']);
-    if ($this->getSetting('label_display')) {
-      $summary[] = $this->t('Label separator: @sep', ['@sep' => $this->getSetting('label_separator')]);
+    $show_labels = (bool) $this->getSetting('show_labels');
+    $summary[] = $this->t('Show labels: @show_labels', [
+      '@show_labels' => $show_labels ? 'Yes' : 'No',
+    ]);
+    if ($show_labels) {
+      $summary[] = $this->t('Label separator: @sep', [
+        '@sep' => $this->getSetting('label_separator'),
+      ]);
     }
-    $summary[] = $this->t('Item separator: @sep', ['@sep' => $this->getSetting('item_separator')]);
+    $summary[] = $this->t('Item separator: @sep', [
+      '@sep' => $this->getSetting('item_separator'),
+    ]);
 
     return $summary;
   }
@@ -118,7 +134,7 @@ class CustomInlineFormatter extends BaseFormatter {
         '#theme' => 'custom_field_item',
         '#field_name' => $field_name,
         '#name' => $value['name'],
-        '#value' => $value['value']['#markup'],
+        '#value' => $value['value'],
         '#label' => $value['label'],
         '#label_display' => 'hidden',
         '#type' => $value['type'],

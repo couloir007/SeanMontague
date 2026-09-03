@@ -2,50 +2,72 @@
 
 namespace Drupal\geolocation\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\geolocation\DataProviderInterface;
+use Drupal\geolocation\DataProviderManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'geolocation_token' formatter.
- *
- * @FieldFormatter(
- *   id = "geolocation_token",
- *   module = "geolocation",
- *   label = @Translation("Geolocation tokenized text"),
- *   field_types = {
- *     "geolocation"
- *   }
- * )
  */
+#[FieldFormatter(
+  id: 'geolocation_token',
+  label: new \Drupal\Core\StringTranslation\TranslatableMarkup('Geolocation tokenized text'),
+  field_types: ['geolocation']
+)]
 class GeolocationTokenFormatter extends FormatterBase {
 
   /**
-   * Data Provider.
+   * Data provider.
    *
    * @var \Drupal\geolocation\DataProviderInterface
    */
-  protected $dataProvider = NULL;
+  protected DataProviderInterface $dataProvider;
 
   /**
    * {@inheritdoc}
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings) {
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    $label,
+    $view_mode,
+    array $third_party_settings,
+    protected DataProviderManager $dataProviderManager,
+  ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
 
-    $this->dataProvider = \Drupal::service('plugin.manager.geolocation.dataprovider')->getDataProviderByFieldDefinition($field_definition);
-    if (empty($this->dataProvider)) {
-      throw new \Exception('Geolocation data provider not found');
-    }
+    $this->dataProvider = $this->dataProviderManager->getDataProviderByFieldDefinition($field_definition);
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function defaultSettings() {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): GeolocationTokenFormatter {
+    return new static(
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['label'],
+      $configuration['view_mode'],
+      $configuration['third_party_settings'],
+      $container->get('plugin.manager.geolocation.dataprovider')
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings(): array {
     $settings = [];
     $settings['tokenized_text'] = [
       'value' => '',
@@ -59,7 +81,7 @@ class GeolocationTokenFormatter extends FormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function settingsForm(array $form, FormStateInterface $form_state) {
+  public function settingsForm(array $form, FormStateInterface $form_state): array {
     $settings = $this->getSettings();
 
     $element['tokenized_text'] = [
@@ -83,7 +105,7 @@ class GeolocationTokenFormatter extends FormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function settingsSummary() {
+  public function settingsSummary(): array {
     $settings = $this->getSettings();
 
     $summary = [];
@@ -107,15 +129,9 @@ class GeolocationTokenFormatter extends FormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items, $langcode) {
-    $token_context = [
-      $this->fieldDefinition->getTargetEntityTypeId() => $items->getEntity(),
-    ];
-
+  public function viewElements(FieldItemListInterface $items, $langcode): array {
     $elements = [];
     foreach ($items as $delta => $item) {
-      $token_context['geolocation_current_item'] = $item;
-
       $tokenized_text = $this->getSetting('tokenized_text');
 
       if (
@@ -136,7 +152,7 @@ class GeolocationTokenFormatter extends FormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function calculateDependencies() {
+  public function calculateDependencies(): array {
     $dependencies = parent::calculateDependencies();
     $settings = $this->getSettings();
     if (!empty($settings['tokenized_text']['format'])) {

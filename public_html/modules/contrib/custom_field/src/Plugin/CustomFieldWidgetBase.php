@@ -53,6 +53,20 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
   protected ?ContentTranslationManagerInterface $contentTranslationManager;
 
   /**
+   * The custom field definition.
+   *
+   * @var \Drupal\custom_field\Plugin\CustomFieldTypeInterface|null
+   */
+  protected ?CustomFieldTypeInterface $customFieldDefinition;
+
+  /**
+   * The field definition name.
+   *
+   * @var string|null
+   */
+  protected ?string $fieldName;
+
+  /**
    * {@inheritdoc}
    */
   final public function __construct(array $configuration, $plugin_id, $plugin_definition, array $settings, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager, ?ContentTranslationManagerInterface $content_translation_manager = NULL) {
@@ -61,6 +75,8 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
     $this->moduleHandler = $module_handler;
     $this->languageManager = $language_manager;
     $this->contentTranslationManager = $content_translation_manager;
+    $this->fieldName = $configuration['field_name'] ?? NULL;
+    $this->customFieldDefinition = $configuration['custom_field_definition'] ?? NULL;
   }
 
   /**
@@ -89,12 +105,6 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
   public static function defaultSettings(): array {
     return [
       'label' => '',
-      'translatable' => FALSE,
-      'settings' => [
-        'description' => '',
-        'description_display' => 'after',
-        'required' => FALSE,
-      ],
     ];
   }
 
@@ -106,19 +116,20 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
     // override as necessary or just set #type and be on their merry way.
     $field_definition = $items->getFieldDefinition();
     $field_name = $field_definition->getName();
+    $field_settings = $field->getFieldSettings();
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $items->getEntity();
-    $settings = $field->getWidgetSetting('settings') ?? static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
     $is_required = $items->getFieldDefinition()->isRequired();
-    $description = !empty($settings['description']) ? $this->t('@description', ['@description' => $settings['description']]) : NULL;
+    $description = !empty($field_settings['description']) ? $this->t('@description', ['@description' => $field_settings['description']]) : NULL;
     /** @var \Drupal\custom_field\Plugin\Field\FieldType\CustomItem $item */
     $item = $items[$delta];
     $access = TRUE;
-    $parents = $form['#parents'];
+    $parents = $form['#parents'] ?? [];
     $field_parents = array_merge($parents, [$field_name, $delta, $field->getName()]);
     if (!$this->isDefaultValueWidget($form_state) && $entity->isTranslatable()) {
       $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
-      $is_translatable = $field_definition->isTranslatable() && $field->getWidgetSetting('translatable');
+      $is_translatable = $field_definition->isTranslatable() && $field_settings['translatable'];
       if (!$entity->isNew() && $entity->hasTranslation($langcode)) {
         $entity = $entity->getTranslation($langcode);
       }
@@ -126,12 +137,13 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
       $access = $is_default_translation || $is_translatable || $entity->isNew();
     }
 
+    $label = $settings['label'] ? trim($settings['label']) : '';
     return [
-      '#title' => $this->t('@label', ['@label' => $field->getLabel()]),
+      '#title' => $label ?: $field->getLabel(),
       '#description' => $description,
-      '#description_display' => $settings['description_display'] ?: NULL,
+      '#description_display' => $field_settings['description_display'] ?: NULL,
       '#default_value' => $item->{$field->getName()} ?? NULL,
-      '#required' => !(isset($form_state->getBuildInfo()['base_form_id']) && $form_state->getBuildInfo()['base_form_id'] == 'field_config_form') && $is_required && $settings['required'],
+      '#required' => !(isset($form_state->getBuildInfo()['base_form_id']) && $form_state->getBuildInfo()['base_form_id'] == 'field_config_form') && $is_required && $field_settings['required'],
       '#access' => $access,
       '#field_parents' => $field_parents,
     ];
@@ -141,76 +153,16 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
    * {@inheritdoc}
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
-    $label = $field->getLabel();
-    $translatable = $field->getWidgetSetting('translatable');
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
-    /** @var \Drupal\field_ui\Form\FieldConfigEditForm $form_object */
-    $form_object = $form_state->getFormObject();
-    /** @var \Drupal\Core\Field\FieldConfigInterface $field_definition */
-    $field_definition = $form_object->getEntity();
-    $bundle_is_translatable = FALSE;
-    if ($this->contentTranslationManager) {
-      $bundle_is_translatable = $this->contentTranslationManager->isEnabled($field_definition->getTargetEntityTypeId(), $field_definition->getTargetBundle());
-    }
+    $settings = $this->getSettings() + static::defaultSettings();
 
     // Some table columns containing raw markup.
     $element['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
-      '#default_value' => $label,
-      '#required' => TRUE,
-    ];
-    $element['translatable'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Users may translate this field'),
-      '#default_value' => $translatable,
-      '#states' => [
-        'visible' => [
-          ':input[name="translatable"]' => ['checked' => TRUE],
-        ],
-      ],
-      '#access' => $this->moduleHandler->moduleExists('content_translation') && $bundle_is_translatable,
-    ];
-    $element['settings'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Settings'),
-    ];
-
-    // Keep settings open during ajax updates.
-    if ($form_state->isRebuilding()) {
-      $trigger = $form_state->getTriggeringElement();
-      $parents = $trigger['#parents'];
-      if (in_array($field->getName(), $parents)) {
-        $element['settings']['#open'] = TRUE;
-      }
-    }
-
-    // Some table columns containing raw markup.
-    $element['settings']['required'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Required'),
-      '#description' => $this->t('This setting is only applicable when the field itself is required.'),
-      '#default_value' => $settings['required'],
-    ];
-
-    // Some table columns containing raw markup.
-    $element['settings']['description'] = [
-      '#type' => 'textarea',
-      '#title' => $this->t('Help text'),
-      '#description' => $this->t('Instructions to present to the user for this field on the editing form.'),
-      '#rows' => 2,
-      '#default_value' => $settings['description'],
-    ];
-
-    $element['settings']['description_display'] = [
-      '#type' => 'radios',
-      '#title' => $this->t('Help text position'),
-      '#options' => [
-        'before' => $this->t('Before input'),
-        'after' => $this->t('After input'),
-      ],
-      '#default_value' => $settings['description_display'],
-      '#required' => TRUE,
+      '#description' => $this->t('The form element label. Leave blank to use the default field label.'),
+      '#default_value' => $settings['label'] ?? '',
+      '#maxlength' => 255,
+      '#required' => FALSE,
     ];
 
     return $element;
@@ -240,26 +192,6 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
   /**
    * {@inheritdoc}
    */
-  public function getWidgetSettings(): array {
-    return $this->settings['settings'] ?? static::defaultSettings()['settings'];
-  }
-
-  /**
-   * Helper function to return a property from settings.
-   *
-   * @param string $key
-   *   The lookup key in the settings array.
-   *
-   * @return mixed
-   *   The property value.
-   */
-  public function getWidgetSetting(string $key): mixed {
-    return $this->settings['settings'][$key] ?? (static::defaultSettings()['settings'][$key] ?? NULL);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function isApplicable(CustomFieldTypeInterface $custom_item): bool {
     // By default, widgets are available for all fields.
     return TRUE;
@@ -268,7 +200,14 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
   /**
    * {@inheritdoc}
    */
-  public function calculateWidgetDependencies(array $settings): array {
+  public function calculateWidgetDependencies(): array {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function onWidgetDependencyRemoval(array $dependencies): array {
     return [];
   }
 

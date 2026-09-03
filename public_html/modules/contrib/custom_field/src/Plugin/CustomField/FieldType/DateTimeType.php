@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
+use Drupal\Core\Datetime\TimeZoneFormHelper;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\custom_field\Attribute\CustomFieldType;
@@ -65,6 +67,7 @@ class DateTimeType extends CustomFieldTypeBase implements DateTimeTypeInterface 
 
     $properties[$name] = DataDefinition::create('custom_field_datetime')
       ->setLabel(new TranslatableMarkup('@name', ['@name' => $name]))
+      ->setSetting('datetime_type', $datetime_type)
       ->setRequired(FALSE);
 
     $properties[$date] = DataDefinition::create('any')
@@ -90,7 +93,58 @@ class DateTimeType extends CustomFieldTypeBase implements DateTimeTypeInterface 
   /**
    * {@inheritdoc}
    */
-  public static function generateSampleValue(CustomFieldTypeInterface $field, string $target_entity_type): string {
+  public static function defaultFieldSettings(): array {
+    return [
+      'timezone_enabled' => FALSE,
+      'timezone_options' => [],
+      'seconds_enabled' => TRUE,
+    ] + parent::defaultFieldSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldSettingsForm(array &$form, FormStateInterface $form_state): array {
+    $element = parent::fieldSettingsForm($form, $form_state);
+    $settings = $this->getFieldSettings();
+    $date_time_type = $this->getDatetimeType();
+
+    if ($date_time_type == self::DATETIME_TYPE_DATETIME) {
+      $element['seconds_enabled'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Add seconds parameter to input widget'),
+        '#default_value' => $settings['seconds_enabled'],
+      ];
+      $timezone_options = TimeZoneFormHelper::getOptionsListByRegion();
+      $element['timezone_enabled'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Enable time zone selection'),
+        '#description' => $this->t('Allows users to set a time zone for the date value.'),
+        '#default_value' => $settings['timezone_enabled'],
+      ];
+      $element['timezone_options'] = [
+        '#type' => 'select',
+        '#multiple' => TRUE,
+        '#title' => $this->t('Time zone options'),
+        '#description' => $this->t('Select one or more time zones to display as options in the widget.<br />Hold down Ctrl (Windows) or Command (Mac) to select multiple.'),
+        '#description_display' => 'before',
+        '#options' => $timezone_options,
+        '#default_value' => $settings['timezone_options'],
+        '#states' => [
+          'visible' => [
+            ':input[name="settings[field_settings][' . $this->getName() . '][timezone_enabled]"]' => ['checked' => TRUE],
+          ],
+        ],
+      ];
+    }
+
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function generateSampleValue(CustomFieldTypeInterface $field, string $target_entity_type): string|array {
     $datetime_type = $field->getDatetimeType();
     $timestamp = \Drupal::time()->getRequestTime() - mt_rand(0, 86400 * 365);
     if ($datetime_type == self::DATETIME_TYPE_DATE) {

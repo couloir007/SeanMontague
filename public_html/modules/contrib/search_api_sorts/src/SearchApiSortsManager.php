@@ -30,11 +30,11 @@ class SearchApiSortsManager implements SearchApiSortsManagerInterface {
   protected $moduleHandler;
 
   /**
-   * The search api sorts field storage.
+   * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $searchApiSortsFieldStorage;
+  protected $entityTypeManager;
 
   /**
    * The search api display manager.
@@ -57,7 +57,7 @@ class SearchApiSortsManager implements SearchApiSortsManagerInterface {
    */
   public function __construct(RequestStack $request_stack, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, DisplayPluginManagerInterface $searchApiDisplayManager) {
     $this->currentRequest = $request_stack->getCurrentRequest();
-    $this->searchApiSortsFieldStorage = $entity_type_manager->getStorage('search_api_sorts_field');
+    $this->entityTypeManager = $entity_type_manager;
     $this->moduleHandler = $module_handler;
     $this->searchApiDisplayManager = $searchApiDisplayManager;
   }
@@ -80,7 +80,7 @@ class SearchApiSortsManager implements SearchApiSortsManagerInterface {
    * {@inheritdoc}
    */
   public function getEnabledSorts(DisplayInterface $display) {
-    return $this->searchApiSortsFieldStorage->loadByProperties([
+    return $this->entityTypeManager->getStorage('search_api_sorts_field')->loadByProperties([
       'status' => TRUE,
       'display_id' => $this->getEscapedConfigId($display->getPluginId()),
     ]);
@@ -96,7 +96,7 @@ class SearchApiSortsManager implements SearchApiSortsManagerInterface {
    *   An array containing sort fields for the given search display/
    */
   protected function getSorts(DisplayInterface $display) {
-    return $this->searchApiSortsFieldStorage->loadByProperties([
+    return $this->entityTypeManager->getStorage('search_api_sorts_field')->loadByProperties([
       'display_id' => $this->getEscapedConfigId($display->getPluginId()),
     ]);
   }

@@ -1,0 +1,11 @@
+plugin.plugin_configuration.geolocation.data_layer_provider.geolocation_default_layer:*:
+  type: geolocation.data_layer_provider_settings
+  label: 'Default Layer'
+
+plugin.plugin_configuration.geolocation.data_layer_provider.geolocation_views_attachment_layer:*:
+  type: geolocation.data_layer_provider_settings
+  label: 'Views Attachment'
+
+plugin.plugin_configuration.geolocation.data_layer_provider.geolocation_views_data_layer:*:
+  type: geolocation.data_layer_provider_settings
+  label: 'Views Data Layer'

@@ -2,33 +2,29 @@
 
 namespace Drupal\geolocation_gpx\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\geolocation\Plugin\Field\FieldFormatter\GeolocationMapFormatterBase;
 
 /**
  * Plugin implementation of the 'geofield' formatter.
- *
- * @FieldFormatter(
- *   id = "geolocation_gpx_file",
- *   module = "geolocation",
- *   label = @Translation("Geolocation GPX Formatter - Map"),
- *   field_types = {
- *     "geolocation_gpx_file",
- *     "file"
- *   }
- * )
  */
+#[FieldFormatter(
+  id: 'geolocation_gpx_map',
+  label: new \Drupal\Core\StringTranslation\TranslatableMarkup('Geolocation GPX Formatter - Map'),
+  field_types: ['geolocation_gpx']
+)]
 class GeolocationGpxMapFormatter extends GeolocationMapFormatterBase {
 
   /**
    * {@inheritdoc}
    */
-  static protected $dataProviderId = 'geolocation_gpx';
+  protected static string $dataProviderId = 'geolocation_gpx';
 
   /**
    * {@inheritdoc}
    */
-  public function settingsForm(array $form, FormStateInterface $form_state) {
+  public function settingsForm(array $form, FormStateInterface $form_state): array {
     $element = parent::settingsForm($form, $form_state);
 
     unset($element['set_marker']);

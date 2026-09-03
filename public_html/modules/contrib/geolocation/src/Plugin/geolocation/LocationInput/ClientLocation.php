@@ -2,24 +2,25 @@
 
 namespace Drupal\geolocation\Plugin\geolocation\LocationInput;
 
+use Drupal\geolocation\Attribute\LocationInput;
+use Drupal\Core\Url;
 use Drupal\geolocation\LocationInputBase;
 use Drupal\geolocation\LocationInputInterface;
 
 /**
  * Location based proximity center.
- *
- * @LocationInput(
- *   id = "client_location",
- *   name = @Translation("Client location"),
- *   description = @Translation("If client provides location, use it."),
- * )
  */
+#[LocationInput(
+  id: 'client_location',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('Client location'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('If client provides location, use it.')
+)]
 class ClientLocation extends LocationInputBase implements LocationInputInterface {
 
   /**
    * {@inheritdoc}
    */
-  public static function getDefaultSettings() {
+  public static function getDefaultSettings(): array {
     $settings = parent::getDefaultSettings();
 
     $settings['auto_submit'] = FALSE;
@@ -31,10 +32,10 @@ class ClientLocation extends LocationInputBase implements LocationInputInterface
   /**
    * {@inheritdoc}
    */
-  public function getSettingsForm($option_id = NULL, array $settings = [], $context = NULL) {
+  public function getSettingsForm(array $settings = [], $context = NULL): array {
     $settings = $this->getSettings($settings);
 
-    $form = parent::getSettingsForm($option_id, $settings, $context);
+    $form = parent::getSettingsForm($settings, $context);
 
     $form['auto_submit'] = [
       '#type' => 'checkbox',
@@ -57,38 +58,23 @@ class ClientLocation extends LocationInputBase implements LocationInputInterface
   /**
    * {@inheritdoc}
    */
-  public function getForm(string $center_option_id, array $center_option_settings, $context = NULL, ?array $default_value = NULL) {
-    $form = parent::getForm($center_option_id, $center_option_settings, $context, $default_value);
+  public function alterForm(array $form, array $settings, array $context = [], ?array $default_value = NULL): array {
+    $form = parent::alterForm($form, $settings, $context, $default_value);
 
-    $identifier = uniqid($center_option_id);
-
-    if (!empty($form['coordinates'])) {
-      $form['coordinates']['#attributes'] = [
+    $form['coordinates']['client_location'] = [
+      '#type' => 'link',
+      '#title' => $this->t('Locate me'),
+      '#url' => Url::fromUserInput('#'),
+      '#attributes' => [
         'class' => [
-          $identifier,
-          'location-input-client-location',
+          'js-hide',
+          'btn',
+          'button',
+          'geolocation-location-input-client-location',
         ],
-      ];
-
-      $form['coordinates']['#attached'] = [
-        'library' => [
-          'geolocation/location_input.client_location',
-        ],
-        'drupalSettings' => [
-          'geolocation' => [
-            'locationInput' => [
-              'clientLocation' => [
-                [
-                  'identifier' => $identifier,
-                  'autoSubmit' => $center_option_settings['auto_submit'],
-                  'hideForm' => $center_option_settings['hide_form'],
-                ],
-              ],
-            ],
-          ],
-        ],
-      ];
-    }
+      ],
+      '#weight' => 10,
+    ];
 
     return $form;
   }

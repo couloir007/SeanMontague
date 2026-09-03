@@ -6,12 +6,17 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test cases related to the 'check empty' feature.
  *
  * @group custom_field
+ * @runTestsInSeparateProcesses
  */
+#[Group('custom_field')]
+#[RunTestsInSeparateProcesses]
 class CheckEmptyTest extends BrowserTestBase {
 
   /**
@@ -70,28 +75,14 @@ class CheckEmptyTest extends BrowserTestBase {
         'settings' => [
           'field_settings' => [
             'string_1' => [
-              'type' => 'text',
-              'weight' => 0,
               'check_empty' => FALSE,
-              'widget_settings' => [
-                'label' => 'string_1',
-                'settings' => [
-                  'description' => '',
-                  'description_display' => 'after',
-                ],
-              ],
+              'description' => '',
+              'description_display' => 'after',
             ],
             'string_2' => [
-              'type' => 'text',
-              'weight' => 1,
               'check_empty' => TRUE,
-              'widget_settings' => [
-                'label' => 'string_2',
-                'settings' => [
-                  'description' => '',
-                  'description_display' => 'after',
-                ],
-              ],
+              'description' => '',
+              'description_display' => 'after',
             ],
           ],
         ],

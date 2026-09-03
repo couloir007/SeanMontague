@@ -2,6 +2,7 @@
 
 namespace Drupal\custom_field\Plugin\Field\FieldFormatter;
 
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -139,21 +140,37 @@ class CustomTemplateFormatter extends BaseFormatter {
     }
     else {
       $token_type = $this->tokenEntityMapper->getTokenTypeForEntityType($entity_type);
-      $form['advanced_tokens'] = [
-        '#type' => 'token_browser',
-        '#theme_wrappers' => ['fieldset'],
-        '#title' => $this->t('Advanced Tokens'),
-        '#token_types' => [$token_type],
-        '#recursion_limit' => $this->getSetting('advanced_tokens')['recursion_limit'],
-        '#recursion_limit_max' => 6,
-        '#global_types' => $this->getSetting('advanced_tokens')['global_types'],
-        '#show_settings' => TRUE,
-        '#states' => [
-          'visible' => [
-            ':input[name="' . $visibility_path . '[tokens]"]' => ['value' => 'advanced'],
+      // Use token_browser_link if available.
+      if ($this->moduleHandler->moduleExists('token_browser')) {
+        $form['advanced_tokens'] = [
+          '#theme' => 'token_browser_link',
+          '#theme_wrappers' => ['container'],
+          '#token_types' => [$token_type],
+          '#global_types' => TRUE,
+          '#states' => [
+            'visible' => [
+              ':input[name="' . $visibility_path . '[tokens]"]' => ['value' => 'advanced'],
+            ],
           ],
-        ],
-      ];
+        ];
+      }
+      else {
+        $form['advanced_tokens'] = [
+          '#type' => 'token_browser',
+          '#theme_wrappers' => ['fieldset'],
+          '#title' => $this->t('Advanced Tokens'),
+          '#token_types' => [$token_type],
+          '#recursion_limit' => $this->getSetting('advanced_tokens')['recursion_limit'],
+          '#recursion_limit_max' => 6,
+          '#global_types' => $this->getSetting('advanced_tokens')['global_types'],
+          '#show_settings' => TRUE,
+          '#states' => [
+            'visible' => [
+              ':input[name="' . $visibility_path . '[tokens]"]' => ['value' => 'advanced'],
+            ],
+          ],
+        ];
+      }
     }
 
     return $form;
@@ -194,6 +211,10 @@ class CustomTemplateFormatter extends BaseFormatter {
     else {
       foreach ($this->getCustomFieldItems() as $name => $custom_item) {
         $markup = $custom_item->value($item) ?? '';
+        // Convert map values to JSON.
+        if (in_array($custom_item->getDataType(), ['map', 'map_string'])) {
+          $markup = !empty($markup) ? Json::encode($markup) : NULL;
+        }
         $replacements["[$name]"] = $markup;
         $replacements["[$name:label]"] = $custom_item->getLabel();
       }

@@ -20,6 +20,8 @@ use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
     'color',
     'daterange',
     'datetime',
+    'decimal',
+    'duration',
     'file',
     'float',
     'email',
@@ -33,10 +35,12 @@ use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
     'string_long',
     'telephone',
     'time',
+    'time_range',
     'uri',
     'uuid',
     'viewfield',
   ],
+  weight: 10,
 )]
 class HiddenFormatter extends CustomFieldFormatterBase {
 

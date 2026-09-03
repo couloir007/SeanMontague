@@ -1,13 +1,13 @@
 name: Geolocation - Address
 type: module
 description: 'Address integration.'
-core_version_requirement: ^10.3 || ^11
+core_version_requirement: ^10 || ^11 || ^12
 package: Geolocation
 dependencies:
   - geolocation:geolocation
   - address:address
 
 # Information added by Drupal.org packaging script on 2026-06-21
-version: '8.x-3.15'
+version: '4.0.0'
 project: 'geolocation'
-datestamp: 1782062463
+datestamp: 1782057431

@@ -5,9 +5,9 @@ namespace Drupal\geolocation_address\Plugin\migrate;
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Exception\RequirementsException;
+use Drupal\migrate\Plugin\migrate\source\SqlBase;
 use Drupal\migrate\Plugin\MigrationDeriverTrait;
 use Drupal\migrate\Row;
-use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
  * Deriver geolocation field config migrations of Drupal 7 Location CCK fields.
@@ -25,7 +25,7 @@ class D7LocationFieldDeriver extends DeriverBase {
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
     $source = $this->getSourcePlugin($base_plugin_definition['source']['plugin']);
-    assert($source instanceof DrupalSqlBase);
+    assert($source instanceof SqlBase);
 
     try {
       $source->checkRequirements();

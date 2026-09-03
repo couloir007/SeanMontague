@@ -8,8 +8,8 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
-use Drupal\custom_field\Plugin\CustomField\MapWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
+use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
 
 /**
  * Plugin implementation of the 'map_key_value' widget.
@@ -22,32 +22,16 @@ use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
     'map',
   ],
 )]
-class MapKeyValueWidget extends MapWidgetBase {
-
-  /**
-   * Default new item.
-   *
-   * @return string[]
-   *   The default value for new items.
-   */
-  protected static function newItem(): array {
-    return [
-      'key' => '',
-      'value' => '',
-    ];
-  }
+class MapKeyValueWidget extends CustomFieldWidgetBase {
 
   /**
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    $settings = parent::defaultSettings();
-    $settings['settings'] = [
+    return [
       'key_label' => 'Key',
       'value_label' => 'Value',
-    ] + $settings['settings'];
-
-    return $settings;
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -55,9 +39,9 @@ class MapKeyValueWidget extends MapWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
 
-    $element['settings']['key_label'] = [
+    $element['key_label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Key label'),
       '#description' => $this->t('The table header label for key column'),
@@ -65,7 +49,7 @@ class MapKeyValueWidget extends MapWidgetBase {
       '#required' => TRUE,
       '#maxlength' => 128,
     ];
-    $element['settings']['value_label'] = [
+    $element['value_label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Value label'),
       '#description' => $this->t('The table header label for value column'),
@@ -85,74 +69,23 @@ class MapKeyValueWidget extends MapWidgetBase {
     $element['#element_validate'] = [[static::class, 'validateArrayValues']];
     /** @var \Drupal\Core\Field\FieldItemInterface $item */
     $item = $items[$delta];
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
-    $field_name = $items->getFieldDefinition()->getName();
-    $custom_field_name = $field->getName();
-    $wrapper_id = $this->getUniqueElementId($form, $field_name, $delta, $custom_field_name);
-    $name_key = str_replace('-', '_', $wrapper_id);
-    $field_parents = $element['#field_parents'];
+    $settings = $this->getSettings() + static::defaultSettings();
 
-    if (!$form_state->has($wrapper_id)) {
-      $default_value = $item->{$custom_field_name} ?? [];
-      $form_state->set($wrapper_id, $default_value);
-    }
-
-    $map_items = $form_state->get($wrapper_id);
-
-    $element['data'] = [
-      '#type' => 'table',
-      '#header' => [
-        $settings['key_label'] ?? $this->t('Key'),
-        $settings['value_label'] ?? $this->t('Label'),
-        '',
-      ],
-      '#empty' => $settings['table_empty'] ?? NULL,
+    $element['#type'] = 'custom_field_multivalue';
+    $element['#default_value'] = $item->{$field->getName()} ?? [];
+    $element['items'] = [
+      '#type' => 'container',
       '#attributes' => [
-        'class' => ['customfield-map-table'],
+        'class' => ['custom-field-element-grid-2'],
       ],
-      '#prefix' => '<div id="' . $wrapper_id . '">',
-      '#suffix' => '</div>',
-      '#wrapper_id' => $wrapper_id,
-    ];
-    foreach ($map_items as $key => $value) {
-      $element['data'][$key]['key'] = [
+      'key' => [
         '#type' => 'textfield',
-        '#title' => $this->t('Key'),
-        '#title_display' => 'invisible',
-        '#default_value' => $value['key'] ?? '',
-        '#required' => TRUE,
-      ];
-      $element['data'][$key]['value'] = [
-        '#type' => 'textfield',
-        '#title' => $this->t('Value'),
-        '#title_display' => 'invisible',
-        '#default_value' => $value['value'] ?? '',
-        '#required' => TRUE,
-      ];
-      $element['data'][$key]['remove'] = [
-        '#type' => 'submit',
-        '#value' => $this->t('Remove'),
-        '#submit' => [[static::class, 'removeItem']],
-        '#name' => $name_key . '_' . $key . '_remove',
-        '#attributes' => ['data-key' => $key],
-        '#ajax' => [
-          'callback' => [$this, 'actionCallback'],
-          'wrapper' => $wrapper_id,
-        ],
-        '#limit_validation_errors' => [[...$field_parents, 'data', $key, 'remove']],
-      ];
-    }
-
-    $element['add_item'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Add item'),
-      '#submit' => [[static::class, 'addItem']],
-      '#name' => $name_key . '_add_item',
-      '#ajax' => [
-        'callback' => [$this, 'actionCallback'],
-        'wrapper' => $wrapper_id,
+        '#title' => $settings['key_label'] ?: $this->t('Key'),
       ],
-      '#limit_validation_errors' => [$field_parents],
+      'value' => [
+        '#type' => 'textfield',
+        '#title' => $settings['value_label'] ?: $this->t('Value'),
+      ],
     ];
 
     return $element;
@@ -170,36 +103,50 @@ class MapKeyValueWidget extends MapWidgetBase {
    * @see \Drupal\Core\Render\Element\FormElement::processPattern()
    */
   public static function validateArrayValues(array $element, FormStateInterface $form_state): void {
-    $wrapper_id = $element['data']['#wrapper_id'];
-    $values = $element['data']['#value'] ?? NULL;
+    $values = $element['#value'] ?? [];
     $filtered_values = [];
     $has_errors = FALSE;
-    if (is_array($values)) {
-      $unique_keys = [];
-      foreach ($values as $key => $value) {
-        if (!is_array($value)) {
-          continue;
-        }
-        $filtered_value = [
-          'key' => $value['key'] ? trim($value['key']) : '',
-          'value' => $value['value'] ? trim($value['value']) : '',
+    $unique_keys = [];
+    foreach ($values as $key => $value) {
+      if (!is_array($value) || !isset($value['items'])) {
+        continue;
+      }
+      $container = $element[$key]['items'];
+      $items = $value['items'];
+      $item_key = $items['key'] ? trim($items['key']) : '';
+      $item_value = $items['value'] ? trim($items['value']) : '';
+
+      // Skip if both values are empty.
+      if ($item_key === '' && $item_value === '') {
+        continue;
+      }
+
+      // If either key or value is empty, set an error.
+      elseif ($item_key === '' || $item_value === '') {
+        $form_state->setError($container, t('Both %key and %value are required.', [
+          '%key' => $container['key']['#title'],
+          '%value' => $container['value']['#title'],
+        ]));
+      }
+      // Make sure each key is unique.
+      $unique_key = strtolower($item_key);
+      if (in_array($unique_key, $unique_keys)) {
+        $has_errors = TRUE;
+        break;
+      }
+      else {
+        $unique_keys[] = $unique_key;
+        $filtered_values[$key] = [
+          'key' => $item_key,
+          'value' => $item_value,
         ];
-        // Make sure each key is unique.
-        if (in_array($filtered_value['key'], $unique_keys)) {
-          $has_errors = TRUE;
-          break;
-        }
-        else {
-          $unique_keys[] = $filtered_value['key'];
-          $filtered_values[$key] = $filtered_value;
-        }
       }
     }
+
     if ($has_errors) {
       $form_state->setError($element, t('All keys must be unique.'));
     }
     else {
-      $form_state->set($wrapper_id, $filtered_values);
       $form_state->setValueForElement($element, $filtered_values);
     }
   }

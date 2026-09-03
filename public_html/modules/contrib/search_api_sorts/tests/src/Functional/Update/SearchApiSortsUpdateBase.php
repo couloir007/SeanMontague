@@ -33,9 +33,17 @@ abstract class SearchApiSortsUpdateBase extends UpdatePathTestBase {
    * {@inheritdoc}
    */
   protected function setDatabaseDumpFiles() {
-    $filled = DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/drupal-9.4.0.filled.standard.php.gz';
-    if (\Drupal::VERSION < 10) {
-      $filled = DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/drupal-8.8.0.filled.standard.php.gz';
+    $fixtures = DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/';
+    // Older fixtures lack the {router} alias column of system_update_11201().
+    $filled = $fixtures . 'drupal-11.3.0.filled.standard.php.gz';
+    if (!file_exists($filled)) {
+      $filled = $fixtures . 'drupal-10.3.0.filled.standard.php.gz';
+    }
+    if (version_compare(\Drupal::VERSION, '11', '<')) {
+      $filled = $fixtures . 'drupal-9.4.0.filled.standard.php.gz';
+    }
+    if (version_compare(\Drupal::VERSION, '10', '<')) {
+      $filled = $fixtures . 'drupal-8.8.0.filled.standard.php.gz';
     }
 
     $this->databaseDumpFiles = [

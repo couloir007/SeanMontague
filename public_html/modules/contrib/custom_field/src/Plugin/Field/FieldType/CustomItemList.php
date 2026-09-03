@@ -8,12 +8,27 @@ use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Field\FieldItemList;
 use Drupal\Core\TypedData\Exception\MissingDataException;
+use Drupal\Core\Validation\Plugin\Validation\Constraint\NotNullConstraint;
 use Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface;
 
 /**
  * Represents a configurable entity custom field.
  */
 class CustomItemList extends FieldItemList implements CustomFieldItemListInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConstraints(): array {
+    $constraints = parent::getConstraints();
+    foreach ($constraints as $constraint) {
+      if ($constraint instanceof NotNullConstraint) {
+        $constraint->message = $this->t('@label is required', ['@label' => $this->getFieldDefinition()->getLabel()]);
+      }
+    }
+
+    return $constraints;
+  }
 
   /**
    * {@inheritdoc}

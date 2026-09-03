@@ -2,8 +2,8 @@
 
 namespace Drupal\geolocation_address\Plugin\migrate\field;
 
-use Drupal\address\Plugin\migrate\field\AddressField as LocationAddress;
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\address\Plugin\migrate\field\AddressField as LocationAddress;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\migrate\Plugin\MigrationInterface;
 
@@ -42,7 +42,7 @@ class Location extends LocationAddress {
   /**
    * {@inheritdoc}
    */
-  public function defineValueProcessPipeline(MigrationInterface $migration, $field_name, $data) {
+  public function defineValueProcessPipeline(MigrationInterface $migration, mixed $field_name, mixed $data): void {
     parent::defineValueProcessPipeline($migration, $field_name, $data);
     // Address cannot store geographical locations, so we need a separate
     // geolocation field.
@@ -73,7 +73,9 @@ class Location extends LocationAddress {
         ]
       )
     );
-    $migration->set('migration_dependencies', $migration_dependencies);
+    if (method_exists($migration, 'set')) {
+      $migration->set('migration_dependencies', $migration_dependencies);
+    }
   }
 
 }

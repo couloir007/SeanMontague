@@ -1,0 +1,9 @@
+{
+  "name": "drupal/geolocation_geocodio",
+  "type": "drupal-module",
+  "description": "Geocodio integration.",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "geocodio/geocodio-library-php ": "^3.0"
+  }
+}

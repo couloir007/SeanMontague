@@ -1,0 +1,20 @@
+plugin.plugin_configuration.geolocation.tile_layer_provider.geolocation_tile_thunderforest:
+  type: geolocation.tile_layer_provider_settings
+  label: 'Thunderforest Tiles'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        apikey:
+          type: string
+          label: 'API Key'
+    layers:
+      type: sequence
+      label: 'Available layers'
+      sequence:
+        type: mapping
+        mapping:
+          enabled:
+            type: integer
+

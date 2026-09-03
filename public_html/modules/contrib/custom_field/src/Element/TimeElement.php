@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\custom_field\Element;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\FormElementBase;
 use Drupal\custom_field\Time;
@@ -22,11 +23,10 @@ use Drupal\custom_field\Time;
  * ];
  * @endcode
  *
- * @FormElement("time_cf")
- *
  * A stripped copy of
  *  https://git.drupalcode.org/project/time_field/-/blob/2.x/src/Element/TimeElement.php.
  */
+#[FormElement('time_cf')]
 class TimeElement extends FormElementBase {
 
   /**
@@ -51,7 +51,7 @@ class TimeElement extends FormElementBase {
   /**
    * {@inheritdoc}
    */
-  public static function valueCallback(&$element, $input, FormStateInterface $form_state): int {
+  public static function valueCallback(&$element, $input, FormStateInterface $form_state): ?int {
 
     if ($input === FALSE && !is_null($element['#default_value'])) {
       $input = $element['#default_value'];
@@ -61,7 +61,7 @@ class TimeElement extends FormElementBase {
       return Time::createFromHtml5Format($input)->getTimestamp();
     }
 
-    return Time::EMPTY_VALUE;
+    return NULL;
   }
 
   /**
@@ -79,7 +79,7 @@ class TimeElement extends FormElementBase {
     $element['#attributes']['type'] = 'time';
     $element['#attributes']['class'] = ['form-time'];
 
-    if (is_int($element['#value']) && $element['#value'] !== Time::EMPTY_VALUE) {
+    if (is_int($element['#value'])) {
       $element['#value'] = Time::createFromTimestamp($element['#value'])
         ->formatForWidget($element['#show_seconds']);
     }

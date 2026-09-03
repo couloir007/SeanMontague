@@ -1,0 +1,11 @@
+name: 'Schema.org Blueprints Mermaid test'
+type: module
+description: 'Support module for Schema.org Blueprints Mermaid testing.'
+package: Testing
+dependencies:
+  - 'schemadotorg:schemadotorg'
+
+# Information added by Drupal.org packaging script on 2026-07-15
+version: '1.0.0-alpha38'
+project: 'schemadotorg'
+datestamp: 1784128780

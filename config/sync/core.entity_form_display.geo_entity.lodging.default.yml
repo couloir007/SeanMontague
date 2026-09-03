@@ -168,9 +168,42 @@ content:
     weight: 155
     region: content
     settings:
-      label: true
       wrapper: fieldset
+      label_value: ''
+      label_limit: 60
+      label_prefix: Item
+      auto_collapse: false
       open: true
+      fields:
+        contact_type:
+          weight: 0
+          type: select
+          label: 'Contact type'
+          empty_option: '- Select -'
+        telephone:
+          weight: 1
+          type: text
+          label: Telephone
+          size: 60
+          placeholder: ''
+          maxlength: 255
+          maxlength_js: false
+        email:
+          weight: 2
+          type: text
+          label: Email
+          size: 60
+          placeholder: ''
+          maxlength: 255
+          maxlength_js: false
+        description:
+          weight: 3
+          type: text
+          label: Description
+          size: 60
+          placeholder: ''
+          maxlength: 255
+          maxlength_js: false
     third_party_settings: {  }
   schema_description:
     type: text_textarea

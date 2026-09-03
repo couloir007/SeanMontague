@@ -1,0 +1,23 @@
+geolocation_geometry.geometry_format_file_download:
+  path: '/geolocation/geometry-file-download/{format}/{entity_type}/{entity_id}/{field_name}/{delta}'
+  defaults:
+    _controller: '\Drupal\geolocation_geometry\Controller\GeometryFormatFileDownloadController::download'
+    _title: 'Geometry File Download'
+    format: 'geojson'
+    delta: -1
+  requirements:
+    _permission: 'access content'
+  options:
+    parameters:
+      format:
+        type: string
+      entity_type:
+        type: 'entity:type'
+        constraints:
+          type: '[a-zA-Z_]+'
+      entity_id:
+        type: 'entity:id'
+      field_name:
+        type: 'string'
+      delta:
+        type: 'integer'

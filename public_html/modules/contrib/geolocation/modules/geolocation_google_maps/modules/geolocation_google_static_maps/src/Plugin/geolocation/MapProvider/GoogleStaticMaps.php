@@ -2,25 +2,20 @@
 
 namespace Drupal\geolocation_google_static_maps\Plugin\geolocation\MapProvider;
 
+use Drupal\geolocation\Attribute\MapProvider;
 use Drupal\Core\Url;
 use Drupal\geolocation\Element\GeolocationMap;
 use Drupal\geolocation_google_maps\GoogleMapsProviderBase;
 
 /**
  * Provides Google Maps.
- *
- * @MapProvider(
- *   id = "google_static_maps",
- *   name = @Translation("Google Static Maps"),
- *   description = @Translation("You do require an API key for this plugin to work."),
- * )
  */
+#[MapProvider(
+  id: 'google_static_maps',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('Google Static Maps'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('You do require an API key for this plugin to work.')
+)]
 class GoogleStaticMaps extends GoogleMapsProviderBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static $googleMapsApiUrlPath = '/maps/api/staticmap';
 
   /**
    * {@inheritdoc}
@@ -40,8 +35,8 @@ class GoogleStaticMaps extends GoogleMapsProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function getSettingsForm(array $settings, array $parents = []): array {
-    $form = parent::getSettingsForm($settings, $parents);
+  public function getSettingsForm(array $settings, array $parents = [], array $context = []): array {
+    $form = parent::getSettingsForm($settings, $parents, $context);
     $parents_string = '';
     if ($parents) {
       $parents_string = implode('][', $parents) . '][';
@@ -51,22 +46,22 @@ class GoogleStaticMaps extends GoogleMapsProviderBase {
       '#type' => 'number',
       '#description' => $this->t('Enter width in pixels. Free users maximum 640.'),
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\Number', 'preRenderNumber'],
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ]);
     $form['height'] = array_replace($form['height'], [
       '#type' => 'number',
       '#description' => $this->t('Enter height in pixels. Free users maximum 640.'),
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\Number', 'preRenderNumber'],
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ]);
 
@@ -81,11 +76,11 @@ class GoogleStaticMaps extends GoogleMapsProviderBase {
       ],
       '#default_value' => $settings['scale'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
         ['\Drupal\Core\Render\Element\Select', 'processSelect'],
       ],
       '#pre_render' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
 
@@ -102,11 +97,11 @@ class GoogleStaticMaps extends GoogleMapsProviderBase {
       ],
       '#default_value' => $settings['format'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
         ['\Drupal\Core\Render\Element\Select', 'processSelect'],
       ],
       '#pre_render' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
 
@@ -150,7 +145,7 @@ class GoogleStaticMaps extends GoogleMapsProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function alterRenderArray(array $render_array, array $map_settings, array $context = []): array {
+  public function alterRenderArray(array $render_array, array $map_settings = [], array $context = []): array {
     $additional_parameters = [
       'type' => strtolower($map_settings['type']),
       'size' => filter_var($map_settings['width'], FILTER_SANITIZE_NUMBER_INT) . 'x' . filter_var($map_settings['height'], FILTER_SANITIZE_NUMBER_INT),
@@ -164,7 +159,7 @@ class GoogleStaticMaps extends GoogleMapsProviderBase {
       $additional_parameters['center'] = $render_array['#centre']['lat'] . ',' . $render_array['#centre']['lng'];
     }
 
-    $static_map_url = $this->getGoogleMapsApiUrl($additional_parameters);
+    $static_map_url = $this->googleMapsService->getGoogleMapsApiUrl($additional_parameters, '/staticmap');
 
     $locations = GeolocationMap::getLocations($render_array);
 

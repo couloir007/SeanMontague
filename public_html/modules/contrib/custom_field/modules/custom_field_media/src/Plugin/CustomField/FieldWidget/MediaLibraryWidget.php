@@ -20,7 +20,7 @@ use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
-use Drupal\custom_field\Plugin\CustomField\EntityReferenceWidgetBase;
+use Drupal\custom_field\Plugin\CustomField\FieldWidget\EntityReferenceWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\field_ui\FieldUI;
 use Drupal\media\Entity\Media;
@@ -53,10 +53,9 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    $settings = parent::defaultSettings();
-    $settings['settings']['media_types'] = [];
-
-    return $settings;
+    return [
+      'media_types' => [],
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -64,14 +63,14 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
-    $media_type_ids = $this->getAllowedMediaTypeIdsSorted($settings);
+    $field_settings = $field->getFieldSettings();
+    $media_type_ids = $this->getAllowedMediaTypeIdsSorted($field_settings);
 
     if (count($media_type_ids) <= 1) {
       return $element;
     }
 
-    $element['settings']['media_types'] = [
+    $element['media_types'] = [
       '#type' => 'table',
       '#header' => [
         $this->t('Tab order'),
@@ -92,7 +91,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
     $weight = 0;
     foreach ($media_types as $media_type_id => $media_type) {
       $label = $media_type->label();
-      $element['settings']['media_types'][$media_type_id] = [
+      $element['media_types'][$media_type_id] = [
         'label' => ['#markup' => $label],
         'weight' => [
           '#type' => 'weight',
@@ -160,7 +159,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
     $wrapper_id = $this->getUniqueElementId($form, $field_name, $delta, $field->getName());
     $name_key = str_replace('-', '_', $wrapper_id);
     $limit_validation_errors = [$field_parents];
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $field_settings = $field->getFieldSettings();
     $item = $items[$delta];
     $input = $form_state->getUserInput();
     $referenced_entity = NULL;
@@ -183,7 +182,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
       '#type' => 'fieldset',
       '#cardinality' => 1,
       // If no target bundles are specified, all target bundles are allowed.
-      '#target_bundles' => $settings['handler_settings']['target_bundles'] ?? [],
+      '#target_bundles' => $field_settings['handler_settings']['target_bundles'] ?? [],
       '#attributes' => [
         'id' => $wrapper_id,
         'class' => ['js-media-library-widget'],
@@ -197,7 +196,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
     ];
     $element['#attached']['library'][] = 'media_library/widget';
 
-    if ($settings['required']) {
+    if ($field_settings['required']) {
       $element['#element_validate'][] = [static::class, 'validateRequired'];
     }
 
@@ -205,7 +204,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
     // ::getAllowedMediaTypeIdsSorted() returns all existing media types. When
     // the list of allowed types is an empty array, we show a message to users
     // and ask them to configure the field if they have access.
-    $allowed_media_type_ids = $this->getAllowedMediaTypeIdsSorted($settings);
+    $allowed_media_type_ids = $this->getAllowedMediaTypeIdsSorted($field_settings);
     if (!$allowed_media_type_ids) {
       $element['no_types_message'] = [
         '#markup' => $this->getNoMediaTypesAvailableMessage($items->getFieldDefinition()),
@@ -432,7 +431,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
    * Gets the enabled media type IDs sorted by weight.
    *
    * @param array<string, mixed> $settings
-   *   The widget settings.
+   *   The field settings.
    *
    * @return array|null
    *   The media type IDs sorted by weight.
@@ -442,7 +441,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
    */
   protected function getAllowedMediaTypeIdsSorted(array $settings): ?array {
     // Get the media type IDs sorted by the user in the settings form.
-    $sorted_media_type_ids = $settings['media_types'] ?? [];
+    $sorted_media_type_ids = $this->getSetting('media_types');
 
     // Get the configured media types from the field storage.
     $handler_settings = $settings['handler_settings'];

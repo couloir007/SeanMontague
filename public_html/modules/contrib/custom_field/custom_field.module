@@ -5,18 +5,19 @@
  * Contains custom_field.module.
  */
 
-use Drupal\Component\Utility\Html;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\Core\Hook\Attribute\LegacyModuleImplementsAlter;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Template\Attribute;
+use Drupal\custom_field\Hook\EntityHooks;
 use Drupal\custom_field\Hook\FormHooks;
 use Drupal\custom_field\Hook\GeneralHooks;
 use Drupal\custom_field\Hook\ThemeHooks;
 use Drupal\custom_field\Hook\TokenHooks;
 use Drupal\custom_field\Hook\ViewsHooks;
-use Drupal\custom_field\TagManagerInterface;
 use Drupal\field\FieldStorageConfigInterface;
 
 /**
@@ -91,63 +92,67 @@ function custom_field_field_views_data(FieldStorageConfigInterface $field_storag
 
 /**
  * Prepares variables for custom-field template.
+ *
+ * The preprocess function is now registered as an 'initial preprocess'
+ * callback in hook_theme(). This procedural wrapper exists only for
+ * backwards compatibility with Drupal core < 11.2.
  */
 function template_preprocess_custom_field(array &$variables): void {
-  $variables['items'] = $variables['elements']['#items'];
-  $variables['field_name'] = $variables['elements']['#field_name'];
-  // Set the item attributes.
-  foreach ($variables['elements']['#items'] as &$item) {
-    // Attributes are optional, so we check if it's set first and process
-    // appropriately.
-    if (isset($item['attributes'])) {
-      $item['attributes'] = new Attribute($item['attributes']);
-    }
-    else {
-      $item['attributes'] = new Attribute();
-    }
-  }
+  \Drupal::service(ThemeHooks::class)->preprocessCustomField($variables);
 }
 
 /**
  * Prepares variables for custom-field-item template.
+ *
+ * The preprocess function is now registered as an 'initial preprocess'
+ * callback in hook_theme(). This procedural wrapper exists only for
+ * backwards compatibility with Drupal core < 11.2.
  */
 function template_preprocess_custom_field_item(array &$variables): void {
-  $wrappers = $variables['elements']['#wrappers'];
-  // Set wrapper classes.
-  if (!empty($wrappers['field_wrapper_classes'])) {
-    $wrapper_classes = explode(' ', $wrappers['field_wrapper_classes']);
-    foreach ($wrapper_classes as $class) {
-      $variables['attributes']['class'][] = Html::cleanCssIdentifier($class, []);
-    }
-  }
-  // Set field classes.
-  if (!empty($wrappers['field_classes'])) {
-    $field_classes = explode(' ', $wrappers['field_classes']);
-    foreach ($field_classes as $class) {
-      $variables['content_attributes']['class'][] = Html::cleanCssIdentifier($class, []);
-    }
-  }
-  // Set label classes.
-  if (!empty($wrappers['label_classes'])) {
-    $label_classes = explode(' ', $wrappers['label_classes']);
-    foreach ($label_classes as $class) {
-      $variables['title_attributes']['class'][] = Html::cleanCssIdentifier($class, []);
-    }
-  }
+  \Drupal::service(ThemeHooks::class)->preprocessCustomFieldItem($variables);
+}
 
-  $variables['display_label_tag'] = $wrappers['label_tag'] !== TagManagerInterface::NO_MARKUP_VALUE;
-  $variables['display_field_tag'] = $wrappers['field_tag'] !== TagManagerInterface::NO_MARKUP_VALUE;
-  $variables['display_field_wrapper_tag'] = $wrappers['field_wrapper_tag'] !== TagManagerInterface::NO_MARKUP_VALUE;
-  $variables['field_wrapper_tag'] = $wrappers['field_wrapper_tag'];
-  $variables['field_tag'] = $wrappers['field_tag'];
-  $variables['label_tag'] = $wrappers['label_tag'];
-  $variables['label'] = $variables['elements']['#label'];
-  $variables['label_display'] = $variables['elements']['#label_display'];
-  $variables['label_hidden'] = ($variables['elements']['#label_display'] == 'hidden');
-  $variables['value'] = $variables['elements']['#value'];
-  $variables['name'] = $variables['elements']['#name'];
-  $variables['type'] = $variables['elements']['#type'];
-  $variables['field_name'] = $variables['elements']['#field_name'];
+/**
+ * Prepares variables for custom-field-daterange template.
+ *
+ * The preprocess function is now registered as an 'initial preprocess'
+ * callback in hook_theme(). This procedural wrapper exists only for
+ * backwards compatibility with Drupal core < 11.2.
+ */
+function template_preprocess_custom_field_daterange(array &$variables): void {
+  \Drupal::service(ThemeHooks::class)->preprocessCustomFieldDaterange($variables);
+}
+
+/**
+ * Prepares variables for custom-field-time-range template.
+ *
+ * The preprocess function is now registered as an 'initial preprocess'
+ * callback in hook_theme(). This procedural wrapper exists only for
+ * backwards compatibility with Drupal core < 11.2.
+ */
+function template_preprocess_custom_field_time_range(array &$variables): void {
+  \Drupal::service(ThemeHooks::class)->preprocessCustomFieldTimeRange($variables);
+}
+
+/**
+ * Prepares variables for custom-field-hierarchical-formatter template.
+ *
+ * The preprocess function is now registered as an 'initial preprocess'
+ * callback in hook_theme(). This procedural wrapper exists only for
+ * backwards compatibility with Drupal core < 11.2.
+ */
+function template_preprocess_custom_field_hierarchical_formatter(array &$variables): void {
+  \Drupal::service(ThemeHooks::class)->preprocessCustomFieldHierarchicalFormatter($variables);
+}
+
+/**
+ * Implements hook_preprocess_field_multiple_value_form().
+ */
+// @phpstan-ignore-next-line
+#[LegacyHook]
+// phpcs:ignore Squiz.WhiteSpace.FunctionSpacing.Before
+function custom_field_preprocess_field_multiple_value_form(array &$variables): void {
+  \Drupal::service(ThemeHooks::class)->preprocessFieldMultipleValueForm($variables);
 }
 
 /**
@@ -181,6 +186,36 @@ function custom_field_field_widget_complete_form_alter(array &$element, FormStat
 }
 
 /**
+ * Implements hook_ENTITY_TYPE_insert() for node entities.
+ */
+// @phpstan-ignore-next-line
+#[LegacyHook]
+// phpcs:ignore Squiz.WhiteSpace.FunctionSpacing.Before
+function custom_field_node_insert(EntityInterface $node): void {
+  \Drupal::service(EntityHooks::class)->nodeInsert($node);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update() for node entities.
+ */
+// @phpstan-ignore-next-line
+#[LegacyHook]
+// phpcs:ignore Squiz.WhiteSpace.FunctionSpacing.Before
+function custom_field_node_update(EntityInterface $node): void {
+  \Drupal::service(EntityHooks::class)->nodeUpdate($node);
+}
+
+/**
+ * Implements hook_entity_view_display_presave().
+ */
+// @phpstan-ignore-next-line
+#[LegacyHook]
+// phpcs:ignore Squiz.WhiteSpace.FunctionSpacing.Before
+function custom_field_entity_view_display_presave(EntityViewDisplayInterface $display): void {
+  \Drupal::service(EntityHooks::class)->entityViewDisplayPresave($display);
+}
+
+/**
  * Implements hook_sam_allowed_widget_types_alter().
  *
  * Allows custom fields to work with the Simple Add More module.
@@ -192,4 +227,22 @@ function custom_field_field_widget_complete_form_alter(array &$element, FormStat
 // phpcs:ignore Squiz.WhiteSpace.FunctionSpacing.Before
 function custom_field_sam_allowed_widget_types_alter(array &$widget_types): void {
   \Drupal::service(GeneralHooks::class)->samAllowedWidgetTypesAlter($widget_types);
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+// @phpstan-ignore-next-line
+#[LegacyModuleImplementsAlter]
+// phpcs:ignore Squiz.WhiteSpace.FunctionSpacing.Before
+function custom_field_module_implements_alter(array &$implementations, string $hook): void {
+  if ($hook === 'node_update') {
+    // Make sure we run after taxonomy so the index doesn't get deleted.
+    if (isset($implementations['taxonomy'])) {
+      $group = $implementations['custom_field'];
+      unset($implementations['custom_field']);
+      // Put our module right after.
+      $implementations['custom_field'] = $group;
+    }
+  }
 }

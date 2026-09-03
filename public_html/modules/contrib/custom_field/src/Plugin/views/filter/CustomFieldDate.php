@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Date/time views filter.
  *
- * Even thought dates are stored as strings, the numeric filter is extended
+ * Even though dates are stored as strings, the numeric filter is extended
  * because it provides more sensible operators.
  *
  * @ingroup views_filter_handlers
@@ -755,15 +755,16 @@ class CustomFieldDate extends NumericDate implements ContainerFactoryPluginInter
         '#date_time_callbacks' => [],
         '#date_timezone' => $date_timezone,
         '#default_value' => $value_date,
+        '#attached' => [
+          'library' => ['custom_field/custom-field-widget'],
+        ],
         '#wrapper_attributes' => [
           'class' => ['views-exposed-form__item'],
         ],
       ];
-      if ($filter_type === 'datetime') {
-        $element['#theme_wrappers'] = ['container', 'fieldset'];
-        $element['#attributes'] = [
-          'class' => ['custom-field-datetime-grid'],
-        ];
+      if ($filter_type === 'datetime' && $exposed) {
+        $element['#theme'] = 'custom_field_flex_wrapper';
+        $element['#theme_wrappers'] = ['fieldset'];
       }
     }
     else {

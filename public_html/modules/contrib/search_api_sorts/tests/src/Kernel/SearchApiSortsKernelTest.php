@@ -15,10 +15,13 @@ class SearchApiSortsKernelTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'field',
     'search_api',
     'search_api_db',
     'search_api_test_db',
+    'search_api_test_example_content',
     'search_api_test_views',
+    'text',
     'entity_test',
     'search_api_sorts',
     'search_api_sorts_test_views',
@@ -48,6 +51,7 @@ class SearchApiSortsKernelTest extends KernelTestBase {
 
     $this->installConfig([
       'search_api',
+      'search_api_test_example_content',
       'search_api_test_db',
       'search_api_db',
       'search_api_sorts_test_views',

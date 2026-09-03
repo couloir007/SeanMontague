@@ -41,6 +41,7 @@ class CustomFlexWidget extends CustomWidgetBase {
     $elements['#tree'] = TRUE;
     $elements['#attached']['library'][] = 'custom_field/custom-field-flex';
     $elements['#attached']['library'][] = 'custom_field/custom-field-flex-admin';
+    $custom_items = $this->getCustomFieldItems($form_state);
 
     $elements['columns'] = [
       '#type' => 'fieldset',
@@ -54,7 +55,7 @@ class CustomFlexWidget extends CustomWidgetBase {
     ];
 
     $columns = $this->getSettings()['columns'];
-    foreach ($this->getCustomFieldItems() as $name => $custom_item) {
+    foreach ($custom_items as $name => $custom_item) {
       $plugin_id = $custom_item->getPluginId();
       // The uuid widget type is a hidden field.
       if ($plugin_id == 'uuid') {
@@ -115,61 +116,50 @@ class CustomFlexWidget extends CustomWidgetBase {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state): array {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
-
     $element['#attached']['library'][] = 'custom_field/custom-field-flex';
+    $fields = $this->getSetting('fields') ?? [];
     $classes = ['custom-field-row'];
     if ($this->getSetting('breakpoint')) {
       $classes[] = 'custom-field-flex--stack-' . $this->getSetting('breakpoint');
     }
     // Using markup since we can't nest values because the field api expects
     // subfields to be at the top-level.
-    $element['wrapper_prefix']['#markup'] = '<div class="custom-field-row-wrapper"><div class="' . implode(' ', $classes) . '">';
+    $element['wrapper_prefix']['#markup'] = '<div class="' . implode(' ', $classes) . '">';
     $columns = $this->getSettings()['columns'];
-
-    // Account for unsaved fields in field config default values form.
-    if (!empty($form_state->get('current_settings'))) {
-      $current_settings = $form_state->get('current_settings');
-      $field_settings = $current_settings['field_settings'];
-      $custom_items = $this->customFieldTypeManager->getCustomFieldItems($current_settings);
-    }
-    else {
-      $field_settings = $this->getFieldSetting('field_settings');
-      $custom_items = $this->getCustomFieldItems();
-    }
+    $custom_items = $this->getCustomFieldItems($form_state);
 
     foreach ($custom_items as $name => $custom_item) {
+      $settings = $fields[$name] ?? [];
       $data_type = $custom_item->getDataType();
-      $type = $field_settings[$name]['type'] ?? $custom_item->getDefaultWidget();
+      $type = $settings['type'] ?? $custom_item->getDefaultWidget();
       if (!in_array($type, $this->customFieldWidgetManager->getWidgetsForField($custom_item->getPluginId()))) {
         $type = $custom_item->getDefaultWidget();
       }
       /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetInterface $widget_plugin */
-      $widget_plugin = $this->customFieldWidgetManager->createInstance($type, ['settings' => $field_settings[$name]['widget_settings'] ?? []]);
-      $widget_settings = $custom_item->getWidgetSetting('settings');
+      $widget_plugin = $this->customFieldWidgetManager->createInstance((string) $type, ['settings' => $settings]);
       $element[$name] = $widget_plugin->widget($items, $delta, $element, $form, $form_state, $custom_item);
-      $attributes = $this->getAttributesKey($custom_item, $widget_settings, $type);
+      $attributes = $this->getAttributesKey($custom_item, $type);
       $column_class = "custom-field-$name custom-field-col";
-      if (isset($columns[$name])) {
-        $column_class .= " custom-field-col-$columns[$name]";
-      }
-
-      if (isset($element[$name]['#type']) && $element[$name]['#type'] === 'managed_file') {
-        $element[$name]['#column_class'] = $column_class;
-        $element[$name]['#after_build'][] = [$this, 'callManagedFileAfterBuild'];
-      }
-
-      // Entity reference widgets need class on target_id element.
+      $column_class .= isset($columns[$name]) ? " custom-field-col-$columns[$name]" : ' custom-field-col-auto';
       $entity_reference_widgets = [
         'entity_reference_autocomplete',
         'entity_reference_radios',
         'entity_reference_select',
       ];
 
-      if (in_array($type, $entity_reference_widgets)) {
+      // For the file widget, we assign to the outer ajax wrapper div.
+      if (isset($element[$name]['#type']) && $element[$name]['#type'] === 'managed_file') {
+        $element[$name]['#column_class'] = $column_class;
+        $element[$name]['#after_build'][] = [$this, 'callManagedFileAfterBuild'];
+      }
+
+      // Entity reference widgets need class on the target_id element.
+      elseif (in_array($type, $entity_reference_widgets)) {
         $element[$name]['target_id'][$attributes]['class'][] = $column_class;
       }
 
-      if ($data_type === 'datetime' && in_array($type, ['datetime_default', 'datetime_local'])) {
+      // The datetime widgets have different wrapper types.
+      elseif ($data_type === 'datetime' && in_array($type, ['datetime_default', 'datetime_local'])) {
         $datetime_type = $custom_item->getDatetimeType();
         if (($datetime_type === DateTimeType::DATETIME_TYPE_DATE || $type === 'datetime_local') && !isset($element[$name]['timezone'])) {
           $element[$name]['value']['#wrapper_attributes']['class'][] = $column_class;
@@ -178,14 +168,40 @@ class CustomFlexWidget extends CustomWidgetBase {
           $element[$name][$attributes]['class'][] = $column_class;
         }
       }
+      // For ajax enabled fields, we assign to the outer ajax wrapper div.
+      elseif (\in_array($type, ['daterange_default', 'map_text', 'map_key_value'])) {
+        $element[$name]['#column_class'] = $column_class;
+        $element[$name]['#after_build'][] = [$this, 'callFieldAfterBuild'];
+      }
+
       else {
+        // The duration input element is wrapped in a fieldset.
+        if ($data_type === 'duration' && $settings['duration_element'] === 'input') {
+          $attributes = '#attributes';
+        }
         $element[$name][$attributes]['class'][] = $column_class;
       }
     }
 
-    $element['wrapper_suffix']['#markup'] = '</div></div>';
+    $element['wrapper_suffix']['#markup'] = '</div>';
 
     return $element;
+  }
+
+  /**
+   * Closure function to pass arguments to dateRangeAfterBuild().
+   *
+   * @param array<string, mixed> $element
+   *   The form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return array<string, mixed>
+   *   The element array.
+   */
+  public function callFieldAfterBuild(array $element, FormStateInterface $form_state): array {
+    $column = $element['#column_class'];
+    return static::fieldAfterBuild($element, $form_state, $column);
   }
 
   /**
@@ -234,19 +250,49 @@ class CustomFlexWidget extends CustomWidgetBase {
   }
 
   /**
+   * After build function to add a class to the outer ajax wrapper div.
+   *
+   * @param array<string, mixed> $element
+   *   The form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   * @param string $column
+   *   The column class.
+   *
+   * @return array<string, mixed>
+   *   The modified form element.
+   */
+  public static function fieldAfterBuild(array $element, FormStateInterface $form_state, string $column): array {
+    $id_attribute = '';
+    if (preg_match('/id="([^"]+)"/', $element['#prefix'], $matches)) {
+      $id_attribute = $matches[0];
+    }
+    // Check if the class attribute exists.
+    if (str_contains($element['#prefix'], 'class="')) {
+      // If class exists, append the new class.
+      $element['#prefix'] = str_replace('class="', 'class="' . $column . ' ', $element['#prefix']);
+    }
+    else {
+      // If no class attribute exists, insert one after the id attribute.
+      $element['#prefix'] = str_replace($id_attribute, $id_attribute . ' class="' . $column . '"', $element['#prefix']);
+    }
+
+    return $element;
+  }
+
+  /**
    * Determine which attributes to use based on the plugin type.
    *
    * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $custom_item
    *   The custom field item.
-   * @param array<string, mixed> $widget_settings
-   *   The widget settings for the custom field item.
    * @param string $type
    *   The widget type.
    *
    * @return string
    *   The attribute key string.
    */
-  protected function getAttributesKey(CustomFieldTypeInterface $custom_item, array $widget_settings, string $type): string {
+  protected function getAttributesKey(CustomFieldTypeInterface $custom_item, string $type): string {
+    $field_settings = $custom_item->getFieldSettings();
     $attribute_types = [
       'color_boxes',
       'media_library_widget',
@@ -256,8 +302,7 @@ class CustomFlexWidget extends CustomWidgetBase {
       'datetime_datelist',
       'datetime_default',
       'datetime_local',
-      'daterange_default',
-      'daterange_local',
+      'time_range',
       'url',
       'link_default',
       'linkit_url',
@@ -270,7 +315,7 @@ class CustomFlexWidget extends CustomWidgetBase {
 
     switch ($custom_item->getPluginId()) {
       case 'string_long':
-        $formatted = $widget_settings['formatted'] ?? FALSE;
+        $formatted = $field_settings['formatted'] ?? FALSE;
         return $formatted ? '#attributes' : '#wrapper_attributes';
 
       default:

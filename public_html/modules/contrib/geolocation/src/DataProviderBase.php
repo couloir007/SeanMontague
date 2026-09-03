@@ -5,10 +5,14 @@ namespace Drupal\geolocation;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Field\FieldItemList;
+use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\Core\Utility\Token;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\ResultRow;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -20,88 +24,78 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 abstract class DataProviderBase extends PluginBase implements DataProviderInterface, ContainerFactoryPluginInterface {
 
-  /**
-   * Entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected $entityFieldManager;
+  use LoggerChannelTrait;
 
   /**
-   * Views field.
-   *
-   * @var \Drupal\views\Plugin\views\field\FieldPluginBase
-   */
-  protected $viewsField;
-
-  /**
-   * Field definition.
+   * Field definition of data provider.
    *
    * @var \Drupal\Core\Field\FieldDefinitionInterface
    */
-  protected $fieldDefinition;
+  protected FieldDefinitionInterface $fieldDefinition;
 
   /**
-   * Constructs a new GeocoderBase object.
+   * Views field definition of data provider.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   Entity type manager.
+   * @var \Drupal\views\Plugin\views\field\FieldPluginBase|null
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityFieldManagerInterface $entity_field_manager) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  protected ?FieldPluginBase $viewsField;
 
-    $this->entityFieldManager = $entity_field_manager;
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected EntityFieldManagerInterface $entityFieldManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected Token $token,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): DataProviderInterface {
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $container->get('module_handler'),
+      $container->get('token')
     );
   }
 
   /**
-   * Default settings.
+   * Get default Settings.
    *
    * @return array
    *   Default settings.
    */
-  protected function defaultSettings() {
+  protected static function defaultSettings(): array {
     return [];
   }
 
   /**
-   * Add default settings.
-   *
-   * @param array|null $settings
-   *   Unaltered settings.
+   * Get Settings.
    *
    * @return array
-   *   Altered settings.
+   *   Settings.
    */
-  protected function getSettings(?array $settings = NULL) {
+  protected function getSettings(?array $settings = NULL): array {
     if (is_null($settings)) {
       $settings = $this->configuration;
     }
 
-    return $settings + $this->defaultSettings();
+    return array_merge($this->defaultSettings(), array_filter($settings));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getTokenHelp(?FieldDefinitionInterface $fieldDefinition = NULL) {
+  public function getTokenHelp(?FieldDefinitionInterface $fieldDefinition = NULL): array {
     if (empty($fieldDefinition)) {
       $fieldDefinition = $this->fieldDefinition;
     }
@@ -129,10 +123,7 @@ abstract class DataProviderBase extends PluginBase implements DataProviderInterf
       $element['token_items'][] = $item;
     }
 
-    if (
-      \Drupal::service('module_handler')->moduleExists('token')
-      && method_exists($fieldDefinition, 'getTargetEntityTypeId')
-    ) {
+    if ($this->moduleHandler->moduleExists('token')) {
       // Add the token UI from the token module if present.
       $element['token_help'] = [
         '#theme' => 'token_tree_link',
@@ -148,7 +139,7 @@ abstract class DataProviderBase extends PluginBase implements DataProviderInterf
   /**
    * {@inheritdoc}
    */
-  public function replaceFieldItemTokens($text, FieldItemInterface $fieldItem) {
+  public function replaceFieldItemTokens(string $text, FieldItemInterface $fieldItem): string {
     $token_context['geolocation_current_item'] = $fieldItem;
 
     $entity = NULL;
@@ -156,23 +147,18 @@ abstract class DataProviderBase extends PluginBase implements DataProviderInterf
       $entity = $fieldItem->getParent()->getParent()->getValue();
     }
     catch (\Exception $e) {
-
+      $this->getLogger('geolocation')->warning($e->getMessage());
     }
 
-    if (
-      is_object($entity)
-      && $entity instanceof ContentEntityInterface
-    ) {
+    if ($entity instanceof ContentEntityInterface) {
       $token_context[$entity->getEntityTypeId()] = $entity;
     }
 
-    $text = \Drupal::token()->replace($text, $token_context, [
+    $text = $this->token->replace($text, $token_context, [
       'callback' => [$this, 'fieldItemTokens'],
       'clear' => TRUE,
     ]);
-    $text = Html::decodeEntities($text);
-
-    return $text;
+    return Html::decodeEntities($text);
   }
 
   /**
@@ -187,17 +173,14 @@ abstract class DataProviderBase extends PluginBase implements DataProviderInterf
    *   A keyed array of settings and flags to control the token replacement
    *   process. See \Drupal\Core\Utility\Token::replace().
    */
-  public function fieldItemTokens(array &$replacements, array $data, array $options) {
+  public function fieldItemTokens(array &$replacements, array $data, array $options): void {
     if (isset($data['geolocation_current_item'])) {
 
       /** @var \Drupal\Core\Field\FieldItemInterface $item */
       $item = $data['geolocation_current_item'];
 
       foreach ($this->fieldDefinition->getFieldStorageDefinition()->getColumns() as $id => $column) {
-        if (
-          $item->get($id)
-          && isset($replacements['[geolocation_current_item:' . $id . ']'])
-        ) {
+        if (isset($replacements['[geolocation_current_item:' . $id . ']'])) {
           $replacements['[geolocation_current_item:' . $id . ']'] = $item->get($id)->getValue();
         }
       }
@@ -207,14 +190,14 @@ abstract class DataProviderBase extends PluginBase implements DataProviderInterf
   /**
    * {@inheritdoc}
    */
-  public function isViewsGeoOption(FieldPluginBase $viewsField) {
+  public function isViewsGeoOption(FieldPluginBase $viewsField): bool {
     return FALSE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getPositionsFromViewsRow(ResultRow $row, ?FieldPluginBase $viewsField = NULL) {
+  public function getLocationsFromViewsRow(ResultRow $row, ?FieldPluginBase $viewsField = NULL): array {
     $positions = [];
 
     if (!$viewsField) {
@@ -225,25 +208,20 @@ abstract class DataProviderBase extends PluginBase implements DataProviderInterf
       // Get position from row value.
       $lat_field_name = $viewsField->table . '_' . $viewsField->field . '_lat';
       $lng_field_name = $viewsField->table . '_' . $viewsField->field . '_lng';
-      $positions[] = ['lat' => $row->$lat_field_name, 'lng' => $row->$lng_field_name];
-    }
-    else {
-      // Get all positions from row entity values.
-      foreach ($this->getFieldItemsFromViewsRow($row, $viewsField) as $item) {
-        $positions = array_merge($this->getPositionsFromItem($item), $positions);
+      if (isset($row->$lat_field_name) && isset($row->$lng_field_name)) {
+        return [
+          [
+            '#type' => 'geolocation_map_location',
+            '#coordinates' => [
+              'lat' => $row->$lat_field_name,
+              'lng' => $row->$lng_field_name,
+            ],
+          ],
+        ];
       }
     }
 
-    return $positions;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getLocationsFromViewsRow(ResultRow $row, ?FieldPluginBase $viewsField = NULL) {
-    $positions = [];
-
-    foreach ($this->getFieldItemsFromViewsRow($row, $viewsField) as $item) {
+    foreach ($this->getFieldItemsFromViewsRow($row, $viewsField) ?? [] as $item) {
       $positions = array_merge($this->getLocationsFromItem($item), $positions);
     }
 
@@ -253,10 +231,10 @@ abstract class DataProviderBase extends PluginBase implements DataProviderInterf
   /**
    * {@inheritdoc}
    */
-  public function getShapesFromViewsRow(ResultRow $row, ?FieldPluginBase $viewsField = NULL) {
+  public function getShapesFromViewsRow(ResultRow $row, ?FieldPluginBase $viewsField = NULL): array {
     $positions = [];
 
-    foreach ($this->getFieldItemsFromViewsRow($row, $viewsField) as $item) {
+    foreach ($this->getFieldItemsFromViewsRow($row, $viewsField) ?? [] as $item) {
       $positions = array_merge($this->getShapesFromItem($item), $positions);
     }
 
@@ -264,20 +242,31 @@ abstract class DataProviderBase extends PluginBase implements DataProviderInterf
   }
 
   /**
-   * {@inheritdoc}
+   * Get field items from views row.
+   *
+   * @param \Drupal\views\ResultRow $row
+   *   Views result row.
+   * @param \Drupal\views\Plugin\views\field\FieldPluginBase|null $viewsField
+   *   Views field.
+   *
+   * @return \Drupal\Core\Field\FieldItemList|null
+   *   Field items.
+   *
+   * @phpstan-ignore-next-line
    */
-  protected function getFieldItemsFromViewsRow(ResultRow $row, ?FieldPluginBase $viewsField = NULL) {
+  protected function getFieldItemsFromViewsRow(ResultRow $row, ?FieldPluginBase $viewsField = NULL): ?FieldItemList {
     if (!$viewsField) {
       $viewsField = $this->viewsField;
     }
+
     if (!$viewsField) {
-      return [];
+      return NULL;
     }
 
     $entity = $viewsField->getEntity($row);
 
     if (empty($entity->{$viewsField->definition['field_name']})) {
-      return [];
+      return NULL;
     }
 
     return $entity->{$viewsField->definition['field_name']};
@@ -286,42 +275,35 @@ abstract class DataProviderBase extends PluginBase implements DataProviderInterf
   /**
    * {@inheritdoc}
    */
-  public function setViewsField(FieldPluginBase $viewsField) {
+  public function setViewsField(FieldPluginBase $viewsField): void {
     $this->viewsField = $viewsField;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setFieldDefinition(FieldDefinitionInterface $fieldDefinition) {
+  public function setFieldDefinition(FieldDefinitionInterface $fieldDefinition): void {
     $this->fieldDefinition = $fieldDefinition;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getPositionsFromItem(FieldItemInterface $fieldItem) {
+  public function getLocationsFromItem(FieldItemInterface $fieldItem): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getLocationsFromItem(FieldItemInterface $fieldItem) {
+  public function getShapesFromItem(FieldItemInterface $fieldItem): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getShapesFromItem(FieldItemInterface $fieldItem) {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getSettingsForm(array $settings, array $parents = []) {
+  public function getSettingsForm(array $settings, array $parents = []): array {
     return [];
   }
 

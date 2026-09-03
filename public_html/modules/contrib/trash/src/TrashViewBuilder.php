@@ -152,26 +152,32 @@ class TrashViewBuilder {
     if ($label_field !== NULL) {
       $options = [
         'label' => (string) $this->t('Title'),
-        'settings' => ['link_to_entity' => TRUE],
       ];
       // The trash_label formatter only applies to string/uri fields. Use it
       // when the label maps directly to such a field; composite or computed
       // label fields fall back to their main-property column rendered with the
-      // field's default formatter.
+      // field's default formatter. link_to_entity is a trash_label setting, so
+      // it can only be set together with that formatter.
       if ($label_field === $entity_type->getKey('label')) {
         $options['type'] = 'trash_label';
+        $options['settings'] = ['link_to_entity' => TRUE];
       }
       $view->addHandler('default', 'field', $base_table, $label_field, $options);
     }
 
-    // Bundle field.
+    // Bundle field. The bundle key is only an entity reference when the entity
+    // type has a bundle entity type. Otherwise it's a plain string column, and
+    // the entity_reference_label formatter does not apply to it.
     $bundle_key = $entity_type->getKey('bundle');
     if ($bundle_key) {
-      $view->addHandler('default', 'field', $base_table, $bundle_key, [
+      $options = [
         'label' => (string) $entity_type->getBundleLabel(),
-        'type' => 'entity_reference_label',
-        'settings' => ['link' => FALSE],
-      ]);
+      ];
+      if ($entity_type->getBundleEntityType()) {
+        $options['type'] = 'entity_reference_label';
+        $options['settings'] = ['link' => FALSE];
+      }
+      $view->addHandler('default', 'field', $base_table, $bundle_key, $options);
     }
 
     // Owner field (if entity implements EntityOwnerInterface). Render the owner
@@ -227,10 +233,15 @@ class TrashViewBuilder {
       }
     }
 
-    // Deleted timestamp field.
+    // Deleted timestamp field. The date format belongs in the formatter
+    // settings; a top-level 'date_format' is not a Views entity field option
+    // and gets ignored.
     $view->addHandler('default', 'field', $base_table, 'deleted', [
       'label' => (string) $this->t('Deleted'),
-      'date_format' => 'short',
+      'type' => 'timestamp',
+      'settings' => [
+        'date_format' => 'short',
+      ],
     ]);
 
     // Operations field - use standard operations for entity types with a list

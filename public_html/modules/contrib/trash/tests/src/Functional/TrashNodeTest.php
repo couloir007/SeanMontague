@@ -222,6 +222,88 @@ class TrashNodeTest extends BrowserTestBase {
   }
 
   /**
+   * Test the restore and purge local tasks of a trashed node.
+   */
+  public function testRestoreAndPurgeLocalTasks(): void {
+    $this->drupalLogin($this->adminUser);
+
+    $node = $this->drupalCreateNode([
+      'title' => $this->randomMachineName(8),
+    ]);
+    $nid = $node->id();
+    $title = $node->getTitle();
+    $tasks = '#block-page-tabs-block';
+
+    // The tasks are not shown for a node which is not in the trash.
+    $this->drupalGet('node/' . $nid);
+    $this->assertSession()->linkByHrefNotExists('/node/' . $nid . '/restore');
+    $this->assertSession()->linkByHrefNotExists('/node/' . $nid . '/purge');
+
+    $node->delete();
+
+    // Both tasks are shown when the node is viewed in the trash context, and
+    // they keep that context.
+    $this->drupalGet('node/' . $nid, ['query' => ['in_trash' => 1]]);
+    $this->assertSession()->elementExists('css', $tasks . ' a[href$="/node/' . $nid . '/restore?in_trash=1"]');
+    $this->assertSession()->elementExists('css', $tasks . ' a[href$="/node/' . $nid . '/purge?in_trash=1"]');
+
+    // Cancelling returns to the node, which is still in the trash.
+    $this->clickLink('Restore');
+    $this->clickLink('Cancel');
+    $this->assertSession()->addressEquals('node/' . $nid . '?in_trash=1');
+
+    // The restore task restores the node and lands on it outside the trash.
+    $this->clickLink('Restore');
+    $this->submitForm([], 'Confirm');
+    $this->assertSession()->addressEquals('node/' . $nid);
+    $this->assertSession()->statusMessageContains('The content item ' . $title . ' has been restored from trash.', 'status');
+    $this->assertSession()->linkByHrefNotExists('/node/' . $nid . '/restore');
+
+    // Trash the node again. The purge task leads to the purge form, which ends
+    // on the trash listing because the node itself is gone.
+    $this->drupalGet('node/' . $nid . '/delete');
+    $this->submitForm([], 'Delete');
+    $this->drupalGet('node/' . $nid, ['query' => ['in_trash' => 1]]);
+    $this->clickLink('Purge');
+    $this->assertSession()->pageTextContains('This action cannot be undone.');
+    $this->submitForm([], 'Confirm');
+    // The listing of the default entity type redirects to the trash overview.
+    $this->assertSession()->addressEquals('admin/content/trash');
+    $this->assertSession()->statusMessageContains('The content item ' . $title . ' has been permanently deleted.', 'status');
+
+    $node = $this->drupalCreateNode([
+      'title' => $this->randomMachineName(8),
+    ]);
+    $nid = $node->id();
+    $title = $node->getTitle();
+    $node->delete();
+
+    // A user who may view deleted entities but not act on them gets no tasks.
+    $this->drupalLogin($this->drupalCreateUser([
+      'access content',
+      'view deleted entities',
+    ]));
+    $this->drupalGet('node/' . $nid, ['query' => ['in_trash' => 1]]);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->linkByHrefNotExists('/node/' . $nid . '/restore');
+    $this->assertSession()->linkByHrefNotExists('/node/' . $nid . '/purge');
+
+    // The purge permission does not grant access to the trash listing, so this
+    // user lands on the front page instead of a 403.
+    $this->drupalLogin($this->drupalCreateUser([
+      'access content',
+      'view deleted entities',
+      'purge node entities',
+    ]));
+    $this->drupalGet('node/' . $nid, ['query' => ['in_trash' => 1]]);
+    $this->clickLink('Purge');
+    $this->submitForm([], 'Confirm');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->addressNotEquals('admin/content/trash');
+    $this->assertSession()->statusMessageContains('The content item ' . $title . ' has been permanently deleted.', 'status');
+  }
+
+  /**
    * Test deleting a content type with trashed nodes.
    */
   public function testDeletingNodeTypeWithTrashedNodes(): void {

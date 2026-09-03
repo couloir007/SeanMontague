@@ -1,0 +1,128 @@
+plugin.plugin_configuration.geolocation.layer_feature.leaflet_marker_popup:
+  type: geolocation.layer_feature_settings
+  label: 'Marker Popup'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        info_auto_display:
+          type: boolean
+          label: 'Show info window on map start'
+        max_width:
+          type: integer
+          label: 'Popup max width'
+        min_width:
+          type: integer
+          label: 'Popup min width'
+        max_height:
+          type: integer
+          label: 'Popup max height'
+        auto_pan:
+          type: boolean
+          label: 'Popup auto pan'
+        keep_in_view:
+          type: boolean
+          label: 'Popup keep in view'
+        close_button:
+          type: boolean
+          label: 'Popup close button'
+        auto_close:
+          type: boolean
+          label: 'Popup auto close'
+        close_on_escape_key:
+          type: boolean
+          label: 'Popup close with escape'
+        class_name:
+          type: string
+          label: 'Popup class name'
+
+plugin.plugin_configuration.geolocation.layer_feature.leaflet_marker_clusterer:
+  type: geolocation.layer_feature_settings
+  label: 'Marker Clusterer'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        cluster_settings:
+          type: mapping
+          label: 'Cluster Settings'
+          mapping:
+            show_coverage_on_hover:
+              type: boolean
+              label: 'Setting'
+            zoom_to_bounds_on_click:
+              type: boolean
+              label: 'Setting'
+        disable_clustering_at_zoom:
+          type: integer
+          label: 'Max Zoom for clustering'
+        custom_marker_settings:
+          type: string
+          label: 'Custom Marker Settings'
+
+plugin.plugin_configuration.geolocation.layer_feature.leaflet_marker_icon:
+  type: geolocation.layer_feature_settings
+  label: 'Marker Icon'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        marker_shadow_path:
+          type: string
+          label: 'Shadow Path'
+        marker_icon_path:
+          type: string
+          label: 'Icon path'
+        icon_size:
+          type: mapping
+          label: 'Icon Size'
+          mapping:
+            width:
+              type: integer
+              label: 'Width'
+            height:
+              type: integer
+              label: 'Height'
+        icon_anchor:
+          type: mapping
+          label: 'Icon Anchor'
+          mapping:
+            x:
+              type: integer
+              label: 'Width'
+            y:
+              type: integer
+              label: 'Height'
+        popup_anchor:
+          type: mapping
+          label: 'Popup Anchor'
+          mapping:
+            x:
+              type: integer
+              label: 'Width'
+            y:
+              type: integer
+              label: 'Height'
+        shadow_size:
+          type: mapping
+          label: 'Shadow Size'
+          mapping:
+            width:
+              type: integer
+              label: 'Width'
+            height:
+              type: integer
+              label: 'Height'
+        shadow_anchor:
+          type: mapping
+          label: 'Shadow Anchor'
+          mapping:
+            x:
+              type: integer
+              label: 'Width'
+            y:
+              type: integer
+              label: 'Height'

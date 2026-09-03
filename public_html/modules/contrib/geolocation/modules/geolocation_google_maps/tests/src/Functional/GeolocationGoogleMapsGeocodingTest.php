@@ -14,7 +14,7 @@ class GeolocationGoogleMapsGeocodingTest extends BrowserTestBase {
   /**
    * Modules to enable.
    *
-   * @var array
+   * @var string[]
    */
   protected static $modules = [
     'geolocation',
@@ -30,7 +30,7 @@ class GeolocationGoogleMapsGeocodingTest extends BrowserTestBase {
   /**
    * Test geocoding.
    */
-  public function testGeocoder() {
+  public function testGeocoder(): void {
     /** @var \Drupal\geolocation\GeocoderInterface $geocoder */
     $geocoder = \Drupal::service('plugin.manager.geolocation.geocoder')->getGeocoder('google_geocoding_api');
     $location = $geocoder->geocode('H.Congreso de la Unión 66, El Parque, Venustiano Carranza, 15960 Ciudad de México, CDMX, Mexiko');
@@ -40,7 +40,7 @@ class GeolocationGoogleMapsGeocodingTest extends BrowserTestBase {
   /**
    * Test reverse geocoding.
    */
-  public function testReverseGeocoder() {
+  public function testReverseGeocoder(): void {
     /** @var \Drupal\geolocation\GeocoderInterface $geocoder */
     $geocoder = \Drupal::service('plugin.manager.geolocation.geocoder')->getGeocoder('google_geocoding_api');
     $latitude = 38.56;

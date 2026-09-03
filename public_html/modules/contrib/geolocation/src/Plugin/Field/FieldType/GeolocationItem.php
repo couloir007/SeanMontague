@@ -2,6 +2,7 @@
 
 namespace Drupal\geolocation\Plugin\Field\FieldType;
 
+use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -12,20 +13,33 @@ use Drupal\geolocation\TypedData\GeolocationComputed;
 /**
  * Plugin implementation of the 'geolocation' field type.
  *
- * @FieldType(
- *   id = "geolocation",
- *   label = @Translation("Geolocation"),
- *   description = @Translation("This field stores location data (lat, lng)."),
- *   default_widget = "geolocation_latlng",
- *   default_formatter = "geolocation_latlng"
- * )
+ * @property ?float $lat
+ *   Latitude.
+ * @property ?float $lng
+ *    Longitude.
+ * @property ?float $lat_sin
+ *    Latitude Sine.
+ * @property ?float $lat_cos
+ *    Latitude Cosine.
+ * @property ?float $lng_rad
+ *    Longitude Radian.
+ * @property ?mixed $data
+ *    Data.
  */
+#[FieldType(
+  id: 'geolocation',
+  label: new \Drupal\Core\StringTranslation\TranslatableMarkup('Geolocation - Coordinates'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('This field stores latitude & longitude coordinates.'),
+  category: 'geo_spatial',
+  default_widget: 'geolocation_latlng',
+  default_formatter: 'geolocation_latlng'
+)]
 class GeolocationItem extends FieldItemBase {
 
   /**
    * {@inheritdoc}
    */
-  public static function schema(FieldStorageDefinitionInterface $field_definition) {
+  public static function schema(FieldStorageDefinitionInterface $field_definition): array {
     return [
       'columns' => [
         'lat' => [
@@ -76,7 +90,7 @@ class GeolocationItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
+  public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition): array {
     $properties['lat'] = DataDefinition::create('float')
       ->setLabel(t('Latitude'));
 
@@ -110,16 +124,16 @@ class GeolocationItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
-    $values['lat'] = (float) rand(-89, 90) - rand(0, 999999) / 1000000;
-    $values['lng'] = (float) rand(-179, 180) - rand(0, 999999) / 1000000;
+  public static function generateSampleValue(FieldDefinitionInterface $field_definition): array {
+    $values['lat'] = rand(-89, 90) - rand(0, 999999) / 1000000;
+    $values['lng'] = rand(-179, 180) - rand(0, 999999) / 1000000;
     return $values;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isEmpty() {
+  public function isEmpty(): bool {
     $lat = $this->get('lat')->getValue();
     $lng = $this->get('lng')->getValue();
     return $lat === NULL || $lat === '' || $lng === NULL || $lng === '';
@@ -133,7 +147,7 @@ class GeolocationItem extends FieldItemBase {
     foreach ($this->properties as $name => $property) {
       $value = $property->getValue();
       // Only write NULL values if the whole map is not NULL.
-      if (isset($this->values) || isset($value)) {
+      if (isset($value)) {
         $this->values[$name] = $value;
       }
     }
@@ -149,7 +163,7 @@ class GeolocationItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public function setValue($values, $notify = TRUE) {
+  public function setValue($values, $notify = TRUE): void {
     parent::setValue($values, $notify);
 
     // If the values being set do not contain lat_sin, lat_cos or lng_rad,
@@ -162,16 +176,21 @@ class GeolocationItem extends FieldItemBase {
       )
       && !$this->isEmpty()
     ) {
-      $this->get('lat_sin')->setValue(sin(deg2rad(trim($this->get('lat')->getValue()))), FALSE);
-      $this->get('lat_cos')->setValue(cos(deg2rad(trim($this->get('lat')->getValue()))), FALSE);
-      $this->get('lng_rad')->setValue(deg2rad(trim($this->get('lng')->getValue())), FALSE);
+      $this->get('lat_sin')->setValue(sin(deg2rad((float) trim($this->get('lat')->getValue()))), FALSE);
+      $this->get('lat_cos')->setValue(cos(deg2rad((float) trim($this->get('lat')->getValue()))), FALSE);
+      $this->get('lng_rad')->setValue(deg2rad((float) trim($this->get('lng')->getValue())), FALSE);
     }
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @param string $property_name
+   *   Property Name.
+   * @param bool $notify
+   *   Notify.
    */
-  public function onChange($property_name, $notify = TRUE) {
+  public function onChange($property_name, $notify = TRUE): void {
     parent::onChange($property_name, $notify);
 
     // Update the calculated properties if lat or lng changed.
@@ -182,16 +201,17 @@ class GeolocationItem extends FieldItemBase {
       )
       && !$this->isEmpty()
     ) {
-      $this->get('lat_sin')->setValue(sin(deg2rad(trim($this->get('lat')->getValue()))), FALSE);
-      $this->get('lat_cos')->setValue(cos(deg2rad(trim($this->get('lat')->getValue()))), FALSE);
-      $this->get('lng_rad')->setValue(deg2rad(trim($this->get('lng')->getValue())), FALSE);
+      $this->get('lat_sin')->setValue(sin(deg2rad((float) trim($this->get('lat')->getValue()))), FALSE);
+      $this->get('lat_cos')->setValue(cos(deg2rad((float) trim($this->get('lat')->getValue()))), FALSE);
+      $this->get('lng_rad')->setValue(deg2rad((float) trim($this->get('lng')->getValue())), FALSE);
     }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function preSave() {
+  public function preSave(): void {
+    parent::preSave();
     $this->get('lat')->setValue(trim($this->get('lat')->getValue()));
     $this->get('lng')->setValue(trim($this->get('lng')->getValue()));
   }
@@ -204,27 +224,25 @@ class GeolocationItem extends FieldItemBase {
    * @param string $sexagesimal
    *   String in DMS notation.
    *
-   * @return float|false
+   * @return float|null
    *   The regular float notation or FALSE if not sexagesimal.
    */
-  public static function sexagesimalToDecimal($sexagesimal = '') {
+  public static function sexagesimalToDecimal(string $sexagesimal = ''): ?float {
     $pattern = "/(?<degree>-?\d{1,3})°[ ]?((?<minutes>\d{1,2})')?[ ]?((?<seconds>(\d{1,2}|\d{1,2}\.\d+))\")?/";
     preg_match($pattern, $sexagesimal, $gps_matches);
-    if (
-    !empty($gps_matches)
-    ) {
-      $value = $gps_matches['degree'];
+    if (!empty($gps_matches)) {
+      $value = (int) $gps_matches['degree'];
       if (!empty($gps_matches['minutes'])) {
-        $value += $gps_matches['minutes'] / 60;
+        $value += (int) $gps_matches['minutes'] / 60;
       }
       if (!empty($gps_matches['seconds'])) {
-        $value += $gps_matches['seconds'] / 3600;
+        $value += (float) $gps_matches['seconds'] / 3600;
       }
     }
     else {
-      return FALSE;
+      return NULL;
     }
-    return $value;
+    return (float) $value;
   }
 
   /**
@@ -232,16 +250,14 @@ class GeolocationItem extends FieldItemBase {
    *
    * Sexagesimal means a string like - X° Y' Z"
    *
-   * @param float|string $decimal
+   * @param float $decimal
    *   Either float or float-castable location.
    *
-   * @return string
+   * @return string|null
    *   The sexagesimal notation or FALSE on error.
    */
-  public static function decimalToSexagesimal($decimal = '') {
+  public static function decimalToSexagesimal(float $decimal): ?string {
     $negative = FALSE;
-    $decimal = (float) $decimal;
-
     if ($decimal < 0) {
       $negative = TRUE;
       $decimal = abs($decimal);

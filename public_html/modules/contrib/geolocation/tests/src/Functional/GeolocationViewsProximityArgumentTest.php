@@ -14,7 +14,7 @@ class GeolocationViewsProximityArgumentTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $profile = 'standard';
+  protected $profile = 'minimal';
 
   /**
    * {@inheritdoc}
@@ -33,7 +33,7 @@ class GeolocationViewsProximityArgumentTest extends BrowserTestBase {
    *
    * @var string
    */
-  protected $viewsPath = 'geolocation-demo/proximity_argument_and_sort';
+  protected string $viewsPath = 'geolocation-demo/proximity_argument_and_sort';
 
   /**
    * {@inheritdoc}
@@ -43,7 +43,7 @@ class GeolocationViewsProximityArgumentTest extends BrowserTestBase {
   /**
    * Tests the CommonMap style.
    */
-  public function testProximityNoLocations() {
+  public function testProximityNoLocations(): void {
     $this->drupalGet($this->viewsPath);
     $this->assertSession()->statusCodeEquals(200);
   }
@@ -51,13 +51,13 @@ class GeolocationViewsProximityArgumentTest extends BrowserTestBase {
   /**
    * Tests the CommonMap style.
    */
-  public function testNoProximityLocations() {
+  public function testNoProximityLocations(): void {
     $entity_test_storage = \Drupal::entityTypeManager()->getStorage('node');
 
     $entity_test_storage->create([
       'id' => 1,
       'title' => 'Proximity 1',
-      'body' => 'test test',
+      'field_geolocation_demo_body' => 'test test',
       'type' => 'geolocation_default_article',
       'field_geolocation_demo_single' => [
         'lat' => 52,
@@ -67,7 +67,7 @@ class GeolocationViewsProximityArgumentTest extends BrowserTestBase {
     $entity_test_storage->create([
       'id' => 2,
       'title' => 'Proximity 2',
-      'body' => 'bar test',
+      'field_geolocation_demo_body' => 'bar test',
       'type' => 'geolocation_default_article',
       'field_geolocation_demo_single' => [
         'lat' => 53,
@@ -77,7 +77,7 @@ class GeolocationViewsProximityArgumentTest extends BrowserTestBase {
     $entity_test_storage->create([
       'id' => 3,
       'title' => 'Proximity 3',
-      'body' => 'test foobar',
+      'field_geolocation_demo_body' => 'test foobar',
       'type' => 'geolocation_default_article',
       'field_geolocation_demo_single' => [
         'lat' => 54,
@@ -117,12 +117,12 @@ class GeolocationViewsProximityArgumentTest extends BrowserTestBase {
   /**
    * Tests to ensure rounding error doesn't occur (d.o #2796999).
    */
-  public function testRoundingError() {
+  public function testRoundingError(): void {
     $entity_test_storage = \Drupal::entityTypeManager()->getStorage('node');
 
     $entity_test_storage->create([
       'title' => 'Proximity 4',
-      'body' => 'test test',
+      'field_geolocation_demo_body' => 'test test',
       'type' => 'geolocation_default_article',
       'field_geolocation_demo_single' => [
         'lat' => 51.4545,
@@ -139,12 +139,12 @@ class GeolocationViewsProximityArgumentTest extends BrowserTestBase {
   /**
    * Tests to ensure views argument is parsed correctly (d.o #2856948)
    */
-  public function testArgumentParse() {
+  public function testArgumentParse(): void {
     $entity_test_storage = \Drupal::entityTypeManager()->getStorage('node');
 
     $entity_test_storage->create([
       'title' => 'Proximity 5',
-      'body' => 'test test',
+      'field_geolocation_demo_body' => 'test test',
       'type' => 'geolocation_default_article',
       'field_geolocation_demo_single' => [
         'lat' => 51.4545,

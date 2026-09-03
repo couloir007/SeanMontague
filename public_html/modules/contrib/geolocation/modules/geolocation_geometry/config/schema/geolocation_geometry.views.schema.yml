@@ -23,3 +23,10 @@ views.argument.geolocation_geometry_argument_proximity:
 views.argument.geolocation_geometry_argument_boundary:
   type: views_argument
   label: 'Geometry Boundary Argument'
+
+views.relationship.geolocation_geometry:
+  type: views_relationship
+  label: 'Geolocation Geometry'
+  mapping:
+    geometry_join_type:
+      type: string

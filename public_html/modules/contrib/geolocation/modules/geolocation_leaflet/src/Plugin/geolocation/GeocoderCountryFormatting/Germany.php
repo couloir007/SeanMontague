@@ -2,23 +2,23 @@
 
 namespace Drupal\geolocation_leaflet\Plugin\geolocation\GeocoderCountryFormatting;
 
+use Drupal\geolocation\Attribute\GeocoderCountryFormatting;
 use Drupal\geolocation_leaflet\NominatimRoadFirstFormattingBase;
 
 /**
  * Provides address formatting.
- *
- * @GeocoderCountryFormatting(
- *   id = "nominatim_de",
- *   country_code = "de",
- *   geocoder = "nominatim",
- * )
  */
+#[GeocoderCountryFormatting(
+  id: 'nominatim_de',
+  countryCode: 'de',
+  geocoder: 'nominatim'
+)]
 class Germany extends NominatimRoadFirstFormattingBase {
 
   /**
    * {@inheritdoc}
    */
-  public function format(array $atomics) {
+  public function format(array $atomics): ?array {
     $address_elements = parent::format($atomics);
     if (
       empty($address_elements['locality'])

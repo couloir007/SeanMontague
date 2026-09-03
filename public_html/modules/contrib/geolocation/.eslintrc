@@ -1,12 +1,41 @@
 {
-  "extends": "eslint:recommended",
+  "extends": ["eslint:recommended"],
   "globals": {
-    "google": true,
-    "L": true
+    "Drupal": true,
+    "google":  true,
+    "BMapGL": true,
+    "H": true,
+    "L": true,
+    "ymaps": true
   },
   "rules": {
     "max-nested-callbacks": [1, 6],
     "no-mutable-exports": 0,
-    "no-unused-vars": 0
-  }
+    "no-unused-vars": 0,
+    "import/prefer-default-export": ["off"],
+    "import/extensions": ["off"],
+    "no-console": ["off"],
+    "class-methods-use-this": "off",
+    "prefer-template": "off",
+    "new-cap": "off",
+    "radix": "off",
+    "no-jquery/no-ajax-events": "off",
+    "no-case-declarations": "off",
+    "no-restricted-syntax": "off",
+    "no-bitwise": "off"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module"
+  },
+  "env": {
+    "es6": true,
+    "browser": true
+  },
+  "overrides": [
+    {
+      "files": ["js/g*.js"],
+      "parserOptions": { "sourceType": "script"}
+    }
+  ]
 }

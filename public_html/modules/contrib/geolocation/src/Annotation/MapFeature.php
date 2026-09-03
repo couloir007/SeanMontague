@@ -3,9 +3,13 @@
 namespace Drupal\geolocation\Annotation;
 
 use Drupal\Component\Annotation\Plugin;
+use Drupal\Core\Annotation\Translation;
 
 /**
  * Defines a MapFeature annotation object.
+ *
+ * @deprecated in geolocation:4.0.0 and is removed from geolocation:4.0.1. Use Attribute instead.
+ * @see https://www.drupal.org/project/geolocation/issues/3525013
  *
  * @see \Drupal\geolocation\MapFeatureManager
  * @see plugin_api
@@ -19,31 +23,31 @@ class MapFeature extends Plugin {
    *
    * @var string
    */
-  public $id;
+  public string $id;
 
   /**
-   * The name of the MapProvider.
+   * The name of the MapFeature.
    *
    * @var \Drupal\Core\Annotation\Translation
    *
    * @ingroup plugin_translatable
    */
-  public $name;
+  public Translation $name;
 
   /**
-   * The description of the MapProvider.
+   * The description of the MapFeature.
    *
    * @var \Drupal\Core\Annotation\Translation
    *
    * @ingroup plugin_translatable
    */
-  public $description;
+  public Translation $description;
 
   /**
    * The map type supported by this MapFeature.
    *
    * @var string
    */
-  public $type;
+  public string $type;
 
 }

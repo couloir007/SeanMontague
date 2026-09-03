@@ -3,9 +3,13 @@
 namespace Drupal\geolocation\Plugin\views\style;
 
 use Drupal\Component\Render\PlainTextOutput;
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Logger\LoggerChannelTrait;
+use Drupal\Core\Messenger\MessengerTrait;
+use Drupal\geolocation\DataProviderManager;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\views\Plugin\views\style\StylePluginBase;
 use Drupal\views\ResultRow;
@@ -17,6 +21,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @package Drupal\geolocation\Plugin\views\style
  */
 abstract class GeolocationStyleBase extends StylePluginBase {
+
+  use MessengerTrait;
+  use LoggerChannelTrait;
 
   /**
    * {@inheritdoc}
@@ -43,17 +50,19 @@ abstract class GeolocationStyleBase extends StylePluginBase {
    *
    * @var \Drupal\geolocation\DataProviderManager
    */
-  protected $dataProviderManager = NULL;
+  protected DataProviderManager $dataProviderManager;
 
   /**
-   * File url generator.
+   * The file url generator service.
    *
    * @var \Drupal\Core\File\FileUrlGeneratorInterface
    */
-  protected $fileUrlGenerator;
+  protected FileUrlGeneratorInterface $fileUrlGenerator;
 
   /**
    * {@inheritdoc}
+   *
+   * @phpstan-ignore-next-line
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, $data_provider_manager, FileUrlGeneratorInterface $file_url_generator) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
@@ -65,7 +74,7 @@ abstract class GeolocationStyleBase extends StylePluginBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): GeolocationStyleBase {
     return new static(
       $configuration,
       $plugin_id,
@@ -78,15 +87,15 @@ abstract class GeolocationStyleBase extends StylePluginBase {
   /**
    * {@inheritdoc}
    */
-  public function render() {
+  public function render(): array {
     if (empty($this->options['geolocation_field'])) {
-      \Drupal::messenger()->addMessage('The geolocation based view ' . $this->view->id() . ' views style was called without a geolocation field defined in the views style settings.', 'error');
-      return FALSE;
+      $this->messenger()->addMessage('The geolocation based view ' . $this->view->id() . ' views style was called without a geolocation field defined in the views style settings.', 'error');
+      return [];
     }
 
     if (empty($this->view->field[$this->options['geolocation_field']])) {
-      \Drupal::messenger()->addMessage('The geolocation based view ' . $this->view->id() . ' views style was called with a non-available geolocation field defined in the views style settings.', 'error');
-      return FALSE;
+      $this->messenger()->addMessage('The geolocation based view ' . $this->view->id() . ' views style was called with a non-available geolocation field defined in the views style settings.', 'error');
+      return [];
     }
 
     return parent::render();
@@ -101,7 +110,7 @@ abstract class GeolocationStyleBase extends StylePluginBase {
    * @return array
    *   List of location render elements.
    */
-  protected function getLocationsFromRow(ResultRow $row) {
+  public function getLocationsFromRow(ResultRow $row): array {
     $locations = [];
 
     $icon_url = NULL;
@@ -109,7 +118,7 @@ abstract class GeolocationStyleBase extends StylePluginBase {
       !empty($this->options['icon_field'])
       && $this->options['icon_field'] != 'none'
     ) {
-      /** @var \Drupal\views\Plugin\views\field\Field $icon_field_handler */
+      /** @var \Drupal\views\Plugin\views\field\EntityField|null $icon_field_handler */
       $icon_field_handler = $this->view->field[$this->options['icon_field']];
       if (!empty($icon_field_handler)) {
         $image_items = $icon_field_handler->getItems($row);
@@ -142,33 +151,43 @@ abstract class GeolocationStyleBase extends StylePluginBase {
       $data_provider = $this->dataProviderManager->createInstance($this->options['data_provider_id'], $this->options['data_provider_settings']);
     }
     catch (\Exception $e) {
-      \Drupal::logger('geolocation')->critical('View with non-existing data provider called.');
+      $this->getLogger('geolocation')->critical('View with non-existing data provider called. ' . $e->getMessage());
       return [];
     }
 
-    foreach ($data_provider->getPositionsFromViewsRow($row, $this->view->field[$this->options['geolocation_field']]) as $position) {
-      $location = [
-        '#type' => 'geolocation_map_location',
-        'content' => $this->view->rowPlugin->render($row),
+    foreach ($data_provider->getLocationsFromViewsRow($row, $this->view->field[$this->options['geolocation_field']]) as $location) {
+      if (empty($location)) {
+        continue;
+      }
+
+      $location = array_merge([
         '#row' => $row,
         '#title' => $this->getTitleField($row) ?? '',
         '#label' => $this->getLabelField($row) ?? '',
-        '#coordinates' => $position,
         '#weight' => $row->index,
-        '#attributes' => ['data-views-row-index' => $row->index],
-      ];
+      ], $location);
+
+      $location['#attributes'] = array_merge(['data-views-row-index' => $row->index], $location['#attributes'] ?? []);
+
+      $location['content'] = $this->view->rowPlugin->render($row);
+
+      // @phpstan-ignore-next-line
+      if ($row->_entity) {
+        $location['#id'] = Html::getUniqueId($row->_entity->getEntityTypeId() . '-' . $row->_entity->id() . '-' . count($locations));
+        $location['#attributes']['data-entity-type'] = $row->_entity->getEntityTypeId();
+        $location['#attributes']['data-entity-id'] = $row->_entity->id();
+      }
+      else {
+        $location['#id'] = $row->index . '-' . count($locations);
+      }
 
       if (!empty($icon_url)) {
         $location['#icon'] = $icon_url;
       }
 
-      if (!empty($location_id)) {
-        $location['#id'] = $location_id;
-      }
-
       if ($this->options['marker_row_number']) {
         $markerOffset = $this->view->pager->getCurrentPage() * $this->view->pager->getItemsPerPage();
-        $marker_row_number = (int) $markerOffset + (int) $row->index + 1;
+        $marker_row_number = (int) $markerOffset + $row->index + 1;
         if (empty($location['#label'])) {
           $location['#label'] = $marker_row_number;
         }
@@ -180,8 +199,34 @@ abstract class GeolocationStyleBase extends StylePluginBase {
       $locations[] = $location;
     }
 
-    $locations = array_merge($data_provider->getLocationsFromViewsRow($row, $this->view->field[$this->options['geolocation_field']]), $locations);
-    $locations = array_merge($data_provider->getShapesFromViewsRow($row, $this->view->field[$this->options['geolocation_field']]), $locations);
+    foreach ($data_provider->getShapesFromViewsRow($row, $this->view->field[$this->options['geolocation_field']]) as $shape) {
+      if (empty($shape)) {
+        continue;
+      }
+
+      $shape = array_merge([
+        '#row' => $row,
+        '#title' => $this->getTitleField($row) ?? '',
+        '#label' => $this->getLabelField($row) ?? '',
+        '#weight' => $row->index,
+      ], $shape);
+
+      $shape['#attributes'] = array_merge(['data-views-row-index' => $row->index], $shape['#attributes'] ?? []);
+
+      $shape['content'] = $this->view->rowPlugin->render($row);
+
+      // @phpstan-ignore-next-line
+      if ($row->_entity) {
+        $shape['#id'] = Html::getUniqueId($row->_entity->getEntityTypeId() . '-' . $row->_entity->id() . '-' . count($locations));
+        $shape['#attributes']['data-entity-type'] = $row->_entity->getEntityTypeId();
+        $shape['#attributes']['data-entity-id'] = $row->_entity->id();
+      }
+      else {
+        $shape['#id'] = $row->index . '-' . count($locations);
+      }
+
+      $locations[] = $shape;
+    }
 
     return $locations;
   }
@@ -189,7 +234,7 @@ abstract class GeolocationStyleBase extends StylePluginBase {
   /**
    * {@inheritdoc}
    */
-  protected function defineOptions() {
+  protected function defineOptions(): array {
     $options = parent::defineOptions();
 
     $options['geolocation_field'] = ['default' => ''];
@@ -208,8 +253,13 @@ abstract class GeolocationStyleBase extends StylePluginBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @param array $form
+   *   Form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   Form state.
    */
-  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+  public function buildOptionsForm(&$form, FormStateInterface $form_state): void {
     parent::buildOptionsForm($form, $form_state);
 
     $labels = $this->displayHandler->getFieldLabels();
@@ -246,7 +296,7 @@ abstract class GeolocationStyleBase extends StylePluginBase {
     }
 
     $form['geolocation_field'] = [
-      '#title' => $this->t('Geolocation source field'),
+      '#title' => $this->t('Geolocation field'),
       '#type' => 'select',
       '#default_value' => $this->options['geolocation_field'],
       '#description' => $this->t("The source of geodata for each entity."),
@@ -264,8 +314,9 @@ abstract class GeolocationStyleBase extends StylePluginBase {
 
     $data_provider = NULL;
 
+    $user_input = $form_state->getUserInput();
     $form_state_data_provider_id = NestedArray::getValue(
-      $form_state->getUserInput(),
+      $user_input,
       ['style_options', 'geolocation_field']
     );
     if (
@@ -303,19 +354,19 @@ abstract class GeolocationStyleBase extends StylePluginBase {
     ]);
 
     $form['title_field'] = [
-      '#title' => $this->t('Title source field'),
+      '#title' => $this->t('Title field'),
       '#type' => 'select',
       '#default_value' => $this->options['title_field'],
-      '#description' => $this->t("The source of the title for each entity. Field type must be 'string'."),
+      '#description' => $this->t("The title is displayed on hover of the marker/shape. Field type must be 'string'."),
       '#options' => $title_options,
       '#empty_value' => 'none',
     ];
 
     $form['label_field'] = [
-      '#title' => $this->t('Label source field'),
+      '#title' => $this->t('Label field'),
       '#type' => 'select',
       '#default_value' => $this->options['label_field'],
-      '#description' => $this->t("The source of the label for each entity. Field type must be 'string'."),
+      '#description' => $this->t("The label is permanently displayed above the marker/shape . Field type must be 'string'."),
       '#options' => $label_options,
       '#empty_value' => 'none',
     ];
@@ -338,11 +389,11 @@ abstract class GeolocationStyleBase extends StylePluginBase {
         '#options' => $icon_options,
         '#empty_value' => 'none',
         '#process' => [
-          ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+          ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
           ['\Drupal\Core\Render\Element\Select', 'processSelect'],
         ],
         '#pre_render' => [
-          ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+          ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
         ],
       ];
     }
@@ -364,6 +415,24 @@ abstract class GeolocationStyleBase extends StylePluginBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function validateOptionsForm(mixed &$form, FormStateInterface $form_state): void {
+    parent::validateOptionsForm($form, $form_state);
+
+    $triggering_element = $form_state->getTriggeringElement();
+
+    // https://www.drupal.org/project/drupal/issues/3137947
+    if (
+      $triggering_element['#name'] == 'style_options[map_provider_id]'
+      && $triggering_element['#value'] != $triggering_element['#default_value']
+    ) {
+      $form_state->clearErrors();
+    }
+
+  }
+
+  /**
    * Get title value if present.
    *
    * @param \Drupal\views\ResultRow $row
@@ -379,10 +448,10 @@ abstract class GeolocationStyleBase extends StylePluginBase {
     ) {
       $title_field = $this->options['title_field'];
       if (!empty($this->rendered_fields[$row->index][$title_field])) {
-        return PlainTextOutput::renderFromHtml($this->rendered_fields[$row->index][$title_field]);
+        return trim(PlainTextOutput::renderFromHtml($this->rendered_fields[$row->index][$title_field]));
       }
       elseif (!empty($this->view->field[$title_field])) {
-        return PlainTextOutput::renderFromHtml($this->view->field[$title_field]->render($row));
+        return trim(PlainTextOutput::renderFromHtml($this->view->field[$title_field]->render($row)));
       }
     }
 
@@ -405,10 +474,10 @@ abstract class GeolocationStyleBase extends StylePluginBase {
     ) {
       $label_field = $this->options['label_field'];
       if (!empty($this->rendered_fields[$row->index][$label_field])) {
-        return PlainTextOutput::renderFromHtml($this->rendered_fields[$row->index][$label_field]);
+        return trim(PlainTextOutput::renderFromHtml($this->rendered_fields[$row->index][$label_field]));
       }
       elseif (!empty($this->view->field[$label_field])) {
-        return PlainTextOutput::renderFromHtml($this->view->field[$label_field]->render($row));
+        return trim(PlainTextOutput::renderFromHtml($this->view->field[$label_field]->render($row)));
       }
     }
 

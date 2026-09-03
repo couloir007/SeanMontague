@@ -4,12 +4,17 @@ namespace Drupal\Tests\custom_field\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\media\Entity\Media;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test cases for paragraphs integration.
  *
  * @group custom_field
+ * @runTestsInSeparateProcesses
  */
+#[Group('custom_field')]
+#[RunTestsInSeparateProcesses]
 class ParagraphsIntegrationTest extends WebDriverTestBase {
 
   /**
@@ -66,9 +71,18 @@ class ParagraphsIntegrationTest extends WebDriverTestBase {
   }
 
   /**
-   * Adds a card with the provided title and image.
+   * Adds a card with the provided title, image and link.
+   *
+   * @param string $title
+   *   The card title.
+   * @param string $image_id
+   *   An image id.
+   * @param array<string, mixed> $link
+   *   The link containing uri, title and options.
+   *
+   * @throws \Behat\Mink\Exception\ElementNotFoundException
    */
-  protected function addCard(string $title, string $image_id): void {
+  protected function addCard(string $title, string $image_id, array $link): void {
     static $delta = 0;
     $this->getSession()->getPage()->pressButton('Add Card');
     $this->assertSession()->assertWaitOnAjaxRequest();
@@ -92,6 +106,24 @@ class ParagraphsIntegrationTest extends WebDriverTestBase {
 
     $assert->assertWaitOnAjaxRequest();
 
+    // Fill in the link subfield.
+    $card->fillField('URL', $link['uri']);
+    if (!empty($link['title'])) {
+      $card->fillField('Link text', $link['title']);
+    }
+    if (!empty($link['options']['attributes'])) {
+      // The attributes are collapsed inside a details element by default, so
+      // make sure it is expanded before attempting to interact with it.
+      if ($summary = $card->find('css', 'details summary')) {
+        $summary->click();
+      }
+      foreach ($link['options']['attributes'] as $attribute => $value) {
+        $field = $card->find('css', '[name$="[options][attributes][' . $attribute . ']"]');
+        $this->assertNotNull($field, "Attribute field \"$attribute\" exists.");
+        $field->setValue($value);
+      }
+    }
+
     ++$delta;
   }
 
@@ -104,8 +136,13 @@ class ParagraphsIntegrationTest extends WebDriverTestBase {
    *   The expected title.
    * @param string $image_id
    *   The expected image id.
+   * @param array $link
+   *   The expected link data.
+   *
+   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   * @throws \Behat\Mink\Exception\ExpectationException
    */
-  protected function assertCardData(int $delta, string $title, string $image_id): void {
+  protected function assertCardData(int $delta, string $title, string $image_id, array $link): void {
     $assert = $this->assertSession();
 
     // Find the desired card delta.
@@ -119,10 +156,22 @@ class ParagraphsIntegrationTest extends WebDriverTestBase {
 
     $assert->fieldValueEquals('Title', $title, $row);
     $assert->hiddenFieldValueEquals(
-    'field_components[' . $delta . '][subform][field_content][0][media][selection][0][target_id]',
+      'field_components[' . $delta . '][subform][field_content][0][media][selection][0][target_id]',
       $image_id,
       $row
     );
+
+    $assert->fieldValueEquals('URL', $link['uri'], $row);
+    if (!empty($link['title'])) {
+      $assert->fieldValueEquals('Link text', $link['title'], $row);
+    }
+    if (!empty($link['options']['attributes'])) {
+      foreach ($link['options']['attributes'] as $attribute => $value) {
+        $field = $row->find('css', '[name$="[options][attributes][' . $attribute . ']"]');
+        $this->assertNotNull($field, "Attribute field \"$attribute\" exists.");
+        $this->assertEquals($value, $field->getValue(), "Attribute \"$attribute\" has the expected value.");
+      }
+    }
   }
 
   /**
@@ -135,13 +184,37 @@ class ParagraphsIntegrationTest extends WebDriverTestBase {
 
     $this->getSession()->getPage()->fillField('Title', 'Test node');
 
+    // Link examples to exercise the uri, title and attributes subfields.
+    $link_1 = [
+      'uri' => 'https://www.drupal.org',
+      'title' => 'Drupal',
+      'options' => [
+        'attributes' => [
+          'target' => '_blank',
+          'class' => 'link-primary',
+          'rel' => 'nofollow',
+        ],
+      ],
+    ];
+    $link_2 = [
+      'uri' => 'https://www.example.com',
+      'title' => 'Example',
+      'options' => [
+        'attributes' => [
+          'target' => '_self',
+          'class' => 'link-secondary',
+          'rel' => 'noopener',
+        ],
+      ],
+    ];
+
     // Add some cards.
-    $this->addCard('Card 1', '1');
-    $this->addCard('Card 2', '2');
+    $this->addCard('Card 1', '1', $link_1);
+    $this->addCard('Card 2', '2', $link_2);
 
     // Ensure that no card data was lost.
-    $this->assertCardData(0, 'Card 1', '1');
-    $this->assertCardData(1, 'Card 2', '2');
+    $this->assertCardData(0, 'Card 1', '1', $link_1);
+    $this->assertCardData(1, 'Card 2', '2', $link_2);
 
     // Save the content.
     $this->submitForm([], 'Save');
@@ -149,8 +222,8 @@ class ParagraphsIntegrationTest extends WebDriverTestBase {
     $this->drupalGet('/node/1/edit');
 
     // Ensure that the card data was properly persisted.
-    $this->assertCardData(0, 'Card 1', '1');
-    $this->assertCardData(1, 'Card 2', '2');
+    $this->assertCardData(0, 'Card 1', '1', $link_1);
+    $this->assertCardData(1, 'Card 2', '2', $link_2);
   }
 
 }

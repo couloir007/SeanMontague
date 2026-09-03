@@ -1,30 +1,25 @@
-customfield-admin:
-  version: 1.x
+custom-field-admin:
   css:
     component:
-      css/customfield.admin.css: {}
+      css/custom-field.admin.css: {}
 
 custom-field-flex:
-  version: 1.x
   css:
     component:
       css/custom-field-flex.css: {}
 
 custom-field-widget:
-  version: 1.x
   css:
     component:
       css/custom-field-widget.css: {}
 
 custom-field-flex-admin:
-  version: 1.x
   js:
     js/custom-field-flex.widget-settings.js: {}
   dependencies:
     - custom_field/custom-field-flex
 
 custom-field-color-box:
-  version: 1.x
   js:
     js/custom-field-color-box.js: {}
   css:
@@ -34,11 +29,21 @@ custom-field-color-box:
     - core/drupalSettings
     - core/once
 
-custom-field-datetime:
-  version: 1.x
-  css:
-    component:
-      css/custom-field-datetime.css: {}
+date_format_preview:
+  js:
+    js/date-format-preview.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+    - core/once
+
+custom-field-table-header:
+  js:
+    js/custom-field-table-header.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
 
 drupal.custom-icon:
   version: VERSION
@@ -47,3 +52,10 @@ drupal.custom-icon:
       css/custom_field.icon.theme.css: {}
   dependencies:
     - field_ui/drupal.field_ui.manage_fields
+
+custom-field-widget-details-label:
+  js:
+    js/custom-field-widget-details-label.js: {}
+  dependencies:
+    - core/drupal
+    - core/once

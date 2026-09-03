@@ -53,7 +53,7 @@ class HereMapsSettings extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $config = $this->configFactory()->getEditable('here_maps.settings');
     $config->set('app_id', $form_state->getValue('app_id'));
     $config->set('app_code', $form_state->getValue('app_code'));

@@ -1,0 +1,7 @@
+langcode: en
+status: true
+name: 'Provinces of Canada'
+vid: geolocation_provinces_of_canada
+description: ''
+hierarchy: 0
+weight: 0

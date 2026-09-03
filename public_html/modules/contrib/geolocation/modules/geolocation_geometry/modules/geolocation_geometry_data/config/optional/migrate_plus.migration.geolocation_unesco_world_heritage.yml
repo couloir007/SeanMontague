@@ -1,0 +1,89 @@
+# A "migration" is, in technical terms, a plugin whose configuration describes
+# how to read source data, process it (generally by mapping source fields to
+# destination fields), and write it to Drupal.
+
+# The machine name for a migration, used to uniquely identify it.
+id: geolocation_unesco_world_heritage
+
+# A human-friendly description of the migration.
+label: "UNESCO World Heritage Sites"
+
+migration_group: geolocation_geometry_data
+
+# The category or tag for the migration.
+migration_tags:
+  - geolocation
+
+source:
+  plugin: url
+  data_fetcher_plugin: http
+  data_parser_plugin: xml
+  urls:
+    - https://whc.unesco.org/en/list/xml/
+  item_selector: /query/row
+  fields:
+    - name: id_number
+      label: 'ID Number'
+      selector: id_number
+    - name: site
+      label: 'Site'
+      selector: site
+    - name: short_description
+      label: 'Short Description'
+      selector: short_description
+    - name: latitude
+      label: 'Latitude'
+      selector: latitude
+    - name: longitude
+      label: 'Longitude'
+      selector: longitude
+  ids:
+    id_number:
+      type: integer
+
+# Every migration must also have a destination plugin, which handles writing
+# the migrated data in the appropriate form for that particular kind of data.
+# Most Drupal content is an "entity" of one type or another, and we need to
+# specify what entity type we are populating (in this case, taxonomy terms).
+# Unlike the source plugin (which is specific to our particular scenario), this
+# destination plugin is implemented in Drupal itself.
+destination:
+  plugin: entity:node
+
+# Here's the meat of the migration - the processing pipeline. This describes how
+# each destination field is to be populated based on the source data. For each
+# destination field, one or more process plugins may be invoked.
+process:
+  # The simplest process plugin is named 'get' - it is the default plugin, so
+  # does not need to be explicitly named. It simply copies the source value
+  # (the 'style' field from the source database in this case) to the destination
+  # field (the taxonomy term 'name' field). You can see we simply copy the
+  # source 'details' field to destination 'description' field in the same way.
+  title: site
+  body: short_description
+  field_geometry_data_point:
+    plugin: geolocation_coordinates_to_geometry_point
+    format: geojson
+    source:
+      - latitude
+      - longitude
+
+  # Here is a new plugin - default_value. In its simplest usage here, it is used
+  # to hard-code a destination value, the vid (vocabulary ID) our taxonomy terms
+  # should be assigned to. It's important to note that while above the right
+  # side of the mappings was a source field name, here the right side of the
+  # 'default_value:' line is an actual value.
+  type:
+    plugin: default_value
+    default_value: unesco_world_heritage
+
+migration_dependencies: {}
+
+# By default, configuration entities (like this migration) are not automatically
+# removed when the migration which installed them is uninstalled. To have your
+# migrations uninstalled with your migration module, add an enforced dependency
+# on your module.
+dependencies:
+  enforced:
+    module:
+      - geolocation_geometry_data

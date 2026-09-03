@@ -35,10 +35,10 @@ class DateTimeDefaultWidget extends DateTimeWidgetBase {
     // Wrap date and time elements with a fieldset.
     if ($datetime_type === DateTimeType::DATETIME_TYPE_DATETIME) {
       $element['#title'] = $element['value']['#title'];
+      $element['#theme'] = 'custom_field_flex_wrapper';
+      $element['#theme_wrappers'] = ['fieldset', 'container'];
       $element['value']['#type'] = 'custom_field_datetime';
       $element['value']['#theme_wrappers'] = [];
-      $element['#theme_wrappers'] = ['container', 'fieldset', 'container'];
-      $element['#attributes']['class'][] = 'custom-field-datetime-grid';
     }
     else {
       $element['value']['#type'] = 'custom_field_datetime_date';

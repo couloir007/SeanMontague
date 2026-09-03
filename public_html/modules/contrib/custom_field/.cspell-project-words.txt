@@ -3,9 +3,29 @@
 
 # Allowed words until better suggestions are provided or added to dictionary.
 autocollapse
+automator
+automators
 customfield
 nonroot
+nullsafe
 syndicatable
+viewfield
+viewfields
 
 # User names: contributors, maintainers, users (mostly in README.md files).
 apmsooner
+
+# Makedocs words.
+codehilite
+fontawesome
+frontends
+guidlines
+inlinehilite
+linenums
+pygments
+pymdownx
+startinline
+superfences
+Metadrop
+squidfunk
+APPROOT

@@ -1,7 +1,7 @@
 name: Geolocation - Demo
 type: module
 description: 'Example views and pages for some more common use cases.'
-core_version_requirement: ^10.3 || ^11
+core_version_requirement: ^10 || ^11 || ^12
 package: Geolocation
 dependencies:
   - geolocation:geolocation
@@ -12,6 +12,6 @@ dependencies:
   - drupal:taxonomy
 
 # Information added by Drupal.org packaging script on 2026-06-21
-version: '8.x-3.15'
+version: '4.0.0'
 project: 'geolocation'
-datestamp: 1782062463
+datestamp: 1782057431

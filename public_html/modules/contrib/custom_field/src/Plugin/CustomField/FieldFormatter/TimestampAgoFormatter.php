@@ -72,6 +72,7 @@ class TimestampAgoFormatter extends CustomFieldFormatterBase {
       '#type' => 'textfield',
       '#title' => $this->t('Future format'),
       '#default_value' => $this->getSetting('future_format'),
+      '#required' => TRUE,
       '#description' => $this->t('Use <em>@interval</em> where you want the formatted interval text to appear.'),
     ];
 
@@ -79,6 +80,7 @@ class TimestampAgoFormatter extends CustomFieldFormatterBase {
       '#type' => 'textfield',
       '#title' => $this->t('Past format'),
       '#default_value' => $this->getSetting('past_format'),
+      '#required' => TRUE,
       '#description' => $this->t('Use <em>@interval</em> where you want the formatted interval text to appear.'),
     ];
 
@@ -88,7 +90,7 @@ class TimestampAgoFormatter extends CustomFieldFormatterBase {
       '#description' => $this->t('How many time interval units should be shown in the formatted output.'),
       '#default_value' => $this->getSetting('granularity') ?: 2,
       '#min' => 1,
-      '#max' => 6,
+      '#max' => 7,
     ];
 
     return $elements;

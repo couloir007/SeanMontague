@@ -2,6 +2,7 @@
 
 namespace Drupal\geolocation_geometry\Plugin\views\filter;
 
+use Drupal\views\Attribute\ViewsFilter;
 use Drupal\geolocation\Plugin\views\filter\ProximityFilter;
 use Drupal\geolocation_geometry\GeometryProximityTrait;
 
@@ -9,9 +10,8 @@ use Drupal\geolocation_geometry\GeometryProximityTrait;
  * Filter handler for search keywords.
  *
  * @ingroup views_filter_handlers
- *
- * @ViewsFilter("geolocation_geometry_filter_proximity")
  */
+#[ViewsFilter(id: 'geolocation_geometry_filter_proximity')]
 class GeoProximityFilter extends ProximityFilter {
 
   use GeometryProximityTrait;
@@ -19,7 +19,7 @@ class GeoProximityFilter extends ProximityFilter {
   /**
    * {@inheritdoc}
    */
-  public function query() {
+  public function query(): void {
     $table = $this->ensureMyTable();
     $this->value['value'] = self::convertDistance($this->value['value'], $this->options['unit']);
 
@@ -33,7 +33,7 @@ class GeoProximityFilter extends ProximityFilter {
       ];
     }
     else {
-      $center = $this->locationInputManager->getCoordinates((array) $this->value['center'], $this->options['location_input'], $this);
+      $center = $this->locationInputManager->getCoordinates((array) $this->value['center'], $this->options['location_input'], ['filter' => $this]);
     }
 
     if (

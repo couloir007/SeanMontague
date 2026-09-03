@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Element;
 
 use Drupal\Core\Form\FormStateInterface;

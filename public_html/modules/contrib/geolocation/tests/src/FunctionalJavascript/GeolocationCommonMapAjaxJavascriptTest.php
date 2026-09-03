@@ -34,7 +34,7 @@ class GeolocationCommonMapAjaxJavascriptTest extends GeolocationJavascriptTestBa
    *
    * @var array
    */
-  public static $testViews = ['geolocation_common_map_ajax_test'];
+  public static array $testViews = ['geolocation_common_map_ajax_test'];
 
   /**
    * {@inheritdoc}
@@ -110,11 +110,14 @@ class GeolocationCommonMapAjaxJavascriptTest extends GeolocationJavascriptTestBa
   /**
    * Tests the CommonMap style.
    */
-  public function testCommonMap() {
+  public function testCommonMap(): void {
     $this->drupalGet('geolocation-common-map-ajax-test');
 
     $this->assertSession()->elementExists('css', '.geolocation-map-container');
     $this->assertSession()->elementExists('css', '.geolocation-location');
+
+    $anchor = $this->assertSession()->waitForElement('css', 'a[href^="https://maps.google.com"][href*="hl="]');
+    $this->assertNotEmpty($anchor, "Wait for GoogleMaps to be loaded.");
 
     // If Google works, either gm-style or gm-err-container will be present.
     $this->assertSession()->elementExists('css', '.geolocation-map-container [class^="gm-"]');
@@ -123,7 +126,7 @@ class GeolocationCommonMapAjaxJavascriptTest extends GeolocationJavascriptTestBa
   /**
    * Tests the CommonMap style.
    */
-  public function testCommonMapAjax() {
+  public function testCommonMapAjax(): void {
     $this->drupalGet('geolocation-common-map-ajax-test');
 
     $session = $this->getSession();

@@ -1,5 +1,4 @@
 services:
-
   geolocation.ajax_subscriber:
     class: Drupal\geolocation\EventSubscriber\AjaxResponseSubscriber
     tags:
@@ -13,6 +12,18 @@ services:
     class: Drupal\geolocation\DataProviderManager
     parent: default_plugin_manager
 
+  plugin.manager.geolocation.datalayerprovider:
+    class: Drupal\geolocation\DataLayerProviderManager
+    parent: default_plugin_manager
+
+  plugin.manager.geolocation.tilelayerprovider:
+    class: Drupal\geolocation\TileLayerProviderManager
+    parent: default_plugin_manager
+
+  plugin.manager.geolocation.layerfeature:
+    class: Drupal\geolocation\LayerFeatureManager
+    parent: default_plugin_manager
+
   plugin.manager.geolocation.mapprovider:
     class: Drupal\geolocation\MapProviderManager
     parent: default_plugin_manager
@@ -22,8 +33,8 @@ services:
     parent: default_plugin_manager
 
   plugin.manager.geolocation.location:
-      class: Drupal\geolocation\LocationManager
-      parent: default_plugin_manager
+    class: Drupal\geolocation\LocationManager
+    parent: default_plugin_manager
 
   plugin.manager.geolocation.mapfeature:
     class: Drupal\geolocation\MapFeatureManager

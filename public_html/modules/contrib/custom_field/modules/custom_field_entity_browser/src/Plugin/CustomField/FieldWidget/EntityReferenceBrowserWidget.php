@@ -9,10 +9,11 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
-use Drupal\custom_field\Plugin\CustomField\EntityReferenceWidgetBase;
+use Drupal\custom_field\Plugin\CustomField\FieldWidget\EntityReferenceWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\entity_browser\Element\EntityBrowserElement;
 use Drupal\entity_browser\FieldWidgetDisplayInterface;
@@ -20,11 +21,17 @@ use Drupal\entity_browser\FieldWidgetDisplayManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the 'entity_reference_entity_browser' field widget.
+ * Entity browser widget for custom_field entity_reference subfields.
  *
- * Modified version of
- * \Drupal\entity_browser\Plugin\Field\FieldWidget\EntityReferenceBrowserWidget
- * with hardcoded limitation to cardinality = 1.
+ * Adapted from entity_browser's EntityReferenceBrowserWidget with cardinality
+ * fixed to 1. Selection is stored in a hidden target_id as "entity_type:id"
+ * and updated by entity_browser JS via the entity_browser_value_updated event.
+ *
+ * Entity resolution priority (see resolveSelectedEntity()):
+ * 1. Raw user input for target_id
+ * 2. Triggering element (browser AJAX update or remove/replace)
+ * 3. Form-state stash (survives #limit_validation_errors)
+ * 4. Stored field item entity
  */
 #[CustomFieldWidget(
   id: 'entity_reference_entity_browser',
@@ -37,19 +44,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 )]
 class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
 
+  use LoggerChannelTrait;
+
   /**
-   * The cardinality we can support.
-   *
-   * @var int
+   * Supported cardinality for this custom field widget.
    */
   protected const CARDINALITY = 1;
 
   /**
-   * The depth of the delete button.
+   * Fallback depth from remove/replace button to the widget root.
    *
-   * This property exists so it can be changed if subclasses.
-   *
-   * @var int
+   * Prefer #widget_array_parents on buttons when present. This constant only
+   * backs older form builds that lack that property.
    */
   protected const DELETE_DEPTH = 4;
 
@@ -73,38 +79,25 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    $settings = parent::defaultSettings();
-    $settings['settings'] = [
-      'entity_browser' => [
-        'entity_browser' => NULL,
-        'open' => FALSE,
-        'field_widget_display' => 'label',
-        'field_widget_edit' => TRUE,
-        'field_widget_remove' => TRUE,
-        'field_widget_replace' => FALSE,
-        'field_widget_display_settings' => [],
-      ],
-    ] + $settings['settings'];
-
-    return $settings;
+    return [
+      'entity_browser' => NULL,
+      'open' => FALSE,
+      'field_widget_display' => 'label',
+      'field_widget_edit' => TRUE,
+      'field_widget_remove' => TRUE,
+      'field_widget_replace' => FALSE,
+      'field_widget_display_settings' => [],
+    ] + parent::defaultSettings();
   }
 
   /**
    * {@inheritdoc}
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
-    $form = parent::widgetSettingsForm($form_state, $field);
-
-    $settings = $field->getWidgetSetting('settings')['entity_browser'] ?? [];
-    $settings = $settings + self::defaultSettings()['settings']['entity_browser'];
+    $element = parent::widgetSettingsForm($form_state, $field);
+    $settings = $this->getSettings() + self::defaultSettings();
     $target_type = $field->getTargetType();
     $entity_type = $this->entityTypeManager->getStorage($target_type)->getEntityType();
-    $handler_settings = $form['settings']['handler']['handler_settings'] ?? [];
-    if (isset($handler_settings['auto_create'])) {
-      // Unset irrelevant settings.
-      $form['settings']['handler']['handler_settings']['auto_create']['#access'] = FALSE;
-      $form['settings']['handler']['handler_settings']['auto_create_bundle']['#access'] = FALSE;
-    }
 
     $browsers = [];
     try {
@@ -113,17 +106,12 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
       }
     }
     catch (\Exception $exception) {
-      // Silent fail, for now.
+      $this->getLogger('custom_field_entity_browser')->error(
+        'Unable to load entity browsers for widget settings: @message',
+        ['@message' => $exception->getMessage()]
+      );
     }
 
-    $form['settings']['entity_browser'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Entity browser'),
-      '#open' => TRUE,
-      '#tree' => TRUE,
-    ];
-
-    $element = &$form['settings']['entity_browser'];
     $element['entity_browser'] = [
       '#title' => $this->t('Entity browser'),
       '#type' => 'select',
@@ -132,22 +120,8 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
       '#empty_option' => $this->t('- Select -'),
       '#required' => TRUE,
     ];
-    unset($browser, $browsers);
 
-    $displays = [];
-    foreach ($this->fieldDisplayManager->getDefinitions() as $id => $definition) {
-      try {
-        $field_widget_display = $this->fieldDisplayManager->createInstance($id);
-        assert($field_widget_display instanceof FieldWidgetDisplayInterface);
-        if ($field_widget_display->isApplicable($entity_type)) {
-          $displays[$id] = $definition['label'];
-        }
-      }
-      catch (\Exception $exception) {
-        // Silent fail, for now.
-      }
-    }
-    unset($definition, $field_widget_display, $id);
+    $displays = $this->getApplicableDisplayOptions($entity_type);
 
     $id = Html::getId($field->getName()) . '-field-widget-display-settings-ajax-wrapper-' . md5($this->getUniqueIdentifier($field));
     $element['field_widget_display'] = [
@@ -172,30 +146,18 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
         '#tree' => TRUE,
       ];
 
-      try {
-        $field_widget_display = $this->fieldDisplayManager->createInstance(
-          $form_state->getValue(
-            [
-              'settings',
-              'field_widget_display',
-            ],
-            $settings['field_widget_display']
-          ),
-          $form_state->getValue(
-            [
-              'settings',
-              'field_widget_display_settings',
-            ],
-            $settings['field_widget_display_settings']
-          ) + [
-            'entity_type' => $target_type,
-          ]
-        );
-        assert($field_widget_display instanceof FieldWidgetDisplayInterface);
-        $element['field_widget_display_settings'] += $field_widget_display->settingsForm($form, $form_state);
-      }
-      catch (\Exception $exception) {
-        // Silent fail, for now.
+      $display_plugin = $this->createFieldWidgetDisplay(
+        $form_state->getValue(
+          $this->getSettingsFormValueKeys($field, 'field_widget_display'),
+          $settings['field_widget_display']
+        ),
+        $form_state->getValue(
+          $this->getSettingsFormValueKeys($field, 'field_widget_display_settings'),
+          $settings['field_widget_display_settings']
+        ) + ['entity_type' => $target_type]
+      );
+      if ($display_plugin) {
+        $element['field_widget_display_settings'] += $display_plugin->settingsForm($element, $form_state);
       }
     }
 
@@ -225,11 +187,11 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
       '#default_value' => $settings['open'],
     ];
 
-    return $form;
+    return $element;
   }
 
   /**
-   * Ajax callback that updates field widget display settings fieldset.
+   * Ajax callback that updates the field widget display settings fieldset.
    *
    * @param array<string, mixed> $form
    *   The form definition for the widget settings.
@@ -240,6 +202,7 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
     $array_parents = $form_state->getTriggeringElement()['#array_parents'];
     $up_two_levels = array_slice($array_parents, 0, count($array_parents) - 2);
     $settings_path = array_merge($up_two_levels, ['field_widget_display_settings']);
+
     return NestedArray::getValue($form, $settings_path);
   }
 
@@ -248,44 +211,28 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
    */
   public function widget(FieldItemListInterface $items, int $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
+    $field_settings = $field->getFieldSettings();
+    $settings = $this->getSettings() + self::defaultSettings();
     $field_name = $items->getFieldDefinition()->getName();
     $parents = is_array($form['#parents']) ? $form['#parents'] : [];
-    $entity = $this->formElementEntity($parents, $items, $delta, $form_state, $field);
+    $entity = $this->resolveSelectedEntity($parents, $items, $delta, $form_state, $field);
 
-    // @todo Figure out a better way to enforce a 'clean start' when adding
-    // new field item for whose delta a value already may have been stored
-    // in the form state (below), as the field item 'remove' button does not
-    // exist when building the widget element, so we cannot attach
-    // 'removeItemSubmit' to it.
-    $triggering_element = $form_state->getTriggeringElement();
-    if (isset($triggering_element['#name'])) {
-      $match = implode('_', [...$parents, $field_name, 'add_more']);
-      if ($triggering_element['#name'] === $match) {
-        // If the delta is not present in the user input, it means it is new or
-        // is being added again. In both cases, we want to start with an empty
-        // selection.
-        // By forcing $entity to NULL, a selection stored in the form state (if
-        // any) will also be set to NULL hereafter.
-        $user_input = $form_state->getUserInput();
-        if (!NestedArray::keyExists($user_input, [
-          ...$parents,
-          $field_name,
-          $delta,
-        ])) {
-          $entity = NULL;
-        }
-      }
+    // New field-item rows from "add more" must start empty even if form state
+    // still holds a prior selection for this delta.
+    if ($this->isNewItemAfterAddMore($parents, $field_name, $delta, $form_state)) {
+      $entity = NULL;
     }
 
-    // We store current entity ID as we might need them in future requests. If
-    // some other part of the form triggers an AJAX request with
-    // #limit_validation_errors we won't have access to the value of the
-    // target_id element and won't be able to build the form as a result of
-    // that. This will cause missing submit (Remove, Edit, ...) elements, which
-    // might result in unpredictable results.
+    // Stash selection so rebuilds with #limit_validation_errors still work.
+    // Include form #parents so nested hosts (e.g. multi-value Paragraphs) do
+    // not share one key when parent entity ids are empty/identical.
     $parent_entity = $items->getEntity();
-    $form_state_key = static::getFormStateKey("{$parent_entity->getEntityTypeId()}:{$parent_entity->id()}", $field_name, $delta);
+    $form_state_key = static::getFormStateKey(
+      $parent_entity->getEntityTypeId() . ':' . $parent_entity->id(),
+      $field_name,
+      $delta,
+      $parents
+    );
     $form_state->set($form_state_key, $entity?->id());
 
     $id_string = $this->getUniqueElementId($form, $field_name, $delta, $field->getName());
@@ -294,20 +241,18 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
     $element += [
       '#id' => $id_string,
       '#type' => 'details',
-      '#open' => (!is_null($entity) || $settings['entity_browser']['open']),
-      '#required' => $settings['required'],
-      // We are not using Entity browser's hidden element since we maintain
-      // selected entities in it during entire process.
+      '#open' => (!is_null($entity) || $settings['open']),
+      '#required' => $field_settings['required'],
+      // Maintain selection in our own hidden input for the full request cycle.
       'target_id' => [
         '#type' => 'hidden',
         '#id' => $hidden_id,
-        // We need to repeat ID here as it is otherwise skipped when rendering.
+        // Repeat ID: Form API may otherwise omit it when rendering.
         '#attributes' => [
           'id' => $hidden_id,
         ],
-        '#default_value' => is_null($entity) ? '' : "{$entity->getEntityTypeId()}:{$entity->id()}",
-        // #ajax is officially not supported for hidden elements but if we
-        // specify event manually it works.
+        '#default_value' => is_null($entity) ? '' : $entity->getEntityTypeId() . ':' . $entity->id(),
+        // Hidden elements need an explicit event for #ajax to fire.
         '#ajax' => [
           'callback' => [static::class, 'updateWidgetCallback'],
           'wrapper' => $id_string,
@@ -316,17 +261,15 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
       ],
     ];
 
-    // Get configuration required to check entity browser availability.
     $cardinality = static::CARDINALITY;
     $selection_mode = EntityBrowserElement::SELECTION_MODE_APPEND;
 
-    // Enable entity browser if requirements for that are fulfilled.
     if (EntityBrowserElement::isEntityBrowserAvailable($selection_mode, $cardinality, (int) !is_null($entity))) {
       $persistentData = $this->getPersistentData($field);
 
       $element['entity_browser'] = [
         '#type' => 'entity_browser',
-        '#entity_browser' => $settings['entity_browser']['entity_browser'],
+        '#entity_browser' => $settings['entity_browser'],
         '#cardinality' => $cardinality,
         '#selection_mode' => $selection_mode,
         '#default_value' => $entity,
@@ -341,15 +284,19 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
       $element['target_id']['#attributes']['data-entity-browser-available'] = 1;
     }
     else {
-      // Allow non-ajax remove button to trigger ajax refresh when
-      // cardinality.
       $element['target_id']['#attributes']['data-entity-browser-visible'] = 0;
     }
 
     $element['#attached']['library'][] = 'entity_browser/entity_reference';
 
     if (!is_null($entity)) {
-      $element['current'] = $this->displayCurrentSelection($id_string, [(string) $items->getName()], $entity, $delta, $field);
+      $element['current'] = $this->displayCurrentSelection(
+        $id_string,
+        [(string) $items->getName()],
+        $entity,
+        $delta,
+        $field
+      );
     }
 
     return $element;
@@ -357,6 +304,8 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
 
   /**
    * Render API callback: Processes the entity browser element.
+   *
+   * Points entity_browser JS at our custom hidden target_id input.
    *
    * @param array<string, mixed> $element
    *   The element.
@@ -376,22 +325,31 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
    * {@inheritdoc}
    */
   public function massageFormValue(mixed $value, array $column): mixed {
-    if (empty($value['target_id'])) {
+    if (!is_array($value) || empty($value['target_id'])) {
       return NULL;
     }
 
-    $value['target_id'] = explode(':', $value['target_id'])[1];
-    unset($value['current']);
+    $raw = $value['target_id'];
+    if (!is_string($raw)) {
+      return NULL;
+    }
 
-    return $value;
+    // Expected shape from entity browser: "entity_type:id".
+    $parts = explode(':', $raw, 2);
+    if (count($parts) !== 2 || $parts[0] === '' || $parts[1] === '') {
+      return NULL;
+    }
+
+    return [
+      'target_id' => $parts[1],
+    ];
   }
 
   /**
-   * AJAX form callback.
+   * AJAX form callback for browser selection updates and remove/replace.
    *
    * @param array<string, mixed> $form
-   *   The form structure where widgets are being attached to. This might be a
-   *   full form structure, or a sub-element of a larger form.
+   *   The form structure where widgets are being attached to.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    *
@@ -401,61 +359,43 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
   public static function updateWidgetCallback(array $form, FormStateInterface $form_state): array {
     $trigger = $form_state->getTriggeringElement();
     $reopen_browser = FALSE;
-    // AJAX requests can be triggered by hidden "target_id" element when
-    // entities are added or by one of the "Remove" buttons. Depending on that
-    // we need to figure out where root of the widget is in the form structure
-    // and use this information to return correct part of the form.
-    $parents = [];
-    if (
-      NestedArray::keyExists($trigger, ['#ajax', 'event'])
-      && $trigger['#ajax']['event'] === 'entity_browser_value_updated'
-    ) {
-      $parents = array_slice($trigger['#array_parents'], 0, -1);
-    }
-    elseif ($trigger['#type'] === 'submit' && str_ends_with($trigger['#name'], '_entity_browser_remove')) {
-      $parents = array_slice($trigger['#array_parents'], 0, -static::DELETE_DEPTH);
-    }
-    elseif ($trigger['#type'] === 'submit' && str_ends_with($trigger['#name'], '_entity_browser_replace')) {
-      $parents = array_slice($trigger['#array_parents'], 0, -static::DELETE_DEPTH);
-      // We need to re-open the browser. Instead of just passing "TRUE", send
-      // to the JS the unique part of the button's name that needs to be clicked
-      // on to relaunch the browser.
-      $reopen_browser = implode('-', array_slice($trigger['#parents'], 0, -static::DELETE_DEPTH));
-    }
+    $parents = static::getWidgetArrayParentsFromTrigger($trigger, $reopen_browser);
 
-    $parents = NestedArray::getValue($form, $parents);
-    $parents['#attached']['drupalSettings']['entity_browser_reopen_browser'] = $reopen_browser;
-    return $parents;
+    $widget = NestedArray::getValue($form, $parents) ?? [];
+    $widget['#attached']['drupalSettings']['entity_browser_reopen_browser'] = $reopen_browser;
+    return $widget;
   }
 
   /**
-   * Submit callback for replace and remove button.
+   * Submit callback for replace and remove buttons.
    *
    * @param array<string, mixed> $form
-   *   The form structure where widgets are being attached to. This might be a
-   *   full form structure, or a sub-element of a larger form.
+   *   The form structure where widgets are being attached to.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
   public static function removeItemSubmit(array $form, FormStateInterface $form_state): void {
-
     $triggering_element = $form_state->getTriggeringElement();
-    if (!empty($triggering_element['#attributes']['data-entity-id']) && isset($triggering_element['#attributes']['data-row-id'])) {
-      $array_parents = array_slice($triggering_element['#array_parents'], 0, -static::DELETE_DEPTH);
-
-      // Set new value for this widget.
-      $target_id_element = &NestedArray::getValue($form, array_merge($array_parents, ['target_id']));
-      $form_state->setValueForElement($target_id_element, '');
-      $user_input = &$form_state->getUserInput();
-      NestedArray::setValue($user_input, $target_id_element['#parents'], '');
-
-      // Rebuild form.
-      $form_state->setRebuild();
+    if (empty($triggering_element['#attributes']['data-entity-id']) || !isset($triggering_element['#attributes']['data-row-id'])) {
+      return;
     }
+
+    $array_parents = $triggering_element['#widget_array_parents']
+      ?? array_slice($triggering_element['#array_parents'], 0, -static::DELETE_DEPTH);
+
+    $target_id_element = &NestedArray::getValue($form, array_merge($array_parents, ['target_id']));
+    if (!is_array($target_id_element)) {
+      return;
+    }
+
+    $form_state->setValueForElement($target_id_element, '');
+    $user_input = &$form_state->getUserInput();
+    NestedArray::setValue($user_input, $target_id_element['#parents'], '');
+    $form_state->setRebuild();
   }
 
   /**
-   * Builds the render array for displaying the current results.
+   * Builds the render array for the current single selection.
    *
    * @param string $id
    *   The ID for the details element and button key prefixes.
@@ -464,7 +404,7 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The referenced entity.
    * @param int $delta
-   *   The order of this item in the array of sub-elements (0, 1, 2, etc.).
+   *   Field item delta.
    * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $field
    *   The custom field type object.
    *
@@ -472,35 +412,22 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
    *   The render array for the current selection.
    */
   protected function displayCurrentSelection(string $id, array $field_parents, EntityInterface $entity, int $delta, CustomFieldTypeInterface $field): array {
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
-    $browser_settings = $settings['entity_browser'];
+    $settings = $this->getSettings() + self::defaultSettings();
     $name_key = str_replace('-', '_', $id);
-
     $target_entity_type = $field->getTargetType();
-    $field_widget_display_settings = $browser_settings['field_widget_display_settings'] ?? [];
 
-    try {
-      $field_widget_display = $this->fieldDisplayManager->createInstance(
-        $browser_settings['field_widget_display'],
-        $field_widget_display_settings + ['entity_type' => $target_entity_type]
-      );
-      assert($field_widget_display instanceof FieldWidgetDisplayInterface);
-    }
-    catch (\Exception $exception) {
+    $field_widget_display = $this->createFieldWidgetDisplay(
+      $settings['field_widget_display'],
+      ($settings['field_widget_display_settings'] ?? []) + ['entity_type' => $target_entity_type]
+    );
+    if (!$field_widget_display) {
       return [];
     }
 
-    $classes = [
-      'entities-list',
-      Html::cleanCssIdentifier("entity-type--$target_entity_type"),
-    ];
-
-    $edit_button_access = $browser_settings['field_widget_edit'] && $entity->access('update', $this->currentUser);
+    $edit_button_access = $settings['field_widget_edit'] && $entity->access('update', $this->currentUser);
     if ($entity->getEntityTypeId() === 'file') {
-      // On file entities, the "edit" button shouldn't be visible unless
-      // the module "file_entity" is present, which will allow them to be
-      // edited on their own form.
-      $edit_button_access &= $this->moduleHandler->moduleExists('file_entity');
+      // File entities need file_entity to expose a standalone edit form.
+      $edit_button_access = $edit_button_access && $this->moduleHandler->moduleExists('file_entity');
     }
 
     $display = $field_widget_display->view($entity);
@@ -508,62 +435,74 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
       $display = ['#markup' => $display];
     }
 
+    // Widget root is the details element; buttons live under current/items/0.
+    // #widget_array_parents is set in a process callback after parents exist.
+    $button_base = [
+      '#type' => 'submit',
+      '#ajax' => [
+        'callback' => [static::class, 'updateWidgetCallback'],
+        'wrapper' => $id,
+      ],
+      '#submit' => [[static::class, 'removeItemSubmit']],
+      '#limit_validation_errors' => [array_merge($field_parents, [$field->getName()])],
+      '#attributes' => [
+        'data-entity-id' => $entity->getEntityTypeId() . ':' . $entity->id(),
+        'data-row-id' => $delta,
+      ],
+      // Prefer #after_build so Form API can still attach #ajax process.
+      '#after_build' => [[static::class, 'afterBuildSelectionButton']],
+    ];
+
     return [
       '#theme_wrappers' => ['container'],
       '#attributes' => [
-        'class' => $classes,
+        'class' => [
+          'entities-list',
+          Html::cleanCssIdentifier("entity-type--$target_entity_type"),
+        ],
         'data-entity-browser-entities-list' => 1,
       ],
+      // Single-entity structure kept compatible with entity_browser CSS/JS.
       'items' => [
         [
           '#theme_wrappers' => ['container'],
           '#attributes' => [
-            'class' => ['item-container', Html::getClass($field_widget_display->getPluginId())],
+            'class' => [
+              'item-container',
+              Html::getClass($field_widget_display->getPluginId()),
+            ],
             'data-entity-id' => $entity->getEntityTypeId() . ':' . $entity->id(),
             'data-row-id' => $delta,
           ],
           'display' => $display,
           'remove_button' => [
-            '#type' => 'submit',
             '#value' => $this->t('Remove'),
-            '#ajax' => [
-              'callback' => [static::class, 'updateWidgetCallback'],
-              'wrapper' => $id,
-            ],
-            '#submit' => [[static::class, 'removeItemSubmit']],
             '#name' => $name_key . '_entity_browser_remove',
-            '#limit_validation_errors' => [array_merge($field_parents, [$field->getName()])],
             '#attributes' => [
               'data-entity-id' => $entity->getEntityTypeId() . ':' . $entity->id(),
               'data-row-id' => $delta,
               'class' => ['remove-button'],
             ],
-            '#access' => (bool) $browser_settings['field_widget_remove'],
-          ],
+            '#access' => (bool) $settings['field_widget_remove'],
+          ] + $button_base,
           'replace_button' => [
-            '#type' => 'submit',
             '#value' => $this->t('Replace'),
-            '#ajax' => [
-              'callback' => [static::class, 'updateWidgetCallback'],
-              'wrapper' => $id,
-            ],
-            '#submit' => [[static::class, 'removeItemSubmit']],
-            '#name' => $name_key . '_entity_browser_remove',
-            '#limit_validation_errors' => [array_merge($field_parents, [$field->getName()])],
+            '#name' => $name_key . '_entity_browser_replace',
             '#attributes' => [
               'data-entity-id' => $entity->getEntityTypeId() . ':' . $entity->id(),
               'data-row-id' => $delta,
               'class' => ['replace-button'],
             ],
-            '#access' => $browser_settings['field_widget_replace'],
-          ],
+            '#access' => (bool) $settings['field_widget_replace'],
+          ] + $button_base,
           'edit_button' => [
             '#type' => 'submit',
             '#value' => $this->t('Edit'),
             '#name' => $name_key . '_entity_browser_edit',
             '#ajax' => [
               'url' => Url::fromRoute(
-                'entity_browser.edit_form', [
+                'entity_browser.edit_form',
+                [
                   'entity_type' => $entity->getEntityTypeId(),
                   'entity' => $entity->id(),
                 ]
@@ -585,140 +524,307 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
   }
 
   /**
-   * Determines the entity used for the form element.
+   * After-build callback: stores widget root array parents on action buttons.
    *
-   * @param string[] $parents
-   *   The field parents.
-   * @param \Drupal\Core\Field\FieldItemListInterface $items
-   *   Array of default values for this field.
-   * @param int $delta
-   *   The order of this item in the array of sub-elements (0, 1, 2, etc.).
+   * @param array<string, mixed> $element
+   *   The button element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
-   * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $field
-   *   The custom field type object.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|null
-   *   Return the entity if available.
+   * @return array<string, mixed>
+   *   The processed element.
    */
-  protected function formElementEntity(array $parents, FieldItemListInterface $items, int $delta, FormStateInterface $form_state, CustomFieldTypeInterface $field): ?EntityInterface {
-    $entity_type = $field->getTargetType();
-    try {
-      $entity_storage = $this->entityTypeManager->getStorage($entity_type);
+  public static function afterBuildSelectionButton(array $element, FormStateInterface $form_state): array {
+    // Button path: ...[ref][current][items][0][remove_button] → widget is 4 up.
+    if (!empty($element['#array_parents'])) {
+      $element['#widget_array_parents'] = array_slice(
+        $element['#array_parents'],
+        0,
+        -static::DELETE_DEPTH
+      );
     }
-    catch (\Exception $exception) {
-      return NULL;
-    }
-
-    // Find IDs from target_id element (it stores selected entities in form).
-    // This was added to help solve a really edge casey bug in IEF.
-    if (($target_id_entity = $this->getEntityByTargetId($parents, $items, $delta, $form_state, $field)) !== NULL) {
-      return $target_id_entity;
-    }
-
-    // Determine if we're submitting and if submit came from this widget.
-    $is_relevant_submit = FALSE;
-    if ($trigger = $form_state->getTriggeringElement()) {
-
-      // Can be triggered by hidden target_id element or "Remove" button.
-      $last_parent = end($trigger['#parents']);
-      if (in_array($last_parent, ['target_id', 'remove_button', 'replace_button'])) {
-
-        // In case there are more instances of this widget on the same page we
-        // need to check if submit came from this instance.
-        $field_name_key = count($trigger['#parents']) - (static::DELETE_DEPTH + 1);
-
-        $is_relevant_submit =
-          array_key_exists($field_name_key, $trigger['#parents'])
-          && ($trigger['#parents'][$field_name_key] === $field->getName())
-          && ($trigger['#parents'][$field_name_key - 1] === $delta);
-      }
-    }
-
-    if ($is_relevant_submit === TRUE) {
-      // Submit was triggered by hidden "target_id" element when entities were
-      // added via entity browser.
-      $parents = [];
-      if (!empty($trigger['#ajax']['event']) && $trigger['#ajax']['event'] === 'entity_browser_value_updated') {
-        $parents = $trigger['#parents'];
-      }
-      // Submit was triggered by one of the "Remove" buttons. We need to walk
-      // few levels up to read value of "target_id" element.
-      elseif ($trigger['#type'] === 'submit' && str_ends_with($trigger['#name'], '_entity_browser_remove')) {
-        $parents = array_merge(array_slice($trigger['#parents'], 0, -static::DELETE_DEPTH), ['target_id']);
-      }
-
-      $value = ($parents !== []) ? $form_state->getValue($parents) : NULL;
-      if (is_string($value)) {
-        return $this->processEntityId($value);
-      }
-
-      return NULL;
-    }
-    // ID from a previous request might be saved in the form state.
-    else {
-      $parent_entity = $items->getEntity();
-      $form_state_key = static::getFormStateKey("{$parent_entity->getEntityTypeId()}:{$parent_entity->id()}", $items->getFieldDefinition()->getName(), $delta);
-      if ($form_state->has($form_state_key)) {
-
-        $stored_id = $form_state->get($form_state_key);
-        if (is_string($stored_id)) {
-          return $entity_storage->load($stored_id);
-        }
-      }
-    }
-
-    // We are loading for the first time so we need to load any existing values
-    // that might already exist on the entity.
-    return $items[$delta]->{$field->getName() . '__entity'};
+    return $element;
   }
 
   /**
-   * Get selected element from target_id element on form.
+   * Resolves the selected entity for this widget instance.
+   *
+   * Priority: user input → relevant trigger → form-state stash → stored item.
    *
    * @param string[] $parents
-   *   The field parents.
+   *   The form #parents for the field.
    * @param \Drupal\Core\Field\FieldItemListInterface $items
-   *   Array of default values for this field.
+   *   Field values.
    * @param int $delta
-   *   The order of this item in the array of sub-elements (0, 1, 2, etc.).
+   *   Field item delta.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $field
    *   The custom field type object.
    *
    * @return \Drupal\Core\Entity\EntityInterface|null
-   *   Return the entity if available.
+   *   The selected entity, if any.
+   */
+  protected function resolveSelectedEntity(array $parents, FieldItemListInterface $items, int $delta, FormStateInterface $form_state, CustomFieldTypeInterface $field): ?EntityInterface {
+    // 1) Explicit target_id in raw user input (covers IEF edge cases).
+    $from_input = $this->getEntityByTargetId($parents, $items, $delta, $form_state, $field);
+    if ($from_input !== NULL) {
+      return $from_input;
+    }
+
+    // 2) This widget triggered the request (browser update or remove/replace).
+    $from_trigger = $this->getEntityFromTrigger($items, $delta, $form_state, $field);
+    if ($from_trigger['handled']) {
+      return $from_trigger['entity'];
+    }
+
+    // 3) Stashed id from a prior build of this form.
+    $from_state = $this->getEntityFromFormState($parents, $items, $delta, $form_state, $field);
+    if ($from_state !== NULL) {
+      return $from_state;
+    }
+
+    // 4) Value already stored on the entity.
+    return $items[$delta]->{$field->getName() . '__entity'} ?? NULL;
+  }
+
+  /**
+   * Loads an entity from the hidden target_id in raw user input.
+   *
+   * @param string[] $parents
+   *   The form #parents for the field.
+   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   *   Field values.
+   * @param int $delta
+   *   Field item delta.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $field
+   *   The custom field type object.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|null
+   *   The entity if present in user input.
    */
   protected function getEntityByTargetId(array $parents, FieldItemListInterface $items, int $delta, FormStateInterface $form_state, CustomFieldTypeInterface $field): ?EntityInterface {
-    $target_id_element_path = [...$parents, $items->getName(), $delta, $field->getName(), 'target_id'];
-
+    $path = [...$parents, $items->getName(), $delta, $field->getName(), 'target_id'];
     $user_input = $form_state->getUserInput();
-    if (!NestedArray::keyExists($user_input, $target_id_element_path)) {
+    if (!NestedArray::keyExists($user_input, $path)) {
       return NULL;
     }
 
-    // @todo Figure out how to avoid using raw user input.
-    // (this comment is copied from \Drupal\entity_browser\Plugin\Field\FieldWidget\EntityReferenceBrowserWidget::getEntitiesByTargetId)
-    $value = NestedArray::getValue($user_input, $target_id_element_path);
-    if (is_string($value)) {
-      return $this->processEntityId($value);
-    }
-
-    return NULL;
+    $value = NestedArray::getValue($user_input, $path);
+    return is_string($value) ? $this->processEntityId($value) : NULL;
   }
 
   /**
-   * Generate md5 hash using field parent keys array.
+   * Resolves entity from the triggering element when it belongs to this widget.
    *
-   * @param string[] $field_parents
-   *   The field parents.
+   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   *   Field values.
+   * @param int $delta
+   *   Field item delta.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $field
+   *   The custom field type object.
    *
-   * @return string
-   *   The hash.
+   * @return array{handled: bool, entity: \Drupal\Core\Entity\EntityInterface|null}
+   *   Whether this widget handled the trigger, and the entity if any.
    */
-  protected function getFieldParentsMd5Hash(array $field_parents): string {
-    return md5((string) json_encode($field_parents));
+  protected function getEntityFromTrigger(FieldItemListInterface $items, int $delta, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
+    $trigger = $form_state->getTriggeringElement();
+    if (!$trigger || empty($trigger['#parents'])) {
+      return ['handled' => FALSE, 'entity' => NULL];
+    }
+
+    $last_parent = end($trigger['#parents']);
+    if (!in_array($last_parent, ['target_id', 'remove_button', 'replace_button'], TRUE)) {
+      return ['handled' => FALSE, 'entity' => NULL];
+    }
+
+    // Confirm the trigger belongs to this subfield + delta instance.
+    if (!$this->triggerBelongsToWidget($trigger, $field->getName(), $delta)) {
+      return ['handled' => FALSE, 'entity' => NULL];
+    }
+
+    $value_parents = [];
+    if (!empty($trigger['#ajax']['event']) && $trigger['#ajax']['event'] === 'entity_browser_value_updated') {
+      $value_parents = $trigger['#parents'];
+    }
+    elseif (($trigger['#type'] ?? '') === 'submit' && is_string($trigger['#name'] ?? NULL) && str_ends_with($trigger['#name'], '_entity_browser_remove')) {
+      $widget_parents = $trigger['#widget_array_parents']
+        ?? array_slice($trigger['#parents'], 0, -static::DELETE_DEPTH);
+      $value_parents = array_merge($widget_parents, ['target_id']);
+    }
+    // Replace uses a distinct button name suffix.
+    elseif (($trigger['#type'] ?? '') === 'submit' && is_string($trigger['#name'] ?? NULL) && str_ends_with($trigger['#name'], '_entity_browser_replace')) {
+      $widget_parents = $trigger['#widget_array_parents']
+        ?? array_slice($trigger['#parents'], 0, -static::DELETE_DEPTH);
+      $value_parents = array_merge($widget_parents, ['target_id']);
+    }
+
+    if ($value_parents === []) {
+      return ['handled' => TRUE, 'entity' => NULL];
+    }
+
+    $value = $form_state->getValue($value_parents);
+    if (is_string($value)) {
+      return ['handled' => TRUE, 'entity' => $this->processEntityId($value)];
+    }
+
+    return ['handled' => TRUE, 'entity' => NULL];
+  }
+
+  /**
+   * Loads a previously stashed selection from form state.
+   *
+   * @param array $parents
+   *   The form #parents for this widget instance (distinguishes nested hosts).
+   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   *   Field values.
+   * @param int $delta
+   *   Field item delta.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $field
+   *   The custom field type object.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|null
+   *   The stashed entity, if any.
+   */
+  protected function getEntityFromFormState(array $parents, FieldItemListInterface $items, int $delta, FormStateInterface $form_state, CustomFieldTypeInterface $field): ?EntityInterface {
+    $parent_entity = $items->getEntity();
+    $form_state_key = static::getFormStateKey(
+      $parent_entity->getEntityTypeId() . ':' . $parent_entity->id(),
+      $items->getFieldDefinition()->getName(),
+      $delta,
+      $parents
+    );
+    if (!$form_state->has($form_state_key)) {
+      return NULL;
+    }
+
+    $stored_id = $form_state->get($form_state_key);
+    if ($stored_id === NULL || $stored_id === '') {
+      return NULL;
+    }
+
+    try {
+      return $this->entityTypeManager
+        ->getStorage($field->getTargetType())
+        ->load($stored_id);
+    }
+    catch (\Exception $exception) {
+      $this->getLogger('custom_field_entity_browser')->error(
+        'Unable to load stashed entity @type:@id: @message',
+        [
+          '@type' => $field->getTargetType(),
+          '@id' => (string) $stored_id,
+          '@message' => $exception->getMessage(),
+        ]
+      );
+      return NULL;
+    }
+  }
+
+  /**
+   * Whether the current request is adding a new empty delta via add_more.
+   *
+   * @param string[] $parents
+   *   Form parents.
+   * @param string $field_name
+   *   Field machine name.
+   * @param int $delta
+   *   Field item delta.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return bool
+   *   TRUE when this delta should start empty.
+   */
+  protected function isNewItemAfterAddMore(array $parents, string $field_name, int $delta, FormStateInterface $form_state): bool {
+    $triggering_element = $form_state->getTriggeringElement();
+    if (!isset($triggering_element['#name'])) {
+      return FALSE;
+    }
+
+    $match = implode('_', [...$parents, $field_name, 'add_more']);
+    if ($triggering_element['#name'] !== $match) {
+      return FALSE;
+    }
+
+    $user_input = $form_state->getUserInput();
+    return !NestedArray::keyExists($user_input, [...$parents, $field_name, $delta]);
+  }
+
+  /**
+   * Checks that a trigger belongs to this subfield instance and delta.
+   *
+   * @param array<string, mixed> $trigger
+   *   The triggering element.
+   * @param string $subfield_name
+   *   The custom subfield machine name.
+   * @param int $delta
+   *   Field item delta.
+   *
+   * @return bool
+   *   TRUE if the trigger is for this widget instance.
+   */
+  protected function triggerBelongsToWidget(array $trigger, string $subfield_name, int $delta): bool {
+    $parents = $trigger['#parents'] ?? [];
+    // Prefer explicit widget parents when available.
+    if (!empty($trigger['#widget_array_parents'])) {
+      $widget_parents = $trigger['#widget_array_parents'];
+      $count = count($widget_parents);
+      return $count >= 2
+        && ($widget_parents[$count - 1] ?? NULL) === $subfield_name
+        && ($widget_parents[$count - 2] ?? NULL) === $delta;
+    }
+
+    $field_name_key = count($parents) - (static::DELETE_DEPTH + 1);
+    return array_key_exists($field_name_key, $parents)
+      && ($parents[$field_name_key] === $subfield_name)
+      && (($parents[$field_name_key - 1] ?? NULL) === $delta);
+  }
+
+  /**
+   * Resolves widget array parents from an AJAX/submit trigger.
+   *
+   * @param array<string, mixed> $trigger
+   *   The triggering element.
+   * @param bool|string $reopen_browser
+   *   FALSE, or a button-name fragment when replace should reopen the browser.
+   *
+   * @param-out bool|string $reopen_browser
+   *
+   * @return array<int, string|int>
+   *   Array parents of the widget root element.
+   */
+  protected static function getWidgetArrayParentsFromTrigger(array $trigger, bool|string &$reopen_browser): array {
+    if (
+      NestedArray::keyExists($trigger, ['#ajax', 'event'])
+      && $trigger['#ajax']['event'] === 'entity_browser_value_updated'
+    ) {
+      return array_slice($trigger['#array_parents'], 0, -1);
+    }
+
+    $is_submit = ($trigger['#type'] ?? '') === 'submit';
+    $name = $trigger['#name'] ?? '';
+
+    if ($is_submit && is_string($name) && str_ends_with($name, '_entity_browser_remove')) {
+      return $trigger['#widget_array_parents']
+        ?? array_slice($trigger['#array_parents'], 0, -static::DELETE_DEPTH);
+    }
+
+    if ($is_submit && is_string($name) && str_ends_with($name, '_entity_browser_replace')) {
+      $parents = $trigger['#widget_array_parents']
+        ?? array_slice($trigger['#array_parents'], 0, -static::DELETE_DEPTH);
+      // JS reopens the browser using a unique part of the button name path.
+      $reopen_browser = implode('-', array_slice($trigger['#parents'], 0, -static::DELETE_DEPTH));
+      return $parents;
+    }
+
+    return [];
   }
 
   /**
@@ -728,11 +834,10 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
    *   The custom field type object.
    *
    * @return array<string, array<string, mixed>>
-   *   Data that should persist after the Entity Browser is rendered.
+   *   Validators and widget context for the entity browser element.
    */
   protected function getPersistentData(CustomFieldTypeInterface $field): array {
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
-    $handler = $settings['handler_settings'];
+    $handler = $field->getFieldSettings()['handler_settings'] ?? [];
     return [
       'validators' => [
         'entity_type' => ['type' => $field->getTargetType()],
@@ -746,9 +851,7 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
   }
 
   /**
-   * Returns a unique identifier for the field.
-   *
-   * Based on \Drupal\Core\Field\FieldDefinition::getUniqueIdentifier.
+   * Returns a unique identifier for the subfield.
    *
    * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $field
    *   The custom field type object.
@@ -761,39 +864,170 @@ class EntityReferenceBrowserWidget extends EntityReferenceWidgetBase {
   }
 
   /**
-   * Processes 'raw' entity ID input and loads the corresponding entity.
+   * Processes "entity_type:id" input and loads the entity.
    *
    * @param string $user_input
    *   The string containing the entity type and ID.
    *
    * @return \Drupal\Core\Entity\EntityInterface|null
-   *   Return the entity if available.
+   *   The entity if available.
    */
   protected function processEntityId(string $user_input): ?EntityInterface {
+    if ($user_input === '') {
+      return NULL;
+    }
     $entities = EntityBrowserElement::processEntityIds($user_input);
     return $entities !== [] ? reset($entities) : NULL;
   }
 
   /**
-   * Returns a key used to store the previously loaded entity.
+   * Returns a form-state key used to stash the selected entity id.
+   *
+   * Parent entity id alone is not unique for unsaved Paragraphs (or other
+   * nested IEF-style hosts): every new item can be type:NULL. Including the
+   * widget form #parents path keeps each embedded instance isolated.
    *
    * @param string $id
-   *   The 'raw' entity ID of the parent entity.
+   *   Parent entity type and id as "type:id".
    * @param string $field_name
-   *   The (custom field) field name on the parent entity.
+   *   Custom field machine name on the parent entity.
    * @param int $delta
-   *   The order of this item in the array of sub-elements (0, 1, 2, etc.).
+   *   Field item delta.
+   * @param array $parents
+   *   The form #parents for this widget instance.
    *
-   * @return string[]
+   * @return array<int, string>
    *   A key for form state storage.
    */
-  protected static function getFormStateKey(string $id, string $field_name, int $delta): array {
-    $parts = [
-      $id,
-      $field_name,
-      $delta,
+  protected static function getFormStateKey(string $id, string $field_name, int $delta, array $parents = []): array {
+    $parents_key = $parents !== []
+      ? implode('.', array_map(static fn ($part) => (string) $part, $parents))
+      : '';
+    return [
+      'entity_browser_widget',
+      $id . ':' . $field_name . ':' . $delta . ':' . $parents_key,
     ];
-    return ['entity_browser_widget', implode(':', $parts)];
+  }
+
+  /**
+   * Builds Field UI settings form value keys for this subfield setting.
+   *
+   * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $field
+   *   The custom field type object.
+   * @param string $setting_name
+   *   The setting key under the subfield.
+   *
+   * @return list<string>
+   *   Value path for form state.
+   */
+  protected function getSettingsFormValueKeys(CustomFieldTypeInterface $field, string $setting_name): array {
+    return [
+      'fields',
+      $this->fieldName,
+      'settings_edit_form',
+      'settings',
+      'fields',
+      $field->getName(),
+      $setting_name,
+    ];
+  }
+
+  /**
+   * Returns applicable field widget display plugin labels.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The target entity type definition.
+   *
+   * @return array<string, string|\Drupal\Core\StringTranslation\TranslatableMarkup>
+   *   Plugin id => label.
+   */
+  protected function getApplicableDisplayOptions($entity_type): array {
+    $displays = [];
+    foreach ($this->fieldDisplayManager->getDefinitions() as $id => $definition) {
+      try {
+        $plugin = $this->fieldDisplayManager->createInstance($id);
+        assert($plugin instanceof FieldWidgetDisplayInterface);
+        if ($plugin->isApplicable($entity_type)) {
+          $displays[$id] = $definition['label'];
+        }
+      }
+      catch (\Exception $exception) {
+        $this->getLogger('custom_field_entity_browser')->error(
+          'Unable to instantiate field widget display @id: @message',
+          ['@id' => $id, '@message' => $exception->getMessage()]
+        );
+      }
+    }
+    return $displays;
+  }
+
+  /**
+   * Instantiates a field widget display plugin.
+   *
+   * @param string|null $plugin_id
+   *   The display plugin id.
+   * @param array<string, mixed> $configuration
+   *   Plugin configuration.
+   *
+   * @return \Drupal\entity_browser\FieldWidgetDisplayInterface|null
+   *   The plugin instance, or NULL on failure.
+   */
+  protected function createFieldWidgetDisplay(?string $plugin_id, array $configuration = []): ?FieldWidgetDisplayInterface {
+    if (!$plugin_id) {
+      return NULL;
+    }
+    try {
+      $plugin = $this->fieldDisplayManager->createInstance($plugin_id, $configuration);
+      assert($plugin instanceof FieldWidgetDisplayInterface);
+      return $plugin;
+    }
+    catch (\Exception $exception) {
+      $this->getLogger('custom_field_entity_browser')->error(
+        'Unable to create field widget display @id: @message',
+        ['@id' => $plugin_id, '@message' => $exception->getMessage()]
+      );
+      return NULL;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function calculateWidgetDependencies(): array {
+    $dependencies = parent::calculateWidgetDependencies();
+    $browser = $this->getSetting('entity_browser');
+    if ($browser) {
+      /** @var \Drupal\entity_browser\Entity\EntityBrowser|null $entity_browser */
+      $entity_browser = $this->entityTypeManager->getStorage('entity_browser')->load($browser);
+      if ($entity_browser) {
+        $dependencies[$entity_browser->getConfigDependencyKey()][] = $entity_browser->getConfigDependencyName();
+      }
+    }
+
+    return $dependencies;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function onWidgetDependencyRemoval(array $dependencies): array {
+    $settings = $this->getSettings();
+    $browser = $this->getSetting('entity_browser');
+    if (!$browser) {
+      return [];
+    }
+
+    /** @var \Drupal\entity_browser\Entity\EntityBrowser|null $entity_browser */
+    $entity_browser = $this->entityTypeManager->getStorage('entity_browser')->load($browser);
+    if (
+      $entity_browser
+      && !empty($dependencies[$entity_browser->getConfigDependencyKey()][$entity_browser->getConfigDependencyName()])
+    ) {
+      $settings['entity_browser'] = NULL;
+      return $settings;
+    }
+
+    return [];
   }
 
 }

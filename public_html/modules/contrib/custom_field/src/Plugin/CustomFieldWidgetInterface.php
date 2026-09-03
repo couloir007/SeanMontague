@@ -86,14 +86,6 @@ interface CustomFieldWidgetInterface extends PluginInspectionInterface {
   public function massageFormValue(mixed $value, array $column): mixed;
 
   /**
-   * Helper function to return array of widget settings.
-   *
-   * @return array<string, mixed>
-   *   The array of settings.
-   */
-  public function getWidgetSettings(): array;
-
-  /**
    * Returns if the widget can be used for the provided field.
    *
    * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $custom_item
@@ -107,12 +99,20 @@ interface CustomFieldWidgetInterface extends PluginInspectionInterface {
   /**
    * Returns an array of dependencies for the widget.
    *
-   * @param array<string, mixed> $settings
-   *   An array of widget settings.
-   *
    * @return array
    *   An array of dependencies.
    */
-  public function calculateWidgetDependencies(array $settings): array;
+  public function calculateWidgetDependencies(): array;
+
+  /**
+   * Returns an array of changed settings for the parent method to act on.
+   *
+   * @param array<string, mixed> $dependencies
+   *   An array of dependencies for the subfield to evaluate.
+   *
+   * @return array<string, mixed>
+   *   An array of settings for parent to update.
+   */
+  public function onWidgetDependencyRemoval(array $dependencies): array;
 
 }

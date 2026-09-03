@@ -21,13 +21,12 @@ class EmailTarget extends BaseTarget {
    * {@inheritdoc}
    */
   public function prepareValue(mixed $value, array $configuration, string $langcode): ?string {
-    $name = $this->configuration['name'];
     $value = is_string($value) ? trim($value) : $value;
     if (empty($value) || !filter_var($value, FILTER_VALIDATE_EMAIL)) {
       $value = NULL;
     }
-    if (!empty($value) && $configuration[$name]['defuse']) {
-      $value .= '_test';
+    if (!empty($value) && $configuration['defuse']) {
+      return 'FEEDS_TEST_' . $value;
     }
 
     return $value;
@@ -50,7 +49,7 @@ class EmailTarget extends BaseTarget {
       '#type' => 'checkbox',
       '#title' => $this->t('Defuse email addresses'),
       '#default_value' => $configuration['defuse'],
-      '#description' => $this->t('This appends _test to all imported email addresses to ensure they cannot be used as recipients.'),
+      '#description' => $this->t('This prepends FEEDS_TEST_ to all imported email addresses to ensure they cannot be used as recipients.'),
     ];
 
     return $form;

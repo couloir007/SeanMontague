@@ -16,9 +16,34 @@ content:
     weight: 0
     region: content
     settings:
-      label: true
       wrapper: div
+      label_prefix: Item
+      auto_collapse: true
       open: true
+      fields:
+        title:
+          weight: 0
+          type: text
+          label: Title
+          size: 60
+          placeholder: ''
+          maxlength: 255
+          maxlength_js: false
+        media:
+          weight: 0
+          type: media_library_widget
+          label: Media
+          media_types:
+            - image
+            - document
+        link:
+          weight: 0
+          type: link_default
+          label: ''
+          maxlength: 255
+          maxlength_js: false
+          placeholder_url: ''
+          placeholder_title: ''
     third_party_settings: {  }
 hidden:
   created: true

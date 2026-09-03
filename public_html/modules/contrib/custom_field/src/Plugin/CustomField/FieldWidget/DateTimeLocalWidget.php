@@ -30,7 +30,7 @@ class DateTimeLocalWidget extends DateTimeWidgetBase {
    */
   public function widget(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $this->getSettings()['settings'] + static::defaultSettings()['settings'];
+    $field_settings = $field->getFieldSettings();
 
     $element['value']['#type'] = 'custom_field_datetime_date';
     $element['value'] += [
@@ -41,10 +41,10 @@ class DateTimeLocalWidget extends DateTimeWidgetBase {
       '#date_time_element' => 'none',
       '#date_time_callbacks' => [],
     ];
-    if ($settings['timezone_enabled']) {
-      $element['#theme_wrappers'] = ['container', 'fieldset', 'container'];
-      $element['#attributes']['class'][] = 'custom-field-datetime-grid';
-      $element['#title'] = NULL;
+    if ($field_settings['timezone_enabled']) {
+      $element['#theme'] = 'custom_field_flex_wrapper';
+      $element['#theme_wrappers'] = ['fieldset', 'container'];
+      $element['value']['#title'] = $this->t('Date');
       $element['value']['#description'] = NULL;
     }
 

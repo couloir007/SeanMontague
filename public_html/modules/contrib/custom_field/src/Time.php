@@ -161,6 +161,9 @@ final class Time {
    *
    * @return \Drupal\custom_field\Time
    *   Time object created html5 formatted string
+   *
+   * @throws \InvalidArgumentException
+   *    When $string is not a valid HTML5 time.
    */
   public static function createFromHtml5Format(string $string): Time {
 
@@ -168,13 +171,18 @@ final class Time {
       return new Time();
     }
 
-    $inputs = explode(':', $string);
-    if (count($inputs) === 2) {
-      $inputs[] = 0;
+    // Require H:i or H:i:s (1–2 digit hour). Reject free-form strings so we
+    // never list()-destructure a short explode() result.
+    if (!preg_match('/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/', $string, $matches)) {
+      throw new \InvalidArgumentException(sprintf('Invalid HTML5 time: %s', $string));
     }
 
-    [$hour, $minute, $seconds] = $inputs;
-    return new Time((int) $hour, (int) $minute, (int) $seconds);
+    $hour = (int) $matches[1];
+    $minute = (int) $matches[2];
+    $seconds = isset($matches[3]) ? (int) $matches[3] : 0;
+
+    // Constructor assertInRange() still rejects e.g. 25:00.
+    return new Time($hour, $minute, $seconds);
   }
 
   /**

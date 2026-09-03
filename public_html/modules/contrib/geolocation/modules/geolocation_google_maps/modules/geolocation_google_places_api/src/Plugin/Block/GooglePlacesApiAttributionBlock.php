@@ -2,16 +2,16 @@
 
 namespace Drupal\geolocation_google_places_api\Plugin\Block;
 
+use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 
 /**
  * Provides a 'Fax' block.
- *
- * @Block(
- *   id = "geolocation_google_places_api_attribution_block",
- *   admin_label = @Translation("Geolocation - Google Places API Attribution block"),
- * )
  */
+#[Block(
+  id: 'geolocation_google_places_api_attribution_block',
+  admin_label: new \Drupal\Core\StringTranslation\TranslatableMarkup('Geolocation - Google Places API Attribution block')
+)]
 class GooglePlacesApiAttributionBlock extends BlockBase {
 
   /**

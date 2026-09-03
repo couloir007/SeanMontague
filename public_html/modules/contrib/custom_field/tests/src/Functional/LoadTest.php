@@ -4,12 +4,14 @@ namespace Drupal\Tests\custom_field\Functional;
 
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Simple test to ensure that main page loads with module enabled.
  *
  * @group custom_field
  */
+#[Group('custom_field')]
 class LoadTest extends BrowserTestBase {
 
   /**

@@ -14,6 +14,7 @@ use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\custom_field\Plugin\CustomField\FieldType\LinkTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
 use Drupal\link\AttributeXss;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -198,16 +199,19 @@ class UriLinkFormatter extends CustomFieldFormatterBase {
   /**
    * Builds the \Drupal\Core\Url object for a link field item.
    *
+   * @param \Drupal\Core\Field\FieldItemInterface $item
+   *   The field item being rendered.
    * @param array $value
-   *   The value to build the url from.
+   *   The custom field value.
    *
    * @return \Drupal\Core\Url
    *   A Url object.
    */
-  protected function buildUrl(array $value): Url {
+  protected function buildUrl(FieldItemInterface $item, array $value): Url {
+    assert($this->customFieldDefinition instanceof LinkTypeInterface);
     $settings = $this->getSettings();
     try {
-      $url = $this->getUrl($value['uri']);
+      $url = $this->customFieldDefinition->getUrl($item);
     }
     catch (\InvalidArgumentException $e) {
       // @todo Add logging here in https://www.drupal.org/project/drupal/issues/3348020
@@ -218,7 +222,10 @@ class UriLinkFormatter extends CustomFieldFormatterBase {
     $options += $url->getOptions();
 
     // Check for widget attributes.
-    $rel = explode(' ', $options['attributes']['rel'] ?? '');
+    $rel = [];
+    if (!empty($options['attributes']['rel'])) {
+      $rel = explode(' ', $options['attributes']['rel']);
+    }
     $class = $options['attributes']['class'] ?? [];
     $id = trim($options['attributes']['id'] ?? '');
     $target = $options['attributes']['target'] ?? '';
@@ -279,29 +286,16 @@ class UriLinkFormatter extends CustomFieldFormatterBase {
   }
 
   /**
-   * Helper function to get a Url from given string value.
-   *
-   * @param string $value
-   *   The field value.
-   *
-   * @return \Drupal\Core\Url
-   *   The Url object.
-   */
-  protected function getUrl(string $value): Url {
-    return Url::fromUri($value);
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function formatValue(FieldItemInterface $item, mixed $value): ?array {
     $settings = $this->getSettings();
     $entity = $item->getEntity();
     $langcode = $entity->language()->getId();
-    $url = $this->buildUrl($value);
+    $url = $this->buildUrl($item, $value);
     // Use the full URL as the link title by default.
     $link_title = $url->toString();
-    $title = $value['title'] ?? $settings['link_text'];
+    $title = !empty($value['title']) ? $value['title'] : $settings['link_text'];
 
     // Check for access for linked entities.
     $link_entity = NULL;

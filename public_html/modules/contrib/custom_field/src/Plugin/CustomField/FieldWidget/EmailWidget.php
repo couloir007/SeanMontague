@@ -30,13 +30,10 @@ class EmailWidget extends CustomFieldWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    $settings = parent::defaultSettings();
-    $settings['settings'] = [
+    return [
       'size' => 60,
       'placeholder' => '',
-    ] + $settings['settings'];
-
-    return $settings;
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -44,7 +41,7 @@ class EmailWidget extends CustomFieldWidgetBase {
    */
   public function widget(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
 
     // Add our widget type and additional properties and return.
     return [
@@ -60,16 +57,16 @@ class EmailWidget extends CustomFieldWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
 
-    $element['settings']['size'] = [
+    $element['size'] = [
       '#type' => 'number',
       '#title' => $this->t('Size of textfield'),
       '#default_value' => $settings['size'],
       '#required' => TRUE,
       '#min' => 1,
     ];
-    $element['settings']['placeholder'] = [
+    $element['placeholder'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Placeholder'),
       '#default_value' => $settings['placeholder'],

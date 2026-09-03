@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - geolocation_gpx
+id: geolocation_gpx_delete_action
+label: 'Delete Geolocation GPX'
+type: geolocation_gpx
+plugin: entity:delete_action:geolocation_gpx
+configuration: {  }

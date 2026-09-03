@@ -2,28 +2,28 @@
 
 namespace Drupal\geolocation\Plugin\views\style;
 
+use Drupal\views\Attribute\ViewsStyle;
+
 /**
  * Allow to display several field items on a common map.
  *
  * @ingroup views_style_plugins
- *
- * @ViewsStyle(
- *   id = "geolocation_layer",
- *   title = @Translation("Geolocation Layer"),
- *   help = @Translation("Display geolocations on a layer."),
- *   theme = "views_view_list",
- *   display_types = {"normal"},
- * )
  */
+#[ViewsStyle(
+  id: 'geolocation_layer',
+  title: new \Drupal\Core\StringTranslation\TranslatableMarkup('Geolocation Layer'), help: new \Drupal\Core\StringTranslation\TranslatableMarkup('Display geolocations on a layer.'),
+  theme: 'views_view_list',
+  display_types: ['normal']
+)]
 class Layer extends GeolocationStyleBase {
 
   /**
    * {@inheritdoc}
    */
-  public function render() {
+  public function render(): array {
 
     $render = parent::render();
-    if ($render === FALSE) {
+    if (!$render) {
       return [];
     }
 
@@ -32,7 +32,7 @@ class Layer extends GeolocationStyleBase {
       '#attributes' => [
         'id' => $this->displayHandler->display['id'],
         'class' => [
-          'geolocation-layer',
+          'geolocation-map-layer',
         ],
       ],
     ];

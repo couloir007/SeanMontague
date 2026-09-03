@@ -12,11 +12,6 @@ use Drupal\Tests\BrowserTestBase;
 class GeolocationViewsSettingsTest extends BrowserTestBase {
 
   /**
-   * {@inheritdoc}
-   */
-  protected $profile = 'standard';
-
-  /**
    * Modules to enable for this test.
    *
    * @var string[]
@@ -36,12 +31,17 @@ class GeolocationViewsSettingsTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $profile = 'minimal';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $defaultTheme = 'stark';
 
   /**
    * Tests the Views admin UI and field handlers.
    */
-  public function testViewsMapSettings() {
+  public function testViewsMapSettings(): void {
     $permissions = [
       'access administration pages',
       'administer views',
@@ -62,7 +62,7 @@ class GeolocationViewsSettingsTest extends BrowserTestBase {
   /**
    * Tests the Views admin UI and field handlers.
    */
-  public function testViewsProximitySettings() {
+  public function testViewsProximitySettings(): void {
     $permissions = [
       'access administration pages',
       'administer views',

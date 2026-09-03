@@ -3,9 +3,13 @@
 namespace Drupal\geolocation\Annotation;
 
 use Drupal\Component\Annotation\Plugin;
+use Drupal\Core\Annotation\Translation;
 
 /**
  * Defines a Location annotation object.
+ *
+ * @deprecated in geolocation:4.0.0 and is removed from geolocation:4.0.1. Use Attribute instead.
+ * @see https://www.drupal.org/project/geolocation/issues/3525013
  *
  * @see \Drupal\geolocation\LocationManager
  * @see plugin_api
@@ -19,7 +23,7 @@ class Location extends Plugin {
    *
    * @var string
    */
-  public $id;
+  public string $id;
 
   /**
    * The name of the Location.
@@ -28,7 +32,7 @@ class Location extends Plugin {
    *
    * @ingroup plugin_translatable
    */
-  public $name;
+  public Translation $name;
 
   /**
    * The description of the Location.
@@ -37,6 +41,6 @@ class Location extends Plugin {
    *
    * @ingroup plugin_translatable
    */
-  public $description;
+  public Translation $description;
 
 }

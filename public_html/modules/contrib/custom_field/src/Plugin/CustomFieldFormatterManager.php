@@ -8,20 +8,12 @@ use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
  * Provides the custom field formatter plugin manager.
  */
 class CustomFieldFormatterManager extends DefaultPluginManager implements CustomFieldFormatterManagerInterface {
-
-  /**
-   * The custom field type manager.
-   *
-   * @var \Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface
-   */
-  protected CustomFieldTypeManagerInterface $customFieldTypeManager;
 
   /**
    * Constructs a new CustomFieldFormatterManager object.
@@ -33,10 +25,10 @@ class CustomFieldFormatterManager extends DefaultPluginManager implements Custom
    *   Cache backend instance to use.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
-   * @param \Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface $custom_field_type_manager
+   * @param \Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface $customFieldTypeManager
    *   The custom field type manager.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, CustomFieldTypeManagerInterface $custom_field_type_manager) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, protected CustomFieldTypeManagerInterface $customFieldTypeManager) {
     parent::__construct(
       'Plugin/CustomField/FieldFormatter',
       $namespaces,
@@ -48,7 +40,6 @@ class CustomFieldFormatterManager extends DefaultPluginManager implements Custom
 
     $this->setCacheBackend($cache_backend, 'custom_field_formatter_plugins');
     $this->alterInfo('custom_field_formatter_info');
-    $this->customFieldTypeManager = $custom_field_type_manager;
   }
 
   /**
@@ -153,76 +144,20 @@ class CustomFieldFormatterManager extends DefaultPluginManager implements Custom
   /**
    * {@inheritdoc}
    */
-  public function getFormatterValueKeys(FormStateInterface $form_state, string $field_name, string $property): array {
-    $form_id = $form_state->getFormObject()->getFormId();
-    $value_keys = [
-      'fields',
-      $field_name,
-      'settings_edit_form',
-      'settings',
-      'fields',
-      $property,
-      'format_type',
-    ];
-
-    switch ($form_id) {
-      case 'views_ui_config_item_form':
-        $value_keys = [
-          'options',
-          'settings',
-          'fields',
-          $property,
-          'format_type',
-        ];
-        break;
-
-      case 'block_form':
-        $value_keys = [
-          'settings',
-          'formatter_settings',
-          'fields',
-          $property,
-          'format_type',
-        ];
-        break;
-
-      case 'layout_builder_add_block':
-      case 'layout_builder_update_block':
-        $value_keys = [
-          'settings',
-          'formatter',
-          'settings',
-          'fields',
-          $property,
-          'format_type',
-        ];
-        break;
-
-      default:
-        break;
+  public function getInputPathStates(array $parents, string $property, bool $is_views_subfield = FALSE, ?string $wrapper = NULL): string {
+    $path = array_shift($parents);
+    foreach ($parents as $parent) {
+      $path .= '[' . $parent . ']';
     }
-
-    return $value_keys;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getInputPathForStatesApi(FormStateInterface $form_state, string $field_name, string $property, bool $is_views_subfield = FALSE): string {
-    $form_id = $form_state->getFormObject()->getFormId();
-    $is_views_form = $form_id === 'views_ui_config_item_form';
-    $is_block_form = $form_id === 'block_form';
-    $is_layout_builder_form = $form_id === 'layout_builder_add_block' || $form_id === 'layout_builder_update_block';
-    if ($is_views_form) {
-      return $is_views_subfield ? 'options[settings]' : "options[settings][fields][$property][formatter_settings]";
+    if ($is_views_subfield) {
+      return $path;
     }
-    elseif ($is_block_form) {
-      return "settings[formatter_settings][fields][$property][formatter_settings]";
+    else {
+      if ($wrapper) {
+        $path .= '[' . $wrapper . ']';
+      }
+      return $path . '[' . $property . ']';
     }
-    elseif ($is_layout_builder_form) {
-      return "settings[formatter][settings][fields][$property][formatter_settings]";
-    }
-    return "fields[$field_name][settings_edit_form][settings][fields][$property][formatter_settings]";
   }
 
   /**
@@ -231,19 +166,28 @@ class CustomFieldFormatterManager extends DefaultPluginManager implements Custom
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function getOptions(CustomFieldTypeInterface $custom_field): array {
-    $options = [];
     $field_type = $custom_field->getPluginId();
+    $candidates = [];
     foreach ($this->getDefinitions() as $id => $definition) {
       /** @var \Drupal\custom_field\Plugin\CustomFieldFormatterInterface $plugin_class */
       $plugin_class = DefaultFactory::getPluginClass($id, $definition);
       $is_applicable = $plugin_class::isApplicable($custom_field);
-      if (!in_array($field_type, $definition['field_types']) || !$is_applicable) {
+      if (!\in_array($field_type, $definition['field_types']) || !$is_applicable) {
         continue;
       }
-      $options[$id] = $definition['label'];
+      $candidates[$id] = $definition + ['weight' => 0];
     }
+    // Sort by weight, then label.
+    \uasort($candidates, function (array $a, array $b): int {
+      if ($a['weight'] !== $b['weight']) {
+        return $a['weight'] <=> $b['weight'];
+      }
+      return \strcmp((string) $a['label'], (string) $b['label']);
+    });
 
-    return $options;
+    return \array_map(function ($definition) {
+      return $definition['label'];
+    }, $candidates);
   }
 
   /**

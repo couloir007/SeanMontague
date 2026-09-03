@@ -14,7 +14,7 @@ dependencies:
   - graphql_compose:graphql_compose
   - graphql_compose:graphql_compose_views
 
-# Information added by Drupal.org packaging script on 2025-08-29
-version: '3.1.16'
+# Information added by Drupal.org packaging script on 2026-08-17
+version: '4.0.11'
 project: 'custom_field'
-datestamp: 1756499049
+datestamp: 1786952236

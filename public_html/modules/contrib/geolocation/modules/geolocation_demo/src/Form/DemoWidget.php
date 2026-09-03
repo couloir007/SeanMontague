@@ -18,14 +18,14 @@ abstract class DemoWidget extends FormBase {
    *
    * @var \Drupal\Core\Field\WidgetPluginManager
    */
-  protected $pluginManagerFieldWidget;
+  protected WidgetPluginManager $pluginManagerFieldWidget;
 
   /**
    * Drupal\Core\Entity\EntityTypeManager definition.
    *
    * @var \Drupal\Core\Entity\EntityTypeManager
    */
-  protected $entityTypeManager;
+  protected EntityTypeManager $entityTypeManager;
 
   /**
    * {@inheritdoc}
@@ -37,6 +37,8 @@ abstract class DemoWidget extends FormBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @phpstan-ignore-next-line
    */
   public static function create(ContainerInterface $container) {
     return new static(
@@ -46,9 +48,19 @@ abstract class DemoWidget extends FormBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Get widget form.
+   *
+   * @param string $widget_id
+   *   Widget ID.
+   * @param array $form
+   *   Form array.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   Form state.
+   *
+   * @return array
+   *   Widget form.
    */
-  public function getWidgetForm($widget_id, array $form, FormStateInterface $form_state) {
+  public function getWidgetForm(string $widget_id, array $form, FormStateInterface $form_state): array {
 
     /** @var \Drupal\node\NodeInterface $node */
     $node = $this->entityTypeManager->getStorage('node')->create([
@@ -82,6 +94,6 @@ abstract class DemoWidget extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {}
+  public function submitForm(array &$form, FormStateInterface $form_state): void {}
 
 }

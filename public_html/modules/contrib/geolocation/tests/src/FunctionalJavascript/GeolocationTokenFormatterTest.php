@@ -79,7 +79,7 @@ class GeolocationTokenFormatterTest extends GeolocationJavascriptTestBase {
   /**
    * Tests the token formatter.
    */
-  public function testGeocoderTokenizedTestReplacement() {
+  public function testGeocoderTokenizedTestReplacement(): void {
     $this->drupalGet('node/1');
     $this->assertSession()->responseContains('<span class="geolocation-latlng">52, 47</span>');
 

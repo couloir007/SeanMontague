@@ -2,24 +2,37 @@
 
 namespace Drupal\geolocation_leaflet\Plugin\geolocation\MapProvider;
 
-use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\geolocation\Attribute\MapProvider;
 use Drupal\geolocation\MapProviderBase;
 
 /**
  * Provides Leaflet maps.
- *
- * @MapProvider(
- *   id = "leaflet",
- *   name = @Translation("Leaflet"),
- *   description = @Translation("Leaflet support."),
- * )
  */
+#[MapProvider(
+  id: 'leaflet',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('Leaflet'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('Leaflet support.')
+)]
 class Leaflet extends MapProviderBase {
 
   /**
    * {@inheritdoc}
    */
-  public static function getDefaultSettings() {
+  protected array $scripts = [
+    'https://unpkg.com/leaflet@1.9.3/dist/leaflet.js',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected array $stylesheets = [
+    'https://unpkg.com/leaflet@1.9.3/dist/leaflet.css',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getDefaultSettings(): array {
     return array_replace_recursive(
       parent::getDefaultSettings(),
       [
@@ -27,7 +40,7 @@ class Leaflet extends MapProviderBase {
         'height' => '400px',
         'width' => '100%',
         'minZoom' => 0,
-        'maxZoom' => 0,
+        'maxZoom' => 20,
         'maxBounds' => [
           'north_east_bound' => [],
           'south_west_bound' => [],
@@ -79,55 +92,23 @@ class Leaflet extends MapProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function getSettings(array $settings) {
-    $settings = parent::getSettings($settings);
-
-    $settings['zoom'] = (int) $settings['zoom'];
-
-    if (empty($settings['minZoom'])) {
-      unset($settings['minZoom']);
-    }
-    else {
-      $settings['minZoom'] = (int) $settings['minZoom'];
-    }
-    if (empty($settings['maxZoom'])) {
-      unset($settings['maxZoom']);
-    }
-    else {
-      $settings['maxZoom'] = (int) $settings['maxZoom'];
-    }
-
-    return $settings;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getSettingsSummary(array $settings) {
-    $settings = array_replace_recursive(
-      self::getDefaultSettings(),
-      $settings
-    );
+  public function getSettingsSummary(array $settings): array {
     $summary = parent::getSettingsSummary($settings);
-    $summary[] = $this->t('Zoom level: @zoom', ['@zoom' => $settings['zoom']]);
-    $summary[] = $this->t('Height: @height', ['@height' => $settings['height']]);
-    $summary[] = $this->t('Width: @width', ['@width' => $settings['width']]);
+    $summary[] = $this->t('Zoom level: @zoom', ['@zoom' => $settings['zoom'] ?? '']);
+    $summary[] = $this->t('Height: @height', ['@height' => $settings['height'] ?? '']);
+    $summary[] = $this->t('Width: @width', ['@width' => $settings['width'] ?? '']);
     return $summary;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getSettingsForm(array $settings, array $parents = []) {
+  public function getSettingsForm(array $settings, array $parents = [], array $context = []): array {
     $settings += self::getDefaultSettings();
-    if ($parents) {
-      $parents_string = implode('][', $parents);
-    }
-    else {
-      $parents_string = NULL;
-    }
 
-    $form = parent::getSettingsForm($settings, $parents);
+    $form = parent::getSettingsForm($settings, $parents, $context);
+
+    $parents_string = $parents ? implode('][', $parents) : NULL;
 
     $form['height'] = [
       '#group' => $parents_string,
@@ -153,11 +134,11 @@ class Leaflet extends MapProviderBase {
       '#description' => $this->t('The initial resolution at which to display the map, where zoom 0 corresponds to a map of the Earth fully zoomed out, and higher zoom levels zoom in at a higher resolution.'),
       '#default_value' => $settings['zoom'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
         ['\Drupal\Core\Render\Element\Select', 'processSelect'],
       ],
       '#pre_render' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
 
@@ -175,11 +156,11 @@ class Leaflet extends MapProviderBase {
       '#description' => $this->t('Minimum zoom level of the map. If not specified and at least one GridLayer or TileLayer is in the map, the lowest of their minZoom options will be used instead. 0 to skip.'),
       '#default_value' => $settings['minZoom'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
         ['\Drupal\Core\Render\Element\Select', 'processSelect'],
       ],
       '#pre_render' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
     $form['maxZoom'] = [
@@ -190,11 +171,11 @@ class Leaflet extends MapProviderBase {
       '#description' => $this->t('Maximum zoom level of the map. If not specified and at least one GridLayer or TileLayer is in the map, the highest of their maxZoom options will be used instead. 0 to skip.'),
       '#default_value' => $settings['maxZoom'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
         ['\Drupal\Core\Render\Element\Select', 'processSelect'],
       ],
       '#pre_render' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
 
@@ -229,11 +210,11 @@ class Leaflet extends MapProviderBase {
       '#description' => $this->t("The Coordinate Reference System to use. Don't change this if you're not sure what it means. Do not add 'L.CRS.' in front."),
       '#default_value' => $settings['crs'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
         ['\Drupal\Core\Render\Element\Select', 'processSelect'],
       ],
       '#pre_render' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
     $form['preferCanvas'] = [
@@ -249,11 +230,11 @@ class Leaflet extends MapProviderBase {
       '#description' => $this->t("Forces the map's zoom level to always be a multiple of this, particularly right after a fitBounds() or a pinch-zoom. By default, the zoom level snaps to the nearest integer; lower values (e.g. 0.5 or 0.1) allow for greater granularity. A value of 0 means the zoom level will not be snapped after fitBounds or a pinch-zoom."),
       '#default_value' => $settings['zoomSnap'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\Number', 'preRenderNumber'],
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
     $form['zoomDelta'] = [
@@ -263,11 +244,11 @@ class Leaflet extends MapProviderBase {
       '#description' => $this->t("Controls how much the map's zoom level will change after a zoomIn(), zoomOut(), pressing + or - on the keyboard, or using the zoom controls. Values smaller than 1 (e.g. 0.5) allow for greater granularity."),
       '#default_value' => $settings['zoomDelta'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\Number', 'preRenderNumber'],
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
     $form['trackResize'] = [
@@ -307,11 +288,11 @@ class Leaflet extends MapProviderBase {
       '#description' => $this->t("Won't animate zoom if the zoom difference exceeds this value."),
       '#default_value' => $settings['zoomAnimationThreshold'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\Number', 'preRenderNumber'],
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
     $form['fadeAnimation'] = [
@@ -339,11 +320,11 @@ class Leaflet extends MapProviderBase {
       '#description' => $this->t("The rate with which the inertial movement slows down, in pixels/second²."),
       '#default_value' => $settings['inertiaDeceleration'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\Number', 'preRenderNumber'],
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
     $form['worldCopyJump'] = [
@@ -352,7 +333,6 @@ class Leaflet extends MapProviderBase {
       '#title' => $this->t("With this option enabled, the map tracks when you pan to another 'copy' of the world and seamlessly jumps to the original one so that all overlays like markers and vector layers are still visible."),
       '#default_value' => $settings['worldCopyJump'],
     ];
-
     $form['easeLinearity'] = [
       '#group' => $advanced_parents_string,
       '#type' => 'number',
@@ -361,11 +341,11 @@ class Leaflet extends MapProviderBase {
       '#description' => $this->t("The curvature factor of panning animation easing (third parameter of the Cubic Bezier curve). 1.0 means linear animation, the less the more bowed the curve."),
       '#default_value' => $settings['easeLinearity'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\Number', 'preRenderNumber'],
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
     $form['maxBoundsViscosity'] = [
@@ -376,11 +356,11 @@ class Leaflet extends MapProviderBase {
       '#description' => $this->t("If maxBounds is set, this option will control how solid the bounds are when dragging the map around. The default value of 0.0 allows the user to drag outside the bounds at normal speed, higher values will slow down map dragging outside bounds, and 1.0 makes the bounds fully solid, preventing the user from dragging outside the bounds."),
       '#default_value' => $settings['maxBoundsViscosity'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\Number', 'preRenderNumber'],
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
     $form['keyboard'] = [
@@ -396,11 +376,11 @@ class Leaflet extends MapProviderBase {
       '#description' => $this->t("Amount of pixels to pan when pressing an arrow key."),
       '#default_value' => $settings['keyboardPanDelta'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\Number', 'preRenderNumber'],
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
     $form['scrollWheelZoom'] = [
@@ -416,11 +396,11 @@ class Leaflet extends MapProviderBase {
       '#description' => $this->t("Limits the rate at which a wheel can fire (in milliseconds). By default user can't zoom via wheel more often than once per 40 ms."),
       '#default_value' => $settings['wheelDebounceTime'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\Number', 'preRenderNumber'],
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
     $form['wheelPxPerZoomLevel'] = [
@@ -430,11 +410,11 @@ class Leaflet extends MapProviderBase {
       '#description' => $this->t("How many scroll pixels (as reported by L.DomEvent.getWheelDelta) mean a change of one full zoom level. Smaller values will make wheel-zooming faster (and vice versa)."),
       '#default_value' => $settings['wheelPxPerZoomLevel'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\Number', 'preRenderNumber'],
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
     $form['tap'] = [
@@ -450,11 +430,11 @@ class Leaflet extends MapProviderBase {
       '#description' => $this->t("The max number of pixels a user can shift his finger during touch for it to be considered a valid tap."),
       '#default_value' => $settings['tapTolerance'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\Number', 'preRenderNumber'],
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
     $form['touchZoom'] = [
@@ -476,7 +456,7 @@ class Leaflet extends MapProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function alterRenderArray(array $render_array, array $map_settings, array $context = []) {
+  public function alterRenderArray(array $render_array, array $map_settings, array $context = []): array {
     if (
       !empty($map_settings['maxBounds'])
       && !empty($map_settings['maxBounds']['north_east_bound'])
@@ -505,55 +485,19 @@ class Leaflet extends MapProviderBase {
       unset($map_settings['maxBounds']);
     }
 
-    $render_array['#attached'] = BubbleableMetadata::mergeAttachments(
-      empty($render_array['#attached']) ? [] : $render_array['#attached'],
-      [
-        'library' => [
-          'geolocation_leaflet/geolocation.leaflet',
-        ],
-        'drupalSettings' => [
-          'geolocation' => [
-            'maps' => [
-              $render_array['#id'] => [
-                'settings' => [
-                  'leaflet_settings' => $map_settings,
-                ],
-              ],
-            ],
-          ],
-        ],
-      ]
-    );
-
     return parent::alterRenderArray($render_array, $map_settings, $context);
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function getControlPositions() {
+  public static function getControlPositions(): array {
     return [
       'topleft' => t('Top left'),
       'topright' => t('Top right'),
       'bottomleft' => t('Bottom left'),
       'bottomright' => t('Bottom right'),
     ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function alterCommonMap(array $render_array, array $map_settings, array $context) {
-    $render_array['#attached'] = BubbleableMetadata::mergeAttachments(
-      empty($render_array['#attached']) ? [] : $render_array['#attached'],
-      [
-        'library' => [
-          'geolocation_leaflet/commonmap.leaflet',
-        ],
-      ]
-    );
-
-    return $render_array;
   }
 
 }

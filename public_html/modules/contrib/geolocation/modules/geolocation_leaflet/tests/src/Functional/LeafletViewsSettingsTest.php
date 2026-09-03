@@ -14,7 +14,7 @@ class LeafletViewsSettingsTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $profile = 'standard';
+  protected $profile = 'minimal';
 
   /**
    * Modules to enable for this test.
@@ -41,7 +41,7 @@ class LeafletViewsSettingsTest extends BrowserTestBase {
   /**
    * Tests the Views admin UI and field handlers.
    */
-  public function testViewsAdmin() {
+  public function testViewsAdmin(): void {
     $permissions = [
       'access administration pages',
       'administer views',

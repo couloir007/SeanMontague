@@ -2,24 +2,54 @@
 
 namespace Drupal\geolocation\Plugin\geolocation\Location;
 
+use Drupal\geolocation\Attribute\Location;
 use Drupal\geolocation\LocationBase;
 use Drupal\geolocation\LocationInterface;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\RequestException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Fixed coordinates map center.
- *
- * @Location(
- *   id = "ipstack",
- *   name = @Translation("ipstack Service"),
- *   description = @Translation("See https://ipstack.com/ website. Limited to 10000 requests per month. Access key required."),
- * )
  */
+#[Location(
+  id: 'ipstack',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('ipstack Service'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('See https://ipstack.com/ website. Limited to 10000 requests per month. Access key required.')
+)]
 class IpStack extends LocationBase implements LocationInterface {
 
   /**
    * {@inheritdoc}
    */
-  public static function getDefaultSettings() {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected Request $request,
+    protected ClientInterface $httpClient,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): LocationInterface {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('request_stack')->getCurrentRequest(),
+      $container->get('http_client'),
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getDefaultSettings(): array {
     return [
       'access_key' => '',
     ];
@@ -28,7 +58,7 @@ class IpStack extends LocationBase implements LocationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getSettingsForm($option_id = NULL, array $settings = [], $context = NULL) {
+  public function getSettingsForm(?string $location_option_id = NULL, array $settings = [], $context = NULL): array {
     $settings = $this->getSettings($settings);
 
     $form['access_key'] = [
@@ -45,21 +75,31 @@ class IpStack extends LocationBase implements LocationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCoordinates($center_option_id, array $center_option_settings, $context = NULL) {
-    $settings = $this->getSettings($center_option_settings);
+  public function getCoordinates(string $location_option_id, array $location_option_settings, $context = NULL): array {
+    $settings = $this->getSettings($location_option_settings);
     // Access Key is required.
     if (empty($settings['access_key'])) {
       return [];
     }
 
-    // Get client IP.
-    $ip = \Drupal::request()->getClientIp();
-    if (empty($ip)) {
+    // Get client IP and validate it is a proper IP address.
+    $ip = $this->request->getClientIp();
+    if (empty($ip) || !filter_var($ip, FILTER_VALIDATE_IP)) {
       return [];
     }
 
     // Get data from api.ipstack.com.
-    $json = file_get_contents("http://api.ipstack.com/" . $ip . "?access_key=" . $settings['access_key']);
+    try {
+      $response = $this->httpClient->request('GET', 'https://api.ipstack.com/' . rawurlencode($ip), [
+        'query' => ['access_key' => $settings['access_key']],
+        'timeout' => 5,
+      ]);
+      $json = $response->getBody()->getContents();
+    }
+    catch (RequestException $e) {
+      return [];
+    }
+
     if (empty($json)) {
       return [];
     }

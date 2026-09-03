@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Component\Utility\Random;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\custom_field\Attribute\CustomFieldType;
@@ -23,6 +24,8 @@ use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
   default_formatter: 'string',
 )]
 class StringType extends CustomFieldTypeBase {
+
+  use OptionsTrait;
 
   /**
    * {@inheritdoc}
@@ -54,14 +57,75 @@ class StringType extends CustomFieldTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function getConstraints(array $settings): array {
+  public static function defaultFieldSettings(): array {
+    return [
+      'prefix' => '',
+      'suffix' => '',
+      'allowed_values' => [],
+    ] + parent::defaultFieldSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldSettingsForm(array &$form, FormStateInterface $form_state): array {
+    $element = parent::fieldSettingsForm($form, $form_state);
+    $settings = $this->getFieldSettings();
+
+    $element['prefix'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Prefix'),
+      '#default_value' => $settings['prefix'],
+      '#size' => 60,
+      '#description' => $this->t("Define a string that should be prefixed to the value, like '$ ' or '&euro; '. Leave blank for none."),
+    ];
+
+    $element['suffix'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Suffix'),
+      '#default_value' => $settings['suffix'],
+      '#size' => 60,
+      '#description' => $this->t("Define a string that should be suffixed to the value, like ' m', ' kb/s'. Leave blank for none."),
+    ];
+
+    $this->allowedValues($element, $form_state, $settings);
+
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function validateAllowedValue(array $element, FormStateInterface $form_state): void {
+    $value = $element['#value'];
+    $sliced_parents = array_slice($element['#parents'], 0, -4);
+    $field_name = end($sliced_parents);
+    $column_settings = $form_state->get(['current_settings', 'columns', $field_name]);
+    $length = $column_settings['length'];
+    $value_length = mb_strlen($value);
+
+    if ($length && mb_strlen($value) > $length) {
+      $form_state->setError($element, new TranslatableMarkup('The allowed value %value cannot be longer than %length characters but is currently %value_length characters long.', [
+        '%value' => $value,
+        '%length' => $length,
+        '%value_length' => $value_length,
+      ]));
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConstraints(): array {
     $constraints = [];
-    if (isset($settings['length'])) {
+    $length = $this->getSetting('length');
+    if ($length) {
+      $name = $this->getName();
       $constraints['Length'] = [
-        'max' => $settings['length'],
-        'maxMessage' => $this->t('%name: may not be longer than @max characters.', [
-          '%name' => $settings['name'],
-          '@max' => $settings['length'],
+        'max' => $length,
+        'maxMessage' => $this->t('@name: may not be longer than @max characters.', [
+          '@name' => $name,
+          '@max' => $length,
         ]),
       ];
     }
@@ -73,13 +137,12 @@ class StringType extends CustomFieldTypeBase {
    * {@inheritdoc}
    */
   public static function generateSampleValue(CustomFieldTypeInterface $field, string $target_entity_type): string {
-    $widget_settings = $field->getWidgetSetting('settings');
-    if (!empty($widget_settings['allowed_values'])) {
-      return (string) static::getRandomOptions($widget_settings['allowed_values']);
+    $field_settings = $field->getFieldSettings();
+    if (!empty($field_settings['allowed_values'])) {
+      return (string) static::getRandomOptions($field_settings['allowed_values']);
     }
     $random = new Random();
-    $default_max = $field->getMaxLength();
-    $max_length = isset($widget_settings['maxlength']) && is_numeric($widget_settings['maxlength']) ? (int) $widget_settings['maxlength'] : $default_max;
+    $max_length = $field->getMaxLength();
 
     // When the maximum length is less than 15 generate a random word using the
     // maximum length.

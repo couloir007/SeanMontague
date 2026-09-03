@@ -14,7 +14,7 @@ class KeyProvider {
    *
    * So that we don't need to store plain text api key secrets in config file.
    */
-  public static function getKeyValue($api_key) {
+  public static function getKeyValue(string $api_key): string {
     if (empty($api_key)) {
       return $api_key;
     }

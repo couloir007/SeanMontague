@@ -26,11 +26,11 @@ class TranslationTest extends SortsFunctionalBase {
   ];
 
   /**
-   * The search api sorts field storage.
+   * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $searchApiSortsFieldStorage;
+  protected $entityTypeManager;
 
   /**
    * {@inheritdoc}
@@ -53,8 +53,7 @@ class TranslationTest extends SortsFunctionalBase {
       'id' => 'sorts_id',
     ];
     $this->drupalPlaceBlock('search_api_sorts_block:' . $this->displayId, $block_settings);
-
-    $this->searchApiSortsFieldStorage = $this->container->get('entity_type.manager')->getStorage('search_api_sorts_field');
+    $this->entityTypeManager = $this->container->get('entity_type.manager');
   }
 
   /**
@@ -72,10 +71,10 @@ class TranslationTest extends SortsFunctionalBase {
     $this->assertSession()->pageTextNotContains('You are currently editing the English version of the search api sorts fields.');
 
     // Check if the translate column is not present.
-    $this->assertSession()->elementNotContains('css', 'table#edit-sorts thead th:last-child', 'Translate');
+    $this->assertSession()->elementNotContains('css', 'table#edit-sorts thead th:nth-last-child(2)', 'Translate');
 
     // Check if translate link is not present.
-    $this->assertSession()->linkByHrefNotExists(sprintf('admin/config/search/search-api/sorts/%s/translate', $this->escapedDisplayId . '_' . 'id'));
+    $this->assertSession()->linkByHrefNotExists(sprintf('admin/config/search/search-api/sorts/%s/translate', $this->escapedDisplayId . '_id'));
 
     $this->submitForm([
       'sorts[id][status]' => TRUE,
@@ -83,11 +82,11 @@ class TranslationTest extends SortsFunctionalBase {
     ], 'Save settings');
 
     // Check if the config is saved in the default language.
-    $search_api_sorts_field = $this->searchApiSortsFieldStorage->load($this->escapedDisplayId . '_' . 'id');
+    $search_api_sorts_field = $this->entityTypeManager->getStorage('search_api_sorts_field')->load($this->escapedDisplayId . '_id');
     $this->assertEquals('en', $search_api_sorts_field->language()->getId());
 
     // Check if translate link is still not present.
-    $this->assertSession()->linkByHrefNotExists(sprintf('admin/config/search/search-api/sorts/%s/translate', $this->escapedDisplayId . '_' . 'id'));
+    $this->assertSession()->linkByHrefNotExists(sprintf('admin/config/search/search-api/sorts/%s/translate', $this->escapedDisplayId . '_id'));
 
     // Visit the EN version of the search_api overview and check if the labels
     // are shown in the default language.
@@ -106,10 +105,10 @@ class TranslationTest extends SortsFunctionalBase {
     $this->assertSession()->pageTextNotContains('You are currently editing the English version of the search api sorts fields.');
 
     // Check if the translate column is present.
-    $this->assertSession()->elementContains('css', 'table#edit-sorts thead th:last-child', 'Translate');
+    $this->assertSession()->elementContains('css', 'table#edit-sorts thead th:nth-last-child(2)', 'Translate');
 
     // Check if translate link is not present.
-    $this->assertSession()->linkByHrefNotExists(sprintf('admin/config/search/search-api/sorts/%s/translate', $this->escapedDisplayId . '_' . 'id'));
+    $this->assertSession()->linkByHrefNotExists(sprintf('admin/config/search/search-api/sorts/%s/translate', $this->escapedDisplayId . '_id'));
 
     $this->submitForm([
       'sorts[id][status]' => TRUE,
@@ -117,11 +116,11 @@ class TranslationTest extends SortsFunctionalBase {
     ], 'Save settings');
 
     // Check if config is saved in the default language (EN).
-    $search_api_sorts_field = $this->searchApiSortsFieldStorage->load($this->escapedDisplayId . '_' . 'id');
+    $search_api_sorts_field = $this->entityTypeManager->getStorage('search_api_sorts_field')->load($this->escapedDisplayId . '_id');
     $this->assertEquals('en', $search_api_sorts_field->language()->getId());
 
     // Check if translate link is present.
-    $this->assertSession()->linkByHrefExists(sprintf('admin/config/search/search-api/sorts/%s/translate', $this->escapedDisplayId . '_' . 'id'));
+    $this->assertSession()->linkByHrefExists(sprintf('admin/config/search/search-api/sorts/%s/translate', $this->escapedDisplayId . '_id'));
 
     $this->drupalGet('search-api-sorts-test');
     $this->assertSession()->linkNotExists('Identifiant');
@@ -134,24 +133,24 @@ class TranslationTest extends SortsFunctionalBase {
     $this->assertSession()->pageTextContains('You are currently editing the English version of the search api sorts fields.');
 
     // Check if the translate column is present.
-    $this->assertSession()->elementContains('css', 'table#edit-sorts thead th:last-child', 'Translate');
+    $this->assertSession()->elementContains('css', 'table#edit-sorts thead th:nth-last-child(2)', 'Translate');
 
     $this->submitForm([
       'sorts[created][status]' => TRUE,
     ], 'Save settings');
 
     // Check if ID field config is still saved in the default language.
-    $search_api_sorts_field = $this->searchApiSortsFieldStorage->load($this->escapedDisplayId . '_' . 'id');
+    $search_api_sorts_field = $this->entityTypeManager->getStorage('search_api_sorts_field')->load($this->escapedDisplayId . '_id');
     $this->assertEquals('en', $search_api_sorts_field->language()->getId());
 
     // Check if created config is also saved in the default language.
-    $search_api_sorts_field = $this->searchApiSortsFieldStorage->load($this->escapedDisplayId . '_' . 'created');
+    $search_api_sorts_field = $this->entityTypeManager->getStorage('search_api_sorts_field')->load($this->escapedDisplayId . '_created');
     $this->assertEquals('en', $search_api_sorts_field->language()->getId());
 
     // Translate the ID field.
-    $this->drupalGet('admin/config/search/search-api/sorts/' . $this->escapedDisplayId . '_' . 'id' . '/translate/fr/add');
+    $this->drupalGet('admin/config/search/search-api/sorts/' . $this->escapedDisplayId . '_id/translate/fr/add');
     $this->submitForm([
-      'translation[config_names][search_api_sorts.search_api_sorts_field.' . $this->escapedDisplayId . '_' . 'id' . '][label]' => 'Identifiant',
+      'translation[config_names][search_api_sorts.search_api_sorts_field.' . $this->escapedDisplayId . '_id][label]' => 'Identifiant',
     ], 'Save translation');
 
     // Visit the EN version of the search_api overview and check if the labels

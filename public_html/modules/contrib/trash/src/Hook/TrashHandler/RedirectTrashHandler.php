@@ -15,16 +15,46 @@ use Drupal\redirect\Entity\Redirect;
 use Drupal\redirect\RedirectRepository;
 use Drupal\trash\Exception\UnrestorableEntityException;
 use Drupal\trash\Handler\DefaultTrashHandler;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a trash handler for the 'redirect' entity type.
  */
 class RedirectTrashHandler extends DefaultTrashHandler {
 
+  /**
+   * The redirect repository.
+   *
+   * @var \Drupal\redirect\RedirectRepository|null|false
+   */
+  protected RedirectRepository|null|false $redirectRepository = NULL;
+
   public function __construct(
     protected ConfigFactoryInterface $configFactory,
-    protected ?RedirectRepository $redirectRepository = NULL,
-  ) {}
+  ) {
+  }
+
+  /**
+   * Returns the redirect repository.
+   *
+   * @return \Drupal\redirect\RedirectRepository|false
+   *   The redirect repository, or FALSE if the Redirect module is not
+   *   installed.
+   */
+  protected function getRedirectRepository(): RedirectRepository|false {
+    // TrashManager holds its handlers in a tagged iterator, so the first
+    // getHandler() call builds every tagged handler. Taking
+    // 'redirect.repository' as a constructor argument would drag it into that,
+    // and it reads 'redirect.settings' in its own constructor. A config
+    // override that keys itself by the negotiated interface language, like
+    // Domain Config's DomainConfigOverrider, turns that into a language
+    // negotiation and a router build. Resolve it on demand instead.
+    if ($this->redirectRepository === NULL) {
+      // @phpstan-ignore globalDrupalDependencyInjection.useDependencyInjection
+      $this->redirectRepository = \Drupal::getContainer()->get('redirect.repository', ContainerInterface::NULL_ON_INVALID_REFERENCE) ?: FALSE;
+    }
+    return $this->redirectRepository;
+  }
 
   /**
    * Implements hook_ENTITY_TYPE_presave() for the 'redirect' entity type.
@@ -70,11 +100,11 @@ class RedirectTrashHandler extends DefaultTrashHandler {
   #[RemoveHook('path_alias_update', class: ProceduralCall::class, method: 'redirect_path_alias_update')]
   #[RemoveHook('path_alias_update', class: 'Drupal\redirect\Hook\RedirectEntityHooks', method: 'pathAliasUpdate')]
   public function pathAliasUpdate(PathAliasInterface $path_alias): void {
-    if (!$this->redirectRepository) {
+    if (!$redirect_repository = $this->getRedirectRepository()) {
       return;
     }
 
-    if (!$this->tryRestoreTrashedRedirect($path_alias, $this->redirectRepository)) {
+    if (!$this->tryRestoreTrashedRedirect($path_alias, $redirect_repository)) {
       // Fall back to the Redirect module's own implementation whenever there is
       // nothing to restore.
       redirect_path_alias_update($path_alias);

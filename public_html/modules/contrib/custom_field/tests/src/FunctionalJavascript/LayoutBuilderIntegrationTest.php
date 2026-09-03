@@ -5,12 +5,17 @@ namespace Drupal\Tests\custom_field\FunctionalJavascript;
 use Drupal\Tests\layout_builder\FunctionalJavascript\InlineBlockTestBase;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Layout builder integration tests for custom field.
  *
  * @group custom_field
+ * @runTestsInSeparateProcesses
  */
+#[Group('custom_field')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderIntegrationTest extends InlineBlockTestBase {
 
   /**
@@ -69,28 +74,14 @@ class LayoutBuilderIntegrationTest extends InlineBlockTestBase {
         'settings' => [
           'field_settings' => [
             'string_1' => [
-              'type' => 'text',
-              'weight' => 0,
               'check_empty' => FALSE,
-              'widget_settings' => [
-                'label' => 'string_1',
-                'settings' => [
-                  'description' => '',
-                  'description_display' => 'after',
-                ],
-              ],
+              'description' => '',
+              'description_display' => 'after',
             ],
             'string_2' => [
-              'type' => 'text',
-              'weight' => 1,
               'check_empty' => TRUE,
-              'widget_settings' => [
-                'label' => 'string_2',
-                'settings' => [
-                  'description' => '',
-                  'description_display' => 'after',
-                ],
-              ],
+              'description' => '',
+              'description_display' => 'after',
             ],
           ],
         ],

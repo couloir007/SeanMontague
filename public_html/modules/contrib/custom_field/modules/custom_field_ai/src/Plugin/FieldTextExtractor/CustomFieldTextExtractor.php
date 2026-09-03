@@ -55,7 +55,7 @@ class CustomFieldTextExtractor extends FieldExtractorBase implements ContainerFa
     $field_definition = $entity->get($fieldName)->getFieldDefinition();
     $custom_items = $this->customFieldTypeManager->getCustomFieldItems($field_definition->getSettings());
     foreach ($custom_items as $name => $custom_item) {
-      $is_subfield_translatable = $custom_item->getWidgetSetting('translatable') ?? FALSE;
+      $is_subfield_translatable = $custom_item->getFieldSetting('translatable') ?? FALSE;
 
       if ($is_subfield_translatable) {
         $data_type = $custom_item->getDataType();
@@ -95,13 +95,13 @@ class CustomFieldTextExtractor extends FieldExtractorBase implements ContainerFa
    * {@inheritdoc}
    */
   public function setValue(ContentEntityInterface $entity, string $fieldName, array $textMeta) : void {
-    // Start from the original language value array, to make sure
+    // Start from the original language value array to make sure
     // non-translatable properties do not get cleared.
     $newValue = $entity->get($fieldName)->getValue();
     foreach ($textMeta as $delta => $singleValue) {
       unset($singleValue['field_name'], $singleValue['field_type']);
-      // Merge the original language value array, with the AI-translated data.
-      // Properties that are not translatable, should not be in the
+      // Merge the original language value array with the AI-translated data.
+      // Properties that are not translatable should not be in the
       // AI-translated results, so would remain untouched.
       $newValue[$delta] = isset($newValue[$delta]) ? array_merge($newValue[$delta], $singleValue) : $singleValue;
       $field_definition = $entity->getFieldDefinition($fieldName);
@@ -111,7 +111,7 @@ class CustomFieldTextExtractor extends FieldExtractorBase implements ContainerFa
         foreach ($newValue[$delta] as $name => $value) {
           if (isset($custom_items[$name])) {
             // Trim result if the custom field has a length limit.
-            $max_length = $custom_items[$name]->getWidgetSetting('settings')['maxlength'] ?? NULL;
+            $max_length = $custom_items[$name]->getSetting('length');
             if ($max_length !== NULL && is_string($value)) {
               $newValue[$delta][$name] = mb_strimwidth($value, 0, $max_length, '...');
             }

@@ -6,18 +6,18 @@ namespace Drupal\custom_field\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\SubformStateInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\custom_field\Event\PreFormatEvent;
 use Drupal\custom_field\Plugin\CustomFieldFormatterInterface;
@@ -25,6 +25,7 @@ use Drupal\custom_field\Plugin\CustomFieldFormatterManagerInterface;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface;
 use Drupal\custom_field\TagManagerInterface;
+use Drupal\custom_field\Trait\FieldFormatterTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -32,6 +33,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * The base formatter for custom_field.
  */
 abstract class BaseFormatter extends FormatterBase implements BaseFormatterInterface {
+
+  use FieldFormatterTrait;
 
   /**
    * The custom field type manager.
@@ -120,13 +123,12 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
    */
   public function settingsForm(array $form, FormStateInterface $form_state): array {
     $form = parent::settingsForm($form, $form_state);
-    $field_name = $this->fieldDefinition->getName();
+    $form['#attached']['library'][] = 'custom_field/custom-field-admin';
 
     $form['fields'] = [
       '#type' => 'table',
       '#header' => [
-        $this->t('Field'),
-        $this->t('Settings'),
+        $this->t('Field settings'),
         $this->t('Weight'),
       ],
       '#tableselect' => FALSE,
@@ -137,190 +139,275 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
           'group' => 'field-settings-order-weight',
         ],
       ],
+      '#responsive' => FALSE,
+      '#sticky' => FALSE,
       '#weight' => 10,
+      '#attributes' => [
+        'class' => ['form-fields-settings-table'],
+      ],
+      '#process' => [
+        [$this, 'processFields'],
+      ],
     ];
 
+    return $form;
+  }
+
+  /**
+   * Processes the 'fields' element in settings form.
+   *
+   * @param array<string, mixed> $element
+   *   The form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   * @param array<string, mixed> $form
+   *   The form array.
+   *
+   * @return array<string, mixed>
+   *   The processed form element.
+   */
+  public function processFields(array $element, FormStateInterface $form_state, array $form): array {
+    $field_name = $this->fieldDefinition->getName();
+    $values = $form_state->getValues();
+    $trigger = $form_state->getTriggeringElement();
+    if ($form_state instanceof SubformStateInterface) {
+      $complete_form_state = $form_state->getCompleteFormState();
+      $values = $complete_form_state->getValues();
+      $trigger = $complete_form_state->getTriggeringElement();
+    }
+
+    $parents = $element['#parents'] ?? [];
     $field_settings = $this->getSetting('fields') ?? [];
     $custom_items = $this->sortFields($field_settings);
+    $trigger_parents = $trigger['#parents'] ?? [];
+
+    // UI patterns.
+    $is_ui_pattern = \in_array('ui_patterns', $parents, TRUE);
+    if ($is_ui_pattern) {
+      $ui_pattern_formatter = $this->getUiPatternsSourceType($parents, $values, $trigger);
+      $access = !empty($ui_pattern_formatter);
+      $element['#access'] = $access;
+      if (!$access) {
+        return $element;
+      }
+    }
 
     foreach ($custom_items as $name => $custom_item) {
+      $plugin_id = $custom_item->getPluginId();
+      $visibility_path = $this->customFieldFormatterManager->getInputPathStates($parents, $name);
+      $element['#visibility_path'] = $visibility_path . '[formatter_settings]';
+      $element['#field_parents'] = [...$parents, $name, 'formatter_settings'];
       $settings = $field_settings[$name] ?? [];
-      $formatter_settings = $settings['formatter_settings'] ?? [];
-      $wrapper_settings = $settings['wrappers'] ?? [];
-      $type = $custom_item->getPluginId();
-      $formatter_options = $this->customFieldFormatterManager->getOptions($custom_item);
-      $default_format = $custom_item->getDefaultFormatter();
-      if (isset($settings['format_type']) && isset($formatter_options[$settings['format_type']])) {
-        $default_format = $settings['format_type'];
-      }
-      $values = $form_state->getValues();
-      $value_keys = $this->customFieldFormatterManager->getFormatterValueKeys($form_state, $field_name, (string) $name);
-      $parents = array_slice($value_keys, 0, -1);
-      $format_type = NestedArray::getValue($values, $value_keys) ?? $default_format;
-
-      $visibility_path = $this->customFieldFormatterManager->getInputPathForStatesApi($form_state, $field_name, (string) $name);
-      $root_visibility_path = $visibility_path;
-      // Strip the last [formatter_settings] to get root path.
-      if (str_ends_with($visibility_path, '[formatter_settings]')) {
-        $root_visibility_path = substr($visibility_path, 0, -strlen('[formatter_settings]'));
-      }
-      $form['#visibility_path'] = $visibility_path;
-      $wrapper_id = 'field-' . $field_name . '-' . $name . '-ajax';
       $weight = $settings['weight'] ?? 0;
-      $form['fields'][$name] = [
+
+      // Defaults from stored settings.
+      $format_type = $settings['format_type'] ?? $custom_item->getDefaultFormatter();
+      $formatter_settings = $settings['formatter_settings'] ?? [];
+      $wrapper_settings = $settings['wrappers'] ?? static::defaultWrappers();
+
+      // Override with submitted values.
+      $fields_path = [...$parents, $name];
+      $submitted_fields = [];
+      if ($form_state->isSubmitted() || $trigger) {
+        $user_input = $form_state->getUserInput();
+        $submitted_fields = NestedArray::getValue($user_input, $fields_path) ?? [];
+      }
+
+      // Fallback to processed values.
+      if (empty($format_type)) {
+        $submitted_fields = NestedArray::getValue($values, $fields_path) ?? '';
+      }
+      if (!empty($submitted_fields)) {
+        $format_type = $submitted_fields['format_type'] ?? '';
+        $formatter_settings = $submitted_fields['formatter_settings'] ?? [];
+      }
+
+      // Special handling for the triggering element.
+      $expected_format_type_parents = [...$parents, $name, 'format_type'];
+      if ($trigger_parents === $expected_format_type_parents) {
+        $format_type = $trigger['#value'] ?? '';
+        $formatter_settings = [];
+      }
+
+      $tag_options = $this->tagManager->getTagOptions();
+      $formatter_options = $this->customFieldFormatterManager->getOptions($custom_item);
+
+      $options = $this->customFieldFormatterManager->createOptionsForInstance($custom_item, $format_type, $formatter_settings, $this->viewMode);
+
+      // Add the formatter settings.
+      $format = $this->customFieldFormatterManager->getInstance($options);
+      $formatter = !is_null($format)
+        ? $format->settingsForm($element, $form_state)
+        : [];
+
+      // Build the subfields.
+      $wrapper_id = Html::cleanCssIdentifier(implode('_', [...$parents, $name, 'wrapper']));
+      $element[$name] = [
         '#attributes' => [
           'class' => ['draggable'],
         ],
         '#weight' => $weight,
       ];
-      $form['fields'][$name]['name'] = [
-        '#type' => 'markup',
-        '#markup' => $custom_item->getLabel(),
-      ];
-
-      $form['fields'][$name]['content'] = [
+      $element[$name]['content'] = [
         '#type' => 'details',
-        '#title' => $this->t('Settings'),
-        '#parents' => $parents,
+        '#title' => $this->t('@label', ['@label' => $custom_item->getLabel()]),
+        '#parents' => [...$parents, $name],
+        '#attributes' => [
+          'name' => $field_name,
+        ],
+      ];
+      $element[$name]['content']['format_type'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Format type'),
+        '#options' => $formatter_options,
+        '#default_value' => $format_type,
+        '#ajax' => [
+          'callback' => [$this, 'actionCallback'],
+          'wrapper' => $wrapper_id,
+          'method' => 'replace',
+        ],
+        '#after_build' => [[static::class, 'limitElementValidation']],
+      ];
+      $element[$name]['content']['formatter_settings'] = [
+        '#type' => 'container',
+        '#prefix' => '<div id="' . $wrapper_id . '">',
+        '#suffix' => '</div>',
+      ];
+      $element[$name]['content']['formatter_settings'] += $formatter;
+      $element[$name]['content']['formatter_settings']['label_display'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Label display'),
+        '#options' => $this->fieldLabelOptions(),
+        '#default_value' => $formatter_settings['label_display'] ?? 'above',
+        '#weight' => 10,
+        '#access' => !($plugin_id === 'boolean' || $format_type === 'hidden'),
+      ];
+      $element[$name]['content']['formatter_settings']['field_label'] = [
+        '#type' => 'textfield',
+        '#title' => $this->t('Field label'),
+        '#description' => $this->t('The label for viewing this field. Leave blank to use the default field label.'),
+        '#default_value' => $formatter_settings['field_label'] ?? '',
+        '#weight' => 11,
+        '#maxlength' => 255,
+        '#access' => $format_type !== 'hidden',
+        '#states' => [
+          'visible' => [
+            ':input[name="' . $visibility_path . '[formatter_settings][label_display]"]' => ['!value' => 'hidden'],
+          ],
+        ],
       ];
 
-      if (!empty($formatter_options)) {
-        $form['fields'][$name]['content']['format_type'] = [
-          '#type' => 'select',
-          '#title' => $this->t('Format type'),
-          '#options' => $formatter_options,
-          '#default_value' => $format_type,
-          '#ajax' => [
-            'callback' => [$this, 'actionCallback'],
-            'wrapper' => $wrapper_id,
-            'method' => 'replace',
-          ],
-        ];
-        $form['fields'][$name]['content']['formatter_settings'] = [
-          '#type' => 'container',
-          '#prefix' => '<div id="' . $wrapper_id . '">',
-          '#suffix' => '</div>',
-        ];
-        $formatter = [];
-        $options = $this->customFieldFormatterManager->createOptionsForInstance($custom_item, $format_type, $formatter_settings, $this->viewMode);
+      // HTML wrappers.
+      $this->buildHtmlWrappers($element[$name]['content'], $visibility_path, $wrapper_settings, $tag_options, $plugin_id);
 
-        // Get the formatter settings form.
-        $format = $this->customFieldFormatterManager->getInstance($options);
-        if (!is_null($format)) {
-          $formatter = $format->settingsForm($form, $form_state);
-        }
-        $form['fields'][$name]['content']['formatter_settings'] += $formatter;
+      $element[$name]['weight'] = [
+        '#type' => 'weight',
+        '#title' => $this->t('Weight for @label', ['@label' => $custom_item->getLabel()]),
+        '#title_display' => 'invisible',
+        '#default_value' => $weight,
+        '#attributes' => ['class' => ['field-settings-order-weight']],
+      ];
 
-        $form['fields'][$name]['content']['formatter_settings']['label_display'] = [
-          '#type' => 'select',
-          '#title' => $this->t('Label display'),
-          '#options' => $this->fieldLabelOptions(),
-          '#default_value' => $formatter_settings['label_display'] ?? 'above',
-          '#weight' => 10,
-          '#access' => $type !== 'boolean' && $format_type !== 'hidden',
-        ];
-        $form['fields'][$name]['content']['formatter_settings']['field_label'] = [
-          '#type' => 'textfield',
-          '#title' => $this->t('Field label'),
-          '#description' => $this->t('The label for viewing this field. Leave blank to use the default field label.'),
-          '#default_value' => $formatter_settings['field_label'] ?? $custom_item->getLabel(),
-          '#weight' => 11,
-          '#maxlength' => 255,
-          '#access' => $format_type !== 'hidden',
-          '#states' => [
-            'visible' => [
-              ':input[name="' . $visibility_path . '[label_display]"]' => ['!value' => 'hidden'],
-            ],
-          ],
-        ];
-        // HTML wrapper settings.
-        $tag_options = $this->tagManager->getTagOptions();
+    }
 
-        $form['fields'][$name]['content']['wrappers'] = [
-          '#type' => 'details',
-          '#title' => $this->t('Style settings'),
-          '#states' => [
-            'visible' => [
-              ':input[name="' . $root_visibility_path . '[format_type]"]' => ['!value' => 'hidden'],
-            ],
-          ],
-        ];
-        $form['fields'][$name]['content']['wrappers']['field_wrapper_tag'] = [
-          '#type' => 'select',
-          '#title' => $this->t('Field wrapper tag'),
-          '#description' => $this->t('Choose the HTML element to wrap around this field and label.'),
-          '#options' => $tag_options,
-          '#empty_option' => $this->t('- Use default -'),
-          '#default_value' => $wrapper_settings['field_wrapper_tag'] ?? '',
-        ];
-        $form['fields'][$name]['content']['wrappers']['field_wrapper_classes'] = [
-          '#type' => 'textfield',
-          '#title' => $this->t('Field wrapper classes'),
-          '#description' => $this->t('Enter additional classes, separated by space.'),
-          '#default_value' => $wrapper_settings['field_wrapper_classes'] ?? '',
-          '#states' => [
-            'invisible' => [
-              ':input[name="' . $root_visibility_path . '[wrappers][field_wrapper_tag]"]' => ['value' => 'none'],
-            ],
-          ],
-        ];
-        $form['fields'][$name]['content']['wrappers']['field_tag'] = [
-          '#type' => 'select',
-          '#title' => $this->t('Field tag'),
-          '#description' => $this->t('Choose the HTML element to wrap around this field.'),
-          '#options' => $tag_options,
-          '#empty_option' => $this->t('- Use default -'),
-          '#default_value' => $wrapper_settings['field_tag'] ?? '',
-        ];
-        $form['fields'][$name]['content']['wrappers']['field_classes'] = [
-          '#type' => 'textfield',
-          '#title' => $this->t('Field classes'),
-          '#description' => $this->t('Enter additional classes, separated by space.'),
-          '#default_value' => $wrapper_settings['field_classes'] ?? '',
-          '#states' => [
-            'invisible' => [
-              ':input[name="' . $root_visibility_path . '[wrappers][field_tag]"]' => ['value' => 'none'],
-            ],
-          ],
-        ];
-        $form['fields'][$name]['content']['wrappers']['label_tag'] = [
-          '#type' => 'select',
-          '#title' => $this->t('Label tag'),
-          '#description' => $this->t('Choose the HTML element to wrap around this label.'),
-          '#options' => $tag_options,
-          '#empty_option' => $this->t('- Use default -'),
-          '#default_value' => $wrapper_settings['label_tag'] ?? '',
-          '#states' => [
-            'visible' => [
-              ':input[name="' . $visibility_path . '[label_display]"]' => ['!value' => 'hidden'],
-            ],
-          ],
-        ];
-        $form['fields'][$name]['content']['wrappers']['label_classes'] = [
-          '#type' => 'textfield',
-          '#title' => $this->t('Label classes'),
-          '#description' => $this->t('Enter additional classes, separated by space.'),
-          '#default_value' => $wrapper_settings['label_classes'] ?? '',
-          '#states' => [
-            'visible' => [
-              ':input[name="' . $visibility_path . '[label_display]"]' => ['!value' => 'hidden'],
-            ],
-            'invisible' => [
-              ':input[name="' . $root_visibility_path . '[wrappers][label_tag]"]' => ['value' => 'none'],
-            ],
-          ],
-        ];
-        $form['fields'][$name]['weight'] = [
-          '#type' => 'weight',
-          '#title' => $this->t('Weight for @label', ['@label' => $custom_item->getLabel()]),
-          '#title_display' => 'invisible',
-          '#default_value' => $weight,
-          '#attributes' => ['class' => ['field-settings-order-weight']],
-        ];
+    return $element;
+  }
+
+  /**
+   * The #after_build callback: scopes validation to this element's real path.
+   *
+   * #array_parents is only reliable once the form builder has actually placed
+   * the element in the tree, which happens right before #after_build runs —
+   * using it here (rather than a hand-assembled path during #process) avoids
+   * mismatches against $form_state's real structure, which caused
+   * #limit_validation_errors to silently drop AJAX requests when nested
+   * several rebuild-generations deep (e.g. new Layout Builder blocks).
+   *
+   * @param array<string, mixed> $element
+   *   The element being built.
+   *
+   * @return array<string, mixed>
+   *   The element, with #limit_validation_errors set from its real parents.
+   */
+  public static function limitElementValidation(array $element): array {
+    $element['#limit_validation_errors'] = [$element['#array_parents']];
+    return $element;
+  }
+
+  /**
+   * Determines whether this element is nested in a UI Patterns source.
+   *
+   * Locates the parents of the UI Patterns "source" array by searching
+   * $parents from the end for the last (innermost) literal 'source' segment,
+   * rather than trimming a fixed number of trailing elements. The segments
+   * after 'source' differ between formatters (BaseFormatter appends
+   * 'settings'/'fields'; SingleDirectoryComponentFormatter appends only
+   * 'settings'), so a length-based slice would need re-verifying per caller
+   * — a class of bug this logic has already broken on more than once.
+   *
+   * Searching right-to-left and stopping at the first match is safe against
+   * component-/user-controlled names (subfield names, UI Patterns slot
+   * names, referenced field machine names) that might themselves be
+   * literally 'source': every such name necessarily sits to the LEFT of the
+   * real, hardcoded UI Patterns schema keys ('source', 'sources', 'value')
+   * in $parents, because those schema keys only appear once UI Patterns has
+   * already navigated into a selected source's own settings — so the search
+   * always finds a genuine schema key before it could ever reach a
+   * user-chosen name occupying the same string.
+   *
+   * IMPORTANT: $parents must be the element's base parents, captured before
+   * any subfield/slot machine name is appended. Both current call sites
+   * (BaseFormatter::processFields(), SingleDirectoryComponentFormatter::
+   * processSdcSettingsForm()) satisfy this by calling this method before
+   * their respective subfield/slot loops begin.
+   *
+   * @param array<int, mixed> $parents
+   *   The '#parents' of the current form element, captured before any
+   *   subfield/slot name has been appended.
+   * @param array<string, mixed> $values
+   *   The full submitted/default form values.
+   * @param array<string, mixed>|null $trigger
+   *   The triggering element info, or NULL if none.
+   *
+   * @return string|null
+   *   The UI Patterns source plugin type/id, or NULL if this element isn't
+   *   nested in UI Patterns, or no source has been selected yet.
+   */
+  protected function getUiPatternsSourceType(array $parents, array $values, ?array $trigger): ?string {
+    if (!\in_array('ui_patterns', $parents, TRUE)) {
+      return NULL;
+    }
+
+    $source_index = NULL;
+    for ($i = count($parents) - 1; $i >= 0; $i--) {
+      if ($parents[$i] === 'source') {
+        $source_index = $i;
+        break;
       }
     }
 
-    return $form;
+    // A 'source' segment must come after 'ui_patterns' — guards against a
+    // false match if this were ever called with an out-of-precondition
+    // $parents (see docblock above).
+    $ui_patterns_index = \array_search('ui_patterns', $parents, TRUE);
+    if ($source_index === NULL || $source_index <= $ui_patterns_index) {
+      return NULL;
+    }
+    $source_parents = array_slice($parents, 0, $source_index + 1);
+
+    $ui_pattern_type = NULL;
+    $submitted_type = NestedArray::getValue($values, [...$source_parents, 'type']);
+    if (!empty($submitted_type)) {
+      $ui_pattern_type = $submitted_type;
+    }
+
+    $trigger_parents = $trigger['#parents'] ?? [];
+    if (!empty($trigger_parents) && end($trigger_parents) === 'type'
+      && \array_slice($trigger_parents, 0, -1) === $source_parents) {
+      $ui_pattern_type = $trigger['#value'];
+    }
+
+    return $ui_pattern_type;
   }
 
   /**
@@ -369,12 +456,10 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
         continue;
       }
 
-      $field_label = $custom_field->getLabel();
-      $format_label = $definition['label'];
       $formatted_summary = new FormattableMarkup(
         '<strong>@label</strong>: @format_label', [
-          '@label' => $field_label,
-          '@format_label' => $format_label,
+          '@label' => $custom_field->getLabel(),
+          '@format_label' => $definition['label'],
         ]
       );
       $summary[] = $this->t('@summary', ['@summary' => $formatted_summary]);
@@ -500,7 +585,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
           '#theme' => 'custom_field_item',
           '#field_name' => $field_name,
           '#name' => $value['name'],
-          '#value' => $value['value']['#markup'],
+          '#value' => $value['value'],
           '#label' => $value['label'],
           '#label_display' => $value['label_display'],
           '#type' => $value['type'],
@@ -537,7 +622,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
    */
   protected function getFormattedValues(FieldItemInterface $item, string $langcode): array {
     $settings = $this->getSetting('fields') ?? [];
-    $custom_items = $this->sortFields($settings);
+    $custom_items = $this->getSubfieldsForValueFormatting();
 
     $event = new PreFormatEvent($custom_items, $item, $langcode);
     $this->eventDispatcher->dispatch($event);
@@ -545,58 +630,14 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
 
     $values = [];
     $entity_type = $this->fieldDefinition->getTargetEntityTypeId();
-    foreach ($custom_items as $name => $custom_item) {
-      $value = $custom_item->value($item);
-      $data_type = $custom_item->getDataType();
+    foreach ($custom_items as $custom_item) {
+      $name = $custom_item->getName();
+      $value = static::prepareFormattedSubfieldValue($item, $custom_item, $name, $langcode);
       if ($value === '' || $value === NULL) {
         continue;
       }
-      if ($data_type === 'viewfield') {
-        $value = [
-          'target_id' => $value,
-          'display_id' => $item->{$name . '__display'},
-          'arguments' => $item->{$name . '__arguments'},
-          'items_to_display' => $item->{$name . '__items'},
-        ];
-      }
-      elseif ($data_type === 'uri') {
-        $value = [
-          'uri' => $value,
-        ];
-      }
-      elseif ($data_type === 'link') {
-        $value = [
-          'uri' => $value,
-          'title' => $item->{$name . '__title'},
-          'options' => $item->{$name . '__options'},
-        ];
-      }
-      elseif ($data_type === 'datetime') {
-        $value = [
-          'date' => $item->{$name . '__date'},
-          'timezone' => $item->{$name . '__timezone'},
-        ];
-      }
-      elseif (in_array($data_type, ['entity_reference', 'file', 'image'])) {
-        $entity = $item->{$name . '__entity'};
-        if (!$entity instanceof EntityInterface) {
-          continue;
-        }
-        if ($entity instanceof TranslatableInterface) {
-          $entity = $this->entityRepository->getTranslationFromContext($entity, $langcode);
-        }
-        $value = $entity;
-      }
 
-      $default_wrappers = [
-        'field_wrapper_tag' => '',
-        'field_wrapper_classes' => '',
-        'field_tag' => '',
-        'field_classes' => '',
-        'label_tag' => '',
-        'label_classes' => '',
-      ];
-
+      $default_wrappers = static::defaultWrappers();
       $wrappers = $settings[$name]['wrappers'] ?? $default_wrappers;
       $formatter_settings = [
         'format_type' => $settings[$name]['format_type'] ?? NULL,
@@ -622,12 +663,14 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
       $formatter_settings['formatter_settings'] += $plugin::defaultSettings();
       $field_label = $formatter_settings['formatter_settings']['field_label'] ?? NULL;
 
+      // If formatValue() returned a render array, use it directly.
+      // Otherwise, wrap scalar values in #markup for proper rendering.
+      $render_value = is_array($value) ? $value : ['#markup' => $value];
+
       $markup = [
         'name' => $name,
-        'value' => [
-          '#markup' => $value,
-        ],
-        'label' => !empty($field_label) ? $field_label : $custom_item->getLabel(),
+        'value' => $render_value,
+        'label' => $field_label ?: $custom_item->getLabel(),
         'label_display' => $formatter_settings['formatter_settings']['label_display'] ?? 'above',
         'type' => $custom_item->getPluginId(),
         'wrappers' => $formatter_settings['wrappers'],
@@ -638,6 +681,17 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
     }
 
     return $values;
+  }
+
+  /**
+   * Helper function to return the subfields for value formatting.
+   *
+   * @return \Drupal\custom_field\Plugin\CustomFieldTypeInterface[]
+   *   An array of custom field items.
+   */
+  protected function getSubfieldsForValueFormatting(): array {
+    $settings = $this->getSetting('fields') ?? [];
+    return $this->sortFields($settings);
   }
 
   /**
@@ -675,7 +729,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
    */
   public function calculateDependencies(): array {
     $dependencies = parent::calculateDependencies();
-    $fields = $this->getSetting('fields');
+    $fields = $this->getSetting('fields') ?? [];
     if (!empty($fields)) {
       foreach ($fields as $field) {
         $formatter_settings = $field['formatter_settings'] ?? [];
@@ -707,7 +761,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
   public function onDependencyRemoval(array $dependencies): bool {
     $changed = parent::onDependencyRemoval($dependencies);
     $settings_changed = FALSE;
-    $fields = $this->getSetting('fields');
+    $fields = $this->getSetting('fields') ?? [];
     foreach ($fields as $name => $field) {
       if (!isset($field['formatter_settings'])) {
         continue;

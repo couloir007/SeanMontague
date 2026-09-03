@@ -11,6 +11,7 @@ use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
+use Drupal\custom_field\Plugin\CustomField\FieldType\LinkTypeInterface;
 use Drupal\custom_field\Plugin\CustomField\FieldWidget\UrlWidget;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\file\FileInterface;
@@ -59,10 +60,9 @@ class LinkitUrlWidget extends UrlWidget {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    $settings = parent::defaultSettings();
-    $settings['settings']['linkit_profile'] = 'default';
-
-    return $settings;
+    return [
+      'linkit_profile' => 'default',
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -70,14 +70,14 @@ class LinkitUrlWidget extends UrlWidget {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
     $profile_storage = $this->entityTypeManager->getStorage('linkit_profile');
 
     $options = array_map(function ($linkit_profile) {
       return $linkit_profile->label();
     }, $profile_storage->loadMultiple());
 
-    $element['settings']['linkit_profile'] = [
+    $element['linkit_profile'] = [
       '#type' => 'select',
       '#title' => $this->t('Linkit profile'),
       '#options' => $options,
@@ -94,7 +94,8 @@ class LinkitUrlWidget extends UrlWidget {
    */
   public function widget(FieldItemListInterface $items, int $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    assert($field instanceof LinkTypeInterface);
+    $settings = $this->getSettings() + static::defaultSettings();
     /** @var \Drupal\Core\Field\FieldItemInterface $item */
     $item = $items[$delta];
     $uri = $item->{$field->getName()} ?? NULL;

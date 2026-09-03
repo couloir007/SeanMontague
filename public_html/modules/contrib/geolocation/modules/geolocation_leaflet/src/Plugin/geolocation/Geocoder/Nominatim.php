@@ -2,25 +2,27 @@
 
 namespace Drupal\geolocation_leaflet\Plugin\geolocation\Geocoder;
 
+use Drupal\geolocation\Attribute\Geocoder;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\Error;
 use Drupal\geolocation\GeocoderBase;
 use Drupal\geolocation\GeocoderInterface;
+use Drupal\geolocation\GeolocationAddress;
 use GuzzleHttp\Exception\RequestException;
 
 /**
  * Provides the Nominatim API.
- *
- * @Geocoder(
- *   id = "nominatim",
- *   name = @Translation("Nominatim"),
- *   description = @Translation("See https://wiki.openstreetmap.org/wiki/Nominatim for details."),
- *   locationCapable = true,
- *   boundaryCapable = true,
- *   frontendCapable = false,
- *   reverseCapable = true,
- * )
  */
+#[Geocoder(
+  id: 'nominatim',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('Nominatim'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('See https://wiki.openstreetmap.org/wiki/Nominatim for details.'),
+  locationCapable: TRUE,
+  boundaryCapable: TRUE,
+  frontendCapable: FALSE,
+  reverseCapable: TRUE
+)]
 class Nominatim extends GeocoderBase implements GeocoderInterface {
 
   /**
@@ -28,18 +30,24 @@ class Nominatim extends GeocoderBase implements GeocoderInterface {
    *
    * @var string
    */
-  protected static $nominatimBaseUrl = 'https://nominatim.openstreetmap.org';
+  protected static string $nominatimGeocodingUrl = 'https://nominatim.openstreetmap.org/search';
+
+  /**
+   * Nominatim reverse geocoding URL.
+   *
+   * @var string
+   */
+  protected static string $nominatimReverseGeocodingUrl = 'https://nominatim.openstreetmap.org/reverse';
 
   /**
    * {@inheritdoc}
    */
-  public function geocode($address) {
+  public function geocode(string $address): ?array {
     if (empty($address)) {
-      return FALSE;
+      return NULL;
     }
 
-    $request_url_base = $this->getRequestUrlBase();
-    $url = Url::fromUri($request_url_base . '/search', [
+    $url = Url::fromUri($this->getGeocodingUrl(), [
       'query' => [
         'q' => $address,
         'email' => $this->getRequestEmail(),
@@ -53,14 +61,70 @@ class Nominatim extends GeocoderBase implements GeocoderInterface {
       $result = Json::decode(\Drupal::httpClient()->get($url->toString())->getBody());
     }
     catch (RequestException $e) {
-      \Drupal::logger('geolocation')->warning($e->getMessage());
-      return FALSE;
+      $logger = \Drupal::logger('geolocation');
+      Error::logException($logger, $e);
+      return NULL;
     }
 
     $location = [];
 
     if (empty($result[0])) {
-      return FALSE;
+      return NULL;
+    }
+    else {
+      $location['location'] = [
+        'lat' => $result[0]['lat'],
+        'lng' => $result[0]['lon'],
+      ];
+    }
+
+    if (!empty($result[0]['boundingbox'])) {
+      $location['boundary'] = [
+        'lat_north_east' => $result[0]['boundingbox'][1],
+        'lng_north_east' => $result[0]['boundingbox'][3],
+        'lat_south_west' => $result[0]['boundingbox'][0],
+        'lng_south_west' => $result[0]['boundingbox'][2],
+      ];
+    }
+
+    if (!empty($result[0]['display_name'])) {
+      $location['address'] = $result[0]['display_name'];
+    }
+
+    return $location;
+  }
+
+  /**
+   * Geocode a structured address.
+   */
+  public function geocodeAddress(GeolocationAddress $address): ?array {
+    $url = Url::fromUri($this->getGeocodingUrl(), [
+      'query' => [
+        'street' => $address->addressLine1,
+        'city' => $address->locality ?? NULL,
+        'county' => $address->dependentLocality ?? NULL,
+        'state' => $address->administrativeArea ?? NULL,
+        'country' => $address->countryCode ?? NULL,
+        'postalcode' => $address->postalCode ?? NULL,
+        'limit' => 1,
+        'format' => 'json',
+        'connect_timeout' => 5,
+      ],
+    ]);
+
+    try {
+      $result = Json::decode(\Drupal::httpClient()->get($url->toString())->getBody());
+    }
+    catch (RequestException $e) {
+      $logger = \Drupal::logger('geolocation');
+      Error::logException($logger, $e);
+      return NULL;
+    }
+
+    $location = [];
+
+    if (empty($result[0])) {
+      return NULL;
     }
     else {
       $location['location'] = [
@@ -88,9 +152,8 @@ class Nominatim extends GeocoderBase implements GeocoderInterface {
   /**
    * {@inheritdoc}
    */
-  public function reverseGeocode($latitude, $longitude) {
-    $request_url_base = $this->getRequestUrlBase();
-    $url = Url::fromUri($request_url_base . '/reverse', [
+  public function reverseGeocode(float $latitude, float $longitude): ?array {
+    $url = Url::fromUri($this->getReverseGeocodingUrl(), [
       'query' => [
         'lat' => $latitude,
         'lon' => $longitude,
@@ -107,12 +170,13 @@ class Nominatim extends GeocoderBase implements GeocoderInterface {
       $result = Json::decode(\Drupal::httpClient()->get($url->toString())->getBody());
     }
     catch (RequestException $e) {
-      \Drupal::logger('geolocation')->warning($e->getMessage());
-      return FALSE;
+      $logger = \Drupal::logger('geolocation');
+      Error::logException($logger, $e);
+      return NULL;
     }
 
     if (empty($result['address'])) {
-      return FALSE;
+      return NULL;
     }
 
     $address_atomics = [];
@@ -177,14 +241,32 @@ class Nominatim extends GeocoderBase implements GeocoderInterface {
    * @return string
    *   Base URL.
    */
-  protected function getRequestUrlBase() {
+  protected function getGeocodingUrl(): string {
     $config = \Drupal::config('geolocation_leaflet.nominatim_settings');
 
-    if (!empty($config->get('nominatim_base_url'))) {
-      $request_url = $config->get('nominatim_base_url');
+    if (!empty($config->get('nominatim_geocoding_url'))) {
+      $request_url = $config->get('nominatim_geocoding_url');
     }
     else {
-      $request_url = self::$nominatimBaseUrl;
+      $request_url = self::$nominatimGeocodingUrl;
+    }
+    return $request_url;
+  }
+
+  /**
+   * Retrieve base URL from setting or default.
+   *
+   * @return string
+   *   Base URL.
+   */
+  protected function getReverseGeocodingUrl(): string {
+    $config = \Drupal::config('geolocation_leaflet.nominatim_settings');
+
+    if (!empty($config->get('nominatim_reverse_geocoding_url'))) {
+      $request_url = $config->get('nominatim_reverse_geocoding_url');
+    }
+    else {
+      $request_url = self::$nominatimReverseGeocodingUrl;
     }
     return $request_url;
   }
@@ -195,7 +277,7 @@ class Nominatim extends GeocoderBase implements GeocoderInterface {
    * @return string
    *   Get Request Email.
    */
-  protected function getRequestEmail() {
+  protected function getRequestEmail(): string {
     $config = \Drupal::config('geolocation_leaflet.nominatim_settings');
 
     if (!empty($config->get('nominatim_email'))) {

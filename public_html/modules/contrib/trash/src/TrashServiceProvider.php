@@ -6,12 +6,14 @@ namespace Drupal\trash;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
+use Drupal\trash\Cache\TrashEntityCacheBackend;
 use Drupal\trash\EntityQuery\Sql\PgsqlQueryFactory as CorePgsqlQueryFactory;
 use Drupal\trash\EntityQuery\Sql\QueryFactory as CoreQueryFactory;
 use Drupal\trash\EntityQuery\Workspaces\PgsqlQueryFactory as WorkspacesPgsqlQueryFactory;
 use Drupal\trash\EntityQuery\Workspaces\QueryFactory as WorkspacesQueryFactory;
 use Drupal\trash\Handler\TrashHandlerPass;
 use Drupal\trash\LayoutBuilder\TrashInlineBlockUsage;
+use Drupal\trash\Menu\TrashMenuLinkManager;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -80,6 +82,14 @@ class TrashServiceProvider extends ServiceProviderBase {
         ->setDecoratedService('workspaces.information', NULL, 100)
         ->addArgument(new Reference('trash.workspaces.information.inner'))
         ->addArgument(new Reference('trash.manager'));
+
+      // Core before 11.3.0 only provides 'workspace_association'.
+      $tracker = $container->hasDefinition('workspaces.tracker') ? 'workspaces.tracker' : 'workspace_association';
+
+      $container->getDefinition(TrashEntityCacheBackend::class)
+        ->setArgument('$workspaceManager', new Reference('workspaces.manager'))
+        ->setArgument('$workspaceInformation', new Reference('workspaces.information'))
+        ->setArgument('$workspaceTracker', new Reference($tracker));
     }
 
     if ($container->hasDefinition('workspaces.manager')) {
@@ -102,6 +112,23 @@ class TrashServiceProvider extends ServiceProviderBase {
       $container->getDefinition('wse_menu.tree_storage')
         ->setClass(TrashWseMenuTreeStorage::class)
         ->addMethodCall('setTrashManager', [new Reference('trash.manager')]);
+    }
+
+    // Guard at the menu link manager rather than at menu.tree_storage: core's
+    // workspaces and wse_menu both decorate that service and drop the inner
+    // one, and contrib or custom code may do the same, so a class set there can
+    // stop applying.
+    //
+    // The lowest decoration priority keeps this guard outermost, so no other
+    // decorator can add a trashed link back before the guard sees the call.
+    // wse_menu, for one, decorates the same service at priority 50.
+    if ($container->hasDefinition('plugin.manager.menu.link')) {
+      $container->register('trash.plugin.manager.menu.link', TrashMenuLinkManager::class)
+        ->setPublic(FALSE)
+        ->setDecoratedService('plugin.manager.menu.link', NULL, -100)
+        ->addArgument(new Reference('trash.plugin.manager.menu.link.inner'))
+        ->addArgument(new Reference('entity_type.manager'))
+        ->addArgument(new Reference('entity.repository'));
     }
 
     // Ensure the trash ignore subscriber is one of the first definitions used

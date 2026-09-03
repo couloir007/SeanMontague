@@ -87,22 +87,22 @@ abstract class NumericFormatterBase extends CustomFieldFormatterBase {
    * {@inheritdoc}
    */
   public function formatValue(FieldItemInterface $item, mixed $value): mixed {
-    $widget_settings = $this->customFieldDefinition->getWidgetSetting('settings');
-    $allowed_values = $this->getFieldWidgetSetting('allowed_values') ?? [];
+    $field_settings = $this->customFieldDefinition->getFieldSettings();
+    $allowed_values = $field_settings['allowed_values'] ?? [];
     $output = $this->numberFormat((float) $value);
     if (!empty($allowed_values) && $this->getSetting('key_label') == 'label') {
       $index = array_search($output, array_column($allowed_values, 'key'));
-      $output = $index !== FALSE ? $allowed_values[$index]['value'] : $output;
+      $output = $index !== FALSE ? $allowed_values[$index]['label'] : $output;
     }
     elseif ($this->getSetting('prefix_suffix')) {
-      $prefixes = isset($widget_settings['prefix']) ? array_map([
+      $prefixes = isset($field_settings['prefix']) ? array_map([
         'Drupal\Core\Field\FieldFilteredMarkup',
         'create',
-      ], explode('|', $widget_settings['prefix'])) : [''];
-      $suffixes = isset($widget_settings['suffix']) ? array_map([
+      ], explode('|', $field_settings['prefix'])) : [''];
+      $suffixes = isset($field_settings['suffix']) ? array_map([
         'Drupal\Core\Field\FieldFilteredMarkup',
         'create',
-      ], explode('|', $widget_settings['suffix'])) : [''];
+      ], explode('|', $field_settings['suffix'])) : [''];
       $prefix = (count($prefixes) > 1) ? $this->formatPlural($value, $prefixes[0], $prefixes[1]) : $prefixes[0];
       $suffix = (count($suffixes) > 1) ? $this->formatPlural($value, $suffixes[0], $suffixes[1]) : $suffixes[0];
       $output = $prefix . $output . $suffix;

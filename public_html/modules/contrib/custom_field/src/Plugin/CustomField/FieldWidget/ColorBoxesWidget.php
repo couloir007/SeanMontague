@@ -28,8 +28,7 @@ class ColorBoxesWidget extends ColorWidget {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    $settings = parent::defaultSettings();
-    $settings['settings'] = [
+    return [
       'default_colors' => [
         '#ac725e',
         '#d06b64',
@@ -55,9 +54,7 @@ class ColorBoxesWidget extends ColorWidget {
         '#cd74e6',
         '#a47ae2',
       ],
-    ] + $settings['settings'];
-
-    return $settings;
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -65,16 +62,16 @@ class ColorBoxesWidget extends ColorWidget {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
     $colors = is_array($settings['default_colors']) ? implode(',', $settings['default_colors']) : $settings['default_colors'];
 
-    $element['settings']['default_colors'] = [
+    $element['default_colors'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Default colors'),
       '#default_value' => $colors,
       '#required' => TRUE,
       '#element_validate' => [
-        [$this, 'settingsColorValidate'],
+        [static::class, 'settingsColorValidate'],
       ],
       '#description' => $this->t('Default colors for pre-selected color boxes. Enter as 6 digit upper case hex - such as #FF0000.'),
     ];
@@ -87,7 +84,7 @@ class ColorBoxesWidget extends ColorWidget {
    */
   public function widget(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
     $element['#uid'] = Html::getUniqueId('color-field-' . $field->getName());
 
     // Ensure the default value is the required format.
@@ -109,7 +106,7 @@ class ColorBoxesWidget extends ColorWidget {
 
     // Set Drupal settings.
     $settings[$element['#uid']] = [
-      'required' => $settings['required'],
+      'required' => $field->getFieldSetting('required'),
     ];
 
     $default_colors = is_array($settings['default_colors']) ? implode(',', $settings['default_colors']) : $settings['default_colors'];
@@ -121,14 +118,17 @@ class ColorBoxesWidget extends ColorWidget {
 
     $element['#attached']['drupalSettings']['custom_field']['color_box']['settings'] = $settings;
 
+    $value_element = [
+      '#type' => 'textfield',
+      '#maxlength' => 7,
+      '#size' => 7,
+    ] + $element;
+
+    $value_element['#attributes']['class'][] = 'visually-hidden';
+
     return [
       '#type' => 'container',
-      'value' => [
-        '#type' => 'textfield',
-        '#maxlength' => 7,
-        '#size' => 7,
-        '#attributes' => ['class' => ['visually-hidden']],
-      ] + $element,
+      'value' => $value_element,
       'color_picker' => [
         '#type' => 'container',
         '#attributes' => [
@@ -158,21 +158,18 @@ class ColorBoxesWidget extends ColorWidget {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public function settingsColorValidate(array $element, FormStateInterface $form_state): void {
+  public static function settingsColorValidate(array $element, FormStateInterface $form_state): void {
     $default_colors = $form_state->getValue($element['#parents']);
     $colors = '';
     if (!empty($default_colors)) {
       preg_match_all("/#[0-9a-f]{6}/i", $default_colors, $default_colors, PREG_SET_ORDER);
-
       foreach ($default_colors as $color) {
         if (!empty($colors)) {
           $colors .= ',';
         }
-
         $colors .= strtolower($color[0]);
       }
     }
-
     $form_state->setValue($element['#parents'], $colors);
   }
 

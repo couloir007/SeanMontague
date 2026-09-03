@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * Geolocation test setup.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function geolocation_yandex_test_install(): void {
+  $key64 = 'MDgyNzA1ZTItMTg1MC00Y2E5LWI5ZWYtZmNiMDM5MzQyNTEx1';
+
+  /** @var \Drupal\Core\Config\Config $config */
+  $config = \Drupal::service('config.factory')->getEditable('geolocation_yandex.settings');
+  if (empty($config->get('api_key'))) {
+    $config->set('api_key', base64_decode($key64))->save();
+  }
+}

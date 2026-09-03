@@ -6,6 +6,7 @@ namespace Drupal\Tests\trash\Kernel;
 
 use Drupal\redirect\Entity\Redirect;
 use Drupal\trash\Exception\UnrestorableEntityException;
+use Drupal\trash\Hook\TrashHandler\RedirectTrashHandler;
 use Drupal\trash\TrashViewBuilder;
 
 /**
@@ -37,6 +38,24 @@ class TrashRedirectTest extends TrashKernelTestBase {
     $this->installEntitySchema('redirect');
     $this->installEntitySchema('path_alias');
     $this->installConfig(['redirect', 'system']);
+  }
+
+  /**
+   * Tests that building trash handlers does not build the redirect repository.
+   *
+   * TrashManager holds its handlers in a tagged iterator, so the first
+   * getHandler() call builds every tagged handler. RedirectTrashHandler must
+   * not pull 'redirect.repository' in with it. The repository reads
+   * 'redirect.settings' in its constructor, and a config override that keys
+   * itself by the negotiated interface language turns that into a language
+   * negotiation and a router build.
+   */
+  public function testGetHandlerDoesNotBuildRedirectRepository(): void {
+    $this->assertInstanceOf(RedirectTrashHandler::class, $this->getTrashManager()->getHandler('redirect'));
+    $this->assertFalse(
+      $this->container->initialized('redirect.repository'),
+      "Building trash handlers must not instantiate 'redirect.repository'."
+    );
   }
 
   /**

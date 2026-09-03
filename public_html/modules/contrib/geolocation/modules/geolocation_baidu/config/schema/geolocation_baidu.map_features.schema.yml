@@ -1,0 +1,15 @@
+geolocation.map_feature_settings.baidu.control:
+  type: geolocation.map_feature_settings
+  label: 'Control Element'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        position:
+          type: string
+          label: 'Position'
+
+plugin.plugin_configuration.geolocation.map_feature.baidu_zoom_control:
+  type: geolocation.map_feature_settings.baidu.control
+  label: 'Zoom'

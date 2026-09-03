@@ -8,7 +8,6 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
-use Drupal\custom_field\Plugin\CustomField\ListWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
@@ -29,13 +28,23 @@ class RadiosWidget extends ListWidgetBase {
   /**
    * {@inheritdoc}
    */
+  public static function defaultSettings(): array {
+    return [
+      'empty_option' => 'N/A',
+    ] + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function widget(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $field_settings = $field->getFieldSettings();
+    $settings = $this->getSettings() + static::defaultSettings();
 
     // Add our widget type and additional properties and return.
     $element['#type'] = 'radios';
-    if (!$settings['required']) {
+    if (!$field_settings['required']) {
       $options = $element['#options'];
       $options = ['' => $settings['empty_option']] + $options;
       $element['#options'] = $options;

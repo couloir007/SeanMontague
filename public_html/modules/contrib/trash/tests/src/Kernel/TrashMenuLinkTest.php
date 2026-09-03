@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\trash\Kernel;
 
+use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\node\Entity\Node;
@@ -87,6 +88,54 @@ class TrashMenuLinkTest extends TrashKernelTestBase {
     ];
     $tree = $menu_tree->transform($tree, $manipulators);
     return $menu_tree->build($tree);
+  }
+
+  /**
+   * Counts the {menu_tree} rows for a menu link plugin ID.
+   */
+  protected function countMenuTreeRows(string $plugin_id): int {
+    return (int) $this->container->get('database')->select('menu_tree', 't')
+      ->condition('t.id', $plugin_id)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
+  }
+
+  /**
+   * Asserts that a trashed link left nothing behind in the menu tree.
+   *
+   * Checks the {menu_tree} row, the loaded tree, and an access-checked render.
+   * A leftover row shows up in the render as a PluginException, because
+   * MenuLinkContent::getEntity() cannot resolve a trashed entity by ID or by
+   * its UUID fallback.
+   */
+  protected function assertNoStaleMenuTreeEntry(string $plugin_id, string $menu_name = 'test-menu'): void {
+    $this->assertSame(0, $this->countMenuTreeRows($plugin_id), 'A trashed menu link should have no {menu_tree} row.');
+    $this->assertArrayNotHasKey($plugin_id, $this->loadMenuTree($menu_name));
+
+    try {
+      $build = $this->buildMenu($menu_name);
+      $this->assertNotEquals(0, $build['#cache']['max-age'], 'The menu render cache should not be poisoned.');
+    }
+    catch (PluginException $e) {
+      $this->fail('Rendering the menu threw a PluginException for a trashed menu link: ' . $e->getMessage());
+    }
+  }
+
+  /**
+   * Data provider for trash contexts in which trashed entities are visible.
+   *
+   * The 'ignore' context drops the 'deleted' filter, so storage loads and
+   * entity queries return live and trashed entities alike. The 'inactive'
+   * context inverts it and returns only the trashed ones.
+   *
+   * @see \Drupal\trash\Hook\TrashEntityHooks::entityQueryAlter()
+   */
+  public static function providerNonActiveTrashContexts(): array {
+    return [
+      'ignore' => ['ignore'],
+      'inactive' => ['inactive'],
+    ];
   }
 
   /**
@@ -320,6 +369,177 @@ class TrashMenuLinkTest extends TrashKernelTestBase {
     $this->assertEmpty($tree[$restored_parent->getPluginId()]->subtree);
     $this->assertArrayHasKey($restored_child2->getPluginId(), $tree);
     $this->assertArrayHasKey($grandchild1->getPluginId(), $tree);
+  }
+
+  /**
+   * Tests that resaving a trashed menu link does not put it back in the tree.
+   *
+   * MenuLinkContent::postSave() calls addDefinition(), so any save of a
+   * trash-flagged link writes a {menu_tree} row again. The entity stays
+   * filtered out of storage, so MenuLinkContent::getEntity() then throws a
+   * PluginException on every menu walk that checks access, including anonymous
+   * page renders.
+   *
+   * Callers that hit this in practice: workspace publishing, which runs with
+   * the 'ignore' context for the whole operation; any request on a trash admin
+   * route, including bulk operation submits; and code that saves links it found
+   * through an entity query, such as a path alias update rewriting link URIs.
+   * The second half covers that query shape, where the link is reached by
+   * 'link.uri' instead of by ID.
+   *
+   * A menu rebuild does not clean this up. MenuTreeStorage's
+   * findNoLongerExistingLinks() only considers rows with discovered = 1, and
+   * entity-backed rows have discovered = 0, so the row survives until the link
+   * is purged or restored.
+   *
+   * @dataProvider providerNonActiveTrashContexts
+   */
+  public function testResavingTrashedLinkDoesNotReAddMenuTreeEntry(string $context): void {
+    $link = $this->createMenuLink('Test Link');
+    $link_id = $link->id();
+    $plugin_id = $link->getPluginId();
+
+    $link->delete();
+    $this->assertSame(0, $this->countMenuTreeRows($plugin_id), 'Trashing the link should remove its {menu_tree} row.');
+
+    // Resave the trashed link outside the 'active' trash context.
+    $this->getTrashManager()->executeInTrashContext($context, function () use ($link_id, $context): void {
+      $trashed = $this->getEntityTypeManager()->getStorage('menu_link_content')->loadUnchanged($link_id);
+      $this->assertNotEmpty($trashed, "A trashed link should be loadable in the '$context' trash context.");
+      $trashed->set('title', 'Test Link updated');
+      $trashed->save();
+    });
+
+    // The link is still trashed, so it has to stay out of the menu tree.
+    $this->assertEmpty(MenuLinkContent::load($link_id));
+    $this->assertNoStaleMenuTreeEntry($plugin_id);
+
+    // Same again for a link reached through an entity query.
+    $aliased = $this->createMenuLink('Aliased Link', 'internal:/old-alias');
+    $aliased_id = $aliased->id();
+    $aliased_plugin_id = $aliased->getPluginId();
+
+    $aliased->delete();
+    $this->assertSame(0, $this->countMenuTreeRows($aliased_plugin_id));
+
+    $this->getTrashManager()->executeInTrashContext($context, function () use ($context): void {
+      $storage = $this->getEntityTypeManager()->getStorage('menu_link_content');
+      $ids = $storage->getQuery()
+        ->accessCheck(FALSE)
+        ->condition('link.uri', 'internal:/old-alias')
+        ->execute();
+      $this->assertNotEmpty($ids, "The entity query should return the trashed link in the '$context' trash context.");
+      $storage->resetCache(array_values($ids));
+      foreach ($storage->loadMultiple(array_values($ids)) as $found) {
+        $found->set('link', [['uri' => 'internal:/new-alias']]);
+        $found->save();
+      }
+    });
+
+    $this->assertEmpty(MenuLinkContent::load($aliased_id));
+    $this->assertNoStaleMenuTreeEntry($aliased_plugin_id);
+  }
+
+  /**
+   * Tests that removing a parent does not resurrect an already-trashed child.
+   *
+   * MenuLinkContent::preDelete() re-parents children with $child->save(). With
+   * a non-active trash context, loadByProperties() also returns trashed
+   * children, so they get resaved and land back in {menu_tree} while still
+   * being trash-flagged. Purging a parent takes the same path, and runs with
+   * the trash context set to 'ignore' from both the purge form and the cron
+   * queue worker.
+   *
+   * @dataProvider providerNonActiveTrashContexts
+   */
+  public function testRemovingParentDoesNotResurrectTrashedChild(string $context): void {
+    $parent = $this->createMenuLink('Parent');
+    $child = $this->createMenuLink('Child', 'internal:/', $parent->uuid());
+    $parent_id = $parent->id();
+    $child_id = $child->id();
+    $child_plugin_id = $child->getPluginId();
+
+    // Trash the child first, then remove the parent in that context.
+    $child->delete();
+    $this->assertSame(0, $this->countMenuTreeRows($child_plugin_id));
+
+    $this->getTrashManager()->executeInTrashContext($context, function () use ($parent_id): void {
+      $parent = $this->getEntityTypeManager()->getStorage('menu_link_content')->loadUnchanged($parent_id);
+      $this->assertNotEmpty($parent);
+      $parent->delete();
+    });
+
+    $this->assertNotEmpty($this->loadTrashedEntity('menu_link_content', $child_id), 'The child should still be trashed.');
+    $this->assertNoStaleMenuTreeEntry($child_plugin_id);
+
+    // Purging a parent reaches the same re-parenting path.
+    $purged_parent = $this->createMenuLink('Purged parent');
+    $purged_child = $this->createMenuLink('Purged child', 'internal:/', $purged_parent->uuid());
+    $purged_child_id = $purged_child->id();
+    $purged_child_plugin_id = $purged_child->getPluginId();
+
+    $purged_child->delete();
+    $this->assertSame(0, $this->countMenuTreeRows($purged_child_plugin_id));
+
+    $this->purgeEntity('menu_link_content', $purged_parent->id());
+
+    $this->assertNotEmpty($this->loadTrashedEntity('menu_link_content', $purged_child_id), 'The child should still be trashed.');
+    $this->assertNoStaleMenuTreeEntry($purged_child_plugin_id);
+  }
+
+  /**
+   * Tests that a menu rebuild does not put a trashed link back in the tree.
+   *
+   * MenuLinkContentDeriver returns trashed links in those contexts, so a
+   * rebuild would otherwise write a row for one. A rebuild collects its
+   * definitions inside the inner manager, past the decorator's guard, so
+   * TrashMenuLinkManager::rebuild() runs the whole rebuild in the 'active'
+   * trash context and the deriver's own entity query filters the trashed
+   * links out.
+   *
+   * The live link covers the 'inactive' case: that context inverts the entity
+   * query filter, so without the forced context a rebuild would drop every
+   * live link from discovery and purge their rows.
+   *
+   * @dataProvider providerNonActiveTrashContexts
+   */
+  public function testMenuRebuildDoesNotReAddTrashedLink(string $context): void {
+    $live = $this->createMenuLink('Live Link');
+    $live_plugin_id = $live->getPluginId();
+    $link = $this->createMenuLink('Test Link');
+    $plugin_id = $link->getPluginId();
+
+    // A rebuild marks both rows 'discovered', the state every rebuilt site is
+    // in. Only marked rows are purged when a link falls out of discovery, so
+    // without this the live link below would survive a bad rebuild by
+    // accident.
+    \Drupal::service('plugin.manager.menu.link')->rebuild();
+
+    $database = $this->container->get('database');
+    $row = $database->select('menu_tree', 't')
+      ->fields('t')
+      ->condition('t.id', $plugin_id)
+      ->execute()
+      ->fetchAssoc();
+
+    $link->delete();
+    $this->assertSame(0, $this->countMenuTreeRows($plugin_id));
+
+    // Recreate the row an unguarded rebuild used to leave behind. The rebuild
+    // below has to purge it.
+    $database->insert('menu_tree')->fields($row)->execute();
+    $this->assertSame(1, $this->countMenuTreeRows($plugin_id));
+
+    $this->getTrashManager()->executeInTrashContext($context, function () use ($context): void {
+      $this->container->get('plugin.manager.menu.link')->rebuild();
+      $this->assertSame($context, $this->getTrashManager()->getTrashContext(), 'rebuild() must restore the ambient trash context.');
+    });
+
+    $this->assertEmpty(MenuLinkContent::load($link->id()));
+    $this->assertNoStaleMenuTreeEntry($plugin_id);
+
+    $this->assertSame(1, $this->countMenuTreeRows($live_plugin_id), 'A rebuild must not purge the row of a live link.');
+    $this->assertArrayHasKey($live_plugin_id, $this->loadMenuTree('test-menu'));
   }
 
 }

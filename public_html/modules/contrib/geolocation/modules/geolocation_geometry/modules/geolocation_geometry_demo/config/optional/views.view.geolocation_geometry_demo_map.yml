@@ -60,11 +60,10 @@ display:
           data_provider_id: geolocation_geometry
           data_provider_settings:
             stroke_color: '#ff0044'
-            stroke_color_randomize: false
+            color_randomize: false
             stroke_width: 1
             stroke_opacity: 0.8
             fill_color: '#0033ff'
-            fill_color_randomize: false
             fill_opacity: 0.1
           title_field: title
           label_field: title
@@ -74,7 +73,6 @@ display:
             fit_bounds:
               settings:
                 min_zoom: null
-                reset_zoom: false
               weight: 0
               enable: false
               map_center_id: fit_bounds
@@ -158,60 +156,6 @@ display:
                   south: null
                   east: null
                   west: null
-                enabled: false
-              leaflet_marker_zoom_and_animate:
-                weight: 0
-                settings:
-                  marker_zoom_anchor_id: ''
-                enabled: false
-              geolocation_marker_scroll_to_id:
-                weight: 0
-                settings:
-                  scroll_target_id: ''
-                enabled: false
-              leaflet_marker_popup:
-                enabled: true
-                weight: 0
-                settings:
-                  max_width: 300
-                  min_width: 50
-                  max_height: null
-                  auto_pan: true
-                  close_button: true
-                  auto_close: true
-                  close_on_escape_key: true
-                  class_name: ''
-                  info_auto_display: false
-                  keep_in_view: false
-              leaflet_marker_icon:
-                weight: 0
-                settings:
-                  marker_icon_path: ''
-                  icon_size:
-                    width: null
-                    height: null
-                  icon_anchor:
-                    x: null
-                    'y': null
-                  popup_anchor:
-                    x: 0
-                    'y': 0
-                  marker_shadow_path: ''
-                  shadow_size:
-                    width: null
-                    height: null
-                  shadow_anchor:
-                    x: null
-                    'y': null
-                enabled: false
-              leaflet_marker_clusterer:
-                weight: 0
-                settings:
-                  cluster_settings:
-                    show_coverage_on_hover: true
-                    zoom_to_bounds_on_click: true
-                  disable_clustering_at_zoom: 0
-                  custom_marker_settings: ''
                 enabled: false
               leaflet_control_zoom:
                 enabled: true
@@ -515,17 +459,17 @@ display:
                     GeoportailFrance:
                       apikey: ''
                 enabled: false
-              leaflet_control_recenter:
+              control_recenter:
                 weight: 0
                 settings:
                   position: topright
                 enabled: false
-              leaflet_control_locate:
+              control_locate:
                 weight: 0
                 settings:
                   position: topright
                 enabled: false
-              leaflet_control_geocoder:
+              control_geocoder:
                 weight: 0
                 settings:
                   position: topright
@@ -560,9 +504,6 @@ display:
                   polygon: false
                 enabled: false
               leaflet_disable_user_interaction:
-                weight: 0
-                enabled: false
-              leaflet_client_location_indicator:
                 weight: 0
                 enabled: false
               leaflet_wms:
@@ -615,6 +556,64 @@ display:
             tapTolerance: 15
             touchZoom: true
             bounceAtZoomLimits: true
+            data_layers:
+              'geolocation_default_layer:default':
+                enabled: true
+                weight: 1
+                settings:
+                  features:
+                    leaflet_marker_zoom_and_animate:
+                      weight: 0
+                      enabled: false
+                    geolocation_marker_scroll_to_id:
+                      weight: 0
+                      settings:
+                        scroll_target_id: ''
+                      enabled: false
+                    leaflet_marker_popup:
+                      enabled: true
+                      weight: 0
+                      settings:
+                        max_width: 300
+                        min_width: 50
+                        max_height: null
+                        auto_pan: true
+                        close_button: true
+                        auto_close: true
+                        close_on_escape_key: true
+                        class_name: ''
+                        info_auto_display: false
+                        keep_in_view: false
+                    leaflet_marker_icon:
+                      weight: 0
+                      settings:
+                        marker_icon_path: ''
+                        icon_size:
+                          width: null
+                          height: null
+                        icon_anchor:
+                          x: null
+                          'y': null
+                        popup_anchor:
+                          x: 0
+                          'y': 0
+                        marker_shadow_path: ''
+                        shadow_size:
+                          width: null
+                          height: null
+                        shadow_anchor:
+                          x: null
+                          'y': null
+                      enabled: false
+                    leaflet_marker_clusterer:
+                      weight: 0
+                      settings:
+                        cluster_settings:
+                          show_coverage_on_hover: true
+                          zoom_to_bounds_on_click: true
+                        disable_clustering_at_zoom: 0
+                        custom_marker_settings: ''
+                      enabled: false
       row:
         type: fields
         options:
@@ -719,7 +718,7 @@ display:
           empty_zero: false
           hide_alter_empty: true
           click_sort_column: geometry
-          type: geolocation_geometry_wkt
+          type: geolocation_geometry_data
           settings: {  }
           group_column: ''
           group_columns: {  }
@@ -782,7 +781,7 @@ display:
           empty_zero: false
           hide_alter_empty: true
           click_sort_column: geometry
-          type: geolocation_geometry_wkt
+          type: geolocation_geometry_data
           settings: {  }
           group_column: ''
           group_columns: {  }
@@ -870,11 +869,10 @@ display:
           data_provider_id: geolocation_geometry
           data_provider_settings:
             stroke_color: '#ff0044'
-            stroke_color_randomize: false
+            color_randomize: false
             stroke_width: 1
             stroke_opacity: 0.8
             fill_color: '#0033ff'
-            fill_color_randomize: false
             fill_opacity: 0.1
           title_field: title
           label_field: title

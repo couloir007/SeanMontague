@@ -66,6 +66,9 @@ class CustomFieldFeedsManager extends DefaultPluginManager implements CustomFiel
         /** @var \Drupal\custom_field\Plugin\CustomFieldFeedsTypeInterface $instance */
         $instance = $this->createInstance($type, $custom_item->getSettings());
         $items[$name] = $instance;
+        if (in_array($type, ['daterange', 'time_range'])) {
+          $items[$name . '__end'] = $instance;
+        }
       }
       catch (PluginException $e) {
         // Should we log the error?

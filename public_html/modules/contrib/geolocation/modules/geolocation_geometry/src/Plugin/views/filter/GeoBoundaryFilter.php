@@ -2,6 +2,7 @@
 
 namespace Drupal\geolocation_geometry\Plugin\views\filter;
 
+use Drupal\views\Attribute\ViewsFilter;
 use Drupal\geolocation\Plugin\views\filter\BoundaryFilter;
 use Drupal\geolocation_geometry\GeometryBoundaryTrait;
 use Drupal\views\Plugin\views\query\Sql;
@@ -10,9 +11,8 @@ use Drupal\views\Plugin\views\query\Sql;
  * Filter handler for search keywords.
  *
  * @ingroup views_filter_handlers
- *
- * @ViewsFilter("geolocation_geometry_filter_boundary")
  */
+#[ViewsFilter(id: 'geolocation_geometry_filter_boundary')]
 class GeoBoundaryFilter extends BoundaryFilter {
 
   use GeometryBoundaryTrait;
@@ -20,7 +20,7 @@ class GeoBoundaryFilter extends BoundaryFilter {
   /**
    * {@inheritdoc}
    */
-  public function query() {
+  public function query(): void {
     if (!($this->query instanceof Sql)) {
       return;
     }

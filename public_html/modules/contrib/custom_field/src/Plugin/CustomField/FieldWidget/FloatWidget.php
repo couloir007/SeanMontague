@@ -8,7 +8,6 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
-use Drupal\custom_field\Plugin\CustomField\NumberWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
@@ -34,18 +33,6 @@ class FloatWidget extends NumberWidgetBase {
     return [
       '#step' => 'any',
     ] + $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
-    $element = parent::widgetSettingsForm($form_state, $field);
-
-    $element['settings']['min']['#scale'] = 'any';
-    $element['settings']['max']['#scale'] = 'any';
-
-    return $element;
   }
 
   /**

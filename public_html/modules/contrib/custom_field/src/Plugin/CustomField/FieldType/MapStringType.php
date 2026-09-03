@@ -18,7 +18,7 @@ use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
   description: new TranslatableMarkup('A field for storing a serialized array of strings.'),
   category: new TranslatableMarkup('Map'),
   default_widget: 'map_text',
-  default_formatter: 'string',
+  default_formatter: 'map_list',
 )]
 class MapStringType extends MapType {
 

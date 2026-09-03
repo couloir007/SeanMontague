@@ -1,0 +1,78 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.card.field_content
+    - paragraphs.paragraphs_type.card
+  module:
+    - custom_field
+id: paragraph.card.default
+targetEntityType: paragraph
+bundle: card
+mode: default
+content:
+  field_content:
+    type: custom_formatter
+    label: above
+    settings:
+      fields:
+        title:
+          weight: 0
+          format_type: string
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            key_label: label
+            label_display: above
+            field_label: ''
+            prefix_suffix: false
+        link:
+          weight: 0
+          format_type: link
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            field_label: ''
+            link_text: ''
+            title: ''
+            trim_length: 80
+            url_plain: false
+            url_only: false
+            rel: '0'
+            noopener: '0'
+            noreferrer: '0'
+            id: ''
+            class: ''
+            aria-label: ''
+            accesskey: ''
+            name: ''
+            target: '0'
+        media:
+          weight: 0
+          format_type: entity_reference_label
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            field_label: ''
+            link: true
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden: {  }

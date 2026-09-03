@@ -23,7 +23,7 @@ plugin.plugin_configuration.geolocation.location_input.geocoder:
       mapping:
         plugin_id:
           type: string
-        settings:
+        geocoder_settings:
           type: geolocation.geocoder.[%parent.plugin_id]
         hide_form:
           type: boolean

@@ -6,5 +6,5 @@ geolocation_address.widget:
   js:
     js/geolocation-address-map-widget.js: {}
   dependencies:
-      - geolocation/geolocation.map
-      - geolocation/geolocation.widget.api
+    - geolocation/geolocation.map
+    - geolocation/geolocation.widget.api

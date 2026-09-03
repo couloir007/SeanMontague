@@ -10,6 +10,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
@@ -20,9 +21,10 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Plugin\CustomField\FieldType\DateRangeType;
 use Drupal\custom_field\Plugin\CustomField\FieldType\DateTimeType;
-use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface;
+use Drupal\custom_field\Time;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 
@@ -152,18 +154,15 @@ class CustomItem extends FieldItemBase {
     $field_constraints = [];
     $custom_items = $plugin_service->getCustomFieldItems($settings);
     foreach ($custom_items as $name => $custom_item) {
-      $widget_settings = $custom_item->getWidgetSetting('settings') ?? [];
-      $constraint_settings = $custom_item->getSettings();
-      if (isset($widget_settings['min'])) {
-        $constraint_settings['min'] = $widget_settings['min'];
+      $item_constraints = $custom_item->getConstraints();
+      if (!empty($item_constraints)) {
+        $field_constraints[$name] = $custom_item->getConstraints();
       }
-      if (isset($widget_settings['max'])) {
-        $constraint_settings['max'] = $widget_settings['max'];
-      }
-      $field_constraints[$name] = $custom_item->getConstraints($constraint_settings);
     }
 
-    $constraints[] = $constraint_manager->create('ComplexData', $field_constraints);
+    if (!empty($field_constraints)) {
+      $constraints[] = $constraint_manager->create('ComplexData', $field_constraints);
+    }
 
     return $constraints;
   }
@@ -201,7 +200,7 @@ class CustomItem extends FieldItemBase {
 
       foreach ($custom_items as $name => $custom_item) {
         $field_type = $custom_item->getDataType();
-        $is_subfield_translatable = $custom_item->getWidgetSetting('translatable') ?? FALSE;
+        $is_subfield_translatable = $custom_item->getFieldSetting('translatable') ?? FALSE;
 
         // The synchronization logic only applies if the entity supports
         // translations, and we're not in the default language.
@@ -227,9 +226,15 @@ class CustomItem extends FieldItemBase {
               $current_field->{$name . self::SEPARATOR . 'title'} = $title;
               $current_field->{$name . self::SEPARATOR . 'options'} = $options;
             }
-            if ($field_type === 'daterange') {
+            if (in_array($field_type, ['datetime', 'daterange'])) {
+              $timezone = $original_field->{$name . self::SEPARATOR . 'timezone'};
+              $current_field->{$name . self::SEPARATOR . 'timezone'} = $timezone;
+            }
+            if (in_array($field_type, ['daterange', 'time_range'])) {
               $end = $original_field->{$name . self::SEPARATOR . 'end'};
+              $duration = $original_field->{$name . self::SEPARATOR . 'duration'};
               $current_field->{$name . self::SEPARATOR . 'end'} = $end;
+              $current_field->{$name . self::SEPARATOR . 'duration'} = $duration;
             }
           }
         }
@@ -241,7 +246,6 @@ class CustomItem extends FieldItemBase {
         switch ($field_type) {
           case 'color':
             $color = is_string($subfield_value) ? trim($subfield_value) : '';
-
             if (str_starts_with($color, '#')) {
               $color = substr($color, 1);
             }
@@ -263,7 +267,10 @@ class CustomItem extends FieldItemBase {
           case 'decimal':
             if (is_numeric($subfield_value)) {
               $scale = $custom_item->getScale();
-              $current_field->{$name} = round((float) $subfield_value, $scale);
+              if (is_string($subfield_value)) {
+                $subfield_value = (float) $subfield_value;
+              }
+              $current_field->{$name} = round($subfield_value, $scale);
             }
             break;
 
@@ -274,24 +281,118 @@ class CustomItem extends FieldItemBase {
             break;
 
           case 'image':
-            if (is_array($subfield_value) && isset($subfield_value['target_id'])) {
-              $subfield_value = $subfield_value['target_id'];
+            if (empty($subfield_value)) {
+              foreach (['alt', 'title', 'width', 'height'] as $extra_property) {
+                $current_field->{$name . self::SEPARATOR . $extra_property} = NULL;
+              }
             }
-            if (!empty($subfield_value)) {
-              $width = $current_field->get($name . self::SEPARATOR . 'width')->getValue();
-              $height = $current_field->get($name . self::SEPARATOR . 'height')->getValue();
-              if (empty($width) || empty($height)) {
-                /** @var \Drupal\file\FileInterface $file */
-                $file = \Drupal::entityTypeManager()
-                  ->getStorage('file')
-                  ->load($subfield_value);
-                if ($file) {
-                  $image = \Drupal::service('image.factory')->get($file->getFileUri());
-                  if ($image->isValid()) {
-                    $current_field->{$name . self::SEPARATOR . 'width'} = $image->getWidth();
-                    $current_field->{$name . self::SEPARATOR . 'height'} = $image->getHeight();
+            else {
+              if (is_array($subfield_value) && isset($subfield_value['target_id'])) {
+                $subfield_value = $subfield_value['target_id'];
+              }
+              if (!empty($subfield_value)) {
+                $width = $current_field->get($name . self::SEPARATOR . 'width')
+                  ->getValue();
+                $height = $current_field->get($name . self::SEPARATOR . 'height')
+                  ->getValue();
+                if (empty($width) || empty($height)) {
+                  /** @var \Drupal\file\FileInterface $file */
+                  $file = \Drupal::entityTypeManager()
+                    ->getStorage('file')
+                    ->load($subfield_value);
+                  if ($file) {
+                    $image = \Drupal::service('image.factory')
+                      ->get($file->getFileUri());
+                    if ($image->isValid()) {
+                      $current_field->{$name . self::SEPARATOR . 'width'} = $image->getWidth();
+                      $current_field->{$name . self::SEPARATOR . 'height'} = $image->getHeight();
+                    }
                   }
                 }
+              }
+            }
+            break;
+
+          case 'link':
+            if (empty($subfield_value)) {
+              // Set extra properties to empty state.
+              $current_field->{$name . self::SEPARATOR . 'title'} = NULL;
+              $current_field->{$name . self::SEPARATOR . 'options'} = [];
+            }
+            break;
+
+          case 'datetime':
+            if (empty($subfield_value)) {
+              // Set timezone to NULL when there is no date value.
+              $current_field->{$name . self::SEPARATOR . 'timezone'} = NULL;
+            }
+            break;
+
+          case 'daterange':
+            if (empty($subfield_value)) {
+              foreach (['end', 'timezone', 'duration'] as $extra_property) {
+                $current_field->{$name . self::SEPARATOR . $extra_property} = NULL;
+              }
+            }
+            else {
+              $start_date = $current_field->get($name . self::SEPARATOR . 'start_date')
+                ->getValue();
+              $end_date = $current_field->get($name . self::SEPARATOR . 'end_date')
+                ->getValue();
+              $duration = NULL;
+              if ($start_date instanceof DrupalDateTime) {
+                $duration = 0;
+                if ($end_date instanceof DrupalDateTime) {
+                  $difference = $end_date->getTimestamp() - $start_date->getTimestamp();
+                  if ($difference > 0) {
+                    $duration = $difference;
+                  }
+                }
+                $current_field->{$name . self::SEPARATOR . 'duration'} = $duration;
+              }
+            }
+            break;
+
+          case 'time_range':
+            $start_value = $current_field->get($name)->getValue();
+            $end_value = $current_field->get($name . self::SEPARATOR . 'end')->getValue();
+            $duration = NULL;
+            try {
+              $start_time = Time::createFromTimestamp($start_value);
+              $end_time = Time::createFromTimestamp($end_value);
+            }
+            catch (\Exception $e) {
+              $start_time = NULL;
+              $end_time = NULL;
+            }
+            if (!$start_time) {
+              foreach (['end', 'duration'] as $extra_property) {
+                $current_field->{$name . self::SEPARATOR . $extra_property} = NULL;
+              }
+            }
+            else {
+              if ($end_time) {
+                $start_timestamp = $start_time->getTimestamp();
+                $end_timestamp = $end_time->getTimestamp();
+                if ($start_timestamp > $end_timestamp) {
+                  $current_field->{$name . self::SEPARATOR . 'end'} = NULL;
+                }
+                else {
+                  $difference = $end_timestamp - $start_timestamp;
+                  if ($difference > 0) {
+                    $duration = $difference;
+                  }
+                }
+              }
+              $current_field->{$name . self::SEPARATOR . 'duration'} = $duration;
+            }
+            break;
+
+          case 'viewfield':
+            if (empty($subfield_value)) {
+              // Set extra properties to NULL.
+              foreach (['display', 'arguments', 'items'] as $extra_property) {
+                $current_field->{$name . self::SEPARATOR . $extra_property} = NULL;
               }
             }
             break;
@@ -362,7 +463,9 @@ class CustomItem extends FieldItemBase {
           $reset_input = TRUE;
         }
         elseif (isset($current_columns[$name])) {
-          $diffs = array_diff($item, $current_columns[$name]);
+          $diff_item = array_filter($item, 'is_scalar');
+          $diff_column = array_filter($current_columns[$name], 'is_scalar');
+          $diffs = array_diff($diff_item, $diff_column);
           if (!empty($diffs)) {
             $columns[$name] = $item;
             if (isset($field_settings[$name])) {
@@ -608,6 +711,9 @@ class CustomItem extends FieldItemBase {
           DateTimeType::DATETIME_TYPE_DATETIME => $this->t('Date and time'),
           DateTimeType::DATETIME_TYPE_DATE => $this->t('Date only'),
         ];
+        if ($type === 'daterange') {
+          $datetime_type_options[DateRangeType::DATETIME_TYPE_ALLDAY] = $this->t('All day');
+        }
         $element['items'][$i]['datetime_type'] = [
           '#type' => 'select',
           '#title' => $this->t('Date type'),
@@ -736,10 +842,12 @@ class CustomItem extends FieldItemBase {
     else {
       $items = $form_state->getValue($item_parents) ?? [];
       foreach ($items as $item) {
-        $columns[$item['name']] = $item;
-        unset($columns[$item['name']]['remove']);
+        $column_name = (string) $item['name'];
+        $columns[$column_name] = $item;
+        unset($columns[$column_name]['remove']);
       }
     }
+
     $form_state->setValue([...$parents, 'columns'], $columns);
     $form_state->setValue([...$parents, 'items'], NULL);
 
@@ -957,12 +1065,8 @@ class CustomItem extends FieldItemBase {
    *
    * @return array<string, mixed>
    *   The field settings form.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function fieldSettingsForm(array $form, FormStateInterface $form_state): array {
-    /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetManager $widget_manager */
-    $widget_manager = \Drupal::service('plugin.manager.custom_field_widget');
     $wrapper_id = 'custom-field-settings-wrapper';
     $is_cloning = FALSE;
 
@@ -982,29 +1086,8 @@ class CustomItem extends FieldItemBase {
     ];
 
     $element['field_settings'] = [
-      '#type' => 'table',
-      '#header' => [
-        '',
-        $this->t('Form element'),
-        $this->t('Settings'),
-        $this->t('Check empty?'),
-        $this->t('Weight'),
-      ],
-      '#empty' => $this->t('There are no items yet. Add an item.'),
-      '#attributes' => [
-        'class' => ['customfield-settings-table'],
-      ],
-      '#tableselect' => FALSE,
-      '#tabledrag' => [
-        [
-          'action' => 'order',
-          'relationship' => 'sibling',
-          'group' => 'field-settings-order-weight',
-        ],
-      ],
-      '#attached' => [
-        'library' => ['custom_field/customfield-admin'],
-      ],
+      '#type' => 'fieldset',
+      '#title' => $this->t('Field settings'),
       '#weight' => -99,
       '#prefix' => '<div id="' . $wrapper_id . '">',
       '#suffix' => '</div>',
@@ -1022,101 +1105,23 @@ class CustomItem extends FieldItemBase {
       if ($plugin_id === 'uuid') {
         continue;
       }
-      $weight = $current_settings['field_settings'][$name]['weight'] ?? 0;
 
       $element['field_settings'][$name] = [
-        '#attributes' => [
-          'class' => ['draggable'],
-        ],
-        '#weight' => $weight,
+        '#type' => 'details',
+        '#title' => $this->t('@name', ['@name' => $name]),
       ];
 
-      $element['field_settings'][$name]['handle'] = [
-        '#type' => 'markup',
-        '#markup' => '<span></span>',
-      ];
-
-      $options = self::getCustomFieldWidgetOptions($custom_item);
-      $widget_type = $current_settings['field_settings'][$name]['type'] ?? NULL;
-      if (!empty($widget_type) && in_array($widget_type, $widget_manager->getWidgetsForField($plugin_id))) {
-        $type = $widget_type;
-      }
-      else {
-        $type = $custom_item->getDefaultWidget();
-      }
-
-      $options_count = count($options);
-
-      $element['field_settings'][$name]['type'] = [
-        '#type' => 'select',
-        '#title' => $this->t('%name widget', ['%name' => $name]),
-        '#options' => $options,
-        '#default_value' => $type,
-        '#value' => $type,
-        '#ajax' => [
-          'callback' => [$this, 'widgetSelectionCallback'],
-          'wrapper' => $wrapper_id,
-        ],
-        '#attributes' => [
-          'disabled' => $options_count <= 1,
-        ],
-      ];
-
-      // Add our plugin widget settings form.
-      /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetInterface $widget */
-      $widget = $widget_manager->createInstance($type, ['settings' => $custom_item->getWidgetSetting('settings')]);
-      $element['field_settings'][$name]['widget_settings'] = $widget->widgetSettingsForm($form_state, $custom_item);
-
-      $element['field_settings'][$name]['check_empty'] = [
-        '#type' => 'checkbox',
-        '#title' => $this->t('Check empty?'),
-        '#description' => $this->t('Remove row when this value is empty.'),
-        '#default_value' => $current_settings['field_settings'][$name]['check_empty'] ?? FALSE,
-      ];
+      // Add our plugin field settings form.
+      $element['field_settings'][$name] += $custom_item->fieldSettingsForm($form, $form_state);
 
       if ($custom_item->getSetting('never_check_empty')) {
-        $element['field_settings'][$name]['check_empty']['#default_value'] = FALSE;
-        $element['field_settings'][$name]['check_empty']['#disabled'] = TRUE;
-        $element['field_settings'][$name]['check_empty']['#description'] = $this->t("<em>This custom field type can't be empty checked.</em>");
+        // Hide the check empty element for irrelevant types.
+        $element['field_settings'][$name]['check_empty']['#type'] = 'value';
+        $element['field_settings'][$name]['check_empty']['#value'] = FALSE;
       }
-
-      // TableDrag: Weight column element.
-      $element['field_settings'][$name]['weight'] = [
-        '#type' => 'weight',
-        '#title' => $this->t('Weight for @title', ['@title' => $name]),
-        '#title_display' => 'invisible',
-        '#default_value' => $weight,
-        // Classify the weight element for #tabledrag.
-        '#attributes' => ['class' => ['field-settings-order-weight']],
-      ];
     }
 
     return $element;
-  }
-
-  /**
-   * Callback for widget type select.
-   *
-   * Selects and returns the fieldset with the names in it.
-   *
-   * @param array<string, mixed> $form
-   *   The form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state.
-   *
-   * @return \Drupal\Core\Ajax\AjaxResponse
-   *   The ajax response.
-   */
-  public function widgetSelectionCallback(array &$form, FormStateInterface $form_state): AjaxResponse {
-    $parents = $form_state->getTriggeringElement()['#parents'];
-    array_pop($parents);
-    $last_key = array_key_last($parents);
-    $input = 'settings[field_settings][' . $parents[$last_key] . '][widget_settings][label]';
-    $response = new AjaxResponse();
-    $response->addCommand(new ReplaceCommand('#custom-field-settings-wrapper', $form['settings']['field_settings']));
-    $response->addCommand(new InvokeCommand('input[name="' . $input . '"]', 'focus'));
-
-    return $response;
   }
 
   /**
@@ -1215,53 +1220,6 @@ class CustomItem extends FieldItemBase {
     $changed |= $settings_changed;
 
     return (bool) $changed;
-  }
-
-  /**
-   * Return the available widget plugins as an array keyed by plugin_id.
-   *
-   * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $custom_item
-   *   The Custom field type interface.
-   *
-   * @return array<string, mixed>
-   *   The array of widget options.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
-   */
-  private static function getCustomFieldWidgetOptions(CustomFieldTypeInterface $custom_item): array {
-    $options = [];
-    /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetManager $plugin_service */
-    $plugin_service = \Drupal::service('plugin.manager.custom_field_widget');
-    $definitions = $plugin_service->getDefinitions();
-    $type = $custom_item->getPluginId();
-    // Remove undefined widgets for data_type.
-    foreach ($definitions as $key => $definition) {
-      /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetInterface $instance */
-      $instance = $plugin_service->createInstance($definition['id']);
-      if (!$instance::isApplicable($custom_item)) {
-        unset($definitions[$key]);
-      }
-      if (!in_array($type, $definition['field_types'])) {
-        unset($definitions[$key]);
-      }
-    }
-    // Sort the widgets by category and then by name.
-    uasort($definitions, function ($a, $b) {
-      if ($a['category'] != $b['category']) {
-        return strnatcasecmp((string) $a['category'], (string) $b['category']);
-      }
-      return strnatcasecmp((string) $a['label'], (string) $b['label']);
-    });
-    foreach ($definitions as $id => $definition) {
-      $category = $definition['category'];
-      // Add category grouping for multiple options.
-      $options[(string) $category][$id] = $definition['label'];
-    }
-    if (count($options) <= 1) {
-      $options = array_values($options)[0];
-    }
-
-    return $options;
   }
 
   /**

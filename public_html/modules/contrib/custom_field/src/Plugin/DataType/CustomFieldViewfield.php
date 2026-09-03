@@ -6,10 +6,8 @@ namespace Drupal\custom_field\Plugin\DataType;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
-use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\Attribute\DataType;
-use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\custom_field\Plugin\Field\FieldType\CustomItem;
 use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 
@@ -31,40 +29,6 @@ class CustomFieldViewfield extends CustomFieldDataTypeBase {
   protected ?EntityInterface $entity = NULL;
 
   /**
-   * The views display id.
-   *
-   * @var string
-   */
-  protected mixed $displayId;
-
-  /**
-   * The view arguments.
-   *
-   * @var string
-   */
-  protected mixed $arguments;
-
-  /**
-   * The items_to_display value.
-   *
-   * @var int
-   */
-  protected mixed $itemsToDisplay;
-
-  /**
-   * {@inheritdoc}
-   *
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
-   */
-  public function __construct(DataDefinitionInterface $definition, $name = NULL, ?FieldItemInterface $parent = NULL) {
-    parent::__construct($definition, $name, $parent);
-    $this->value = $parent->{$this->getName()};
-    $this->displayId = $parent->get($this->getName() . '__display')->getValue();
-    $this->arguments = $parent->get($this->getName() . '__arguments')->getValue();
-    $this->itemsToDisplay = $parent->get($this->getName() . '__items')->getValue();
-  }
-
-  /**
    * {@inheritdoc}
    *
    * @throws \Drupal\Core\TypedData\Exception\MissingDataException
@@ -74,14 +38,15 @@ class CustomFieldViewfield extends CustomFieldDataTypeBase {
     $arguments = $value['arguments'] ?? NULL;
     $items_to_display = $value['items_to_display'] ?? NULL;
     if (!empty($display_id)) {
-      $this->setDisplayId($display_id);
+      $this->getParent()->set($this->getName() . CustomItem::SEPARATOR . 'display', $display_id);
     }
     if (!empty($arguments)) {
-      $this->setArguments($arguments);
+      $this->getParent()->set($this->getName() . CustomItem::SEPARATOR . 'arguments', $arguments);
     }
     if (!empty($items_to_display)) {
-      $this->setItemsToDisplay($items_to_display);
+      $this->getParent()->set($this->getName() . CustomItem::SEPARATOR . 'items', (int) $items_to_display);
     }
+
     $entity = $value['entity'] ?? NULL;
     if ($entity instanceof EntityInterface) {
       if ($entity->isNew()) {
@@ -92,10 +57,22 @@ class CustomFieldViewfield extends CustomFieldDataTypeBase {
           $entity = NULL;
         }
       }
-      $this->entity = $entity;
-      $value = $entity->id();
+      $value = $entity?->id();
     }
-    $this->value = $value['target_id'] ?? $value;
+
+    $new_value = is_array($value) ? ($value['target_id'] ?? NULL) : $value;
+
+    // Invalidate the cached entity whenever the target changes without an
+    // explicit entity object being supplied, so a stale reference can't be
+    // returned for a different target_id.
+    if ($entity instanceof EntityInterface) {
+      $this->entity = $entity;
+    }
+    elseif ($new_value !== $this->value) {
+      $this->entity = NULL;
+    }
+
+    $this->value = $new_value;
   }
 
   /**
@@ -118,57 +95,11 @@ class CustomFieldViewfield extends CustomFieldDataTypeBase {
   }
 
   /**
-   * Sets the alt text value.
-   *
-   * @param string $display_id
-   *   The display id value to set.
-   *
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
-   */
-  protected function setDisplayId(string $display_id): void {
-    $this->getParent()->set($this->getName() . CustomItem::SEPARATOR . 'display', $display_id);
-    $this->displayId = $display_id;
-  }
-
-  /**
-   * Sets the title text value.
-   *
-   * @param string $arguments
-   *   The arguments value to set.
-   *
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
-   */
-  protected function setArguments(string $arguments): void {
-    $this->getParent()->set($this->getName() . CustomItem::SEPARATOR . 'arguments', $arguments);
-    $this->arguments = $arguments;
-  }
-
-  /**
-   * Sets the title text value.
-   *
-   * @param int $items
-   *   The items to display value to set.
-   *
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
-   */
-  protected function setItemsToDisplay(int $items): void {
-    $this->getParent()->set($this->getName() . CustomItem::SEPARATOR . 'items', $items);
-    $this->itemsToDisplay = $items;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getValue() {
-    $value = $this->value;
-    return $value['target_id'] ?? $value;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function getCastedValue() {
-    return $this->getValue();
+    $value = $this->getValue();
+    return $value !== NULL ? (string) $value : NULL;
   }
 
 }

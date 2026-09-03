@@ -16,7 +16,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
-use Drupal\custom_field\Plugin\CustomField\EntityReferenceWidgetBase;
+use Drupal\custom_field\Plugin\CustomField\FieldType\EntityReference;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
@@ -36,13 +36,10 @@ class HierarchicalSelectWidget extends EntityReferenceWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    $settings = parent::defaultSettings();
-    $settings['settings'] = [
+    return [
       'force_deepest_level' => FALSE,
       'level_labels' => TRUE,
-    ] + $settings['settings'];
-
-    return $settings;
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -50,24 +47,15 @@ class HierarchicalSelectWidget extends EntityReferenceWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
-    $handler_settings = $element['settings']['handler']['handler_settings'] ?? [];
-    if (isset($handler_settings['auto_create'])) {
-      // Unset irrelevant settings.
-      $element['settings']['handler']['handler_settings']['auto_create']['#access'] = FALSE;
-      $element['settings']['handler']['handler_settings']['auto_create_bundle']['#access'] = FALSE;
-    }
-    if (isset($handler_settings['view'])) {
-      $element['settings']['handler']['handler']['#description'] = $this->t('Views apply to the first level of hierarchy only. Child levels load on demand based on parent selection.');
-    }
+    $settings = $this->getSettings() + static::defaultSettings();
 
-    $element['settings']['force_deepest_level'] = [
+    $element['force_deepest_level'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Force deepest level'),
       '#description' => $this->t('This will require the deepest level in the term tree to be selected.'),
       '#default_value' => $settings['force_deepest_level'],
     ];
-    $element['settings']['level_labels'] = [
+    $element['level_labels'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Show level labels'),
       '#description' => $this->t('Show labels above widgets. The first level will be the field label and child levels will be the parent term for that level.'),
@@ -82,7 +70,9 @@ class HierarchicalSelectWidget extends EntityReferenceWidgetBase {
    */
   public function widget(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    assert($field instanceof EntityReference);
+    $field_settings = $field->getFieldSettings();
+    $settings = $this->getSettings() + static::defaultSettings();
     /** @var \Drupal\taxonomy\TermStorageInterface $term_storage */
     $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
     /** @var \Drupal\Core\Field\FieldItemInterface $item */
@@ -113,7 +103,7 @@ class HierarchicalSelectWidget extends EntityReferenceWidgetBase {
       $levels = !empty($item->{$name}) ? $this->getPathToRoot((int) $item->{$name}) : [];
     }
 
-    $handler = $this->getSelectionHandler($settings, $target_type);
+    $handler = $field->getSelectionHandler($field_settings, $target_type);
     $base_options = [];
     $views_enabled = $this->moduleHandler->moduleExists('views');
     if ($views_enabled && $handler::class === 'Drupal\views\Plugin\EntityReferenceSelection\ViewsSelection') {
@@ -146,18 +136,17 @@ class HierarchicalSelectWidget extends EntityReferenceWidgetBase {
       }
     }
     else {
-      $target_bundles = $settings['handler_settings']['target_bundles'] ?? [];
+      $target_bundles = $field_settings['handler_settings']['target_bundles'] ?? [];
       if (empty($target_bundles)) {
         return $element;
       }
       $base_options = $this->getBaseOptions($target_bundles, $langcode, $translations_enabled);
     }
 
-    // Set a variable for the current field title.
     $title = $element['#title'];
+    // Unset the title so we can display it inline for the level.
+    unset($element['#title']);
     if ($settings['level_labels']) {
-      // Unset the title so we can display it inline for the level.
-      unset($element['#title']);
       $element['#wrapper_attributes']['class'][] = 'custom-field-level-labels';
     }
     $element['#type'] = 'item';
@@ -173,7 +162,6 @@ class HierarchicalSelectWidget extends EntityReferenceWidgetBase {
     $element['levels'][0] = [
       '#type' => 'select',
       '#title' => $title,
-      '#title_display' => $settings['level_labels'] ? 'before' : 'invisible',
       '#options' => $base_options,
       '#empty_option' => $this->t('- Select -'),
       '#default_value' => $levels[0] ?? NULL,
@@ -207,6 +195,10 @@ class HierarchicalSelectWidget extends EntityReferenceWidgetBase {
             ],
             '#element_validate' => [[$this, 'validateLevel']],
           ];
+          // If the top level changed, unset the child level value.
+          if (!empty($level_value) && !isset($child_options[$level_value])) {
+            $element['levels'][$level_key]['#value'] = NULL;
+          }
         }
       }
     }

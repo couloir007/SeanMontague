@@ -1,0 +1,13 @@
+.geolocation-yandex-hint {
+  position: absolute;
+  transform: translate(40px, -50%);
+  padding: 8px 10px;
+  background: white;
+  width: 200px;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px 0 rgba(95, 105, 131, 0.1), 0 4px 24px 0 rgba(95, 105, 131, 0.04);
+  font-weight: 600;
+  font-size: 14px;
+  color: #050d33;
+  margin-bottom: 8px;
+}

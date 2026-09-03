@@ -2,6 +2,7 @@
 
 namespace Drupal\geolocation\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -9,15 +10,12 @@ use Drupal\geolocation\Plugin\Field\FieldType\GeolocationItem;
 
 /**
  * Plugin implementation of the 'geolocation_latlng' widget.
- *
- * @FieldWidget(
- *   id = "geolocation_latlng",
- *   label = @Translation("Geolocation Lat/Lng"),
- *   field_types = {
- *     "geolocation"
- *   }
- * )
  */
+#[FieldWidget(
+  id: 'geolocation_latlng',
+  label: new \Drupal\Core\StringTranslation\TranslatableMarkup('Geolocation Lat/Lng'),
+  field_types: ['geolocation']
+)]
 class GeolocationLatlngWidget extends WidgetBase {
 
   /**
@@ -72,8 +70,8 @@ class GeolocationLatlngWidget extends WidgetBase {
         !empty($geolocation['lat'])
         && !empty($geolocation['lng'])
       ) {
-        $latitude = GeolocationItem::sexagesimalToDecimal($values[$index]['lat']);
-        $longitude = GeolocationItem::sexagesimalToDecimal($values[$index]['lng']);
+        $latitude = GeolocationItem::sexagesimalToDecimal($geolocation['lat']);
+        $longitude = GeolocationItem::sexagesimalToDecimal($geolocation['lng']);
 
         if (!empty($latitude) && !empty($longitude)) {
           $values[$index]['lat'] = $latitude;

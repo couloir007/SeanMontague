@@ -15,7 +15,7 @@ field.widget.third_party.geolocation_address:
       type: string
     geocoder:
       type: string
-    settings:
+    geocoder_settings:
       type: geolocation.geocoder.[%parent.geocoder]
     sync_mode:
       type: string

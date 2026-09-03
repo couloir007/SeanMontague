@@ -2,23 +2,23 @@
 
 namespace Drupal\geolocation_leaflet\Plugin\geolocation\GeocoderCountryFormatting;
 
+use Drupal\geolocation\Attribute\GeocoderCountryFormatting;
 use Drupal\geolocation_leaflet\NominatimRoadFirstFormattingBase;
 
 /**
  * Provides address formatting.
- *
- * @GeocoderCountryFormatting(
- *   id = "nominatim_br",
- *   country_code = "br",
- *   geocoder = "nominatim",
- * )
  */
+#[GeocoderCountryFormatting(
+  id: 'nominatim_br',
+  countryCode: 'br',
+  geocoder: 'nominatim'
+)]
 class Brazil extends NominatimRoadFirstFormattingBase {
 
   /**
    * {@inheritdoc}
    */
-  public function format(array $atomics) {
+  public function format(array $atomics): ?array {
     $address_elements = parent::format($atomics);
 
     if ($atomics['state']) {

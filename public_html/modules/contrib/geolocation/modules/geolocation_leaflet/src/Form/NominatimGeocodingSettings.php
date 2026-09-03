@@ -13,7 +13,7 @@ class NominatimGeocodingSettings extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $config = $this->configFactory->get('geolocation_leaflet.nominatim_settings');
 
     $form['nominatim_base_url'] = [
@@ -36,14 +36,14 @@ class NominatimGeocodingSettings extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'geolocation_nominatim_settings';
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getEditableConfigNames() {
+  protected function getEditableConfigNames(): array {
     return [
       'geolocation_leaflet.nominatim_settings',
     ];
@@ -52,15 +52,14 @@ class NominatimGeocodingSettings extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $config = $this->configFactory()->getEditable('geolocation_leaflet.nominatim_settings');
     $config->set('nominatim_base_url', rtrim($form_state->getValue('nominatim_base_url'), '/'));
     $config->set('nominatim_email', $form_state->getValue('nominatim_email'));
 
     $config->save();
 
-    // Confirmation on form submission.
-    \Drupal::messenger()->addMessage($this->t('The configuration options have been saved.'));
+    $this->messenger()->addMessage($this->t('The configuration options have been saved.'));
   }
 
 }

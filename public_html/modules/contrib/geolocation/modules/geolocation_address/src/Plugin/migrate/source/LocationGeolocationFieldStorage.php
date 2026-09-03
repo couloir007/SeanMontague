@@ -48,6 +48,11 @@ class LocationGeolocationFieldStorage extends Field {
 
   /**
    * {@inheritdoc}
+   *
+   * @param \Drupal\migrate\Row $row
+   *   Row.
+   * @param bool $keep
+   *   Keep or no.
    */
   public function prepareRow(Row $row, $keep = TRUE) {
     if (!parent::prepareRow($row)) {

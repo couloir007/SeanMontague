@@ -1,0 +1,23 @@
+plugin.plugin_configuration.geolocation.layer_feature.geolocation_marker_scroll_to_id:
+  type: geolocation.layer_feature_settings
+  label: 'Scroll to ID'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        scroll_target_id:
+          type: string
+          label: 'Anchor'
+
+plugin.plugin_configuration.geolocation.layer_feature.marker_zoom_by_anchor:
+  type: geolocation.layer_feature_settings
+  label: 'Marker Zoom By Anchor'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        marker_zoom_anchor_id:
+          type: string
+          label: 'Anchor ID'

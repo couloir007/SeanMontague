@@ -21,72 +21,47 @@ settings:
   add_more_label: ''
   field_settings:
     contact_type:
-      type: select
-      weight: 0
+      label: 'Contact type'
       check_empty: false
-      widget_settings:
-        label: 'Contact type'
-        settings:
-          description: 'A person or organization can have different contact points, for different purposes.'
-          description_display: after
-          required: false
-          empty_option: '- Select -'
-          allowed_values:
-            -
-              key: mobile
-              value: Mobile
-            -
-              key: home
-              value: Home
-            -
-              key: work
-              value: Work
+      required: false
+      translatable: false
+      description: 'A person or organization can have different contact points, for different purposes.'
+      description_display: after
+      allowed_values:
+        -
+          key: mobile
+          label: Mobile
+        -
+          key: home
+          label: Home
+        -
+          key: work
+          label: Work
     telephone:
-      type: text
-      weight: 1
+      label: Telephone
       check_empty: false
-      widget_settings:
-        label: Telephone
-        settings:
-          description: 'The telephone number.'
-          description_display: after
-          size: 60
-          placeholder: ''
-          maxlength: 255
-          maxlength_js: false
-          prefix: ''
-          suffix: ''
-          required: false
+      required: false
+      translatable: false
+      description: 'The telephone number.'
+      description_display: after
+      prefix: ''
+      suffix: ''
     email:
-      type: text
-      weight: 2
+      label: Email
       check_empty: false
-      widget_settings:
-        label: Email
-        settings:
-          description: 'Email address.'
-          description_display: after
-          size: 60
-          placeholder: ''
-          maxlength: 255
-          maxlength_js: false
-          prefix: ''
-          suffix: ''
-          required: false
+      required: false
+      translatable: false
+      description: 'Email address.'
+      description_display: after
+      prefix: ''
+      suffix: ''
     description:
-      type: text
-      weight: 3
+      label: Description
       check_empty: false
-      widget_settings:
-        label: Description
-        settings:
-          description: 'A description of the item.'
-          description_display: after
-          size: 60
-          placeholder: ''
-          maxlength: 255
-          maxlength_js: false
-          prefix: ''
-          suffix: ''
-          required: false
+      required: false
+      translatable: false
+      description: 'A description of the item.'
+      description_display: after
+      prefix: ''
+      suffix: ''
 field_type: custom

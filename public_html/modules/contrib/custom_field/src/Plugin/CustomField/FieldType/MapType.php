@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Component\Utility\Random;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\MapDataDefinition;
 use Drupal\custom_field\Attribute\CustomFieldType;
@@ -20,7 +21,7 @@ use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
   description: new TranslatableMarkup('A field for storing a serialized array of values.'),
   category: new TranslatableMarkup('Map'),
   default_widget: 'map_key_value',
-  default_formatter: 'string',
+  default_formatter: 'map_table',
 )]
 class MapType extends CustomFieldTypeBase {
 
@@ -51,6 +52,16 @@ class MapType extends CustomFieldTypeBase {
       ->setRequired(FALSE);
 
     return $properties;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldSettingsForm(array &$form, FormStateInterface $form_state): array {
+    $element = parent::fieldSettingsForm($form, $form_state);
+    unset($element['description_display']);
+
+    return $element;
   }
 
   /**

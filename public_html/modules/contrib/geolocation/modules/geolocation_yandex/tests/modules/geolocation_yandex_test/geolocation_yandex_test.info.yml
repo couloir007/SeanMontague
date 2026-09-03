@@ -1,0 +1,14 @@
+name: 'Geolocation Yandex Test'
+type: module
+description: 'Test the geocoding functionality'
+package: Testing
+dependencies:
+  - geolocation:geolocation
+  - geolocation:geolocation_demo
+hidden: true
+core_version_requirement: ^10 || ^11 || ^12
+
+# Information added by Drupal.org packaging script on 2026-06-21
+version: '4.0.0'
+project: 'geolocation'
+datestamp: 1782057431

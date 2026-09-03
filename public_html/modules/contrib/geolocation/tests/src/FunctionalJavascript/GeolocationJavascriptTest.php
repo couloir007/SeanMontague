@@ -36,7 +36,7 @@ class GeolocationJavascriptTest extends GeolocationJavascriptTestBase {
    *
    * @var array
    */
-  public static $testViews = ['geolocation_test'];
+  public static array $testViews = ['geolocation_test'];
 
   /**
    * {@inheritdoc}
@@ -61,8 +61,9 @@ class GeolocationJavascriptTest extends GeolocationJavascriptTestBase {
 
     EntityFormDisplay::load('node.article.default')
       ->setComponent('field_geolocation', [
-        'type' => 'geolocation_googlegeocoder',
+        'type' => 'geolocation_map',
         'settings' => [
+          'map_provider_id' => 'google_maps',
           'allow_override_map_settings' => TRUE,
         ],
       ])
@@ -136,7 +137,7 @@ class GeolocationJavascriptTest extends GeolocationJavascriptTestBase {
    *
    * Changes the language to French, checking for the French map.
    */
-  public function testGoogleMapUsingCurrentLanguage() {
+  public function testGoogleMapUsingCurrentLanguage(): void {
     // Log in as an administrator and change geolocation and language settings.
     $admin_user = $this->drupalCreateUser([
       'configure geolocation',
@@ -185,12 +186,15 @@ class GeolocationJavascriptTest extends GeolocationJavascriptTestBase {
   /**
    * Tests the CommonMap style.
    */
-  public function testCommonMap() {
+  public function testCommonMap(): void {
     $this->drupalGet('geolocation-test');
 
     $this->assertSession()->elementExists('css', '.geolocation-map-container');
     $this->assertSession()->elementExists('css', '.geolocation-location');
 
+    $anchor = $this->assertSession()->waitForElement('css', 'a[href^="https://maps.google.com"][href*="hl="]');
+    $this->assertNotEmpty($anchor, "Wait for GoogleMaps to be loaded.");
+
     // If Google works, either gm-style or gm-err-container will be present.
     $this->assertSession()->elementExists('css', '.geolocation-map-container [class^="gm-"]');
   }
@@ -198,11 +202,14 @@ class GeolocationJavascriptTest extends GeolocationJavascriptTestBase {
   /**
    * Tests the Google Maps formatter.
    */
-  public function testGoogleMapFormatter() {
+  public function testGoogleMapFormatter(): void {
     $this->drupalGet('node/3');
 
     $this->assertSession()->elementExists('css', '.geolocation-map-container');
 
+    $anchor = $this->assertSession()->waitForElement('css', 'a[href^="https://maps.google.com"][href*="hl="]');
+    $this->assertNotEmpty($anchor, "Wait for GoogleMaps to be loaded.");
+
     // If Google works, either gm-style or gm-err-container will be present.
     $this->assertSession()->elementExists('css', '.geolocation-map-container [class^="gm-"]');
   }
@@ -210,11 +217,14 @@ class GeolocationJavascriptTest extends GeolocationJavascriptTestBase {
   /**
    * Tests the Google Maps formatter.
    */
-  public function testGoogleMapFormatterCustomSettings() {
+  public function testGoogleMapFormatterCustomSettings(): void {
     $this->drupalGet('node/4');
 
     $this->assertSession()->elementExists('css', '.geolocation-map-container');
     $this->assertSession()->elementAttributeContains('css', '.geolocation-map-container', 'style', 'height: 376px');
+
+    $anchor = $this->assertSession()->waitForElement('css', 'a[href^="https://maps.google.com"][href*="hl="]');
+    $this->assertNotEmpty($anchor, "Wait for GoogleMaps to be loaded.");
 
     // If Google works, either gm-style or gm-err-container will be present.
     $this->assertSession()->elementExists('css', '.geolocation-map-container [class^="gm-"]');
@@ -228,23 +238,106 @@ class GeolocationJavascriptTest extends GeolocationJavascriptTestBase {
     // Display creation form.
     $this->drupalGet('node/4/edit');
 
-    $this->assertSession()->fieldExists("field_geolocation[0][google_map_settings][height]");
+    $this->assertSession()->fieldExists("field_geolocation[map_provider_settings][height]");
 
-    $this->getSession()->wait(6000);
-    $this->assertSession()->elementExists('css', '#edit-field-geolocation-0-google-map-settings > summary');
-    $this->getSession()->getPage()->find('css', '#edit-field-geolocation-0-google-map-settings > summary')->click();
+    $result = $this->assertSession()->waitForElementVisible('css', '.geolocation-map-widget > details', 1000);
+    $result->click();
 
     $edit = [
       'title[0][value]' => $this->randomMachineName(),
-      'field_geolocation[0][google_map_settings][height]' => '273px',
+      'field_geolocation[map_provider_settings][height]' => '273px',
     ];
 
     $this->submitForm($edit, 'Save');
 
     $this->drupalGet('node/4');
 
+    $anchor = $this->assertSession()->waitForElement('css', 'a[href^="https://maps.google.com"][href*="hl="]');
+    $this->assertNotEmpty($anchor, "Wait for GoogleMaps to be loaded.");
+
     $this->assertSession()->elementExists('css', '.geolocation-map-container');
     $this->assertSession()->elementAttributeContains('css', '.geolocation-map-container', 'style', 'height: 273px;');
+
+    // If Google works, either gm-style or gm-err-container will be present.
+    $this->assertSession()->elementExists('css', '.geolocation-map-container [class^="gm-"]');
+  }
+
+  /**
+   * Tests the Google Maps formatter.
+   */
+  public function testGoogleMapFormatterConditionalInitialization(): void {
+    // @todo Create node with custom settings and test it.
+    $admin_user = $this->drupalCreateUser([
+      'bypass node access',
+      'administer nodes',
+    ]);
+    $this->drupalLogin($admin_user);
+    // Display creation form.
+    $this->drupalGet('node/4/edit');
+
+    $this->assertSession()->fieldExists("field_geolocation[map_provider_settings][conditional_initialization]");
+
+    $result = $this->assertSession()->waitForElementVisible('css', '.geolocation-map-widget > details', 1000);
+    $result->click();
+
+    $edit = [
+      'field_geolocation[map_provider_settings][conditional_initialization]' => 'button',
+    ];
+
+    $this->submitForm($edit, 'Save');
+
+    $this->drupalGet('node/4');
+
+    $this->assertSession()->elementExists('css', '.geolocation-map-container button');
+
+    $this->click('.geolocation-map-container button');
+
+    $anchor = $this->assertSession()->waitForElement('css', 'a[href^="https://maps.google.com"][href*="hl="]');
+    $this->assertNotEmpty($anchor, "Wait for GoogleMaps to be loaded.");
+
+    // If Google works, either gm-style or gm-err-container will be present.
+    $this->assertSession()->elementExists('css', '.geolocation-map-container [class^="gm-"]');
+  }
+
+  /**
+   * Tests the Google Maps formatter.
+   */
+  public function testGoogleMapFormatterConditionalInitializationProgrammatically(): void {
+    // @todo Create node with custom settings and test it.
+    $admin_user = $this->drupalCreateUser([
+      'bypass node access',
+      'administer nodes',
+    ]);
+    $this->drupalLogin($admin_user);
+    // Display creation form.
+    $this->drupalGet('node/4/edit');
+
+    $this->assertSession()->fieldExists("field_geolocation[map_provider_settings][conditional_initialization]");
+
+    $result = $this->assertSession()->waitForElementVisible('css', '.geolocation-map-widget > details', 1000);
+    $result->click();
+
+    $edit = [
+      'field_geolocation[map_provider_settings][conditional_initialization]' => 'programmatically',
+    ];
+
+    $this->submitForm($edit, 'Save');
+
+    $this->drupalGet('node/4');
+
+    $this->assertSession()->waitForElement('css', '.geolocation-map-container');
+
+    // Now that there definitely is no more AJAX request in progress, count the
+    // number of AJAX responses.
+    $javascript = <<<JS
+(function(){
+  Drupal.geolocation.maps.initializeDelayed();
+})()
+JS;
+    $this->getSession()->evaluateScript($javascript);
+
+    $anchor = $this->assertSession()->waitForElement('css', 'a[href^="https://maps.google.com"][href*="hl="]');
+    $this->assertNotEmpty($anchor, "Wait for GoogleMaps to be loaded.");
 
     // If Google works, either gm-style or gm-err-container will be present.
     $this->assertSession()->elementExists('css', '.geolocation-map-container [class^="gm-"]');

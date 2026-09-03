@@ -21,8 +21,8 @@ process:
   label:
     plugin: concat
     source:
-     - constants/label_prefix
-     - label
+      - constants/label_prefix
+      - label
   required: required
   status: constants/status
   settings: constants/settings

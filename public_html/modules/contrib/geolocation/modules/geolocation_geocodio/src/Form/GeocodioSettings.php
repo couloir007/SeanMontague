@@ -54,7 +54,7 @@ class GeocodioSettings extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $config = $this->configFactory()->getEditable('geolocation_geocodio.settings');
     $config->set('api_key', $form_state->getValue('api_key'));
     $config->set('fields', $form_state->getValue('fields'));

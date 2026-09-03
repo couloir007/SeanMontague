@@ -5,26 +5,49 @@ geolocation_plugin_base_settings:
     enable:
       type: boolean
       label: 'Enabled yes/no/maybe'
+    enabled:
+      type: boolean
+      label: 'Enabled yes/no/maybe'
     weight:
       type: integer
       label: 'Weight'
     settings:
       type: mapping
       label: 'Settings'
-      mapping:
-        location_option_id:
-          type: string
-          label: 'Location option ID'
 
 geolocation_map_provider:
   type: mapping
   mapping:
+    conditional_initialization:
+      type: string
+      label: 'Conditional initialization option'
+    conditional_description:
+      type: string
+      label: 'Conditional initialization text'
+    conditional_label:
+      type: string
+      label: 'Conditional initialization label'
+    conditional_viewport_threshold:
+      type: float
+      label: 'Conditional initialization viewport threshold'
     map_features:
       type: sequence
       label: 'Map feature settings'
       sequence:
         type: plugin.plugin_configuration.geolocation.map_feature.[%key]
         label: 'The settings for a map feature'
+    data_layers:
+      type: sequence
+      label: 'Data Layers'
+      sequence:
+        type: plugin.plugin_configuration.geolocation.data_layer_provider.[%key]
+        label: 'Data Layer settings'
+    tile_layers:
+      type: sequence
+      label: 'Tile Layers'
+      sequence:
+        type: plugin.plugin_configuration.geolocation.tile_layer_provider.[%key]
+        label: 'Tile Layer settings'
 
 geolocation.map_provider.*:
   type: geolocation_map_provider
@@ -33,10 +56,6 @@ geolocation.map_provider.*:
 geolocation.map_feature_settings:
   type: geolocation_plugin_base_settings
   label: 'Default map feature configuration'
-  mapping:
-    enabled:
-      type: boolean
-      label: 'Enabled yes/no/maybe'
 
 plugin.plugin_configuration.geolocation.map_feature.*:
   type: geolocation.map_feature_settings
@@ -45,6 +64,12 @@ geolocation.map_center_option_settings:
   type: geolocation_plugin_base_settings
   label: 'Default map center configuration'
   mapping:
+    settings:
+      type: mapping
+      mapping:
+        location_option_id:
+          type: string
+          label: 'Location option ID'
     map_center_id:
       type: string
       label: 'Map Center ID for this option'
@@ -61,6 +86,12 @@ geolocation_geocoder:
     description:
       type: label
       label: 'Description'
+    autocomplete_min_length:
+      type: integer
+      label: 'Min Length'
+    import_path:
+      type: string
+      label: 'Import Path'
 
 geolocation.geocoder.*:
   type: geolocation_geocoder
@@ -78,12 +109,18 @@ geolocation_data_provider:
 
 geolocation.data_provider.*:
   type: geolocation_data_provider
-  label: 'Empty geocoder'
+  label: 'Data provider'
 
 geolocation.location_settings:
   type: geolocation_plugin_base_settings
   label: 'Default location configuration'
   mapping:
+    settings:
+      type: mapping
+      mapping:
+        location_option_id:
+          type: string
+          label: 'Location option ID'
     location_plugin_id:
       type: string
       label: 'Location ID for this option'
@@ -95,9 +132,61 @@ geolocation.location_input_settings:
   type: geolocation_plugin_base_settings
   label: 'Default location input configuration'
   mapping:
+    settings:
+      type: mapping
+      mapping:
+        location_option_id:
+          type: string
+          label: 'Location option ID'
     location_input_id:
       type: string
       label: 'Location Input ID for this option'
 
 plugin.plugin_configuration.geolocation.location_input.*:
   type: geolocation.location_input_settings
+
+geolocation.data_layer_provider_settings:
+  type: geolocation_plugin_base_settings
+  mapping:
+    enabled:
+      type: boolean
+      label: 'Enabled'
+    weight:
+      type: integer
+      label: 'Weight'
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        features:
+          type: sequence
+          label: 'Layer feature settings'
+          sequence:
+            type: plugin.plugin_configuration.geolocation.layer_feature.[%key]
+            label: 'The settings for a layer feature'
+
+plugin.plugin_configuration.geolocation.data_layer_provider.*:
+  type: geolocation.data_layer_provider_settings
+
+geolocation.layer_feature_settings:
+  type: geolocation_plugin_base_settings
+  label: 'Default layer feature configuration'
+
+plugin.plugin_configuration.geolocation.layer_feature.*:
+  type: geolocation.layer_feature_settings
+
+geolocation.tile_layer_provider_settings:
+  type: geolocation_plugin_base_settings
+  mapping:
+    enabled:
+      type: boolean
+      label: 'Enabled'
+    weight:
+      type: integer
+      label: 'Weight'
+    settings:
+      type: mapping
+      label: 'Settings'
+
+plugin.plugin_configuration.geolocation.tile_layer_provider.*:
+  type: geolocation.tile_layer_provider_settings

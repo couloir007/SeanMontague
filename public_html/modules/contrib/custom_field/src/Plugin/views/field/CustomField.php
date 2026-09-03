@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\custom_field\Plugin\views\field;
 
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
@@ -20,6 +21,7 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\custom_field\Entity\Render\EntityFieldRenderer;
 use Drupal\custom_field\Plugin\CustomFieldFormatterManagerInterface;
 use Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface;
+use Drupal\field\Entity\FieldConfig;
 use Drupal\views\Attribute\ViewsField;
 use Drupal\views\FieldAPIHandlerTrait;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
@@ -45,14 +47,14 @@ final class CustomField extends FieldPluginBase implements MultiItemsFieldHandle
    *
    * @var bool
    */
-  private bool $limitValues;
+  protected bool $limitValues;
 
   /**
    * Does the field supports multiple field values.
    *
    * @var bool
    */
-  private bool $multiple;
+  protected bool $multiple;
 
   /**
    * Static cache for ::getEntityFieldRenderer().
@@ -91,11 +93,11 @@ final class CustomField extends FieldPluginBase implements MultiItemsFieldHandle
     $plugin_definition,
     RendererInterface $renderer,
     EntityFieldManagerInterface $entity_field_manager,
-    private readonly EntityTypeManagerInterface $entityTypeManager,
-    private readonly EntityRepositoryInterface $entityRepository,
-    private readonly CustomFieldTypeManagerInterface $customFieldTypeManager,
-    private readonly CustomFieldFormatterManagerInterface $customFieldFormatterManager,
-    private readonly LanguageManagerInterface $languageManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityRepositoryInterface $entityRepository,
+    protected CustomFieldTypeManagerInterface $customFieldTypeManager,
+    protected CustomFieldFormatterManagerInterface $customFieldFormatterManager,
+    protected LanguageManagerInterface $languageManager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityFieldManager = $entity_field_manager;
@@ -323,9 +325,13 @@ final class CustomField extends FieldPluginBase implements MultiItemsFieldHandle
   public function buildOptionsForm(&$form, FormStateInterface $form_state): void {
     parent::buildOptionsForm($form, $form_state);
 
-    // Extract field name and subfield from the field handler definition.
-    [$field_name, $subfield] = $this->extractFieldInfo();
-    $visibility_path = $this->customFieldFormatterManager->getInputPathForStatesApi($form_state, $field_name, $subfield, TRUE);
+    $subfield = $this->definition['property'];
+    $form['#field_parents'] = ['options', 'settings'];
+    $visibility_path = $this->customFieldFormatterManager->getInputPathStates(
+      $form['#field_parents'],
+      $subfield,
+      TRUE,
+    );
     $form['#visibility_path'] = $visibility_path;
 
     // Get field storage configuration.
@@ -603,10 +609,10 @@ final class CustomField extends FieldPluginBase implements MultiItemsFieldHandle
    * This selects displayed deltas, reorders items, and takes offsets into
    * account.
    *
-   * @param array<string, mixed> $all_values
+   * @param array<int, mixed> $all_values
    *   The items for individual rendering.
    *
-   * @return mixed[]
+   * @return array<int, mixed>
    *   The manipulated items.
    */
   private function prepareItemsByDelta(array $all_values): array {
@@ -743,19 +749,33 @@ final class CustomField extends FieldPluginBase implements MultiItemsFieldHandle
    * {@inheritdoc}
    */
   public function getItems(ResultRow $values): array {
-    $entity = $this->entityFieldRenderer->getEntityTranslationByRelationship($values->_entity, $values);
+    $entity = $this->getEntity($values);
+    if (!$entity) {
+      return [];
+    }
+    $relationship = $this->options['relationship'] ?? 'none';
+    $entity = $this->entityFieldRenderer->getEntityTranslationByRelationship($entity, $values, $relationship);
     $langcode = $entity->language()->getId();
-    $field_storage = $this->getFieldStorageDefinition();
-    $custom_fields = $this->customFieldTypeManager->getCustomFieldItems($field_storage->getSettings());
     /** @var string $field_name */
     /** @var string $subfield */
     [$field_name, $subfield] = $this->extractFieldInfo();
+    /** @var \Drupal\custom_field\Plugin\Field\FieldType\CustomItemList $field_items */
+    $field_items = $entity->{$field_name};
+
+    // Return early if the field is empty.
+    if (!$field_items || $field_items->isEmpty()) {
+      return [];
+    }
+
+    $field_storage = $this->getFieldStorageDefinition();
+    $field_config = FieldConfig::loadByName($entity->getEntityTypeId(), $entity->bundle(), $field_storage->getName());
+    $settings = array_merge($field_storage->getSettings(), $field_config->getSettings());
+    $custom_fields = $this->customFieldTypeManager->getCustomFieldItems($settings);
     $custom_field = $custom_fields[$subfield];
     $formatter_id = $this->options['type'];
     $formatter_settings = $this->options['settings'] ?? [];
     $instance_options = $this->customFieldFormatterManager->createOptionsForInstance($custom_field, $formatter_id, $formatter_settings, '_custom');
     $plugin = $this->customFieldFormatterManager->getInstance($instance_options);
-    $field_items = $entity->{$field_name};
     $extra_columns = $this->definition['extra columns'];
 
     // Prepare render array.
@@ -810,8 +830,26 @@ final class CustomField extends FieldPluginBase implements MultiItemsFieldHandle
           'timezone' => $field_item->{$subfield . '__timezone'},
         ];
       }
+      elseif ($data_type === 'daterange') {
+        $value = [
+          'start_date' => $field_item->{$subfield . '__start_date'},
+          'end_date' => $field_item->{$subfield . '__end_date'},
+          'timezone' => $field_item->{$subfield . '__timezone'},
+          'duration' => $field_item->{$subfield . '__duration'},
+        ];
+      }
+      elseif ($data_type === 'time_range') {
+        $value = [
+          'start' => $value,
+          'end' => $field_item->{$subfield . '__end'},
+          'duration' => $field_item->{$subfield . '__duration'},
+        ];
+      }
+      if (in_array($data_type, ['map', 'map_string'])) {
+        $raw_value = Json::encode($raw_value);
+      }
       $formatted_value = $plugin->formatValue($field_item, $value);
-      $items[$delta] = [
+      $items[(int) $delta] = [
         'raw' => $raw_value,
         'raw_extra' => $raw_extra,
         'rendered' => $formatted_value,
@@ -871,7 +909,7 @@ final class CustomField extends FieldPluginBase implements MultiItemsFieldHandle
   protected function documentSelfTokens(&$tokens): void {
     $property = $this->definition['property'];
     $extra_columns = $this->definition['extra columns'];
-    $tokens['{{ ' . $this->options['id'] . ' }}'] = (string) $this->t('Raw @column', ['@column' => $property]);
+    $tokens['{{ ' . $this->options['id'] . '__raw }}'] = (string) $this->t('Raw @column', ['@column' => $property]);
     if (!empty($extra_columns)) {
       foreach ($extra_columns as $column) {
         $tokens['{{ ' . $this->options['id'] . '__' . $column . ' }}'] = (string) $this->t('Raw @column', ['@column' => $column]);
@@ -882,22 +920,16 @@ final class CustomField extends FieldPluginBase implements MultiItemsFieldHandle
   /**
    * {@inheritdoc}
    *
-   * @param string[] $tokens
+   * @param array<string, mixed> $tokens
    *   The tokens array.
    * @param array<string, mixed> $item
    *   The item.
    */
   protected function addSelfTokens(&$tokens, $item): void {
-    if (isset($item['raw'])) {
-      $raw = $item['raw'];
-      if (!empty($raw)) {
-        $tokens['{{ ' . $this->options['id'] . ' }}'] = (string) $raw;
-      }
-      else {
-        // Make sure that empty values are replaced as well.
-        $tokens['{{ ' . $this->options['id'] . ' }}'] = '';
-      }
-    }
+    $raw = $item['raw'] ?? '';
+    $rendered = $item['rendered'] ?? '';
+    $tokens['{{ ' . $this->options['id'] . ' }}'] = $rendered;
+    $tokens['{{ ' . $this->options['id'] . '__raw }}'] = $raw;
     if (isset($item['raw_extra'])) {
       $extra_columns = $this->definition['extra columns'];
       $raw_extra = $item['raw_extra'];

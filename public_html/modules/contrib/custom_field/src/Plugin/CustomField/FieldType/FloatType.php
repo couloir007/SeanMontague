@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\custom_field\Attribute\CustomFieldType;
@@ -21,6 +23,8 @@ use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
   default_formatter: 'number_decimal',
 )]
 class FloatType extends NumericTypeBase {
+
+  use OptionsTrait;
 
   /**
    * {@inheritdoc}
@@ -53,13 +57,83 @@ class FloatType extends NumericTypeBase {
   /**
    * {@inheritdoc}
    */
+  public static function defaultFieldSettings(): array {
+    return [
+      'allowed_values' => [],
+    ] + parent::defaultFieldSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldSettingsForm(array &$form, FormStateInterface $form_state): array {
+    $element = parent::fieldSettingsForm($form, $form_state);
+    $settings = $this->getFieldSettings();
+
+    $element['min']['#step'] = 'any';
+    $element['max']['#step'] = 'any';
+
+    $this->allowedValues($element, $form_state, $settings);
+
+    foreach (Element::children($element['allowed_values']['table']) as $option) {
+      $element['allowed_values']['table'][$option]['key']['#type'] = 'number';
+      $element['allowed_values']['table'][$option]['key']['#step'] = 'any';
+      if ($this->isUnsigned()) {
+        $element['allowed_values']['table'][$option]['key']['#min'] = 0;
+      }
+    }
+
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function validateAllowedValue(array $element, FormStateInterface $form_state): void {
+    $value = $element['#value'];
+    $sliced_parents = array_slice($element['#parents'], 0, -4);
+    $field_name = end($sliced_parents);
+    $column_settings = $form_state->get(['current_settings', 'columns', $field_name]);
+    $unsigned = $column_settings['unsigned'] ?? FALSE;
+    if (!is_numeric($value)) {
+      $form_state->setError($element, new TranslatableMarkup('The allowed value %value must be a valid integer or decimal.', [
+        '%value' => $value,
+      ]));
+    }
+    elseif ($unsigned && $value < 0) {
+      $form_state->setError($element, new TranslatableMarkup('The allowed value %value must be a positive number.', [
+        '%value' => $value,
+      ]));
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function generateSampleValue(CustomFieldTypeInterface $field, string $target_entity_type): float {
-    $widget_settings = $field->getWidgetSetting('settings');
-    $precision = rand(10, 32);
-    $scale = rand(0, 2);
-    $default_min = $field->isUnsigned() ? 0 : -pow(10, ($precision - $scale)) + 1;
-    $min = isset($widget_settings['min']) && is_numeric($widget_settings['min']) ? $widget_settings['min'] : $default_min;
-    $max = isset($widget_settings['max']) && is_numeric($widget_settings['max']) ? $widget_settings['max'] : pow(10, ($precision - $scale)) - 1;
+    $field_settings = $field->getFieldSettings();
+    if (!empty($field_settings['allowed_values'])) {
+      return (float) static::getRandomOptions($field_settings['allowed_values']);
+    }
+
+    $size = $field->getSetting('size') ?? 'normal';
+    // Only 'big' maps to a double-precision DOUBLE column; every other size
+    // (tiny/small/medium/normal) maps to a single-precision FLOAT column,
+    // which reliably holds only ~7 significant digits. Bound the generated
+    // range/scale so it never exceeds what the actual column can store.
+    if ($size === 'big') {
+      $scale = rand(0, 4);
+      $default_min = $field->isUnsigned() ? 0 : -1000000;
+      $default_max = 1000000;
+    }
+    else {
+      $scale = rand(0, 2);
+      $default_min = $field->isUnsigned() ? 0 : -9999;
+      $default_max = 9999;
+    }
+
+    $min = isset($field_settings['min']) && is_numeric($field_settings['min']) ? $field_settings['min'] : $default_min;
+    $max = isset($field_settings['max']) && is_numeric($field_settings['max']) ? $field_settings['max'] : $default_max;
     $random_decimal = $min + mt_rand() / mt_getrandmax() * ($max - $min);
 
     return static::truncateDecimal((float) $random_decimal, $scale);

@@ -19,7 +19,7 @@ interface CustomFieldStringLongInterface extends PrimitiveInterface {
    * Returns the processed text or original value if not formatted.
    *
    * @return \Drupal\Component\Render\MarkupInterface|mixed|string
-   *   The filtered markup or string if widget setting is not formatted.
+   *   The filtered markup or string if the field is not formatted.
    */
   public function getProcessed(): mixed;
 

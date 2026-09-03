@@ -2,22 +2,24 @@
 
 namespace Drupal\custom_field\Plugin\EntityUsage\Track;
 
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\entity_usage\Attribute\EntityUsageTrack;
 use Drupal\entity_usage\EntityUsageTrackBase;
 use Drupal\entity_usage\EntityUsageTrackMultipleLoadInterface;
 
 /**
  * Tracks usage of entities related in custom fields.
- *
- * @EntityUsageTrack(
- *   id = "custom_field",
- *   label = @Translation("Custom Field"),
- *   description = @Translation("Tracks relationships created with 'Custom Field' sub-fields (entity_reference, image, file, viewfield)."),
- *   field_types = {"custom"},
- *   source_entity_class = "Drupal\Core\Entity\FieldableEntityInterface",
- * )
  */
+#[EntityUsageTrack(
+  id: 'custom_field',
+  label: new TranslatableMarkup('Custom Field'),
+  description: new TranslatableMarkup("Tracks relationships created with 'Custom Field' sub-fields (entity_reference, image, file, viewfield)."),
+  field_types: ['custom'],
+  source_entity_class: FieldableEntityInterface::class,
+)]
 class CustomField extends EntityUsageTrackBase implements EntityUsageTrackMultipleLoadInterface {
 
   /**
@@ -87,21 +89,20 @@ class CustomField extends EntityUsageTrackBase implements EntityUsageTrackMultip
     if (empty($reference_subfields)) {
       return [];
     }
+    /** @var \Drupal\Core\Field\FieldItemInterface $item */
     foreach ($iterable as $item) {
-      if ($item instanceof FieldItemInterface) {
-        foreach ($reference_subfields as $name => $subfield) {
-          $target_type = $subfield['target_type'];
-          $target_id = $item->get($name)->getValue();
-          if (!empty($target_id)) {
-            $entity_ids[$target_type][] = $target_id;
-          }
+      foreach ($reference_subfields as $name => $subfield) {
+        $target_type = $subfield['target_type'];
+        $target_id = $item->get($name)->getValue();
+        if (!empty($target_id)) {
+          $entity_ids[$target_type][] = $target_id;
         }
       }
     }
 
     $return = [];
     foreach ($entity_ids as $target_type_id => $entity_id_values) {
-      $return = array_merge($return, $this->checkAndPrepareEntityIds($target_type_id, $entity_id_values, 'id'));
+      $return = \array_merge($return, $this->checkAndPrepareEntityIds($target_type_id, $entity_id_values, 'id'));
     }
 
     return $return;

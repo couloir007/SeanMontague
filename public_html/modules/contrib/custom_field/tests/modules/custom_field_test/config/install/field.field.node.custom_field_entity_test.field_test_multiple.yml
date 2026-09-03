@@ -19,324 +19,255 @@ translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:
+  add_more_label: 'Add another test item'
   field_settings:
-    string_test:
-      type: text
-      weight: 0
+    string:
+      label: 'String (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'String test'
-        translatable: false
-        settings:
-          description: ''
-          description_display: after
-          size: 60
-          placeholder: ''
-          maxlength: 255
-          maxlength_js: false
-          prefix: ''
-          suffix: ''
-          required: false
-    string_long_test:
-      type: textarea
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      prefix: ''
+      suffix: ''
+      allowed_values: { }
+    string_long:
+      label: 'String Long (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'String long test'
-        translatable: false
-        settings:
-          description: ''
-          description_display: after
-          placeholder: ''
-          maxlength: null
-          maxlength_js: false
-          required: false
-          rows: 5
-          formatted: false
-          default_format: plain_text
-          format:
-            guidelines: true
-            help: true
-    integer_test:
-      type: integer
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      formatted: false
+      default_format: plain_text
+      format:
+        guidelines: true
+        help: true
+    integer:
+      label: 'Integer (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'Integer test'
-        translatable: false
-        settings:
-          description: ''
-          description_display: after
-          placeholder: ''
-          min: null
-          max: null
-          prefix: ''
-          suffix: ''
-          required: false
-    decimal_test:
-      type: decimal
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      prefix: ''
+      suffix: ''
+      allowed_values: { }
+      min: null
+      max: null
+    decimal:
+      label: 'Decimal (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'Decimal test'
-        translatable: false
-        settings:
-          description: ''
-          description_display: after
-          placeholder: ''
-          min: null
-          max: null
-          prefix: ''
-          suffix: ''
-          required: false
-    float_test:
-      type: float
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      prefix: ''
+      suffix: ''
+      min: null
+      max: null
+    float:
+      label: 'Float (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'Float test'
-        translatable: false
-        settings:
-          description: ''
-          description_display: after
-          placeholder: ''
-          min: null
-          max: null
-          prefix: ''
-          suffix: ''
-          required: false
-    email_test:
-      type: email
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      prefix: ''
+      suffix: ''
+      allowed_values: { }
+      min: null
+      max: null
+    email:
+      label: 'Email (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'Email test'
-        translatable: false
-        settings:
-          description: ''
-          description_display: after
-          size: 60
-          placeholder: ''
-          required: false
-    telephone_test:
-      type: telephone
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+    telephone:
+      label: 'Telephone (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'Telephone test'
-        translatable: false
-        settings:
-          description: ''
-          description_display: after
-          size: 60
-          placeholder: ''
-          maxlength: 256
-          maxlength_js: false
-          prefix: ''
-          suffix: ''
-          required: false
-          pattern: ''
-    uri_test:
-      type: url
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      prefix: ''
+      suffix: ''
+      allowed_values: { }
+      pattern: ''
+    uri:
+      label: 'URI (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'Uri test'
-        translatable: false
-        settings:
-          description: ''
-          description_display: after
-          size: 60
-          placeholder: ''
-          required: false
-          link_type: 17
-          field_prefix: default
-          field_prefix_custom: ''
-    boolean_test:
-      type: checkbox
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      link_type: 17
+      field_prefix: default
+      field_prefix_custom: ''
+    boolean:
+      label: 'Boolean (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'Boolean test'
-        translatable: false
-        settings:
-          description: ''
-          description_display: after
-          required: false
-    uuid_test:
-      type: uuid
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+    color:
+      label: 'Color (Multiple)'
       check_empty: false
-    color_test:
-      type: color
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+    map:
+      label: 'Map (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'Color test'
-        translatable: false
-        settings:
-          description: ''
-          description_display: after
-          required: false
-    map_test:
-      type: map_key_value
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      table_empty: ''
+    map_string:
+      label: 'Map String (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'Map test'
-        translatable: false
-        settings:
-          description: ''
-          description_display: after
-          table_empty: ''
-          key_label: Key
-          value_label: Value
-          required: false
-    map_string_test:
-      type: map_text
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      table_empty: ''
+    datetime:
+      label: 'Datetime (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'Map string test'
-        translatable: false
-        settings:
-          description: ''
-          description_display: after
-          table_empty: ''
-          required: false
-    datetime_test:
-      type: datetime_default
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      timezone_enabled: false
+      timezone_options: { }
+    daterange:
+      label: 'Daterange (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'Datetime test'
-        translatable: false
-        settings:
-          description: ''
-          description_display: after
-          required: false
-    entity_reference_test:
-      type: entity_reference_autocomplete
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      seconds_enabled: true
+      timezone_enabled: false
+      timezone_options: { }
+      duration_enabled: false
+      duration_options: { }
+    entity_reference:
+      label: 'Entity Reference (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'Entity reference test'
-        translatable: false
-        settings:
-          description: ''
-          description_display: after
-          size: 60
-          placeholder: ''
-          required: false
-          match_operator: CONTAINS
-          match_limit: 10
-          handler: 'default:node'
-          handler_settings:
-            sort:
-              field: _none
-              direction: ASC
-            auto_create: false
-            target_bundles:
-              article: article
-            auto_create_bundle: ''
-    file_test:
-      type: file_generic
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      handler: 'default:node'
+      handler_settings:
+        sort:
+          field: _none
+          direction: ASC
+        auto_create: false
+        target_bundles:
+          article: article
+        auto_create_bundle: ''
+    file:
+      label: 'File (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'File test'
-        translatable: false
-        settings:
-          description: ''
-          description_display: after
-          required: false
-          file_directory: '[date:custom:Y]-[date:custom:m]'
-          file_extensions: txt
-          max_filesize: ''
-          progress_indicator: throbber
-    image_test:
-      type: image_image
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      file_directory: '[date:custom:Y]-[date:custom:m]'
+      file_extensions: txt
+      max_filesize: ''
+    image:
+      label: 'Image (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'Image test'
-        translatable: false
-        settings:
-          alt_field: true
-          alt_field_required: true
-          title_field: true
-          title_field_required: false
-          description: ''
-          description_display: after
-          max_resolution: ''
-          min_resolution: ''
-          required: false
-          file_directory: '[date:custom:Y]-[date:custom:m]'
-          file_extensions: 'png gif jpg jpeg'
-          max_filesize: ''
-          progress_indicator: throbber
-          preview_image_style: ''
-    viewfield_test:
-      type: viewfield_select
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      file_directory: '[date:custom:Y]-[date:custom:m]'
+      file_extensions: 'png gif jpg jpeg webp'
+      max_filesize: ''
+      max_resolution: ''
+      min_resolution: ''
+      alt_field: true
+      alt_field_required: true
+      title_field: false
+      title_field_required: false
+    link:
+      label: 'Link (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'Viewfield test'
-        translatable: false
-        settings:
-          allowed_views:
-            custom_field_test:
-              block_1: block_1
-              default: default
-            custom_field_test_2:
-              block_1: block_1
-              default: default
-          description: ''
-          description_display: after
-          required: false
-          empty_option: '- None -'
-          force_default: false
-          token_browser:
-            recursion_limit: 3
-            global_types: false
-    time_test:
-      type: time_widget
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      link_type: 17
+      field_prefix: default
+      field_prefix_custom: ''
+      title: 1
+      enabled_attributes:
+        target: true
+        class: true
+        rel: true
+        title: false
+        aria-label: false
+        id: false
+        name: false
+        accesskey: false
+      widget_default_open: expandIfValuesSet
+    time:
+      label: 'Time (Multiple)'
       check_empty: false
-      widget_settings:
-        label: Time
-        translatable: false
-        settings:
-          description: ''
-          description_display: after
-          required: false
-          seconds_enabled: false
-          seconds_step: 5
-    link_test:
-      type: link_default
-      weight: 0
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      seconds_enabled: false
+      seconds_step: 5
+    time_range:
+      label: 'Time Range (Multiple)'
       check_empty: false
-      widget_settings:
-        label: 'Link test'
-        translatable: false
-        settings:
-          description: ''
-          description_display: after
-          required: false
-          link_type: 17
-          field_prefix: default
-          field_prefix_custom: ''
-          title: 1
-          enabled_attributes:
-            target: true
-            class: true
-            rel: true
-            title: false
-            aria-label: false
-            id: false
-            name: false
-            accesskey: false
-          widget_default_open: expandIfValuesSet
-          placeholder_url: ''
-          placeholder_title: ''
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      seconds_enabled: false
+      seconds_step: 5
+    viewfield:
+      label: 'Viewfield (Multiple)'
+      check_empty: false
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      allowed_views:
+        custom_field_test:
+          block_1: block_1
+          default: default
+        custom_field_test_2:
+          block_1: block_1
+          default: default
+      force_default: false
+      token_browser:
+        recursion_limit: 3
+        global_types: false
+    duration:
+      label: 'Duration (Multiple)'
+      check_empty: false
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      duration_options:
+        - key: 86400
+          label: '1 day'
+        - key: 604800
+          label: '1 week'
+        - key: 2592000
+          label: '1 month'
 field_type: custom

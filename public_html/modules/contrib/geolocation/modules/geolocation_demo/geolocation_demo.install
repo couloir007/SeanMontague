@@ -12,7 +12,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 /**
  * Implements hook_install().
  */
-function geolocation_demo_install() {
+function geolocation_demo_install(): void {
 
   /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
   $module_handler = \Drupal::service('module_handler');
@@ -29,7 +29,7 @@ function geolocation_demo_install() {
 
     $taxonomy_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
 
-    $icon_path = \Drupal::service('extension.list.module')->getPath('geolocation_demo') . '/icons/';
+    $icon_path = Drupal::service('extension.list.module')->getPath('geolocation_demo') . '/icons/';
 
     /** @var \Drupal\taxonomy\TermInterface $term_a */
     $term_a = $taxonomy_storage->create([
@@ -130,7 +130,7 @@ function geolocation_demo_install() {
 /**
  * Implements hook_uninstall().
  */
-function geolocation_demo_uninstall() {
+function geolocation_demo_uninstall(): void {
   $taxonomy_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
   $node_storage = \Drupal::entityTypeManager()->getStorage('node');
 
@@ -142,10 +142,7 @@ function geolocation_demo_uninstall() {
     'field_geolocation_demo_multiple',
     'field_geolocation_demo_taxonomy',
   ] as $field_storage_name) {
-    $field_storage = FieldStorageConfig::loadByName('node', $field_storage_name);
-    if ($field_storage) {
-      $field_storage->delete();
-    }
+    FieldStorageConfig::loadByName('node', $field_storage_name)?->delete();
   }
 
   field_purge_batch(100);

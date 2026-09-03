@@ -2,7 +2,8 @@
 
 namespace Drupal\geolocation_geometry\Plugin\Validation\Constraint;
 
-use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\geolocation_geometry\GeometryFormat\GeoJSON;
+use Drupal\geolocation_geometry\GeometryFormat\WKT;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -14,55 +15,50 @@ class GeometryConstraintValidator extends ConstraintValidator {
   /**
    * {@inheritdoc}
    */
-  public function validate($value, Constraint $constraint) {
+  public function validate(mixed $value, Constraint $constraint): void {
 
     if (!is_a($constraint, GeometryConstraint::class)) {
       return;
     }
 
-    if (isset($value)) {
-      try {
-        $query = NULL;
-        /* maybe: this could be configurable with field options */
-        $allowed_types_for_geometry = [
-          'point',
-          'multipoint',
-          'linestring',
-          'multilinestring',
-          'polygon',
-          'multipolygon',
-          'geometrycollection',
-        ];
+    if (!isset($value)) {
+      return;
+    }
 
-        if ($constraint->type === 'WKT') {
-          $query = \Drupal::database()->query("SELECT ST_GeometryType(ST_GeomFromText(:wkt)) as type", [':wkt' => $value]);
-        }
-        elseif ($constraint->type === 'GeoJSON') {
-          $query = \Drupal::database()->query("SELECT ST_GeometryType(ST_GeomFromGeoJSON(:json)) as type", [':json' => $value]);
-        }
+    switch (strtolower($constraint->type)) {
 
-        $result_ = $query->fetchAll();
-        $result = str_replace("st_", "", strtolower($result_[0]->type));
+      case 'wkt':
+        $geometry = WKT::geometryByText($value);
+        break;
 
-        if ($constraint->geometryType != 'geometry' && $result != $constraint->geometryType) {
-          $this->context->addViolation($constraint->messageGeom, [
-            '@value' => $value,
-            '@geom_type' => $constraint->geometryType,
-          ]);
-        }
-        elseif ($constraint->geometryType === 'geometry' && !in_array($result, $allowed_types_for_geometry)) {
-          $this->context->addViolation($constraint->messageGeom, [
-            '@value' => $value,
-            '@geom_type' => $constraint->geometryType,
-          ]);
-        }
-      }
-      catch (DatabaseExceptionWrapper $e) {
-        $this->context->addViolation($constraint->messageType, [
-          '@value' => $value,
-          '@type' => $constraint->type,
-        ]);
-      }
+      case 'geojson':
+        $geometry = GeoJSON::geometryByText($value);
+        break;
+
+      default:
+        $this->context->addViolation('Unknown source type');
+        return;
+    }
+
+    if (!$geometry) {
+      $this->context->addViolation('Could not derive geometry from value');
+    }
+
+    if (
+      $constraint->geometryType == 'geometry'
+      || $constraint->geometryType == 'geometrycollection'
+    ) {
+      // Geometries catch all types.
+      return;
+    }
+
+    $geometry_class = (new \ReflectionClass($geometry))->getShortName();
+
+    if (strtolower($geometry_class) != $constraint->geometryType) {
+      $this->context->addViolation('Type of geometry @class differs from intended type @type', [
+        '@class' => $geometry::class,
+        '@type' => $constraint->geometryType,
+      ]);
     }
   }
 

@@ -2,18 +2,18 @@
 
 namespace Drupal\geolocation_google_maps\Plugin\geolocation\MapProvider;
 
+use Drupal\geolocation\Attribute\MapProvider;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\geolocation_google_maps\GoogleMapsProviderBase;
 
 /**
  * Provides Google Maps.
- *
- * @MapProvider(
- *   id = "google_maps",
- *   name = @Translation("Google Maps"),
- *   description = @Translation("You do require an API key for this plugin to work."),
- * )
  */
+#[MapProvider(
+  id: 'google_maps',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('Google Maps'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('You do require an API key for this plugin to work.')
+)]
 class GoogleMaps extends GoogleMapsProviderBase {
 
   /**
@@ -21,44 +21,26 @@ class GoogleMaps extends GoogleMapsProviderBase {
    *
    * @var int
    */
-  public static $maxZoomLevel = 20;
+  public static int $maxZoomLevel = 20;
 
   /**
    * Google map min zoom level.
    *
    * @var int
    */
-  public static $minZoomLevel = 0;
+  public static int $minZoomLevel = 0;
 
   /**
    * {@inheritdoc}
    */
-  public static $googleMapsApiUrlPath = '/maps/api/js';
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getGoogleMapsApiParameters(array $additional_parameters = []) {
-    $parameters = parent::getGoogleMapsApiParameters($additional_parameters);
-    $parameters['callback'] = 'Drupal.geolocation.google.load';
-
-    if (!empty($parameters['client'])) {
-      unset($parameters['key']);
-    }
-
-    return $parameters;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getDefaultSettings() {
+  public static function getDefaultSettings(): array {
     return array_replace_recursive(
       parent::getDefaultSettings(),
       [
         'minZoom' => static::$minZoomLevel,
         'maxZoom' => static::$maxZoomLevel,
         'gestureHandling' => 'auto',
+        'mapId' => '',
         'map_features' => [
           'marker_infowindow' => [
             'enabled' => TRUE,
@@ -80,7 +62,7 @@ class GoogleMaps extends GoogleMapsProviderBase {
   /**
    * {@inheritdoc}
    */
-  public static function getControlPositions() {
+  public static function getControlPositions(): array {
     return [
       'LEFT_TOP' => t('Left top'),
       'LEFT_CENTER' => t('Left center'),
@@ -100,7 +82,7 @@ class GoogleMaps extends GoogleMapsProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function getSettings(array $settings) {
+  public function getSettings(array $settings): array {
     $settings = parent::getSettings($settings);
 
     $settings['minZoom'] = (int) $settings['minZoom'];
@@ -112,14 +94,14 @@ class GoogleMaps extends GoogleMapsProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function getSettingsForm(array $settings, array $parents = []) {
+  public function getSettingsForm(array $settings, array $parents = [], array $context = []): array {
     $settings = $this->getSettings($settings);
     $parents_string = '';
     if ($parents) {
       $parents_string = implode('][', $parents) . '][';
     }
 
-    $form = parent::getSettingsForm($settings, $parents);
+    $form = parent::getSettingsForm($settings, $parents, $context);
 
     $form['zoom']['#min'] = static::$minZoomLevel;
     $form['zoom']['#max'] = static::$maxZoomLevel;
@@ -132,11 +114,11 @@ class GoogleMaps extends GoogleMapsProviderBase {
       '#description' => $this->t('The maximum zoom level of the map. If omitted, or set to null, the default maximum zoom from the current map type is used instead.'),
       '#default_value' => $settings['maxZoom'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\Number', 'preRenderNumber'],
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
     $form['minZoom'] = [
@@ -148,16 +130,33 @@ class GoogleMaps extends GoogleMapsProviderBase {
       '#description' => $this->t('The minimum zoom level of the map. If omitted, or set to null, the default minimum zoom from the current map type is used instead.'),
       '#default_value' => $settings['minZoom'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
       ],
       '#pre_render' => [
         ['\Drupal\Core\Render\Element\Number', 'preRenderNumber'],
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
+      ],
+    ];
+
+    $form['mapId'] = [
+      '#group' => $parents_string . 'general_settings',
+      '#type' => 'textfield',
+      '#title' => $this->t('Map ID'),
+      '#default_value' => $settings['mapId'],
+      '#description' => $this->t('The <a href=":url">Map ID</a> associated with a specific map style or feature. Required for advanced markers and cloud-based map styling. If left empty, the map element ID is used.', [
+        ':url' => 'https://developers.google.com/maps/documentation/javascript/map-ids',
+      ]),
+      '#process' => [
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
+      ],
+      '#pre_render' => [
+        ['\Drupal\Core\Render\Element\Textfield', 'preRenderTextfield'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
 
     $form['behavior_settings'] = [
-      '#type' => 'fieldset',
+      '#type' => 'details',
       '#title' => $this->t('Behavior'),
     ];
     $form['gestureHandling'] = [
@@ -176,11 +175,11 @@ class GoogleMaps extends GoogleMapsProviderBase {
         'none' => $this->t('none'),
       ],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
         ['\Drupal\Core\Render\Element\Select', 'processSelect'],
       ],
       '#pre_render' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
 
@@ -190,44 +189,34 @@ class GoogleMaps extends GoogleMapsProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function alterRenderArray(array $render_array, array $map_settings, array $context = []) {
-    $render_array['#attached'] = BubbleableMetadata::mergeAttachments(
-      empty($render_array['#attached']) ? [] : $render_array['#attached'],
+  public function alterRenderArray(array $render_array, array $map_settings = [], array $context = []): array {
+    $google_url = $this->googleMapsService->getGoogleMapsApiUrl(
       [
-        'library' => [
-          'geolocation_google_maps/google',
-        ],
+        'callback' => 'DrupalGeolocationGoogleLoader',
+        'loading' => 'async',
+      ],
+      '/js'
+    );
+    $render_array['#attached'] = BubbleableMetadata::mergeAttachments(
+      $render_array['#attached'] ?? [],
+      [
         'drupalSettings' => [
           'geolocation' => [
             'maps' => [
               $render_array['#id'] => [
-                'settings' => [
-                  'google_map_settings' => $map_settings,
-                ],
+                'async_scripts' => [$google_url],
+                'google_map_settings' => $map_settings,
               ],
             ],
           ],
+        ],
+        'library' => [
+          'geolocation_google_maps/geolocation_google_maps.loader',
         ],
       ]
     );
 
     return parent::alterRenderArray($render_array, $map_settings, $context);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function alterCommonMap(array $render_array, array $map_settings, array $context) {
-    $render_array['#attached'] = BubbleableMetadata::mergeAttachments(
-      empty($render_array['#attached']) ? [] : $render_array['#attached'],
-      [
-        'library' => [
-          'geolocation_google_maps/commonmap.google',
-        ],
-      ]
-    );
-
-    return $render_array;
   }
 
 }

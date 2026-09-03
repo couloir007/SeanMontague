@@ -6,7 +6,7 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\views\Entity\View;
 
 /**
- * Tests the grid style plugin.
+ * Tests schema for providers and features.
  *
  * @group geolocation
  */
@@ -15,7 +15,7 @@ class GeolocationSchemaCoverageTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $profile = 'standard';
+  protected $profile = 'minimal';
 
   /**
    * {@inheritdoc}
@@ -28,11 +28,12 @@ class GeolocationSchemaCoverageTest extends BrowserTestBase {
     'geolocation',
     'geolocation_demo',
     'geolocation_google_maps',
-    'geolocation_google_static_maps',
     'geolocation_google_maps_demo',
+    'geolocation_google_static_maps',
     'geolocation_leaflet',
     'geolocation_yandex',
     'geolocation_here',
+    'geolocation_baidu',
   ];
 
   /**
@@ -43,7 +44,7 @@ class GeolocationSchemaCoverageTest extends BrowserTestBase {
   /**
    * Test MapProviders.
    */
-  public function testMapProvidersDefaults() {
+  public function testMapProvidersDefaults(): void {
     /** @var \Drupal\geolocation\MapProviderManager $mapProviderManager */
     $mapProviderManager = \Drupal::service('plugin.manager.geolocation.mapprovider');
     $mapProviderIds = $mapProviderManager->getDefinitions();
@@ -66,9 +67,12 @@ class GeolocationSchemaCoverageTest extends BrowserTestBase {
   /**
    * Test MapFeatures with providers.
    */
-  public function testMapProvidersWithMapFeatures() {
+  public function testMapProvidersWithMapFeatures(): void {
     /** @var \Drupal\geolocation\MapFeatureManager $mapFeatureManager */
     $mapFeatureManager = \Drupal::service('plugin.manager.geolocation.mapfeature');
+
+    /** @var \Drupal\geolocation\LayerFeatureManager $layerFeatureManager */
+    $layerFeatureManager = \Drupal::service('plugin.manager.geolocation.layerfeature');
 
     /** @var \Drupal\geolocation\MapProviderManager $mapProviderManager */
     $mapProviderManager = \Drupal::service('plugin.manager.geolocation.mapprovider');
@@ -87,11 +91,32 @@ class GeolocationSchemaCoverageTest extends BrowserTestBase {
           'enabled' => TRUE,
           'settings' => $mapFeature->getSettings([]),
         ];
-      }
-      $view->save();
 
-      $this->drupalGet('geolocation-demo/common-map');
-      $this->assertSession()->statusCodeEquals(200);
+        $view->save();
+
+        $this->drupalGet('geolocation-demo/common-map');
+        $status_code = $this->getSession()->getStatusCode();
+        $this->assertEquals(200, $status_code, "Testing Map provider $mapProviderId: Map feature $mapFeatureId returning Status 200.");
+      }
+
+      $display['display_options']['style']['options']['map_provider_settings']['data_layers'] = [];
+      $display['display_options']['style']['options']['map_provider_settings']['data_layers']['geolocation_default_layer:default'] = [];
+      $display['display_options']['style']['options']['map_provider_settings']['data_layers']['geolocation_default_layer:default']['settings'] = [];
+      $display['display_options']['style']['options']['map_provider_settings']['data_layers']['geolocation_default_layer:default']['enabled'] = 1;
+      $display['display_options']['style']['options']['map_provider_settings']['data_layers']['geolocation_default_layer:default']['weight'] = 1;
+      foreach ($layerFeatureManager->getLayerFeaturesByMapType($mapProviderId) as $layerFeatureId => $layerFeatureDefinition) {
+        $layerFeature = $layerFeatureManager->getLayerFeature($layerFeatureId);
+        $display['display_options']['style']['options']['map_provider_settings']['data_layers']['geolocation_default_layer:default']['settings']['features'][$layerFeatureId] = [
+          'enabled' => TRUE,
+          'settings' => $layerFeature->getSettings([]),
+        ];
+
+        $view->save();
+
+        $this->drupalGet('geolocation-demo/common-map');
+        $status_code = $this->getSession()->getStatusCode();
+        $this->assertEquals(200, $status_code, "Testing Map provider $mapProviderId: Layer feature $layerFeatureId returning Status 200.");
+      }
     }
   }
 

@@ -16,7 +16,7 @@ use Drupal\custom_field\Time;
  */
 #[FieldFormatter(
   id: 'time',
-  label: new TranslatableMarkup('Time'),
+  label: new TranslatableMarkup('Default'),
   field_types: [
     'time',
   ],

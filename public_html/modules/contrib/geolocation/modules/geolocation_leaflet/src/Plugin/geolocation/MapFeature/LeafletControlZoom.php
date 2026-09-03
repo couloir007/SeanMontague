@@ -2,16 +2,18 @@
 
 namespace Drupal\geolocation_leaflet\Plugin\geolocation\MapFeature;
 
+use Drupal\geolocation\Attribute\MapFeature;
+use Drupal\geolocation\Plugin\geolocation\MapFeature\ControlElementBase;
+
 /**
  * Provides Zoom control element.
- *
- * @MapFeature(
- *   id = "leaflet_control_zoom",
- *   name = @Translation("Map Control - Zoom"),
- *   description = @Translation("Add buttons to zoom the map."),
- *   type = "leaflet",
- * )
  */
+#[MapFeature(
+  id: 'leaflet_control_zoom',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('Map Control - Zoom'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('Add buttons to zoom the map.'),
+  type: 'leaflet'
+)]
 class LeafletControlZoom extends ControlElementBase {
 
 }

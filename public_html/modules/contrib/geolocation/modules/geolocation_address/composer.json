@@ -4,6 +4,6 @@
     "description": "Address integration.",
     "license": "GPL-2.0-or-later",
     "require": {
-        "drupal/address": "^1.9"
+        "drupal/address": "^2"
     }
 }

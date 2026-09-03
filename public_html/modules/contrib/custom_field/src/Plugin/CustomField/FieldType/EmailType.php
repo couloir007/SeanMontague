@@ -56,11 +56,12 @@ class EmailType extends CustomFieldTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function getConstraints(array $settings): array {
+  public function getConstraints(): array {
+    $name = $this->getName();
     $constraints['Length'] = [
       'max' => self::EMAIL_MAX_LENGTH,
       'maxMessage' => $this->t('%name: the email address can not be longer than @max characters.', [
-        '%name' => $settings['name'],
+        '%name' => $name,
         '@max' => self::EMAIL_MAX_LENGTH,
       ]),
     ];

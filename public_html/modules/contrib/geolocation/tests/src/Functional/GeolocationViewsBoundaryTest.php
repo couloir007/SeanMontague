@@ -14,7 +14,7 @@ class GeolocationViewsBoundaryTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $profile = 'standard';
+  protected $profile = 'minimal';
 
   /**
    * {@inheritdoc}
@@ -33,7 +33,7 @@ class GeolocationViewsBoundaryTest extends BrowserTestBase {
    *
    * @var string
    */
-  protected $viewsPath = 'geolocation-demo/boundary-filter-fixed-values';
+  protected string $viewsPath = 'geolocation-demo/boundary-filter-fixed-values';
 
   /**
    * {@inheritdoc}
@@ -43,7 +43,7 @@ class GeolocationViewsBoundaryTest extends BrowserTestBase {
   /**
    * Tests the boundary filter.
    */
-  public function testBoundaryNoLocations() {
+  public function testBoundaryNoLocations(): void {
     $this->drupalGet($this->viewsPath);
     $this->assertSession()->statusCodeEquals(200);
   }
@@ -53,13 +53,13 @@ class GeolocationViewsBoundaryTest extends BrowserTestBase {
    *
    * It's currently locked to filter boundary of NE80,80 to SW20,20.
    */
-  public function testBoundaryLocations() {
+  public function testBoundaryLocations(): void {
     $entity_test_storage = \Drupal::entityTypeManager()->getStorage('node');
 
     $entity_test_storage->create([
       'id' => 1,
       'title' => 'Boundary 1',
-      'body' => 'test test',
+      'field_geolocation_demo_body' => 'test test',
       'type' => 'geolocation_default_article',
       'field_geolocation_demo_single' => [
         'lat' => 52,
@@ -69,7 +69,7 @@ class GeolocationViewsBoundaryTest extends BrowserTestBase {
     $entity_test_storage->create([
       'id' => 2,
       'title' => 'Boundary 2',
-      'body' => 'bar test',
+      'field_geolocation_demo_body' => 'bar test',
       'type' => 'geolocation_default_article',
       'field_geolocation_demo_single' => [
         'lat' => 53,
@@ -79,7 +79,7 @@ class GeolocationViewsBoundaryTest extends BrowserTestBase {
     $entity_test_storage->create([
       'id' => 3,
       'title' => 'Boundary 3',
-      'body' => 'test foobar',
+      'field_geolocation_demo_body' => 'test foobar',
       'type' => 'geolocation_default_article',
       'field_geolocation_demo_single' => [
         'lat' => 5,

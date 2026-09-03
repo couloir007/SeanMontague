@@ -1,0 +1,6 @@
+# Define default links for this module.
+geolocation_gpx.content:
+  route_name: view.geolocation_gpx.page_1
+  title: 'GPX'
+  parent: system.admin_content
+  description: 'Overview of all GPX data sets.'

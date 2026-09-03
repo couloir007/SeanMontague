@@ -6,12 +6,17 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Field storage settings form tests for custom field.
  *
  * @group custom_field
+ * @runTestsInSeparateProcesses
  */
+#[Group('custom_field')]
+#[RunTestsInSeparateProcesses]
 class FieldStorageSettingsTest extends WebDriverTestBase {
 
   /**
@@ -40,7 +45,7 @@ class FieldStorageSettingsTest extends WebDriverTestBase {
    *
    * @var array|\Drupal\Core\Field\FieldDefinitionInterface[]
    */
-  protected $fields = [];
+  protected array $fields = [];
 
   /**
    * The field manager service.
@@ -61,21 +66,21 @@ class FieldStorageSettingsTest extends WebDriverTestBase {
    *
    * @var string
    */
-  protected $fieldName;
+  protected string $fieldName;
 
   /**
    * The field array path.
    *
    * @var string
    */
-  protected $parentPath;
+  protected string $parentPath;
 
   /**
    * URL to field's storage configuration form.
    *
    * @var string
    */
-  protected $fieldStorageConfigUrl;
+  protected string $fieldStorageConfigUrl;
 
   /**
    * Entity form display.
@@ -172,7 +177,7 @@ class FieldStorageSettingsTest extends WebDriverTestBase {
       }
 
       // Check 'datetime_type' field.
-      if ($type === 'datetime') {
+      if (in_array($type, ['datetime', 'daterange'])) {
         $this->assertNotNull($datetime_type_field, 'The datetime_type field exists.');
         $this->assertOptionSelected("$this->parentPath[$name][datetime_type]", $column['datetime_type'], 'The configured datetime type is selected.');
       }
@@ -266,7 +271,7 @@ class FieldStorageSettingsTest extends WebDriverTestBase {
     $field_instance->save();
     $article_config_url = '/admin/structure/types/manage/article/fields/node.article.field_custom_generic';
 
-    // Set article's form display.
+    // Set the article's form display.
     $this->formDisplay = EntityFormDisplay::load('node.article.default');
 
     if (!$this->formDisplay) {
@@ -288,24 +293,34 @@ class FieldStorageSettingsTest extends WebDriverTestBase {
 
     // Verify the clone settings field exists.
     $assert_session->elementExists('css', '[name="field_storage[subform][settings][clone]"]');
-    $clone_field = $page->findField('field_storage[subform][settings][clone]');
+
+    // Wait for the element to be visible and stable before interacting.
+    $assert_session->waitForElementVisible('css', '[name="field_storage[subform][settings][clone]"]');
+
     $option_value = 'node.' . $this->bundle . '.' . $this->fieldName;
-    $clone_field->setValue($option_value);
-    $this->assertEquals($option_value, $clone_field->getValue(), 'Clone field is set to the correct value');
+    $page->findField('field_storage[subform][settings][clone]')->setValue($option_value);
+    $this->assertEquals(
+      $option_value,
+      $page->findField('field_storage[subform][settings][clone]')->getValue(),
+      'Clone field is set to the correct value'
+    );
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContainsOnce('The selected custom field field settings will be cloned. Any existing settings for this field will be overwritten. Field widget and formatter settings will not be cloned.');
 
     // Save the form.
     $save_button = $page->findButton('Save settings');
     $this->assertNotNull($save_button, 'Save settings button exists');
-    $save_button->click();
+    $save_button->press();
+
+    // Wait for the success message after page reload.
+    $this->assertSession()->waitForText('Saved Generic custom field configuration.');
+    $this->assertSession()->pageTextContains('Saved Generic custom field configuration.');
 
     // Load the cloned storage and see if they match the source.
-    \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
-    // Disable this part for now that is failing in core 11.2.
-    // $field_storage = FieldStorageConfig::loadByName('node', 'field_custom_generic');
-    // $columns = $field_storage->getColumns();
-    // $this->assertEquals($field_copy_columns, $columns, 'The cloned columns match the source columns.');
+    $field_storage = FieldStorageConfig::loadByName('node', 'field_custom_generic');
+    $columns = $field_storage->getColumns();
+    $this->assertEquals($field_copy_columns, $columns, 'The cloned columns match the source columns.');
+    $this->drupalGet($article_config_url);
   }
 
   /**

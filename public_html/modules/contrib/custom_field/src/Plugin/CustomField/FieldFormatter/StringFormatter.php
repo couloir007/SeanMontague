@@ -89,15 +89,16 @@ class StringFormatter extends CustomFieldFormatterBase {
       ];
     }
 
-    $allowed_values = $this->getFieldWidgetSetting('allowed_values') ?? [];
+    $field_settings = $this->customFieldDefinition->getFieldSettings();
+    $allowed_values = $field_settings['allowed_values'] ?? [];
 
     if (!empty($allowed_values) && $this->getSetting('key_label') == 'label') {
       $index = array_search($value, array_column($allowed_values, 'key'));
-      $value = $index !== FALSE ? $allowed_values[$index]['value'] : $value;
+      $value = $index !== FALSE ? $allowed_values[$index]['label'] : $value;
     }
     elseif ($this->getSetting('prefix_suffix') ?? FALSE) {
-      $prefix = $this->getFieldWidgetSetting('prefix') ?? '';
-      $suffix = $this->getFieldWidgetSetting('suffix') ?? '';
+      $prefix = $field_settings['prefix'] ?? '';
+      $suffix = $field_settings['suffix'] ?? '';
       $value = $prefix . $value . $suffix;
     }
 

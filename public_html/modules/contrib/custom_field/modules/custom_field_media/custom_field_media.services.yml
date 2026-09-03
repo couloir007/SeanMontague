@@ -5,3 +5,7 @@ services:
     class: Drupal\custom_field_media\MediaLibraryOpener
     arguments:
       - '@entity_type.manager'
+
+  Drupal\custom_field_media\Hook\ConfigSchemaHooks:
+    class: Drupal\custom_field_media\Hook\ConfigSchemaHooks
+    autowire: true

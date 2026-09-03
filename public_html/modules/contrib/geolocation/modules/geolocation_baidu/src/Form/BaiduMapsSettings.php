@@ -15,8 +15,8 @@ class BaiduMapsSettings extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->configFactory->get('baidu_maps.settings');
+  public function buildForm(array $form, FormStateInterface $form_state): array {
+    $config = $this->configFactory->get('geolocation_baidu.settings');
 
     $form['key'] = [
       '#type' => 'textfield',
@@ -33,24 +33,24 @@ class BaiduMapsSettings extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'geolocation_baidu_settings';
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getEditableConfigNames() {
+  protected function getEditableConfigNames(): array {
     return [
-      'baidu_maps.settings',
+      'geolocation_baidu.settings',
     ];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    $config = $this->configFactory()->getEditable('baidu_maps.settings');
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
+    $config = $this->configFactory()->getEditable('geolocation_baidu.settings');
     $config->set('key', $form_state->getValue('key'));
 
     $config->save();

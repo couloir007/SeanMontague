@@ -3,9 +3,13 @@
 namespace Drupal\geolocation\Annotation;
 
 use Drupal\Component\Annotation\Plugin;
+use Drupal\Core\Annotation\Translation;
 
 /**
  * Defines a geocoder annotation object.
+ *
+ * @deprecated in geolocation:4.0.0 and is removed from geolocation:4.0.1. Use Attribute instead.
+ * @see https://www.drupal.org/project/geolocation/issues/3525013
  *
  * @see \Drupal\geolocation\GeocoderManager
  * @see plugin_api
@@ -19,7 +23,7 @@ class Geocoder extends Plugin {
    *
    * @var string
    */
-  public $id;
+  public string $id;
 
   /**
    * The name of the geocoder.
@@ -28,7 +32,7 @@ class Geocoder extends Plugin {
    *
    * @ingroup plugin_translatable
    */
-  public $name;
+  public Translation $name;
 
   /**
    * The description of the geocoder.
@@ -37,34 +41,34 @@ class Geocoder extends Plugin {
    *
    * @ingroup plugin_translatable
    */
-  public $description;
+  public Translation $description;
 
   /**
    * Can the geocoder retrieve coordinates.
    *
    * @var bool
    */
-  public $locationCapable;
+  public bool $locationCapable;
 
   /**
    * Can the geocoder retrieve boundaries.
    *
    * @var bool
    */
-  public $boundaryCapable;
+  public bool $boundaryCapable;
 
   /**
    * Can the geocoder be used in the frontend.
    *
    * @var bool
    */
-  public $frontendCapable;
+  public bool $frontendCapable;
 
   /**
    * Can the geocoder perform reverse geocoding.
    *
    * @var bool
    */
-  public $reverseCapable;
+  public bool $reverseCapable;
 
 }

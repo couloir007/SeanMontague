@@ -47,9 +47,8 @@ geolocation.geocoder.google_geocoding_api:
   type: geolocation_geocoder
   label: 'Google Geocoding API'
   mapping:
-    autocomplete_min_length:
-      type: integer
-      label: 'Autocomplete MinLength'
+    google_api_url:
+      type: string
     component_restrictions:
       type: mapping
       label: 'Components'
@@ -117,3 +116,6 @@ geolocation.map_provider.google_maps:
     gestureHandling:
       type: string
       label: 'Smart scrolling'
+    mapId:
+      type: string
+      label: 'Map ID'

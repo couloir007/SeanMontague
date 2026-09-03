@@ -31,6 +31,25 @@ $connection->update('config')
   ->condition('name', 'core.extension')
   ->execute();
 
+// Without this, core stores English config overrides in a NullStorage.
+$locale_settings = $connection->select('config')
+  ->fields('config', ['data'])
+  ->condition('collection', '')
+  ->condition('name', 'locale.settings')
+  ->execute()
+  ->fetchField();
+if ($locale_settings !== FALSE) {
+  $locale_settings = unserialize($locale_settings);
+  $locale_settings['translate_english'] = TRUE;
+  $connection->update('config')
+    ->fields([
+      'data' => serialize($locale_settings),
+    ])
+    ->condition('collection', '')
+    ->condition('name', 'locale.settings')
+    ->execute();
+}
+
 $connection->insert('key_value')
   ->fields([
     'collection',

@@ -11,10 +11,11 @@ use Drupal\Tests\BrowserTestBase;
  */
 class GeolocationViewsProximityByEntityTest extends BrowserTestBase {
 
+
   /**
    * {@inheritdoc}
    */
-  protected $profile = 'standard';
+  protected $profile = 'minimal';
 
   /**
    * {@inheritdoc}
@@ -36,7 +37,7 @@ class GeolocationViewsProximityByEntityTest extends BrowserTestBase {
   /**
    * Tests the proximity sort.
    */
-  public function testEmpty() {
+  public function testEmpty(): void {
     $this->drupalGet('geolocation-demo/proximity-by-entity-id/');
     $this->assertSession()->statusCodeEquals(200);
 
@@ -47,14 +48,14 @@ class GeolocationViewsProximityByEntityTest extends BrowserTestBase {
   /**
    * Tests the proximity sort.
    */
-  public function testProximityByEntity() {
+  public function testProximityByEntity(): void {
     /** @var \Drupal\node\NodeStorageInterface $entity_test_storage */
     $entity_test_storage = \Drupal::entityTypeManager()->getStorage('node');
 
     $origin_node = $entity_test_storage->create([
       'id' => 1,
       'title' => 'Proximity Origin Node',
-      'body' => 'test test',
+      'field_geolocation_demo_body' => 'test test',
       'type' => 'geolocation_default_article',
       'field_geolocation_demo_single' => [
         'lat' => 52,
@@ -65,7 +66,7 @@ class GeolocationViewsProximityByEntityTest extends BrowserTestBase {
 
     $entity_test_storage->create([
       'title' => 'Closest Node',
-      'body' => 'bar test',
+      'field_geolocation_demo_body' => 'bar test',
       'type' => 'geolocation_default_article',
       'field_geolocation_demo_single' => [
         'lat' => 53,

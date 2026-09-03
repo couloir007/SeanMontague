@@ -21,42 +21,50 @@ default_value_callback: ''
 settings:
   field_settings:
     title:
-      type: text
-      weight: -10
       check_empty: false
-      widget_settings:
-        label: Title
-        settings:
-          description: ''
-          description_display: after
-          size: 60
-          placeholder: ''
-          maxlength: 255
-          maxlength_js: false
-          prefix: ''
-          suffix: ''
-          required: true
+      required: true
+      translatable: false
+      description: ''
+      description_display: after
+      prefix: ''
+      suffix: ''
+      allowed_values: { }
     media:
-      type: media_library_widget
-      weight: 0
       check_empty: false
-      widget_settings:
-        label: Media
-        settings:
-          description: ''
-          description_display: after
-          required: false
-          handler: 'default:media'
-          handler_settings:
-            sort:
-              field: _none
-              direction: ASC
-            auto_create: false
-            target_bundles:
-              document: document
-              image: image
-            auto_create_bundle: document
-          media_types:
-            - image
-            - document
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      handler: 'default:media'
+      handler_settings:
+        sort:
+          field: _none
+          direction: ASC
+        auto_create: false
+        target_bundles:
+          document: document
+          image: image
+        auto_create_bundle: document
+    link:
+      label: Link
+      check_empty: false
+      required: false
+      translatable: false
+      description: ''
+      description_display: after
+      link_type: 17
+      field_prefix: default
+      field_prefix_custom: ''
+      title: 1
+      enabled_attributes:
+        target: true
+        class: true
+        rel: true
+        title: false
+        aria-label: false
+        id: false
+        name: false
+        accesskey: false
+        data-download-only: false
+      widget_default_open: expandIfValuesSet
 field_type: custom

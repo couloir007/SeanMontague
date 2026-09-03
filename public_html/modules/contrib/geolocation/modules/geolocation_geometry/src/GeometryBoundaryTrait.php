@@ -25,7 +25,7 @@ trait GeometryBoundaryTrait {
     $field_point = "{$table_name}.{$field_id}_geometry";
 
     /*
-     * Google Maps shows a map, not a globe. Therefore it will never flip over
+     * Google Maps shows a map, not a globe. Therefore, it will never flip over
      * the poles, but it will move across -180°/+180° longitude.
      * So latitude will always have north larger than south, but east not
      * necessarily larger than west.

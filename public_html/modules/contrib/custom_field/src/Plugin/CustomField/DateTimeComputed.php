@@ -51,7 +51,7 @@ class DateTimeComputed extends TypedData {
     /** @var string $date_source */
     $date_source = $this->definition->getSetting('date source');
     /** @var ?string $value */
-    $value = $item->get($date_source)->getValue();
+    $value = $item->{$date_source};
     $timezone = DateTimeTypeInterface::STORAGE_TIMEZONE;
 
     // A date cannot be created from a NULL value.

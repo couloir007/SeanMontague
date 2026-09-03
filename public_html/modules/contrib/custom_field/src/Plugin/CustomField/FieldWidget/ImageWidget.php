@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
-use Drupal\custom_field\Plugin\CustomField\FieldType\ImageType;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\file\Element\ManagedFile;
 use Drupal\image\Entity\ImageStyle;
@@ -36,11 +36,19 @@ class ImageWidget extends FileWidget {
   protected ImageFactory $imageFactory;
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected EntityTypeManagerInterface $entityTypeManager;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->imageFactory = $container->get('image.factory');
+    $instance->entityTypeManager = $container->get('entity_type.manager');
 
     return $instance;
   }
@@ -49,20 +57,9 @@ class ImageWidget extends FileWidget {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    $settings = parent::defaultSettings();
-    $settings['settings'] = [
-      'file_extensions' => 'png gif jpg jpeg',
-      'alt_field' => 1,
-      'alt_field_required' => 1,
-      'title_field' => 0,
-      'title_field_required' => 0,
-      'progress_indicator' => 'throbber',
-      'max_resolution' => '',
-      'min_resolution' => '',
+    return [
       'preview_image_style' => ImageStyle::load('thumbnail') ? 'thumbnail' : '',
-    ] + $settings['settings'];
-
-    return $settings;
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -70,102 +67,9 @@ class ImageWidget extends FileWidget {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
-    assert($field instanceof ImageType);
+    $settings = $this->getSettings() + static::defaultSettings();
 
-    // Add maximum and minimum resolution settings.
-    $max_resolution = explode('x', $settings['max_resolution']) + ['', ''];
-    $element['settings']['max_resolution'] = [
-      '#type' => 'item',
-      '#title' => $this->t('Maximum image resolution'),
-      '#element_validate' => [[static::class, 'validateResolution']],
-      '#weight' => 4.1,
-      '#description' => $this->t('The maximum allowed image size expressed as WIDTH×HEIGHT (e.g. 640×480). Leave blank for no restriction. If a larger image is uploaded, it will be resized to reflect the given width and height. Resizing images on upload will cause the loss of <a href="http://wikipedia.org/wiki/Exchangeable_image_file_format">EXIF data</a> in the image.'),
-    ];
-    $element['settings']['max_resolution']['x'] = [
-      '#type' => 'number',
-      '#title' => $this->t('Maximum width'),
-      '#title_display' => 'invisible',
-      '#default_value' => $max_resolution[0],
-      '#min' => 1,
-      '#field_suffix' => ' × ',
-      '#prefix' => '<div class="form--inline clearfix">',
-    ];
-    $element['settings']['max_resolution']['y'] = [
-      '#type' => 'number',
-      '#title' => $this->t('Maximum height'),
-      '#title_display' => 'invisible',
-      '#default_value' => $max_resolution[1],
-      '#min' => 1,
-      '#field_suffix' => ' ' . $this->t('pixels'),
-      '#suffix' => '</div>',
-    ];
-
-    $min_resolution = explode('x', $settings['min_resolution']) + ['', ''];
-    $element['settings']['min_resolution'] = [
-      '#type' => 'item',
-      '#title' => $this->t('Minimum image resolution'),
-      '#element_validate' => [[static::class, 'validateResolution']],
-      '#weight' => 4.2,
-      '#description' => $this->t('The minimum allowed image size expressed as WIDTH×HEIGHT (e.g. 640×480). Leave blank for no restriction. If a smaller image is uploaded, it will be rejected.'),
-    ];
-    $element['settings']['min_resolution']['x'] = [
-      '#type' => 'number',
-      '#title' => $this->t('Minimum width'),
-      '#title_display' => 'invisible',
-      '#default_value' => $min_resolution[0],
-      '#min' => 1,
-      '#field_suffix' => ' × ',
-      '#prefix' => '<div class="form--inline clearfix">',
-    ];
-    $element['settings']['min_resolution']['y'] = [
-      '#type' => 'number',
-      '#title' => $this->t('Minimum height'),
-      '#title_display' => 'invisible',
-      '#default_value' => $min_resolution[1],
-      '#min' => 1,
-      '#field_suffix' => ' ' . $this->t('pixels'),
-      '#suffix' => '</div>',
-    ];
-    // Add title and alt configuration options.
-    $element['settings']['alt_field'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Enable <em>Alt</em> field'),
-      '#default_value' => $settings['alt_field'],
-      '#description' => $this->t('Short description of the image used by screen readers and displayed when the image is not loaded. Enabling this field is recommended.'),
-      '#weight' => 9,
-    ];
-    $element['settings']['alt_field_required'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('<em>Alt</em> field required'),
-      '#default_value' => $settings['alt_field_required'],
-      '#description' => $this->t('Making this field required is recommended.'),
-      '#weight' => 10,
-      '#states' => [
-        'visible' => [
-          ':input[name="settings[field_settings][ ' . $field->getName() . '][widget_settings][settings][alt_field]"]' => ['checked' => TRUE],
-        ],
-      ],
-    ];
-    $element['settings']['title_field'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Enable <em>Title</em> field'),
-      '#default_value' => $settings['title_field'],
-      '#description' => $this->t('The title attribute is used as a tooltip when the mouse hovers over the image. Enabling this field is not recommended as it can cause problems with screen readers.'),
-      '#weight' => 11,
-    ];
-    $element['settings']['title_field_required'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('<em>Title</em> field required'),
-      '#default_value' => $settings['title_field_required'],
-      '#weight' => 12,
-      '#states' => [
-        'visible' => [
-          ':input[name="settings[field_settings][' . $field->getName() . '][widget_settings][settings][title_field]"]' => ['checked' => TRUE],
-        ],
-      ],
-    ];
-    $element['settings']['preview_image_style'] = [
+    $element['preview_image_style'] = [
       '#title' => $this->t('Preview image style'),
       '#type' => 'select',
       '#options' => image_style_options(FALSE),
@@ -187,6 +91,8 @@ class ImageWidget extends FileWidget {
     $item = $items[$delta];
     $name = $field->getName();
     $fid = $item->{$name};
+    $settings = $this->getSettings() + static::defaultSettings();
+    $field_settings = $field->getFieldSettings();
     // Account for temporary storage settings.
     $current_settings = $form_state->get('current_settings');
     if (!empty($current_settings)) {
@@ -195,22 +101,22 @@ class ImageWidget extends FileWidget {
     else {
       $uri_scheme = $field->getSetting('uri_scheme');
     }
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
-    $settings['uri_scheme'] = $uri_scheme;
-    $is_config_form = $form_state->getBuildInfo()['base_form_id'] == 'field_config_form';
+
+    $field_settings['uri_scheme'] = $uri_scheme;
+    $is_config_form = ($form_state->getBuildInfo()['base_form_id'] ?? NULL) === 'field_config_form';
 
     // Add image validation.
     $element['#upload_validators']['FileIsImage'] = [];
 
     // Add upload resolution validation.
-    if ($settings['max_resolution'] || $settings['min_resolution']) {
+    if ($field_settings['max_resolution'] || $field_settings['min_resolution']) {
       $element['#upload_validators']['FileImageDimensions'] = [
-        'maxDimensions' => $settings['max_resolution'],
-        'minDimensions' => $settings['min_resolution'],
+        'maxDimensions' => $field_settings['max_resolution'],
+        'minDimensions' => $field_settings['min_resolution'],
       ];
     }
 
-    $extensions = $settings['file_extensions'];
+    $extensions = $field_settings['file_extensions'];
     $supported_extensions = $this->imageFactory->getSupportedExtensions();
 
     // If using custom extension validation, ensure that the extensions are
@@ -225,10 +131,10 @@ class ImageWidget extends FileWidget {
     // Add properties needed by process() method.
     $element['#image_width'] = $item->{$name . '__width'} ?? NULL;
     $element['#image_height'] = $item->{$name . '__height'} ?? NULL;
-    $element['#title_field'] = $settings['title_field'];
-    $element['#title_field_required'] = !$is_config_form && $settings['title_field_required'];
-    $element['#alt_field'] = $settings['alt_field'];
-    $element['#alt_field_required'] = !$is_config_form && $settings['alt_field_required'];
+    $element['#title_field'] = $field_settings['title_field'];
+    $element['#title_field_required'] = !$is_config_form && $field_settings['title_field_required'];
+    $element['#alt_field'] = $field_settings['alt_field'];
+    $element['#alt_field_required'] = !$is_config_form && $field_settings['alt_field_required'];
     $element['#preview_image_style'] = $settings['preview_image_style'];
     $element['#default_value'] = [
       'fids' => [],
@@ -342,32 +248,6 @@ class ImageWidget extends FileWidget {
   }
 
   /**
-   * Element validate function for resolution fields.
-   *
-   * @param array<string, mixed> $element
-   *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state.
-   */
-  public static function validateResolution(array $element, FormStateInterface $form_state): void {
-    if (!empty($element['x']['#value']) || !empty($element['y']['#value'])) {
-      foreach (['x', 'y'] as $dimension) {
-        if (!$element[$dimension]['#value']) {
-          // We expect the field name placeholder value to be wrapped in
-          // $this->t() here, so it won't be escaped again as it's already
-          // marked safe.
-          $form_state->setError($element[$dimension], new TranslatableMarkup('Both a height and width value must be specified in the @name field.', ['@name' => $element['#title']]));
-          return;
-        }
-      }
-      $form_state->setValueForElement($element, $element['x']['#value'] . 'x' . $element['y']['#value']);
-    }
-    else {
-      $form_state->setValueForElement($element, '');
-    }
-  }
-
-  /**
    * Validate callback for alt and title field, if the user wants them required.
    *
    * This is separated in a validate function instead of a #required flag to
@@ -382,8 +262,14 @@ class ImageWidget extends FileWidget {
     // Only do validation if the function is triggered from other places than
     // the image process form.
     $triggering_element = $form_state->getTriggeringElement();
-    if (!empty($triggering_element['#submit']) && in_array('file_managed_file_submit', $triggering_element['#submit'], TRUE)) {
-      $form_state->setLimitValidationErrors([]);
+    if (!empty($triggering_element['#submit'])) {
+      $needle = [ManagedFile::class, 'submit'];
+      if (version_compare(\Drupal::VERSION, '11.3', '<')) {
+        $needle = 'file_managed_file_submit';
+      }
+      if (in_array($needle, $triggering_element['#submit'], TRUE)) {
+        $form_state->setLimitValidationErrors([]);
+      }
     }
   }
 
@@ -399,6 +285,54 @@ class ImageWidget extends FileWidget {
     }
     // We depend on the managed file element to handle uploads.
     return ManagedFile::valueCallback($element, $input, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function calculateWidgetDependencies(): array {
+    $dependencies = parent::calculateWidgetDependencies();
+    $settings = $this->getSettings();
+    $style_id = $settings['preview_image_style'] ?? NULL;
+    if ($style_id && $style = ImageStyle::load($style_id)) {
+      // If this widget uses a valid image style to display the preview of the
+      // uploaded image, add that image style configuration entity as dependency
+      // of this widget.
+      $dependencies[$style->getConfigDependencyKey()][] = $style->getConfigDependencyName();
+    }
+
+    return $dependencies;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function onWidgetDependencyRemoval(array $dependencies): array {
+    $settings = $this->getSettings();
+    $changed = FALSE;
+    $changed_settings = [];
+    $style_id = $settings['preview_image_style'];
+    if ($style_id && $style = ImageStyle::load($style_id)) {
+      if (!empty($dependencies[$style->getConfigDependencyKey()][$style->getConfigDependencyName()])) {
+        /** @var \Drupal\image\ImageStyleStorageInterface $storage */
+        $storage = $this->entityTypeManager->getStorage($style->getEntityTypeId());
+        $replacement_id = $storage->getReplacementId($style_id);
+        // If a valid replacement has been provided in the storage, replace the
+        // preview image style with the replacement.
+        if ($replacement_id && ImageStyle::load($replacement_id)) {
+          $settings['preview_image_style'] = $replacement_id;
+        }
+        else {
+          $settings['preview_image_style'] = '';
+        }
+        $changed = TRUE;
+      }
+    }
+    if ($changed) {
+      $changed_settings = $settings;
+    }
+
+    return $changed_settings;
   }
 
 }

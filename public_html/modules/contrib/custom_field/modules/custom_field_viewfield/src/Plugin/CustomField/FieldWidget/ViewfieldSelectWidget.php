@@ -15,6 +15,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
+use Drupal\custom_field_viewfield\Plugin\CustomField\FieldType\ViewfieldType;
 use Drupal\views\Views;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -55,19 +56,9 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    $settings = parent::defaultSettings();
-    $settings['settings'] = [
+    return [
       'empty_option' => '- None -',
-      'force_default' => 0,
-      'allowed_views' => [],
-      'items_to_display' => NULL,
-      'token_browser' => [
-        'recursion_limit' => 3,
-        'global_types' => FALSE,
-      ],
-    ] + $settings['settings'];
-
-    return $settings;
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -75,140 +66,17 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
-    $range = range(1, 6);
-    $views = [];
-    foreach ($this->getViewOptions(FALSE) as $id => $view) {
-      $displays = $this->getDisplayOptions($id);
-      if (!empty($displays)) {
-        $views[$id] = [
-          'label' => $view,
-          'displays' => $displays,
-        ];
-      }
-    }
-    $element['settings']['allowed_views'] = [
-      '#type' => 'fieldset',
-      '#title' => $this->t('Allowed views'),
-      '#description' => $this->t('Views displays available for content authors. Leave empty to allow all.'),
-      '#description_display' => 'before',
-      '#element_validate' => [[$this, 'validateAllowedViews']],
-    ];
-    foreach ($views as $view_name => $view) {
-      $element['settings']['allowed_views'][$view_name] = [
-        '#type' => 'checkboxes',
-        '#title' => $this->t('@label', ['@label' => $view['label']]),
-        '#options' => $view['displays'],
-        '#default_value' => $settings['allowed_views'][$view_name] ?? [],
-      ];
-    }
-    $element['settings']['force_default'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Always use default value'),
-      '#description' => $this->t('The allowed views will not immediately be available in the default value form until they are saved into configuration. It is recommended to save the field settings prior to setting the default values for this particular setting.'),
-      '#default_value' => $settings['force_default'],
-    ];
-    $element['settings']['empty_option'] = [
+    $settings = $this->getSettings() + static::defaultSettings();
+
+    $element['empty_option'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Empty option'),
       '#description' => $this->t('Option to show when field is not required.'),
       '#default_value' => $settings['empty_option'],
       '#required' => TRUE,
     ];
-    $element['settings']['token_browser'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Token browser'),
-      '#description' => $this->t('Settings to handle available tokens for the arguments field when token module is enabled.'),
-      '#description_display' => 'before',
-    ];
-    $element['settings']['token_browser']['recursion_limit'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Recursion limit'),
-      '#description' => $this->t('The depth of the token browser tree.'),
-      '#options' => array_combine($range, $range),
-      '#default_value' => $settings['token_browser']['recursion_limit'] ?? 3,
-    ];
-    $element['settings']['token_browser']['global_types'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Global types'),
-      '#description' => $this->t("Enable 'global' context tokens like [current-user:*] or [site:*]."),
-      '#default_value' => $settings['token_browser']['global_types'] ?? FALSE,
-    ];
-
-    $element['#element_validate'][] = [static::class, 'fieldSettingsFormValidate'];
 
     return $element;
-  }
-
-  /**
-   * Validates the allowed views fieldset to enforce at least one view enabled.
-   *
-   * @param array $element
-   *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state.
-   */
-  public function validateAllowedViews(array &$element, FormStateInterface $form_state): void {
-    $any_enabled = FALSE;
-    $views = $form_state->getValue($element['#parents']);
-    // Iterate for each view's displays to check for enabled.
-    foreach ($views as $displays) {
-      if (!empty(array_filter($displays))) {
-        $any_enabled = TRUE;
-        break;
-      }
-    }
-    // No displays for any view are enabled, so set an error.
-    if (!$any_enabled) {
-      $form_state->setError($element, $this->t('At least one view display must be enabled.'));
-    }
-  }
-
-  /**
-   * Form API callback.
-   *
-   * Requires that field defaults be supplied when the 'force_default' option
-   * is checked.
-   *
-   * This function is assigned as an #element_validate callback in
-   * fieldSettingsForm().
-   */
-  public static function fieldSettingsFormValidate(array &$element, FormStateInterface $form_state, array &$form): void {
-    $parents = $element['#array_parents'];
-    $subfield_path = array_slice($parents, 0, -1, TRUE);
-    $settings = $form_state->getValue([...$subfield_path, 'widget_settings', 'settings']);
-
-    if ($settings['force_default']) {
-      $default_value = $form_state->getValue('default_value_input');
-      /** @var \Drupal\field_ui\Form\FieldConfigEditForm $form_object */
-      $form_object = $form_state->getFormObject();
-      /** @var \Drupal\Core\Field\FieldConfigInterface $field_definition */
-      $field_definition = $form_object->getEntity();
-      $field_name = $field_definition->getName();
-      $subfield_name = (string) end($subfield_path);
-      if (empty($default_value[$field_name][0][$subfield_name]['display_id'])) {
-        $form_element = NestedArray::getValue($form, [...$subfield_path, 'widget_settings', 'settings']);
-        // Set an error on the default value checkbox.
-        $form_state->setErrorByName('set_default_value', t('%title requires a default value.', [
-          '%title' => $form_element['force_default']['#title'],
-        ]));
-        // Set an error on the target id field.
-        $target_form_keys = [
-          'default_value',
-          'widget',
-          0,
-          $subfield_name,
-          'target_id',
-        ];
-        $complete_form = $form_state->getCompleteForm();
-        $target_id_element = NestedArray::getValue($complete_form, $target_form_keys);
-        if ($target_id_element) {
-          $form_state->setError($target_id_element, t('The field %view requires a default view.', [
-            '%view' => $target_id_element['#title'],
-          ]));
-        }
-      }
-    }
   }
 
   /**
@@ -216,21 +84,23 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
    */
   public function widget(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
+    assert($field instanceof ViewfieldType);
+    $settings = $this->getSettings() + static::defaultSettings();
     $field_parents = $element['#field_parents'];
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
-    $allowed_views = $this->getAllowedViewsOptions($settings['allowed_views']);
+    $field_settings = $field->getFieldSettings();
+    $allowed_views = $this->getAllowedViewsOptions($field_settings['allowed_views']);
     $token_module_installed = $this->moduleHandler->moduleExists('token');
     /** @var \Drupal\custom_field\Plugin\Field\FieldType\CustomItem $item */
     $item = $items[$delta];
     $entity_type_id = $item->getEntity()->getEntityTypeId();
-    $is_required = $item->getFieldDefinition()->isRequired() && $settings['required'];
+    $is_required = $item->getFieldDefinition()->isRequired() && $field_settings['required'];
     $values = $form_state->getValues();
-    if ($this->isDefaultValueWidget($form_state) && !$settings['force_default']) {
+    if ($this->isDefaultValueWidget($form_state) && !$field_settings['force_default']) {
       $is_required = FALSE;
     }
     $field_name = $item->getFieldDefinition()->getName();
     $name = $field->getName();
-    if (!$this->isDefaultValueWidget($form_state) && $settings['force_default']) {
+    if (!$this->isDefaultValueWidget($form_state) && $field_settings['force_default']) {
       $element['#access'] = FALSE;
     }
     $wrapper = $this->getUniqueElementId($form, $field_name, $delta, $name);
@@ -260,7 +130,7 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
       $default_items_to_display = $item->{$name . '__items'} ?? NULL;
     }
 
-    // Use the allowed displays by current view selected.
+    // Use the allowed displays by the current view selected.
     $display_id_options = $target_id ? $allowed_views[$target_id]['displays'] ?? [] : [];
 
     // Add a container div for flex layout compatibility.
@@ -269,7 +139,7 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
     $element['target_id'] = [
       '#title' => $this->t('View'),
       '#type' => 'select',
-      '#options' => $this->getViewOptions(TRUE, $settings['allowed_views']),
+      '#options' => $field->getViewOptions(TRUE),
       '#empty_value' => '',
       '#default_value' => $target_id,
       '#description' => $this->t('View name.'),
@@ -291,7 +161,7 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
       '#title' => $this->t('Display'),
       '#type' => 'select',
       '#options' => $display_id_options,
-      '#empty_option' => $this->t('- Select -'),
+      '#empty_option' => $settings['empty_option'],
       '#default_value' => $default_display_id,
       '#description' => $this->t('View display to be used.'),
       '#prefix' => '<div id="' . $wrapper . '">',
@@ -325,7 +195,7 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
     $element['view_options']['arguments'] = [
       '#title' => $this->t('Arguments'),
       '#type' => 'textfield',
-      '#default_value' => $default_arguments ?? NULL,
+      '#default_value' => $default_arguments,
       '#description' => Markup::create($this->t('Separate contextual filters with a "/". Each filter may use "+" or "," for multi-value arguments.<br> @tokens', [
         '@tokens' => $token_module_installed ? $this->t('This field supports tokens.') : '',
       ])),
@@ -344,74 +214,13 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
       $element['view_options']['token_help'] = [
         '#theme' => 'token_tree_link',
         '#token_types' => [$token_type],
-        '#recursion_limit' => $settings['token_browser']['recursion_limit'] ?? 3,
+        '#recursion_limit' => $field_settings['token_browser']['recursion_limit'] ?? 3,
         '#recursion_limit_max' => 6,
-        '#global_types' => $settings['token_browser']['global_types'] ?? FALSE,
+        '#global_types' => $field_settings['token_browser']['global_types'] ?? FALSE,
       ];
     }
 
     return $element;
-  }
-
-  /**
-   * Get an options array of views.
-   *
-   * @param bool $filter
-   *   Flag to filter the output using the 'allowed_views' setting.
-   * @param array<string, mixed> $allowed_views_setting
-   *   (optional) An array of 'allowed_views' from settings to filter by.
-   *
-   * @return array
-   *   The array of options.
-   */
-  public function getViewOptions(bool $filter, array $allowed_views_setting = []): array {
-    $views_options = [];
-    $allowed_views = [];
-    if ($filter) {
-      // Add only the views where displays are allowed.
-      foreach ($allowed_views_setting as $id => $displays) {
-        if (!empty(array_filter($displays))) {
-          $allowed_views[$id] = $displays;
-        }
-      }
-    }
-
-    foreach (Views::getEnabledViews() as $key => $view) {
-      if (empty($allowed_views) || isset($allowed_views[$key])) {
-        $views_options[$key] = FieldFilteredMarkup::create($view->get('label'));
-      }
-    }
-    natcasesort($views_options);
-
-    return $views_options;
-  }
-
-  /**
-   * Get display ID options for a view.
-   *
-   * @param string $entity_id
-   *   The entity_id of the view.
-   * @param bool $filter
-   *   (optional) Flag to filter the output using the 'allowed_display_types'
-   *   setting.
-   *
-   * @return array<\Drupal\Component\Render\MarkupInterface|string>
-   *   The array of options.
-   */
-  public function getDisplayOptions(string $entity_id, bool $filter = TRUE): array {
-    $display_options = [];
-    $views = Views::getEnabledViews();
-    if (isset($views[$entity_id])) {
-      foreach ($views[$entity_id]->get('display') as $key => $display) {
-        if (isset($display['display_options']['enabled']) && !$display['display_options']['enabled']) {
-          continue;
-        }
-        $display_options[$key] = FieldFilteredMarkup::create($display['display_title']);
-      }
-      natcasesort($display_options);
-    }
-
-    return $display_options;
   }
 
   /**
@@ -428,7 +237,7 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
     $allowed_options = [];
 
     foreach ($allowed_views as $view_name => $displays) {
-      // Check if the view and our filters exists in $views before adding.
+      // Check if the view and our filters exist in $views before adding.
       if (isset($views[$view_name])) {
         $filtered_displays = array_filter($displays);
         $display_options = [];

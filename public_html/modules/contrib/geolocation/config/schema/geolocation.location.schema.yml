@@ -39,8 +39,8 @@ plugin.plugin_configuration.geolocation.location.fixed_value:
       label: 'Fixed value settings'
       mapping:
         latitude:
-          type: string
+          type: float
           label: 'Latitude'
         longitude:
-          type: string
+          type: float
           label: 'Longitude'

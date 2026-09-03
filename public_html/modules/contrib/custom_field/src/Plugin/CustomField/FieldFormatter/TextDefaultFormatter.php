@@ -25,14 +25,15 @@ class TextDefaultFormatter extends CustomFieldFormatterBase {
    * {@inheritdoc}
    */
   public function formatValue(FieldItemInterface $item, mixed $value): mixed {
-    $formatted = $this->getFieldWidgetSetting('formatted') ?? FALSE;
+    $field_settings = $this->customFieldDefinition->getFieldSettings();
+    $formatted = $field_settings['formatted'] ?? FALSE;
     if ($formatted) {
       // The ProcessedText element already handles cache context & tag bubbling.
       // @see \Drupal\filter\Element\ProcessedText::preRenderText()
       $build = [
         '#type' => 'processed_text',
         '#text' => $value,
-        '#format' => $this->getFieldWidgetSetting('default_format'),
+        '#format' => $field_settings['default_format'],
         '#langcode' => $item->getLangcode(),
       ];
       $value = $build;

@@ -2,24 +2,24 @@
 
 namespace Drupal\geolocation_here\Plugin\geolocation\MapProvider;
 
+use Drupal\geolocation\Attribute\MapProvider;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\geolocation\MapProviderBase;
 
 /**
  * Provides HERE Maps API.
- *
- * @MapProvider(
- *   id = "here",
- *   name = @Translation("HERE Maps"),
- *   description = @Translation("Here support."),
- * )
  */
+#[MapProvider(
+  id: 'here',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('HERE Maps'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('Here support.')
+)]
 class Here extends MapProviderBase {
 
   /**
    * {@inheritdoc}
    */
-  public static function getDefaultSettings() {
+  public static function getDefaultSettings(): array {
     return array_replace_recursive(
       parent::getDefaultSettings(),
       [
@@ -33,7 +33,7 @@ class Here extends MapProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function getSettings(array $settings) {
+  public function getSettings(array $settings): array {
     $settings = parent::getSettings($settings);
 
     $settings['zoom'] = (int) $settings['zoom'];
@@ -44,11 +44,7 @@ class Here extends MapProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function getSettingsSummary(array $settings) {
-    $settings = array_replace_recursive(
-      self::getDefaultSettings(),
-      $settings
-    );
+  public function getSettingsSummary(array $settings): array {
     $summary = parent::getSettingsSummary($settings);
     $summary[] = $this->t('Zoom level: @zoom', ['@zoom' => $settings['zoom']]);
     $summary[] = $this->t('Height: @height', ['@height' => $settings['height']]);
@@ -59,16 +55,12 @@ class Here extends MapProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function getSettingsForm(array $settings, array $parents = []) {
+  public function getSettingsForm(array $settings, array $parents = [], array $context = []): array {
     $settings += self::getDefaultSettings();
-    if ($parents) {
-      $parents_string = implode('][', $parents);
-    }
-    else {
-      $parents_string = NULL;
-    }
 
-    $form = parent::getSettingsForm($settings, $parents);
+    $form = parent::getSettingsForm($settings, $parents, $context);
+
+    $parents_string = $parents ? implode('][', $parents) : NULL;
 
     $form['height'] = [
       '#group' => $parents_string,
@@ -94,11 +86,11 @@ class Here extends MapProviderBase {
       '#description' => $this->t('The initial resolution at which to display the map, where zoom 0 corresponds to a map of the Earth fully zoomed out, and higher zoom levels zoom in at a higher resolution.'),
       '#default_value' => $settings['zoom'],
       '#process' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'processGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
         ['\Drupal\Core\Render\Element\Select', 'processSelect'],
       ],
       '#pre_render' => [
-        ['\Drupal\Core\Render\Element\RenderElement', 'preRenderGroup'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
       ],
     ];
 
@@ -108,30 +100,18 @@ class Here extends MapProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function alterRenderArray(array $render_array, array $map_settings, array $context = []) {
+  public function alterRenderArray(array $render_array, array $map_settings, array $context = []): array {
     $config = \Drupal::config('here_maps.settings');
 
-    $render_array['#attached'] = BubbleableMetadata::mergeAttachments(
-      empty($render_array['#attached']) ? [] : $render_array['#attached'],
-      [
-        'library' => [
-          'geolocation_here/geolocation.here',
+    $render_array['#attached'] = BubbleableMetadata::mergeAttachments($render_array['#attached'] ?? [],
+    [
+      'drupalSettings' => [
+        'geolocation' => [
+          'hereMapsAppId' => $config->get('app_id'),
+          'hereMapsAppCode' => $config->get('app_code'),
         ],
-        'drupalSettings' => [
-          'geolocation' => [
-            'hereMapsAppId' => $config->get('app_id'),
-            'hereMapsAppCode' => $config->get('app_code'),
-            'maps' => [
-              $render_array['#id'] => [
-                'settings' => [
-                  'here_settings' => $map_settings,
-                ],
-              ],
-            ],
-          ],
-        ],
-      ]
-    );
+      ],
+    ]);
 
     return parent::alterRenderArray($render_array, $map_settings, $context);
   }
@@ -139,29 +119,13 @@ class Here extends MapProviderBase {
   /**
    * {@inheritdoc}
    */
-  public static function getControlPositions() {
+  public static function getControlPositions(): array {
     return [
       'topleft' => t('Top left'),
       'topright' => t('Top right'),
       'bottomleft' => t('Bottom left'),
       'bottomright' => t('Bottom right'),
     ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function alterCommonMap(array $render_array, array $map_settings, array $context) {
-    $render_array['#attached'] = BubbleableMetadata::mergeAttachments(
-      empty($render_array['#attached']) ? [] : $render_array['#attached'],
-      [
-        'library' => [
-          'geolocation_here/commonmap.here',
-        ],
-      ]
-    );
-
-    return $render_array;
   }
 
 }

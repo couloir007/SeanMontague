@@ -2,27 +2,27 @@
 
 namespace Drupal\geolocation_geometry\Plugin\Field\FieldType;
 
+use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
 /**
  * Plugin implementation of the 'geolocation' field type.
- *
- * @FieldType(
- *   id = "geolocation_geometry_polygon",
- *   label = @Translation("Geolocation Geometry - Polygon"),
- *   category = "Spatial fields",
- *   description = @Translation("This field stores spatial geometry data."),
- *   default_widget = "geolocation_geometry_wkt",
- *   default_formatter = "geolocation_geometry_wkt"
- * )
  */
+#[FieldType(
+  id: 'geolocation_geometry_polygon',
+  label: new \Drupal\Core\StringTranslation\TranslatableMarkup('Geolocation Geometry - Polygon'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup("This field stores spatial geometry of type 'Polygon'."),
+  category: 'geo_spatial',
+  default_widget: 'geolocation_geometry_geojson',
+  default_formatter: 'geolocation_geometry_data'
+)]
 class GeolocationGeometryPolygon extends GeolocationGeometryBase {
 
   /**
    * {@inheritdoc}
    */
-  public static function schema(FieldStorageDefinitionInterface $field_definition) {
+  public static function schema(FieldStorageDefinitionInterface $field_definition): array {
     $schema = parent::schema($field_definition);
 
     $schema['columns']['geometry']['pgsql_type'] = "geometry('POLYGON')";
@@ -34,7 +34,7 @@ class GeolocationGeometryPolygon extends GeolocationGeometryBase {
   /**
    * {@inheritdoc}
    */
-  public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
+  public static function generateSampleValue(FieldDefinitionInterface $field_definition): array {
     $reference_point = self::getRandomCoordinates();
     $coordinates = [];
     for ($i = 1; $i <= 16; $i++) {
@@ -44,7 +44,7 @@ class GeolocationGeometryPolygon extends GeolocationGeometryBase {
     usort(
       $coordinates,
       function ($a, $b) use ($center_point) {
-        return self::sortCoordinatesByAngle($a, $b, $center_point) ? 1 : -1;
+        return self::sortCoordinatesByAngle($a, $b, $center_point);
       }
     );
     // POLYGONS need to be closed.

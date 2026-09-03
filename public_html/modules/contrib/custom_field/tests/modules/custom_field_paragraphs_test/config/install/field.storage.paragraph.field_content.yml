@@ -12,6 +12,7 @@ type: custom
 settings:
   columns:
     title:
+      allowed_values: {  }
       name: title
       type: string
       length: 255
@@ -19,6 +20,9 @@ settings:
       name: media
       type: entity_reference
       target_type: media
+    link:
+      name: link
+      type: link
 module: custom_field
 locked: false
 cardinality: -1

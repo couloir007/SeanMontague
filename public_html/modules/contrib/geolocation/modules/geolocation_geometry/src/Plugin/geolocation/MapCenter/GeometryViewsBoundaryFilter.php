@@ -2,23 +2,23 @@
 
 namespace Drupal\geolocation_geometry\Plugin\geolocation\MapCenter;
 
+use Drupal\geolocation\Attribute\MapCenter;
 use Drupal\geolocation\Plugin\geolocation\MapCenter\ViewsBoundaryFilter;
 
 /**
  * Derive center from boundary filter.
- *
- * @MapCenter(
- *   id = "geometry_views_boundary_filter",
- *   name = @Translation("Geometry Boundary filter"),
- *   description = @Translation("Fit map to geometry boundary filter."),
- * )
  */
+#[MapCenter(
+  id: 'geometry_views_boundary_filter',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('Geometry Boundary filter'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('Fit map to geometry boundary filter.')
+)]
 class GeometryViewsBoundaryFilter extends ViewsBoundaryFilter {
 
   /**
    * {@inheritdoc}
    */
-  public function getAvailableMapCenterOptions($context) {
+  public function getAvailableMapCenterOptions(array $context = []): array {
     $options = [];
 
     if ($displayHandler = self::getViewsDisplayHandler($context)) {

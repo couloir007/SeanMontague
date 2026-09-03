@@ -13,7 +13,7 @@ class NominatimCountryFormattingBase extends GeocoderCountryFormattingBase imple
   /**
    * {@inheritdoc}
    */
-  public function format(array $atomics) {
+  public function format(array $atomics): ?array {
     $address_elements = parent::format($atomics);
 
     if (
@@ -42,10 +42,7 @@ class NominatimCountryFormattingBase extends GeocoderCountryFormattingBase imple
     if (isset($atomics['city'])) {
       $address_elements['locality'] = $atomics['city'];
     }
-    elseif (
-      empty($atomics['city'])
-      && isset($atomics['county'])
-    ) {
+    elseif (isset($atomics['county'])) {
       $address_elements['locality'] = $atomics['county'];
     }
 

@@ -4,7 +4,6 @@ namespace Drupal\geolocation_yandex\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\geolocation_yandex\Plugin\geolocation\MapProvider\Yandex;
 
 /**
  * Implements the Yandex Maps form controller.
@@ -16,7 +15,7 @@ class YandexMapsSettings extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $config = $this->configFactory->get('geolocation_yandex.settings');
 
     $form['api_key'] = [
@@ -26,29 +25,20 @@ class YandexMapsSettings extends ConfigFormBase {
       '#description' => $this->t('Yandex Maps requires users to sign up at <a href="https://developer.tech.yandex.ru/">developer.tech.yandex.ru</a>.'),
     ];
 
-    $form['packages'] = [
-      '#type' => 'checkboxes',
-      '#title' => $this->t('Yandex Maps API Packages'),
-      '#options' => Yandex::getPackages(),
-      '#multiple' => TRUE,
-      '#default_value' => $config->get('packages'),
-      '#description' => $this->t('More about <a href="https://tech.yandex.ru/maps/archive/doc/jsapi/2.0/ref/reference/packages-docpage/">packages</a>.'),
-    ];
-
     return parent::buildForm($form, $form_state);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'geolocation_yandex_settings';
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getEditableConfigNames() {
+  protected function getEditableConfigNames(): array {
     return [
       'geolocation_yandex.settings',
     ];
@@ -57,10 +47,9 @@ class YandexMapsSettings extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $config = $this->configFactory()->getEditable('geolocation_yandex.settings');
     $config->set('api_key', $form_state->getValue('api_key'));
-    $config->set('packages', array_filter(array_values($form_state->getValue('packages'))));
     $config->save();
 
     // Confirmation on form submission.

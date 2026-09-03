@@ -2,6 +2,8 @@
 
 namespace Drupal\geolocation_geocodio\Plugin\geolocation\Geocoder;
 
+use Drupal\geolocation\Attribute\Geocoder;
+use Drupal\Core\Utility\Error;
 use Drupal\geolocation\GeocoderBase;
 use Drupal\geolocation\GeocoderInterface;
 use Drupal\geolocation\KeyProvider;
@@ -10,25 +12,24 @@ use GuzzleHttp\Exception\RequestException;
 
 /**
  * Provides a Geocodio integration.
- *
- * @Geocoder(
- *   id = "geocodio",
- *   name = @Translation("Geocodio"),
- *   description = @Translation("See https://www.geocod.io/docs/ for details."),
- *   locationCapable = true,
- *   boundaryCapable = false,
- *   frontendCapable = false,
- * )
  */
+#[Geocoder(
+  id: 'geocodio',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('Geocodio'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('See https://www.geocod.io/docs/ for details.'),
+  locationCapable: TRUE,
+  boundaryCapable: FALSE,
+  frontendCapable: FALSE
+)]
 class Geocodio extends GeocoderBase implements GeocoderInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function geocode($address) {
+  public function geocode(string $address): ?array {
 
     if (empty($address)) {
-      return FALSE;
+      return NULL;
     }
 
     // Get config.
@@ -55,30 +56,32 @@ class Geocodio extends GeocoderBase implements GeocoderInterface {
       }
     }
     catch (RequestException $e) {
-      \Drupal::logger('geolocation')->warning($e->getMessage());
-      return FALSE;
+      $logger = \Drupal::logger('geolocation');
+      Error::logException($logger, $e);
+      return NULL;
     }
 
-    $results = $result->results[0] ?? FALSE;
+    /** @var array{results: array<int, array<string, mixed>>} $result */
+    $results = $result['results'][0] ?? FALSE;
 
     // If no results, return false.
     if (!$results) {
-      return FALSE;
+      return NULL;
     }
     // Otherwise add location, formatted address and fields.
     else {
       $location['location'] = [
-        'lat' => $results->location->lat,
-        'lng' => $results->location->lng,
+        'lat' => $results['location']['lat'],
+        'lng' => $results['location']['lng'],
       ];
     }
     // Add formatted address if it exists.
-    if (!empty($results->formatted_address)) {
-      $location['address'] = $results->formatted_address;
+    if (!empty($results['formatted_address'])) {
+      $location['address'] = $results['formatted_address'];
     }
     // Add metadata coming from fields if it exists.
-    if (!empty($results->fields)) {
-      $location['metadata'] = $results->fields;
+    if (!empty($results['fields'])) {
+      $location['metadata'] = $results['fields'];
     }
 
     return $location;

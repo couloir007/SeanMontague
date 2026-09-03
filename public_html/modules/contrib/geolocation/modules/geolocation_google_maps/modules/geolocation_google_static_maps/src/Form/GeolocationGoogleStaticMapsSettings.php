@@ -15,7 +15,7 @@ class GeolocationGoogleStaticMapsSettings extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $config = $this->configFactory->get('geolocation_google_static_maps.settings');
 
     $form['google_static_maps_url_secret'] = [
@@ -47,7 +47,7 @@ class GeolocationGoogleStaticMapsSettings extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $config = $this->configFactory()->getEditable('geolocation_google_static_maps.settings');
     $config->set('google_static_maps_url_secret', $form_state->getValue('google_static_maps_url_secret'));
 

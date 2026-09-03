@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Element;
 
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -19,12 +21,9 @@ abstract class DatetimeBase extends Datetime {
     $info = parent::getInfo();
     $info['#theme_wrappers'] = [];
     $info['#theme'] = NULL;
-    $info['#attached'] = [
-      'library' => [
-        'custom_field/custom-field-datetime',
-      ],
-    ];
     $info['#timezone_element'] = FALSE;
+    $info['#show_seconds'] = TRUE;
+    $info['#field_parents'] = [];
 
     return $info;
   }
@@ -41,19 +40,32 @@ abstract class DatetimeBase extends Datetime {
         // @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/datetime-local
         // 'html_datetime' is not a valid format to pass to
         // DrupalDateTime::createFromFormat()
-        [$date_input, $time_input] = explode('T', $input['date']);
+        $date_parts = explode('T', $input['date']);
+        $date_input = $date_parts[0];
+        $time_input = $date_parts[1] ?? NULL;
         $date_format = DateFormat::load('html_date')->getPattern();
         $time_format = DateFormat::load('html_time')->getPattern();
       }
       else {
         $date_format = $element['#date_date_format'] != 'none' ? static::getHtml5DateFormat($element) : '';
         $time_format = $element['#date_time_element'] != 'none' ? static::getHtml5TimeFormat($element) : '';
+        $same_day = $form_state->getValue([...$element['#field_parents'], 'same_day']);
         if ($input instanceof DrupalDateTime) {
           $values = [
             'date' => $input->format($date_format),
             'time' => $input->format($time_format),
           ];
           $input = $values;
+        }
+        // Modify input for same-day checkbox.
+        elseif ($same_day && end($element['#parents']) === 'end_value') {
+          $start_date = $form_state->getValue([...$element['#field_parents'], 'value']);
+          if (empty($start_date['date'])) {
+            $input['time'] = '';
+          }
+          else {
+            $input['date'] = $start_date['date'];
+          }
         }
 
         $date_input = $element['#date_date_element'] != 'none' && !empty($input['date']) ? $input['date'] : '';
@@ -113,11 +125,85 @@ abstract class DatetimeBase extends Datetime {
         return DateFormat::load('html_datetime')->getPattern();
 
       case 'datetime-local':
-        return 'Y-m-d\TH:i';
+        return !empty($element['#show_seconds']) ? 'Y-m-d\TH:i:s' : 'Y-m-d\TH:i';
 
       default:
         return $element['#date_date_format'];
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @return array<string, mixed>
+   *   The processed element.
+   */
+  public static function processDatetime(&$element, FormStateInterface $form_state, &$complete_form): array {
+    $element = parent::processDatetime($element, $form_state, $complete_form);
+    $show_seconds = $element['#show_seconds'] ?? FALSE;
+    if ($element['#date_date_element'] === 'datetime-local') {
+      if ($show_seconds) {
+        $element['date']['#attributes']['step'] = 1;
+        $format = 'm/d/Y, h:i:s A';
+      }
+      else {
+        $element['date']['#attributes']['step'] = 60;
+        $format = 'm/d/Y, h:i A';
+      }
+      $element['date']['#attributes']['title'] = t('Enter a valid date and time - e.g. @format', [
+        '@format' => (new \DateTime())->format($format),
+      ]);
+    }
+    elseif ($element['#date_time_element'] !== 'none') {
+      if ($show_seconds) {
+        $element['time']['#attributes']['step'] = 1;
+        $format = 'h:i:s A';
+      }
+      else {
+        $element['time']['#attributes']['step'] = 60;
+        $format = 'h:i A';
+        // Remove the seconds from the time element.
+        if (!empty($element['time']['#value'])) {
+          $parts = explode(':', $element['time']['#value']);
+          $parts = array_splice($parts, 0, 2);
+          $element['time']['#value'] = implode(':', $parts);
+        }
+      }
+      $element['time']['#attributes']['title'] = t('Enter a valid time - e.g. @format', [
+        '@format' => (new \DateTime())->format($format),
+      ]);
+    }
+
+    if ($element['#date_date_element'] != 'none') {
+      // The value callback has populated the #value array.
+      $same_day = $element['#same_day'] ?? FALSE;
+      if ($same_day) {
+        $element['date']['#type'] = 'hidden';
+        $element['time']['#title'] = $element['#title'];
+        $element['time']['#title_display'] = 'before';
+      }
+      $date = !empty($element['#value']['object']) ? $element['#value']['object'] : NULL;
+      if (!$date instanceof DrupalDateTime) {
+        $format_settings = [];
+        $date_format = $element['#date_date_element'] != 'none' ? static::getHtml5DateFormat($element) : '';
+        // With a datetime-local input, the date value is always normalized to
+        // the format Y-m-d\TH:i.
+        // @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/datetime-local
+        // 'html_datetime' returned by static::getHtml5DateFormat($element) is
+        // not a valid format.
+        // @see https://www.drupal.org/project/drupal/issues/3505318
+        if ($element['#date_date_element'] === 'datetime-local') {
+          $date_format = DateFormat::load('html_date')->getPattern() . '\T' . DateFormat::load('html_time')->getPattern();
+        }
+        $range = static::datetimeRangeYears($element['#date_year_range']);
+        $html5_min = DrupalDateTime::createFromFormat(DrupalDateTime::FORMAT, $range[0] . '-01-01 00:00:00');
+        $html5_max = DrupalDateTime::createFromFormat(DrupalDateTime::FORMAT, $range[1] . '-12-31 23:59:59');
+        $element['date']['#attributes']['min'] = $html5_min->format($date_format, $format_settings);
+        $element['date']['#attributes']['max'] = $html5_max->format($date_format, $format_settings);
+      }
+    }
+
+    return $element;
   }
 
 }

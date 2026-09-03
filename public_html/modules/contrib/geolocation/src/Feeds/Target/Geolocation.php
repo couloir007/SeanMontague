@@ -30,7 +30,7 @@ class Geolocation extends FieldTargetBase {
   /**
    * {@inheritdoc}
    */
-  protected function prepareValue($delta, array &$values) {
+  protected function prepareValue($delta, array &$values): array {
     // Both latitude and longitude must be set in order to prepare the values.
     // Check if both contain values.
     foreach (['lat', 'lng'] as $key) {
@@ -56,7 +56,7 @@ class Geolocation extends FieldTargetBase {
   /**
    * {@inheritdoc}
    */
-  protected function prepareValues(array $values) {
+  protected function prepareValues(array $values): array {
     $return = [];
     foreach ($values as $delta => $columns) {
       try {

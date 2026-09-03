@@ -5,3 +5,19 @@ field.formatter.settings.geolocation_geometry:
     data_provider_settings:
       label: 'Data provider settings'
       type: geolocation.data_provider.geolocation_geometry
+
+field.formatter.settings.geolocation_geometry_data:
+  type: mapping
+  label: 'Geolocation Geometry Data Formatter'
+  mapping:
+    geometry_format:
+      type: string
+      label: 'Format'
+
+field.formatter.settings.geolocation_geometry_file:
+  type: mapping
+  label: 'Geolocation Geometry File Formatter'
+  mapping:
+    geometry_format:
+      type: string
+      label: 'Format'

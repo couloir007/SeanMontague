@@ -8,7 +8,8 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\custom_field\CustomFieldUpdateManagerInterface;
+use Drupal\custom_field\Service\UpdateManagerInterface;
+use Drupal\custom_field\Plugin\CustomField\FieldType\DateRangeType;
 use Drupal\custom_field\Plugin\CustomField\FieldType\DateTimeType;
 use Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -26,41 +27,14 @@ final class UpdaterCommands extends DrushCommands {
   use StringTranslationTrait;
 
   /**
-   * The custom field update manager service.
-   *
-   * @var \Drupal\custom_field\CustomFieldUpdateManagerInterface
-   */
-  private readonly CustomFieldUpdateManagerInterface $updateManager;
-
-  /**
-   * The custom field type manager service.
-   *
-   * @var \Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface
-   */
-  private readonly CustomFieldTypeManagerInterface $customFieldTypeManager;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  private readonly EntityTypeManagerInterface $entityTypeManager;
-
-  /**
    * Constructs a new UpdaterCommands object.
-   *
-   * @param \Drupal\custom_field\CustomFieldUpdateManagerInterface $update_manager
-   *   The custom field update manager service.
-   * @param \Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface $custom_field_type_manager
-   *   The custom field type manager service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
    */
-  public function __construct(CustomFieldUpdateManagerInterface $update_manager, CustomFieldTypeManagerInterface $custom_field_type_manager, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(
+    private readonly UpdateManagerInterface $updateManager,
+    private readonly CustomFieldTypeManagerInterface $customFieldTypeManager,
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+  ) {
     parent::__construct();
-    $this->updateManager = $update_manager;
-    $this->customFieldTypeManager = $custom_field_type_manager;
-    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -505,16 +479,19 @@ final class UpdaterCommands extends DrushCommands {
 
       case 'datetime':
       case 'daterange':
-        $prompt = $this->t('Select datetime type');
         $date_time_types = [
           DateTimeType::DATETIME_TYPE_DATE,
           DateTimeType::DATETIME_TYPE_DATETIME,
         ];
-        $options['datetime_type'] = $this->promptChoice(
-          (string) $prompt,
+        if ($data_type === 'daterange') {
+          $date_time_types[] = DateRangeType::DATETIME_TYPE_ALLDAY;
+        }
+        $question = new ChoiceQuestion(
+          (string) $this->t('Select datetime type'),
           $date_time_types,
-          'datetime'
+          1
         );
+        $options['datetime_type'] = $this->io()->askQuestion($question);
         break;
     }
 

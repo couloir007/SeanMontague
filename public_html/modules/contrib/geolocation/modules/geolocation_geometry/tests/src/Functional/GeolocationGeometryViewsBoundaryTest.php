@@ -15,7 +15,7 @@ class GeolocationGeometryViewsBoundaryTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $profile = 'standard';
+  protected $profile = 'minimal';
 
   /**
    * {@inheritdoc}
@@ -37,14 +37,14 @@ class GeolocationGeometryViewsBoundaryTest extends BrowserTestBase {
    *
    * @var array
    */
-  public static $testViews = ['geolocation_geometry_test_boundary'];
+  public static array $testViews = ['geolocation_geometry_test_boundary'];
 
   /**
    * ID of the geolocation field in this test.
    *
    * @var string
    */
-  protected $viewsPath = 'geolocation-geometry-test-boundary';
+  protected string $viewsPath = 'geolocation-geometry-test-boundary';
 
   /**
    * {@inheritdoc}
@@ -63,7 +63,7 @@ class GeolocationGeometryViewsBoundaryTest extends BrowserTestBase {
   /**
    * Tests the boundary filter.
    */
-  public function testBoundaryNoLocations() {
+  public function testBoundaryNoLocations(): void {
     $this->drupalGet($this->viewsPath);
     $this->assertSession()->statusCodeEquals(200);
   }
@@ -73,7 +73,7 @@ class GeolocationGeometryViewsBoundaryTest extends BrowserTestBase {
    *
    * It's currently locked to filter boundary of NE80,80 to SW20,20.
    */
-  public function testBoundaryLocations() {
+  public function testBoundaryLocations(): void {
     $entity_test_storage = \Drupal::entityTypeManager()->getStorage('node');
 
     $entity_test_storage->create([
@@ -82,7 +82,7 @@ class GeolocationGeometryViewsBoundaryTest extends BrowserTestBase {
       'body' => 'test test',
       'type' => 'geolocation_geometry_demo',
       'field_geolocation_geometry_polyg' => [
-        'wkt' => 'POLYGON((170 -44, 169 -44, 169 -45, 170 -45, 170 -44))',
+        'geojson' => '{"type":"Polygon","coordinates":[[[170,-44],[169,-44],[169,-45],[170,-45],[170,-44]]]}',
       ],
     ])->save();
     $entity_test_storage->create([
@@ -91,7 +91,7 @@ class GeolocationGeometryViewsBoundaryTest extends BrowserTestBase {
       'body' => 'test foobar',
       'type' => 'geolocation_geometry_demo',
       'field_geolocation_geometry_polyg' => [
-        'wkt' => 'POLYGON((171.1217044 -43.6891741, 168.1217044 -43.6891741, 168.1217044 -45.6891741, 171.1217044 -45.6891741, 171.1217044 -43.6891741))',
+        'geojson' => '{"type":"Polygon","coordinates":[[[171.1217044,-43.6891741],[168.1217044,-43.6891741],[168.1217044,-45.6891741],[171.1217044,-45.6891741],[171.1217044,-43.6891741]]]}',
       ],
     ])->save();
     $entity_test_storage->create([
@@ -100,7 +100,7 @@ class GeolocationGeometryViewsBoundaryTest extends BrowserTestBase {
       'body' => 'test foobar',
       'type' => 'geolocation_geometry_demo',
       'field_geolocation_geometry_polyg' => [
-        'wkt' => 'POLYGON((10 20, 8 20, 8 22, 10 22, 10 20))',
+        'geojson' => '{"type":"Polygon","coordinates":[[[10,20],[8,20],[8,22],[10,22],[10,20]]]}',
       ],
     ])->save();
 

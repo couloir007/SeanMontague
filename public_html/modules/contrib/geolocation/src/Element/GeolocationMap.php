@@ -7,6 +7,7 @@ use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Template\Attribute;
+use Drupal\geolocation\MapProviderManager;
 
 /**
  * Provides a render element to display a geolocation map.
@@ -23,7 +24,7 @@ use Drupal\Core\Template\Attribute;
  * ];
  * @endcode
  *
- * @FormElement("geolocation_map")
+ * @RenderElement("geolocation_map")
  */
 class GeolocationMap extends RenderElementBase {
 
@@ -32,7 +33,7 @@ class GeolocationMap extends RenderElementBase {
    *
    * @var \Drupal\geolocation\MapProviderManager
    */
-  protected $mapProviderManager = NULL;
+  protected MapProviderManager $mapProviderManager;
 
   /**
    * {@inheritdoc}
@@ -46,7 +47,7 @@ class GeolocationMap extends RenderElementBase {
   /**
    * {@inheritdoc}
    */
-  public function getInfo() {
+  public function getInfo(): array {
     $class = get_class($this);
 
     return [
@@ -61,6 +62,7 @@ class GeolocationMap extends RenderElementBase {
       '#centre' => NULL,
       '#id' => NULL,
       '#controls' => NULL,
+      '#layers' => [],
       '#context' => [],
     ];
   }
@@ -74,39 +76,20 @@ class GeolocationMap extends RenderElementBase {
    * @return array
    *   Renderable map.
    */
-  public function preRenderMap(array $render_array) {
+  public function preRenderMap(array $render_array): array {
     $render_array['#theme'] = 'geolocation_map_wrapper';
 
-    if (empty($render_array['#cache'])) {
-      $render_array['#cache'] = [];
-    }
-
     $render_array['#cache'] = array_merge_recursive(
-      $render_array['#cache'],
+      $render_array['#cache'] ?? [],
       ['contexts' => ['languages:language_interface']]
     );
 
-    if (empty($render_array['#attributes'])) {
-      $render_array['#attributes'] = [];
-    }
-
-    if (empty($render_array['#attributes'])) {
-      $render_array['#attributes'] = [];
-    }
-
     if (empty($render_array['#id'])) {
-      $render_array['#id'] = uniqid();
+      $render_array['#id'] = uniqid('map-');
     }
 
     if (!empty($render_array['#controls'])) {
       uasort($render_array['#controls'], [
-        SortArray::class,
-        'sortByWeightProperty',
-      ]);
-    }
-
-    if (!empty($render_array['#layers'])) {
-      uasort($render_array['#layers'], [
         SortArray::class,
         'sortByWeightProperty',
       ]);
@@ -154,18 +137,7 @@ class GeolocationMap extends RenderElementBase {
       $render_array
     );
 
-    if (!empty($render_array['#layers'])) {
-      foreach (Element::children($render_array['#layers']) as $layer) {
-        $render_array['#children']['layers']['layer-' . $layer] = $render_array['#layers'][$layer];
-      }
-    }
-
-    foreach (Element::children($render_array) as $child) {
-      $render_array['#children'][$child] = $render_array[$child];
-      unset($render_array[$child]);
-    }
-
-    $render_array['#attributes'] = new Attribute($render_array['#attributes']);
+    $render_array['#attributes'] = new Attribute($render_array['#attributes'] ?? []);
     $render_array['#attributes']->addClass('geolocation-map-wrapper');
     $render_array['#attributes']->setAttribute('id', $render_array['#id']);
     $render_array['#attributes']->setAttribute('data-map-type', $render_array['#maptype']);
@@ -174,8 +146,12 @@ class GeolocationMap extends RenderElementBase {
       !empty($render_array['#centre']['lat'])
       && !empty($render_array['#centre']['lng'])
     ) {
-      $render_array['#attributes']->setAttribute('data-centre-lat', $render_array['#centre']['lat']);
-      $render_array['#attributes']->setAttribute('data-centre-lng', $render_array['#centre']['lng']);
+      $render_array['#attributes']->setAttribute('data-lat', $render_array['#centre']['lat']);
+      $render_array['#attributes']->setAttribute('data-lng', $render_array['#centre']['lng']);
+    }
+
+    if (!empty($render_array['#centre']['zoom'])) {
+      $render_array['#attributes']->setAttribute('data-zoom', $render_array['#centre']['zoom']);
     }
 
     if (
@@ -195,7 +171,21 @@ class GeolocationMap extends RenderElementBase {
       $context = $render_array['#context'];
     }
 
-    return $map_provider->alterRenderArray($render_array, $map_settings, $context);
+    $render_array = $map_provider->alterRenderArray($render_array, $map_settings, $context);
+
+    if (is_array($render_array['#layers'] ?? FALSE)) {
+      foreach (Element::children($render_array['#layers']) as $layer_id) {
+        $render_array['#children'][$layer_id] = $render_array['#layers'][$layer_id];
+        unset($render_array['#layers'][$layer_id]);
+      }
+    }
+
+    foreach (Element::children($render_array) as $child) {
+      $render_array['#children'][$child] = $render_array[$child];
+      unset($render_array[$child]);
+    }
+
+    return $render_array;
   }
 
   /**
@@ -207,7 +197,7 @@ class GeolocationMap extends RenderElementBase {
    * @return array
    *   Geolocation Map Locations.
    */
-  public static function getLocations(array $render_array) {
+  public static function getLocations(array $render_array): array {
     $locations = [];
     if (
       !empty($render_array['#type'])

@@ -4,6 +4,7 @@ namespace Drupal\custom_field\Plugin;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Defines an interface for custom field Type plugins.
@@ -11,27 +12,25 @@ use Drupal\Core\Field\FieldItemInterface;
 interface CustomFieldTypeInterface extends PluginInspectionInterface {
 
   /**
-   * Specifies whether the field supports only internal URLs.
-   */
-  const LINK_INTERNAL = 0x01;
-
-  /**
-   * Specifies whether the field supports only external URLs.
-   */
-  const LINK_EXTERNAL = 0x10;
-
-  /**
-   * Specifies whether the field supports both internal and external URLs.
-   */
-  const LINK_GENERIC = 0x11;
-
-  /**
-   * Defines the widget settings for this plugin.
+   * Defines the field settings for this plugin.
    *
    * @return array<string, mixed>
    *   A list of default settings, keyed by the setting name.
    */
-  public static function defaultWidgetSettings(): array;
+  public static function defaultFieldSettings(): array;
+
+  /**
+   * Returns a form for the widget settings for this custom field type.
+   *
+   * @param array<string, mixed> $form
+   *   The parent form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state of the (entire) configuration form.
+   *
+   * @return array<string, mixed>
+   *   The form definition for the field settings.
+   */
+  public function fieldSettingsForm(array &$form, FormStateInterface $form_state): array;
 
   /**
    * Render the stored value of the custom field item.
@@ -133,7 +132,7 @@ interface CustomFieldTypeInterface extends PluginInspectionInterface {
   public function getTargetType(): ?string;
 
   /**
-   * Returns the array of field settings.
+   * Returns the array of settings.
    *
    * @return array<string, mixed>
    *   The array of settings.
@@ -141,7 +140,7 @@ interface CustomFieldTypeInterface extends PluginInspectionInterface {
   public function getSettings(): array;
 
   /**
-   * Returns the value of a field setting.
+   * Returns the value of a setting.
    *
    * @param string $setting
    *   The setting name.
@@ -152,31 +151,23 @@ interface CustomFieldTypeInterface extends PluginInspectionInterface {
   public function getSetting(string $setting): mixed;
 
   /**
-   * Returns the array of widget settings.
+   * Returns the array of field settings.
    *
    * @return array<string, mixed>
-   *   The array of widget settings.
+   *   The array of settings.
    */
-  public function getWidgetSettings(): array;
+  public function getFieldSettings(): array;
 
   /**
-   * Gets a widget setting by name.
+   * Returns the value of a field setting.
    *
-   * @param string $name
-   *   The name of the widget setting to get.
+   * @param string $setting
+   *   The setting name.
    *
    * @return mixed
-   *   The widget setting to return.
+   *   The setting value.
    */
-  public function getWidgetSetting(string $name): mixed;
-
-  /**
-   * Returns the plugin id for the widget assigned to the field.
-   *
-   * @return string
-   *   The widget plugin id assigned to the field type.
-   */
-  public function getWidgetPluginId(): string;
+  public function getFieldSetting(string $setting): mixed;
 
   /**
    * Should the field item be included in the empty check?
@@ -224,13 +215,10 @@ interface CustomFieldTypeInterface extends PluginInspectionInterface {
   /**
    * Returns an array of constraints.
    *
-   * @param array<string, mixed> $settings
-   *   An array of settings passed to the getConstraints() function.
-   *
    * @return array<string, mixed>
    *   Array of constraints.
    */
-  public function getConstraints(array $settings): array;
+  public function getConstraints(): array;
 
   /**
    * Returns an array of calculated dependencies.
@@ -258,25 +246,6 @@ interface CustomFieldTypeInterface extends PluginInspectionInterface {
    *   An array of settings that changed.
    */
   public static function onDependencyRemoval(CustomFieldTypeInterface $item, array $dependencies): array;
-
-  /**
-   * Returns Url object for a field.
-   *
-   * @param \Drupal\Core\Field\FieldItemInterface $item
-   *   A field.
-   *
-   * @return \Drupal\Core\Url
-   *   The Url object.
-   */
-  public function getUrl(FieldItemInterface $item);
-
-  /**
-   * Determines if a link is external.
-   *
-   * @return bool
-   *   TRUE if the link is external, FALSE otherwise.
-   */
-  public function isExternal(FieldItemInterface $item): bool;
 
   /**
    * Returns if the field type can be added.

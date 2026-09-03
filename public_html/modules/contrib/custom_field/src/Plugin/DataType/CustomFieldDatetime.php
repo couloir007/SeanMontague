@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Drupal\custom_field\Plugin\DataType;
 
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\Attribute\DataType;
-use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\Type\DateTimeInterface;
 use Drupal\custom_field\Plugin\Field\FieldType\CustomItem;
 use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
@@ -22,27 +20,6 @@ use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
   definition_class: CustomFieldDataDefinition::class,
 )]
 class CustomFieldDatetime extends CustomFieldDataTypeBase implements DateTimeInterface {
-
-  /**
-   * The link title value.
-   *
-   * @var string|null
-   */
-  protected ?string $timezone = NULL;
-
-  /**
-   * {@inheritdoc}
-   *
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
-   */
-  public function __construct(DataDefinitionInterface $definition, $name = NULL, ?FieldItemInterface $parent = NULL) {
-    parent::__construct($definition, $name, $parent);
-    $this->value = $parent->{$this->getName()};
-    $timezone = $parent->get($this->getName() . CustomItem::SEPARATOR . 'timezone')->getValue();
-    if ($timezone) {
-      $this->timezone = (string) $timezone;
-    }
-  }
 
   /**
    * {@inheritdoc}
@@ -84,19 +61,8 @@ class CustomFieldDatetime extends CustomFieldDataTypeBase implements DateTimeInt
     }
     if (isset($value['timezone'])) {
       $parent->set($this->getName() . CustomItem::SEPARATOR . 'timezone', $value['timezone']);
-      $this->timezone = (string) $value['timezone'];
     }
-    parent::setValue($value, $notify);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getValue() {
-    if (is_array($this->value)) {
-      $this->value = $this->value['value'];
-    }
-    return $this->value;
+    $this->value = !empty($value['value']) && is_string($value['value']) ? $value['value'] : NULL;
   }
 
   /**
@@ -104,16 +70,19 @@ class CustomFieldDatetime extends CustomFieldDataTypeBase implements DateTimeInt
    *
    * @return string|null
    *   The stored timezone.
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   public function getTimezone(): ?string {
-    return $this->timezone;
+    $timezone = $this->getParent()->get($this->getName() . CustomItem::SEPARATOR . 'timezone')->getValue();
+    return $timezone ? (string) $timezone : NULL;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCastedValue() {
-    return (string) $this->getValue();
+    return $this->value;
   }
 
 }

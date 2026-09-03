@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * Contains geolocation_geometry_test_js.module.
+ */
+
+use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\geolocation_geometry_test_js\Hook\TestHooks;
+
+/**
+ * Implements hook_page_attachments().
+ */
+#[LegacyHook]
+function geolocation_geometry_test_js_page_attachments(array &$attachments): void {
+  $route_match = \Drupal::service('current_route_match');
+  $test_hooks = new TestHooks($route_match);
+  $test_hooks->pageAttachments($attachments);
+}

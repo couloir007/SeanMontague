@@ -1,17 +1,20 @@
-plugin.plugin_configuration.geolocation.map_center_option.fixed_value:
+plugin.plugin_configuration.geolocation.map_center_option.client_location:
   type: geolocation.map_center_option_settings
-  label: 'Fixed Coordinates'
+  label: 'Client location'
   mapping:
     settings:
       type: mapping
       label: 'Settings'
       mapping:
-        latitude:
+        initial_latitude:
           type: float
-          label: 'Latitude'
-        longitude:
+          label: 'Initial Latitude'
+        initial_longitude:
           type: float
-          label: 'Longitude'
+          label: 'Initial Longitude'
+        follow_client:
+          type: boolean
+          label: 'Follow Client'
 
 plugin.plugin_configuration.geolocation.map_center_option.fit_bounds:
   type: geolocation.map_center_option_settings
@@ -21,9 +24,6 @@ plugin.plugin_configuration.geolocation.map_center_option.fit_bounds:
       type: mapping
       label: 'Settings'
       mapping:
-        reset_zoom:
-          type: boolean
-          label: 'Reset zoom'
         min_zoom:
           type: integer
           label: 'Min zoom'
@@ -49,14 +49,24 @@ plugin.plugin_configuration.geolocation.map_center_option.fixed_boundaries:
           type: string
           label: 'East'
 
-plugin.plugin_configuration.geolocation.map_center_option.ipstack:
+plugin.plugin_configuration.geolocation.map_center_option.views_boundary_filter:
   type: geolocation.map_center_option_settings
-  label: 'IpStack'
+  label: 'Boundary filter'
   mapping:
     settings:
       type: mapping
       label: 'Settings'
       mapping:
-        access_key:
-          type: string
-          label: 'Access key'
+        clear_address_input:
+          type: boolean
+          label: 'Clear address input on map bound change'
+
+
+plugin.plugin_configuration.geolocation.map_center_option.location_plugins:
+  type: plugin.plugin_configuration.geolocation.location.[settings.location_option_id]
+  label: 'Location Option'
+  mapping:
+    map_center_id:
+      type: string
+      label: 'Fixed Map Center ID'
+

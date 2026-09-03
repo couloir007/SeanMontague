@@ -1,3 +1,11 @@
+views.display.geolocation_layer:
+  type: views.display.attachment
+  label: 'Geolocation Views Attachment Layer'
+
+views.display.geolocation_data_layer:
+  type: views_display
+  label: 'Geolocation Views Data Layer'
+
 views.style.geolocation_source:
   type: views_style
   label: 'Geolocation Source'
@@ -26,10 +34,6 @@ views.style.geolocation_source:
     marker_icon_path:
       type: string
       label: 'Path to marker icon'
-
-views.display.geolocation_layer:
-  type: views.display.attachment
-  label: 'Geolocation Layer'
 
 views.style.geolocation_layer:
   type: views.style.geolocation_source
@@ -71,7 +75,7 @@ views.style.maps_common:
       type: sequence
       label: 'Center option settings'
       sequence:
-        type: plugin.plugin_configuration.geolocation.map_center_option.[%key]
+        type: plugin.plugin_configuration.geolocation.map_center_option.[map_center_id]
         label: 'The settings for a map center option'
     map_provider_id:
       type: string
@@ -119,14 +123,14 @@ views.filter.geolocation_filter_boundary:
           type: string
           label: 'North East Latitude'
         lng_north_east:
-           type: string
-           label: 'North East Longitude'
+          type: string
+          label: 'North East Longitude'
         lat_south_west:
-           type: string
-           label: 'South West Latitude'
+          type: string
+          label: 'South West Latitude'
         lng_south_west:
-           type: string
-           label: 'North East Longitude'
+          type: string
+          label: 'North East Longitude'
     expose:
       type: mapping
       label: 'Expose settings'
@@ -134,15 +138,11 @@ views.filter.geolocation_filter_boundary:
         input_by_geocoding_widget:
           type: integer
           label: 'Enable geocoding widget'
-        geocoder_plugin_settings:
-          type: mapping
-          label: 'Geocoding widget settings'
-          mapping:
-            plugin_id:
-              type: string
-              label: 'Geolocation geocoding widget'
-            settings:
-              type: geolocation.geocoder.[%parent.plugin_id]
+        geocoder:
+          type: string
+          label: 'Geolocation geocoding widget'
+        geocoder_settings:
+          type: geolocation.geocoder.[%parent.geocoder]
 
 views.filter_value.geolocation_filter_proximity:
   type: views.filter_value.numeric

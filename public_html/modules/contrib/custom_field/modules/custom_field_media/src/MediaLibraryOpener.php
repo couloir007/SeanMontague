@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field_media;
 
 use Drupal\Core\Access\AccessResult;
@@ -16,21 +18,7 @@ use Drupal\media_library\MediaLibraryState;
  */
 class MediaLibraryOpener implements MediaLibraryOpenerInterface {
 
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * MediaLibraryFormElementOpener constructor.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
-    $this->entityTypeManager = $entity_type_manager;
+  public function __construct(protected EntityTypeManagerInterface $entityTypeManager) {
   }
 
   /**
@@ -50,7 +38,7 @@ class MediaLibraryOpener implements MediaLibraryOpenerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getSelectionResponse(MediaLibraryState $state, array $selected_ids) {
+  public function getSelectionResponse(MediaLibraryState $state, array $selected_ids): AjaxResponse {
     $response = new AjaxResponse();
 
     $parameters = $state->getOpenerParameters();

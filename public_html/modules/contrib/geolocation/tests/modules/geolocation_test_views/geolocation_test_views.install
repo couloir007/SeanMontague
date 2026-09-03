@@ -8,7 +8,7 @@
 /**
  * Implements hook_install().
  */
-function geolocation_test_views_install() {
+function geolocation_test_views_install(): void {
   /** @var \Drupal\Core\Config\Config $config */
   $config = \Drupal::service('config.factory')->getEditable('geolocation_google_maps.settings');
   if (empty($config->get('google_map_api_key'))) {
@@ -19,7 +19,7 @@ function geolocation_test_views_install() {
 /**
  * Implements hook_uninstall().
  */
-function geolocation_test_views_uninstall() {
+function geolocation_test_views_uninstall(): void {
   /** @var \Drupal\Core\Config\Config $config */
   $config = \Drupal::service('config.factory')->getEditable('geolocation_google_maps.settings');
   if ($config->get('google_map_api_key') == 'AIzaSyAS0hYgEXBmvArc7_yXiK9lDrZ1O038weU') {

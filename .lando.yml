@@ -2,7 +2,7 @@ name: seanmontague
 recipe: drupal10
 config:
   webroot: web
-  php: '8.3'
+  php: '8.4'
   composer_version: '2'
   database: postgres:17
 
@@ -12,7 +12,7 @@ proxy:
 
 services:
   appserver:
-    type: php:8.3
+    type: php:8.4
     webroot: public_html
     via: apache
     overrides:

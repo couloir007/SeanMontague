@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<ruleset name="geolocation">
+
+  <file>.</file>
+
+  <exclude-pattern>*\.css$</exclude-pattern>
+
+  <description>Overrides for Geolocation geometry.</description>
+
+  <!-- Use Drupal coding standards -->
+  <rule ref="Drupal"/>
+
+  <arg name="extensions" value="php,module,inc,install,test,profile,theme"/>
+
+  <exclude-pattern>*/node_modules/*</exclude-pattern>
+
+  <rule ref="Drupal.NamingConventions.ValidFunctionName.ScopeNotCamelCaps">
+    <!-- Geometry formats are not CamelCase. -->
+    <exclude-pattern>*/modules/geolocation_geometry/*</exclude-pattern>
+  </rule>
+
+  <rule ref="Drupal.NamingConventions.ValidVariableName.LowerCamelName">
+    <!-- Geometry formats are not CamelCase. -->
+    <exclude-pattern>/src/Plugin/views/filter/*</exclude-pattern>
+  </rule>
+
+</ruleset>

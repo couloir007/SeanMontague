@@ -1,0 +1,5 @@
+log:
+  version: VERSION
+  header: true
+  js:
+    js/geolocation_google_js_errors.js: {}

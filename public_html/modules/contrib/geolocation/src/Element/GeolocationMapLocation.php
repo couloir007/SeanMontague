@@ -16,7 +16,10 @@ use Drupal\Core\Template\Attribute;
  *   '#prefix' => $this->t('Geolocation Map Render Element'),
  *   '#description' => $this->t('Render element type "geolocation_map"'),
  *   '#title' => NULL,
- *   '#coordinates' => NULL,
+ *   '#coordinates' => [
+ *     'lat' => 19,
+ *     'lng' => 23,
+ *   ],
  *   '#id' => NULL,
  *   '#hidden' => NULL,
  *   '#icon' => NULL,
@@ -24,14 +27,14 @@ use Drupal\Core\Template\Attribute;
  * ];
  * @endcode
  *
- * @FormElement("geolocation_map_location")
+ * @RenderElement("geolocation_map_location")
  */
 class GeolocationMapLocation extends RenderElementBase {
 
   /**
    * {@inheritdoc}
    */
-  public function getInfo() {
+  public function getInfo(): array {
     $class = get_class($this);
 
     return [
@@ -48,6 +51,7 @@ class GeolocationMapLocation extends RenderElementBase {
       '#hidden' => NULL,
       '#icon' => NULL,
       '#label' => NULL,
+      '#draggable' => NULL,
     ];
   }
 
@@ -60,23 +64,18 @@ class GeolocationMapLocation extends RenderElementBase {
    * @return array
    *   Renderable map.
    */
-  public function preRenderLocation(array $render_array) {
+  public function preRenderLocation(array $render_array): array {
     $render_array['#theme'] = 'geolocation_map_location';
 
-    if (empty($render_array['#id'])) {
-      $id = uniqid();
-      $render_array['#id'] = $id;
+    if (!isset($render_array['#id'])) {
+      $render_array['#id'] = uniqid('location-');
     }
 
     foreach (Element::children($render_array) as $child) {
       $render_array['#children'][] = $render_array[$child];
     }
 
-    if (empty($render_array['#attributes'])) {
-      $render_array['#attributes'] = [];
-    }
-
-    $render_array['#attributes'] = new Attribute($render_array['#attributes']);
+    $render_array['#attributes'] = new Attribute($render_array['#attributes'] ?? []);
     $render_array['#attributes']->addClass('geolocation-location');
     $render_array['#attributes']->addClass('js-hide');
     if (!empty($render_array['#id'])) {
@@ -86,6 +85,10 @@ class GeolocationMapLocation extends RenderElementBase {
     if (!empty($render_array['#coordinates'])) {
       $render_array['#attributes']->setAttribute('data-lat', $render_array['#coordinates']['lat']);
       $render_array['#attributes']->setAttribute('data-lng', $render_array['#coordinates']['lng']);
+    }
+
+    if ($render_array['#draggable'] ?? FALSE) {
+      $render_array['#attributes']->setAttribute('data-draggable', 'true');
     }
 
     if (empty($render_array['#hidden'])) {

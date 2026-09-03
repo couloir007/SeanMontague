@@ -2,6 +2,7 @@
 
 namespace Drupal\geolocation_geometry\Plugin\geolocation\DataProvider;
 
+use Drupal\geolocation\Attribute\DataProvider;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\geolocation\DataProviderBase;
@@ -12,29 +13,28 @@ use Drupal\views\ResultRow;
 
 /**
  * Provides GPX.
- *
- * @DataProvider(
- *   id = "geolocation_geometry",
- *   name = @Translation("Geolocation Geometry"),
- *   description = @Translation("Points, Polygons, Polyines."),
- * )
  */
+#[DataProvider(
+  id: 'geolocation_geometry',
+  name: new \Drupal\Core\StringTranslation\TranslatableMarkup('Geolocation Geometry'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('Points, Polygons, Polyines.')
+)]
 class GeolocationGeometry extends DataProviderBase implements DataProviderInterface {
 
   /**
    * {@inheritdoc}
    */
-  protected function defaultSettings() {
+  protected static function defaultSettings(): array {
     $settings = parent::defaultSettings();
 
+    $settings['color_randomize'] = TRUE;
+
     $settings['stroke_color'] = '#FF0044';
-    $settings['stroke_color_randomize'] = TRUE;
     $settings['stroke_width'] = 1;
-    $settings['stroke_opacity'] = 0.8;
+    $settings['stroke_opacity'] = 0.9;
 
     $settings['fill_color'] = '#0033FF';
-    $settings['fill_color_randomize'] = TRUE;
-    $settings['fill_opacity'] = 0.1;
+    $settings['fill_opacity'] = 0.2;
 
     return $settings;
 
@@ -43,14 +43,14 @@ class GeolocationGeometry extends DataProviderBase implements DataProviderInterf
   /**
    * {@inheritdoc}
    */
-  public function isViewsGeoOption(FieldPluginBase $views_field) {
+  public function isViewsGeoOption(FieldPluginBase $viewsField): bool {
     if (
-      $views_field instanceof EntityField
-      && $views_field->getPluginId() == 'field'
+      $viewsField instanceof EntityField
+      && $viewsField->getPluginId() == 'field'
     ) {
-      $field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions($views_field->getEntityType());
-      if (!empty($field_storage_definitions[$views_field->field])) {
-        $field_storage_definition = $field_storage_definitions[$views_field->field];
+      $field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions($viewsField->getEntityType());
+      if (!empty($field_storage_definitions[$viewsField->field])) {
+        $field_storage_definition = $field_storage_definitions[$viewsField->field];
 
         if (in_array($field_storage_definition->getType(), [
           'geolocation_geometry_geometry',
@@ -73,21 +73,22 @@ class GeolocationGeometry extends DataProviderBase implements DataProviderInterf
   /**
    * {@inheritdoc}
    */
-  public function getSettingsForm(array $settings, array $parents = []) {
+  public function getSettingsForm(array $settings, array $parents = []): array {
     $element = parent::getSettingsForm($settings, $parents);
 
     $settings = $this->getSettings($settings);
+
+    $element['color_randomize'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Randomize colors'),
+      '#description' => $this->t('Set stroke and fill color to the same random value. Enabling ignores any set specific color values.'),
+      '#default_value' => $settings['color_randomize'],
+    ];
 
     $element['stroke_color'] = [
       '#type' => 'color',
       '#title' => $this->t('Stroke color'),
       '#default_value' => $settings['stroke_color'],
-    ];
-
-    $element['stroke_color_randomize'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Randomize stroke colors'),
-      '#default_value' => $settings['stroke_color_randomize'],
     ];
 
     $element['stroke_width'] = [
@@ -111,12 +112,6 @@ class GeolocationGeometry extends DataProviderBase implements DataProviderInterf
       '#default_value' => $settings['fill_color'],
     ];
 
-    $element['fill_color_randomize'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Randomize fill colors'),
-      '#default_value' => $settings['fill_color_randomize'],
-    ];
-
     $element['fill_opacity'] = [
       '#type' => 'number',
       '#step' => 0.01,
@@ -131,15 +126,12 @@ class GeolocationGeometry extends DataProviderBase implements DataProviderInterf
   /**
    * {@inheritdoc}
    */
-  public function getLocationsFromViewsRow(ResultRow $row, ?FieldPluginBase $viewsField = NULL) {
+  public function getLocationsFromViewsRow(ResultRow $row, ?FieldPluginBase $viewsField = NULL): array {
     $locations = parent::getLocationsFromViewsRow($row, $viewsField);
 
     $current_style = $viewsField->displayHandler->getPlugin('style');
 
-    if (
-      empty($current_style)
-      || !is_subclass_of($current_style, 'Drupal\geolocation\Plugin\views\style\GeolocationStyleBase')
-    ) {
+    if (!is_subclass_of($current_style, 'Drupal\geolocation\Plugin\views\style\GeolocationStyleBase')) {
       return $locations;
     }
 
@@ -157,7 +149,7 @@ class GeolocationGeometry extends DataProviderBase implements DataProviderInterf
   /**
    * {@inheritdoc}
    */
-  public function getShapesFromViewsRow(ResultRow $row, ?FieldPluginBase $viewsField = NULL) {
+  public function getShapesFromViewsRow(ResultRow $row, ?FieldPluginBase $viewsField = NULL): array {
     $shapes = parent::getShapesFromViewsRow($row, $viewsField);
 
     if (empty($shapes)) {
@@ -166,10 +158,7 @@ class GeolocationGeometry extends DataProviderBase implements DataProviderInterf
 
     $current_style = $viewsField->displayHandler->getPlugin('style');
 
-    if (
-      empty($current_style)
-      || !is_subclass_of($current_style, 'Drupal\geolocation\Plugin\views\style\GeolocationStyleBase')
-    ) {
+    if (!is_subclass_of($current_style, 'Drupal\geolocation\Plugin\views\style\GeolocationStyleBase')) {
       return $shapes;
     }
 
@@ -186,167 +175,142 @@ class GeolocationGeometry extends DataProviderBase implements DataProviderInterf
   /**
    * {@inheritdoc}
    */
-  public function getShapesFromItem(FieldItemInterface $fieldItem) {
+  public function getShapesFromItem(FieldItemInterface $fieldItem): array {
     $settings = $this->getSettings();
 
-    $shapes = $locations = [];
+    $shapes = [];
 
-    $this->parseGeoJson($fieldItem->get('geojson')->getString(), $locations, $shapes);
-    $positions = [];
-
-    foreach ($shapes as $shape) {
-      $random_color = sprintf('#%06X', mt_rand(0, 0xFFFFFF));
-      switch ($shape->type) {
-        case 'Polygon':
-          $coordinates = '';
-          foreach ($shape->coordinates[0] as $coordinate) {
-            $coordinates .= $coordinate[1] . ',' . $coordinate[0] . ' ';
-          }
-
-          $position = [
-            '#type' => 'geolocation_map_polygon',
-            '#coordinates' => $coordinates,
-            '#stroke_color' => $settings['stroke_color_randomize'] ? $random_color : $settings['stroke_color'],
-            '#stroke_width' => (int) $settings['stroke_width'],
-            '#stroke_opacity' => (float) $settings['stroke_opacity'],
-            '#fill_color' => $settings['fill_color_randomize'] ? $random_color : $settings['fill_color'],
-            '#fill_opacity' => (float) $settings['fill_opacity'],
-          ];
-          $positions[] = $position;
-          break;
-
-        case 'MultiPolygon':
-          $container = [
-            '#type' => 'container',
-            '#attributes' => [
-              'class' => [
-                'geolocation-multipolygon',
-              ],
-            ],
-          ];
-          foreach ($shape->coordinates as $key => $polygon) {
-            $coordinates = '';
-            foreach ($polygon[0] as $coordinate) {
-              $coordinates .= $coordinate[1] . ',' . $coordinate[0] . ' ';
-            }
-
-            $position = [
-              '#type' => 'geolocation_map_polygon',
-              '#coordinates' => $coordinates,
-              '#stroke_color' => $settings['stroke_color_randomize'] ? $random_color : $settings['stroke_color'],
-              '#stroke_width' => (int) $settings['stroke_width'],
-              '#stroke_opacity' => (float) $settings['stroke_opacity'],
-              '#fill_color' => $settings['fill_color_randomize'] ? $random_color : $settings['fill_color'],
-              '#fill_opacity' => (float) $settings['fill_opacity'],
-            ];
-            $container[$key] = $position;
-          }
-          $positions[] = $container;
-          break;
-
-        case 'LineString':
-          $coordinates = '';
-          foreach ($shape->coordinates as $coordinate) {
-            $coordinates .= $coordinate[1] . ',' . $coordinate[0] . ' ';
-          }
-
-          $position = [
-            '#type' => 'geolocation_map_polyline',
-            '#coordinates' => $coordinates,
-            '#stroke_color' => $settings['stroke_color_randomize'] ? $random_color : $settings['stroke_color'],
-            '#stroke_width' => (int) $settings['stroke_width'],
-            '#stroke_opacity' => (float) $settings['stroke_opacity'],
-          ];
-          $positions[] = $position;
-          break;
-
-        case 'MultiLineString':
-          $container = [
-            '#type' => 'container',
-            '#attributes' => [
-              'class' => [
-                'geolocation-multipolyline',
-              ],
-            ],
-          ];
-          foreach ($shape->coordinates as $key => $polyline) {
-            $coordinates = '';
-            foreach ($polyline as $coordinate) {
-              $coordinates .= $coordinate[1] . ',' . $coordinate[0] . ' ';
-            }
-
-            $position = [
-              '#type' => 'geolocation_map_polyline',
-              '#coordinates' => $coordinates,
-              '#stroke_color' => $settings['stroke_color_randomize'] ? $random_color : $settings['stroke_color'],
-              '#stroke_width' => (int) $settings['stroke_width'],
-              '#stroke_opacity' => (float) $settings['stroke_opacity'],
-            ];
-            $container[$key] = $position;
-          }
-          $positions[] = $container;
-          break;
-      }
+    foreach ($this->getShapeGeometriesFromGeoJson($fieldItem->get('geojson')->getString()) as $geometry) {
+      $shapes[] = self::getRenderedElementByGeoJSON($geometry, $settings);
     }
 
-    return $positions;
+    return $shapes;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getLocationsFromItem(FieldItemInterface $fieldItem) {
-    $shapes = $locations = [];
+  public function getLocationsFromItem(FieldItemInterface $fieldItem): array {
+    $settings = $this->getSettings();
 
-    $this->parseGeoJson($fieldItem->get('geojson')->getString(), $locations, $shapes);
+    $locations = [];
 
-    $positions = [];
+    foreach ($this->getLocationGeometriesFromGeoJson($fieldItem->get('geojson')->getString()) as $geometry) {
+      $locations[] = self::getRenderedElementByGeoJSON($geometry, $settings);
+    }
 
-    foreach ($locations as $location) {
+    return $locations;
+  }
 
-      switch ($location->type) {
-        case 'Point':
+  /**
+   * Get render element.
+   *
+   * @param object $geojson
+   *   GeoJSON.
+   * @param array|null $settings
+   *   Optional settings.
+   *
+   * @return array
+   *   Render Element.
+   */
+  public static function getRenderedElementByGeoJSON(object $geojson, ?array $settings = NULL): array {
+    $settings = $settings ?? self::defaultSettings();
+
+    if (!isset($settings['stroke_width'])) {
+      $settings['stroke_width'] = self::defaultSettings()['stroke_width'];
+    }
+    if (!isset($settings['stroke_opacity'])) {
+      $settings['stroke_opacity'] = self::defaultSettings()['stroke_opacity'];
+    }
+    if (!isset($settings['fill_opacity'])) {
+      $settings['fill_opacity'] = self::defaultSettings()['fill_opacity'];
+    }
+
+    $random_color = sprintf('#%06X', mt_rand(0, 0xFFFFFF));
+    switch ($geojson->type) {
+      case 'Point':
+        return [
+          '#type' => 'geolocation_map_location',
+          '#coordinates' => [
+            'lat' => $geojson->coordinates[1],
+            'lng' => $geojson->coordinates[0],
+          ],
+        ];
+
+      case 'MultiPoint':
+        $container = [
+          '#type' => 'container',
+          '#attributes' => [
+            'class' => [
+              'geolocation-multipoint',
+            ],
+          ],
+        ];
+        foreach ($geojson->coordinates as $key => $point) {
           $position = [
             '#type' => 'geolocation_map_location',
             '#coordinates' => [
-              'lat' => $location->coordinates[1],
-              'lng' => $location->coordinates[0],
+              'lat' => $point->coordinates[1],
+              'lng' => $point->coordinates[0],
             ],
           ];
-          $positions[] = $position;
-          break;
+          $container[$key] = $position;
+        }
+        return $container;
 
-        case 'MultiPoint':
-          $container = [
-            '#type' => 'container',
-            '#attributes' => [
-              'class' => [
-                'geolocation-multipoint',
-              ],
-            ],
-          ];
-          foreach ($location->coordinates as $key => $point) {
-            $position = [
-              '#type' => 'geolocation_map_location',
-              '#coordinates' => [
-                'lat' => $point->coordinates[1],
-                'lng' => $point->coordinates[0],
-              ],
-            ];
-            $container[$key] = $position;
-          }
-          $positions[] = $container;
-          break;
-      }
+      case 'Polygon':
+        return [
+          '#type' => 'geolocation_map_shape',
+          '#geometry' => json_encode($geojson),
+          '#geometry_type' => 'polygon',
+          '#stroke_color' => $settings['color_randomize'] ? $random_color : $settings['stroke_color'],
+          '#stroke_width' => (int) $settings['stroke_width'],
+          '#stroke_opacity' => (float) $settings['stroke_opacity'],
+          '#fill_color' => $settings['color_randomize'] ? $random_color : $settings['fill_color'],
+          '#fill_opacity' => (float) $settings['fill_opacity'],
+        ];
+
+      case 'MultiPolygon':
+        return [
+          '#type' => 'geolocation_map_shape',
+          '#geometry' => json_encode($geojson),
+          '#geometry_type' => 'multipolygon',
+          '#stroke_color' => $settings['color_randomize'] ? $random_color : $settings['stroke_color'],
+          '#stroke_width' => (int) $settings['stroke_width'],
+          '#stroke_opacity' => (float) $settings['stroke_opacity'],
+          '#fill_color' => $settings['color_randomize'] ? $random_color : $settings['fill_color'],
+          '#fill_opacity' => (float) $settings['fill_opacity'],
+        ];
+
+      case 'LineString':
+        return [
+          '#type' => 'geolocation_map_shape',
+          '#geometry' => json_encode($geojson),
+          '#geometry_type' => 'line',
+          '#stroke_color' => $settings['color_randomize'] ? $random_color : $settings['stroke_color'],
+          '#stroke_width' => (int) $settings['stroke_width'],
+          '#stroke_opacity' => (float) $settings['stroke_opacity'],
+        ];
+
+      case 'MultiLineString':
+        return [
+          '#type' => 'geolocation_map_shape',
+          '#geometry' => json_encode($geojson),
+          '#geometry_type' => 'multiline',
+          '#stroke_color' => $settings['color_randomize'] ? $random_color : $settings['stroke_color'],
+          '#stroke_width' => (int) $settings['stroke_width'],
+          '#stroke_opacity' => (float) $settings['stroke_opacity'],
+        ];
+
+      default:
+        return [];
     }
-
-    return $positions;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isFieldGeoOption(FieldDefinitionInterface $fieldDefinition) {
+  public function isFieldGeoOption(FieldDefinitionInterface $fieldDefinition): bool {
     return (in_array($fieldDefinition->getType(), [
       'geolocation_geometry_geometry',
       'geolocation_geometry_geometrycollection',
@@ -360,16 +324,17 @@ class GeolocationGeometry extends DataProviderBase implements DataProviderInterf
   }
 
   /**
-   * Parse GeoJson for content.
+   * Get Shapes from GeoJSON.
    *
    * @param string $geoJson
    *   GeoJSON.
-   * @param array $locations
-   *   Locations to be filled.
-   * @param array $shapes
-   *   Shapes to be filled.
+   *
+   * @return array
+   *   Shapes.
    */
-  protected function parseGeoJson(string $geoJson, array &$locations, array &$shapes) {
+  protected function getShapeGeometriesFromGeoJson(string $geoJson): array {
+    $geometries = [];
+
     $json = json_decode($geoJson);
 
     if (
@@ -388,21 +353,21 @@ class GeolocationGeometry extends DataProviderBase implements DataProviderInterf
           if (empty($entry->features)) {
             continue 2;
           }
-          $this->parseGeoJson(is_string($entry->features) ?: json_encode($entry->features), $locations, $shapes);
+          $geometries = array_merge($geometries, $this->getShapeGeometriesFromGeoJson(is_string($entry->features) ?: json_encode($entry->features)));
           break;
 
         case 'Feature':
           if (empty($entry->geometry)) {
             continue 2;
           }
-          $this->parseGeoJson(is_string($entry->geometry) ?: json_encode($entry->geometry), $locations, $shapes);
+          $geometries = array_merge($geometries, $this->getShapeGeometriesFromGeoJson(is_string($entry->geometry) ?: json_encode($entry->geometry)));
           break;
 
         case 'GeometryCollection':
           if (empty($entry->geometries)) {
             continue 2;
           }
-          $this->parseGeoJson(is_string($entry->geometries) ?: json_encode($entry->geometries), $locations, $shapes);
+          $geometries = array_merge($geometries, $this->getShapeGeometriesFromGeoJson(is_string($entry->geometries) ?: json_encode($entry->geometries)));
           break;
 
         case 'MultiPolygon':
@@ -412,7 +377,59 @@ class GeolocationGeometry extends DataProviderBase implements DataProviderInterf
           if (empty($entry->coordinates)) {
             continue 2;
           }
-          $shapes[] = $entry;
+          $geometries[] = $entry;
+          break;
+      }
+    }
+
+    return $geometries;
+  }
+
+  /**
+   * Get Locations from GeoJSON.
+   *
+   * @param string $geoJson
+   *   GeoJSON.
+   *
+   * @return array
+   *   Locations.
+   */
+  protected function getLocationGeometriesFromGeoJson(string $geoJson): array {
+    $geometries = [];
+
+    $json = json_decode($geoJson);
+
+    if (
+      is_object($json)
+      && isset($json->type)
+    ) {
+      $json = [$json];
+    }
+
+    foreach ($json as $entry) {
+      if (empty($entry->type)) {
+        continue;
+      }
+      switch ($entry->type) {
+        case 'FeatureCollection':
+          if (empty($entry->features)) {
+            continue 2;
+          }
+          $geometries = array_merge($geometries, $this->getLocationGeometriesFromGeoJson(is_string($entry->features) ?: json_encode($entry->features)));
+          break;
+
+        case 'Feature':
+          if (empty($entry->geometry)) {
+            continue 2;
+          }
+          $geometries = array_merge($geometries, $this->getLocationGeometriesFromGeoJson(is_string($entry->geometry) ?: json_encode($entry->geometry)));
+          break;
+
+        case 'GeometryCollection':
+          if (empty($entry->geometries)) {
+            continue 2;
+          }
+          $geometries = array_merge($geometries, $this->getLocationGeometriesFromGeoJson(is_string($entry->geometries) ?: json_encode($entry->geometries)));
           break;
 
         case 'MultiPoint':
@@ -420,10 +437,12 @@ class GeolocationGeometry extends DataProviderBase implements DataProviderInterf
           if (empty($entry->coordinates)) {
             continue 2;
           }
-          $locations[] = $entry;
+          $geometries[] = $entry;
           break;
       }
     }
+
+    return $geometries;
   }
 
 }

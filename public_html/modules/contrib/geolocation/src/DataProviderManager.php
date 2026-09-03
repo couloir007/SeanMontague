@@ -7,13 +7,18 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 
 /**
  * Search plugin manager.
+ *
+ * @method DataProviderInterface createInstance($plugin_id, array $configuration = [])
  */
 class DataProviderManager extends DefaultPluginManager {
+
+  use LoggerChannelTrait;
 
   /**
    * Constructs an DataProviderManager object.
@@ -27,27 +32,26 @@ class DataProviderManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/geolocation/DataProvider', $namespaces, $module_handler, 'Drupal\geolocation\DataProviderInterface', 'Drupal\geolocation\Annotation\DataProvider');
+    parent::__construct('Plugin/geolocation/DataProvider', $namespaces, $module_handler, 'Drupal\geolocation\DataProviderInterface', 'Drupal\geolocation\Attribute\DataProvider');
     $this->alterInfo('geolocation_dataprovider_info');
     $this->setCacheBackend($cache_backend, 'geolocation_dataprovider');
   }
 
   /**
-   * Return DataProvider by field type.
+   * Get data provider by views field.
    *
    * @param \Drupal\views\Plugin\views\field\FieldPluginBase $viewField
-   *   Map type.
+   *   Views field.
    * @param array $configuration
    *   Configuration.
    *
-   * @return \Drupal\geolocation\DataProviderInterface|false
+   * @return ?\Drupal\geolocation\DataProviderInterface
    *   Data provider.
    */
-  public function getDataProviderByViewsField(FieldPluginBase $viewField, array $configuration = []) {
+  public function getDataProviderByViewsField(FieldPluginBase $viewField, array $configuration = []): ?DataProviderInterface {
     $definitions = $this->getDefinitions();
     try {
       foreach ($definitions as $dataProviderId => $dataProviderDefinition) {
-        /** @var \Drupal\geolocation\DataProviderInterface $dataProvider */
         $dataProvider = $this->createInstance($dataProviderId, $configuration);
 
         if ($dataProvider->isViewsGeoOption($viewField)) {
@@ -57,28 +61,28 @@ class DataProviderManager extends DefaultPluginManager {
       }
     }
     catch (\Exception $e) {
-      return FALSE;
+      $this->getLogger('geolocation')->warning($e->getMessage());
+      return NULL;
     }
 
-    return FALSE;
+    return NULL;
   }
 
   /**
-   * Return DataProvider by field type.
+   * Get data provider by field definition.
    *
    * @param \Drupal\Core\Field\FieldDefinitionInterface $fieldDefinition
    *   Field definition.
    * @param array $configuration
    *   Configuration.
    *
-   * @return \Drupal\geolocation\DataProviderInterface|false
+   * @return ?\Drupal\geolocation\DataProviderInterface
    *   Data provider.
    */
-  public function getDataProviderByFieldDefinition(FieldDefinitionInterface $fieldDefinition, array $configuration = []) {
+  public function getDataProviderByFieldDefinition(FieldDefinitionInterface $fieldDefinition, array $configuration = []): ?DataProviderInterface {
     $definitions = $this->getDefinitions();
     try {
       foreach ($definitions as $dataProviderId => $dataProviderDefinition) {
-        /** @var \Drupal\geolocation\DataProviderInterface $dataProvider */
         $dataProvider = $this->createInstance($dataProviderId, $configuration);
 
         if ($dataProvider->isFieldGeoOption($fieldDefinition)) {
@@ -88,24 +92,25 @@ class DataProviderManager extends DefaultPluginManager {
       }
     }
     catch (\Exception $e) {
-      return FALSE;
+      $this->getLogger('geolocation')->warning($e->getMessage());
+      return NULL;
     }
 
-    return FALSE;
+    return NULL;
   }
 
   /**
-   * Return settings array for data provider after select change.
+   * Data provider settings form AJAX endpoint.
    *
    * @param array $form
-   *   Form.
+   *   Render array.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   Current From State.
+   *   Form state.
    *
-   * @return array|false
-   *   Settings form.
+   * @return ?array
+   *   Render array.
    */
-  public static function addDataProviderSettingsFormAjax(array $form, FormStateInterface $form_state) {
+  public static function addDataProviderSettingsFormAjax(array $form, FormStateInterface $form_state): ?array {
     $triggering_element_parents = $form_state->getTriggeringElement()['#array_parents'];
 
     $settings_element_parents = $triggering_element_parents;

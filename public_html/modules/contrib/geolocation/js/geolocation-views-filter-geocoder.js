@@ -3,9 +3,15 @@
  * Javascript for the Google geocoder function, specifically the views filter.
  */
 
-(function ($, Drupal) {
-  "use strict";
+/**
+ * @typedef {Object} GeolocationViewsFilterGeocoderSettings
+ *
+ * @extends {GeolocationGeocoderSettings}
+ *
+ * @prop {String} import_path
+ */
 
+(function (Drupal) {
   /**
    * Attach common map style functionality.
    *
@@ -18,79 +24,49 @@
     /**
      * @param {Object} context
      * @param {Object} drupalSettings
-     * @param {String} drupalSettings.geolocation.geocoder.viewsFilterGeocoder
+     * @param {Object.<String, GeolocationViewsFilterGeocoderSettings>} drupalSettings.geolocation.geocoder.viewsFilterGeocoder
      */
-    attach: function (context, drupalSettings) {
-      $.each(
-        drupalSettings.geolocation.geocoder.viewsFilterGeocoder,
-        function (elementId, settings) {
-          /**
-           * @param {google.map.GeocoderResult} address - Google address object.
-           */
-          Drupal.geolocation.geocoder.addResultCallback(function (address) {
-            if (typeof address.geometry.location === "undefined") {
-              return false;
-            }
+    attach: (context, drupalSettings) => {
+      for (const [elementId, filterSettings] of Object.entries(drupalSettings.geolocation.geocoder.viewsFilterGeocoder)) {
+        const form = document.querySelector(`.views-exposed-form .geolocation-geocoder-address[data-source-identifier="${elementId}"]`);
 
-            if (typeof address.geometry.viewport === "undefined") {
-              address.geometry.viewport = {
-                getNorthEast: function () {
-                  return {
-                    lat: function () {
-                      return address.geometry.location.lat();
-                    },
-                    lng: function () {
-                      return address.geometry.location.lng();
-                    },
-                  };
-                },
-                getSouthWest: function () {
-                  return {
-                    lat: function () {
-                      return address.geometry.location.lat();
-                    },
-                    lng: function () {
-                      return address.geometry.location.lng();
-                    },
-                  };
-                },
-              };
-            }
-
-            $(context)
-              .find("input[name='" + elementId + "[lat_north_east]']")
-              .val(address.geometry.viewport.getNorthEast().lat());
-            $(context)
-              .find("input[name='" + elementId + "[lng_north_east]']")
-              .val(address.geometry.viewport.getNorthEast().lng());
-            $(context)
-              .find("input[name='" + elementId + "[lat_south_west]']")
-              .val(address.geometry.viewport.getSouthWest().lat());
-            $(context)
-              .find("input[name='" + elementId + "[lng_south_west]']")
-              .val(address.geometry.viewport.getSouthWest().lng());
-          }, elementId.toString());
-
-          Drupal.geolocation.geocoder.addClearCallback(function () {
-            $(context)
-              .find("input[name='" + elementId + "[lat_north_east]']")
-              .val("");
-            $(context)
-              .find("input[name='" + elementId + "[lng_north_east]']")
-              .val("");
-            $(context)
-              .find("input[name='" + elementId + "[lat_south_west]']")
-              .val("");
-            $(context)
-              .find("input[name='" + elementId + "[lng_south_west]']")
-              .val("");
-          }, elementId.toString());
-
-          delete drupalSettings.geolocation.geocoder.viewsFilterGeocoder[
-            elementId
-          ];
+        if (form.classList.contains("processed")) {
+          return;
         }
-      );
+        form.classList.add("processed");
+
+        if (!form) {
+          console.warn("Could not find views exposed filter form.");
+          return;
+        }
+
+        import(filterSettings.settings.import_path)
+          /** @param {GeolocationGeocoder} geocoder */
+          .then((geocoder) => {
+            geocoder = new geocoder.default(filterSettings.settings);
+
+            if (!geocoder) {
+              console.error(geocoder, "Could not instantiate Geocoder. No Geocoding feature support.");
+            }
+
+            geocoder.addResultCallback((result) => {
+              document.querySelector(`input[name='${elementId}[lat_north_east]']`).value = result.boundaries?.north ?? result.coordinates.lat;
+              document.querySelector(`input[name='${elementId}[lng_north_east]']`).value = result.boundaries?.east ?? result.coordinates.lng;
+              document.querySelector(`input[name='${elementId}[lat_south_west]']`).value = result.boundaries?.south ?? result.coordinates.lat;
+              document.querySelector(`input[name='${elementId}[lng_south_west]']`).value = result.boundaries?.west ?? result.coordinates.lng;
+            });
+
+            geocoder.addClearCallback(() => {
+              document.querySelector(`input[name='${elementId}[lat_north_east]']`).value = "";
+              document.querySelector(`input[name='${elementId}[lng_north_east]']`).value = "";
+              document.querySelector(`input[name='${elementId}[lat_south_west]']`).value = "";
+              document.querySelector(`input[name='${elementId}[lng_south_west]']`).value = "";
+            });
+
+            geocoder.attachToElement(form);
+          });
+      }
     },
+    detach: () => {},
   };
-})(jQuery, Drupal);
+})(Drupal);

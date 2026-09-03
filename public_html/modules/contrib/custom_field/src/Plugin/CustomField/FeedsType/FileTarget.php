@@ -82,7 +82,7 @@ class FileTarget extends EntityReferenceTarget {
     $instance->fileSystem = $container->get('file_system');
     $instance->fileRepository = $container->get('file.repository');
     $instance->fileConfig = $container->get('config.factory')->get('system.file');
-    $file_extensions = $configuration['widget_settings']['settings']['file_extensions'] ?? '';
+    $file_extensions = $configuration['field_settings']['file_extensions'] ?? '';
     $instance->fileExtensions = array_keys(explode(' ', (string) $file_extensions));
 
     return $instance;
@@ -150,8 +150,7 @@ class FileTarget extends EntityReferenceTarget {
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
   public function prepareValue(mixed $value, array $configuration, string $langcode): ?int {
-    $name = (string) $this->configuration['name'];
-    return !empty($value) ? (int) $this->getFile($value, $configuration[$name], $langcode) : NULL;
+    return !empty($value) ? (int) $this->getFile($value, $configuration, $langcode) : NULL;
   }
 
   /**
@@ -260,7 +259,7 @@ class FileTarget extends EntityReferenceTarget {
    *   The directory to save the file to.
    */
   protected function getDestinationDirectory(): string {
-    $file_directory = $this->configuration['widget_settings']['settings']['file_directory'] ?? '';
+    $file_directory = $this->configuration['field_settings']['file_directory'] ?? '';
     $destination = $this->token->replace($this->configuration['uri_scheme'] . '://' . trim($file_directory, '/'));
     $this->fileSystem->prepareDirectory($destination, FileSystemInterface::MODIFY_PERMISSIONS | FileSystemInterface::CREATE_DIRECTORY);
 
@@ -280,7 +279,7 @@ class FileTarget extends EntityReferenceTarget {
    *   In case the file extension is not valid.
    */
   protected function getFileName($url): string {
-    $filename = trim($this->fileSystem->basename($url), " \t\n\r\0\x0B.");
+    $filename = trim(\basename($url), " \t\n\r\0\x0B.");
     // Remove query string from file name, if it has one.
     [$filename] = explode('?', $filename);
     $extension = substr($filename, strrpos($filename, '.') + 1);
@@ -369,6 +368,13 @@ class FileTarget extends EntityReferenceTarget {
     catch (EntityStorageException | FileException $e) {
       return FALSE;
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function hasAutocreateSupport(): bool {
+    return FALSE;
   }
 
 }

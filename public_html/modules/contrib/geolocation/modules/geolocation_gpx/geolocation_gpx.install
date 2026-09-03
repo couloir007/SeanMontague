@@ -5,21 +5,23 @@
  * Sth sth dark side.
  */
 
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
+
 /**
  * Implements hook_requirements().
  */
-function geolocation_gpx_requirements($phase) {
+function geolocation_gpx_requirements(string $phase): array {
   $requirements = [];
   $requirements['geolocation_gpx_composer'] = [
     'title' => t('Geolocation GPX - Composer dependency'),
     'value' => t('Libraries installed'),
     'description' => t('Use "composer require sibyx/phpgpx:@RC" to install required library.'),
-    'severity' => REQUIREMENT_OK,
+    'severity' => RequirementSeverity::OK,
   ];
 
   if (!class_exists('phpGPX\\phpGPX')) {
     $requirements['geolocation_gpx_composer']['value'] = t('Libraries not installed');
-    $requirements['geolocation_gpx_composer']['severity'] = REQUIREMENT_ERROR;
+    $requirements['geolocation_gpx_composer']['severity'] = RequirementSeverity::Error;
   }
 
   return $requirements;

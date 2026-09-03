@@ -29,17 +29,12 @@ class TextWidget extends CustomFieldWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    $settings = parent::defaultSettings();
-    $settings['settings'] = [
+    return [
       'size' => 60,
       'placeholder' => '',
       'maxlength' => '',
       'maxlength_js' => FALSE,
-      'prefix' => '',
-      'suffix' => '',
-    ] + $settings['settings'];
-
-    return $settings;
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -47,26 +42,24 @@ class TextWidget extends CustomFieldWidgetBase {
    */
   public function widget(FieldItemListInterface $items, int $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
+    $field_settings = $field->getFieldSettings();
     $default_maxlength = $field->getMaxLength();
     if (is_numeric($settings['maxlength']) && $settings['maxlength'] < $field->getMaxLength()) {
       $default_maxlength = $settings['maxlength'];
     }
 
-    // Add our widget type and additional properties and return.
-    if (is_numeric($settings['maxlength'])) {
-      $element['#attributes']['data-maxlength'] = $settings['maxlength'];
-    }
-    if (isset($settings['maxlength_js']) && $settings['maxlength_js']) {
+    if (!empty($settings['maxlength_js'])) {
       $element['#maxlength_js'] = TRUE;
+      $element['#attributes']['data-maxlength'] = $default_maxlength;
     }
 
     // Add prefix and suffix.
-    if (isset($settings['prefix'])) {
-      $element['#field_prefix'] = FieldFilteredMarkup::create($settings['prefix']);
+    if (isset($field_settings['prefix'])) {
+      $element['#field_prefix'] = FieldFilteredMarkup::create($field_settings['prefix']);
     }
-    if (isset($settings['suffix'])) {
-      $element['#field_suffix'] = FieldFilteredMarkup::create($settings['suffix']);
+    if (isset($field_settings['suffix'])) {
+      $element['#field_suffix'] = FieldFilteredMarkup::create($field_settings['suffix']);
     }
 
     return [
@@ -82,25 +75,25 @@ class TextWidget extends CustomFieldWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $settings = $this->getSettings() + static::defaultSettings();
     $default_maxlength = $field->getMaxLength();
     if (is_numeric($settings['maxlength']) && $settings['maxlength'] < $field->getMaxLength()) {
       $default_maxlength = $settings['maxlength'];
     }
-    $element['settings']['size'] = [
+    $element['size'] = [
       '#type' => 'number',
       '#title' => $this->t('Size of textfield'),
       '#default_value' => $settings['size'],
       '#required' => TRUE,
       '#min' => 1,
     ];
-    $element['settings']['placeholder'] = [
+    $element['placeholder'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Placeholder'),
       '#default_value' => $settings['placeholder'],
       '#description' => $this->t('Text that will be shown inside the field until a value is entered. This hint is usually a sample value or a brief description of the expected format.'),
     ];
-    $element['settings']['maxlength'] = [
+    $element['maxlength'] = [
       '#type' => 'number',
       '#title' => $this->t('Max length'),
       '#description' => $this->t('The maximum amount of characters in the field'),
@@ -111,28 +104,12 @@ class TextWidget extends CustomFieldWidgetBase {
     ];
     // Add additional setting if maxlength module is enabled.
     if ($this->moduleHandler->moduleExists('maxlength')) {
-      $element['settings']['maxlength_js'] = [
+      $element['maxlength_js'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Show max length character count'),
         '#default_value' => $settings['maxlength_js'],
       ];
     }
-
-    $element['settings']['prefix'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Prefix'),
-      '#default_value' => $settings['prefix'],
-      '#size' => 60,
-      '#description' => $this->t("Define a string that should be prefixed to the value, like '$ ' or '&euro; '. Leave blank for none."),
-    ];
-
-    $element['settings']['suffix'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Suffix'),
-      '#default_value' => $settings['suffix'],
-      '#size' => 60,
-      '#description' => $this->t("Define a string that should be suffixed to the value, like ' m', ' kb/s'. Leave blank for none."),
-    ];
 
     return $element;
   }
