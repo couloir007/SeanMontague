@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Dashboard\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\dashboard\Entity\Dashboard;
 
 /**
  * Test for dashboard text block.
- *
- * @group dashboard
  */
+#[Group('dashboard')]
 class DashboardTextBlockTest extends BrowserTestBase {
 
   /**

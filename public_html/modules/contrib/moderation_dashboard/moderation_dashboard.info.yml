@@ -2,7 +2,7 @@ name: Moderation dashboard
 description: 'Provides a per-user dashboard for moderation.'
 type: module
 package: Other
-core_version_requirement: ^10.3 || ^11
+core_version_requirement: ^11.2 || ^12
 configure: moderation_dashboard.settings
 dependencies:
   - drupal:content_moderation
@@ -10,7 +10,7 @@ dependencies:
   - drupal:views
   - drupal:layout_builder
 
-# Information added by Drupal.org packaging script on 2024-09-05
-version: '3.1.0'
+# Information added by Drupal.org packaging script on 2026-06-17
+version: '4.0.1'
 project: 'moderation_dashboard'
-datestamp: 1725558907
+datestamp: 1781705546

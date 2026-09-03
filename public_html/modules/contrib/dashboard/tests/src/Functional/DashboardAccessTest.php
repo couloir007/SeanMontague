@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Dashboard\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\dashboard\Entity\Dashboard;
 
 /**
  * Test for access to dashboard controller.
- *
- * @group dashboard
  */
+#[Group('dashboard')]
 class DashboardAccessTest extends BrowserTestBase {
 
   /**
@@ -125,6 +125,34 @@ class DashboardAccessTest extends BrowserTestBase {
     $this->drupalGet('/admin/dashboard/another_dashboard');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->elementExists('css', '.dashboard--another-dashboard');
+  }
+
+  /**
+   * The "Manage permissions" operation requires 'administer permissions'.
+   */
+  public function testManagePermissionsOperationAccess() {
+    // A dashboard administrator without 'administer permissions' must not see
+    // the "Manage permissions" operation.
+    $dashboard_admin = $this->drupalCreateUser([
+      'view the administration theme',
+      'administer dashboard',
+    ]);
+    $this->drupalLogin($dashboard_admin);
+    $this->drupalGet('/admin/structure/dashboard');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->linkExists('Edit layout');
+    $this->assertSession()->linkNotExists('Manage permissions');
+
+    // Granting 'administer permissions' reveals the operation.
+    $permissions_admin = $this->drupalCreateUser([
+      'view the administration theme',
+      'administer dashboard',
+      'administer permissions',
+    ]);
+    $this->drupalLogin($permissions_admin);
+    $this->drupalGet('/admin/structure/dashboard');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->linkExists('Manage permissions');
   }
 
 }

@@ -62,8 +62,8 @@ class ModerationDashboardPersonalizedComponentsTest extends ModerationDashboardT
   protected function setUp(): void {
     parent::setUp();
 
-    $this->moderatorUser = $this->createUser($this->userPermissions, 'moderator user');
-    $this->regularUser = $this->createUser([
+    $this->moderatorUser = $this->drupalCreateUser($this->userPermissions, 'moderator user');
+    $this->regularUser = $this->drupalCreateUser([
       'access content',
       'use moderation dashboard',
     ], 'regular user');
@@ -87,6 +87,9 @@ class ModerationDashboardPersonalizedComponentsTest extends ModerationDashboardT
 
   /**
    * Tests that blocks and other elements exist on the user dashboard.
+   *
+   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function testModerationElement(): void {
     $users = [$this->user, $this->moderatorUser, $this->regularUser];
@@ -124,7 +127,7 @@ class ModerationDashboardPersonalizedComponentsTest extends ModerationDashboardT
       }
     }
 
-    $user_without_content = $this->createUser([
+    $user_without_content = $this->drupalCreateUser([
       'access content',
       'use moderation dashboard',
     ]);

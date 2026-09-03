@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\dashboard\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
 use Drupal\dashboard\Entity\Dashboard;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 
 /**
  * Tests the default block is installed for navigation.
- *
- * @group navigation
  */
+#[Group('dashboard')]
+#[Group('navigation')]
 class NavigationDefaultBlockTest extends BrowserTestBase {
 
   /**

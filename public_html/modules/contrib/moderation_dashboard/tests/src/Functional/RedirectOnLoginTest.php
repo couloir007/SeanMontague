@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\moderation_dashboard\Functional;
 
+use Drupal\Core\Url;
+
 /**
  * Tests redirect on login configuration.
  *
@@ -15,11 +17,12 @@ class RedirectOnLoginTest extends ModerationDashboardTestBase {
    * @throws \Behat\Mink\Exception\ExpectationException
    */
   public function testEnabled(): void {
-    // Redirect is enabled by default.
-    $this->assertTrue($this->config('moderation_dashboard.settings')->get('redirect_on_login'));
+    $this->drupalGet(Url::fromRoute('user.login'));
+    $this->submitForm([
+      'name' => $this->user->getAccountName(),
+      'pass' => $this->user->passRaw,
+    ], 'Log in');
 
-    // User is redirected.
-    $this->drupalLogin($this->user);
     $this->assertSession()->addressEquals("user/{$this->user->id()}/moderation-dashboard");
   }
 
@@ -41,9 +44,12 @@ class RedirectOnLoginTest extends ModerationDashboardTestBase {
 
   /**
    * Tests if settings form is working as expected.
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws \Behat\Mink\Exception\ElementNotFoundException
    */
   public function testSettingsForm(): void {
-    $admin = $this->createUser([], NULL, TRUE);
+    $admin = $this->drupalCreateUser([], NULL, TRUE);
     $assert_session = $this->assertSession();
 
     $this->drupalLogin($admin);

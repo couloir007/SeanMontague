@@ -282,9 +282,28 @@ abstract class CallExpression extends AbstractExpression
     {
         $twigCallable = $this->getAttribute('twig_callable');
         $rc = $this->reflectCallable($twigCallable);
+        $r = $rc->getReflector();
         $callableName = $rc->getName();
 
-        $parameters = $rc->getTwigParameters($this->hasNode('node'));
+        $parameters = $r->getParameters();
+        if ($this->hasNode('node')) {
+            array_shift($parameters);
+        }
+        if ($twigCallable->needsCharset()) {
+            array_shift($parameters);
+        }
+        if ($twigCallable->needsEnvironment()) {
+            array_shift($parameters);
+        }
+        if ($twigCallable->needsContext()) {
+            array_shift($parameters);
+        }
+        if (self::needsIsSandboxed($twigCallable)) {
+            array_shift($parameters);
+        }
+        foreach ($twigCallable->getArguments() as $argument) {
+            array_shift($parameters);
+        }
 
         $isPhpVariadic = false;
         if ($isVariadic) {

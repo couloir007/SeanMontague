@@ -372,6 +372,7 @@ permissions:
   - 'process media_entity_thumbnail queue'
   - 'process trash_entity_purge queue'
   - 'purge node entities'
+  - 'rebuild node access permissions'
   - 'restore from backup'
   - 'restore node entities'
   - 'revert all revisions'

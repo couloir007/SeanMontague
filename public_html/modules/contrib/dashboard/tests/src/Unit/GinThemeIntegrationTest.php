@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Dashboard\Unit;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Drupal\Core\Theme\ActiveTheme;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\dashboard\Hook\GinThemeIntegration;
@@ -11,16 +13,14 @@ use Drupal\Tests\UnitTestCase;
 
 /**
  * Tests for dashboard gin integration.
- *
- * @group dashboard
  */
+#[Group('dashboard')]
 class GinThemeIntegrationTest extends UnitTestCase {
 
   /**
    * Tests library info alter.
-   *
-   * @dataProvider provider
    */
+  #[DataProvider('provider')]
   public function testLibraryInfoAlter(string $extension, ActiveTheme $activeTheme, bool $mustAddLibraries): void {
     $themeManager = $this->prophesize(ThemeManagerInterface::class);
     $themeManager->getActiveTheme()->willReturn($activeTheme);

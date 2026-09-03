@@ -6,6 +6,6 @@ dependencies:
     - node
 id: node.inline_entity_form
 label: 'Inline entity form'
-description: ''
+description: null
 targetEntityType: node
 cache: true

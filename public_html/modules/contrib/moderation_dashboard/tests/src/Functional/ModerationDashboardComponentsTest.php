@@ -62,6 +62,8 @@ class ModerationDashboardComponentsTest extends ModerationDashboardTestBase {
 
   /**
    * Tests that blocks and other elements exist on the user dashboard.
+   *
+   * @throws \Behat\Mink\Exception\ElementNotFoundException
    */
   public function testModerationElement(): void {
     $this->drupalCreateNode([
@@ -95,8 +97,10 @@ class ModerationDashboardComponentsTest extends ModerationDashboardTestBase {
 
   /**
    * Tests the empty moderation activity chart.
+   *
+   * @throws \Behat\Mink\Exception\ElementNotFoundException
    */
-  public function testModerationActivityChartWithoutData() {
+  public function testModerationActivityChartWithoutData(): void {
     $this->drupalGet('/user/' . $this->user->id() . '/moderation-dashboard');
     $drupal_js_settings = $this->getDrupalSettings();
 
@@ -109,7 +113,7 @@ class ModerationDashboardComponentsTest extends ModerationDashboardTestBase {
   /**
    * Tests moderation activity chart with some data.
    */
-  public function testModerationActivityChartWithData() {
+  public function testModerationActivityChartWithData(): void {
     $this->drupalCreateNode([
       'title' => 'Draft node',
       'moderation_state' => 'draft',

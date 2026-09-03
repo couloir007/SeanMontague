@@ -85,7 +85,6 @@ use Twig\Node\Expression\Unary\NotUnary;
 use Twig\Node\Expression\Unary\PosUnary;
 use Twig\Node\Expression\Unary\SpreadUnary;
 use Twig\Node\Node;
-use Twig\NodeVisitor\CorrectnessNodeVisitor;
 use Twig\Parser;
 use Twig\Sandbox\SecurityNotAllowedMethodError;
 use Twig\Sandbox\SecurityNotAllowedPropertyError;
@@ -311,27 +310,25 @@ final class CoreExtension extends AbstractExtension
     public function getTests(): array
     {
         return [
-            new TwigTest('even', null, ['node_class' => EvenTest::class, 'always_allowed_in_sandbox' => true]),
-            new TwigTest('odd', null, ['node_class' => OddTest::class, 'always_allowed_in_sandbox' => true]),
-            new TwigTest('defined', null, ['node_class' => DefinedTest::class, 'always_allowed_in_sandbox' => true]),
-            new TwigTest('same as', null, ['node_class' => SameasTest::class, 'one_mandatory_argument' => true, 'always_allowed_in_sandbox' => true]),
-            new TwigTest('none', null, ['node_class' => NullTest::class, 'always_allowed_in_sandbox' => true]),
-            new TwigTest('null', null, ['node_class' => NullTest::class, 'always_allowed_in_sandbox' => true]),
-            new TwigTest('divisible by', null, ['node_class' => DivisiblebyTest::class, 'one_mandatory_argument' => true, 'always_allowed_in_sandbox' => true]),
+            new TwigTest('even', null, ['node_class' => EvenTest::class]),
+            new TwigTest('odd', null, ['node_class' => OddTest::class]),
+            new TwigTest('defined', null, ['node_class' => DefinedTest::class]),
+            new TwigTest('same as', null, ['node_class' => SameasTest::class, 'one_mandatory_argument' => true]),
+            new TwigTest('none', null, ['node_class' => NullTest::class]),
+            new TwigTest('null', null, ['node_class' => NullTest::class]),
+            new TwigTest('divisible by', null, ['node_class' => DivisiblebyTest::class, 'one_mandatory_argument' => true]),
             new TwigTest('constant', null, ['node_class' => ConstantTest::class]),
-            new TwigTest('empty', [self::class, 'testEmpty'], ['always_allowed_in_sandbox' => true]),
-            new TwigTest('iterable', 'is_iterable', ['always_allowed_in_sandbox' => true]),
-            new TwigTest('sequence', [self::class, 'testSequence'], ['always_allowed_in_sandbox' => true]),
-            new TwigTest('mapping', [self::class, 'testMapping'], ['always_allowed_in_sandbox' => true]),
-            new TwigTest('true', null, ['node_class' => TrueTest::class, 'always_allowed_in_sandbox' => true]),
+            new TwigTest('empty', [self::class, 'testEmpty']),
+            new TwigTest('iterable', 'is_iterable'),
+            new TwigTest('sequence', [self::class, 'testSequence']),
+            new TwigTest('mapping', [self::class, 'testMapping']),
+            new TwigTest('true', null, ['node_class' => TrueTest::class]),
         ];
     }
 
     public function getNodeVisitors(): array
     {
-        return [
-            new CorrectnessNodeVisitor(),
-        ];
+        return [];
     }
 
     public function getExpressionParsers(): array
@@ -1493,11 +1490,9 @@ final class CoreExtension extends AbstractExtension
      * @param bool                         $ignoreMissing Whether to ignore missing templates or not
      * @param bool                         $sandboxed     Whether to sandbox the template or not
      *
-     * @return string|Markup
-     *
      * @internal
      */
-    public static function include(Environment $env, $context, $template, $variables = [], $withContext = true, $ignoreMissing = false, $sandboxed = false)
+    public static function include(Environment $env, $context, $template, $variables = [], $withContext = true, $ignoreMissing = false, $sandboxed = false): string
     {
         $alreadySandboxed = false;
         $sandbox = null;
@@ -1524,9 +1519,7 @@ final class CoreExtension extends AbstractExtension
                 return '';
             }
 
-            $rendered = $loaded->render($variables);
-
-            return '' === $rendered ? '' : new Markup($rendered, $env->getCharset());
+            return $loaded->render($variables);
         } finally {
             if ($isSandboxed && !$alreadySandboxed) {
                 $sandbox->disableSandbox();
@@ -1846,14 +1839,14 @@ final class CoreExtension extends AbstractExtension
                 $classCache[$lcName = $lcMethods[$i]] = $method;
 
                 if ('g' === $lcName[0] && str_starts_with($lcName, 'get')) {
-                    $prefixLength = 3;
-                    $lcName = substr($lcName, $prefixLength);
+                    $name = substr($method, 3);
+                    $lcName = substr($lcName, 3);
                 } elseif ('i' === $lcName[0] && str_starts_with($lcName, 'is')) {
-                    $prefixLength = 2;
-                    $lcName = substr($lcName, $prefixLength);
+                    $name = substr($method, 2);
+                    $lcName = substr($lcName, 2);
                 } elseif ('h' === $lcName[0] && str_starts_with($lcName, 'has')) {
-                    $prefixLength = 3;
-                    $lcName = substr($lcName, $prefixLength);
+                    $name = substr($method, 3);
+                    $lcName = substr($lcName, 3);
                     if (\in_array('is'.$lcName, $lcMethods, true)) {
                         continue;
                     }
@@ -1861,11 +1854,8 @@ final class CoreExtension extends AbstractExtension
                     continue;
                 }
 
-                // skip get(), is() and has() methods (in which case, $lcName is empty)
-                if ($lcName) {
-                    // camelCase name (e.g. getFooBar() -> fooBar)
-                    $name = $lcName[0].substr($method, $prefixLength + 1);
-
+                // skip get() and is() methods (in which case, $name is empty)
+                if ($name) {
                     if (!isset($classCache[$name])) {
                         $classCache[$name] = $method;
                     }

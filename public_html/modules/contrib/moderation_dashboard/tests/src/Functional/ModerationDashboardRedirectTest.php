@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\moderation_dashboard\Functional;
 
+use Drupal\Core\Url;
+
 /**
  * Tests redirection to dashboard on login.
  *
@@ -28,8 +30,11 @@ class ModerationDashboardRedirectTest extends ModerationDashboardTestBase {
    * @throws \Behat\Mink\Exception\ExpectationException
    */
   public function testRedirect(): void {
-    $this->drupalGet('user/login');
-    $this->drupalLogin($this->user);
+    $this->drupalGet(Url::fromRoute('user.login'));
+    $this->submitForm([
+      'name' => $this->user->getAccountName(),
+      'pass' => $this->user->passRaw,
+    ], 'Log in');
     $this->assertSession()->addressEquals("user/{$this->user->id()}/moderation-dashboard");
   }
 

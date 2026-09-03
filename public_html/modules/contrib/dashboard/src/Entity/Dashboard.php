@@ -2,62 +2,69 @@
 
 namespace Drupal\dashboard\Entity;
 
+use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\EntityDeleteForm;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\dashboard\DashboardAccessControlHandler;
 use Drupal\dashboard\DashboardInterface;
+use Drupal\dashboard\DashboardListBuilder;
+use Drupal\dashboard\DashboardStorageHandler;
+use Drupal\dashboard\Form\DashboardForm;
+use Drupal\dashboard\Form\DashboardLayoutBuilderForm;
 use Drupal\layout_builder\SectionListInterface;
 use Drupal\layout_builder\SectionListTrait;
 
 /**
  * Defines the dashboard entity type.
- *
- * @ConfigEntityType(
- *   id = "dashboard",
- *   label = @Translation("Dashboard"),
- *   label_collection = @Translation("Dashboards"),
- *   label_singular = @Translation("dashboard"),
- *   label_plural = @Translation("dashboards"),
- *   label_count = @PluralTranslation(
- *     singular = "@count dashboard",
- *     plural = "@count dashboards",
- *   ),
- *   handlers = {
- *     "access" = "Drupal\dashboard\DashboardAccessControlHandler",
- *     "storage" = "Drupal\dashboard\DashboardStorageHandler",
- *     "list_builder" = "Drupal\dashboard\DashboardListBuilder",
- *     "form" = {
- *       "add" = "Drupal\dashboard\Form\DashboardForm",
- *       "edit" = "Drupal\dashboard\Form\DashboardForm",
- *       "delete" = "Drupal\Core\Entity\EntityDeleteForm",
- *       "layout_builder" = "Drupal\dashboard\Form\DashboardLayoutBuilderForm"
- *     }
- *   },
- *   config_prefix = "dashboard",
- *   admin_permission = "administer dashboard",
- *   links = {
- *     "collection" = "/admin/structure/dashboard",
- *     "add-form" = "/admin/structure/dashboard/add",
- *     "edit-form" = "/admin/structure/dashboard/{dashboard}",
- *     "delete-form" = "/admin/structure/dashboard/{dashboard}/delete",
- *     "canonical" = "/admin/dashboard/{dashboard}",
- *     "preview" = "/admin/structure/dashboard/{dashboard}/preview"
- *   },
- *   entity_keys = {
- *     "id" = "id",
- *     "label" = "label",
- *     "uuid" = "uuid",
- *     "weight" = "weight"
- *   },
- *   config_export = {
- *     "id",
- *     "label",
- *     "description",
- *     "layout",
- *     "weight"
- *   }
- * )
  */
+#[ConfigEntityType(
+  id: 'dashboard',
+  label: new TranslatableMarkup('Dashboard'),
+  label_collection: new TranslatableMarkup('Dashboards'),
+  label_singular: new TranslatableMarkup('dashboard'),
+  label_plural: new TranslatableMarkup('dashboards'),
+  config_prefix: 'dashboard',
+  entity_keys: [
+    'id' => 'id',
+    'label' => 'label',
+    'uuid' => 'uuid',
+    'weight' => 'weight',
+  ],
+  handlers: [
+    'access' => DashboardAccessControlHandler::class,
+    'storage' => DashboardStorageHandler::class,
+    'list_builder' => DashboardListBuilder::class,
+    'form' => [
+      'add' => DashboardForm::class,
+      'edit' => DashboardForm::class,
+      'delete' => EntityDeleteForm::class,
+      'layout_builder' => DashboardLayoutBuilderForm::class,
+    ],
+  ],
+  links: [
+    'collection' => '/admin/structure/dashboard',
+    'add-form' => '/admin/structure/dashboard/add',
+    'edit-form' => '/admin/structure/dashboard/{dashboard}',
+    'delete-form' => '/admin/structure/dashboard/{dashboard}/delete',
+    'canonical' => '/admin/dashboard/{dashboard}',
+    'preview' => '/admin/structure/dashboard/{dashboard}/preview',
+  ],
+  admin_permission: 'administer dashboard',
+  label_count: [
+    'singular' => '@count dashboard',
+    'plural' => '@count dashboards',
+  ],
+  config_export: [
+    'id',
+    'label',
+    'description',
+    'layout',
+    'weight',
+  ]
+)]
 class Dashboard extends ConfigEntityBase implements DashboardInterface, SectionListInterface {
 
   use SectionListTrait;

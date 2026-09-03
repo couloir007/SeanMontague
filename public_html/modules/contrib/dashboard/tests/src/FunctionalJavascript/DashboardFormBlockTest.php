@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\dashboard\FunctionalJavascript;
 
+use PHPUnit\Framework\Attributes\Group;
 use Drupal\dashboard\Entity\Dashboard;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\system\Traits\OffCanvasTestTrait;
 
 /**
  * Tests a block with a form functionality with js interaction.
- *
- * @group dashboard
  */
+#[Group('dashboard')]
 class DashboardFormBlockTest extends WebDriverTestBase {
 
   use OffCanvasTestTrait;

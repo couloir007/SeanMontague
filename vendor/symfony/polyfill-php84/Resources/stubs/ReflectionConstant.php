@@ -22,7 +22,6 @@ if (\PHP_VERSION_ID < 80400) {
 
         private $value;
         private $deprecated;
-        private $persistent;
 
         private static $persistentConstants = [];
 

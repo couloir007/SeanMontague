@@ -2,8 +2,10 @@
 
 namespace Drupal\Tests\moderation_dashboard\Functional;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
+use Drupal\workflows\WorkflowInterface;
 
 /**
  * Defines a base class for testing Moderation Dashboard module.
@@ -35,7 +37,7 @@ abstract class ModerationDashboardTestBase extends BrowserTestBase {
   ];
 
   /**
-   * Set to FALSE to skip adding editorial workflow to test node types.
+   * Set FALSE to skip adding editorial workflow to test node types.
    *
    * @var bool
    */
@@ -54,14 +56,14 @@ abstract class ModerationDashboardTestBase extends BrowserTestBase {
    *
    * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $user;
+  protected AccountInterface $user;
 
   /**
    * The editorial workflow.
    *
    * @var \Drupal\workflows\WorkflowInterface|null
    */
-  protected $editorialWorkflow;
+  protected ?WorkflowInterface $editorialWorkflow;
 
   /**
    * {@inheritdoc}
@@ -87,7 +89,7 @@ abstract class ModerationDashboardTestBase extends BrowserTestBase {
     }
 
     // Create test user.
-    $this->user = $this->createUser($this->userPermissions, 'test user');
+    $this->user = $this->drupalCreateUser($this->userPermissions, 'test user');
   }
 
 }

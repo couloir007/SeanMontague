@@ -14,7 +14,9 @@ namespace Twig\Node;
 
 use Twig\Attribute\YieldReady;
 use Twig\Compiler;
+use Twig\Node\Expression\ReturnPrimitiveTypeInterface;
 use Twig\Node\Expression\Test\TrueTest;
+use Twig\TwigTest;
 
 /**
  * Represents an if node.
@@ -27,7 +29,10 @@ class IfNode extends Node
     public function __construct(Node $tests, ?Node $else, int $lineno)
     {
         for ($i = 0, $count = \count($tests); $i < $count; $i += 2) {
-            $tests->setNode($i, TrueTest::wrap($tests->getNode((string) $i)));
+            $test = $tests->getNode((string) $i);
+            if (!$test instanceof ReturnPrimitiveTypeInterface) {
+                $tests->setNode($i, new TrueTest($test, new TwigTest('true'), null, $test->getTemplateLine()));
+            }
         }
         $nodes = ['tests' => $tests];
         if (null !== $else) {

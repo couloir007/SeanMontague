@@ -2,6 +2,9 @@
 
 namespace Drupal\dashboard\Plugin\SectionStorage;
 
+use Drupal\Core\Plugin\Context\EntityContextDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\layout_builder\Attribute\SectionStorage;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -20,17 +23,19 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * Defines the 'dashboard' section storage type.
  *
- * @SectionStorage(
- *   id = "dashboard",
- *   context_definitions = {
- *     "dashboard" = @ContextDefinition("entity:dashboard")
- *   },
- *   allow_inline_blocks = FALSE
- * )
- *
  * @internal
  *   Plugin classes are internal.
  */
+#[SectionStorage(
+  id: 'dashboard',
+  context_definitions: [
+    'dashboard' => new EntityContextDefinition(
+      data_type: 'dashboard',
+      label: new TranslatableMarkup('Dashboard'),
+    ),
+  ],
+  allow_inline_blocks: FALSE,
+)]
 class DashboardSectionStorage extends SectionStorageBase implements ContainerFactoryPluginInterface {
 
   use ContextAwarePluginTrait;

@@ -3,13 +3,11 @@
 namespace Drupal\dashboard\Form;
 
 use Drupal\Component\Utility\Html;
-use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\layout_builder\LayoutTempstoreRepositoryInterface;
 use Drupal\layout_builder\SectionStorageInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Dashboard form.
@@ -17,6 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @property \Drupal\dashboard\DashboardInterface $entity
  */
 class DashboardLayoutBuilderForm extends EntityForm {
+
+  use AutowireTrait;
 
   /**
    * The section storage.
@@ -33,17 +33,7 @@ class DashboardLayoutBuilderForm extends EntityForm {
    */
   public function __construct(
     protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository,
-  ) {
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('layout_builder.tempstore_repository')
-    );
-  }
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -62,81 +52,12 @@ class DashboardLayoutBuilderForm extends EntityForm {
       '#section_storage' => $section_storage,
       '#prefix' => "<div class='$classes'>",
       '#suffix' => '</div>',
-      '#process' => [[static::class, 'layoutBuilderElementGetKeys']],
       '#attached' => [
         'library' => ['dashboard/dashboard'],
       ],
     ];
     $this->sectionStorage = $section_storage;
     return parent::buildForm($form, $form_state);
-  }
-
-  /**
-   * Form element #process callback.
-   *
-   * Save the layout builder element array parents as a property on the top form
-   * element so that they can be used to access the element within the whole
-   * render array later.
-   *
-   * @see \Drupal\layout_builder\Controller\LayoutBuilderHtmlEntityFormController
-   */
-  public static function layoutBuilderElementGetKeys(array $element, FormStateInterface $form_state, &$form) {
-    $form['#layout_builder_element_keys'] = $element['#array_parents'];
-    $form['#pre_render'][] = [static::class, 'renderLayoutBuilderAfterForm'];
-    $form['#post_render'][] = [static::class, 'addRenderedLayoutBuilder'];
-    return $element;
-  }
-
-  /**
-   * Render API #pre_render callback for form containing layout builder element.
-   *
-   * Because the layout builder element can contain components with forms, it
-   * needs to exist outside forms within the DOM, to avoid nested form tags.
-   * The layout builder element is rendered to markup here and saved, and later
-   * the saved markup will be appended after the form markup.
-   *
-   * @param array $form
-   *   The rendered form.
-   *
-   * @return array
-   *   Renders the layout builder element, if it exists, and adds it to the
-   *   form.
-   *
-   * @see ::addRenderedLayoutBuilder()
-   */
-  #[TrustedCallback]
-  public static function renderLayoutBuilderAfterForm(array $form): array {
-    if (isset($form['#layout_builder_element_keys'])) {
-      $layout_builder_element = &NestedArray::getValue($form, $form['#layout_builder_element_keys']);
-      // Save the rendered layout builder HTML to a non-rendering child key.
-      // Since this method is a pre_render callback, it is assumed that it is
-      // called while rendering with an active render context, so that the
-      // cache metadata and attachments bubble correctly.
-      $form['#layout_builder_markup'] = \Drupal::service('renderer')->render($layout_builder_element);
-      // Remove the layout builder child element within form array.
-      $layout_builder_element = [];
-    }
-    return $form;
-  }
-
-  /**
-   * Render API #post_render callback that adds layout builder markup to form.
-   *
-   * @param string $html
-   *   The rendered form.
-   * @param array $form
-   *   The form render array.
-   *
-   * @return string
-   *   The render string with any layout builder markup added.
-   */
-  #[TrustedCallback]
-  public static function addRenderedLayoutBuilder(string $html, array $form): string {
-    if (isset($form['#layout_builder_markup'])) {
-      $html .= $form['#layout_builder_markup'];
-    }
-
-    return $html;
   }
 
   /**

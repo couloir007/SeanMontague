@@ -694,21 +694,6 @@ display:
             multiple: false
             remember_roles:
               authenticated: authenticated
-              anonymous: '0'
-              content_api_consumer: '0'
-              content_creator_benefits_hubs: '0'
-              content_creator_resources_and_support: '0'
-              office_content_creator: '0'
-              vamc_content_creator: '0'
-              content_creator_vet_center: '0'
-              content_editor: '0'
-              content_reviewer: '0'
-              content_publisher: '0'
-              content_admin: '0'
-              redirect_administrator: '0'
-              admnistrator_users: '0'
-              administrator: '0'
-              homepage_manager: '0'
             placeholder: ''
           is_grouped: false
           group_info:
@@ -749,21 +734,6 @@ display:
             multiple: false
             remember_roles:
               authenticated: authenticated
-              anonymous: '0'
-              content_api_consumer: '0'
-              content_creator_benefits_hubs: '0'
-              content_creator_resources_and_support: '0'
-              office_content_creator: '0'
-              vamc_content_creator: '0'
-              content_creator_vet_center: '0'
-              content_editor: '0'
-              content_reviewer: '0'
-              content_publisher: '0'
-              content_admin: '0'
-              redirect_administrator: '0'
-              admnistrator_users: '0'
-              administrator: '0'
-              homepage_manager: '0'
             placeholder: ''
           is_grouped: false
           group_info:
@@ -804,21 +774,6 @@ display:
             multiple: false
             remember_roles:
               authenticated: authenticated
-              anonymous: '0'
-              content_api_consumer: '0'
-              content_creator_benefits_hubs: '0'
-              content_creator_resources_and_support: '0'
-              office_content_creator: '0'
-              vamc_content_creator: '0'
-              content_creator_vet_center: '0'
-              content_editor: '0'
-              content_reviewer: '0'
-              content_publisher: '0'
-              content_admin: '0'
-              redirect_administrator: '0'
-              admnistrator_users: '0'
-              administrator: '0'
-              homepage_manager: '0'
             placeholder: ''
           is_grouped: false
           group_info:
@@ -859,21 +814,6 @@ display:
             multiple: false
             remember_roles:
               authenticated: authenticated
-              anonymous: '0'
-              content_api_consumer: '0'
-              content_creator_benefits_hubs: '0'
-              content_creator_resources_and_support: '0'
-              office_content_creator: '0'
-              vamc_content_creator: '0'
-              content_creator_vet_center: '0'
-              content_editor: '0'
-              content_reviewer: '0'
-              content_publisher: '0'
-              content_admin: '0'
-              redirect_administrator: '0'
-              admnistrator_users: '0'
-              administrator: '0'
-              homepage_manager: '0'
             placeholder: ''
           is_grouped: false
           group_info:
@@ -914,21 +854,6 @@ display:
             multiple: false
             remember_roles:
               authenticated: authenticated
-              anonymous: '0'
-              content_api_consumer: '0'
-              content_creator_benefits_hubs: '0'
-              content_creator_resources_and_support: '0'
-              office_content_creator: '0'
-              vamc_content_creator: '0'
-              content_creator_vet_center: '0'
-              content_editor: '0'
-              content_reviewer: '0'
-              content_publisher: '0'
-              content_admin: '0'
-              redirect_administrator: '0'
-              admnistrator_users: '0'
-              administrator: '0'
-              homepage_manager: '0'
             placeholder: ''
           is_grouped: false
           group_info:
@@ -1051,6 +976,7 @@ display:
           empty_table: false
           caption: 'List of fields used across the content model.'
           description: ''
+          class: ''
       row:
         type: fields
       query:

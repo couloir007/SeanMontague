@@ -41,12 +41,12 @@
 
 # Pantheon commits a settings.php for environment-specific settings.
 # Place local settings in settings.local.php
-/public_html/sites/*/settings.local.php
-/public_html/sites/*/services*.yml
-/public_html/sites/*/dev.local.php
-/public_html/sites/*/local.services.yml
-/public_html/sites/*/services.yml
-/public_html/sites/*/settings.php
+#/public_html/sites/*/settings.local.php
+#/public_html/sites/*/services*.yml
+#/public_html/sites/*/dev.local.php
+#/public_html/sites/*/local.services.yml
+#/public_html/sites/*/services.yml
+#/public_html/sites/*/settings.php
 
 # Ignore paths that contain user-generated content.
 /public_html/sites/*/files

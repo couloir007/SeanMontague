@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\dashboard\Functional\Form;
 
+use PHPUnit\Framework\Attributes\Group;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\dashboard\Entity\Dashboard;
 use Drupal\user\Entity\Role;
@@ -11,9 +12,8 @@ use Drupal\user\UserInterface;
 
 /**
  * Tests for dashboard selection logic.
- *
- * @group dashboard
  */
+#[Group('dashboard')]
 class DashboardSelectionTest extends BrowserTestBase {
 
   /**

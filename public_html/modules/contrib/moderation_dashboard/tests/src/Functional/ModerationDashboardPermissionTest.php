@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\moderation_dashboard\Functional;
 
+use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 
@@ -66,13 +67,17 @@ class ModerationDashboardPermissionTest extends BrowserTestBase {
    */
   public function testCanViewOwnDashboard(): void {
     foreach ($this->canViewOwnDashboardCases as $i => $testCase) {
-      $user = $this->createUser($testCase['permissions']);
-      $this->drupalLogin($user);
-      $this->assertSession()
-        ->addressEquals("/user/{$user->id()}/moderation-dashboard");
+      $user = $this->drupalCreateUser($testCase['permissions']);
+      $this->drupalGet(Url::fromRoute('user.login'));
+      $this->submitForm([
+        'name' => $user->getAccountName(),
+        'pass' => $user->passRaw,
+      ], 'Log in');
+      $this->assertSession()->addressEquals("/user/{$user->id()}/moderation-dashboard");
       $status_code = $this->getSession()->getStatusCode();
       $message = "#$i: expected 200, got $status_code.";
       $this->assertEquals(200, $status_code, $message);
+      $this->drupalLogout();
     }
   }
 
@@ -97,7 +102,7 @@ class ModerationDashboardPermissionTest extends BrowserTestBase {
    */
   public function testCanNotViewOwnDashboard(): void {
     foreach ($this->canNotViewOwnDashboardCases as $i => $testCase) {
-      $user = $this->createUser($testCase['permissions']);
+      $user = $this->drupalCreateUser($testCase['permissions']);
       $this->drupalLogin($user);
       $this->drupalGet("/user/{$user->id()}/moderation-dashboard");
       $status_code = $this->getSession()->getStatusCode();
@@ -157,8 +162,8 @@ class ModerationDashboardPermissionTest extends BrowserTestBase {
    */
   public function testCanViewOtherDashboard(): void {
     foreach ($this->canViewOtherDashboardCases as $i => $testCase) {
-      $user_a = $this->createUser($testCase['permissions_a']);
-      $user_b = $this->createUser($testCase['permissions_b']);
+      $user_a = $this->drupalCreateUser($testCase['permissions_a']);
+      $user_b = $this->drupalCreateUser($testCase['permissions_b']);
       $this->drupalLogin($user_a);
       $this->drupalGet("/user/{$user_b->id()}/moderation-dashboard");
       $status_code = $this->getSession()->getStatusCode();
@@ -244,8 +249,8 @@ class ModerationDashboardPermissionTest extends BrowserTestBase {
    */
   public function testCanNotViewOtherDashboard(): void {
     foreach ($this->canNotViewOtherDashboardCases as $i => $testCase) {
-      $user_a = $this->createUser($testCase['permissions_a']);
-      $user_b = $this->createUser($testCase['permissions_b']);
+      $user_a = $this->drupalCreateUser($testCase['permissions_a']);
+      $user_b = $this->drupalCreateUser($testCase['permissions_b']);
       $this->drupalLogin($user_a);
       $this->drupalGet("/user/{$user_b->id()}/moderation-dashboard");
       $status_code = $this->getSession()->getStatusCode();

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\dashboard\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
 use Drupal\announce_feed_test\AnnounceTestHttpClientMiddleware;
 use Drupal\Tests\BrowserTestBase;
 
 /**
  * Tests the Remove block functionality.
- *
- * @group dashboard
  */
+#[Group('dashboard')]
 class DashboardUninstallBlockProviderTest extends BrowserTestBase {
 
   /**

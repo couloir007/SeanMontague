@@ -45,14 +45,12 @@ abstract class NodeTestCase extends TestCase
     }
 
     /**
-     * The non-static "getTests" is intentionally not mirrored as an attribute: PHPUnit >= 11 rejects non-static providers, so PHPUnit >= 10 relies on the static "provideTests" instead.
-     *
      * @dataProvider getTests
      * @dataProvider provideTests
      *
      * @return void
      */
-    #[DataProvider('provideTests')]
+    #[DataProvider('getTests'), DataProvider('provideTests')]
     public function testCompile($node, $source, $environment = null, $isPattern = false)
     {
         $this->assertNodeCompilation($source, $node, $environment, $isPattern);

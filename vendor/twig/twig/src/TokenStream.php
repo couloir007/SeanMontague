@@ -83,8 +83,7 @@ final class TokenStream
                 $token->getValue() ? \sprintf(' of value "%s"', $token->getValue()) : '',
                 Token::typeToEnglish($type), $value ? \sprintf(' with value "%s"', $value) : ''),
                 $line,
-                $this->source,
-                columnno: $this->source->getColumn($token->getOffset() ?? -1),
+                $this->source
             );
         }
         $this->next();
