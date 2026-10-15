@@ -60,7 +60,14 @@ abstract class DatetimeBase extends Datetime {
         // Modify input for same-day checkbox.
         elseif ($same_day && end($element['#parents']) === 'end_value') {
           $start_date = $form_state->getValue([...$element['#field_parents'], 'value']);
-          if (empty($start_date['date'])) {
+          // In same-day mode the day is always taken from the start date and
+          // the user only supplies a time, so both parts are needed for an
+          // end value to exist. Adopting the start date on its own leaves a
+          // date-only string that either fails to parse against this
+          // element's format, or parses as a date with an arbitrary
+          // current-time component.
+          if (empty($start_date['date']) || empty($input['time'])) {
+            $input['date'] = '';
             $input['time'] = '';
           }
           else {

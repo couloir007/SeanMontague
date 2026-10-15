@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\RevisionableStorageInterface;
+use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Tests\RandomGeneratorTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\trash\Trash;
@@ -25,7 +26,7 @@ use Drupal\user\Entity\User;
  *
  * @see \Drupal\Tests\trash\Kernel\EntityAccessTestTrait
  *
- * @phpstan-require-extends \PHPUnit\Framework\TestCase
+ * @phpstan-require-extends \Drupal\Tests\trash\Kernel\TrashKernelTestBase
  */
 trait EntityActionsTrait {
 
@@ -172,6 +173,32 @@ trait EntityActionsTrait {
 
       case 'save':
         $entity->save();
+        break;
+
+      case 'add-translation':
+        assert($entity instanceof TranslatableInterface);
+        $entity->addTranslation(...$arguments);
+        $entity->save();
+        break;
+
+      case 'delete-translation':
+        assert($entity instanceof TranslatableInterface);
+        $langcodes = is_array($arguments) ? $arguments : [$arguments];
+
+        foreach ($langcodes as $langcode) {
+          $entity->removeTranslation($langcode);
+        }
+
+        $entity->save();
+        break;
+
+      case 'restore-translation':
+        Trash::restoreEntity($entity, $arguments);
+        break;
+
+      case 'switch-translation':
+        assert($entity instanceof TranslatableInterface);
+        $context['entity'] = $entity->getTranslation($arguments);
         break;
 
       case 'set-trash-context':

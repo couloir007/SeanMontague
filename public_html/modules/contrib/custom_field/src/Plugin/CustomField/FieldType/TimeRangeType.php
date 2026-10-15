@@ -9,6 +9,7 @@ use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\TypedDataTrait;
 use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
+use Drupal\custom_field\Time;
 
 /**
  * Plugin implementation of the 'time_range' custom field type.
@@ -42,6 +43,36 @@ class TimeRangeType extends TimeType {
     ];
 
     return $columns;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * The nested shape keys its end time as 'end', while the column is
+   * '<name>__end', so the name has to be mapped rather than copied. The guard
+   * is the one CustomFieldTimeRange::setValue() applies to the same value -
+   * both the start and the end have to be non-empty times - so completing the
+   * values array here cannot change what is stored.
+   *
+   * The duration column is deliberately left out: CustomItem::preSave()
+   * computes it from the start and end times, and it never appears in the
+   * incoming value.
+   */
+  public static function extractExtraPropertyValues(array $settings, mixed $value): array {
+    if (!is_array($value)) {
+      return [];
+    }
+    ['name' => $name] = $settings;
+
+    $start_time = $value['value'] ?? NULL;
+    $end_time = $value['end'] ?? NULL;
+
+    $extra = [];
+    if (!Time::isEmpty($start_time) && !Time::isEmpty($end_time)) {
+      $extra[$name . self::SEPARATOR . 'end'] = $end_time;
+    }
+
+    return $extra;
   }
 
   /**

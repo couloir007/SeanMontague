@@ -13,7 +13,7 @@ use Drupal\schemadotorg\Traits\SchemaDotOrgMappingStorageTrait;
 /**
  * Schema.org config manager.
  *
- * The Schema.org config manager service allows modules and starter kits to
+ * The Schema.org config manager service allows modules and recipes to
  * easily set and unset a Schema.org types default properties.
  *
  * This service also provides a validate configuration and

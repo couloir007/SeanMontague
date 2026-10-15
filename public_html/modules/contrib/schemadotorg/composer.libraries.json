@@ -41,12 +41,14 @@
     "drupal/jsonapi_extras": "^3.0",
     "drupal/layout_paragraphs": "^2.0",
     "drupal/link_attributes": "^2.0",
+    "drupal/markup": "^2.0",
     "drupal/mercury_editor": "^2.0 || ^3.0",
     "drupal/metatag": "^2.0",
     "drupal/office_hours": "^1.0",
     "drupal/paragraphs": "^1.0",
     "drupal/pathauto": "^1.0",
     "drupal/physical": "^1.0",
+    "drupal/range": "^1.0",
     "drupal/scheduler": "^2.0",
     "drupal/simple_sitemap": "^4.0",
     "drupal/smart_date": "^4.1",
@@ -71,10 +73,6 @@
       },
       "drupal/entity_reference_revisions": {
         "Issue #3265084: EntityReferenceRevisionsItem:generateSampleValue can break when all bundle types are allowed": "https://www.drupal.org/files/issues/2022-02-18/treat-no-selection-as-all-3265084-2.patch"
-      },
-      "drupal/entity_browser": {
-        "Issue #3012432: Broken views exposed form in modals": "https://www.drupal.org/files/issues/2026-07-13/entity_browser-3012432-mr116.patch",
-        "Issue #2946829: Make submit button on modal always visible": "https://www.drupal.org/files/issues/2026-07-13/entity_browser-2946829-mr99.patch"
       },
       "drupal/jsonapi_extras": {
         "Issue #3608182: Array to string conversion warning during route rebuild on Drupal 11.4": "https://www.drupal.org/files/issues/2026-07-03/array_to_string_conv-3608182-2.patch"

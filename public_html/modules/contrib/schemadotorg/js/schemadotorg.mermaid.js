@@ -5,7 +5,7 @@
  * Schema.org mermaid behaviors.
  */
 
-((Drupal, once, mermaid, Panzoom) => {
+((Drupal, once, mermaid) => {
   /**
    * Schema.org mermaid behaviors.
    *
@@ -58,42 +58,7 @@
             closedDetails = null;
           });
 
-          // @see https://github.com/timmywil/panzoom
-          once(
-            'schemadotorg-mermaid-panzoom',
-            '.mermaid svg, .language-mermaid svg',
-            document,
-          ).forEach(function initializePanzoom(svg) {
-            const viewport = svg.closest('.mermaid, .language-mermaid');
-            if (!viewport) {
-              return;
-            }
-            if (
-              viewport.getAttribute('data-schemadotorg-mermaid-panzoom') ===
-              'false'
-            ) {
-              return;
-            }
-
-            let canvas = svg.parentElement;
-            if (
-              !canvas ||
-              !canvas.classList.contains('schemadotorg-mermaid-panzoom-canvas')
-            ) {
-              canvas = document.createElement('div');
-              canvas.classList.add('schemadotorg-mermaid-panzoom-canvas');
-              svg.before(canvas);
-              canvas.append(svg);
-            }
-
-            const panzoom = Panzoom(canvas, {
-              canvas: true,
-              maxScale: 5,
-              minScale: 0.25,
-            });
-
-            viewport.addEventListener('wheel', panzoom.zoomWithWheel);
-          });
+          Drupal.behaviors.schemaDotOrgMermaidPanzoom.attach(document);
         },
       });
     },
@@ -135,4 +100,4 @@
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
-})(Drupal, once, mermaid, window.Panzoom);
+})(Drupal, once, mermaid);

@@ -10,4 +10,3 @@ schemadotorg_ui:
     - core/drupal.debounce
     - core/drupal.form
     - core/once
-    - schemadotorg/schemadotorg.dialog

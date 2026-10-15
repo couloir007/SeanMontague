@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\trash\Form;
 
+use Drupal\Core\DependencyInjection\AutowireTrait;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Form\WorkspaceSafeFormTrait;
 use Drupal\Core\Form\BaseFormIdInterface;
@@ -15,7 +17,6 @@ use Drupal\Core\TempStore\PrivateTempStoreFactory;
 use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\Core\Url;
 use Drupal\trash\TrashManagerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -23,6 +24,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  */
 class EntityPurgeMultipleForm extends ConfirmFormBase implements BaseFormIdInterface, WorkspaceDynamicSafeFormInterface {
 
+  use AutowireTrait;
   use WorkspaceSafeFormTrait;
 
   /**
@@ -56,18 +58,6 @@ class EntityPurgeMultipleForm extends ConfirmFormBase implements BaseFormIdInter
     protected TrashManagerInterface $trashManager,
   ) {
     $this->tempStore = $tempStoreFactory->get('trash_purge_multiple_confirm');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('current_user'),
-      $container->get('entity_type.manager'),
-      $container->get('tempstore.private'),
-      $container->get('trash.manager')
-    );
   }
 
   /**
@@ -124,6 +114,7 @@ class EntityPurgeMultipleForm extends ConfirmFormBase implements BaseFormIdInter
     $this->selection = $this->tempStore->get($this->currentUser->id() . ':' . $entity_type_id) ?? [];
 
     if (empty($this->entityTypeId) || empty($this->selection)) {
+      // @phpstan-ignore return.type
       return new RedirectResponse($this->getCancelUrl()->setAbsolute()->toString());
     }
 
@@ -136,6 +127,7 @@ class EntityPurgeMultipleForm extends ConfirmFormBase implements BaseFormIdInter
     // selection, and bail out if nothing is left to confirm.
     $this->selection = array_intersect_key($this->selection, $entities);
     if (empty($this->selection)) {
+      // @phpstan-ignore return.type
       return new RedirectResponse($this->getCancelUrl()->setAbsolute()->toString());
     }
 
@@ -207,7 +199,7 @@ class EntityPurgeMultipleForm extends ConfirmFormBase implements BaseFormIdInter
     $delete_translations = [];
     $inaccessible_entities = [];
 
-    /** @var \Drupal\Core\Entity\TranslatableInterface[] $entities */
+    /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
     $entities = $this->entityTypeManager->getStorage($this->entityTypeId)->loadMultiple(array_keys($this->selection));
 
     foreach ($this->selection as $id => $selected_langcodes) {
@@ -217,10 +209,6 @@ class EntityPurgeMultipleForm extends ConfirmFormBase implements BaseFormIdInter
         continue;
       }
       $entity = $entities[$id];
-      if (!$entity->access('purge', $this->currentUser)) {
-        $inaccessible_entities[] = $entity;
-        continue;
-      }
       foreach ($selected_langcodes as $langcode) {
         if ($entity instanceof TranslatableInterface) {
           // A single translation may have been purged since the confirm page
@@ -229,6 +217,12 @@ class EntityPurgeMultipleForm extends ConfirmFormBase implements BaseFormIdInter
             continue;
           }
           $entity = $entity->getTranslation($langcode);
+        }
+        if (!$entity->access('purge', $this->currentUser)) {
+          $inaccessible_entities[] = $entity;
+          continue;
+        }
+        if ($entity instanceof TranslatableInterface) {
           if ($entity->isDefaultTranslation()) {
             $delete_entities[$id] = $entity;
             unset($delete_translations[$id]);
@@ -245,6 +239,12 @@ class EntityPurgeMultipleForm extends ConfirmFormBase implements BaseFormIdInter
       }
     }
 
+    // A translation whose own access check was denied may still belong to an
+    // entity whose default translation was granted and selected: purging the
+    // default destroys every translation regardless, so don't report it as
+    // undeleted.
+    $inaccessible_entities = array_filter($inaccessible_entities, static fn ($entity) => !isset($delete_entities[$entity->id()]));
+
     if ($delete_entities) {
       $storage = $this->entityTypeManager->getStorage($this->entityTypeId);
       $storage->delete($delete_entities);
@@ -258,7 +258,11 @@ class EntityPurgeMultipleForm extends ConfirmFormBase implements BaseFormIdInter
 
     if ($delete_translations) {
       foreach ($delete_translations as $id => $translations) {
-        $entity = $entities[$id]->getUntranslated();
+        $entity = $entities[$id];
+        // Only translatable entities reach $delete_translations, but that is
+        // decided in the loop above and can't be seen from here.
+        assert($entity instanceof ContentEntityInterface);
+        $entity = $entity->getUntranslated();
         foreach ($translations as $translation) {
           $entity->removeTranslation($translation->language()->getId());
         }

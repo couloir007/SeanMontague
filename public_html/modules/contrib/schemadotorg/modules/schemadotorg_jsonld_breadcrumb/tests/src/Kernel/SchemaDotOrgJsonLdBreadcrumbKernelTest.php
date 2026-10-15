@@ -4,10 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\schemadotorg_jsonld_breadcrumb\Kernel;
 
+use Drupal\Core\Breadcrumb\Breadcrumb;
+use Drupal\Core\Breadcrumb\ChainBreadcrumbBuilderInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
+use Drupal\schemadotorg\SchemaDotOrgSchemaTypeManagerInterface;
 use Drupal\schemadotorg_jsonld\SchemaDotOrgJsonLdBuilderInterface;
 use Drupal\schemadotorg_jsonld\SchemaDotOrgJsonLdManagerInterface;
+use Drupal\schemadotorg_jsonld_breadcrumb\SchemaDotOrgJsonLdBreadcrumbManager;
 use Drupal\Tests\schemadotorg_jsonld\Kernel\SchemaDotOrgJsonLdKernelTestBase;
 
 /**
@@ -95,6 +102,41 @@ class SchemaDotOrgJsonLdBreadcrumbKernelTest extends SchemaDotOrgJsonLdKernelTes
     ];
     $route_match = $this->manager->getEntityRouteMatch($thing_node);
     $this->assertEquals($expected_result, $this->builder->build($route_match));
+
+    // Check that breadcrumbs without a URL are omitted from JSON-LD.
+    $breadcrumb = (new Breadcrumb())->setLinks([
+      Link::fromTextAndUrl('Home', Url::fromRoute('<front>')),
+      Link::fromTextAndUrl('Section heading', Url::fromUri('internal:')),
+    ]);
+    $breadcrumb_builder = $this->createMock(ChainBreadcrumbBuilderInterface::class);
+    $breadcrumb_builder->expects($this->once())
+      ->method('applies')
+      ->with($route_match)
+      ->willReturn(TRUE);
+    $breadcrumb_builder->expects($this->once())
+      ->method('build')
+      ->with($route_match)
+      ->willReturn($breadcrumb);
+    $breadcrumb_manager = new SchemaDotOrgJsonLdBreadcrumbManager(
+      $this->createMock(RendererInterface::class),
+      $breadcrumb_builder,
+      $this->createMock(SchemaDotOrgSchemaTypeManagerInterface::class),
+      $this->createMock(SchemaDotOrgJsonLdManagerInterface::class),
+    );
+    $this->assertEquals([
+      '@context' => 'https://schema.org',
+      '@type' => 'BreadcrumbList',
+      'itemListElement' => [
+        [
+          '@type' => 'ListItem',
+          'position' => 1,
+          'item' => [
+            '@id' => Url::fromRoute('<front>')->setAbsolute()->toString(),
+            'name' => 'Home',
+          ],
+        ],
+      ],
+    ], $breadcrumb_manager->jsonLd($route_match, new BubbleableMetadata()));
 
     // Check that the breadcrumb is move to the https://schema.org/breadcrumb
     // property via https://schema.org/WebPage.

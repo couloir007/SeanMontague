@@ -8,13 +8,18 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\trash\Exception\UnrestorableEntityException;
+use Drupal\trash\TrashStorageInterface;
 use Drupal\trash_test\Entity\TrashTestEntity;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests unique field validation during entity restoration.
- *
- * @group trash
  */
+#[Group('trash')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class TrashUniqueFieldTest extends BrowserTestBase {
 
   /**
@@ -112,6 +117,7 @@ class TrashUniqueFieldTest extends BrowserTestBase {
     // Drush) must run the same conflict validation as the restore form.
     $trash_manager = \Drupal::service('trash.manager');
     $storage = \Drupal::entityTypeManager()->getStorage('trash_test_entity');
+    assert($storage instanceof TrashStorageInterface);
     $trashed = $trash_manager->executeInTrashContext('ignore', fn () => $storage->load($entity1->id()));
     try {
       $storage->restoreFromTrash([$trashed]);

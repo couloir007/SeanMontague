@@ -62,6 +62,34 @@ class ViewfieldType extends EntityReference {
 
   /**
    * {@inheritdoc}
+   *
+   * The submitted shape keys its parts 'display_id', 'arguments' and
+   * 'items_to_display', while the columns are '<name>__display',
+   * '<name>__arguments' and '<name>__items', so the names have to be mapped
+   * rather than copied.
+   */
+  public static function extractExtraPropertyValues(array $settings, mixed $value): array {
+    if (!is_array($value)) {
+      return [];
+    }
+    ['name' => $name] = $settings;
+
+    $extra = [];
+    if (!empty($value['display_id'])) {
+      $extra[$name . self::SEPARATOR . 'display'] = $value['display_id'];
+    }
+    if (!empty($value['arguments'])) {
+      $extra[$name . self::SEPARATOR . 'arguments'] = $value['arguments'];
+    }
+    if (!empty($value['items_to_display'])) {
+      $extra[$name . self::SEPARATOR . 'items'] = (int) $value['items_to_display'];
+    }
+
+    return $extra;
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public static function propertyDefinitions(array $settings): array {
     $properties = parent::propertyDefinitions($settings);
@@ -74,6 +102,7 @@ class ViewfieldType extends EntityReference {
     $properties[$name] = CustomFieldDataDefinition::create('custom_field_viewfield')
       ->setLabel(new TranslatableMarkup('@label ID', ['@label' => $name]))
       ->setSetting('target_type', 'view')
+      ->setSetting('field_type', 'viewfield')
       ->setRequired(FALSE);
 
     $properties[$display_id] = DataDefinition::create('string')

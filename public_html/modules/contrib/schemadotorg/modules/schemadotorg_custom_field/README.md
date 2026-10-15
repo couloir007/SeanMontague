@@ -23,6 +23,8 @@ Features
 - Appends units field suffix to custom_field widget edit forms and
   custom_field view displays.
 - Appends units to custom_field JSON-LD data.
+- Maps Custom Field map subfields that represent Schema.org additionalProperty
+  values to PropertyValue JSON-LD objects.
 - Supports [Schema.org: Role](https://schema.org/Role) by automatically adding a
   target entity reference to a custom field that includes a `roleName` property.
 
@@ -42,6 +44,8 @@ Configuration
 - Go to the 'Custom field settings' details.
 - Set Schema.org properties that should use custom_fields and define the
   custom_field item data types.
+- Map subfields can be used for Schema.org additionalProperty values inside a
+  custom field's Schema.org type.
 
 
 Notes

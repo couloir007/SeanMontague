@@ -6,7 +6,6 @@ namespace Drupal\trash_test;
 
 use Drupal\Component\Datetime\Time;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -16,7 +15,6 @@ class TestTime extends Time {
 
   public function __construct(
     RequestStack $requestStack,
-    #[Autowire(service: 'keyvalue')]
     protected KeyValueFactoryInterface $keyValueFactory,
   ) {
     parent::__construct($requestStack);

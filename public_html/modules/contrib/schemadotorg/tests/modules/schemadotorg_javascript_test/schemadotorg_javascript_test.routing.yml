@@ -1,0 +1,26 @@
+schemadotorg_javascript_test.mermaid:
+  path: '/schemadotorg/test/javascript/mermaid'
+  defaults:
+    _title: 'Schema.org Mermaid Test'
+    _controller: 'Drupal\schemadotorg_javascript_test\Controller\SchemaDotOrgJavascriptTestMermaidController::diagram'
+  requirements:
+    # Needs to be accessed by an anonymous user.
+    _access: 'TRUE'
+
+schemadotorg_javascript_test.jstree:
+  path: '/schemadotorg/test/javascript/jstree'
+  defaults:
+    _title: 'Schema.org jsTree Test'
+    _controller: 'Drupal\schemadotorg_javascript_test\Controller\SchemaDotOrgJavaScriptTestJsTreeController::tree'
+  requirements:
+    # Needs to be accessed by an anonymous user.
+    _access: 'TRUE'
+
+schemadotorg_javascript_test.form:
+  path: '/schemadotorg/test/javascript/form'
+  defaults:
+    _title: 'Schema.org JavaScript Test'
+    _form: 'Drupal\schemadotorg_javascript_test\Form\SchemaDotOrgJavaScriptTestForm'
+  requirements:
+    # Needs to be accessed by an anonymous user.
+    _access: 'TRUE'

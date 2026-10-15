@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\local_tasks_more\Functional;
 
 use Drupal\Core\Form\FormState;
-use Drupal\Tests\BrowserTestBase;
 use Drupal\local_tasks_more\Form\LocalTasksMoreSettingsForm;
+use Drupal\Tests\BrowserTestBase;
 
 /**
  * Tests the Local Tasks More settings form.

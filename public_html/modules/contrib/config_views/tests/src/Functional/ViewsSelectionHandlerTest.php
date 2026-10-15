@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\config_views\Functional;
 
+use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\views\Entity\View;
 
@@ -85,6 +86,64 @@ class ViewsSelectionHandlerTest extends BrowserTestBase {
     $this->drupalGet('node/add/article');
     $this->assertSession()->elementTextNotContains('css', '.field--name-field-roles', 'Show me');
     $this->assertSession()->elementTextContains('css', '.field--name-field-roles', 'Hide me');
+  }
+
+  /**
+   * Tests reference labels and IDs that use different entity property names.
+   */
+  public function testReferenceableEntitiesWithCustomKeys() {
+    foreach (['first_format' => 'First format', 'second_format' => 'Second format'] as $id => $label) {
+      FilterFormat::create([
+        'format' => $id,
+        'name' => $label,
+      ])->save();
+    }
+
+    View::create([
+      'id' => 'reference_formats',
+      'label' => 'Reference formats',
+      'base_table' => 'config_filter_format',
+      'base_field' => 'format',
+      'display' => [
+        'default' => [
+          'id' => 'default',
+          'display_plugin' => 'default',
+          'display_options' => [
+            'fields' => [
+              'name' => [
+                'id' => 'name',
+                'table' => 'config_filter_format',
+                'field' => 'name',
+                'plugin_id' => 'standard',
+              ],
+            ],
+          ],
+        ],
+        'entity_reference_1' => [
+          'id' => 'entity_reference_1',
+          'display_plugin' => 'entity_reference',
+          'display_options' => [
+            'style' => [
+              'type' => 'entity_reference',
+              'options' => ['search_fields' => ['name' => 'name']],
+            ],
+            'row' => ['type' => 'entity_reference'],
+          ],
+        ],
+      ],
+    ])->save();
+
+    $selection = $this->container->get('plugin.manager.entity_reference_selection')->createInstance('config_views', [
+      'target_type' => 'filter_format',
+      'view' => [
+        'view_name' => 'reference_formats',
+        'display_name' => 'entity_reference_1',
+        'arguments' => [],
+      ],
+    ]);
+    $entities = $selection->getReferenceableEntities();
+    $this->assertSame('First format', $entities['filter_format']['first_format']);
+    $this->assertSame('Second format', $entities['filter_format']['second_format']);
   }
 
 }

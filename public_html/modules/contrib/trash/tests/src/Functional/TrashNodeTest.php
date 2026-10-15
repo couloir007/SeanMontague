@@ -6,13 +6,23 @@ namespace Drupal\Tests\trash\Functional;
 
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Tests the basic trash functionality on nodes.
  *
- * @group trash
+ * The IgnoreDeprecations attribute is used because the trash module decorates
+ * entity.memory_cache, and core services that use MemoryCacheInterface for
+ * autowiring trigger a deprecation warning.
+ *
+ * @see https://www.drupal.org/node/3546856
  */
+#[Group('trash')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class TrashNodeTest extends BrowserTestBase {
 
   /**

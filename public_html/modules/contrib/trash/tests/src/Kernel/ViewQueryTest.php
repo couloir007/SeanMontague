@@ -5,15 +5,21 @@ declare(strict_types=1);
 namespace Drupal\Tests\trash\Kernel;
 
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\trash\Hook\TrashViewsHooks;
 use Drupal\trash_test\Entity\TrashTestEntity;
 use Drupal\views\Tests\ViewResultAssertionTrait;
+use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests views integration for Trash.
- *
- * @group trash
  */
+#[CoversClass(TrashViewsHooks::class)]
+#[Group('trash')]
+#[RunTestsInSeparateProcesses]
 class ViewQueryTest extends TrashKernelTestBase {
 
   use ViewResultAssertionTrait;
@@ -29,6 +35,16 @@ class ViewQueryTest extends TrashKernelTestBase {
   protected bool $installNode = FALSE;
 
   /**
+   * Loads an executable view, failing the test when the view does not exist.
+   */
+  protected function loadView(string $id): ViewExecutable {
+    $view = Views::getView($id);
+    $this->assertNotNull($view, "The '$id' view does not exist.");
+
+    return $view;
+  }
+
+  /**
    * Tests that deleted entities are excluded from views results.
    */
   public function testQueryWithoutDeletedAccess(): void {
@@ -41,7 +57,7 @@ class ViewQueryTest extends TrashKernelTestBase {
     }
 
     // Test whether they appear in the view.
-    $view = Views::getView('trash_test_view');
+    $view = $this->loadView('trash_test_view');
     $view->execute('page_1');
     $this->assertIdenticalResultset($view, [
       ['id' => 1],
@@ -57,7 +73,7 @@ class ViewQueryTest extends TrashKernelTestBase {
       $entities[$i]->delete();
     }
 
-    $view = Views::getView('trash_test_view');
+    $view = $this->loadView('trash_test_view');
     $view->execute('page_1');
     $this->assertIdenticalResultset($view, [
       ['id' => 4],
@@ -99,8 +115,7 @@ class ViewQueryTest extends TrashKernelTestBase {
       $trash_manager->setTrashContext($initial_trash_context);
       static::assertEquals($initial_trash_context, $trash_manager->getTrashContext(), $name);
 
-      $view = Views::getView('trash_test_view');
-      assert($view !== NULL);
+      $view = $this->loadView('trash_test_view');
       if ($render) {
         // Execute and render the view.
         $view->render($display_id);
@@ -152,7 +167,7 @@ class ViewQueryTest extends TrashKernelTestBase {
     }
 
     // Test whether they appear in the view.
-    $view = Views::getView('trash_test_view');
+    $view = $this->loadView('trash_test_view');
     $view->execute('page_1');
     $this->assertIdenticalResultset($view, [
       ['id' => 1],
@@ -170,7 +185,7 @@ class ViewQueryTest extends TrashKernelTestBase {
     }
 
     // Only the entities that were not deleted will be visible.
-    $view = Views::getView('trash_test_view');
+    $view = $this->loadView('trash_test_view');
     $view->execute('page_1');
     $this->assertIdenticalResultset($view, [
       ['id' => 4],
@@ -179,7 +194,7 @@ class ViewQueryTest extends TrashKernelTestBase {
     $view->destroy();
 
     // The default filter will only pick up deleted entities.
-    $view = Views::getView('trash_test_view');
+    $view = $this->loadView('trash_test_view');
     $view->execute('page_2');
     $this->assertIdenticalResultset($view, [
       ['id' => 1],
@@ -191,7 +206,7 @@ class ViewQueryTest extends TrashKernelTestBase {
     // A 'not empty' (IS NOT NULL) filter on deleted also shows only trashed
     // entities. This requires 'allow empty' in the filter definition, which
     // viewsDataAlter() ensures is present.
-    $view = Views::getView('trash_test_view');
+    $view = $this->loadView('trash_test_view');
     $view->execute('page_3');
     $this->assertIdenticalResultset($view, [
       ['id' => 1],
@@ -223,14 +238,14 @@ class ViewQueryTest extends TrashKernelTestBase {
     // The deleted-column lookup joins the data table, which also has one row
     // per translation: joining on the entity ID alone would multiply every
     // revision row by the number of translations.
-    $view = Views::getView('trash_test_revision_view');
+    $view = $this->loadView('trash_test_revision_view');
     $view->execute();
     $this->assertCount(4, $view->result);
     $view->destroy();
 
     // Trashing the entity removes all of its revision rows from the view.
     TrashTestEntity::load($entity->id())->delete();
-    $view = Views::getView('trash_test_revision_view');
+    $view = $this->loadView('trash_test_revision_view');
     $view->execute();
     $this->assertCount(0, $view->result);
     $view->destroy();
@@ -253,7 +268,7 @@ class ViewQueryTest extends TrashKernelTestBase {
     // The view should return the list of entities that reference the entity
     // passed in. Confirm that when we pass in entityA, we get back
     // entityB and entityC.
-    $view = Views::getView('trash_test_view_relationship');
+    $view = $this->loadView('trash_test_view_relationship');
     $view->setArguments([$entityA->id()]);
     $view->execute('default');
     $this->assertIdenticalResultset($view, [
@@ -271,7 +286,7 @@ class ViewQueryTest extends TrashKernelTestBase {
 
     // The same view should no longer include entityB in its result set since
     // it's in the trash.
-    $view = Views::getView('trash_test_view_relationship');
+    $view = $this->loadView('trash_test_view_relationship');
     $view->setArguments([$entityA->id()]);
     $view->execute('default');
     $this->assertIdenticalResultset($view, [
@@ -287,6 +302,9 @@ class ViewQueryTest extends TrashKernelTestBase {
    * Expected results are creation-order positions (1-5) of the five entities
    * created per case; the first three are trashed. testQueryTrashContext()
    * maps these positions to the actual entity IDs.
+   *
+   * @return array<string, array{0: string, 1: list<int>, 2: string, 3: string, 4: string, 5: bool}>
+   *   Test cases keyed by name.
    */
   protected static function queryTrashContextCases(): array {
     $non_trashed = [4, 5];

@@ -91,7 +91,7 @@ class LocalTasksMoreSettingsForm extends ConfigFormBase {
     $form['alter_local_tasks'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Local tasks alterations (YAML)'),
-      '#description' => $this->t('Enter the local task id and this the altered title and weight. Set the local tasks to FALSE to remove it.'),
+      '#description' => $this->t('Enter the local task id and the altered title and weight. Set the local tasks to FALSE to remove it.'),
       '#element_validate' => [[static::class, 'alterLocalTasksElementValidate']],
       '#config_target' => new ConfigTarget(
         'local_tasks_more.settings',

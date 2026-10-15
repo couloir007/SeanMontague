@@ -35,13 +35,6 @@ schemadotorg_recipe.details.export:
   requirements:
     _permission: 'administer schemadotorg'
 
-schemadotorg_starterkit.details.export:
-  path: '/admin/config/schemadotorg/starterkits/{name}/export'
-  defaults:
-    _controller: '\Drupal\schemadotorg_export\Controller\SchemaDotOrgExportStarterKitController::details'
-  requirements:
-    _permission: 'administer schemadotorg'
-
 schemadotorg_report.type.export:
   path: '/admin/reports/schemadotorg/{id}/export'
   defaults:

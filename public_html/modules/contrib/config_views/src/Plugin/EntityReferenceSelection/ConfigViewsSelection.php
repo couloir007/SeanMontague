@@ -97,7 +97,8 @@ class ConfigViewsSelection extends ViewsSelection {
     $entities = [];
     if ($results = $this->getDisplayExecutionResults($match, $match_operator, $limit)) {
       foreach (Element::children($results) as $id) {
-        $entities[$results[$id]['#row']->type][$results[$id]['#row']->id] = $results[$id]['#row']->label;
+        $entity = $results[$id]['#row']->entity;
+        $entities[$entity->getEntityTypeId()][$entity->id()] = $entity->label();
       }
     }
     return $entities;

@@ -17,7 +17,7 @@
   "require-dev": {
     "drupal/feeds": "^3",
     "drupal/linkit": "^6.1 || ^7",
-    "drupal/graphql_compose": "2.4.x-dev",
+    "drupal/graphql_compose": "^2.4",
     "drupal/paragraphs": "^1",
     "drupal/search_api": "^1",
     "drupal/entity_usage": "^2",

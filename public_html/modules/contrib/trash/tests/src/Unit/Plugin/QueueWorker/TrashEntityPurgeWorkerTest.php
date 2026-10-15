@@ -9,18 +9,20 @@ use Drupal\Core\Entity\ContentEntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\trash\Plugin\QueueWorker\TrashEntityPurgeWorker;
 use Drupal\trash\TrashManagerInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Unit test for the entity purge worker.
- *
- * @coversDefaultClass \Drupal\trash\Plugin\QueueWorker\TrashEntityPurgeWorker
- * @group trash
  */
+#[CoversClass(TrashEntityPurgeWorker::class)]
+#[Group('trash')]
 class TrashEntityPurgeWorkerTest extends UnitTestCase {
 
   /**
@@ -52,6 +54,13 @@ class TrashEntityPurgeWorkerTest extends UnitTestCase {
   protected TimeInterface|MockObject $time;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected LanguageManagerInterface|MockObject $languageManager;
+
+  /**
    * The trash purge worker under test.
    *
    * @var \Drupal\trash\Plugin\QueueWorker\TrashEntityPurgeWorker
@@ -78,12 +87,13 @@ class TrashEntityPurgeWorkerTest extends UnitTestCase {
       ->willReturn(TRUE);
     $this->loggerFactory = $this->createMock(LoggerChannelFactoryInterface::class);
     $this->time = $this->createMock(TimeInterface::class);
-    $this->worker = new TrashEntityPurgeWorker($configuration, $plugin_id, $plugin_definition, $this->entityTypeManager, $this->trashManager, $this->loggerFactory, $this->time);
+    $this->languageManager = $this->createMock(LanguageManagerInterface::class);
+    $this->worker = new TrashEntityPurgeWorker($configuration, $plugin_id, $plugin_definition, $this->entityTypeManager, $this->trashManager, $this->loggerFactory, $this->time, $this->languageManager);
     $this->worker->setStringTranslation($this->getStringTranslationStub());
   }
 
   /**
-   * @covers ::processItem
+   * Tests TrashEntityPurgeWorker::processItem().
    */
   public function testProcessItem() {
     // Nothing ends up purged in this scenario, so no success message may be
@@ -132,6 +142,10 @@ class TrashEntityPurgeWorkerTest extends UnitTestCase {
       ->with('node')
       ->willReturn($nodeDefinition);
 
+    $this->languageManager->expects($this->once())
+      ->method('isMultilingual')
+      ->willReturn(FALSE);
+
     // Run the purge closure for real, against a storage that loads nothing.
     $this->trashManager->expects($this->once())
       ->method('executeInTrashContext')
@@ -170,7 +184,7 @@ class TrashEntityPurgeWorkerTest extends UnitTestCase {
     $this->loggerFactory->expects($this->never())
       ->method('get');
 
-    $worker = new TrashEntityPurgeWorker([], 'trash_entity_purge', ['id' => 'trash_entity_purge'], $this->entityTypeManager, $trash_manager, $this->loggerFactory, $this->time);
+    $worker = new TrashEntityPurgeWorker([], 'trash_entity_purge', ['id' => 'trash_entity_purge'], $this->entityTypeManager, $trash_manager, $this->loggerFactory, $this->time, $this->languageManager);
     $worker->setStringTranslation($this->getStringTranslationStub());
 
     $worker->processItem([

@@ -28,7 +28,7 @@ class SchemaDotOrgExportRecipeController extends ControllerBase {
    * @param \Drupal\schemadotorg\SchemaDotOrgMappingManagerInterface $schemaMappingManager
    *   The Schema.org mapping manager.
    * @param \Drupal\schemadotorg_recipe\SchemaDotOrgRecipeManagerInterface $schemaRecipeManager
-   *   The Schema.org starter kit manager.
+   *   The Schema.org recipe manager.
    */
   public function __construct(
     protected SchemaDotOrgNamesInterface $schemaNames,

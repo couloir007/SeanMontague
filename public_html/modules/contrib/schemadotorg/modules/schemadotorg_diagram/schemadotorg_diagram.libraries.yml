@@ -3,6 +3,5 @@ schemadotorg_diagram:
     component:
       css/schemadotorg_diagram.css: {  }
   dependencies:
-    - schemadotorg/schemadotorg.dialog
     - schemadotorg/schemadotorg.details
     - schemadotorg/schemadotorg.mermaid

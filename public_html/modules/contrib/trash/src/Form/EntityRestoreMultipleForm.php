@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\trash\Form;
 
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Form\WorkspaceSafeFormTrait;
 use Drupal\Core\Form\BaseFormIdInterface;
@@ -16,7 +18,6 @@ use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\Core\Url;
 use Drupal\trash\Trash;
 use Drupal\trash\TrashManagerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -24,6 +25,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  */
 class EntityRestoreMultipleForm extends ConfirmFormBase implements BaseFormIdInterface, WorkspaceDynamicSafeFormInterface {
 
+  use AutowireTrait;
   use WorkspaceSafeFormTrait;
 
   /**
@@ -57,18 +59,6 @@ class EntityRestoreMultipleForm extends ConfirmFormBase implements BaseFormIdInt
     protected TrashManagerInterface $trashManager,
   ) {
     $this->tempStore = $tempStoreFactory->get('trash_restore_multiple_confirm');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('current_user'),
-      $container->get('entity_type.manager'),
-      $container->get('tempstore.private'),
-      $container->get('trash.manager')
-    );
   }
 
   /**
@@ -114,6 +104,7 @@ class EntityRestoreMultipleForm extends ConfirmFormBase implements BaseFormIdInt
    * {@inheritdoc}
    */
   public function getDescription() {
+    // @phpstan-ignore return.type
     return NULL;
   }
 
@@ -132,6 +123,7 @@ class EntityRestoreMultipleForm extends ConfirmFormBase implements BaseFormIdInt
     $this->selection = $this->tempStore->get($this->currentUser->id() . ':' . $entity_type_id) ?? [];
 
     if (empty($this->entityTypeId) || empty($this->selection)) {
+      // @phpstan-ignore return.type
       return new RedirectResponse($this->getCancelUrl()->setAbsolute()->toString());
     }
 
@@ -144,55 +136,50 @@ class EntityRestoreMultipleForm extends ConfirmFormBase implements BaseFormIdInt
     // selection, and bail out if nothing is left to confirm.
     $this->selection = array_intersect_key($this->selection, $entities);
     if (empty($this->selection)) {
+      // @phpstan-ignore return.type
       return new RedirectResponse($this->getCancelUrl()->setAbsolute()->toString());
     }
 
     $items = [];
     foreach ($this->selection as $id => $selected_langcodes) {
       $entity = $entities[$id];
-      foreach ($selected_langcodes as $langcode) {
-        $key = $id . ':' . $langcode;
-        if ($entity instanceof TranslatableInterface) {
-          // A single translation may have been purged since the confirm page
-          // selection was built; skip it instead of fatally erroring in
-          // getTranslation().
-          if (!$entity->hasTranslation($langcode)) {
-            continue;
-          }
-          $entity = $entity->getTranslation($langcode);
-          $default_key = $id . ':' . $entity->getUntranslated()->language()->getId();
-
-          // Build a nested list of translations that will be restored if the
-          // entity has multiple translations.
-          $entity_languages = $entity->getTranslationLanguages();
-          if (count($entity_languages) > 1 && $entity->isDefaultTranslation()) {
-            $names = [];
-            foreach ($entity_languages as $translation_langcode => $language) {
-              $names[] = $language->getName();
-              unset($items[$id . ':' . $translation_langcode]);
-            }
-            $items[$default_key] = [
-              'label' => [
-                '#markup' => $this->t('@label (Original translation) - <em>The following @entity_type translations will be restored:</em>',
-                  [
-                    '@label' => $entity->label(),
-                    '@entity_type' => $this->entityType->getSingularLabel(),
-                  ]),
-              ],
-              'restored_translations' => [
-                '#theme' => 'item_list',
-                '#items' => $names,
-              ],
-            ];
-          }
-          elseif (!isset($items[$default_key])) {
-            $items[$key] = $entity->label();
-          }
-        }
-        elseif (!isset($items[$key])) {
-          $items[$key] = $entity->label();
-        }
+      $restore_langcodes = $this->getRestoreLangcodes($entity, $selected_langcodes);
+      // Nothing left to restore for this entity, for example because it was
+      // restored by another user while the selection sat in the tempstore.
+      if (!$restore_langcodes) {
+        continue;
       }
+
+      // A single translation: show its label directly.
+      if (count($restore_langcodes) === 1 || !$entity instanceof TranslatableInterface) {
+        $langcode = reset($restore_langcodes);
+        $translation = $entity instanceof TranslatableInterface ? $entity->getTranslation($langcode) : $entity;
+        $items[$id] = $translation->label();
+        continue;
+      }
+
+      // List each translation that will be restored, including a default
+      // translation that is restored along with a selected translation.
+      $names = [];
+      foreach ($restore_langcodes as $langcode) {
+        $translation = $entity->getTranslation($langcode);
+        $names[] = $translation->isDefaultTranslation()
+          ? $this->t('@language (Original language)', ['@language' => $translation->language()->getName()])
+          : $translation->language()->getName();
+      }
+      $items[$id] = [
+        'label' => [
+          '#markup' => $this->t('@label - <em>The following @entity_type translations will be restored:</em>',
+            [
+              '@label' => $entity->label(),
+              '@entity_type' => $this->entityType->getSingularLabel(),
+            ]),
+        ],
+        'restored_translations' => [
+          '#theme' => 'item_list',
+          '#items' => $names,
+        ],
+      ];
     }
 
     $form['entities'] = [
@@ -210,12 +197,11 @@ class EntityRestoreMultipleForm extends ConfirmFormBase implements BaseFormIdInt
     assert($this->trashManager->getTrashContext() !== 'active');
 
     $total_count = 0;
-    $restore_entities = [];
+    $restore_langcodes = [];
     $inaccessible_entities = [];
 
     $entities = $this->entityTypeManager->getStorage($this->entityTypeId)->loadMultiple(array_keys($this->selection));
 
-    // Collect entities to restore (restore always restores the full entity).
     foreach ($this->selection as $id => $selected_langcodes) {
       // The entity may have been purged since the confirm page was built;
       // skip it instead of fatally erroring on the missing array key.
@@ -223,19 +209,42 @@ class EntityRestoreMultipleForm extends ConfirmFormBase implements BaseFormIdInt
         continue;
       }
       $entity = $entities[$id];
-      if (!$entity->access('restore', $this->currentUser)) {
-        $inaccessible_entities[] = $entity;
-        continue;
+      $accessible_langcodes = [];
+      foreach ($selected_langcodes as $langcode) {
+        if ($entity instanceof TranslatableInterface) {
+          // The translation may have been purged or restored since the
+          // selection was made; skip it so the reported count only covers
+          // translations this submit actually restores.
+          if (!$entity->hasTranslation($langcode)) {
+            continue;
+          }
+          $translation = $entity->getTranslation($langcode);
+        }
+        else {
+          $translation = $entity;
+        }
+        if (!Trash::entityIsDeleted($translation)) {
+          continue;
+        }
+        if (!$translation->access('restore', $this->currentUser)) {
+          $inaccessible_entities[] = $translation;
+          continue;
+        }
+        $accessible_langcodes[] = $langcode;
       }
-      if (!isset($restore_entities[$id])) {
-        $restore_entities[$id] = $entity;
+      // The forced default translation needs no separate access check: restore
+      // access on a translation already requires restore access on its deleted
+      // default translation.
+      if ($langcodes = $this->getRestoreLangcodes($entity, $accessible_langcodes)) {
+        $restore_langcodes[$id] = $langcodes;
       }
     }
 
-    foreach ($restore_entities as $entity) {
+    foreach ($restore_langcodes as $id => $langcodes) {
+      $entity = $entities[$id];
       try {
-        Trash::restoreEntity($entity);
-        $total_count++;
+        Trash::restoreEntity($entity, $langcodes);
+        $total_count += count($langcodes);
         $this->logger('trash')->info('Restored @entity-type %label from trash.', [
           '@entity-type' => $entity->getEntityType()->getSingularLabel(),
           '%label' => $entity->label(),
@@ -258,6 +267,56 @@ class EntityRestoreMultipleForm extends ConfirmFormBase implements BaseFormIdInt
 
     $this->tempStore->delete($this->currentUser->id() . ':' . $this->entityTypeId);
     $form_state->setRedirectUrl($this->getCancelUrl());
+  }
+
+  /**
+   * Resolves the langcodes that will actually be restored for an entity.
+   *
+   * Drops selected langcodes whose translation is missing or not deleted, and
+   * adds the default langcode when a selected translation has a deleted
+   * default translation. Restoring a translation whose original language is
+   * also deleted must restore the original too, otherwise the entity ends up
+   * live in one language while still trashed in its default, and a later
+   * purge of that still-trashed default would destroy the restored
+   * translation.
+   *
+   * Both the confirm page and the submit handler use this method, so the
+   * confirm page lists exactly the translations that get restored.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The selected entity.
+   * @param string[] $selected_langcodes
+   *   The selected langcodes.
+   *
+   * @return string[]
+   *   The langcodes that will be restored, keyed by langcode.
+   */
+  protected function getRestoreLangcodes(EntityInterface $entity, array $selected_langcodes): array {
+    $langcodes = [];
+    foreach ($selected_langcodes as $langcode) {
+      if ($entity instanceof TranslatableInterface) {
+        if (!$entity->hasTranslation($langcode)) {
+          continue;
+        }
+        $translation = $entity->getTranslation($langcode);
+      }
+      else {
+        $translation = $entity;
+      }
+      if (!Trash::entityIsDeleted($translation)) {
+        continue;
+      }
+      $langcodes[$langcode] = $langcode;
+
+      if ($translation instanceof TranslatableInterface && !$translation->isDefaultTranslation()) {
+        $untranslated = $translation->getUntranslated();
+        if (Trash::entityIsDeleted($untranslated)) {
+          $default_langcode = $untranslated->language()->getId();
+          $langcodes[$default_langcode] = $default_langcode;
+        }
+      }
+    }
+    return $langcodes;
   }
 
   /**

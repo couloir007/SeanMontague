@@ -209,6 +209,30 @@ class DateRangeWidgetTest extends WebDriverTestBase {
   }
 
   /**
+   * Sets the value of a datetime-local input via JavaScript.
+   *
+   * WebDriver's native field interaction is unreliable for datetime-local
+   * inputs, so assign the value directly and dispatch the events the browser
+   * would send.
+   *
+   * @param string $name
+   *   The input's name attribute.
+   * @param string $value
+   *   Value in the format the element expects, e.g. '2026-08-21T10:30'.
+   */
+  protected function setDateTimeLocalValue(string $name, string $value): void {
+    $script = <<<JS
+      (function () {
+        const el = document.querySelector('input[name="$name"]');
+        el.value = '$value';
+        el.dispatchEvent(new Event('input', {bubbles: true}));
+        el.dispatchEvent(new Event('change', {bubbles: true}));
+      })();
+    JS;
+    $this->getSession()->executeScript($script);
+  }
+
+  /**
    * Tests all_day AJAX swaps datetime-local for date and hides same_day.
    */
   public function testAllDayCheckboxAjaxSwitchesToDateInputs(): void {
@@ -340,6 +364,158 @@ class DateRangeWidgetTest extends WebDriverTestBase {
     $assert->fieldExists('field_test[0][range_interactive][all_day]');
     $assert->fieldExists('field_test[0][range_interactive][same_day]');
     $assert->fieldExists('field_test[0][range_interactive][end_value][date]');
+  }
+
+  /**
+   * Tests same_day with a populated start date and an empty end date.
+   *
+   * Regression test for the InvalidArgumentException thrown by
+   * DateTimePlus::createFromFormat(). DatetimeBase::valueCallback() copies the
+   * start element's 'Y-m-d' date part onto end_value whenever same_day is set,
+   * but on the request that ticks the checkbox the widget has not been rebuilt
+   * yet, so end_value is still a datetime-local element expecting
+   * 'Y-m-d\TH:i'. The copied value cannot be parsed, leaving
+   * $input['object'] NULL, and because $input['date'] is non-empty
+   * validateDatetime() falls through to its unguarded
+   * DrupalDateTime::createFromFormat() call and throws.
+   *
+   * Only reproducible with an empty end date: a populated end date is parsed
+   * by the datetime-local branch before the same_day rewrite is reached.
+   */
+  public function testSameDayCheckboxWithStartDateAndEmptyEndDate(): void {
+    $assert = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    $this->drupalGet('node/add/page');
+
+    $this->setDateTimeLocalValue(
+      'field_test[0][range_interactive][value][date]',
+      '2026-08-21T10:30'
+    );
+    $assert->fieldValueEquals('field_test[0][range_interactive][end_value][date]', '');
+
+    $page->checkField('field_test[0][range_interactive][same_day]');
+    $assert->assertWaitOnAjaxRequest();
+
+    // The rebuild must have completed: all_day is removed via #access while
+    // same_day is checked. Before the fix the AJAX request returns a 500 and
+    // all_day is still present.
+    $assert->fieldNotExists('field_test[0][range_interactive][all_day]');
+    $assert->checkboxChecked('field_test[0][range_interactive][same_day]');
+    $assert->elementNotExists('css', '.messages--error');
+
+    // The start value survives the rebuild.
+    $assert->fieldValueEquals(
+      'field_test[0][range_interactive][value][date]',
+      '2026-08-21T10:30'
+    );
+
+    // End is rebuilt as a hidden date plus a visible time input. With no time
+    // entered there is no end value at all, so both parts stay empty rather
+    // than leaving a day with no time attached to it.
+    $end_date = $page->find(
+      'css',
+      'input[name="field_test[0][range_interactive][end_value][date]"]'
+    );
+    $this->assertNotNull($end_date, 'End date input exists after same_day rebuild.');
+    $this->assertSame('', $end_date->getValue());
+
+    $end_time = $page->find(
+      'css',
+      'input[name="field_test[0][range_interactive][end_value][time]"]'
+    );
+    $this->assertNotNull($end_time, 'End time input exists after same_day rebuild.');
+    $this->assertSame('', $end_time->getValue());
+  }
+
+  /**
+   * Tests toggling same_day off again with a populated start, empty end.
+   *
+   * Covers the return trip: end_value is switched back to datetime-local while
+   * the user input still holds whatever was written for same-day mode.
+   */
+  public function testSameDayCheckboxUncheckWithStartDateAndEmptyEndDate(): void {
+    $assert = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    $this->drupalGet('node/add/page');
+
+    $this->setDateTimeLocalValue(
+      'field_test[0][range_interactive][value][date]',
+      '2026-08-21T10:30'
+    );
+
+    $page->checkField('field_test[0][range_interactive][same_day]');
+    $assert->assertWaitOnAjaxRequest();
+    $assert->fieldNotExists('field_test[0][range_interactive][all_day]');
+
+    $page->uncheckField('field_test[0][range_interactive][same_day]');
+    $assert->assertWaitOnAjaxRequest();
+    $assert->waitForField('field_test[0][range_interactive][all_day]');
+
+    $assert->fieldExists('field_test[0][range_interactive][all_day]');
+    $assert->elementNotExists('css', '.messages--error');
+    $assert->elementAttributeContains(
+      'css',
+      'input[name="field_test[0][range_interactive][end_value][date]"]',
+      'type',
+      'datetime-local'
+    );
+  }
+
+  /**
+   * Tests saving a same-day range with no end time stores no end value.
+   *
+   * In same-day mode processDatetime() hides the date input and the user
+   * supplies only a time, so an end value exists only once that time is
+   * entered. Without the guard, validateDatetime() falls through to
+   * DrupalDateTime::createFromFormat() with the date-only string and the
+   * element's own 'Y-m-d' format, which parses successfully and takes its
+   * time component from the current clock. That stores an end date on the
+   * start's day at an arbitrary time, and whether validateStartEnd() rejects
+   * it depends on when the request happened to run.
+   */
+  public function testSameDayWithoutEndTimeStoresNoEndValue(): void {
+    $assert = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    $this->drupalGet('node/add/page');
+
+    $title = 'Same day without end time';
+    $page->fillField('title[0][value]', $title);
+    $this->setDateTimeLocalValue(
+      'field_test[0][range_interactive][value][date]',
+      '2026-08-21T10:30'
+    );
+
+    $page->checkField('field_test[0][range_interactive][same_day]');
+    $assert->assertWaitOnAjaxRequest();
+    $assert->fieldNotExists('field_test[0][range_interactive][all_day]');
+
+    // Save without ever entering an end time.
+    $page->pressButton('Save');
+    $assert->statusMessageExists('status');
+    $assert->elementNotExists('css', '.messages--error');
+
+    \Drupal::entityTypeManager()->getStorage('node')->resetCache();
+    $node = $this->drupalGetNodeByTitle($title);
+    $this->assertNotNull($node, 'Node was saved.');
+
+    $item = $node->get('field_test')->first();
+    $this->assertNotNull($item, 'Custom field item exists.');
+
+    // The start date is stored as submitted.
+    $this->assertNotEmpty(
+      $item->get('range_interactive')->getValue(),
+      'Start date was stored.'
+    );
+
+    // No time was entered, so there is no end value. A non-empty value here
+    // means a phantom timestamp was manufactured from the current clock.
+    $this->assertNull(
+      $item->get('range_interactive__end')->getValue(),
+      'No end value is stored when the same-day end time is left empty.'
+    );
   }
 
   /**

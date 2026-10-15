@@ -6,6 +6,7 @@ namespace Drupal\trash\Hook\TrashHandler;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\menu_link_content\MenuLinkContentInterface;
 use Drupal\trash\Handler\DefaultTrashHandler;
 use Drupal\trash\Trash;
 use Drupal\workspaces\Event\WorkspacePostPublishEvent;
@@ -57,12 +58,18 @@ class MenuLinkContentTrashHandler extends DefaultTrashHandler implements EventSu
   /**
    * {@inheritdoc}
    */
-  public function postTrashDelete(EntityInterface $entity): void {
-    parent::postTrashDelete($entity);
+  public function postTrashDelete(EntityInterface $entity, array $langcodes): void {
+    parent::postTrashDelete($entity, $langcodes);
+
+    // The menu_tree entry covers all languages of the link, so it is only
+    // removed once no live translation remains.
+    if (!Trash::entityHasAllTranslationsDeleted($entity)) {
+      return;
+    }
 
     // This needs to happen *after* the menu link is trashed, so its menu_tree
     // entry can be deleted.
-    /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $entity */
+    assert($entity instanceof MenuLinkContentInterface);
     $entity::preDelete($this->entityTypeManager->getStorage('menu_link_content'), [$entity]);
   }
 

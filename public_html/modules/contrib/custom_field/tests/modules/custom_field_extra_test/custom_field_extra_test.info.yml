@@ -1,0 +1,11 @@
+name: 'Custom Field Extra Property Test'
+type: module
+description: 'Provides a subfield type that returns an undeclared extra property.'
+package: Testing
+dependencies:
+  - custom_field:custom_field
+
+# Information added by Drupal.org packaging script on 2026-09-16
+version: '4.0.12'
+project: 'custom_field'
+datestamp: 1789545753

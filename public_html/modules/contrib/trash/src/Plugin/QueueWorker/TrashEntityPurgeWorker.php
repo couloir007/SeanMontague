@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace Drupal\trash\Plugin\QueueWorker;
 
 use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\DependencyInjection\AutowiredInstanceTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Queue\Attribute\QueueWorker;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\trash\Trash;
 use Drupal\trash\TrashManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -26,6 +29,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 )]
 class TrashEntityPurgeWorker extends QueueWorkerBase implements ContainerFactoryPluginInterface {
 
+  use AutowiredInstanceTrait;
   use StringTranslationTrait;
 
   /**
@@ -39,6 +43,7 @@ class TrashEntityPurgeWorker extends QueueWorkerBase implements ContainerFactory
     protected TrashManagerInterface $trashManager,
     protected LoggerChannelFactoryInterface $loggerFactory,
     protected TimeInterface $time,
+    protected LanguageManagerInterface $languageManager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
@@ -47,15 +52,7 @@ class TrashEntityPurgeWorker extends QueueWorkerBase implements ContainerFactory
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.manager'),
-      $container->get('trash.manager'),
-      $container->get('logger.factory'),
-      $container->get('datetime.time')
-    );
+    return static::createInstanceAutowired($container, $configuration, $plugin_id, $plugin_definition);
   }
 
   /**
@@ -74,8 +71,9 @@ class TrashEntityPurgeWorker extends QueueWorkerBase implements ContainerFactory
       $storage = $this->entityTypeManager->getStorage($data['entity_type_id']);
       $entity_definition = $this->entityTypeManager->getDefinition($data['entity_type_id']);
       $id_key = $entity_definition->getKey('id');
+      $translatable = $this->languageManager->isMultilingual() && $entity_definition->isTranslatable();
 
-      // The cutoff timestamp the queue item was built with. Only entities
+      // The cutoff timestamp the queue item was built with. Only translations
       // deleted before this may be purged. Legacy items queued without this
       // key purge nothing: the next cron run re-enqueues their entities with
       // a real cutoff.
@@ -91,20 +89,57 @@ class TrashEntityPurgeWorker extends QueueWorkerBase implements ContainerFactory
 
       if ($ids) {
         $purged_count = 0;
-        $this->trashManager->executeInTrashContext('inactive', function () use ($storage, $ids, $cutoff, &$purged_count) {
+        $this->trashManager->executeInTrashContext('inactive', function () use ($storage, $ids, $translatable, $cutoff, &$purged_count) {
           $entities = $storage->loadMultiple($ids);
-          // An entity that was restored and trashed again after the item
-          // was queued has a fresh timestamp and keeps its full retention
-          // window, so only purge entities deleted before the cutoff.
-          $entities = array_filter($entities, fn (ContentEntityInterface $entity) => (int) $entity->get('deleted')->value < $cutoff);
-          if ($entities) {
-            $storage->delete($entities);
-            $purged_count = count($entities);
+          if (!$translatable) {
+            // An entity that was restored and trashed again after the item
+            // was queued has a fresh timestamp and keeps its full retention
+            // window, so only purge entities deleted before the cutoff.
+            $entities = array_filter($entities, fn (ContentEntityInterface $entity) => (int) $entity->get('deleted')->value < $cutoff);
+            if ($entities) {
+              $storage->delete($entities);
+              $purged_count = count($entities);
+            }
+            return;
+          }
+          foreach ($entities as $entity) {
+            assert($entity instanceof ContentEntityInterface);
+            // A whole-entity purge is only allowed when every translation is
+            // deleted and past the cutoff. Otherwise only the qualifying
+            // non-default translations are removed: live or recently trashed
+            // translations must survive, and a deleted default translation
+            // cannot be removed on its own, so it stays in the trash until
+            // all translations qualify.
+            $purge_entity = TRUE;
+            $langcodes = [];
+            foreach (array_keys($entity->getTranslationLanguages()) as $langcode) {
+              $translation = $entity->getTranslation($langcode);
+              if (!Trash::entityIsDeleted($translation) || (int) $translation->get('deleted')->value >= $cutoff) {
+                $purge_entity = FALSE;
+              }
+              elseif (!$translation->isDefaultTranslation()) {
+                $langcodes[] = $langcode;
+              }
+            }
+            if ($purge_entity) {
+              $storage->delete([$entity]);
+              $purged_count++;
+              continue;
+            }
+            if (empty($langcodes)) {
+              continue;
+            }
+            $untranslated = $entity->getUntranslated();
+            foreach ($langcodes as $langcode) {
+              $untranslated->removeTranslation($langcode);
+            }
+            $untranslated->save();
+            $purged_count++;
           }
         });
 
-        // Report only the entities that were acted on; the cutoff check
-        // above may skip any number of queued IDs.
+        // Report only the entities that were acted on; the cutoff and
+        // translation checks above may skip any number of queued IDs.
         if ($purged_count > 0) {
           $message = $this->formatPlural($purged_count, 'Successfully purged @count @item', 'Successfully purged @count @items', [
             '@count' => $purged_count,

@@ -44,6 +44,18 @@ interface CustomFieldTypeInterface extends PluginInspectionInterface {
   public function value(FieldItemInterface $item): mixed;
 
   /**
+   * Returns the raw stored value(s) of this subfield for a field item.
+   *
+   * @param \Drupal\Core\Field\FieldItemInterface $item
+   *   The field item to read the stored columns from.
+   *
+   * @return mixed
+   *   A scalar for single-column subfields, or an array keyed by property
+   *   suffix ('value', 'end', 'duration', ...) for multi-column subfields.
+   */
+  public function getRawValue(FieldItemInterface $item): mixed;
+
+  /**
    * The default formatter plugin type.
    *
    * @return string
@@ -187,6 +199,44 @@ interface CustomFieldTypeInterface extends PluginInspectionInterface {
    *   An array of schema properties for the field type.
    */
   public static function schema(array $settings): array;
+
+  /**
+   * Returns the names of the extra properties this subfield stores.
+   *
+   * Some subfield types store more than one column: an image also stores its
+   * alt text and dimensions, a viewfield also stores its display id. Those
+   * live in sibling columns named "<subfield>__<suffix>".
+   *
+   * @param array<string, mixed> $settings
+   *   The column settings, including the subfield machine name in 'name'.
+   *
+   * @return string[]
+   *   FULL property names, not suffixes - for example
+   *   ['my_view__display', 'my_view__items']. An empty array when the subfield
+   *   stores only its main column.
+   */
+  public static function getExtraPropertyNames(array $settings): array;
+
+  /**
+   * Maps a nested subfield value onto its extra properties.
+   *
+   * Implement this when a subfield accepts a nested array whose keys do not
+   * already match its extra property names, so that callers holding only that
+   * nested value can still derive the flat sibling values from it.
+   *
+   * This method RETURNS values and must never write to properties or to the
+   * field item - callers decide what to do with the result.
+   *
+   * @param array<string, mixed> $settings
+   *   The column settings, including the subfield machine name in 'name'.
+   * @param mixed $value
+   *   The incoming subfield value, typically a nested array.
+   *
+   * @return array<string, mixed>
+   *   Extra property values keyed by FULL property name, covering only the
+   *   subset the value actually carries. Defaults to an empty array.
+   */
+  public static function extractExtraPropertyValues(array $settings, mixed $value): array;
 
   /**
    * Returns an array of property definitions.

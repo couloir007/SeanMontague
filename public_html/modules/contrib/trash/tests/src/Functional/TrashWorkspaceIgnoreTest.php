@@ -8,12 +8,14 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\workspaces\Functional\WorkspaceTestUtilities;
 use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the trash ignore functionality.
- *
- * @group trash
  */
+#[Group('trash')]
+#[RunTestsInSeparateProcesses]
 final class TrashWorkspaceIgnoreTest extends BrowserTestBase {
 
   use ContentTypeCreationTrait;
@@ -27,6 +29,7 @@ final class TrashWorkspaceIgnoreTest extends BrowserTestBase {
     'block',
     'trash',
     'workspaces',
+    'workspaces_ui',
   ];
 
   /**
@@ -39,11 +42,6 @@ final class TrashWorkspaceIgnoreTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    // The workspaces_ui module was split out from workspaces in Drupal 11.1.
-    if (version_compare(\Drupal::VERSION, '11.1', '>')) {
-      \Drupal::service('module_installer')->install(['workspaces_ui']);
-    }
 
     if ($this->profile != 'standard') {
       $this->drupalCreateContentType([

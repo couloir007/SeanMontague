@@ -243,10 +243,17 @@ class SchemaDotOrgEntityFieldManager implements SchemaDotOrgEntityFieldManagerIn
         default => $field_definition['category'],
       };
 
-      // Support categories as translatable string and the newer category info.
-      $optgroup = ($category instanceof TranslatableMarkup)
-        ? (string) $category
-        : (string) $category_info[$category]['label'];
+      // Support categories as translatable string, the newer category info,
+      // and the simple $category value.
+      if ($category instanceof TranslatableMarkup) {
+        $optgroup = (string) $category;
+      }
+      elseif (isset($category_info[$category])) {
+        $optgroup = (string) $category_info[$category]['label'];
+      }
+      else {
+        $optgroup = mb_ucfirst(str_replace('_', ' ', $category));
+      }
 
       $options[$optgroup][$name] = $field_definition['label'];
     }

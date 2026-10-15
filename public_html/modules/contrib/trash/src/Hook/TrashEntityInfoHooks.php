@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\trash\Hook;
 
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\trash\EntityHandler\TrashNodeAccessControlHandler;
 use Drupal\trash\Form\EntityPurgeForm;
@@ -24,6 +24,7 @@ class TrashEntityInfoHooks {
 
   public function __construct(
     protected TrashManagerInterface $trashManager,
+    protected LanguageManagerInterface $languageManager,
   ) {}
 
   /**
@@ -35,12 +36,7 @@ class TrashEntityInfoHooks {
 
     // Add the 'deleted' base field.
     if ($this->trashManager->isEntityTypeEnabled($entity_type)) {
-      $base_field_definitions['deleted'] = BaseFieldDefinition::create('timestamp')
-        ->setLabel($this->t('Deleted'))
-        ->setDescription($this->t('Time when the item got deleted.'))
-        ->setInternal(TRUE)
-        ->setTranslatable(FALSE)
-        ->setRevisionable(TRUE);
+      $base_field_definitions['deleted'] = $this->trashManager->getDeletedFieldDefinition();
     }
 
     return $base_field_definitions;
@@ -74,8 +70,12 @@ class TrashEntityInfoHooks {
         else {
           $base_path = "/admin/content/trash/$entity_type_id/{" . $entity_type_id . '}';
         }
-        $entity_type->setLinkTemplate('restore', $base_path . '/restore');
-        $entity_type->setLinkTemplate('purge', $base_path . '/purge');
+
+        // Only add the {language} slug on multilingual sites.
+        $language_slug = $this->languageManager->isMultilingual() ? '/{language}' : '';
+        $entity_type->setLinkTemplate('restore', $base_path . '/restore' . $language_slug);
+        $entity_type->setLinkTemplate('purge', $base_path . '/purge' . $language_slug);
+
         $entity_type->setLinkTemplate('restore-multiple-form', "/admin/content/trash/$entity_type_id/restore");
         $entity_type->setLinkTemplate('purge-multiple-form', "/admin/content/trash/$entity_type_id/purge");
 
@@ -83,6 +83,12 @@ class TrashEntityInfoHooks {
         // 'bypass node access' permission check if the node is deleted.
         if ($entity_type->id() === 'node') {
           $entity_type->setHandlerClass('access', TrashNodeAccessControlHandler::class);
+        }
+
+        // Report a new redirect whose source is held by a trashed redirect,
+        // instead of letting it fail to save.
+        if ($entity_type->id() === 'redirect') {
+          $entity_type->addConstraint('TrashedRedirectSource');
         }
       }
     }

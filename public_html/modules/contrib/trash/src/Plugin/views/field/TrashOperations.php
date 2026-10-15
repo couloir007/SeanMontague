@@ -39,6 +39,7 @@ class TrashOperations extends EntityOperations {
       }
     }
 
+    // @phpstan-ignore return.type
     return [
       '#type' => 'operations',
       '#links' => $operations,

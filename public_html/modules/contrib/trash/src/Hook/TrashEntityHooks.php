@@ -4,21 +4,35 @@ declare(strict_types=1);
 
 namespace Drupal\trash\Hook;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Serialization\Json;
-use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\ConditionInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Entity\RevisionableInterface;
+use Drupal\Core\Entity\RevisionableStorageInterface;
+use Drupal\Core\Entity\RevisionLogInterface;
+use Drupal\Core\Entity\SynchronizableInterface;
+use Drupal\Core\Entity\TranslatableInterface;
+use Drupal\Core\Entity\TranslatableRevisionableInterface;
+use Drupal\Core\Database\Query\AlterableInterface;
+use Drupal\Core\Database\Query\SelectInterface;
+use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\TypedData\TranslationStatusInterface;
 use Drupal\trash\Trash;
 use Drupal\trash\TrashManagerInterface;
+use Drupal\trash\TrashStorageTrait;
 use Drupal\workspaces\WorkspaceInformationInterface;
 use Drupal\workspaces\WorkspaceManagerInterface;
 
@@ -27,108 +41,33 @@ use Drupal\workspaces\WorkspaceManagerInterface;
  */
 class TrashEntityHooks {
 
+  use RedirectDestinationTrait;
   use StringTranslationTrait;
+
+  /**
+   * Langcodes of translations being soft-deleted, keyed by the entity object.
+   *
+   * Stashed in entityPresave() and consumed in entityUpdate(), so the post
+   * trash delete events fire only after the save has been persisted. Keyed by
+   * the entity instance (the same object flows through both hooks) so a save
+   * that throws before entityUpdate cannot leak its entry into a later save:
+   * the object is discarded and the entry goes with it.
+   *
+   * @var \WeakMap<object, string[]>
+   */
+  private \WeakMap $pendingTranslationTrash;
 
   public function __construct(
     protected TrashManagerInterface $trashManager,
+    protected LanguageManagerInterface $languageManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected TimeInterface $time,
+    protected AccountInterface $currentUser,
+    protected ModuleHandlerInterface $moduleHandler,
     protected ?WorkspaceManagerInterface $workspaceManager = NULL,
     protected ?WorkspaceInformationInterface $workspaceInformation = NULL,
-  ) {}
-
-  /**
-   * Implements hook_entity_access().
-   */
-  #[Hook('entity_access')]
-  public function entityAccess(EntityInterface $entity, $operation, AccountInterface $account): AccessResultInterface {
-    $is_trash_operation = in_array($operation, ['restore', 'purge'], TRUE);
-
-    $access = AccessResult::allowed()->addCacheableDependency($entity);
-
-    // Reverting to an old deleted revision would make the entity deleted
-    // again, so block it even for users who can otherwise revert.
-    if ($operation === 'revert revision'
-      && $entity instanceof RevisionableInterface
-      && !$entity->isDefaultRevision()
-      && !$entity->isLatestRevision()
-      && Trash::entityIsDeleted($entity)
-    ) {
-      return $access->andIf(AccessResult::forbidden('Can not revert to a deleted revision'));
-    }
-
-    if ($is_trash_operation) {
-      // Restore and purge outcomes flip when trash support is enabled or
-      // disabled for the entity type, so they depend on the trash settings.
-      $access->addCacheTags(['config:trash.settings']);
-      if (!$this->trashManager->isEntityTypeEnabled($entity->getEntityTypeId())) {
-        return $access->andIf(AccessResult::forbidden('Unsupported entity type'));
-      }
-    }
-
-    if (!Trash::entityIsDeleted($entity)) {
-      // A non-deleted entity can never be restored or purged. Other operations
-      // are left to their own access handlers.
-      return $access->andIf(AccessResult::forbiddenIf($is_trash_operation, "Unsupported operation on non-deleted entity: $operation"));
-    }
-
-    $is_view_operation = $operation === 'view' || $operation === 'view label';
-
-    // Old deleted revisions can still be managed with the regular revision
-    // permissions while the trash context is 'ignore'. The default revision
-    // keeps the deleted-entity forbid below in every context, so a trashed
-    // entity cannot be edited or deleted just because the context was switched,
-    // for example through the 'in_trash' query parameter.
-    if (!$is_trash_operation && !$is_view_operation
-      && $entity instanceof RevisionableInterface
-      && !$entity->isDefaultRevision()
-      && $this->trashManager->getTrashContext() === 'ignore'
-    ) {
-      return $access->andIf(AccessResult::neutral('Trash context is "ignore" for a non-default revision'));
-    }
-
-    $access->addCacheContexts(['user.permissions']);
-
-    if ($is_view_operation) {
-      // Only ever remove view access here; let the entity's own access handler
-      // decide whether to grant it. Returning allowed() would OR with the
-      // handler and over-grant on entity types whose handler returns neutral
-      // (rather than forbidden) when a user lacks view access.
-      return AccessResult::forbiddenIf(!$account->hasPermission('view deleted entities'))
-        ->addCacheableDependency($entity)
-        ->cachePerPermissions();
-    }
-
-    if ($operation === 'restore') {
-      $permission = "restore {$entity->getEntityTypeId()} entities";
-      if (!$account->hasPermission($permission)) {
-        return $access->andIf(AccessResult::forbidden("The '$permission' permission is required."));
-      }
-      return $access;
-    }
-
-    if ($operation === 'purge') {
-      $permission = "purge {$entity->getEntityTypeId()} entities";
-      if (!$account->hasPermission($permission)) {
-        return $access->andIf(AccessResult::forbidden("The '$permission' permission is required."));
-      }
-
-      // Ensure that trashed entities can only be purged in the workspace they
-      // were created in or in Live.
-      if (NULL !== $this->workspaceManager
-        && NULL !== $this->workspaceInformation
-        && $this->workspaceInformation->isEntitySupported($entity)
-        && ($active_workspace = $this->workspaceManager->getActiveWorkspace())
-      ) {
-        $access->addCacheableDependency($active_workspace);
-        if (!$this->workspaceInformation->isEntityDeletable($entity, $active_workspace)) {
-          return $access->andIf(AccessResult::forbidden('Entity cannot be purged in the current workspace.'));
-        }
-      }
-
-      return $access;
-    }
-
-    // Block all other operations for deleted entities.
-    return $access->andIf(AccessResult::forbidden('Entity is deleted'));
+  ) {
+    $this->pendingTranslationTrash = new \WeakMap();
   }
 
   /**
@@ -203,6 +142,104 @@ class TrashEntityHooks {
   }
 
   /**
+   * Implements hook_query_alter().
+   *
+   * Filters out deleted entities from entity load queries by altering
+   * queries tagged with {entity_type_id}_load_multiple.
+   */
+  #[Hook('query_alter')]
+  public function queryAlter(AlterableInterface $query): void {
+    assert($query instanceof SelectInterface);
+
+    // Only filter in 'active' context.
+    if ($this->trashManager->getTrashContext() !== 'active') {
+      return;
+    }
+
+    // Find which entity type this query is for by checking tags.
+    $entity_type_id = NULL;
+    foreach ($this->trashManager->getEnabledEntityTypes() as $type_id) {
+      if ($query->hasTag($type_id . '_load_multiple')) {
+        $entity_type_id = $type_id;
+        break;
+      }
+    }
+
+    if ($entity_type_id === NULL) {
+      return;
+    }
+
+    $storage = $this->entityTypeManager->getStorage($entity_type_id);
+    assert($storage instanceof SqlEntityStorageInterface);
+
+    /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
+    $table_mapping = $storage->getTableMapping();
+    $deleted_columns = $table_mapping->getColumnNames('deleted');
+    if (!$deleted_columns) {
+      return;
+    }
+    $deleted_column = $deleted_columns['value'];
+
+    $entity_type = $storage->getEntityType();
+    $id_key = $entity_type->getKey('id');
+    $revision_key = $entity_type->getKey('revision');
+
+    // Handle workspace-specific revision loading. Skip this alteration if
+    // specific revisions are being loaded, as the original join will have
+    // a :revisionIds[] argument that we should not interfere with.
+    // @see \Drupal\Core\Entity\Sql\SqlContentEntityStorage::buildQuery()
+    $tables =& $query->getTables();
+    $loading_specific_revisions = isset($tables['revision']['arguments'][':revisionIds[]']);
+    if (
+      !$loading_specific_revisions
+      && $this->workspaceInformation?->isEntityTypeSupported($entity_type)
+      && ($active_workspace = $this->workspaceManager?->getActiveWorkspace())
+    ) {
+      // Join the workspace_association table so we can select possible
+      // workspace-specific revisions.
+      $wa_join = $query->leftJoin('workspace_association', NULL, "[%alias].[target_entity_type_id] = :entity_type_id AND [%alias].[target_entity_id] = [base].[$id_key] AND [%alias].[workspace] = :active_workspace_id", [
+        ':entity_type_id' => $entity_type_id,
+        ':active_workspace_id' => $active_workspace->id(),
+      ]);
+
+      // Joins must be in order. Tables mentioned in the ON clause of a JOIN
+      // must appear prior to that JOIN. So we must ensure that the new
+      // 'workspace_association' table appears prior to the 'revision' one.
+      if (isset($tables['revision'])) {
+        $revision = $tables['revision'];
+        unset($tables['revision']);
+        $tables['revision'] = $revision;
+
+        $tables['revision']['condition'] = "[revision].[$revision_key] = COALESCE([$wa_join].[target_entity_revision_id], [base].[$revision_key])";
+      }
+    }
+
+    // Ensure that entity_load excludes deleted entities.
+    $revision_data_table = $table_mapping->getRevisionDataTable();
+    $revision_table = $table_mapping->getRevisionTable();
+    $data_table = $table_mapping->getDataTable();
+
+    if ($revision_data_table) {
+      // Use the alias join() actually assigns (via the '%alias' placeholder)
+      // rather than assuming the requested 'revision_data' was free, so a
+      // collision with another module's join on the same alias can't leave
+      // this condition pointing at the wrong table.
+      $revision_data_alias = $query->join($revision_data_table, 'revision_data', "[%alias].[$revision_key] = [revision].[$revision_key]");
+      $query->condition("$revision_data_alias.$deleted_column", NULL, 'IS NULL');
+    }
+    elseif ($revision_table) {
+      $query->condition("revision.$deleted_column", NULL, 'IS NULL');
+    }
+    elseif ($data_table) {
+      $data_alias = $query->join($data_table, 'data', "[%alias].[$id_key] = [base].[$id_key]");
+      $query->condition("$data_alias.$deleted_column", NULL, 'IS NULL');
+    }
+    else {
+      $query->condition("base.$deleted_column", NULL, 'IS NULL');
+    }
+  }
+
+  /**
    * Implements hook_entity_operation_alter().
    */
   #[Hook('entity_operation_alter')]
@@ -214,14 +251,32 @@ class TrashEntityHooks {
 
     // Remove all other operations for deleted entities.
     $operations = [];
+
+    // When the restore/purge routes have a {language} slug, pin it to this
+    // row's translation, so the scope of the operation does not depend on the
+    // negotiated content language. Both link templates gain the slug together,
+    // so checking 'restore' covers both.
+    $entity_type = $entity->getEntityType();
+    $pin_language = $entity instanceof TranslatableInterface
+      && $entity_type->hasLinkTemplate('restore')
+      && str_contains($entity_type->getLinkTemplate('restore'), '{language}');
+
     if ($entity->access('restore')) {
-      $url_options['attributes']['aria-label'] = $this->t('Restore @label', [
-        '@label' => $entity->label() ?? $entity->id(),
+      $url = $entity->toUrl('restore', [
+        'language' => $this->languageManager->getCurrentLanguage(),
+        'attributes' => [
+          'aria-label' => $this->t('Restore @label', [
+            '@label' => $entity->label() ?? $entity->id(),
+          ]),
+        ],
       ]);
+      if ($pin_language) {
+        $url->setRouteParameter('language', $entity->language()->getId());
+      }
 
       $operations['restore'] = [
         'title' => $this->t('Restore'),
-        'url' => $entity->toUrl('restore')->mergeOptions($url_options),
+        'url' => $url,
         'weight' => 0,
         'attributes' => [
           'class' => ['use-ajax'],
@@ -233,13 +288,21 @@ class TrashEntityHooks {
       ];
     }
     if ($entity->access('purge')) {
-      $url_options['attributes']['aria-label'] = $this->t('Purge @label', [
-        '@label' => $entity->label() ?? $entity->id(),
+      $url = $entity->toUrl('purge', [
+        'language' => $this->languageManager->getCurrentLanguage(),
+        'attributes' => [
+          'aria-label' => $this->t('Purge @label', [
+            '@label' => $entity->label() ?? $entity->id(),
+          ]),
+        ],
       ]);
+      if ($pin_language) {
+        $url->setRouteParameter('language', $entity->language()->getId());
+      }
 
       $operations['purge'] = [
         'title' => $this->t('Purge'),
-        'url' => $entity->toUrl('purge')->mergeOptions($url_options),
+        'url' => $url,
         'weight' => 5,
         'attributes' => [
           'class' => ['use-ajax'],
@@ -260,8 +323,9 @@ class TrashEntityHooks {
     if ($entity->getEntityTypeId() === 'workspace') {
       foreach (Element::children($build['changes']['list']) as $key) {
         $tracked_entity = $build['changes']['list'][$key]['#entity'];
-        if ($this->trashManager->isEntityTypeEnabled($tracked_entity->getEntityType(), $tracked_entity->bundle()) && Trash::entityIsDeleted($tracked_entity)) {
-          // Highlight deleted entities in the workspace changes page.
+        if ($this->trashManager->isEntityTypeEnabled($tracked_entity->getEntityType(), $tracked_entity->bundle()) && Trash::entityHasDeletedTranslations($tracked_entity)) {
+          // Highlight fully or partially deleted entities in the workspace
+          // changes page.
           $build['changes']['list'][$key]['#attributes']['style'] = 'color: #a51b00; background-color: #fcf4f2;';
         }
       }
@@ -270,6 +334,206 @@ class TrashEntityHooks {
     if (Trash::entityIsDeleted($entity)) {
       $build['#attributes']['class'][] = 'is-deleted';
       $build['#attached']['library'][] = 'trash/trash';
+    }
+  }
+
+  /**
+   * Implements hook_entity_presave().
+   *
+   * Converts translation removals into soft-deletes by re-adding the removed
+   * translations with a 'deleted' timestamp, which stops core's
+   * translation_delete hook from hard-deleting their rows. For live saves,
+   * the trash delete events fire with the affected langcodes: the pre events
+   * here, the post events in entityUpdate().
+   */
+  #[Hook('entity_presave')]
+  public function entityPresave(EntityInterface $entity): void {
+    // Early return conditions.
+    if ($entity->isNew() ||
+      ($entity instanceof SynchronizableInterface && $entity->isSyncing()) ||
+      $this->trashManager->getTrashContext() !== 'active' ||
+      !$entity instanceof TranslatableInterface ||
+      !$entity->getEntityType()->isTranslatable() ||
+      !$entity instanceof TranslationStatusInterface ||
+      !$this->trashManager->isEntityTypeEnabled($entity->getEntityType(), $entity->bundle())
+    ) {
+      return;
+    }
+
+    // Detect removed translations. This only needs the translation status, so
+    // saves that do not remove any translation skip the original handling
+    // below entirely.
+    $removed_langcodes = [];
+    foreach (array_keys($this->languageManager->getLanguages()) as $langcode) {
+      if ($entity->getTranslationStatus($langcode) === TranslationStatusInterface::TRANSLATION_REMOVED) {
+        $removed_langcodes[] = (string) $langcode;
+      }
+    }
+    if (empty($removed_langcodes)) {
+      return;
+    }
+
+    // The removed translations are re-added below with their last saved field
+    // values, which have to come from the revision this entity object was
+    // loaded from. Core populates the original with the default revision, so
+    // reload the baseline when a pending revision is being saved. The reload
+    // runs in the 'ignore' context because the loaded revision may be
+    // soft-deleted.
+    $revisionable = $entity instanceof RevisionableInterface && $entity->getEntityType()->isRevisionable();
+    $original = $entity->getOriginal();
+    $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
+    if ($revisionable) {
+      $loaded_revision_id = $entity->getLoadedRevisionId() ?? $entity->getRevisionId();
+      if ($loaded_revision_id !== NULL && (!$original instanceof RevisionableInterface || $original->getRevisionId() != $loaded_revision_id)) {
+        assert($storage instanceof RevisionableStorageInterface);
+        $original = $this->trashManager->executeInTrashContext('ignore', fn () => $storage->loadRevision($loaded_revision_id));
+      }
+    }
+    elseif ($original === NULL) {
+      $original = $this->trashManager->executeInTrashContext('ignore', fn () => $storage->loadUnchanged($entity->id()));
+    }
+
+    // Without a stored baseline there are no translation values to preserve,
+    // so let core handle the save.
+    if (!$original instanceof TranslatableInterface) {
+      return;
+    }
+    if ($entity->getOriginal() === NULL) {
+      $entity->setOriginal(clone $original);
+    }
+
+    // Only translations present in the baseline can be re-added.
+    $removed_langcodes = array_filter($removed_langcodes, fn (string $langcode): bool => $original->hasTranslation($langcode));
+    if (empty($removed_langcodes)) {
+      return;
+    }
+
+    // Re-add each removed translation marked as deleted.
+    // Re-adding flips their status back to TRANSLATION_EXISTING, which stops
+    // core's translation_delete hook from hard-deleting the row. Any other
+    // changes in the same save, made by the caller or by earlier presave
+    // code, are kept and saved as usual.
+    $request_time = $this->time->getRequestTime();
+
+    // Record the soft-delete as one new revision.
+    if ($revisionable) {
+      $entity->setNewRevision(TRUE);
+
+      if ($entity instanceof RevisionLogInterface) {
+        $names = array_map(
+          fn (string $langcode): string => $original->getTranslation($langcode)->language()->getName(),
+          $removed_langcodes,
+        );
+        $entity->setRevisionUserId($this->currentUser->id());
+        $entity->setRevisionCreationTime($request_time);
+        $entity->setRevisionLogMessage($this->t('Deleted translation: @languages', [
+          '@languages' => implode(', ', $names),
+        ]));
+      }
+    }
+
+    foreach ($removed_langcodes as $langcode) {
+      // The storage restores the stored values instead of initializing new
+      // ones, so the re-added translation holds exactly what it held when it
+      // was last saved.
+      // @see \Drupal\trash\TrashStorageTrait::createTranslation()
+      $values = ['deleted' => $request_time] + $original->getTranslation($langcode)->toArray();
+      $translation = $entity->addTranslation($langcode, $values);
+
+      if ($revisionable) {
+        assert($translation instanceof TranslatableRevisionableInterface);
+        $translation->setRevisionTranslationAffected(TRUE);
+      }
+    }
+
+    // Update original values to avoid hasTranslationChanges() issues.
+    if ($entity instanceof ContentEntityBase) {
+      $entity->updateOriginalValues();
+    }
+
+    // Fire the trash lifecycle events for the soft-deleted translations, so
+    // integrations (path aliases, pathauto) can react like they do for a
+    // whole-entity trash. The pre events fire here, the post events in
+    // entityUpdate(), once the save has been persisted.
+    //
+    // The only saves that must not fire them are drafts: pending revisions
+    // outside a workspace. A draft does not change what is live, but the side
+    // effects would, because other entities have no draft scope to join.
+    // Workspace saves are pending revisions too, but they do fire: they are
+    // the workspace's own publishable state and the side effects land in the
+    // same workspace.
+    //
+    // Skipping drafts has a known limitation: when the draft later becomes
+    // the default revision, no events fire then either, so for example the
+    // trashed translation's alias stays live and points to an inaccessible
+    // translation.
+    $is_draft_save = FALSE;
+    if ($revisionable) {
+      $in_active_workspace = $this->workspaceManager?->hasActiveWorkspace()
+        && $this->workspaceInformation?->isEntitySupported($entity);
+      $is_draft_save = !$entity->isDefaultRevision() && !$in_active_workspace;
+    }
+    if (!$is_draft_save) {
+      $this->trashManager->getHandler($entity->getEntityTypeId())?->preTrashDelete($entity, $removed_langcodes);
+      $this->moduleHandler->invokeAll($entity->getEntityTypeId() . '_pre_trash_delete', [$entity, $removed_langcodes]);
+      $this->moduleHandler->invokeAll('entity_pre_trash_delete', [$entity, $removed_langcodes]);
+      $this->pendingTranslationTrash[$entity] = $removed_langcodes;
+    }
+  }
+
+  /**
+   * Implements hook_entity_update().
+   *
+   * Completes the translation soft-deletes started in entityPresave() by
+   * firing the post trash delete events once the save has been persisted.
+   */
+  #[Hook('entity_update')]
+  public function entityUpdate(EntityInterface $entity): void {
+    if (!isset($this->pendingTranslationTrash[$entity])) {
+      return;
+    }
+    $langcodes = $this->pendingTranslationTrash[$entity];
+    unset($this->pendingTranslationTrash[$entity]);
+
+    // Only keep langcodes whose translation really ended up trashed, so a
+    // caller that re-added or restored one between presave and now is honored.
+    $langcodes = array_values(array_filter(
+      $langcodes,
+      fn (string $langcode): bool => $entity instanceof TranslatableInterface
+        && $entity->hasTranslation($langcode)
+        && Trash::entityIsDeleted($entity->getTranslation($langcode)),
+    ));
+    if ($langcodes === []) {
+      return;
+    }
+
+    $this->trashManager->getHandler($entity->getEntityTypeId())?->postTrashDelete($entity, $langcodes);
+    $this->moduleHandler->invokeAll($entity->getEntityTypeId() . '_trash_delete', [$entity, $langcodes]);
+    $this->moduleHandler->invokeAll('entity_trash_delete', [$entity, $langcodes]);
+  }
+
+  /**
+   * Implements hook_entity_predelete().
+   */
+  #[Hook('entity_predelete')]
+  public function entityPredelete(EntityInterface $entity): void {
+    // Only check when trash context is active (not during purge).
+    if ($this->trashManager->getTrashContext() !== 'active') {
+      return;
+    }
+
+    if (!$this->trashManager->isEntityTypeEnabled($entity->getEntityTypeId(), $entity->bundle())) {
+      return;
+    }
+
+    // Block entity deletion if trash is enabled but storage class generation
+    // failed. This prevents silent data loss.
+    $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
+    if (!isset(class_uses($storage)[TrashStorageTrait::class])) {
+      throw new \RuntimeException(sprintf(
+        'Trash is enabled for %s but storage class generation failed. Delete blocked to prevent data loss.',
+        $entity->getEntityTypeId()
+      ));
     }
   }
 

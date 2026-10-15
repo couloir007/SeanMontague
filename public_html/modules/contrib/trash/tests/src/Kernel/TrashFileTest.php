@@ -9,14 +9,19 @@ use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
 use Drupal\trash\Exception\UnrestorableEntityException;
+use Drupal\trash\Hook\TrashHandler\FileTrashHandler;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\ErrorHandler\BufferingLogger;
 
 /**
  * Tests Trash integration with File entities.
- *
- * @group trash
  */
+#[CoversClass(FileTrashHandler::class)]
+#[Group('trash')]
+#[RunTestsInSeparateProcesses]
 class TrashFileTest extends TrashKernelTestBase {
 
   /**
@@ -238,22 +243,6 @@ class TrashFileTest extends TrashKernelTestBase {
     assert($trashed instanceof FileInterface);
     $this->assertEquals($uri, $trashed->getFileUri());
     $this->assertFileExists($uri);
-  }
-
-  /**
-   * Creates a file in the public stream with given contents.
-   */
-  protected function createPublicFile(string $uri, string $contents): FileInterface {
-    $dir = $this->fileSystem->dirname($uri);
-    $this->fileSystem->prepareDirectory(
-      $dir,
-      FileSystemInterface::CREATE_DIRECTORY,
-    );
-    file_put_contents($uri, $contents);
-    $file = File::create(['uri' => $uri, 'uid' => 1]);
-    $file->setPermanent();
-    $file->save();
-    return $file;
   }
 
 }

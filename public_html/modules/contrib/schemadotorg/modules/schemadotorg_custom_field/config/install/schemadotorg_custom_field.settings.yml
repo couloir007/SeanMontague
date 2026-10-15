@@ -7,6 +7,19 @@ default_schema_properties:
         data_type: string
       value:
         data_type: string
+  Product--isSimilarTo:
+    schema_type: Product
+    schema_properties:
+      name:
+        data_type: string
+      description:
+        data_type: string
+      url:
+        data_type: uri
+      additionalProperty:
+        data_type: map
+        key_label: Name
+        value_label: Value
   contactPoint:
     schema_type: ContactPoint
     schema_properties:

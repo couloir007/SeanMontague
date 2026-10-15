@@ -65,7 +65,7 @@ class SchemaDotOrgExportReportRelationshipsController extends ControllerBase {
         $table_row = $table_row['data'] ?? $table_row;
 
         $row = [];
-        foreach ($table_row as $row_id => $item) {
+        foreach ($table_row as $item) {
           // Get the row value.
           if (is_array($item)) {
             $value = NestedArray::getValue($item, ['data', '#markup'])
@@ -78,7 +78,7 @@ class SchemaDotOrgExportReportRelationshipsController extends ControllerBase {
           }
 
           // Prefix all Schema.org type and properties with https://schema.org/.
-          if (is_array($value) && $row_id !== 'starterkit') {
+          if (is_array($value)) {
             $value = array_map(
               function (mixed $item): mixed {
                 if (isset($item['#title'])) {

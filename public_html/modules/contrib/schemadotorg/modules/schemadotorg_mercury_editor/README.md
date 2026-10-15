@@ -12,9 +12,8 @@ Introduction
 The **Schema.org Blueprints Mercury Editor** automatically enables the 
 Mercury Editor for Schema.org types as they are created.
 
-> For a full demo of the Schema.org Blueprints and Layout Paragraphs
-> (with Mercury Editor) check out the
-> [Layout Starterkit](https://www.drupal.org/project/schemadotorg_starterkit_layout).
+> For an example of configuring a Schema.org site with Recipes, see the
+> [Schema.org Recipes sandbox](https://www.drupal.org/sandbox/jrockowitz/3479651).
 
 
 Features

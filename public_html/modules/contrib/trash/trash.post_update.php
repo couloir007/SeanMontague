@@ -5,6 +5,8 @@
  * Install, update, and uninstall functions for the Trash module.
  */
 
+use Drupal\Core\PhpStorage\PhpStorageFactory;
+
 /**
  * Update the enabled entity types and bundles configuration.
  */
@@ -23,7 +25,7 @@ function trash_post_update_fix_missing_auto_purge(): void {
       'enabled' => FALSE,
       'after' => '30 days',
     ]);
-    $config->save(TRUE);
+    $config->save();
   }
 }
 
@@ -80,4 +82,20 @@ function trash_post_update_create_trash_actions(): void {
       ])->save();
     }
   }
+}
+
+/**
+ * Regenerate storage classes so they implement TrashStorageInterface.
+ */
+function trash_post_update_regenerate_storage_classes(): void {
+  PhpStorageFactory::get('trash')->deleteAll();
+}
+
+/**
+ * Remove the storage classes generated before class names carried a hash.
+ */
+function trash_post_update_hashed_storage_classes(): void {
+  // Generated class names now end in a hash of the template they came from, so
+  // the files generated under the old names are never loaded again.
+  PhpStorageFactory::get('trash')->deleteAll();
 }

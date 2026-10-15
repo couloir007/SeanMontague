@@ -240,6 +240,7 @@ class TrashIgnoreSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents(): array {
+    $events = [];
     // Our ignore subscriber needs to run before language negotiation (which has
     // a priority of 255), but immediately after the authentication subscriber
     // (which has a priority of 300) in order to allow route enhancers (e.g.

@@ -27,7 +27,7 @@ trait SchemaDotOrgBuildTrait {
    * @param array $mapping_defaults
    *   A Schema.org type's mapping defaults.
    *
-   * @see \Drupal\schemadotorg_starterkit\Form\SchemaDotOrgStarterkitConfirmForm::buildSchemaType
+   * @see \Drupal\schemadotorg_recipe\Form\SchemaDotOrgRecipeConfirmForm::buildSchemaType
    */
   protected function buildSchemaType(string $type, array $mapping_defaults): array {
     [$entity_type_id, $bundle, $schema_type] = $this->getMappingStorage()->parseType($type);
@@ -194,7 +194,9 @@ trait SchemaDotOrgBuildTrait {
       }
     }
 
-    $details['#attached']['library'][] = 'schemadotorg/schemadotorg.dialog';
+    if (\Drupal::moduleHandler()->moduleExists('schemadotorg_report')) {
+      $details['#attached']['library'][] = 'schemadotorg_report/schemadotorg_report.dialog';
+    }
     return $details;
   }
 

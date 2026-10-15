@@ -202,11 +202,7 @@ statins
 strikethrough
 stylelint
 starthours
-starterkits
 SSML
-Starterkit
-starterkit
-Starterkits
 TLDR
 Tomean
 webforms
@@ -223,7 +219,6 @@ CHEATSHEET
 cheatsheet
 destid
 sourceid
-starterkit
 cids
 wproofreader
 idlist

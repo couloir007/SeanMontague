@@ -10,7 +10,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\trash\EntityHandler\TrashNodeAccessControlHandler;
-use Drupal\trash\Hook\TrashEntityHooks;
+use Drupal\trash\Hook\TrashEntityAccess;
 use Drupal\trash\TrashStorageTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -19,7 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests entity access for trashed entities.
  */
-#[CoversClass(TrashEntityHooks::class)]
+#[CoversClass(TrashEntityAccess::class)]
 #[CoversClass(TrashNodeAccessControlHandler::class)]
 #[CoversClass(TrashStorageTrait::class)]
 #[Group('trash')]
@@ -252,6 +252,19 @@ class NodeAccessTest extends TrashKernelTestBase {
       ],
     ];
 
+    yield 'Deleted node with "restore node translations"' => [
+      'permissions' => ['restore node translations'],
+      'entity' => $article,
+      'actions' => ['delete'],
+      'access_map' => [
+        'view' => FALSE,
+        'update' => FALSE,
+        'delete' => FALSE,
+        'restore' => FALSE,
+        'purge' => FALSE,
+      ],
+    ];
+
     yield 'Deleted node with "purge node entities"' => [
       'permissions' => ['purge node entities'],
       'entity' => $article,
@@ -262,6 +275,19 @@ class NodeAccessTest extends TrashKernelTestBase {
         'delete' => FALSE,
         'restore' => FALSE,
         'purge' => TRUE,
+      ],
+    ];
+
+    yield 'Deleted node with "purge node translations"' => [
+      'permissions' => ['purge node translations'],
+      'entity' => $article,
+      'actions' => ['delete'],
+      'access_map' => [
+        'view' => FALSE,
+        'update' => FALSE,
+        'delete' => FALSE,
+        'restore' => FALSE,
+        'purge' => FALSE,
       ],
     ];
 
@@ -301,6 +327,7 @@ class NodeAccessTest extends TrashKernelTestBase {
         'revert all revisions',
         'delete all revisions',
         'purge node entities',
+        'purge node translations',
       ],
       'entity' => $article,
       'actions' => [

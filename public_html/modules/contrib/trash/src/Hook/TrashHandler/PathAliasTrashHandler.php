@@ -31,6 +31,8 @@ class PathAliasTrashHandler extends DefaultTrashHandler {
       ->execute();
 
     if ($result) {
+      // The message is shown to the user by the restore form.
+      // @mago-expect lint:drupal/translated-exception
       throw new UnrestorableEntityException((string) $this->t('Cannot restore path alias: An alias with the path "@alias" already exists.', [
         '@alias' => $entity->getAlias(),
       ]));
@@ -42,7 +44,7 @@ class PathAliasTrashHandler extends DefaultTrashHandler {
   /**
    * {@inheritdoc}
    */
-  public function preTrashRestore(EntityInterface $entity): void {
+  public function preTrashRestore(EntityInterface $entity, array $langcodes): void {
     $this->ensureRestoreValidated($entity);
   }
 

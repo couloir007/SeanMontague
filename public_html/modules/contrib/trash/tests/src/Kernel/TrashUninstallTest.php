@@ -4,11 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\trash\Kernel;
 
+use Drupal\trash\TrashUninstallValidator;
 use Drupal\trash_test\Entity\TrashTestEntity;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests uninstall validator for Trash.
  */
+#[CoversClass(TrashUninstallValidator::class)]
+#[Group('trash')]
+#[RunTestsInSeparateProcesses]
 class TrashUninstallTest extends TrashKernelTestBase {
 
   /**

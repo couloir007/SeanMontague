@@ -25,6 +25,7 @@ class UnaryNode extends Node
         'not' => '!',
         '+' => '+',
         '-' => '-',
+        '~' => '~',
     ];
 
     public function __construct(string $operator, Node $node)
@@ -52,7 +53,9 @@ class UnaryNode extends Node
         return match ($this->attributes['operator']) {
             'not',
             '!' => !$value,
+            '+' => +$value,
             '-' => -$value,
+            '~' => ~$value,
             default => $value,
         };
     }

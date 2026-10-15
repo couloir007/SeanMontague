@@ -10,11 +10,11 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the purge queue worker cutoff.
+ * Tests the purge queue worker cutoff on a monolingual site.
  *
- * The queue item carries the auto-purge cutoff it was built with, so an
- * entity that was restored and trashed again after the item was queued keeps
- * its full retention window instead of being purged by the stale item.
+ * Without multiple configured languages the worker takes its whole-entity
+ * path, which must honor the auto-purge cutoff just like the per-translation
+ * path.
  *
  * @see \Drupal\trash\Plugin\QueueWorker\TrashEntityPurgeWorker
  */

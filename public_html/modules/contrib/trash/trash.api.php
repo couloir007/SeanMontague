@@ -5,6 +5,10 @@
  * Hooks and documentation related to Trash.
  */
 
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\views\ViewExecutable;
+
 /**
  * @addtogroup hooks
  * @{
@@ -13,13 +17,20 @@
 /**
  * Act before entity soft-deletion.
  *
+ * This hook also fires when individual translations are soft-deleted, for
+ * example when a translation is removed from an entity; $langcodes says
+ * which translations are affected.
+ *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity object for the entity that is about to be soft-deleted.
+ * @param string[] $langcodes
+ *   The langcodes of the translations that are about to be marked as deleted.
+ *   Translations that are already trashed are not included.
  *
  * @ingroup entity_crud
  * @see hook_ENTITY_TYPE_pre_trash_delete()
  */
-function hook_entity_pre_trash_delete(\Drupal\Core\Entity\EntityInterface $entity) {
+function hook_entity_pre_trash_delete(EntityInterface $entity, array $langcodes) {
 }
 
 /**
@@ -27,25 +38,34 @@ function hook_entity_pre_trash_delete(\Drupal\Core\Entity\EntityInterface $entit
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity object for the entity that is about to be soft-deleted.
+ * @param string[] $langcodes
+ *   The langcodes of the translations that are about to be marked as deleted.
+ *   Translations that are already trashed are not included.
  *
  * @ingroup entity_crud
  * @see hook_entity_pre_trash_delete()
  */
-function hook_ENTITY_TYPE_pre_trash_delete(\Drupal\Core\Entity\EntityInterface $entity) {
+function hook_ENTITY_TYPE_pre_trash_delete(EntityInterface $entity, array $langcodes) {
 }
 
 /**
  * Respond to entity soft-deletion.
  *
- * This hook runs once the entity has been soft-deleted from the storage.
+ * This hook runs once the entity has been soft-deleted from the storage. It
+ * also fires when individual translations are soft-deleted, for example when
+ * a translation is removed from an entity; $langcodes says which translations
+ * are affected.
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity object for the entity that has been soft-deleted.
+ * @param string[] $langcodes
+ *   The langcodes of the translations that were marked as deleted.
+ *   Translations that were already trashed are not included.
  *
  * @ingroup entity_crud
  * @see hook_ENTITY_TYPE_trash_delete()
  */
-function hook_entity_trash_delete(\Drupal\Core\Entity\EntityInterface $entity) {
+function hook_entity_trash_delete(EntityInterface $entity, array $langcodes) {
 }
 
 /**
@@ -55,11 +75,14 @@ function hook_entity_trash_delete(\Drupal\Core\Entity\EntityInterface $entity) {
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity object for the entity that has been soft-deleted.
+ * @param string[] $langcodes
+ *   The langcodes of the translations that were marked as deleted.
+ *   Translations that were already trashed are not included.
  *
  * @ingroup entity_crud
  * @see hook_entity_trash_delete()
  */
-function hook_ENTITY_TYPE_trash_delete(\Drupal\Core\Entity\EntityInterface $entity) {
+function hook_ENTITY_TYPE_trash_delete(EntityInterface $entity, array $langcodes) {
 }
 
 /**
@@ -67,11 +90,13 @@ function hook_ENTITY_TYPE_trash_delete(\Drupal\Core\Entity\EntityInterface $enti
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity object for the entity that is about to be restored.
+ * @param string[] $langcodes
+ *   The langcodes of the translations that are about to be restored.
  *
  * @ingroup entity_crud
  * @see hook_ENTITY_TYPE_pre_trash_restore()
  */
-function hook_entity_pre_trash_restore(\Drupal\Core\Entity\EntityInterface $entity) {
+function hook_entity_pre_trash_restore(EntityInterface $entity, array $langcodes) {
 }
 
 /**
@@ -79,11 +104,13 @@ function hook_entity_pre_trash_restore(\Drupal\Core\Entity\EntityInterface $enti
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity object for the entity that is about to be restored.
+ * @param string[] $langcodes
+ *   The langcodes of the translations that are about to be restored.
  *
  * @ingroup entity_crud
  * @see hook_entity_pre_trash_restore()
  */
-function hook_ENTITY_TYPE_pre_trash_restore(\Drupal\Core\Entity\EntityInterface $entity) {
+function hook_ENTITY_TYPE_pre_trash_restore(EntityInterface $entity, array $langcodes) {
 }
 
 /**
@@ -93,11 +120,14 @@ function hook_ENTITY_TYPE_pre_trash_restore(\Drupal\Core\Entity\EntityInterface 
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity object for the entity that has been restored.
+ * @param array $deleted_timestamps
+ *   The deletion timestamps of the restored translations, keyed by langcode.
+ *   Translations can be trashed at different times, so the values may differ.
  *
  * @ingroup entity_crud
  * @see hook_ENTITY_TYPE_trash_restore()
  */
-function hook_entity_trash_restore(\Drupal\Core\Entity\EntityInterface $entity) {
+function hook_entity_trash_restore(EntityInterface $entity, array $deleted_timestamps) {
 }
 
 /**
@@ -107,11 +137,14 @@ function hook_entity_trash_restore(\Drupal\Core\Entity\EntityInterface $entity) 
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity object for the entity that has been restored.
+ * @param array $deleted_timestamps
+ *   The deletion timestamps of the restored translations, keyed by langcode.
+ *   Translations can be trashed at different times, so the values may differ.
  *
  * @ingroup entity_crud
  * @see hook_entity_trash_restore()
  */
-function hook_ENTITY_TYPE_trash_restore(\Drupal\Core\Entity\EntityInterface $entity) {
+function hook_ENTITY_TYPE_trash_restore(EntityInterface $entity, array $deleted_timestamps) {
 }
 
 /**
@@ -126,7 +159,7 @@ function hook_ENTITY_TYPE_trash_restore(\Drupal\Core\Entity\EntityInterface $ent
  *
  * @see \Drupal\trash\TrashViewBuilder
  */
-function hook_trash_views_build(\Drupal\views\ViewExecutable $view, \Drupal\Core\Entity\EntityTypeInterface $entity_type, bool $export) {
+function hook_trash_views_build(ViewExecutable $view, EntityTypeInterface $entity_type, bool $export) {
   // ID field.
   $id_key = $entity_type->getKey('id');
   if ($id_key) {

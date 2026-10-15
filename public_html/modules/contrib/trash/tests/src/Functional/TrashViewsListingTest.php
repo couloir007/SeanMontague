@@ -6,12 +6,22 @@ namespace Drupal\Tests\trash\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\trash_test\Entity\TrashTestEntity;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Views-based trash listing.
  *
- * @group trash
+ * The IgnoreDeprecations attribute is used because the trash module decorates
+ * entity.memory_cache, and core services that use MemoryCacheInterface for
+ * autowiring trigger a deprecation warning.
+ *
+ * @see https://www.drupal.org/node/3546856
  */
+#[Group('trash')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class TrashViewsListingTest extends BrowserTestBase {
 
   /**
@@ -122,9 +132,6 @@ class TrashViewsListingTest extends BrowserTestBase {
    * Tests bulk operations from the Views listing.
    */
   public function testTrashViewsBulkOperations(): void {
-    if (version_compare(\Drupal::VERSION, '11', '<')) {
-      $this->markTestSkipped('Skipped due to test-only cache invalidation issue.');
-    }
     // Create entities for testing bulk operations.
     $entity1 = TrashTestEntity::create(['label' => 'Bulk Entity 1']);
     $entity1->save();
@@ -214,9 +221,6 @@ class TrashViewsListingTest extends BrowserTestBase {
    * Tests restore and purge operations from the Views listing.
    */
   public function testTrashViewsOperations(): void {
-    if (version_compare(\Drupal::VERSION, '11', '<')) {
-      $this->markTestSkipped('Skipped due to test-only cache invalidation issue.');
-    }
     // Create entities for testing operations.
     $entity_to_restore = TrashTestEntity::create(['label' => 'Entity To Restore']);
     $entity_to_restore->save();

@@ -23,6 +23,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Plugin\CustomField\FieldType\DateRangeType;
 use Drupal\custom_field\Plugin\CustomField\FieldType\DateTimeType;
+use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface;
 use Drupal\custom_field\Time;
 use Drupal\field\Entity\FieldConfig;
@@ -69,9 +70,9 @@ class CustomItem extends FieldItemBase {
     // if there isn't at least one column defined.
     return [
       'columns' => [
-        'value' => [
-          'name' => 'value',
-          'type' => 'string',
+        'uuid' => [
+          'name' => 'uuid',
+          'type' => 'uuid',
         ],
       ],
     ] + parent::defaultStorageSettings();
@@ -165,6 +166,116 @@ class CustomItem extends FieldItemBase {
     }
 
     return $constraints;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Completes nested subfield values with the flat extra-property keys they
+   * imply, so the values array handed to core is self-contained.
+   *
+   * A subfield type may store extra properties in sibling columns and accept a
+   * nested value whose keys do not match those column names. Core's
+   * Map::setValue() re-syncs every already-instantiated property object from
+   * the values array it is given, so an extra property missing from that array
+   * is reset to NULL. Whether the property object already exists depends on
+   * what else in the request has touched a field item of that type, which
+   * makes the loss order-dependent rather than deterministic. Completing the
+   * array here removes the dependence.
+   *
+   * Additions never overwrite: a key already present in $values wins, so the
+   * keys the widget layer already promoted stay authoritative.
+   */
+  public function setValue($values, $notify = TRUE): void {
+    if (!is_array($values)) {
+      parent::setValue($values, $notify);
+      return;
+    }
+
+    $additions = [];
+    foreach (static::extraPropertyMap($this->getFieldDefinition()) as $name => $info) {
+      if (!isset($values[$name]) || !is_array($values[$name])) {
+        continue;
+      }
+      $extra = $info['class']::extractExtraPropertyValues($info['settings'], $values[$name]);
+      foreach ($extra as $property => $property_value) {
+        // Only properties the type actually declares may be added.
+        if (isset($info['names'][$property])) {
+          $additions[$property] = $property_value;
+        }
+      }
+    }
+
+    if ($additions !== []) {
+      $values += $additions;
+    }
+
+    parent::setValue($values, $notify);
+  }
+
+  /**
+   * Returns the subfields of a field that map nested values to extra columns.
+   *
+   * Resolved once per field definition OBJECT and held in a \WeakMap, so the
+   * entry disappears together with the definition it describes. Keying on the
+   * object rather than on the field UUID matters because the UUID does not
+   * change when a field's column settings do. It narrows the staleness window
+   * rather than closing it - the storage definition behind a live FieldConfig
+   * can still be mutated in place - but a stale map can only offer extras that
+   * the name filter then discards, never a wrong stored value.
+   *
+   * Subfield types that do not override
+   * CustomFieldTypeBase::extractExtraPropertyValues() are left out entirely,
+   * so fields containing none of them cost a single lookup per item.
+   *
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The field definition.
+   *
+   * @return array<string, array{class: class-string, settings: array<string, mixed>, names: array<string, int>}>
+   *   Keyed by subfield name.
+   */
+  protected static function extraPropertyMap(FieldDefinitionInterface $field_definition): array {
+    static $cache = NULL;
+    $cache ??= new \WeakMap();
+    if (isset($cache[$field_definition])) {
+      return $cache[$field_definition];
+    }
+
+    $manager = \Drupal::service('plugin.manager.custom_field_type');
+    $map = [];
+    foreach ($field_definition->getSetting('columns') ?? [] as $name => $column) {
+      if (!isset($column['type'])) {
+        continue;
+      }
+      $definition = $manager->getDefinition($column['type'], FALSE);
+      $class = $definition['class'] ?? NULL;
+      // A known plugin id whose class no longer loads must degrade the way
+      // propertyDefinitions() does, not throw ReflectionException from here.
+      if ($class === NULL || !class_exists($class)) {
+        continue;
+      }
+      // Skip types that inherit the no-op default. getDeclaringClass() names
+      // the ancestor that actually declared it, so a subclass inheriting an
+      // override from a non-base ancestor is correctly kept.
+      $declaring = (new \ReflectionMethod($class, 'extractExtraPropertyValues'))
+        ->getDeclaringClass()->getName();
+      if ($declaring === CustomFieldTypeBase::class) {
+        continue;
+      }
+      $settings = $column + ['name' => $name];
+      $names = $class::getExtraPropertyNames($settings);
+      if ($names === []) {
+        continue;
+      }
+      $map[$name] = [
+        'class' => $class,
+        'settings' => $settings,
+        'names' => array_flip($names),
+      ];
+    }
+    $cache[$field_definition] = $map;
+
+    return $map;
   }
 
   /**
@@ -977,11 +1088,10 @@ class CustomItem extends FieldItemBase {
   public static function addSubmit(array &$form, FormStateInterface $form_state): void {
     $storage = $form_state->getValue('field_storage');
     $default_name = uniqid('value_');
-    $default = static::defaultStorageSettings()['columns']['value'];
-    unset($default['name']);
     $storage['subform']['settings']['items'][$default_name] = [
       'name' => $default_name,
-    ] + $default;
+      'type' => 'string',
+    ];
     $form_state->setValue('field_storage', $storage);
     $form_state->setRebuild();
   }

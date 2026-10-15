@@ -31,6 +31,7 @@ Additional documentation
 - [docs/DECISIONS.md](https://git.drupalcode.org/project/schemadotorg/-/blob/1.0.x/docs/DECISIONS.md)
 - [docs/ROADMAP.md](https://git.drupalcode.org/project/schemadotorg/-/blob/1.0.x/docs/ROADMAP.md)
 - [docs/MODULES.md](https://git.drupalcode.org/project/schemadotorg/-/blob/1.0.x/docs/MODULES.md)
+- [docs/CUSTOM_SCHEMAS.md](https://git.drupalcode.org/project/schemadotorg/-/blob/1.0.x/docs/CUSTOM_SCHEMAS.md)
 
 
 Features
@@ -42,8 +43,7 @@ General
 - Provides form elements for editing configuration settings 
   and Schema.org autocompletion
 - Manages reusable JavaScript libraries for UI and sub-modules
-- Removes all dependencies from starter kits and demos to make them
-  easy to uninstall.
+- Removes all dependencies from demos to make them easy to uninstall.
 - Adds the Schema.org Blueprints logo to all 'schemadotorg' routes.
 - Adds fragment/hash to a sub-module's configure link so that
   administrators can directly access a sub module's configuration.
@@ -178,8 +178,8 @@ The [Schema.org Blueprints module](https://www.drupal.org/project/schemadotorg)
 comprises [50+ sub-modules](https://git.drupalcode.org/project/schemadotorg/-/blob/1.0.x/docs/MODULES.md) 
 that provide integrations with various contributed modules to provide the best-structured data with the ideal content authoring and administration user
 experiences. Besides sub-modules, other Schema.org Blueprints projects support 
-complex, experimental, and deprecated integrations. Schema.org Blueprint 
-starter kits provide support for different industries and use cases. 
+complex, experimental, and deprecated integrations. Schema.org Blueprint
+Recipes provide reusable configuration for different industries and use cases.
 Additionally, there is a full feature demo of the 
 entire Schema.org Blueprints ecosystem.
 
@@ -195,14 +195,13 @@ for supporting the Mercury Editor with Layout Paragraphs. Lastly,
 deprecated sub-modules and integrations live (and die) in the 
 [Schema.org Blueprints Deprecated project](https://www.drupal.org/project/schemadotorg_deprecated).
 
-Schema.org Blueprints Starter Kits extend the generated Schema.org types to include additional functionality, including default configuration, views, and SEO URLs. 
-Starter kits include support for 
-[events](https://www.drupal.org/project/schemadotorg_starterkit_events),
-[podcasts](https://www.drupal.org/project/schemadotorg_starterkit_podcast),
-[recipes](https://www.drupal.org/project/schemadotorg_starterkit_recipes),
-[organizations](https://www.drupal.org/project/schemadotorg_starterkit_organization),
-[hospitals](https://www.drupal.org/project/schemadotorg_starterkit_hospital),
-and [medical information](https://www.drupal.org/project/schemadotorg_starterkit_medical).
+**Starter Kits are deprecated and no longer maintained.** Starter Kits are no
+longer the recommended way to set up or configure Drupal sites and features.
+Use Drupal Recipes instead. See the [Schema.org Recipes sandbox](https://www.drupal.org/sandbox/jrockowitz/3479651)
+for an example. Existing installations are not automatically uninstalled;
+keep using them at your own risk while migrating to Recipes. The shared
+Starter Kit API is available from the [Schema.org Blueprints Deprecated
+project](https://www.drupal.org/project/schemadotorg_deprecated).
 
 Finally, the [Schema.org Blueprint Demo project](https://www.drupal.org/project/schemadotorg_demo) and installation profile provide an 
 opinionated demo of the Schema.org Blueprints ecosystem built on top 

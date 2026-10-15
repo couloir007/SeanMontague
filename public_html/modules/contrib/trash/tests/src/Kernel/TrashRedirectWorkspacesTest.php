@@ -89,6 +89,52 @@ class TrashRedirectWorkspacesTest extends TrashKernelTestBase {
   }
 
   /**
+   * Tests a new redirect from the source of a redirect trashed in a workspace.
+   */
+  public function testNewRedirectFromSourceTrashedInWorkspace(): void {
+    $entity_type = $this->entityTypeManager->getDefinition('redirect');
+    if (!$this->container->get('workspaces.information')->isEntityTypeSupported($entity_type)) {
+      $this->markTestSkipped('The installed version of the Redirect module does not make the redirect entity type workspace-supported.');
+    }
+
+    $redirect_storage = $this->entityTypeManager->getStorage('redirect');
+    $redirect = $redirect_storage->create();
+    assert($redirect instanceof Redirect);
+    $redirect->setSource('test-source');
+    $redirect->setRedirect('node');
+    $redirect->save();
+    $restore_user = $this->createUser([
+      'view any workspace',
+      'restore redirect entities',
+    ]);
+
+    // A redirect trashed in a workspace keeps its hash in the base table until
+    // the workspace is published, so a new redirect from the same source fails
+    // validation there.
+    $this->switchToWorkspace('stage');
+    $redirect_storage->load($redirect->id())->delete();
+
+    $new_redirect = $redirect_storage->create();
+    assert($new_redirect instanceof Redirect);
+    $new_redirect->setSource('test-source');
+    $new_redirect->setRedirect('user');
+    $violations = $new_redirect->validate()->getEntityViolations();
+    $this->assertCount(1, $violations);
+    $this->assertSame('The source path <em class="placeholder">test-source</em> is used by a redirect in the trash.', (string) $violations[0]->getMessage());
+
+    // A user who can restore the trashed redirect gets a link to its restore
+    // form. The link has the 'in_trash' query parameter, which loads the
+    // trashed redirect in the 'ignore' trash context.
+    $this->setCurrentUser($restore_user);
+    $restore_url = $redirect->toUrl('restore');
+    $this->assertStringContainsString('in_trash=1', $restore_url->toString());
+    $this->assertTrue($this->getTrashManager()->executeInTrashContext('ignore', fn () => $restore_url->access()));
+    $violations = $new_redirect->validate()->getEntityViolations();
+    $this->assertCount(1, $violations);
+    $this->assertSame('The source path <em class="placeholder">test-source</em> is used by a redirect in the trash. <a href="' . $restore_url->toString() . '">Restore it</a> to edit it.', (string) $violations[0]->getMessage());
+  }
+
+  /**
    * Drives the alias-flip scenario shared by both test methods above.
    */
   private function assertAliasFlipRestoresTrashedRedirect(): void {
@@ -113,7 +159,6 @@ class TrashRedirectWorkspacesTest extends TrashKernelTestBase {
     $alpha_redirects = $repository->findBySourcePath('alpha');
     $this->assertCount(1, $alpha_redirects, 'A redirect from /alpha to the node was created.');
     $alpha_redirect = reset($alpha_redirects);
-    assert($alpha_redirect instanceof Redirect);
     $this->assertEquals('internal:' . $node_path, $alpha_redirect->getRedirect()['uri']);
 
     // Give the redirect a non-default status code so we can later assert that
@@ -133,7 +178,6 @@ class TrashRedirectWorkspacesTest extends TrashKernelTestBase {
     $beta_redirects = $repository->findBySourcePath('beta');
     $this->assertCount(1, $beta_redirects, 'A redirect from /beta to the node was created.');
     $beta_redirect = reset($beta_redirects);
-    assert($beta_redirect instanceof Redirect);
 
     // Changing the alias to /beta again trashes the /beta redirect and must
     // restore the /alpha redirect trashed by the first flip, since its

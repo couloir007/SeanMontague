@@ -270,7 +270,7 @@ class SchemaDotOrgDescriptionsConfigFactoryOverride extends ConfigFactoryOverrid
 
     $custom_descriptions = $this->configFactory
       ->getEditable('schemadotorg_descriptions.settings')
-      ->get('custom_descriptions');
+      ->get('custom_descriptions') ?? [];
 
     // Load the unaltered or not overridden field instance configuration.
     $config_names = array_merge(

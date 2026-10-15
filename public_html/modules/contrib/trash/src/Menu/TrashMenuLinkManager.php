@@ -67,6 +67,7 @@ class TrashMenuLinkManager implements MenuLinkManagerInterface {
       // No cleanup here, unlike updateDefinition(). MenuLinkContent::postSave()
       // only calls this when the link has no tree row, and core's
       // addDefinition() throws when one already exists.
+      // @phpstan-ignore return.type
       return NULL;
     }
 
@@ -83,6 +84,7 @@ class TrashMenuLinkManager implements MenuLinkManagerInterface {
       if ($this->inner->getDefinition($id, FALSE)) {
         $this->inner->removeDefinition($id, FALSE);
       }
+      // @phpstan-ignore return.type
       return NULL;
     }
 
@@ -95,10 +97,11 @@ class TrashMenuLinkManager implements MenuLinkManagerInterface {
   public function rebuild() {
     // A rebuild collects its definitions inside the inner manager, out of
     // reach of the guards above, so the whole rebuild runs in the 'active'
-    // trash context instead. MenuLinkContentDeriver's entity query then
-    // filters out the trashed links on its own, and the rebuild purges any
-    // stale 'discovered' row an unguarded rebuild left behind. The forced
-    // context also protects a rebuild in the 'inactive' context, whose
+    // trash context instead. MenuLinkContentDeriver's entity query then only
+    // returns links with at least one live translation, the same rule
+    // MenuLinkContentTrashHandler::postTrashDelete() applies, and the rebuild
+    // purges any stale 'discovered' row an unguarded rebuild left behind. The
+    // forced context also protects a rebuild in the 'inactive' context, whose
     // inverted entity query filter would otherwise drop every live link from
     // discovery and purge their rows.
     $this->getTrashManager()->executeInTrashContext('active', fn () => $this->inner->rebuild());
@@ -212,7 +215,8 @@ class TrashMenuLinkManager implements MenuLinkManagerInterface {
    *   entity ID.
    *
    * @return bool
-   *   TRUE if the link is backed by a trashed menu_link_content entity.
+   *   TRUE if the link is backed by a menu_link_content entity with no live
+   *   translation left.
    */
   protected function isTrashedMenuLink(string $id, array $definition): bool {
     // Outside the 'active' context storage stops filtering trashed entities, so
@@ -235,6 +239,13 @@ class TrashMenuLinkManager implements MenuLinkManagerInterface {
       ? $this->entityTypeManager->getStorage('menu_link_content')->load($definition['metadata']['entity_id'])
       : $this->entityRepository->loadEntityByUuid('menu_link_content', substr($id, strlen(static::PLUGIN_ID_PREFIX)));
 
+    // A menu_tree row covers every language of a link, so the link only leaves
+    // the tree once no live translation is left. Checking the default
+    // translation is enough. Trash never leaves a live translation beside a
+    // deleted default one, so a deleted default means every translation is
+    // deleted. Both loads above return the default translation.
+    // @see \Drupal\trash\TrashStorageTrait::restoreFromTrash()
+    // @see \Drupal\trash\Hook\TrashHandler\MenuLinkContentTrashHandler::postTrashDelete()
     return $entity && Trash::entityIsDeleted($entity);
   }
 

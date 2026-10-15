@@ -288,3 +288,12 @@ function schemadotorg_update_10019(): void {
   $installer = \Drupal::service('schemadotorg.installer');
   $installer->install();
 }
+
+/**
+ * Rebuild Schema.org tables using Unicode-capable varchar columns.
+ */
+function schemadotorg_update_10020(): void {
+  /** @var \Drupal\schemadotorg\SchemaDotOrgInstallerInterface $installer */
+  $installer = \Drupal::service('schemadotorg.installer');
+  $installer->install();
+}

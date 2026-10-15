@@ -65,10 +65,9 @@ function schemadotorg_help(string $route_name, RouteMatchInterface $route_match)
  * Implements hook_system_info_alter().
  */
 function schemadotorg_system_info_alter(array &$info, Extension $file, string $type): void {
-  // Remove all dependencies from starter kits and demos to make them
-  // easy to uninstall.
+  // Remove all dependencies from demos to make them easy to uninstall.
   if ($type === 'module'
-    && preg_match('/^schemadotorg_(demo|starterkit)/', $file->getName())
+    && str_starts_with($file->getName(), 'schemadotorg_demo')
     && \Drupal::moduleHandler()->moduleExists($file->getName())) {
     $info['dependencies'] = ['schemadotorg'];
   }

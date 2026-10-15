@@ -8,12 +8,17 @@ use Drupal\redirect\Entity\Redirect;
 use Drupal\trash\Exception\UnrestorableEntityException;
 use Drupal\trash\Hook\TrashHandler\RedirectTrashHandler;
 use Drupal\trash\TrashViewBuilder;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Trash integration with the Redirect module.
- *
- * @group trash
  */
+#[CoversClass(RedirectTrashHandler::class)]
+#[Group('trash')]
+#[RunTestsInSeparateProcesses]
 class TrashRedirectTest extends TrashKernelTestBase {
 
   /**
@@ -41,24 +46,6 @@ class TrashRedirectTest extends TrashKernelTestBase {
   }
 
   /**
-   * Tests that building trash handlers does not build the redirect repository.
-   *
-   * TrashManager holds its handlers in a tagged iterator, so the first
-   * getHandler() call builds every tagged handler. RedirectTrashHandler must
-   * not pull 'redirect.repository' in with it. The repository reads
-   * 'redirect.settings' in its constructor, and a config override that keys
-   * itself by the negotiated interface language turns that into a language
-   * negotiation and a router build.
-   */
-  public function testGetHandlerDoesNotBuildRedirectRepository(): void {
-    $this->assertInstanceOf(RedirectTrashHandler::class, $this->getTrashManager()->getHandler('redirect'));
-    $this->assertFalse(
-      $this->container->initialized('redirect.repository'),
-      "Building trash handlers must not instantiate 'redirect.repository'."
-    );
-  }
-
-  /**
    * Test deleting redirects.
    */
   public function testDeletingRedirects(): void {
@@ -82,6 +69,7 @@ class TrashRedirectTest extends TrashKernelTestBase {
     assert($new_redirect instanceof Redirect);
     $new_redirect->setSource('test-source');
     $new_redirect->setRedirect('user');
+    $this->assertCount(0, $new_redirect->validate()->getEntityViolations());
     $new_redirect->save();
 
     $found = $repository->findBySourcePath('test-source');
@@ -109,6 +97,7 @@ class TrashRedirectTest extends TrashKernelTestBase {
    * trash listing loads the redirect module's plugins, which still use the
    * deprecated annotation style.
    */
+  #[IgnoreDeprecations]
   public function testTrashViewsListing(): void {
     $storage = \Drupal::entityTypeManager()->getStorage('redirect');
 

@@ -6,8 +6,10 @@ namespace Drupal\trash\Plugin\Derivative;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\DependencyInjection\AutowiredInstanceTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
+use Drupal\trash\Plugin\Menu\TrashOperationLocalTask;
 use Drupal\trash\TrashManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -15,6 +17,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides local task definitions for trash-enabled entity types.
  */
 class TrashLocalTasks extends DeriverBase implements ContainerDeriverInterface {
+
+  use AutowiredInstanceTrait;
 
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
@@ -26,11 +30,7 @@ class TrashLocalTasks extends DeriverBase implements ContainerDeriverInterface {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $base_plugin_id) {
-    return new static(
-      $container->get('entity_type.manager'),
-      $container->get('trash.manager'),
-      $container->get('config.factory')
-    );
+    return static::createInstanceAutowired($container);
   }
 
   /**
@@ -110,8 +110,10 @@ class TrashLocalTasks extends DeriverBase implements ContainerDeriverInterface {
       }
 
       $this->derivatives[$entity_type_id] = $base_plugin_definition;
+      $this->derivatives[$entity_type_id]['class'] = TrashOperationLocalTask::class;
       $this->derivatives[$entity_type_id]['route_name'] = "entity.$entity_type_id.$operation";
       $this->derivatives[$entity_type_id]['base_route'] = "entity.$entity_type_id.canonical";
+      $this->derivatives[$entity_type_id]['trash_entity_type_id'] = $entity_type_id;
       $this->derivatives[$entity_type_id]['cache_tags'] = ['config:trash.settings'];
     }
 

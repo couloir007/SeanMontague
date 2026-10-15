@@ -24,7 +24,7 @@ abstract class SchemaDotOrgBrowserTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['schemadotorg'];
+  protected static $modules = ['schemadotorg', 'telephone'];
 
 
   /**

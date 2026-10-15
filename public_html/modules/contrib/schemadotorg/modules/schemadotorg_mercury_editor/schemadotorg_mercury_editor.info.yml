@@ -8,7 +8,7 @@ dependencies:
   - 'schemadotorg:schemadotorg'
   - 'schemadotorg:schemadotorg_layout_paragraphs'
 
-# Information added by Drupal.org packaging script on 2026-07-15
-version: '1.0.0-alpha38'
+# Information added by Drupal.org packaging script on 2026-09-08
+version: '1.0.0-alpha39'
 project: 'schemadotorg'
-datestamp: 1784128780
+datestamp: 1788877492

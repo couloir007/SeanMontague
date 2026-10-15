@@ -8,12 +8,14 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\ContentEntityDeleteForm;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Form\DeleteMultipleForm;
-use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -35,12 +37,14 @@ class TrashHooks {
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
     protected TrashManagerInterface $trashManager,
+    protected LanguageManagerInterface $languageManager,
     protected TrashEntityPurger $trashEntityPurger,
     protected ConfigFactoryInterface $configFactory,
     protected ModuleHandlerInterface $moduleHandler,
     protected AccountInterface $currentUser,
     protected DateFormatterInterface $dateFormatter,
     protected TimeInterface $time,
+    protected RouteBuilderInterface $routeBuilder,
   ) {}
 
   /**
@@ -59,13 +63,11 @@ class TrashHooks {
 
     $entity_type = $bundle = $entity = NULL;
     if ($is_entity_delete_form) {
-      assert($form_object instanceof ContentEntityDeleteForm);
       $entity = $form_object->getEntity();
       $entity_type = $entity->getEntityType();
       $bundle = $entity->bundle();
     }
     elseif ($is_entity_multiple_delete_form) {
-      assert($form_object instanceof DeleteMultipleForm);
       $entity_type_call = function () {
         // @phpstan-ignore-next-line
         return $this->entityType;
@@ -133,41 +135,6 @@ class TrashHooks {
     else {
       $entity_delete_label = $this->t('Deleting this @label will move it to the trash.', $params);
       $entity_multiple_delete_label = $this->t('Deleting these @label will move them to the trash.', $params);
-    }
-
-    // Prevent deleting individual translations.
-    // @todo Remove this after https://www.drupal.org/i/3376216 is fixed.
-    if ($is_entity_delete_form && $entity instanceof TranslatableInterface && $entity->isTranslatable() && !$entity->isDefaultTranslation()) {
-      $entity_delete_label = $this->t('Deleting a translation of a @label is currently not supported by Trash. Unpublish the translation instead.', $params);
-      $form['actions']['submit']['#access'] = FALSE;
-    }
-    elseif ($is_entity_multiple_delete_form && $entity_type->isTranslatable()) {
-      $storage = $this->entityTypeManager->getStorage($entity_type->id());
-
-      $can_delete = TRUE;
-      foreach (array_keys($form['entities']['#items'] ?? []) as $item) {
-        [$id, $langcode] = explode(':', $item, 2);
-
-        // All entities have been loaded already in the static cache by the
-        // delete multiple form, so it's ok to single-load them again.
-        $entity = $storage->load($id);
-        assert($entity instanceof TranslatableInterface);
-
-        // Deleting the default translation is considered the same as deleting
-        // the entire entity. When all translations are selected, only the
-        // default langcode will show up in the selections.
-        if (!$entity->getTranslation($langcode)->isDefaultTranslation()) {
-          // If any of the selected translations are not the default translation
-          // of the entity, the multiple deletion can not proceed.
-          $can_delete = FALSE;
-          break;
-        }
-      }
-
-      if (!$can_delete) {
-        $entity_multiple_delete_label = $this->t('Deleting translations of @label is currently not supported by Trash. Unpublish the translations instead.', $params);
-        $form['actions']['submit']['#access'] = FALSE;
-      }
     }
 
     $trash_handler = $this->trashManager->getHandler($entity_type->id());
@@ -259,6 +226,36 @@ class TrashHooks {
 
       $trash_settings->set('enabled_entity_types', $enabled_entity_types)->save();
     }
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_insert() for 'configurable_language'.
+   */
+  #[Hook('configurable_language_insert')]
+  public function configurableLanguageInsert(EntityInterface $entity): void {
+    if (count($this->languageManager->getLanguages()) >= 2) {
+      // Need to add translation link templates. Rebuilds are idempotent, so a
+      // >= 2 guard is safe even when several languages are added at once.
+      $this->entityTypeManager->clearCachedDefinitions();
+
+      // Need to add the translation restore and purge routes.
+      $this->routeBuilder->setRebuildNeeded();
+    }
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_delete() for 'configurable_language'.
+   */
+  #[Hook('configurable_language_delete')]
+  public function configurableLanguageDelete(EntityInterface $entity): void {
+    // The {language} slug in the restore/purge link templates and routes is
+    // only registered on multilingual sites, so both caches have to be
+    // invalidated together when a language is deleted. Invalidate them
+    // unconditionally: ConfigurableLanguage::postDelete() may schedule a
+    // container rebuild, so the injected language manager is not a reliable
+    // source for a fresh language count here.
+    $this->entityTypeManager->clearCachedDefinitions();
+    $this->routeBuilder->setRebuildNeeded();
   }
 
 }

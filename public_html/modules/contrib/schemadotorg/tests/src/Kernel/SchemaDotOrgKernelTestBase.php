@@ -16,7 +16,7 @@ abstract class SchemaDotOrgKernelTestBase extends EntityKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'user', 'schemadotorg'];
+  protected static $modules = ['node', 'user', 'telephone', 'schemadotorg'];
 
   /**
    * Installs the Schema.org module's entities, config, and tables.

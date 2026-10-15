@@ -96,7 +96,7 @@ class TrashSettingsForm extends ConfigFormBase {
       $form['enabled_entity_types'][$entity_type_id]['enabled'] = [
         '#type' => 'checkbox',
         '#title' => $entity_type_label,
-        '#default_value' => isset($field_definitions['deleted']) && isset($enabled_entity_types[$entity_type_id]),
+        '#default_value' => isset($field_definitions['deleted'], $enabled_entity_types[$entity_type_id]),
         '#disabled' => isset($field_definitions['deleted']) && ($field_definitions['deleted']->getProvider() !== 'trash'),
       ];
 

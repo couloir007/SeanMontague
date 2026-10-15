@@ -23,9 +23,8 @@ class NodeTrashHandler extends DefaultTrashHandler {
       return;
     }
 
-    // The Search module is not using an entity query, so we need to alter its
-    // query manually.
-    // @see \Drupal\node\Plugin\Search\NodeSearch::findResults()
+    // The Search module builds this query directly instead of through an
+    // entity query, so it has to be altered manually here.
     /** @var \Drupal\Core\Database\Query\SelectInterface $query */
     $query->isNull('n.deleted');
   }
@@ -39,7 +38,7 @@ class NodeTrashHandler extends DefaultTrashHandler {
       return;
     }
 
-    // Swap the NodeSearch plugin for a trash-aware subclass so that indexing
+    // Swap the node_search plugin for a trash-aware subclass so that indexing
     // runs in the 'ignore' trash context. Without this, trash-aware storage
     // hides trashed nodes from loadMultiple(), causing the indexer to
     // repeatedly select trashed IDs it cannot load and starving live nodes out

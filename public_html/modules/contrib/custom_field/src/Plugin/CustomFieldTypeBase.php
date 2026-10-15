@@ -354,6 +354,31 @@ abstract class CustomFieldTypeBase extends PluginBase implements CustomFieldType
   /**
    * {@inheritdoc}
    */
+  public static function getExtraPropertyNames(array $settings): array {
+    $name = $settings['name'] ?? NULL;
+    if ($name === NULL) {
+      return [];
+    }
+    $schema = static::schema($settings);
+    // Single-column types describe that one column directly rather than
+    // keying it by name, so there is nothing extra to report.
+    if (!array_key_exists($name, $schema)) {
+      return [];
+    }
+
+    return array_values(array_diff(array_keys($schema), [$name]));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function extractExtraPropertyValues(array $settings, mixed $value): array {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function propertyDefinitions(array $settings): mixed {
     return NULL;
   }
@@ -417,5 +442,48 @@ abstract class CustomFieldTypeBase extends PluginBase implements CustomFieldType
    * {@inheritdoc}
    */
   public function onChange(string $property_name, bool $notify, FieldItemInterface $item): void {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRawValue(FieldItemInterface $item): mixed {
+    $values = $this->getRawValues($item);
+
+    // Single-column subfields keep returning a plain scalar.
+    if (count($values) === 1 && array_key_exists('value', $values)) {
+      return $values['value'];
+    }
+
+    return $values;
+  }
+
+  /**
+   * Returns all raw stored columns belonging to this subfield.
+   *
+   * @param \Drupal\Core\Field\FieldItemInterface $item
+   *   The field item.
+   *
+   * @return array<string, mixed>
+   *   Values keyed by property suffix, with the main column keyed 'value'.
+   */
+  protected function getRawValues(FieldItemInterface $item): array {
+    $name = $this->getName();
+    $prefix = $name . static::SEPARATOR;
+    $values = [];
+
+    // The getValue() returns only stored (non-computed) columns, e.g.
+    // 'my_date', 'my_date__end', 'my_date__duration'.
+    foreach ($item->getValue() as $column => $value) {
+      $column = (string) $column;
+      if ($column === $name) {
+        $values['value'] = $value;
+      }
+      elseif (str_starts_with($column, $prefix)) {
+        $values[substr($column, strlen($prefix))] = $value;
+      }
+    }
+
+    return $values;
+  }
 
 }

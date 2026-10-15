@@ -2,3 +2,10 @@ schemadotorg_report:
   css:
     component:
       css/schemadotorg_report.css: {  }
+
+schemadotorg_report.dialog:
+  js:
+    js/schemadotorg_report.dialog.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.dialog.ajax

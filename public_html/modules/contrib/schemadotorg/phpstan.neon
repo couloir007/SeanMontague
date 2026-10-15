@@ -68,6 +68,12 @@ parameters:
           - *Test.php
           - *TestBase.php
 
+      # Functional JavaScript assertions extend WebAssert at runtime.
+      - message: "#^Call to an undefined method Drupal\\\\Tests\\\\WebAssert::waitForElement(Visible)?\\(\\)\\.$#"
+        paths:
+          - *Test.php
+          - *TestBase.php
+
       - message: "#^Property.*Storage.*does not accept.*EntityStorageInterface\\.$#"
         paths:
           - *Test.php

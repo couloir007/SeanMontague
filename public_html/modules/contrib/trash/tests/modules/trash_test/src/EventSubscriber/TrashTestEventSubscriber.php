@@ -22,9 +22,7 @@ class TrashTestEventSubscriber implements EventSubscriberInterface {
     protected LanguageManagerInterface $languageManager,
     #[Autowire(service: 'keyvalue')]
     protected KeyValueFactoryInterface $keyValueFactory,
-  ) {
-
-  }
+  ) {}
 
   /**
    * Handles early language negotiations before the trash module may use it.
@@ -42,6 +40,7 @@ class TrashTestEventSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents(): array {
+    $events = [];
     // Handle language negotiations immediately after the
     // authentication subscriber (priority 300), and before the trash ignore
     // subscriber (priority 299).

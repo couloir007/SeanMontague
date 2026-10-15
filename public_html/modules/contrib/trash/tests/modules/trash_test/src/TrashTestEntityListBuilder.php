@@ -18,6 +18,7 @@ class TrashTestEntityListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
+    $header = [];
     $header['label'] = $this->t('Trash test');
     return $header + parent::buildHeader();
   }
@@ -26,6 +27,7 @@ class TrashTestEntityListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
+    $row = [];
     $row['label'] = $entity->toLink();
     return $row + parent::buildRow($entity);
   }

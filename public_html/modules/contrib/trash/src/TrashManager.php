@@ -6,19 +6,22 @@ namespace Drupal\trash;
 
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
+use Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\trash\Handler\TrashHandlerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
-use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 
 /**
  * Provides the Trash manager.
  */
 class TrashManager implements TrashManagerInterface {
+
+  use DependencySerializationTrait;
 
   /**
    * One of 'active', 'inactive' or 'ignore'.
@@ -27,18 +30,17 @@ class TrashManager implements TrashManagerInterface {
    */
   protected $trashContext = 'active';
 
+  /**
+   * Trash handlers, keyed by entity type ID.
+   *
+   * @var array<string, \Drupal\trash\Handler\TrashHandlerInterface>
+   */
+  protected array $handlers = [];
+
   public function __construct(
     protected ConfigFactoryInterface $configFactory,
-    #[AutowireServiceClosure(service: 'entity.definition_update_manager')]
-    protected \Closure $entityDefinitionUpdateManager,
-    #[AutowireServiceClosure(service: 'entity.last_installed_schema.repository')]
-    protected \Closure $entityLastInstalledSchemaRepository,
-    #[AutowireServiceClosure(service: 'entity_type.manager')]
-    protected \Closure $entityTypeManager,
     #[Autowire(service: 'entity.memory_cache')]
     protected CacheTagsInvalidatorInterface $entityMemoryCache,
-    #[AutowireIterator(tag: 'trash_handler', indexAttribute: 'entity_type_id')]
-    protected iterable $trashHandlers = [],
   ) {}
 
   /**
@@ -78,9 +80,7 @@ class TrashManager implements TrashManagerInterface {
    * {@inheritdoc}
    */
   public function enableEntityType(EntityTypeInterface $entity_type): void {
-    /** @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_schema_repository */
-    $entity_schema_repository = ($this->entityLastInstalledSchemaRepository)();
-    $field_storage_definitions = $entity_schema_repository->getLastInstalledFieldStorageDefinitions($entity_type->id());
+    $field_storage_definitions = $this->getEntityLastInstalledSchemaRepository()->getLastInstalledFieldStorageDefinitions($entity_type->id());
 
     if (!$this->isEntityTypeSupported($entity_type)) {
       throw new \InvalidArgumentException("Trash integration can not be enabled for the {$entity_type->id()} entity type.");
@@ -95,33 +95,20 @@ class TrashManager implements TrashManagerInterface {
       }
     }
 
-    $storage_definition = BaseFieldDefinition::create('timestamp')
-      ->setLabel(new TranslatableMarkup('Deleted'))
-      ->setDescription(new TranslatableMarkup('Time when the item got deleted'))
-      ->setInternal(TRUE)
-      ->setTranslatable(FALSE)
-      ->setRevisionable(TRUE);
-
-    /** @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface $entity_definition_update_manager */
-    $entity_definition_update_manager = ($this->entityDefinitionUpdateManager)();
-    $entity_definition_update_manager->installFieldStorageDefinition('deleted', $entity_type->id(), 'trash', $storage_definition);
+    $this->getEntityDefinitionUpdateManager()->installFieldStorageDefinition('deleted', $entity_type->id(), 'trash', $this->getDeletedFieldDefinition());
   }
 
   /**
    * {@inheritdoc}
    */
   public function disableEntityType(EntityTypeInterface $entity_type): void {
-    /** @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_schema_repository */
-    $entity_schema_repository = ($this->entityLastInstalledSchemaRepository)();
-    $field_storage_definitions = $entity_schema_repository->getLastInstalledFieldStorageDefinitions($entity_type->id());
+    $field_storage_definitions = $this->getEntityLastInstalledSchemaRepository()->getLastInstalledFieldStorageDefinitions($entity_type->id());
 
     if (isset($field_storage_definitions['deleted'])) {
       if ($field_storage_definitions['deleted']->getProvider() !== 'trash') {
         throw new \InvalidArgumentException("The {$entity_type->id()} entity type's 'deleted' field does not belong to Trash; refusing to uninstall it.");
       }
-      /** @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface $entity_definition_update_manager */
-      $entity_definition_update_manager = ($this->entityDefinitionUpdateManager)();
-      $entity_definition_update_manager->uninstallFieldStorageDefinition($field_storage_definitions['deleted']);
+      $this->getEntityDefinitionUpdateManager()->uninstallFieldStorageDefinition($field_storage_definitions['deleted']);
     }
   }
 
@@ -129,7 +116,7 @@ class TrashManager implements TrashManagerInterface {
    * {@inheritdoc}
    */
   public function shouldAlterQueries(): bool {
-    $trash_context = $this->trashContext ?? 'active';
+    $trash_context = $this->trashContext;
     return $trash_context !== 'ignore';
   }
 
@@ -137,7 +124,7 @@ class TrashManager implements TrashManagerInterface {
    * {@inheritdoc}
    */
   public function getTrashContext(): string {
-    return $this->trashContext ?? 'active';
+    return $this->trashContext;
   }
 
   /**
@@ -153,15 +140,6 @@ class TrashManager implements TrashManagerInterface {
       $cache_tags_to_invalidate = [];
       foreach ($this->getEnabledEntityTypes() as $entity_type_id) {
         $cache_tags_to_invalidate[] = 'entity.memory_cache:' . $entity_type_id;
-
-        // For Drupal versions lower than 11.2.6, we also need to clear the
-        // internal latest revision cache of the storage.
-        // @see https://www.drupal.org/node/3535160
-        if (version_compare(\Drupal::VERSION, '11.2.6', '<')) {
-          $storage = ($this->entityTypeManager)()->getStorage($entity_type_id);
-          $ref = new \ReflectionProperty($storage, 'latestRevisionIds');
-          $ref->setValue($storage, []);
-        }
       }
       $this->entityMemoryCache->invalidateTags($cache_tags_to_invalidate);
     }
@@ -187,13 +165,49 @@ class TrashManager implements TrashManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getHandler(string $entity_type_id): ?TrashHandlerInterface {
-    $handlers = iterator_to_array($this->trashHandlers);
-    if (isset($handlers[$entity_type_id])) {
-      return $handlers[$entity_type_id];
-    }
+  public function addHandler(TrashHandlerInterface $handler, string $entity_type_id): void {
+    $this->handlers[$entity_type_id] = $handler;
+  }
 
-    return NULL;
+  /**
+   * {@inheritdoc}
+   */
+  public function getHandler(string $entity_type_id): ?TrashHandlerInterface {
+    return $this->handlers[$entity_type_id] ?? NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDeletedFieldDefinition(): BaseFieldDefinition {
+    $field = BaseFieldDefinition::create('timestamp')
+      ->setLabel(new TranslatableMarkup('Deleted'))
+      ->setDescription(new TranslatableMarkup('Time when the item got deleted.'))
+      ->setInternal(TRUE)
+      ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE);
+
+    // Set indexes via reflection since BaseFieldDefinition lacks setIndexes().
+    $reflection = new \ReflectionProperty(BaseFieldDefinition::class, 'indexes');
+    $reflection->setValue($field, ['value' => ['value']]);
+
+    return $field;
+  }
+
+  /**
+   * Gets the entity definition update manager.
+   */
+  protected function getEntityDefinitionUpdateManager(): EntityDefinitionUpdateManagerInterface {
+    // @phpstan-ignore globalDrupalDependencyInjection.useDependencyInjection
+    return \Drupal::service('entity.definition_update_manager');
+  }
+
+  /**
+   * Gets the entity last installed schema repository.
+   */
+  protected function getEntityLastInstalledSchemaRepository(): EntityLastInstalledSchemaRepositoryInterface {
+    // @phpstan-ignore globalDrupalDependencyInjection.useDependencyInjection
+    return \Drupal::service('entity.last_installed_schema.repository');
   }
 
 }

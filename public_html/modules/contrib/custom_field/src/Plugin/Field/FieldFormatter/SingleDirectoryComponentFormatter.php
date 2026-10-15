@@ -556,6 +556,9 @@ class SingleDirectoryComponentFormatter extends BaseFormatter {
    */
   public function viewValue(FieldItemInterface $item, string $langcode): array {
     $field_name = $this->fieldDefinition->getName();
+    $entity = $item->getEntity();
+    $entity_type = $entity->getEntityTypeId();
+    $bundle = $entity->bundle();
     $component = $this->getSetting('component');
     $slots = $this->getSetting('slots');
     $props = $this->getSetting('props') ? \array_filter($this->getSetting('props')) : [];
@@ -572,8 +575,8 @@ class SingleDirectoryComponentFormatter extends BaseFormatter {
     $is_valid = TRUE;
     $bubbleable_metadata = new BubbleableMetadata();
     $context = [
-      'entity_type' => $this->fieldDefinition->getTargetEntityTypeId(),
-      'entity' => $item->getEntity(),
+      'entity_type' => $entity_type,
+      'entity' => $entity,
       'bubbleable_metadata' => $bubbleable_metadata,
     ];
 
@@ -645,12 +648,14 @@ class SingleDirectoryComponentFormatter extends BaseFormatter {
           '#field_name' => $field_name,
           '#name' => $value['name'],
           '#value' => $value['value'],
+          '#raw_value' => $value['raw_value'],
           '#label' => $value['label'],
           '#label_display' => $value['label_display'],
           '#type' => $value['type'],
           '#wrappers' => $value['wrappers'],
-          '#entity_type' => $value['entity_type'],
-          '#lang_code' => $langcode,
+          '#entity_type' => $entity_type,
+          '#bundle' => $bundle,
+          '#language' => $langcode,
         ];
       }
     }
@@ -682,7 +687,6 @@ class SingleDirectoryComponentFormatter extends BaseFormatter {
     $custom_items = $event->getCustomItems();
 
     $values = [];
-    $entity_type = $this->fieldDefinition->getTargetEntityTypeId();
     foreach ($slots as $name => $slot) {
       $field = (string) ($slot['field'] ?? '');
       if ($field === '') {
@@ -730,11 +734,11 @@ class SingleDirectoryComponentFormatter extends BaseFormatter {
       $markup = [
         'name' => $field,
         'value' => $render_value,
+        'raw_value' => $custom_item->getRawValue($item),
         'label' => $field_label ?: $custom_item->getLabel(),
         'label_display' => $formatter_settings['formatter_settings']['label_display'] ?? 'above',
         'type' => $custom_item->getPluginId(),
         'wrappers' => $formatter_settings['wrappers'],
-        'entity_type' => $entity_type,
       ];
 
       $values[(string) $name] = $markup;

@@ -206,7 +206,7 @@ class TrashViewsHooks {
         }
         // Note: We use strpos because views for some reason has a field
         // looking like "trash_test.Deleted > 0".
-        if (strpos($condition['field'], "{$deleted_table_alias}.{$deleted_table_column}") !== FALSE) {
+        if (str_contains($condition['field'], "{$deleted_table_alias}.{$deleted_table_column}")) {
           return TRUE;
         }
       }

@@ -7,12 +7,18 @@ namespace Drupal\Tests\trash\Kernel;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\trash\TrashViewBuilder;
 use Drupal\views\Plugin\views\exposed_form\ExposedFormPluginInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the dynamically built trash listing views.
  *
- * @group trash
+ * @see https://www.drupal.org/project/trash/issues/3591559
  */
+#[CoversClass(TrashViewBuilder::class)]
+#[Group('trash')]
+#[RunTestsInSeparateProcesses]
 class TrashViewBuilderTest extends TrashKernelTestBase {
 
   /**

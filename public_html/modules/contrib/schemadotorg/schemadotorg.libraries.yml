@@ -18,13 +18,6 @@ schemadotorg.details:
     - core/drupal.announce
     - core/once
 
-schemadotorg.dialog:
-  js:
-    js/schemadotorg.dialog.js: {}
-  dependencies:
-    - core/drupal
-    - core/drupal.dialog.ajax
-
 schemadotorg.form:
   js:
     js/schemadotorg.form.js: {}
@@ -65,7 +58,19 @@ schemadotorg.mermaid:
     - core/drupal
     - core/once
     - schemadotorg/schemadotorg.details
+    - schemadotorg/schemadotorg.mermaid.panzoom
     - schemadotorg/mermaid
+
+schemadotorg.mermaid.panzoom:
+  version: VERSION
+  css:
+    theme:
+      css/schemadotorg.mermaid.panzoom.css: {}
+  js:
+    js/schemadotorg.mermaid.panzoom.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
     - schemadotorg/panzoom
 
 ################################################################################

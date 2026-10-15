@@ -146,6 +146,9 @@ class CustomTableFormatter extends BaseFormatter {
       $sort_order = $this->getSetting('sort_order') ?? 'asc';
       $custom_items = $this->sortFields($settings);
       $sortable = $this->getSortableFields();
+      $entity = $items->getEntity();
+      $entity_type = $entity->getEntityTypeId();
+      $bundle = $entity->bundle();
 
       // Track columns with non-empty values.
       $column_has_values = [];
@@ -236,12 +239,14 @@ class CustomTableFormatter extends BaseFormatter {
               '#field_name' => $name,
               '#name' => $value['name'],
               '#value' => $value['value'],
+              '#raw_value' => $value['raw_value'],
               '#label' => $value['label'],
               '#label_display' => 'hidden',
               '#type' => $value['type'],
               '#wrappers' => $value['wrappers'],
-              '#entity_type' => $value['entity_type'],
-              '#lang_code' => $langcode,
+              '#entity_type' => $entity_type,
+              '#bundle' => $bundle,
+              '#language' => $langcode,
             ];
           }
           $row_data['data'][$name] = [

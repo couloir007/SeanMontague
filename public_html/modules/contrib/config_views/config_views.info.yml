@@ -6,7 +6,7 @@ package: Views
 dependencies:
   - drupal:views
 
-# Information added by Drupal.org packaging script on 2025-02-10
-version: '2.1.2'
+# Information added by Drupal.org packaging script on 2026-10-12
+version: '2.1.3'
 project: 'config_views'
-datestamp: 1739229313
+datestamp: 1791823335

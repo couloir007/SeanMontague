@@ -9,7 +9,6 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 /**
  * Tests the Local Tasks More JavaScript.
  *
- * @covers local_tasks_more.js
  * @group local_tasks_more
  */
 class LocalTasksMoreJavaScriptTest extends WebDriverTestBase {

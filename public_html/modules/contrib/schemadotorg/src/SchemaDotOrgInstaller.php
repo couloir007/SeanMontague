@@ -339,12 +339,12 @@ class SchemaDotOrgInstaller implements SchemaDotOrgInstallerInterface {
       'description' => 'Schema.org types',
       'fields' => [
         'id' => [
-          'type' => 'varchar_ascii',
+          'type' => 'varchar',
           'length' => 255,
           'not null' => TRUE,
         ],
         'label' => [
-          'type' => 'varchar_ascii',
+          'type' => 'varchar',
           'length' => 255,
           'not null' => TRUE,
           'default' => '',
@@ -355,19 +355,19 @@ class SchemaDotOrgInstaller implements SchemaDotOrgInstallerInterface {
           'size' => 'big',
         ],
         'sub_type_of' => [
-          'type' => 'varchar_ascii',
+          'type' => 'varchar',
           'length' => 255,
           'not null' => TRUE,
           'default' => '',
         ],
         'enumerationtype' => [
-          'type' => 'varchar_ascii',
+          'type' => 'varchar',
           'length' => 255,
           'not null' => TRUE,
           'default' => '',
         ],
         'equivalent_class' => [
-          'type' => 'varchar_ascii',
+          'type' => 'varchar',
           'length' => 255,
           'not null' => TRUE,
           'default' => '',
@@ -388,13 +388,13 @@ class SchemaDotOrgInstaller implements SchemaDotOrgInstallerInterface {
           'size' => 'big',
         ],
         'superseded_by' => [
-          'type' => 'varchar_ascii',
+          'type' => 'varchar',
           'length' => 255,
           'not null' => TRUE,
           'default' => '',
         ],
         'is_part_of' => [
-          'type' => 'varchar_ascii',
+          'type' => 'varchar',
           'length' => 255,
           'not null' => TRUE,
           'default' => '',
@@ -412,12 +412,12 @@ class SchemaDotOrgInstaller implements SchemaDotOrgInstallerInterface {
       'description' => 'Schema.org properties',
       'fields' => [
         'id' => [
-          'type' => 'varchar_ascii',
+          'type' => 'varchar',
           'length' => 255,
           'not null' => TRUE,
         ],
         'label' => [
-          'type' => 'varchar_ascii',
+          'type' => 'varchar',
           'length' => 255,
           'not null' => TRUE,
           'default' => '',
@@ -428,13 +428,13 @@ class SchemaDotOrgInstaller implements SchemaDotOrgInstallerInterface {
           'size' => 'big',
         ],
         'sub_property_of' => [
-          'type' => 'varchar_ascii',
+          'type' => 'varchar',
           'length' => 255,
           'not null' => TRUE,
           'default' => '',
         ],
         'equivalent_property' => [
-          'type' => 'varchar_ascii',
+          'type' => 'varchar',
           'length' => 255,
           'not null' => TRUE,
           'default' => '',
@@ -465,13 +465,13 @@ class SchemaDotOrgInstaller implements SchemaDotOrgInstallerInterface {
           'size' => 'big',
         ],
         'superseded_by' => [
-          'type' => 'varchar_ascii',
+          'type' => 'varchar',
           'length' => 255,
           'not null' => TRUE,
           'default' => '',
         ],
         'is_part_of' => [
-          'type' => 'varchar_ascii',
+          'type' => 'varchar',
           'length' => 255,
           'not null' => TRUE,
           'default' => '',
@@ -605,9 +605,6 @@ class SchemaDotOrgInstaller implements SchemaDotOrgInstallerInterface {
       return;
     }
 
-    // Truncate table.
-    $this->database->truncate($table)->execute();
-
     // Load CSV.
     $handle = fopen($filename, 'r');
 
@@ -618,12 +615,45 @@ class SchemaDotOrgInstaller implements SchemaDotOrgInstallerInterface {
       fn(&$field_name) => ($field_name = $this->schemaNames->camelCaseToSnakeCase($field_name))
     );
 
-    // Insert multiple records.
-    $query = $this->database->insert($table)->fields($fields);
+    // Load records keyed by Schema.org ID.
+    $records = [];
     while ($row = fgetcsv($handle, escape: '')) {
       $values = [];
       foreach ($fields as $index => $field_name) {
         $values[$field_name] = $row[$index] ?? '';
+      }
+      if (empty($values['id'] ?? NULL)) {
+        throw new \InvalidArgumentException("The Schema.org $name data contains a record without an ID.");
+      }
+      if (isset($records[$values['id']])) {
+        throw new \InvalidArgumentException("The Schema.org $name data contains a duplicate ID: {$values['id']}.");
+      }
+      $records[$values['id']] = $values;
+    }
+    fclose($handle);
+
+    // Allow modules to alter Schema.org records before importing them.
+    $this->moduleHandler->alter('schemadotorg_schema_data', $records, $name);
+
+    // Validate altered records before replacing the existing table data.
+    foreach ($records as $id => $record) {
+      if (!is_array($record) || empty($record['id'])) {
+        throw new \InvalidArgumentException("The altered Schema.org $name data contains a record without an ID.");
+      }
+      if ($id !== $record['id']) {
+        throw new \InvalidArgumentException("The altered Schema.org $name data record key does not match its ID: $id.");
+      }
+    }
+
+    // Truncate table.
+    $this->database->truncate($table)->execute();
+
+    // Insert multiple records.
+    $query = $this->database->insert($table)->fields($fields);
+    foreach ($records as $record) {
+      $values = [];
+      foreach ($fields as $field_name) {
+        $values[$field_name] = $record[$field_name] ?? '';
       }
       $query->values($values);
     }

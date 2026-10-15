@@ -4,16 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\trash\Kernel;
 
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\path_alias\Entity\PathAlias;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
+use Drupal\trash\Hook\TrashHandler\PathAliasTrashHandler;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests path_alias integration in DefaultTrashHandler.
- *
- * @group trash
  */
+#[CoversClass(PathAliasTrashHandler::class)]
+#[Group('trash')]
+#[RunTestsInSeparateProcesses]
 class TrashPathAliasTest extends TrashKernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -23,6 +29,7 @@ class TrashPathAliasTest extends TrashKernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'language',
     'path',
     'path_alias',
   ];
@@ -198,6 +205,92 @@ class TrashPathAliasTest extends TrashKernelTestBase {
     // Verify no errors when restoring node without aliases.
     $this->restoreEntity('node', $node->id());
     $this->assertNotEmpty(Node::load($node->id()));
+  }
+
+  /**
+   * Tests alias handling for translated nodes across delete and restore.
+   */
+  public function testMultilingualAliasLifecycle(): void {
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    ConfigurableLanguage::createFromLangcode('de')->save();
+
+    $node = $this->createNode(['type' => 'article', 'title' => 'EN']);
+    $node->addTranslation('fr', ['title' => 'FR']);
+    $node->addTranslation('de', ['title' => 'DE']);
+    $node->save();
+    $node_id = $node->id();
+
+    $alias_ids = [];
+    foreach (['en', 'fr', 'de'] as $langcode) {
+      $alias = PathAlias::create([
+        'path' => '/node/' . $node_id,
+        'alias' => '/' . $langcode . '-alias',
+        'langcode' => $langcode,
+      ]);
+      $alias->save();
+      $alias_ids[$langcode] = $alias->id();
+    }
+
+    // Deleting the node trashes the aliases of every translation, not just
+    // the default one.
+    $node->delete();
+    foreach ($alias_ids as $langcode => $alias_id) {
+      $this->assertEmpty(PathAlias::load($alias_id), "The '$langcode' alias is trashed.");
+    }
+
+    // A partial restore only brings back the aliases of the restored
+    // translations; the deleted default translation is always included.
+    $this->restoreEntity('node', $node_id, ['fr']);
+    $this->assertNotEmpty(PathAlias::load($alias_ids['en']));
+    $this->assertNotEmpty(PathAlias::load($alias_ids['fr']));
+    $this->assertEmpty(PathAlias::load($alias_ids['de']));
+
+    // Completing the restore brings back the remaining alias.
+    $this->restoreEntity('node', $node_id, ['de']);
+    $this->assertNotEmpty(PathAlias::load($alias_ids['de']));
+  }
+
+  /**
+   * Tests that removing a translation soft-deletes only its own alias.
+   */
+  public function testTranslationRemovalTrashesItsAlias(): void {
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+
+    $node = $this->createNode(['type' => 'article', 'title' => 'EN']);
+    $node->addTranslation('fr', ['title' => 'FR']);
+    $node->save();
+    $node_id = $node->id();
+
+    $en_alias = PathAlias::create([
+      'path' => '/node/' . $node_id,
+      'alias' => '/en-alias',
+      'langcode' => 'en',
+    ]);
+    $en_alias->save();
+    $fr_alias = PathAlias::create([
+      'path' => '/node/' . $node_id,
+      'alias' => '/fr-alias',
+      'langcode' => 'fr',
+    ]);
+    $fr_alias->save();
+
+    // Removing the translation soft-deletes it together with its alias; the
+    // node and the other alias stay live.
+    $node = Node::load($node_id);
+    $node->removeTranslation('fr');
+    $node->save();
+
+    $this->assertNotEmpty(Node::load($node_id));
+    $this->assertNotEmpty(PathAlias::load($en_alias->id()));
+    $this->assertEmpty(PathAlias::load($fr_alias->id()));
+    $this->assertNotEmpty($this->loadTrashedEntity('path_alias', $fr_alias->id()));
+
+    // Restoring the translation restores its alias as well.
+    $this->restoreEntity('node', $node_id, ['fr']);
+    $node = Node::load($node_id);
+    $this->assertTrue($node->hasTranslation('fr'));
+    $this->assertEmpty($node->getTranslation('fr')->get('deleted')->value);
+    $this->assertNotEmpty(PathAlias::load($fr_alias->id()));
   }
 
   /**

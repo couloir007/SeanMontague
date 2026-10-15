@@ -57,6 +57,28 @@ class DateTimeType extends CustomFieldTypeBase implements DateTimeTypeInterface 
 
   /**
    * {@inheritdoc}
+   *
+   * The nested shape keys its timezone as 'timezone', while the column is
+   * '<name>__timezone', so the name has to be mapped rather than copied. The
+   * guard is the one CustomFieldDatetime::setValue() applies to the same
+   * value, so completing the values array here cannot change what is stored.
+   */
+  public static function extractExtraPropertyValues(array $settings, mixed $value): array {
+    if (!is_array($value)) {
+      return [];
+    }
+    ['name' => $name] = $settings;
+
+    $extra = [];
+    if (isset($value['timezone'])) {
+      $extra[$name . self::SEPARATOR . 'timezone'] = $value['timezone'];
+    }
+
+    return $extra;
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public static function propertyDefinitions(array $settings): array {
     ['name' => $name, 'datetime_type' => $datetime_type] = $settings;

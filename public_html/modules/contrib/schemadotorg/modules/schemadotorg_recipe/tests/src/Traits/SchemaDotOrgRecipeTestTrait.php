@@ -99,6 +99,9 @@ trait SchemaDotOrgRecipeTestTrait {
         throw new \RuntimeException("Configuration file '$name' not found in directory '$directory'.");
       }
     }
+
+    // Imported active configuration can already be cached from module install.
+    \Drupal::configFactory()->reset();
   }
 
   /**

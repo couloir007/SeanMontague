@@ -47,3 +47,11 @@ function local_tasks_more_block_view_alter(array &$build, BlockPluginInterface $
     unset($build['#contextual_links']);
   }
 }
+
+/**
+ * Implements hook_preprocess_top_bar_page_actions().
+ */
+function local_tasks_more_preprocess_top_bar_page_actions(array &$variables): void {
+  // Navigation's dropdown already exposes all actions and needs no tab toggle.
+  unset($variables['page_actions']['local_tasks_more']);
+}

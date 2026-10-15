@@ -15,7 +15,7 @@ dependencies:
   - 'schemadotorg:schemadotorg_allowed_formats'
   - 'schemadotorg:schemadotorg_sidebar'
 
-# Information added by Drupal.org packaging script on 2026-07-15
-version: '1.0.0-alpha38'
+# Information added by Drupal.org packaging script on 2026-09-08
+version: '1.0.0-alpha39'
 project: 'schemadotorg_experimental'
-datestamp: 1784130207
+datestamp: 1788877486

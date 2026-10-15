@@ -84,6 +84,9 @@ class FlippedTableFormatter extends BaseFormatter {
       $settings = $this->getSetting('fields') ?? [];
       $custom_items = $this->sortFields($settings);
       $hide_empty = $this->getSetting('hide_empty') ?? FALSE;
+      $entity = $items->getEntity();
+      $entity_type = $entity->getEntityTypeId();
+      $bundle = $entity->bundle();
 
       // Initialize the table rows array.
       $rows = [];
@@ -144,12 +147,14 @@ class FlippedTableFormatter extends BaseFormatter {
               '#field_name' => $name,
               '#name' => $value['name'],
               '#value' => $value['value'],
+              '#raw_value' => $value['raw_value'],
               '#label' => $value['label'],
               '#label_display' => 'hidden',
               '#type' => $value['type'],
               '#wrappers' => $value['wrappers'],
-              '#entity_type' => $value['entity_type'],
-              '#lang_code' => $langcode,
+              '#entity_type' => $entity_type,
+              '#bundle' => $bundle,
+              '#language' => $langcode,
             ];
           }
           $row['data'][] = ['data' => $output ?: ''];

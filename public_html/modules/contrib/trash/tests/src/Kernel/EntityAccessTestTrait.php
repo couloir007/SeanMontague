@@ -10,6 +10,8 @@ use PHPUnit\Framework\AssertionFailedError;
  * Provides standardized test verifying entities access after some actions.
  *
  * @see \Drupal\Tests\trash\Kernel\EntityActionsTrait
+ *
+ * @phpstan-require-extends \Drupal\Tests\trash\Kernel\TrashKernelTestBase
  */
 trait EntityAccessTestTrait {
 
@@ -21,10 +23,10 @@ trait EntityAccessTestTrait {
    */
   public function testEntityAccess(): void {
     foreach (static::providerTestEntityAccess() as $case_name => $case) {
-      $permissions = $case['permissions'] ?? $case[0];
-      $entity_definition = $case['entity'] ?? $case[1];
-      $actions = $case['actions'] ?? $case[2];
-      $access_map = $case['access_map'] ?? $case[3] ?? NULL;
+      $permissions = $case['permissions'];
+      $entity_definition = $case['entity'];
+      $actions = $case['actions'];
+      $access_map = $case['access_map'] ?? NULL;
 
       // Reset trash context between cases.
       $this->getTrashManager()->setTrashContext('active');
@@ -52,8 +54,10 @@ trait EntityAccessTestTrait {
           $this->performAction([$last_action, $access_map], $context);
         }
       }
+      // AssertionFailedError is @internal but has no public equivalent;
+      // catching it to re-throw assertion failures keeps their diff intact.
+      // @phpstan-ignore catch.internalClass
       catch (AssertionFailedError $e) {
-        // Let assertion failures surface with their comparison diff intact.
         throw $e;
       }
       catch (\Throwable $e) {
@@ -89,7 +93,7 @@ trait EntityAccessTestTrait {
    *    There is also an 'assert-operations-access' action for tests needing
    *    to perform assertions part way through the test.
    *
-   * @return iterable<string, array{permissions: string[], entity: array{type: string, values: array<string, mixed>,actions: array<mixed>, access_map: <array<string, bool|\Drupal\Core\Access\AccessResultInterface>>}}>
+   * @return iterable<string, array{permissions: string[], entity: array{type: string, values?: array<string, mixed>}, actions: array<mixed>, access_map?: array<string, bool|\Drupal\Core\Access\AccessResultInterface>}>
    *   Test cases in the format described above.
    */
   abstract public static function providerTestEntityAccess(): iterable;

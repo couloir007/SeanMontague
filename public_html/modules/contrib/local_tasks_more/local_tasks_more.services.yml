@@ -1,4 +1,7 @@
 services:
+  _defaults:
+    autowire: true
+
   local_tasks_more.manager:
     class: Drupal\local_tasks_more\LocalTasksMoreManager
-    arguments: ['@config.factory', '@cache.discovery', '@cache_tags.invalidator', '@plugin.manager.menu.local_task']
+  Drupal\local_tasks_more\LocalTasksMoreManagerInterface: '@local_tasks_more.manager'

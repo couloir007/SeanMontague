@@ -86,7 +86,7 @@ class SchemaDotOrgAdditionalMappingsManager implements SchemaDotOrgAdditionalMap
       $additional_mapping['schema_properties'] = $schema_properties;
     }
 
-    // Apply starter kit default mappings.
+    // Apply custom additional mapping defaults.
     // @see \Drupal\schemadotorg\SchemaDotOrgMappingManager::getMappingDefaults
     if (!empty($defaults['additional_mappings'])) {
       foreach ($defaults['additional_mappings'] as $additional_schema_type => $default_additional_mapping) {
@@ -96,7 +96,7 @@ class SchemaDotOrgAdditionalMappingsManager implements SchemaDotOrgAdditionalMap
         }
 
         // Unset additional mapping if the additional mapping's Schema.org type
-        // is set to NULL or the starter kit sets it to FALSE.
+        // is set to NULL or the custom mapping sets it to FALSE.
         $is_schema_type_null = is_array($default_additional_mapping)
           && (NestedArray::keyExists($default_additional_mapping, ['schema_type']))
           && (NestedArray::getValue($default_additional_mapping, ['schema_type']) === NULL);

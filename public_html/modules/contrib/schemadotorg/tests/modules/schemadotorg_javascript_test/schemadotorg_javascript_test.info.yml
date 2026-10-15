@@ -1,0 +1,11 @@
+name: 'Schema.org Blueprints JavaScript test'
+type: module
+description: 'Support module for Schema.org Blueprints JavaScript testing.'
+package: Testing
+dependencies:
+  - 'schemadotorg:schemadotorg'
+
+# Information added by Drupal.org packaging script on 2026-09-08
+version: '1.0.0-alpha39'
+project: 'schemadotorg'
+datestamp: 1788877492

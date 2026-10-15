@@ -63,8 +63,8 @@ class FileTrashHandler extends DefaultTrashHandler {
   /**
    * {@inheritdoc}
    */
-  public function preTrashDelete(EntityInterface $entity): void {
-    parent::preTrashDelete($entity);
+  public function preTrashDelete(EntityInterface $entity, array $langcodes): void {
+    parent::preTrashDelete($entity, $langcodes);
 
     if (!$entity instanceof FileInterface) {
       return;
@@ -129,8 +129,8 @@ class FileTrashHandler extends DefaultTrashHandler {
   /**
    * {@inheritdoc}
    */
-  public function postTrashDelete(EntityInterface $entity): void {
-    parent::postTrashDelete($entity);
+  public function postTrashDelete(EntityInterface $entity, array $langcodes): void {
+    parent::postTrashDelete($entity, $langcodes);
 
     if (!$entity instanceof FileInterface) {
       return;
@@ -152,8 +152,8 @@ class FileTrashHandler extends DefaultTrashHandler {
   /**
    * {@inheritdoc}
    */
-  public function preTrashRestore(EntityInterface $entity): void {
-    parent::preTrashRestore($entity);
+  public function preTrashRestore(EntityInterface $entity, array $langcodes): void {
+    parent::preTrashRestore($entity, $langcodes);
 
     if (!$entity instanceof FileInterface) {
       return;
@@ -208,8 +208,8 @@ class FileTrashHandler extends DefaultTrashHandler {
   /**
    * {@inheritdoc}
    */
-  public function postTrashRestore(EntityInterface $entity, int|string $deleted_timestamp): void {
-    parent::postTrashRestore($entity, $deleted_timestamp);
+  public function postTrashRestore(EntityInterface $entity, array $deleted_timestamps): void {
+    parent::postTrashRestore($entity, $deleted_timestamps);
 
     if (!$entity instanceof FileInterface) {
       return;
@@ -292,7 +292,7 @@ class FileTrashHandler extends DefaultTrashHandler {
       return NULL;
     }
 
-    $original_subdir = $matches[1] ?? '';
+    $original_subdir = $matches[1];
     $original_target = $original_subdir !== ''
       ? $original_subdir . '/' . $matches[2]
       : $matches[2];

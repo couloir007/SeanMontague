@@ -166,6 +166,7 @@ class TrashConfigSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents(): array {
+    $events = [];
     $events[ConfigEvents::SAVE][] = ['onSave'];
     return $events;
   }

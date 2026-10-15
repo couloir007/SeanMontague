@@ -558,6 +558,10 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
           $value = $item->{$custom_item->getName()};
           if (!empty($target_type) && !empty($value)) {
             if (isset($target_entities[$target_type][$value])) {
+              // Forcing instantiation here makes prepareView() correct for any
+              // caller, and idempotent: a second call reads back a scalar
+              // rather than the array it wrote the first time.
+              $item->get($custom_item->getName());
               $item->{$custom_item->getName()} = ['entity' => $target_entities[$target_type][$value]];
             }
           }
@@ -571,10 +575,18 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
    */
   public function viewValue(FieldItemInterface $item, string $langcode): array {
     $field_name = $this->fieldDefinition->getName();
+    $entity = $item->getEntity();
+    $entity_type = $entity->getEntityTypeId();
+    $bundle = $entity->bundle();
     $output = [
       '#theme' => 'custom_field',
       '#field_name' => $field_name,
       '#items' => [],
+      '#entity_type' => $entity_type,
+      '#bundle' => $bundle,
+      '#object' => $entity,
+      '#language' => $langcode,
+      '#raw_value' => $item->getValue(),
     ];
 
     $values = $this->getFormattedValues($item, $langcode);
@@ -586,12 +598,14 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
           '#field_name' => $field_name,
           '#name' => $value['name'],
           '#value' => $value['value'],
+          '#raw_value' => $value['raw_value'],
           '#label' => $value['label'],
           '#label_display' => $value['label_display'],
           '#type' => $value['type'],
           '#wrappers' => $value['wrappers'],
-          '#entity_type' => $value['entity_type'],
-          '#lang_code' => $langcode,
+          '#entity_type' => $entity_type,
+          '#bundle' => $bundle,
+          '#language' => $langcode,
         ];
       }
     }
@@ -629,7 +643,6 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
     $custom_items = $event->getCustomItems();
 
     $values = [];
-    $entity_type = $this->fieldDefinition->getTargetEntityTypeId();
     foreach ($custom_items as $custom_item) {
       $name = $custom_item->getName();
       $value = static::prepareFormattedSubfieldValue($item, $custom_item, $name, $langcode);
@@ -670,11 +683,11 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
       $markup = [
         'name' => $name,
         'value' => $render_value,
+        'raw_value' => $custom_item->getRawValue($item),
         'label' => $field_label ?: $custom_item->getLabel(),
         'label_display' => $formatter_settings['formatter_settings']['label_display'] ?? 'above',
         'type' => $custom_item->getPluginId(),
         'wrappers' => $formatter_settings['wrappers'],
-        'entity_type' => $entity_type,
       ];
 
       $values[$name] = $markup;

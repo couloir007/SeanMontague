@@ -15,6 +15,7 @@ use Drupal\Core\Render\Markup;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * The local tasks more manager.
@@ -32,6 +33,7 @@ class LocalTasksMoreManager implements LocalTasksMoreManagerInterface {
    */
   public function __construct(
     protected ConfigFactoryInterface $configFactory,
+    #[Autowire(service: 'cache.data')]
     protected CacheBackendInterface $cacheBackend,
     protected CacheTagsInvalidatorInterface $cacheTagsInvalidator,
     protected LocalTaskManagerInterface $localTaskManager,
@@ -229,7 +231,7 @@ class LocalTasksMoreManager implements LocalTasksMoreManagerInterface {
         $primary_task_info['weight'] = (int) $primary_task_info['weight'];
         foreach ($primary_task_info['children'] as &$secondary_task_info) {
           $secondary_task_info['weight'] = (int) $secondary_task_info['weight'];
-        };
+        }
       }
     }
     return $local_tasks;

@@ -11,6 +11,8 @@ use Drupal\trash\Trash;
 
 /**
  * Provides cache backend decorator methods for filtering deleted entities.
+ *
+ * @property \Drupal\Core\Cache\CacheBackendInterface $inner
  */
 trait TrashCacheBackendTrait {
 
@@ -93,6 +95,9 @@ trait TrashCacheBackendTrait {
    * {@inheritdoc}
    */
   public function invalidateAll() {
+    // Deprecated in core 11.2 and removed in 12.0, so the decorated backend is
+    // not guaranteed to have it.
+    // @see https://www.drupal.org/node/3500622
     if (method_exists($this->inner, 'invalidateAll')) {
       $this->inner->invalidateAll();
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Core\Field\FieldItemInterface;
@@ -54,6 +56,46 @@ class DateRangeType extends DateTimeType {
     ];
 
     return $columns;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * The nested shape keys its parts 'end' and 'timezone', while the columns
+   * are '<name>__end' and '<name>__timezone', so the names have to be mapped
+   * rather than copied. The guards are the ones
+   * CustomFieldDateRange::setValue() applies to the same value - including its
+   * requirement that the start value be a non-empty string before either
+   * sibling is written at all - so completing the values array here cannot
+   * change what is stored.
+   *
+   * This replaces the timezone-only extraction inherited from DateTimeType,
+   * which does not apply the start-value gate.
+   *
+   * The duration column is deliberately left out: CustomItem::preSave()
+   * computes it from the start and end dates, and it never appears in the
+   * incoming value.
+   */
+  public static function extractExtraPropertyValues(array $settings, mixed $value): array {
+    if (!is_array($value)) {
+      return [];
+    }
+    ['name' => $name] = $settings;
+
+    $start_date = !empty($value['value']) && is_string($value['value']) ? $value['value'] : NULL;
+    $end_date = !empty($value['end']) && is_string($value['end']) ? $value['end'] : NULL;
+
+    $extra = [];
+    if (!empty($start_date)) {
+      if (!empty($end_date)) {
+        $extra[$name . self::SEPARATOR . 'end'] = $end_date;
+      }
+      if (isset($value['timezone'])) {
+        $extra[$name . self::SEPARATOR . 'timezone'] = (string) $value['timezone'];
+      }
+    }
+
+    return $extra;
   }
 
   /**

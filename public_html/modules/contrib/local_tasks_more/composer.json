@@ -3,7 +3,7 @@
   "type": "drupal-module",
   "description": "Local Tasks More",
   "keywords": ["Drupal"],
-  "homepage": "https://www.drupal.org/sandbox/jrockowitz/3485942",
+  "homepage": "https://www.drupal.org/project/local_tasks_more",
   "license": "GPL-2.0+",
   "minimum-stability": "dev",
   "require": {

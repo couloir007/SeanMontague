@@ -6,6 +6,7 @@ namespace Drupal\trash;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Queue\QueueFactory;
@@ -15,6 +16,8 @@ use Drupal\Core\Site\Settings;
  * Purges content automatically when a given time has passed.
  */
 class TrashEntityPurger {
+
+  use DependencySerializationTrait;
 
   /**
    * The name of the queue that holds local items to be purged.

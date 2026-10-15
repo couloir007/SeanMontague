@@ -125,7 +125,7 @@ class DefaultViewsTest extends BrowserTestBase {
     $this->drupalGet(Url::fromRoute('view.date_formats.page_1'));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('Default date format');
-    $this->assertSession()->pageTextContains('D, j M Y - H:i');
+    $this->assertSession()->pageTextContains('Y-m-d');
 
     View::load('form_modes')->enable()->save();
     $this->drupalGet(Url::fromRoute('view.form_modes.page_1'));
@@ -208,6 +208,32 @@ class DefaultViewsTest extends BrowserTestBase {
     ]));
     $this->assertSession()->pageTextNotContains('Default date format');
     $this->assertSession()->pageTextContains('HTML Time');
+
+    // Now test menu pagination.
+    $this->drupalGet(Url::fromRoute('view.menus.page_1'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Default menu 1');
+    $this->assertSession()->pageTextContains('Default menu 4');
+
+    $config = \Drupal::configFactory()->getEditable('views.view.menus');
+    $display = $config->get('display');
+    $display['default']['display_options']['pager']['options']['items_per_page'] = 3;
+    $config->set('display', $display)->save();
+    View::load('menus')->invalidateCaches();
+
+    $this->drupalGet(Url::fromRoute('view.menus.page_1'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Default menu 1');
+    $this->assertSession()->pageTextNotContains('Default menu 4');
+
+    $this->drupalGet(Url::fromRoute('view.menus.page_1', [], [
+      'query' => [
+        'page' => 1,
+      ],
+    ]));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextNotContains('Default menu 1');
+    $this->assertSession()->pageTextContains('Default menu 4');
   }
 
   /**
@@ -248,10 +274,12 @@ class DefaultViewsTest extends BrowserTestBase {
       'label' => 'Default image style',
     ])->save();
 
-    Menu::create([
-      'id' => 'default_menu',
-      'label' => 'Default menu',
-    ])->save();
+    foreach (range(0, 4) as $number) {
+      Menu::create([
+        'id' => 'default_menu_' . $number,
+        'label' => 'Default menu ' . $number,
+      ])->save();
+    }
 
     ShortcutSet::create([
       'id' => 'default_shortcut_set',

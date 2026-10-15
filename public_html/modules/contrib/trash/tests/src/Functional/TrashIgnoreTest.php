@@ -10,12 +10,14 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\trash\Trash;
 use Drupal\trash_test\Entity\TrashTestEntity;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the trash ignore functionality.
- *
- * @group trash
  */
+#[Group('trash')]
+#[RunTestsInSeparateProcesses]
 class TrashIgnoreTest extends BrowserTestBase {
 
   use ContentTypeCreationTrait;

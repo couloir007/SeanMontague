@@ -7,13 +7,14 @@ namespace Drupal\trash\Hook\TrashHandler;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Url;
+use Drupal\taxonomy\TermInterface;
 use Drupal\trash\Handler\DefaultTrashHandler;
 use Drupal\trash\Trash;
+use Drupal\trash\TrashStorageInterface;
 
 /**
  * Provides a trash handler for the 'taxonomy_term' entity type.
@@ -62,6 +63,7 @@ class TaxonomyTermTrashHandler extends DefaultTrashHandler {
    * {@inheritdoc}
    */
   public function deleteFormAlter(array &$form, FormStateInterface $form_state, bool $multiple = FALSE): void {
+    parent::deleteFormAlter($form, $form_state, $multiple);
     $form['description']['#markup'] = $this->t('Deleting this term will move it to the <a href=":link">trash</a>, including all its children if there are any. You can restore it from the trash at a later date if necessary.', [
       ':link' => Url::fromRoute('trash.admin_content_trash_entity_type', [
         'entity_type_id' => $this->entityTypeId,
@@ -79,9 +81,9 @@ class TaxonomyTermTrashHandler extends DefaultTrashHandler {
   /**
    * {@inheritdoc}
    */
-  public function preTrashRestore(EntityInterface $entity): void {
-    parent::preTrashRestore($entity);
-    assert($entity instanceof FieldableEntityInterface);
+  public function preTrashRestore(EntityInterface $entity, array $langcodes): void {
+    parent::preTrashRestore($entity, $langcodes);
+    assert($entity instanceof TermInterface);
 
     $storage = $this->entityTypeManager->getStorage('taxonomy_term');
 
@@ -103,8 +105,14 @@ class TaxonomyTermTrashHandler extends DefaultTrashHandler {
   /**
    * {@inheritdoc}
    */
-  public function postTrashDelete(EntityInterface $entity): void {
-    parent::postTrashDelete($entity);
+  public function postTrashDelete(EntityInterface $entity, array $langcodes): void {
+    parent::postTrashDelete($entity, $langcodes);
+
+    // The term hierarchy is not per-language, so a term with live
+    // translations is still a live parent and there is nothing to cascade.
+    if (!Trash::entityHasAllTranslationsDeleted($entity)) {
+      return;
+    }
 
     $storage = $this->entityTypeManager->getStorage('taxonomy_term');
 
@@ -164,24 +172,54 @@ class TaxonomyTermTrashHandler extends DefaultTrashHandler {
   /**
    * {@inheritdoc}
    */
-  public function postTrashRestore(EntityInterface $entity, int|string $deleted_timestamp): void {
-    parent::postTrashRestore($entity, $deleted_timestamp);
+  public function postTrashRestore(EntityInterface $entity, array $deleted_timestamps): void {
+    parent::postTrashRestore($entity, $deleted_timestamps);
+
+    // The term hierarchy is not language-aware. Children are cascade-trashed
+    // only when the parent is fully deleted, and the parent becomes a live node
+    // again the moment its default translation is restored. So drive the child
+    // cascade off the default translation and do nothing until it comes back.
+    assert($entity instanceof TermInterface);
+    $default_langcode = $entity->getUntranslated()->language()->getId();
+    if (!isset($deleted_timestamps[$default_langcode])) {
+      return;
+    }
+
+    // The cascade marked every child with the parent's full-delete request
+    // time, which is the timestamp the default translation had in trash.
+    $cascade_timestamp = $deleted_timestamps[$default_langcode];
 
     $storage = $this->entityTypeManager->getStorage('taxonomy_term');
+    assert($storage instanceof TrashStorageInterface);
 
-    // Find direct children that were cascade-trashed at the same time. The
+    // Find direct children cascade-trashed together with this term. The
     // explicit condition on 'deleted' causes the trash entity query alter to
     // skip this query. Scoping to direct children means each level's
     // postTrashRestore naturally cascades to the next without recursion issues.
     $ids = $storage->getQuery()
       ->accessCheck(FALSE)
       ->condition('parent', $entity->id())
-      ->condition('deleted', $deleted_timestamp)
+      ->condition('deleted', $cascade_timestamp)
       ->execute();
 
-    if (!empty($ids)) {
-      $children = $storage->loadMultiple($ids);
-      $storage->restoreFromTrash(array_values($children));
+    if (empty($ids)) {
+      return;
+    }
+
+    // Restore each child, but only the translations the cascade actually
+    // trashed, the ones marked with the cascade timestamp. Translations
+    // trashed on their own before the cascade keep a different timestamp and
+    // stay in the trash.
+    foreach ($storage->loadMultiple($ids) as $child) {
+      assert($child instanceof TermInterface);
+      $child_langcodes = [];
+      foreach (array_keys($child->getTranslationLanguages()) as $langcode) {
+        $translation = $child->getTranslation($langcode);
+        if (Trash::entityIsDeleted($translation) && $translation->get('deleted')->value == $cascade_timestamp) {
+          $child_langcodes[] = $langcode;
+        }
+      }
+      $storage->restoreFromTrash([$child], $child_langcodes);
     }
   }
 

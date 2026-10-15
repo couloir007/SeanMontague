@@ -29,3 +29,22 @@ superfences
 Metadrop
 squidfunk
 APPROOT
+
+# custom_field_components: class/service names, test-method words and coined
+# adjectives used in the ADR and test docblocks.
+addability
+docblocks
+functionaljs
+greppable
+linkit
+metacharacter
+relocator
+tamperability
+undebuggable
+undraggable
+unloadable
+unminted
+unmodeled
+unrelocated
+unsaveable
+unsubmittable

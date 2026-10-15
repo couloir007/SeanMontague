@@ -32,7 +32,7 @@ drush cr
 lando ssh -s database -c "psql -h us17.acugis-dns.com -U roundybr -d roundybr_drupal < snapshot-local.sql.gz"
 
 # 5. Import config
-ssh roundybr@137.184.139.220
+ssh -p 38391 roundybr@152.53.80.197
 drush cim -y
 
 # 6. Run updates

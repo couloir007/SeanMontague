@@ -11,12 +11,19 @@ use Drupal\Tests\graphql_compose\Functional\GraphQLComposeBrowserTestBase;
 use Drupal\custom_field\Service\GenerateDataInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\node\NodeInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test the Custom Field integration.
  *
- * @group legacy
+ * @group custom_field
+ * @group custom_field_graphql
+ * @runTestsInSeparateProcesses
  */
+#[Group('custom_field')]
+#[Group('custom_field_graphql')]
+#[RunTestsInSeparateProcesses]
 class CustomFieldGraphqlComposeTest extends GraphQLComposeBrowserTestBase {
 
   /**
@@ -417,6 +424,68 @@ class CustomFieldGraphqlComposeTest extends GraphQLComposeBrowserTestBase {
     $item = $node->get('field_test')->first();
 
     $this->assertEquals($item->get('string')->getValue(), $custom_field['someCustomName']);
+  }
+
+  /**
+   * Test the schema still builds with every subfield disabled.
+   *
+   * @see https://www.drupal.org/project/custom_field/issues/3619406
+   *
+   * @throws \Throwable
+   */
+  public function testAllSubfieldsDisabled(): void {
+    $field_config = FieldConfig::loadByName(
+      'node',
+      'custom_field_entity_test',
+      'field_test'
+    );
+    $subfields = [];
+    foreach (array_keys($field_config->getSetting('columns')) as $name) {
+      $subfields[(string) $name] = ['enabled' => FALSE];
+    }
+    $this->setFieldConfig('node', 'custom_field_entity_test', 'field_test', [
+      'subfields' => $subfields,
+    ]);
+
+    $query = <<<GQL
+      query {
+        __schema {
+          queryType {
+            name
+          }
+        }
+        __type(name: "NodeCustomFieldEntityTest") {
+          fields {
+            name
+            type {
+              name
+              ofType {
+                name
+                ofType {
+                  name
+                  ofType {
+                    name
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    GQL;
+
+    $content = $this->executeQuery($query);
+    $this->assertArrayNotHasKey('errors', $content);
+    $this->assertEquals('Query', $content['data']['__schema']['queryType']['name']);
+
+    // The field falls back to UnsupportedType instead of an empty type.
+    $fields = array_column($content['data']['__type']['fields'], 'type', 'name');
+    $this->assertArrayHasKey('test', $fields);
+    $type = $fields['test'];
+    while (empty($type['name']) && !empty($type['ofType'])) {
+      $type = $type['ofType'];
+    }
+    $this->assertEquals('UnsupportedType', $type['name']);
   }
 
 }

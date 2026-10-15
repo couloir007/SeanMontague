@@ -8,12 +8,17 @@ use Drupal\path_alias\AliasManagerInterface;
 use Drupal\path_alias\AliasRepositoryInterface;
 use Drupal\path_alias\Entity\PathAlias;
 use Drupal\trash\Exception\UnrestorableEntityException;
+use Drupal\trash\PathAlias\TrashAliasRepository;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the AliasRepository service class overrides.
- *
- * @group trash
  */
+#[CoversClass(TrashAliasRepository::class)]
+#[Group('trash')]
+#[RunTestsInSeparateProcesses]
 class TrashAliasRepositoryTest extends TrashKernelTestBase {
 
   /**

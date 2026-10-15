@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\trash;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\TranslatableInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\views\Entity\View;
@@ -17,11 +19,19 @@ class TrashCliActions {
 
   use StringTranslationTrait;
 
+  /**
+   * Whether the site is multilingual.
+   */
+  protected bool $isMultilingual;
+
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
     protected TrashManagerInterface $trashManager,
     protected TrashViewBuilder $trashViewBuilder,
-  ) {}
+    LanguageManagerInterface $languageManager,
+  ) {
+    $this->isMultilingual = $languageManager->isMultilingual();
+  }
 
   /**
    * Gets the IDs of all trash-enabled entity types.
@@ -199,7 +209,7 @@ class TrashCliActions {
    * Performs a restore or purge operation on the given arguments.
    *
    * @param \Symfony\Component\Console\Style\SymfonyStyle $io
-   *   The I/O style used for progress reporting.
+   *   The I/O style used for progress and warnings.
    * @param string $operation
    *   The operation to perform, either 'restore' or 'purge'.
    * @param array $entity_type_ids
@@ -215,14 +225,15 @@ class TrashCliActions {
 
     $count = 0;
     foreach ($entity_type_ids as $entity_type_id) {
+      $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
       $storage = $this->entityTypeManager->getStorage($entity_type_id);
+      assert($storage instanceof TrashStorageInterface);
       $query = $storage->getQuery()
         ->accessCheck(FALSE)
         ->addMetaData('trash', 'inactive')
         ->exists('deleted');
 
       if (count($entity_type_ids) === 1 && $entity_ids) {
-        $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
         $query->condition($entity_type->getKey('id'), $entity_ids, 'IN');
       }
 
@@ -235,16 +246,94 @@ class TrashCliActions {
       $chunkSize = Settings::get('entity_update_batch_size', 50);
 
       foreach (array_chunk($ids, $chunkSize) as $chunk) {
-        $this->trashManager->executeInTrashContext('ignore', function () use (&$count, $io, $storage, $chunk, $operation) {
+        $this->trashManager->executeInTrashContext('ignore', function () use (&$count, $io, $storage, $chunk, $operation, $entity_type) {
           $entities = $storage->loadMultiple($chunk);
-          if ($operation === 'restore') {
-            $storage->restoreFromTrash($entities);
+          if (!$this->isMultilingual || !$entity_type->isTranslatable()) {
+            if ($operation === 'restore') {
+              $storage->restoreFromTrash($entities);
+            }
+            elseif ($operation === 'purge') {
+              $storage->delete($entities);
+            }
+            $count += count($entities);
+            $io->progressAdvance(count($chunk));
+            return;
           }
-          elseif ($operation === 'purge') {
-            $storage->delete($entities);
+          foreach ($entities as $entity) {
+            assert($entity instanceof TranslatableInterface);
+            // Check the default translation first.
+            if (Trash::entityIsDeleted($entity)) {
+              if ($operation === 'restore') {
+                $storage->restoreFromTrash([$entity]);
+                $count++;
+                $io->progressAdvance(1);
+                continue;
+              }
+
+              // A whole-entity purge is only allowed when every translation
+              // is deleted; live translations must survive. The deleted
+              // default translation cannot be removed on its own, so when
+              // live translations exist only the deleted non-default
+              // translations are purged.
+              $all_deleted = TRUE;
+              $deleted_langcodes = [];
+              foreach (array_keys($entity->getTranslationLanguages()) as $langcode) {
+                $translation = $entity->getTranslation($langcode);
+                if (!Trash::entityIsDeleted($translation)) {
+                  $all_deleted = FALSE;
+                }
+                elseif (!$translation->isDefaultTranslation()) {
+                  $deleted_langcodes[] = $langcode;
+                }
+              }
+
+              if ($all_deleted) {
+                $storage->delete([$entity]);
+                $count++;
+              }
+              else {
+                // Plain sprintf() instead of dt(): dt() is only defined under
+                // a full Drush bootstrap and this method also runs in kernel
+                // tests.
+                $io->warning(sprintf('The default translation of the %s entity with ID %s was not purged because the entity still has live translations.', $entity->getEntityTypeId(), $entity->id()));
+                if ($deleted_langcodes !== []) {
+                  $untranslated = $entity->getUntranslated();
+                  foreach ($deleted_langcodes as $langcode) {
+                    $untranslated->removeTranslation($langcode);
+                  }
+                  $untranslated->save();
+                  $count++;
+                }
+              }
+              $io->progressAdvance(1);
+              continue;
+            }
+
+            $langcodes = [];
+            foreach ($entity->getTranslationLanguages() as $langcode => $language) {
+              $translation = $entity->getTranslation($langcode);
+              if (!Trash::entityIsDeleted($translation)) {
+                continue;
+              }
+              $langcodes[] = $langcode;
+            }
+            // Nothing is deleted on this entity, so skip the pointless save.
+            if ($langcodes === []) {
+              continue;
+            }
+            if ($operation === 'restore') {
+              $storage->restoreFromTrash([$entity], $langcodes);
+            }
+            elseif ($operation === 'purge') {
+              $untranslated = $entity->getUntranslated();
+              foreach ($langcodes as $langcode) {
+                $untranslated->removeTranslation($langcode);
+              }
+              $untranslated->save();
+            }
+            $count++;
+            $io->progressAdvance(1);
           }
-          $count += count($entities);
-          $io->progressAdvance(count($chunk));
         });
       }
 

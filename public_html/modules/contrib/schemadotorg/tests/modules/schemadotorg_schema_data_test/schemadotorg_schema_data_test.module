@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * @file
+ * Support module for Schema.org Blueprints schema data testing.
+ */
+
+/**
+ * Implements hook_schemadotorg_schema_data_alter().
+ */
+function schemadotorg_schema_data_test_schemadotorg_schema_data_alter(array &$records, string $table): void {
+  $mode = \Drupal::state()->get('schemadotorg_schema_data_test.mode');
+
+  if ($mode === 'valid') {
+    if ($table === 'types') {
+      $records['https://schema.org/Thing']['comment'] = 'An altered Thing.';
+      unset($records['https://schema.org/LearningResource']);
+      $records['https://schema.org/CustomLearningResource'] = [
+        'id' => 'https://schema.org/CustomLearningResource',
+        'label' => 'CustomLearningResource',
+        'comment' => 'A custom learning resource.',
+        'sub_type_of' => 'https://schema.org/LearningResource',
+        'enumerationtype' => '',
+        'equivalent_class' => '',
+        'properties' => 'https://schema.org/customProperty, https://schema.org/assesses',
+        'sub_types' => '',
+        'supersedes' => '',
+        'superseded_by' => '',
+        'is_part_of' => 'https://schema.org',
+      ];
+    }
+    if ($table === 'properties') {
+      $records['https://schema.org/name']['comment'] = 'An altered name.';
+      unset($records['https://schema.org/assesses']);
+      $records['https://schema.org/customProperty'] = [
+        'id' => 'https://schema.org/customProperty',
+        'label' => 'customProperty',
+        'comment' => 'A custom property.',
+        'sub_property_of' => '',
+        'equivalent_property' => '',
+        'subproperties' => '',
+        'domain_includes' => 'https://schema.org/CustomLearningResource',
+        'range_includes' => 'https://schema.org/Text',
+        'inverse_of' => '',
+        'supersedes' => '',
+        'superseded_by' => '',
+        'is_part_of' => 'https://schema.org',
+      ];
+    }
+  }
+}

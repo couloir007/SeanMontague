@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\trash\Functional;
 
 use Drupal\file\Entity\File;
-use Drupal\file\FileInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\UserInterface;
@@ -91,7 +90,6 @@ class TrashFileTest extends BrowserTestBase {
       'uid' => $trash_file_user->id(),
     ]);
     $file->save();
-    assert($file instanceof FileInterface);
 
     $fid = $file->id();
     $filename = $file->getFilename();

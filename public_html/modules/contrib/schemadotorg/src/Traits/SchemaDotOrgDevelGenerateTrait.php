@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\schemadotorg\Traits;
 
 /**
- * Trait for devel generate used by Schema.org mapping sets and starter kits.
+ * Trait for devel generate used by Schema.org mapping sets and recipes.
  */
 trait SchemaDotOrgDevelGenerateTrait {
   use SchemaDotOrgMappingStorageTrait;

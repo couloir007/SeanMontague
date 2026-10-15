@@ -555,6 +555,12 @@ class SchemaDotOrgSchemaTypeManagerKernelTest extends SchemaDotOrgKernelTestBase
     $this->assertEquals(
       0, $this->schemaTypeManager->getSetting([], [], ['return' => 0])
     );
+
+    // Check that the Schema.org type and property tables support Unicode.
+    // cspell:disable
+    $this->assertFalse($this->schemaTypeManager->isType('Élément'));
+    $this->assertFalse($this->schemaTypeManager->isProperty('Élément'));
+    // cspell:enable
   }
 
 }

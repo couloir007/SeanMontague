@@ -169,12 +169,6 @@ class SchemaDotOrgHelpController extends ControllerBase {
         'youtube_id' => 'Dludw8Eomh4',
       ],
       [
-        'title' => $this->t('Schema.org Blueprints Mapping Sets & Starter Kits'),
-        'content' => $this->t("This presentation walks-through using the Schema.org Blueprints mapping sets and starter kit."),
-        // cspell:disable-next-line
-        'youtube_id' => 'CeCY3fq86Xc',
-      ],
-      [
         'title' => $this->t('Schema.org Blueprints Demo'),
         'content' => $this->t("This presentation walks-through installing and setting up the Schema.org Blueprints Demo profile and module."),
         // cspell:disable-next-line
@@ -215,12 +209,6 @@ class SchemaDotOrgHelpController extends ControllerBase {
         'content' => $this->t('This extended presentation walks through the background, configuration, and future of the Schema.org Blueprints module. It provides an in-depth demo of building an entire website architecture that leverages Schema.org type, properties, and enumerations in 5 minutes.'),
         // cspell:disable-next-line
         'youtube_id' => '_kk97O1SEw0',
-      ],
-      [
-        'title' => $this->t('Schema.org Blueprints Organization Starter Kit'),
-        'content' => $this->t("The Schema.org Blueprints Starter Kit: Organization module provides a starting point for building out an Organization's content and information model using Schema.org."),
-        // cspell:disable-next-line
-        'youtube_id' => 'cEJ6pfpBACQ',
       ],
       [
         'title' => $this->t('Schemadotorg Blueprints - Exploration'),

@@ -5,7 +5,7 @@ configure: entity.cm_document.config_form
 core_version_requirement: ^9 || ^10 || ^11
 package: 'Field types'
 
-# Information added by Drupal.org packaging script on 2026-04-04
-version: '1.0.9'
+# Information added by Drupal.org packaging script on 2026-09-23
+version: '1.0.10'
 project: 'mermaid_diagram_field'
-datestamp: 1775317802
+datestamp: 1790129856

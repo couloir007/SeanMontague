@@ -31,6 +31,13 @@ variables:
   # refuse to create one. Allow lockfile creation in CI for every job.
   YARN_ENABLE_IMMUTABLE_INSTALLS: "false"
 
+# Temporary (#3625831): Twig 3.30.0 compiles Drupal core's drupal_escape filter
+# into a direct EscaperRuntime::escape() call, so every page render is a fatal
+# TypeError. Keep the CI build below 3.30 until a fixed Twig release is out.
+.composer-base:
+  before_script:
+    - composer require --dev --no-update "twig/twig:<3.30"
+
 # = Validate stage (all blocking) =
 composer-lint:
   allow_failure: false

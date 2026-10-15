@@ -162,7 +162,7 @@ class SchemaDotOrgSettings extends Textarea {
       $link_url = Url::fromRoute("schemadotorg_report.$link_table");
       $element['#description'] .= (!empty($element['#description'])) ? ' ' : '';
       $element['#description'] .= '<span class="schemadotorg-settings-browse">' . Link::fromTextAndUrl($link_text, $link_url)->toString() . '</span>';
-      $element['#attached']['library'][] = 'schemadotorg/schemadotorg.dialog';
+      $element['#attached']['library'][] = 'schemadotorg_report/schemadotorg_report.dialog';
     }
 
     // Append an example to the description.

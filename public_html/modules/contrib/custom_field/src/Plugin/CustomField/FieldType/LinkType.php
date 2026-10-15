@@ -87,6 +87,32 @@ class LinkType extends UriType {
 
   /**
    * {@inheritdoc}
+   *
+   * The nested shape keys its parts 'title' and 'options', while the columns
+   * are '<name>__title' and '<name>__options', so the names have to be mapped
+   * rather than copied. The guards are the ones CustomFieldLink::setValue()
+   * applies to the same value, so completing the values array here cannot
+   * change what is stored.
+   */
+  public static function extractExtraPropertyValues(array $settings, mixed $value): array {
+    if (!is_array($value)) {
+      return [];
+    }
+    ['name' => $name] = $settings;
+
+    $extra = [];
+    if (isset($value['title'])) {
+      $extra[$name . self::SEPARATOR . 'title'] = $value['title'];
+    }
+    if (isset($value['options']) && is_array($value['options'])) {
+      $extra[$name . self::SEPARATOR . 'options'] = $value['options'];
+    }
+
+    return $extra;
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public static function propertyDefinitions(array $settings): array {
     ['name' => $name] = $settings;

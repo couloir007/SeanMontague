@@ -47,6 +47,11 @@ class CustomFieldType extends GraphQLComposeSchemaTypeBase {
             'description' => (string) $this->t('The @field value of the custom field', ['@field' => $name]),
           ];
         }
+        // An object type without fields is invalid SDL and breaks the whole
+        // schema. Skip it; references to it resolve to UnsupportedType.
+        if (empty($subfields)) {
+          return;
+        }
         $types[$field->getTypeSdl()] = new ObjectType([
           'name' => $field->getTypeSdl(),
           'description' => (string) $this->t('A custom field is a field of fields.'),

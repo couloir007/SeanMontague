@@ -67,12 +67,17 @@ class SchemaDotOrgJsonLdBreadcrumbManager implements SchemaDotOrgJsonLdBreadcrum
         );
       }
 
+      $text = (string) $text;
+      if ($id === '' || trim($text) === '') {
+        continue;
+      }
+
       $items[] = [
         '@type' => 'ListItem',
         'position' => $position,
         'item' => [
           '@id' => $id,
-          'name' => (string) $text,
+          'name' => $text,
         ],
       ];
       $position++;

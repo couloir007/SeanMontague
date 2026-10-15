@@ -5,6 +5,7 @@ namespace Drupal\mermaid_diagram_field\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -36,7 +37,8 @@ class MermaidModalController extends ControllerBase {
     // Load the host entity.
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = $this->entityTypeManager()->getStorage($entity_type);
-    $entity = $storage->loadRevision($storage->getLatestRevisionId($entity_id));
+    $entity = $storage->load($entity_id);
+
     if (
       !$entity instanceof ContentEntityInterface ||
       !$entity->hasField($field_name) ||
@@ -44,9 +46,14 @@ class MermaidModalController extends ControllerBase {
     ) {
       throw new NotFoundHttpException();
     }
-
+    $field = $entity->get($field_name);
+    // Check entity and field level access.
+    if (($entity && !$entity->access('view')) || ($field && !$field->access('view'))) {
+      // The user has no permission to view this entity or field.
+      throw new AccessDeniedHttpException();
+    }
     // Get the specific field item.
-    $item = $entity->get($field_name)[$delta];
+    $item = $field[$delta];
 
     $mermaid = $item->get('diagram')->getString();
     $title = $item->get('title')->getString();

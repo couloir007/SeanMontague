@@ -90,6 +90,37 @@ class ImageType extends FileType {
   /**
    * {@inheritdoc}
    *
+   * The nested shape keys its parts 'alt' and 'title', while the columns are
+   * '<name>__alt' and '<name>__title', so the names have to be mapped rather
+   * than copied. The guards are the ones CustomFieldImage::setValue() applies
+   * to the same value, so completing the values array here cannot change what
+   * is stored.
+   *
+   * The width and height columns are deliberately left out even though
+   * CustomFieldImage::setValue() also writes them: CustomItem::preSave()
+   * re-derives both from the referenced file, and carrying the submitted
+   * values through here would let a caller's stale dimensions win instead.
+   */
+  public static function extractExtraPropertyValues(array $settings, mixed $value): array {
+    if (!is_array($value)) {
+      return [];
+    }
+    ['name' => $name] = $settings;
+
+    $extra = [];
+    if (isset($value['alt'])) {
+      $extra[$name . self::SEPARATOR . 'alt'] = $value['alt'];
+    }
+    if (isset($value['title'])) {
+      $extra[$name . self::SEPARATOR . 'title'] = $value['title'];
+    }
+
+    return $extra;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public static function propertyDefinitions(array $settings): array {

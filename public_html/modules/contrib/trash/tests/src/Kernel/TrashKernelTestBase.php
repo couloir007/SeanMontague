@@ -11,6 +11,9 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\RevisionableStorageInterface;
 use Drupal\Core\Entity\TranslatableInterface;
+use Drupal\Core\File\FileSystemInterface;
+use Drupal\file\Entity\File;
+use Drupal\file\FileInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
@@ -110,7 +113,7 @@ abstract class TrashKernelTestBase extends KernelTestBase {
    *   (optional) A specific revision to load instead of the default revision.
    *
    * @return ($storage is \Drupal\Core\Entity\ContentEntityStorageInterface ?
-   *   \Drupal\Core\Entity\ContentEntityInterface :
+   *   \Drupal\Core\Entity\ContentEntityInterface|null :
    *   \Drupal\Core\Entity\EntityInterface|null) An entity or NULL if the
    *   entity was truly not found.
    */
@@ -214,9 +217,11 @@ abstract class TrashKernelTestBase extends KernelTestBase {
    *   The loaded entity, or NULL if not found.
    */
   protected function loadTrashedEntity(string $entity_type_id, int|string $entity_id): ?ContentEntityInterface {
-    return $this->getTrashManager()->executeInTrashContext('ignore', fn () =>
+    $entity = $this->getTrashManager()->executeInTrashContext('ignore', fn () =>
       $this->getEntityTypeManager()->getStorage($entity_type_id)->load($entity_id)
     );
+    assert($entity === NULL || $entity instanceof ContentEntityInterface);
+    return $entity;
   }
 
   /**
@@ -226,11 +231,14 @@ abstract class TrashKernelTestBase extends KernelTestBase {
    *   The entity type ID.
    * @param int|string $entity_id
    *   The entity ID.
+   * @param string[] $langcodes
+   *   (optional) The translation langcodes to restore. Defaults to all
+   *   translations.
    */
-  protected function restoreEntity(string $entity_type_id, int|string $entity_id): void {
-    $this->getTrashManager()->executeInTrashContext('ignore', function () use ($entity_type_id, $entity_id): void {
+  protected function restoreEntity(string $entity_type_id, int|string $entity_id, array $langcodes = []): void {
+    $this->getTrashManager()->executeInTrashContext('ignore', function () use ($entity_type_id, $entity_id, $langcodes): void {
       if ($entity = $this->getEntityTypeManager()->getStorage($entity_type_id)->load($entity_id)) {
-        Trash::restoreEntity($entity);
+        Trash::restoreEntity($entity, $langcodes);
       }
     });
   }
@@ -259,5 +267,28 @@ abstract class TrashKernelTestBase extends KernelTestBase {
    * when the 'deleted' field is installed on them.
    */
   protected function installAdditionalEntitySchemas(): void {}
+
+  /**
+   * Creates a permanent file entity at the given public URI.
+   *
+   * @param string $uri
+   *   The file URI.
+   * @param string $contents
+   *   The file contents.
+   *
+   * @return \Drupal\file\FileInterface
+   *   The saved file entity.
+   */
+  protected function createPublicFile(string $uri, string $contents): FileInterface {
+    $file_system = $this->container->get('file_system');
+    assert($file_system instanceof FileSystemInterface);
+    $dir = $file_system->dirname($uri);
+    $file_system->prepareDirectory($dir, FileSystemInterface::CREATE_DIRECTORY);
+    file_put_contents($uri, $contents);
+    $file = File::create(['uri' => $uri, 'uid' => 1]);
+    $file->setPermanent();
+    $file->save();
+    return $file;
+  }
 
 }

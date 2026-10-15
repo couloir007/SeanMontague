@@ -6,21 +6,34 @@ namespace Drupal\Tests\trash\Kernel;
 
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Menu\MenuTreeParameters;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\node\Entity\Node;
 use Drupal\system\Entity\Menu;
+use Drupal\trash\Handler\DefaultTrashHandler;
+use Drupal\trash\Hook\TrashHandler\MenuLinkContentTrashHandler;
+use Drupal\trash\Menu\TrashMenuLinkManager;
+use Drupal\trash\TrashStorageInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests menu_link_content integration with the Trash module.
- *
- * @group trash
  */
+#[CoversClass(MenuLinkContentTrashHandler::class)]
+#[CoversClass(DefaultTrashHandler::class)]
+#[CoversClass(TrashMenuLinkManager::class)]
+#[Group('trash')]
+#[RunTestsInSeparateProcesses]
 class TrashMenuLinkTest extends TrashKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
+    'language',
     'link',
     'menu_link_content',
   ];
@@ -139,6 +152,62 @@ class TrashMenuLinkTest extends TrashKernelTestBase {
   }
 
   /**
+   * Tests translation-aware menu link cascade against a target's translations.
+   *
+   * Removing one target translation keeps the link; deleting the whole target
+   * trashes it and restoring the target brings it back. A link translation
+   * trashed on its own (a different timestamp) is left in the trash when the
+   * target is restored.
+   */
+  public function testMenuLinkTranslationCascade(): void {
+    ConfigurableLanguage::createFromLangcode('de')->save();
+
+    // Removing one target translation keeps it partially live, so the link
+    // must not be trashed. Deleting the whole target then trashes it, and
+    // restoring the target restores it.
+    $node = $this->createNode(['type' => 'article', 'title' => 'EN']);
+    $node->addTranslation('de', ['title' => 'DE']);
+    $node->save();
+    $node_id = $node->id();
+    $link = $this->createMenuLink('Node link', 'entity:node/' . $node_id);
+    $link_id = $link->id();
+    $node = Node::load($node_id);
+    $node->removeTranslation('de');
+    $node->save();
+    $this->assertNotEmpty(MenuLinkContent::load($link_id));
+    Node::load($node_id)->delete();
+    $this->assertEmpty(MenuLinkContent::load($link_id));
+    $this->restoreEntity('node', $node_id);
+    $this->assertNotEmpty(MenuLinkContent::load($link_id));
+
+    // A link translation removed on its own before the target's cascade has a
+    // different timestamp, so restoring the target leaves it in the trash.
+    $node2 = $this->createNode(['type' => 'article', 'title' => 'EN']);
+    $node2_id = $node2->id();
+    $link2 = $this->createMenuLink('Node2 link EN', 'entity:node/' . $node2_id);
+    $link2_id = $link2->id();
+    $link2->addTranslation('de', ['title' => 'Node2 link DE']);
+    $link2->save();
+    $link2 = MenuLinkContent::load($link2_id);
+    $link2->removeTranslation('de');
+    $link2->save();
+    $trashed_link = $this->loadTrashedEntity('menu_link_content', $link2_id);
+    $this->assertNotEmpty($trashed_link->getTranslation('de')->get('deleted')->value);
+    $this->assertEmpty($trashed_link->getTranslation('en')->get('deleted')->value);
+    // Later, trash the node, cascading only the link's still-live EN.
+    \Drupal::keyValue('trash_test')->set('time_offset', 100);
+    Node::load($node2_id)->delete();
+    $this->assertNotEmpty($this->loadTrashedEntity('menu_link_content', $link2_id)->getTranslation('en')->get('deleted')->value);
+    // Restoring the node restores the cascaded EN but leaves the independently
+    // trashed DE in the trash.
+    $this->restoreEntity('node', $node2_id);
+    $link2 = MenuLinkContent::load($link2_id);
+    $this->assertNotEmpty($link2);
+    $this->assertEmpty($link2->get('deleted')->value);
+    $this->assertNotEmpty($this->loadTrashedEntity('menu_link_content', $link2_id)->getTranslation('de')->get('deleted')->value);
+  }
+
+  /**
    * Tests that a menu link can be soft-deleted and restored.
    */
   public function testMenuLinkDeleteAndRestore(): void {
@@ -186,6 +255,7 @@ class TrashMenuLinkTest extends TrashKernelTestBase {
    */
   public function testNodeTrashCascadesToMenuLinks(): void {
     $node_storage = $this->getEntityTypeManager()->getStorage('node');
+    assert($node_storage instanceof TrashStorageInterface);
 
     // Trashing and restoring a node without menu links should not cause errors.
     $node_without_links = $this->createNode(['type' => 'article']);
@@ -391,9 +461,8 @@ class TrashMenuLinkTest extends TrashKernelTestBase {
    * findNoLongerExistingLinks() only considers rows with discovered = 1, and
    * entity-backed rows have discovered = 0, so the row survives until the link
    * is purged or restored.
-   *
-   * @dataProvider providerNonActiveTrashContexts
    */
+  #[DataProvider('providerNonActiveTrashContexts')]
   public function testResavingTrashedLinkDoesNotReAddMenuTreeEntry(string $context): void {
     $link = $this->createMenuLink('Test Link');
     $link_id = $link->id();
@@ -449,9 +518,8 @@ class TrashMenuLinkTest extends TrashKernelTestBase {
    * being trash-flagged. Purging a parent takes the same path, and runs with
    * the trash context set to 'ignore' from both the purge form and the cron
    * queue worker.
-   *
-   * @dataProvider providerNonActiveTrashContexts
    */
+  #[DataProvider('providerNonActiveTrashContexts')]
   public function testRemovingParentDoesNotResurrectTrashedChild(string $context): void {
     $parent = $this->createMenuLink('Parent');
     $child = $this->createMenuLink('Child', 'internal:/', $parent->uuid());
@@ -500,9 +568,8 @@ class TrashMenuLinkTest extends TrashKernelTestBase {
    * The live link covers the 'inactive' case: that context inverts the entity
    * query filter, so without the forced context a rebuild would drop every
    * live link from discovery and purge their rows.
-   *
-   * @dataProvider providerNonActiveTrashContexts
    */
+  #[DataProvider('providerNonActiveTrashContexts')]
   public function testMenuRebuildDoesNotReAddTrashedLink(string $context): void {
     $live = $this->createMenuLink('Live Link');
     $live_plugin_id = $live->getPluginId();
@@ -540,6 +607,38 @@ class TrashMenuLinkTest extends TrashKernelTestBase {
 
     $this->assertSame(1, $this->countMenuTreeRows($live_plugin_id), 'A rebuild must not purge the row of a live link.');
     $this->assertArrayHasKey($live_plugin_id, $this->loadMenuTree('test-menu'));
+  }
+
+  /**
+   * Tests that a partially trashed link keeps its row across a menu rebuild.
+   *
+   * A menu_tree row covers every language of a link, so a link with any live
+   * translation left has to stay in the tree and in discovery. The deriver's
+   * entity query in the forced 'active' context matches exactly those links.
+   */
+  public function testPartiallyTrashedLinkSurvivesMenuRebuild(): void {
+    ConfigurableLanguage::createFromLangcode('de')->save();
+
+    $link = $this->createMenuLink('Partial Link');
+    $link->addTranslation('de', ['title' => 'Partial Link DE']);
+    $link->save();
+    $link_id = $link->id();
+    $plugin_id = $link->getPluginId();
+    $this->assertSame(1, $this->countMenuTreeRows($plugin_id));
+
+    // Trash only the 'de' translation.
+    $link = MenuLinkContent::load($link_id);
+    $link->removeTranslation('de');
+    $link->save();
+    $this->assertSame(1, $this->countMenuTreeRows($plugin_id), 'A link with a live translation left keeps its menu tree row.');
+
+    $manager = \Drupal::service('plugin.manager.menu.link');
+    $manager->rebuild();
+
+    $this->assertSame(1, $this->countMenuTreeRows($plugin_id));
+    $this->assertArrayHasKey($plugin_id, $manager->getDefinitions(), 'A link with a live translation left stays in discovery.');
+    $this->assertArrayHasKey($plugin_id, $this->loadMenuTree('test-menu'));
+    $this->assertNotEquals(0, $this->buildMenu('test-menu')['#cache']['max-age']);
   }
 
 }

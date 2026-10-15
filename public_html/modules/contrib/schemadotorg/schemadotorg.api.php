@@ -15,6 +15,42 @@ declare(strict_types=1);
  */
 
 /**
+ * Alter Schema.org data records before they are imported.
+ *
+ * Records are keyed by their canonical Schema.org ID URI. Add a record by
+ * assigning a new ID key, replace a record by assigning an existing ID key,
+ * and remove a record using unset(). This hook is called separately for the
+ * types and properties tables.
+ *
+ * @param array $records
+ *   Schema.org data records keyed by ID URI.
+ * @param string $table
+ *   The table being imported, either 'types' or 'properties'.
+ */
+function hook_schemadotorg_schema_data_alter(array &$records, string $table): void {
+  if ($table === 'types') {
+    $records['https://schema.org/CustomLearningResource'] = [
+      'id' => 'https://schema.org/CustomLearningResource',
+      'label' => 'CustomLearningResource',
+      'comment' => 'A custom learning resource.',
+      'sub_type_of' => 'https://schema.org/LearningResource',
+      'properties' => 'https://schema.org/customProperty',
+    ];
+    return;
+  }
+
+  if ($table === 'properties') {
+    $records['https://schema.org/customProperty'] = [
+      'id' => 'https://schema.org/customProperty',
+      'label' => 'customProperty',
+      'comment' => 'A property for custom learning resources.',
+      'domain_includes' => 'https://schema.org/CustomLearningResource',
+      'range_includes' => 'https://schema.org/Text',
+    ];
+  }
+}
+
+/**
  * Alter the field types for Schema.org property.
  *
  * @param array $field_types

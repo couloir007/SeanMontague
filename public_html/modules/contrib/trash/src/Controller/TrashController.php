@@ -14,13 +14,14 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
+use Drupal\Core\Entity\TranslatableInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Url;
 use Drupal\trash\TrashManagerInterface;
 use Drupal\trash\TrashViewBuilder;
 use Drupal\user\EntityOwnerInterface;
 use Drupal\views\Views;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -29,25 +30,19 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class TrashController extends ControllerBase implements ContainerInjectionInterface {
 
+  /**
+   * Is the site multilingual?
+   */
+  protected bool $isMultilingual = FALSE;
+
   public function __construct(
     protected TrashManagerInterface $trashManager,
     protected EntityTypeBundleInfoInterface $bundleInfo,
     protected DateFormatterInterface $dateFormatter,
     protected TrashViewBuilder $viewBuilder,
     protected TimeInterface $time,
-  ) {}
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container): static {
-    return new static(
-      $container->get('trash.manager'),
-      $container->get('entity_type.bundle.info'),
-      $container->get('date.formatter'),
-      $container->get(TrashViewBuilder::class),
-      $container->get('datetime.time'),
-    );
+  ) {
+    $this->isMultilingual = $this->languageManager()->isMultilingual();
   }
 
   /**
@@ -94,6 +89,7 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
    *   \Drupal\Core\Render\RendererInterface::render().
    */
   protected function render(string $entity_type_id): array {
+    $build = [];
     $trash_settings = $this->config('trash.settings');
     if ($trash_settings->get('auto_purge.enabled')) {
       $timestamp = strtotime(sprintf('+%s', $trash_settings->get('auto_purge.after')));
@@ -183,6 +179,7 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
    *   A render array.
    */
   protected function renderFallbackTable(EntityTypeInterface $entity_type): array {
+    $build = [];
     $header = $this->buildHeader($entity_type);
     $build['table'] = [
       '#type' => 'table',
@@ -194,8 +191,24 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
         'tags' => $entity_type->getListCacheTags(),
       ],
     ];
-    foreach ($this->load($entity_type, $header) as $entity) {
-      if ($row = $this->buildRow($entity)) {
+    /** @var \Drupal\Core\Entity\FieldableEntityInterface[] $entities */
+    $entities = $this->load($entity_type, $header);
+    $url_options = [
+      'language' => $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_INTERFACE),
+      'query' => $this->getDestinationArray(),
+    ];
+    foreach ($entities as $entity) {
+      if ($entity instanceof TranslatableInterface && $entity_type->isTranslatable()) {
+        foreach (array_keys($entity->getTranslationLanguages()) as $langcode) {
+          $translation = $entity->getTranslation($langcode);
+          if ($translation->get('deleted')->value &&
+            ($row = $this->buildRow($translation, $url_options))
+          ) {
+            $build['table']['#rows'][$entity->id() . '_' . $langcode]['data'] = $row;
+          }
+        }
+      }
+      elseif ($row = $this->buildRow($entity, $url_options)) {
         $build['table']['#rows'][$entity->id()] = $row;
       }
     }
@@ -240,6 +253,7 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
    *   A renderable array containing a table header column.
    */
   protected function buildHeader(EntityTypeInterface $entity_type): array {
+    $row = [];
     $row['label'] = [
       'data' => $this->t('Title'),
       'specifier' => $entity_type->getKey('label'),
@@ -264,6 +278,9 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
         'field' => $entity_type->getKey('published'),
       ];
     }
+    if ($this->isMultilingual && $entity_type->isTranslatable()) {
+      $row['language'] = $this->t('Language');
+    }
     if ($entity_type->entityClassImplements(RevisionLogInterface::class)) {
       /** @var \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type */
       $row['revision_user'] = [
@@ -287,11 +304,14 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
    *
    * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
    *   The entity for this row of the list.
+   * @param array $url_options
+   *   URL options for operation links.
    *
    * @return array
    *   A render array structure of fields for this entity.
    */
-  protected function buildRow(FieldableEntityInterface $entity): array {
+  protected function buildRow(FieldableEntityInterface $entity, array $url_options): array {
+    $row = [];
     $entity_type = $entity->getEntityType();
     if ($entity_type->hasLinkTemplate('canonical')
       && $entity_type->getLinkTemplate('canonical') != $entity_type->getLinkTemplate('edit-form')
@@ -322,6 +342,18 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
     if ($entity_type->entityClassImplements(EntityPublishedInterface::class)) {
       assert($entity instanceof EntityPublishedInterface);
       $row['published'] = $entity->isPublished() ? $this->t('published') : $this->t('not published');
+    }
+
+    if ($this->isMultilingual && $entity->getEntityType()->isTranslatable()) {
+      if ($entity instanceof TranslatableInterface && $entity->isDefaultTranslation()) {
+        $row['language'] = $this->t('<strong>@language_name (Original language)</strong>', [
+          '@language_name' => $entity->language()
+            ->getName(),
+        ]);
+      }
+      else {
+        $row['language'] = $entity->language()->getName();
+      }
     }
 
     if ($entity_type->entityClassImplements(RevisionLogInterface::class)) {

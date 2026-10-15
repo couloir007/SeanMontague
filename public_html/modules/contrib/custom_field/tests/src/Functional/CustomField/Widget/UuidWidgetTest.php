@@ -12,9 +12,13 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Functional tests for the uuid widget.
  *
- * The uuid widget is not editable: it renders as #type value and either
- * keeps an existing UUID or generates one on first create. UuidType sets
+ * The uuid widget is not an editable control: it renders as a hidden input and
+ * either keeps an existing UUID or generates one on first create. UuidType sets
  * never_check_empty: TRUE so the generated value is always stored.
+ *
+ * The hidden input is deliberate — the value has to come back with the
+ * submission so it stays stable across AJAX rebuilds for items that are not in
+ * storage yet. See UuidWidgetAjaxTest for that behavior.
  *
  * @group custom_field
  * @runTestsInSeparateProcesses
@@ -57,17 +61,27 @@ class UuidWidgetTest extends CustomFieldFunctionalTestBase {
   }
 
   /**
-   * Tests the subfield is not rendered as a visible form control.
+   * Tests the subfield renders as a hidden input, never a visible control.
    */
   public function testFieldNotVisibleOnForm(): void {
     $assert = $this->assertSession();
     $this->drupalGet('node/add/page');
 
-    $assert->fieldNotExists('field_test[0][item_uuid]');
-    $assert->elementNotExists(
+    // Present, so the value round-trips through submission.
+    $assert->elementExists(
       'css',
-      'input[name="field_test[0][item_uuid]"]'
+      'input[type="hidden"][name="field_test[0][item_uuid]"]'
     );
+
+    // But never an editable control the author can see or type into.
+    foreach (['text', 'textarea', 'select', 'checkbox', 'radio'] as $type) {
+      $assert->elementNotExists(
+        'css',
+        'input[type="' . $type . '"][name="field_test[0][item_uuid]"]'
+      );
+    }
+    $assert->elementNotExists('css', 'textarea[name="field_test[0][item_uuid]"]');
+    $assert->elementNotExists('css', 'select[name="field_test[0][item_uuid]"]');
   }
 
   /**

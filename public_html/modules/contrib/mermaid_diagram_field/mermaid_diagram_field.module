@@ -6,7 +6,10 @@
  */
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\views\ResultRow;
+use Drupal\views\ViewExecutable;
 
 /**
  * Implements hook_theme().
@@ -84,4 +87,55 @@ function mermaid_diagram_field_help($route_name, RouteMatchInterface $route_matc
       }
   }
   return NULL;
+}
+
+/**
+ * Implements hook_views_data_export_row_alter().
+ */
+function mermaid_diagram_field_views_data_export_row_alter(array &$output, ResultRow $row, ViewExecutable $view): void {
+  if (!\Drupal::moduleHandler()->moduleExists('views_data_export')) {
+    return;
+  }
+
+  $format = !empty($view->style_plugin->options['formats']) ? reset($view->style_plugin->options['formats']) : NULL;
+  if ($format !== 'csv') {
+    return;
+  }
+
+  $entity = $row->_entity;
+  if (!$entity instanceof FieldableEntityInterface) {
+    return;
+  }
+
+  foreach ($entity->getFieldDefinitions() as $field_name => $definition) {
+    if ($definition->getType() !== 'mermaid_diagram') {
+      continue;
+    }
+    if ($entity->get($field_name)->isEmpty()) {
+      continue;
+    }
+
+    $parts = [];
+    foreach ($entity->get($field_name) as $item) {
+      $title = trim($item->get('title')->getValue());
+      $diagram = trim($item->get('diagram')->getValue());
+      $caption = trim($item->get('caption')->getValue());
+
+      $diagram = preg_replace('/\s+/', ' ', $diagram);
+      $caption = preg_replace('/\s+/', ' ', $caption);
+
+      $segment = array_filter([
+        $title !== '' ? "title: $title" : NULL,
+        $diagram !== '' ? "diagram: $diagram" : NULL,
+        $caption !== '' ? "caption: $caption" : NULL,
+      ]);
+      $parts[] = implode(' | ', $segment);
+    }
+
+    foreach (array_keys($output) as $col) {
+      if ($col === $field_name || str_starts_with((string) $col, $field_name)) {
+        $output[$col] = implode(' || ', $parts);
+      }
+    }
+  }
 }

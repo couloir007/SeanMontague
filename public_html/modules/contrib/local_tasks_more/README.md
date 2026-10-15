@@ -50,11 +50,14 @@ and weight to be altered or remove a local task from display.
   and fixed position on left or right side.
 
 - [Admin Toolbar Tasks](https://www.drupal.org/project/admin_toolbar_tasks)  
-  Split of and display administrative local tasks as part of the site Toolbar.
+  Split off and display administrative local tasks as part of the site Toolbar.
 
 - [Better Local Tasks](https://www.drupal.org/project/betterlt)  
   Adds a bit of polish to the local task tabs, by fixed positioning it
   and adding some icons, and hover animation.
+
+- [Local Taskbar](https://www.drupal.org/project/local_taskbar)    
+  Moves your local tasks to an easy to find and consistent place at the bottom of the page.
 
 - [Sticky Local Tasks](https://www.drupal.org/project/sticky_local_tasks)  
   Provides more user-friendly, better, and fancier sticky local tasks.

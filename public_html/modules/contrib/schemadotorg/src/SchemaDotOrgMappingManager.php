@@ -19,7 +19,7 @@ use Drupal\schemadotorg\Traits\SchemaDotOrgMappingStorageTrait;
  * and properties and then use these mapping defaults to create
  * entity bundle with fields.
  *
- * This service is used by the UI, mapping sets, and starter kits.
+ * This service is used by the UI, mapping sets, and recipes.
  */
 class SchemaDotOrgMappingManager implements SchemaDotOrgMappingManagerInterface {
   use StringTranslationTrait;

@@ -10,16 +10,14 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\workspaces\WorkspaceInformationInterface;
 use Drupal\workspaces\WorkspaceInterface;
 use Drupal\workspaces\WorkspaceManagerInterface;
+use Drupal\workspaces\WorkspaceTrackerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 
 /**
  * Decorates the entity cache backend to filter out deleted entities.
  *
  * The workspace services are only passed in when the Workspaces module is
- * installed. The tracker declares no type because the interface it implements
- * differs across the supported core range, WorkspaceTrackerInterface from
- * 11.3.0 on and WorkspaceAssociationInterface below it. Both declare the
- * ::getTrackedEntities() method used here with the same signature.
+ * installed.
  *
  * @see \Drupal\trash\TrashServiceProvider::alter()
  */
@@ -37,7 +35,7 @@ class TrashEntityCacheBackend implements CacheBackendInterface, CacheTagsInvalid
     protected CacheBackendInterface $inner,
     protected ?WorkspaceManagerInterface $workspaceManager = NULL,
     protected ?WorkspaceInformationInterface $workspaceInformation = NULL,
-    protected $workspaceTracker = NULL,
+    protected ?WorkspaceTrackerInterface $workspaceTracker = NULL,
   ) {}
 
   /**
@@ -60,7 +58,7 @@ class TrashEntityCacheBackend implements CacheBackendInterface, CacheTagsInvalid
     foreach ($this->findStaleItems($items) as $cid) {
       unset($items[$cid]);
       // Report the entry as a miss, so the caller loads the entity with a
-      // storage query, which TrashStorageTrait::buildQuery() filters.
+      // storage query, which TrashEntityHooks::queryAlter() filters.
       $cids[] = $cid;
     }
 

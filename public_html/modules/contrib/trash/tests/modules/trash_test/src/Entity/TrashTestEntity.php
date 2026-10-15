@@ -4,63 +4,71 @@ declare(strict_types=1);
 
 namespace Drupal\trash_test\Entity;
 
+use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\ContentEntityDeleteForm;
+use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\Form\DeleteMultipleForm;
+use Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\trash_test\TrashTestEntityListBuilder;
+use Drupal\trash_test\TrashTestEntityStorage;
+use Drupal\views\EntityViewsData;
 
 /**
  * Provides a trash test entity.
- *
- * @ContentEntityType(
- *   id = "trash_test_entity",
- *   label = @Translation("Trash test"),
- *   label_collection = @Translation("Trash test"),
- *   label_singular = @Translation("Trash test entity"),
- *   label_plural = @Translation("Trash test entities"),
- *   label_count = @PluralTranslation(
- *     singular = "@count trash test entity",
- *     plural = "@count trash test entities",
- *   ),
- *   handlers = {
- *     "form" = {
- *       "default" = "\Drupal\Core\Entity\ContentEntityForm",
- *       "delete" = "\Drupal\Core\Entity\ContentEntityDeleteForm",
- *       "delete-multiple-confirm" = "\Drupal\Core\Entity\Form\DeleteMultipleForm",
- *     },
- *     "route_provider" = {
- *       "html" = "\Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
- *     },
- *     "list_builder" = "\Drupal\trash_test\TrashTestEntityListBuilder",
- *     "views_data" = "\Drupal\views\EntityViewsData",
- *   },
- *   base_table = "trash_test",
- *   data_table = "trash_test_field_data",
- *   revision_table = "trash_test_revision",
- *   revision_data_table = "trash_test_field_revision",
- *   translatable = TRUE,
- *   entity_keys = {
- *     "id" = "id",
- *     "revision" = "revision",
- *     "label" = "label",
- *     "uuid" = "uuid",
- *     "langcode" = "langcode",
- *   },
- *   show_revision_ui = TRUE,
- *   links = {
- *     "collection" = "/admin/content/trash_test",
- *     "canonical" = "/admin/content/trash_test/{trash_test_entity}",
- *     "add-form" = "/admin/content/trash_test/add",
- *     "edit-form" = "/admin/content/trash_test/{trash_test_entity}/edit",
- *     "delete-form" = "/admin/content/trash_test/{trash_test_entity}/delete",
- *     "delete-multiple-form" = "/admin/content/trash_test/delete",
- *     "revision" = "/admin/content/trash_test/{trash_test_entity}/revisions/{trash_test_entity_revision}/view",
- *   },
- *   field_ui_base_route = "entity.trash_test_entity.collection",
- *   common_reference_target = TRUE,
- *   admin_permission = "administer trash_test",
- * )
  */
+#[ContentEntityType(
+  id: 'trash_test_entity',
+  label: new TranslatableMarkup('Trash test'),
+  label_collection: new TranslatableMarkup('Trash test'),
+  label_singular: new TranslatableMarkup('Trash test entity'),
+  label_plural: new TranslatableMarkup('Trash test entities'),
+  entity_keys: [
+    'id' => 'id',
+    'revision' => 'revision',
+    'label' => 'label',
+    'uuid' => 'uuid',
+    'langcode' => 'langcode',
+  ],
+  handlers: [
+    'storage' => TrashTestEntityStorage::class,
+    'form' => [
+      'default' => ContentEntityForm::class,
+      'delete' => ContentEntityDeleteForm::class,
+      'delete-multiple-confirm' => DeleteMultipleForm::class,
+    ],
+    'route_provider' => [
+      'html' => DefaultHtmlRouteProvider::class,
+    ],
+    'list_builder' => TrashTestEntityListBuilder::class,
+    'views_data' => EntityViewsData::class,
+  ],
+  links: [
+    'collection' => '/admin/content/trash_test',
+    'canonical' => '/admin/content/trash_test/{trash_test_entity}',
+    'add-form' => '/admin/content/trash_test/add',
+    'edit-form' => '/admin/content/trash_test/{trash_test_entity}/edit',
+    'delete-form' => '/admin/content/trash_test/{trash_test_entity}/delete',
+    'delete-multiple-form' => '/admin/content/trash_test/delete',
+    'revision' => '/admin/content/trash_test/{trash_test_entity}/revisions/{trash_test_entity_revision}/view',
+  ],
+  admin_permission: 'administer trash_test',
+  base_table: 'trash_test',
+  data_table: 'trash_test_field_data',
+  revision_table: 'trash_test_revision',
+  revision_data_table: 'trash_test_field_revision',
+  translatable: TRUE,
+  show_revision_ui: TRUE,
+  label_count: [
+    'singular' => '@count trash test entity',
+    'plural' => '@count trash test entities',
+  ],
+  field_ui_base_route: 'entity.trash_test_entity.collection',
+  common_reference_target: TRUE,
+)]
 class TrashTestEntity extends ContentEntityBase {
 
   /**

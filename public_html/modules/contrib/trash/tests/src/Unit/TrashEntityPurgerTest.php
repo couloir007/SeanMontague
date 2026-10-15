@@ -17,15 +17,16 @@ use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
 use Drupal\trash\TrashEntityPurger;
 use Drupal\trash\TrashManagerInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 /**
  * Unit test for the entity purger.
- *
- * @coversDefaultClass \Drupal\trash\TrashEntityPurger
- * @group trash
  */
+#[CoversClass(TrashEntityPurger::class)]
+#[Group('trash')]
 class TrashEntityPurgerTest extends UnitTestCase {
 
   /**
@@ -104,7 +105,7 @@ class TrashEntityPurgerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::cronPurge
+   * Tests nothing is queued on cron if disabled.
    */
   public function testNothingIsQueuedOnCronIfDisabled() {
     $config = $this->createMock(Config::class);
@@ -127,8 +128,6 @@ class TrashEntityPurgerTest extends UnitTestCase {
 
   /**
    * Tests that an invalid auto-purge period logs an error, queues nothing.
-   *
-   * @covers ::populatePurgeQueue
    */
   public function testInvalidPeriodSkipsQueueing() {
     $config = $this->createMock(Config::class);
@@ -169,8 +168,6 @@ class TrashEntityPurgerTest extends UnitTestCase {
 
   /**
    * Tests entities are queued on cron.
-   *
-   * @covers ::cronPurge
    */
   public function testEntitiesAreQueuedOnCron() {
     $config = $this->createMock(Config::class);

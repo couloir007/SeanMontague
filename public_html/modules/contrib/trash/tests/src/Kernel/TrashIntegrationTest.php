@@ -6,14 +6,19 @@ namespace Drupal\Tests\trash\Kernel;
 
 use ColinODell\PsrTestLogger\TestLogger;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Form\FormState;
 use Drupal\Core\Entity\ContentEntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\trash\Trash;
+use Drupal\trash\TrashStorageInterface;
 use Drupal\trash_test\Entity\TrashTestEntity;
+use Drupal\trash_test\TrashTestEntityStorageInterface;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -23,6 +28,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('trash')]
 #[RunTestsInSeparateProcesses]
 class TrashIntegrationTest extends TrashKernelTestBase {
+
+  use EntityActionsTrait;
 
   /**
    * {@inheritdoc}
@@ -44,11 +51,32 @@ class TrashIntegrationTest extends TrashKernelTestBase {
   }
 
   /**
+   * The delete form warns when a newer pending revision exists.
+   */
+  public function testDeleteFormPendingRevisionWarning(): void {
+    $this->setUpCurrentUser();
+    $storage = $this->getEntityTypeManager()->getStorage('node');
+    $node = $this->createNode(['type' => 'article', 'title' => 'Live']);
+
+    // Without a pending revision there is no warning.
+    $form_object = $this->getEntityTypeManager()->getFormObject('node', 'delete')->setEntity($node);
+    $form = $this->container->get('form_builder')->buildForm($form_object, new FormState());
+    $this->assertArrayNotHasKey('trash_pending_revision_warning', $form);
+
+    // With a newer pending revision the warning shows up.
+    $pending = $storage->createRevision($node, FALSE);
+    $pending->save();
+    $node = $storage->load($node->id());
+    $form_object = $this->getEntityTypeManager()->getFormObject('node', 'delete')->setEntity($node);
+    $form = $this->container->get('form_builder')->buildForm($form_object, new FormState());
+    $this->assertArrayHasKey('trash_pending_revision_warning', $form);
+  }
+
+  /**
    * Test trashing entities.
    */
   public function testDeletion(): void {
     $entity = TrashTestEntity::create();
-    assert($entity instanceof ContentEntityInterface);
     $entity->save();
     $entity_id = $entity->id();
 
@@ -184,10 +212,9 @@ class TrashIntegrationTest extends TrashKernelTestBase {
   }
 
   /**
-   * @covers \Drupal\trash\TrashManager::isEntityTypeEnabled
-   *
-   * @dataProvider providerIsEntityTypeEnabled
+   * Tests TrashManager::isEntityTypeEnabled().
    */
+  #[DataProvider('providerIsEntityTypeEnabled')]
   public function testIsEntityTypeEnabled($entity_type_id, $bundle, $enabled): void {
     $this->assertSame($enabled, $this->getTrashManager()->isEntityTypeEnabled($entity_type_id, $bundle));
     $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
@@ -338,7 +365,7 @@ class TrashIntegrationTest extends TrashKernelTestBase {
    */
   public function testGetLatestRevisionId(): void {
     $storage = $this->getEntityTypeManager()->getStorage('trash_test_entity');
-    assert($storage instanceof ContentEntityStorageInterface);
+    assert($storage instanceof TrashStorageInterface);
 
     // Create a test entity (revision 1).
     $entity = $storage->create(['label' => 'Test entity']);
@@ -388,6 +415,216 @@ class TrashIntegrationTest extends TrashKernelTestBase {
   }
 
   /**
+   * Tests deleting and explicitly removing translations.
+   */
+  public function testTranslationDeletion() {
+    $this->enableModules(['user', 'language']);
+    $this->installConfig(['user', 'language']);
+    $this->installEntitySchema('user');
+
+    ConfigurableLanguage::createFromLangcode('sv')->save();
+    ConfigurableLanguage::createFromLangcode('de')->save();
+
+    $english = TrashTestEntity::create([
+      'label' => 'Test 1 EN',
+    ]);
+    $english->addTranslation('sv', [
+      'label' => 'Test 1 SV',
+    ]);
+    $english->addTranslation('de', [
+      'label' => 'Test 1 DE',
+    ]);
+    $english->save();
+    $swedish = $english->getTranslation('sv');
+    $german = $english->getTranslation('de');
+    $this->assertEquals(0, $english->get('deleted')->value);
+    $this->assertEquals(0, $swedish->get('deleted')->value);
+    $this->assertEquals(0, $german->get('deleted')->value);
+    $this->assertEquals('Test 1 EN', $english->label());
+    $this->assertEquals('Test 1 SV', $swedish->label());
+    $this->assertEquals('Test 1 DE', $german->label());
+    $request_time = \Drupal::time()->getRequestTime();
+
+    // German deleted. English and Swedish automatically deleted.
+    $german->delete();
+    [$english, $german, $swedish] = $this->reloadEntityAndTranslations($english->id());
+    $this->assertEquals($request_time, $english->get('deleted')->value);
+    $this->assertEquals($request_time, $german->get('deleted')->value);
+    $this->assertEquals($request_time, $swedish->get('deleted')->value);
+    $this->assertEquals('Test 1 EN', $english->label());
+    $this->assertEquals('Test 1 DE', $german->label());
+    $this->assertEquals('Test 1 SV', $swedish->label());
+
+    // A whole-entity delete marks every translation, including the default
+    // (English), as revision-translation-affected in the single deletion
+    // revision.
+    $this->assertTrue((bool) $english->isRevisionTranslationAffected());
+    $this->assertTrue((bool) $german->isRevisionTranslationAffected());
+    $this->assertTrue((bool) $swedish->isRevisionTranslationAffected());
+
+    // All restored.
+    Trash::restoreEntity($english);
+    [$english, $german, $swedish] = $this->reloadEntityAndTranslations($english->id());
+    $this->assertEquals(0, $english->get('deleted')->value);
+    $this->assertEquals(0, $german->get('deleted')->value);
+    $this->assertEquals(0, $swedish->get('deleted')->value);
+    $this->assertEquals('Test 1 EN', $english->label());
+    $this->assertEquals('Test 1 DE', $german->label());
+    $this->assertEquals('Test 1 SV', $swedish->label());
+
+    // Swedish deleted. English and German automatically deleted.
+    $swedish->delete();
+    [$english, $german, $swedish] = $this->reloadEntityAndTranslations($english->id());
+    $this->assertEquals($request_time, $english->get('deleted')->value);
+    $this->assertEquals($request_time, $german->get('deleted')->value);
+    $this->assertEquals($request_time, $swedish->get('deleted')->value);
+    $this->assertEquals('Test 1 EN', $english->label());
+    $this->assertEquals('Test 1 DE', $german->label());
+    $this->assertEquals('Test 1 SV', $swedish->label());
+
+    // All restored.
+    Trash::restoreEntity($english);
+    [$english, $german, $swedish] = $this->reloadEntityAndTranslations($english->id());
+    $english->save();
+    $this->assertEquals(0, $english->get('deleted')->value);
+    $this->assertEquals(0, $german->get('deleted')->value);
+    $this->assertEquals(0, $swedish->get('deleted')->value);
+    $this->assertEquals('Test 1 EN', $english->label());
+    $this->assertEquals('Test 1 DE', $german->label());
+    $this->assertEquals('Test 1 SV', $swedish->label());
+
+    // Swedish removed. German and English available. Removing a single
+    // translation soft-deletes it in exactly one new revision and leaves the
+    // prior revision (where Swedish is still live) untouched.
+    $live_revision_id = $english->getRevisionId();
+    $revision_count_before = $this->countAllRevisions('trash_test_entity', $english->id());
+    $english->removeTranslation('sv');
+    $english->save();
+    $this->assertEquals(0, $english->get('deleted')->value);
+    $this->assertEquals(0, $german->get('deleted')->value);
+    $this->assertEquals($request_time, $swedish->get('deleted')->value);
+    $this->assertEquals('Test 1 EN', $english->label());
+    $this->assertEquals('Test 1 DE', $german->label());
+    $this->assertEquals('Test 1 SV', $swedish->label());
+
+    $this->assertTrue((bool) $swedish->isRevisionTranslationAffected());
+    $this->assertFalse((bool) $english->isRevisionTranslationAffected());
+    $this->assertFalse((bool) $german->isRevisionTranslationAffected());
+
+    $this->assertSame($revision_count_before + 1, $this->countAllRevisions('trash_test_entity', $english->id()));
+    $this->assertNotSame($live_revision_id, $english->getRevisionId());
+    [$prior_en, $prior_de, $prior_sv] = $this->reloadEntityAndTranslations($english->id(), $live_revision_id);
+    $this->assertEquals(0, $prior_en->get('deleted')->value);
+    $this->assertEquals(0, $prior_de->get('deleted')->value);
+    $this->assertEquals(0, $prior_sv->get('deleted')->value);
+    $this->assertEquals('Test 1 EN', $prior_en->label());
+    $this->assertEquals('Test 1 DE', $prior_de->label());
+    $this->assertEquals('Test 1 SV', $prior_sv->label());
+
+    // German and Swedish removed. English available.
+    $english->removeTranslation('de');
+    $english->save();
+    $this->assertEquals(0, $english->get('deleted')->value);
+    $this->assertEquals($request_time, $german->get('deleted')->value);
+    $this->assertEquals($request_time, $swedish->get('deleted')->value);
+    $this->assertEquals('Test 1 EN', $english->label());
+    $this->assertEquals('Test 1 DE', $german->label());
+    $this->assertEquals('Test 1 SV', $swedish->label());
+
+    // All deleted.
+    $english->delete();
+    [$english, $german, $swedish] = $this->reloadEntityAndTranslations($english->id());
+    $this->assertEquals($request_time, $english->get('deleted')->value);
+    $this->assertEquals($request_time, $german->get('deleted')->value);
+    $this->assertEquals($request_time, $swedish->get('deleted')->value);
+    $this->assertEquals('Test 1 EN', $english->label());
+    $this->assertEquals('Test 1 DE', $german->label());
+    $this->assertEquals('Test 1 SV', $swedish->label());
+
+    // Removing a translation still works when the original is not loadable in
+    // the active context. Core's EntityStorageBase::doPreSave() sets the
+    // original via loadUnchanged() while the trash context is still active,
+    // before hooks run. For this fully trashed entity that returns NULL, so
+    // entityPresave() must reload the original in the 'ignore' context.
+    $storage = $this->getEntityTypeManager()->getStorage('trash_test_entity');
+    assert($storage instanceof ContentEntityStorageInterface);
+    $this->assertNull($storage->loadUnchanged($english->id()), 'Trashed entity is not loadable in the active context.');
+    $english = $this->forceLoadEntity($storage, $english->id());
+    $english->removeTranslation('sv');
+    $english->save();
+    [$english, $german, $swedish] = $this->reloadEntityAndTranslations($english->id());
+    $this->assertEquals($request_time, $english->get('deleted')->value);
+    $this->assertEquals($request_time, $german->get('deleted')->value);
+    $this->assertEquals($request_time, $swedish->get('deleted')->value);
+    $this->assertTrue((bool) $swedish->isRevisionTranslationAffected());
+    $this->assertFalse((bool) $english->isRevisionTranslationAffected());
+    $this->assertFalse((bool) $german->isRevisionTranslationAffected());
+
+    // English restored. German and Swedish deleted.
+    Trash::restoreEntity($english, ['en']);
+    [$english, $german, $swedish] = $this->reloadEntityAndTranslations($english->id());
+    $this->assertEquals(0, $english->get('deleted')->value);
+    $this->assertEquals($request_time, $german->get('deleted')->value);
+    $this->assertEquals($request_time, $swedish->get('deleted')->value);
+    $this->assertEquals('Test 1 EN', $english->label());
+    $this->assertEquals('Test 1 DE', $german->label());
+    $this->assertEquals('Test 1 SV', $swedish->label());
+
+    // Removing a translation while editing another in the same save keeps the
+    // edit and soft-deletes the removed translation.
+    Trash::restoreEntity($english);
+    [$english] = $this->reloadEntityAndTranslations($english->id());
+    $english->removeTranslation('de');
+    $english->getUntranslated()->set('label', 'Test 1 EN changed');
+    $english->save();
+    [$english, $german, $swedish] = $this->reloadEntityAndTranslations($english->id());
+    $this->assertEquals(0, $english->get('deleted')->value);
+    $this->assertEquals($request_time, $german->get('deleted')->value);
+    $this->assertEquals(0, $swedish->get('deleted')->value);
+    $this->assertEquals('Test 1 EN changed', $english->label());
+    $this->assertEquals('Test 1 DE', $german->label());
+  }
+
+  /**
+   * A translation soft-delete leaves an existing pending revision intact.
+   */
+  public function testTranslationSoftDeleteWithPendingRevision(): void {
+    $this->enableModules(['language']);
+    $this->installConfig(['language']);
+    ConfigurableLanguage::createFromLangcode('de')->save();
+
+    $storage = $this->getEntityTypeManager()->getStorage('trash_test_entity');
+    assert($storage instanceof ContentEntityStorageInterface);
+
+    $entity = TrashTestEntity::create(['label' => 'EN']);
+    $entity->addTranslation('de', ['label' => 'DE']);
+    $entity->save();
+    $id = $entity->id();
+
+    // Create a pending (non-default) forward revision.
+    $entity->setNewRevision(TRUE);
+    $entity->isDefaultRevision(FALSE);
+    $entity->getTranslation('de')->set('label', 'DE pending');
+    $entity->save();
+    $pending_revision_id = $entity->getRevisionId();
+
+    // Soft-delete the German translation from the default revision.
+    $entity = $storage->load($id);
+    assert($entity instanceof ContentEntityInterface);
+    $entity->removeTranslation('de');
+    $entity->save();
+
+    // German is trashed in the new default revision.
+    $current = $this->forceLoadEntity($storage, $id);
+    $this->assertTrue(Trash::entityIsDeleted($current->getTranslation('de')));
+
+    // The pending revision still exists with its own content.
+    $pending = $this->forceLoadEntity($storage, $id, revision_id: $pending_revision_id);
+    $this->assertNotNull($pending);
+    $this->assertEquals('DE pending', $pending->getTranslation('de')->label());
+  }
+
+  /**
    * Counts all revisions of an entity, ignoring trash state.
    */
   private function countAllRevisions(string $entity_type_id, string|int $id): int {
@@ -398,6 +635,25 @@ class TrashIntegrationTest extends TrashKernelTestBase {
       ->condition('id', $id)
       ->count()
       ->execute();
+  }
+
+  /**
+   * Reload an entity and its translations.
+   *
+   * @param string $id
+   *   The entity id to reload.
+   * @param string|null $revision_id
+   *   (optional) A specific revision to load instead of the default revision.
+   *
+   * @return array{\Drupal\trash_test\Entity\TrashTestEntity, \Drupal\trash_test\Entity\TrashTestEntity, \Drupal\trash_test\Entity\TrashTestEntity}
+   *   The English, German and Swedish translations of the entity.
+   */
+  private function reloadEntityAndTranslations(string $id, ?string $revision_id = NULL): array {
+    $storage = $this->container->get('entity_type.manager')->getStorage('trash_test_entity');
+    /** @var \Drupal\trash_test\Entity\TrashTestEntity $english */
+    $english = $this->forceLoadEntity($storage, $id, revision_id: $revision_id);
+
+    return [$english, $english->getTranslation('de'), $english->getTranslation('sv')];
   }
 
   /**
@@ -444,6 +700,7 @@ class TrashIntegrationTest extends TrashKernelTestBase {
     $account->delete();
 
     $storage = $this->getEntityTypeManager()->getStorage('user');
+    assert($storage instanceof TrashStorageInterface);
     $this->assertNull($storage->load($account->id()));
     $trashed = $this->loadTrashedEntity('user', $account->id());
     $this->assertNotNull($trashed);
@@ -503,6 +760,36 @@ class TrashIntegrationTest extends TrashKernelTestBase {
     $field_storage_definitions = \Drupal::service('entity.last_installed_schema.repository')->getLastInstalledFieldStorageDefinitions('media');
     $this->assertArrayHasKey('deleted', $field_storage_definitions);
     $this->assertSame('media', $field_storage_definitions['deleted']->getProvider());
+  }
+
+  /**
+   * Tests that the storage proxy implements all the required interfaces.
+   */
+  public function testStorageDecoratorInterfaceCompleteness(): void {
+    // Get the expected storage class from the entity type definition.
+    $entity_type = $this->getEntityTypeManager()->getDefinition('trash_test_entity');
+    $storage_class = $entity_type->getStorageClass();
+    $storage = $this->getEntityTypeManager()->getStorage('trash_test_entity');
+
+    // Verify the storage implements the entity-type-specific storage interface.
+    $this->assertInstanceOf(TrashTestEntityStorageInterface::class, $storage);
+
+    // Verify custom methods from the entity-type-specific interface work.
+    $this->assertEquals('custom_test_value_from_storage', $storage->getCustomTestValue());
+
+    // Verify the storage implements all interfaces of the expected class.
+    foreach (class_implements($storage_class) as $interface) {
+      $this->assertInstanceOf($interface, $storage);
+    }
+
+    // Verify all public methods from the expected class are callable.
+    $reflection = new \ReflectionClass($storage_class);
+    foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+      if (str_starts_with($method->getName(), '__') || $method->isStatic()) {
+        continue;
+      }
+      $this->assertTrue(is_callable([$storage, $method->getName()]));
+    }
   }
 
 }

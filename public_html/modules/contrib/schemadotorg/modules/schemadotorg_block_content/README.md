@@ -35,8 +35,8 @@ Notes
   announcements, but it is a real-world implementation of the specification.
 - The SpecialAnnouncement type will likely be used for other notifications in
   the future.
-- The SpecialAnnouncement block content type has been added to the 
-  [Schema.org Blueprints Hospital Starterkit](https://www.drupal.org/project/schemadotorg_starterkit_hospital) module.
+- The SpecialAnnouncement block content type can be added using a Drupal
+  Recipe, such as the [Schema.org Recipes sandbox](https://www.drupal.org/sandbox/jrockowitz/3479651).
 
 **Implementation notes**
 
