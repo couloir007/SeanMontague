@@ -64,7 +64,7 @@ part of code work.
 │   │   ├── seanmontague_schemadotorg/ # JSON-LD enrichment + correction (has README)
 │   │   ├── trip_import/               # KMZ → geo entities + trip content importer
 │   │   ├── map_page/                  # Full-page Leaflet map + GeoJSON endpoint
-│   │   ├── external_pg/               # Deprecated: direct DB link to TrailMapper, to be removed once the TrailMapper API client exists (see docs/architecture/decisions.md).
+│   │   ├── external_pg/               # Deprecated (see decisions.md)
 │   │   └── trailmapper_safeguards/    # MenuLinkContent validation
 │   └── themes/custom/
 │       └── surface/                   # The theme
