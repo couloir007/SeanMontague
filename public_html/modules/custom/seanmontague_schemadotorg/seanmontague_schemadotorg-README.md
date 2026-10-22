@@ -6,7 +6,7 @@ its quirks and adds the properties Blueprints can't infer (mentions, trip times,
 knowsAbout, geo on referenced entities, etc.).
 
 **It does NOT define content types or fields** — that's Blueprints (see
-`SCHEMADOTORG.md`). This module only touches the rendered JSON-LD.
+`docs/architecture/schema-mappings.md`). This module only touches the rendered JSON-LD.
 
 ---
 
@@ -103,4 +103,4 @@ new keys those classes emit get normalized for free.
 
 geo_entity geofield: `$entity->get('schema_geo')->lat` / `->lon` returns the
 float directly. `->lat->value` is NULL; `.0.value.lat` is NULL. (Same rule the
-theme/services use — see `MODULES-trail_mapper-vs-seanmontague_map.md`.)
+theme/services use.)

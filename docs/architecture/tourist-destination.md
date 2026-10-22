@@ -1,8 +1,6 @@
 # Destination Content Type — TouristDestination
 
-## Status: UI complete — Claude Code prompt ready to run
-
-See `claude-code-destination-content-type.md` for the implementation prompt.
+## Status: UI complete; templates, trip cards and JSON-LD hook pending
 
 ---
 
@@ -70,7 +68,7 @@ Destination and Place pages feature a map that functions as a
 **planning artifact** — showing not just what happened, but the full
 scope of what was considered.
 
-### POI field: `field_status`
+### POI field: `field_status` (planned, not in config)
 
 Add to `geo_entity:poi`:
 
@@ -201,7 +199,7 @@ if ($entity->bundle() === 'tourist_destination') {
 Sections:
 1. Header — title, address region, parent place, tourist type tags
 2. Hero image (`schema_image`)
-3. Leaflet map — destination marker + POIs with `field_status` styling
+3. Leaflet map — destination marker + POIs with `field_status` styling (field planned, not in config)
 4. Body lede (summary) + full editorial
 5. Linked articles — View: articles where `schema_destination` = this node
 
@@ -237,10 +235,24 @@ A future trip to Ireland can reference the same Galway destination node.
 - [x] Change `schema_destination` on article → target `node:tourist_destination`
 - [x] Export config (`lando drush cex`)
 - [ ] Run Claude Code prompt — templates, trip.twig cards, TEMPLATES.md, JSON-LD hook
-- [ ] Add `field_status` to `geo_entity:poi` (did / wished / next_time)
+- [ ] Add `field_status` to `geo_entity:poi` (did / wished / next_time) — planned, not in config
 - [ ] Update map.js `surfaceMarker()` — dashed ring style for `wished`, sky ring for `next_time`
 - [ ] Recreate Ireland destination records as `tourist_destination` nodes
 - [ ] Update KMZ importer to create `tourist_destination` nodes
 - [ ] Create Galway destination node — lede: "Galway is the New Orleans of Irish music"
 - [ ] Build destination map filter UI (future)
 - [ ] Storybook story — `Collections/Destination`
+
+## Schema.org property notes (merged from TOURIST-DESTINATION.md)
+
+### `containedInPlace`
+"This destination is within this larger place": Galway is `containedInPlace` Ireland, Dingle is `containedInPlace` Co. Kerry. The field is named `schema_contained_in_place` to avoid colliding with `schema_place`, which other content types use to mean "referenced Place hub node".
+
+### `includesAttraction`
+Links a destination to its POIs (`geo_entity:poi`). The JSON-LD hook emits it by querying POIs that reference this destination via `schema_place`, so no direct field reference is needed on the destination.
+
+## Storybook story
+
+Planned: `source/patterns/collections/destination/destination.stories.jsx`. The `destination/` directory exists but is empty, so the story and fixture are not built. Intended fixture: Irish destination with image, geo, activity types, body summary. Story: `Collections/Destination`.
+
+Not merged: the older file's `touristType` note (emitted from `activity_type` taxonomy terms). It contradicts this file, which keeps `schema_tourist_type` as plain text and skips `schema_activity_type`. Also not merged: the older "Relationships" diagram, "Replaces" and "Pending" lists, which use the retired `node:destination` name and are superseded by the sections above.

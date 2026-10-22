@@ -1,22 +1,10 @@
 # Ride guide: The Darling Hill Signature
+
+> **Historical spec.** The distance and elevation fields and hard-coded JSON-LD values were proposed, never built. Route stats come from TrailMapper by route ID (see `docs/integrations/trailmapper-interface.md`) and follow the metric-storage decision in `docs/architecture/decisions.md`.
+>
+> Editorial copy (tagline, intro, section prose, practical info) was removed from this file; the editorial version lives in `docs/trail-guides/trail-guides-few-shot.md` (Example 1).
+
 > Working example for the ride_guide content type. Covers page content, Drupal content model, entity relationships, and Schema.org JSON-LD output.
-
----
-
-## Page content
-
-**Difficulty:** Intermediate · blue / black  
-**Distance:** ~15 miles  
-**Elevation gain:** ~1,800 ft  
-**Duration:** 3.5–4.5 hours  
-**Start:** East Burke Village  
-**Best season:** June–October  
-
-### Tagline
-The most complete ride on the network — earned views, fast singletrack, and a river waiting at the finish.
-
-### Intro
-The Darling Hill loop is what people mean when they say Kingdom Trails is worth the drive from wherever you are. It is not the hardest ride on the network — it is the most complete one. A sustained paved climb earns you a ridge that opens onto views that make Vermont locals insufferable at dinner. Then Kitchel unravels below you: 800 vertical feet of berms and rhythm sections placed precisely where your wheels want them. You will ride it once and immediately want to go again.
 
 ---
 
@@ -31,52 +19,6 @@ The Darling Hill loop is what people mean when they say Kingdom Trails is worth 
 | 3 | VAST connector | Doubletrack | 0.5 mi | Flat recovery |
 | 4 | Herbs | Blue descent | 1.2 mi | Hardwood forest; chunkier lower third |
 | F | East Burke Village | Finish | — | Swim hole behind East Burke Sports |
-
----
-
-## Section content
-
-### The climb
-Two and a half miles of pavement. On your mountain bike. Ride it anyway. Keep your cadence high, stay in the saddle, and look at the farms. The grade is consistent at 6–8% — topping out near the Wildflower Inn — so you arrive warm, not cooked.
-
-Stop at the top. Turn around. The view of Burke Mountain from this open meadow is the payoff for everything that follows, and it is free before you have touched a single inch of dirt. KTA owns and manages over 400 acres on Darling Hill. That context matters when you are standing in it.
-
-> **Callout:** Leave the car at East Burke Sports. The paved section is part of the ride, not a penalty — parking at the top robs you of the full descent finish back to the village.
-
-### On the ridge
-The Darling Hill ridge is KT's most iconic terrain — open meadows, stone walls, working farms, and singletrack threading between them. The network up here has changed over the years as landowners have revised access; what's currently open is well-marked and worth savoring before the descent.
-
-Roll the meadow connectors to the top of Kitchel. Eat something. Check your tire pressure. Commit mentally to riding fast. Kitchel rewards commitment.
-
-### Kitchel — the descent
-This is why you climbed. Kitchel drops roughly 800 vertical feet in about 1.5 miles — not cliff-steep, but relentlessly rhythmic. A natural berm feeds into a whoops section, then another berm, a short flat to breathe, and then the trail drops again. The trail builders placed every feature exactly where your wheels want to be.
-
-Feathering your brakes slows you without smoothing the bumps — you will rattle through the whoops instead of floating over them. The line is wide and obvious. Trust it.
-
-> **Warning callout:** First run: ride it at your natural pace before you try to go fast. The trail flows differently than it reads on paper. The second run is where you find your speed.
-
-### VAST to Herbs — back to town
-The VAST connector is flat doubletrack — your legs will thank it. Pick up Herbs on the other side: a classic Vermont descent through hardwood forest, chunkier than Kitchel, with a rough lower third that keeps you honest after a big day. You pop out behind the post office.
-
-Cross to East Burke Sports. Lock your bike. Get in the river behind the shop. This is not optional.
-
-### Optional extension: Pisgah
-**+2 mi · +300 ft · +45 min**
-
-From the top of Darling Hill, Pisgah adds a short ridge traverse with exposed views east toward New Hampshire. Best in early morning before trail traffic picks up. Skip it if your energy is already running low — Kitchel is the ride, not Pisgah.
-
----
-
-## Practical info
-
-| | |
-|--|--|
-| **Parking** | East Burke Sports lot · Rt. 114, East Burke village |
-| **Day pass** | $20 adult · buy at Welcome Center or online before riding |
-| **Best conditions** | Mid-June through October · Darling Hill clay drains slowly — avoid 24h after heavy rain |
-| **Bail option** | From the ridge: return via East Darling Hill Rd. Skip Kitchel, descend pavement. |
-| **Water** | Carry 2L minimum. No water on route. Fill at Welcome Center before departure. |
-| **Post-ride** | Swim hole (behind East Burke Sports) · NEK Country Store · tiki bar (evenings, seasonal) |
 
 ---
 

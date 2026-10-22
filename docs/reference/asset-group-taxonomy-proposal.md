@@ -1,5 +1,7 @@
 # Asset Group Taxonomy — Backend Filtering for Media & Geo Entities
 
+> **Note:** `geo_entity:destination` no longer exists. Destinations are now `node:tourist_destination` (see `docs/architecture/tourist-destination.md`). Of the `geo_entity` bundles in this plan, only `poi` and `lodging` remain; the `destination` references below are stale.
+
 > **Status:** Planned, not built. Deferred to focus on other work first.
 > **Purpose:** A cross-cutting organizational tag so the backend admin can filter
 > *everything uploaded for a trip/project* — images, videos, tracks, POIs,

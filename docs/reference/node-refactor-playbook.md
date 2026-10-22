@@ -5,7 +5,7 @@ to **pure markup + a preprocess hook + services**. This is the pattern proven on
 `node--article` and `node--tourist-trip`; apply it to every remaining node type.
 
 Reference this from agent prompts: open with *"Read `AGENT-GUARDRAILS.md` and
-`PLAYBOOK-node-refactor.md`, then …"* so the prompt only has to carry the
+`docs/reference/node-refactor-playbook.md`, then …"* so the prompt only has to carry the
 page-specific facts.
 
 ---

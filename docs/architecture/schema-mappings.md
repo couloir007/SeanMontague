@@ -1,4 +1,4 @@
-# Schema.org Blueprints — SeanMontague.com Field Model Reference
+# Schema.org mappings
 
 > Read this before creating any content type, field, or JSON-LD customisation
 > on this site. The patterns here are consistent with the BRE VT buildout —
@@ -68,7 +68,7 @@ lando drush php-eval "
 "
 ```
 
-Or check `config/field.storage.node.schema_*.yml` files directly.
+Or check `config/sync/field.storage.node.schema_*.yml` files directly.
 
 ---
 
@@ -446,3 +446,21 @@ have complex geo or cross-referencing requirements. Standard types like
 | Check existing storages before adding a field | Assume a storage doesn't exist |
 | Check `$data['@type']` in the alter hook (fires twice) | Target node alter hook output without type guard |
 | Access geo values with `.value` suffix | Use `schema_geo.lat` directly in string context |
+
+---
+
+
+
+## Planned: Blueprints sub-modules for the trail-guide types
+
+Source: kingdom-trails-strategy.md (April 2026). Enabled status below was checked against `config/sync/core.extension.yml`.
+
+| Module | Purpose |
+|---|---|
+| `schemadotorg_jsonld` (enabled) | Outputs JSON-LD in `<head>`. Required for Google rich results. |
+| `schemadotorg_mapping` (not enabled; `schemadotorg_mapping_set` is) | Maps Drupal fields to Schema.org properties. |
+| `schemadotorg_report` (enabled) | Admin dashboard for browsing Schema.org types while modeling. |
+| `schemadotorg_descriptions` (enabled) | Fills field descriptions from Schema.org definitions. |
+| `schemadotorg_subtype` (not enabled; `schemadotorg_additional_type` is) | Lets `SportsActivityLocation` subtype as `MountainBikeTrail`. |
+
+Itinerary vs hasPart: a ride guide (`TouristTrip`) lists its ordered trails in `hasPart` (each a `SportsActivityLocation`); route distance and elevation come from TrailMapper by route ID, not hard-coded values (see `docs/integrations/trailmapper-interface.md`).

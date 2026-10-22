@@ -8,14 +8,14 @@ the rules that are expensive to get wrong; obey them over any inferred default.
 - **Sean does ALL git.** Never commit, push, stage, or create/switch branches.
 - Finish by **showing the diff** and a short summary of what changed. Stop there.
 - Never hand-edit anything under **`dist/`**. It is the committed Vite build
-  output (Pantheon has no build step), regenerated from `source/` — editing it
+  output (the AcuGIS server has no Node build), regenerated from `source/` — editing it
   directly is overwritten on the next build and ships broken assets.
 
 ## Build & commands
 - **`npm` runs on the HOST**, not Lando — the appserver is PHP-only, so
   `lando npm` does not exist. Build: `npm run build` (from the theme dir).
 - Prefix **Drupal/PHP** commands with `lando`: `lando drush …`,
-  `lando composer …`, `lando terminus …`, `lando php …`, `lando phpunit …`.
+  `lando composer …`, `lando php …`, `lando phpunit …`.
 - PHP/Twig-only changes need **no build** — just `lando drush cr`. Only a
   change under `source/` (CSS/JS) needs `npm run build` + committing `dist/`.
 - Config: export UI changes with `lando drush cex` and commit them with the
@@ -55,6 +55,5 @@ The live code wins. If an existing template models a bug (e.g. `field_body`,
 shows — don't preserve the bug.
 
 ## Read first
-`.junie/guidelines.md` (build/test/ops) and the relevant `CLAUDE.md` — root for
-structure, `themes/custom/surface/CLAUDE.md` for theme/preprocess/content model.
-For map/geo work also `modules/custom/MODULES-trail_mapper-vs-seanmontague_map.md`.
+The relevant `CLAUDE.md` — root for structure, build/test/ops and the map/geo
+module split, `themes/custom/surface/CLAUDE.md` for the theme source directory.

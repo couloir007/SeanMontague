@@ -1,8 +1,8 @@
 # Surface Source Directory
 
-Read `public_html/themes/custom/surface/CLAUDE.md` first — it is the
+Read the root `CLAUDE.md` first — it is the
 authoritative reference for theme architecture, Drupal integration, content
-model, and the map component. Read `../STORYBOOK.md` for the rules that keep
+model, and the map component. Read `STORYBOOK.md` for the rules that keep
 Storybook from breaking (JS dual-context, Twig restrictions, YAML fixtures).
 
 This directory is the Storybook-driven design-system source. Build output goes
@@ -64,7 +64,7 @@ source/
 > `.about__body p`), **not** a `paragraphs` array. Storybook supplies `body` as
 > an HTML string in `about.yml`; in Drupal it is the Person `body` field. (The
 > homepage About wiring — Person mainEntity + page framing fields — is in the
-> theme-root `CLAUDE.md`.)
+> root `CLAUDE.md` ("Node Preprocess & Data Services").)
 
 ### Collections
 
@@ -281,7 +281,7 @@ Drupal:    preprocess hook → node--*.html.twig → name.twig
 ```
 
 Node templates are pure markup — their data comes from bundle/view-mode
-preprocess hooks in `includes/node.theme` (see theme-root CLAUDE.md). The yml
+preprocess hooks in `includes/node.theme` (see the root `CLAUDE.md`, "Node Preprocess & Data Services"). The yml
 keys still define the component contract either way.
 
 ### This is NOT SDC
@@ -326,25 +326,27 @@ choice where wanted.
 ## Build Commands
 
 ```bash
-lando npm run build    # compile source → dist/
-lando npm run watch    # Storybook (localhost:6006) + Vite watch
+npm run build    # compile source → dist/
+npm run watch    # Storybook (localhost:6007) + Vite watch
 lando drush cr         # clear Drupal cache after template changes
 ```
 
+`npm run build` runs Biome lint, format check, and Stylelint before `vite:build`, so a lint failure blocks the `dist/` rebuild. `npm run vite:build` builds without the checks.
+
 ---
 
-## Deployment (Pantheon)
+## Deployment (AcuGIS)
 
-Pantheon runs `composer install` only — no `npm run build`. The compiled
-`dist/` **must be committed**:
+Production deploys are `git pull` over SSH on AcuGIS; the server has no Node
+build, so no `npm run build`. The compiled `dist/` **must be committed**:
 
 ```
-edit source/ → lando npm run build → git add dist/ → commit → push (Sean does git)
+edit source/ → npm run build → git add dist/ → commit → push (Sean does git)
 ```
 
 ### What NOT to commit
 - `node_modules/` — never
-- `storybook-static/` — Storybook build output, not needed on Pantheon
+- `storybook-static/` — Storybook build output, not needed in production
 - `source/` ships for reference but is not required at runtime — only `dist/`
   is served
 

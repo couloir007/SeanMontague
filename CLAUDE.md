@@ -18,32 +18,34 @@ Smithsonian NMNH. This is a personal outlet — not a portfolio or consulting si
 | Doc | Path | Scope |
 |---|---|---|
 | **This file** | `CLAUDE.md` | Stack, repo layout, quick-start |
-| **Schema.org Blueprints** | `SCHEMADOTORG.md` | Content types, field naming, shared storages, JSON-LD |
-| **Trail journal guidelines** | `public_html/themes/custom/surface/CLAUDE.md` | Writing voice, NH 48, biking reports |
-| **Surface theme** | `public_html/themes/custom/surface/CLAUDE.md` | Drupal templates, preprocess, content model, Leaflet |
-| **Surface source** | `public_html/themes/custom/surface/source/CLAUDE.md` | Design-system source (CSS/JS/tokens/Storybook) |
+| **Docs index** | `docs/README.md` | Index of `docs/` and the ownership table (repo vs TrailMapper vs editorial) |
+| **Schema.org Blueprints** | `docs/architecture/schema-mappings.md` | Content types, field naming, shared storages, JSON-LD |
+| **Surface theme** | `public_html/themes/custom/surface/CLAUDE.md` | Theme architecture and design-system source (CSS/JS/tokens/Storybook) |
 | **Storybook rules** | `public_html/themes/custom/surface/STORYBOOK.md` | JS dual-context, Twig rules, Storybook failure modes |
-| **Map/geo module split** | `public_html/modules/custom/MODULES-trail_mapper-vs-seanmontague_map.md` | Which map/geo module owns what |
-| **JSON-LD module** | `public_html/modules/custom/seanmontague_schemadotorg/README.md` | JSON-LD hooks, JsonLd classes, normalizers, CollectionPage plan |
+| **JSON-LD module** | `public_html/modules/custom/seanmontague_schemadotorg/seanmontague_schemadotorg-README.md` | JSON-LD hooks, JsonLd classes, normalizers, CollectionPage plan |
 
-Read `SCHEMADOTORG.md` before creating any content type, field, or JSON-LD
+Read `docs/architecture/schema-mappings.md` before creating any content type, field, or JSON-LD
 customisation. Read `STORYBOOK.md` before touching anything in `source/`.
 
 ---
 
 ## Stack
 
-- **CMS:** Drupal 10/11 (PHP 8.3, Composer, Drush)
-- **Hosting:** Pantheon (no frontend build step — `dist/` is committed)
-- **Local dev:** Lando (Pantheon recipe) — `lando start` to start services
-- **Database:** PostgreSQL 15 with PostGIS
+- **CMS:** Drupal 10/11 (PHP 8.4, Composer, Drush)
+- **Hosting:** AcuGIS (cPanel, shared) — no Node build on the server, so `dist/` is committed
+- **Local dev:** Lando (`drupal10` recipe, PHP 8.4) — `lando start` to start services
+- **Database:** PostgreSQL 18.6 with PostGIS in production; Lando runs PostgreSQL 17
 - **Theme:** Surface — Storybook-driven pattern library, Vite build
 - **Content model:** Schema.org Blueprints (`drupal/schemadotorg`)
 - **Mapping:** Leaflet + GeoJSON, custom `trail_mapper`, `seanmontague_map`, and `map_page` modules
 - **URL:** https://seanmontague.lndo.site
 
-Always prefix PHP/Drupal/frontend commands with `lando` — never run `drush`,
-`composer`, `npm`, or `terminus` directly on the host.
+Always prefix PHP/Drupal commands with `lando` — never run `drush` or `composer`
+directly on the host. `npm` is the exception: it runs on the **host**
+(the Lando appserver is PHP-only), from the theme directory.
+
+`docs/trail-guides/` is editorial reference for field design; don't edit it as
+part of code work.
 
 ---
 
@@ -52,18 +54,17 @@ Always prefix PHP/Drupal/frontend commands with `lando` — never run `drush`,
 ```
 /
 ├── CLAUDE.md                          # ← you are here
-├── SCHEMADOTORG.md                    # Schema.org Blueprints reference
+├── docs/                              # Architecture, reference, integrations, trail-guides (see docs/README.md)
 ├── composer.json / .lock              # Drupal + PHP dependencies
 ├── config/                            # Drupal config export (drush cex/cim)
 ├── public_html/
 │   ├── modules/custom/
-│   │   ├── MODULES-trail_mapper-vs-seanmontague_map.md  # map/geo module split
 │   │   ├── trail_mapper/              # GeoJSON/GPX engine, elevation, ArticleGeoData
 │   │   ├── seanmontague_map/          # Site-specific map aggregation, ArticleMapData
 │   │   ├── seanmontague_schemadotorg/ # JSON-LD enrichment + correction (has README)
 │   │   ├── trip_import/               # KMZ → geo entities + trip content importer
 │   │   ├── map_page/                  # Full-page Leaflet map + GeoJSON endpoint
-│   │   ├── external_pg/               # External PostgreSQL service layer
+│   │   ├── external_pg/               # Deprecated: direct DB link to TrailMapper, to be removed once the TrailMapper API client exists (see docs/architecture/decisions.md).
 │   │   └── trailmapper_safeguards/    # MenuLinkContent validation
 │   └── themes/custom/
 │       └── surface/                   # The theme
@@ -71,10 +72,9 @@ Always prefix PHP/Drupal/frontend commands with `lando` — never run `drush`,
 │           ├── STORYBOOK.md           # Storybook rules — read before touching source/
 │           ├── includes/              # *.theme partials (node.theme, html.theme, views.theme)
 │           ├── source/                # Design system source (Vite + Storybook)
-│           │   ├── CLAUDE.md          # Source-directory reference
 │           │   ├── props/             # Design tokens (nek.css)
 │           │   └── patterns/          # elements/ → components/ → collections/ → layouts/
-│           ├── dist/                  # Vite build output (committed for Pantheon)
+│           ├── dist/                  # Vite build output (committed; no server build)
 │           └── templates/             # Drupal twig overrides
 └── upstream-configuration/            # Pantheon upstream
 ```
@@ -92,9 +92,9 @@ lando drush cr                        # clear cache
 
 # Theme development
 cd public_html/themes/custom/surface
-lando npm install
-lando npm run watch                   # Storybook + Vite dev server (localhost:6006)
-lando npm run build                   # compile source → dist/
+npm install
+npm run watch                   # Storybook + Vite dev server (localhost:6007)
+npm run build                   # compile source → dist/
 
 # Tests
 lando php public_html/modules/custom/trail_mapper/tests/Unit/GeoElevationCalculatorTest.php
@@ -105,17 +105,35 @@ lando php vendor/bin/phpunit public_html/modules/custom
 
 ## Deployment Workflow
 
-Pantheon has no frontend build step. The compiled `dist/` must be committed:
+Production is AcuGIS shared cPanel hosting. Deploys are `git pull` over SSH on
+the server, which has no Node build, so the compiled `dist/` must be committed.
+
+Locally, build with `npm` on the host, then commit and push:
 
 ```bash
 # After any source/ changes:
 cd public_html/themes/custom/surface
-lando npm run build
+npm run build
 cd /path/to/repo/root
 git add public_html/themes/custom/surface/dist/
 git commit -m "Rebuild dist"
 git push
 ```
+
+Then on the server, over SSH. The CLI default PHP is not 8.4, so run Drush
+through the PHP 8.4 binary explicitly:
+
+```bash
+cd /path/to/repo/root
+git pull
+/opt/alt/php84/usr/bin/php vendor/bin/drush updatedb -y
+/opt/alt/php84/usr/bin/php vendor/bin/drush config:import -y
+/opt/alt/php84/usr/bin/php vendor/bin/drush cache:rebuild
+```
+
+`vendor/` is committed (the `/vendor/` ignore rule in `.gitignore` is commented
+out), so `git pull` brings dependencies with it and no `composer install` runs
+on the server.
 
 ---
 
@@ -133,14 +151,10 @@ lando composer require drupal/module_name
 lando composer install
 
 # Frontend (from theme directory)
-lando npm run build
-lando npm run watch
-lando npm run lint:fix             # Biome JS/TS auto-fix
-lando npm run stylelint:fix        # CSS auto-fix
-
-# Pantheon
-lando terminus env:deploy seanmontague.dev
-lando terminus drush seanmontague.dev -- cr
+npm run build
+npm run watch
+npm run lint:fix             # Biome JS/TS auto-fix
+npm run stylelint:fix        # CSS auto-fix
 ```
 
 ---
@@ -148,7 +162,7 @@ lando terminus drush seanmontague.dev -- cr
 ## Content Model (overview)
 
 All content types use Schema.org Blueprints. Fields use `schema_` prefix for
-schema-mapped fields, `field_` for editorial-only. See `SCHEMADOTORG.md` for
+schema-mapped fields, `field_` for editorial-only. See `docs/architecture/schema-mappings.md` for
 the full reference — especially the shared storage rule.
 
 ### Single article bundle
@@ -212,11 +226,11 @@ lando drush schemadotorg:create-type node:Event
 | Module | Purpose |
 |---|---|
 | `trail_mapper` | GeoJSON/GPX engine: `GeoShapeConverter`, `GeoElevationCalculator`, `ArticleGeoData` (article track/stats display data). Settings at `/admin/config/trail-mapper`. Reusable, site-agnostic. |
-| `seanmontague_map` | Site-specific map aggregation: Places/POIs/Lodging + node refs → markers and a unified GeoJSON feed. `ArticleMapData` (markers + map config for article & page nodes). See `MODULES-trail_mapper-vs-seanmontague_map.md`. |
+| `seanmontague_map` | Site-specific map aggregation: Places/POIs/Lodging + node refs → markers and a unified GeoJSON feed. `ArticleMapData` (markers + map config for article & page nodes). |
 | `seanmontague_schemadotorg` | JSON-LD enrichment + correction over Schema.org Blueprints (mentions, trip times, knowsAbout, geo on referenced entities; `@url`→`url` + ISO-date normalizers). See module README. |
 | `trip_import` | Admin UI to import Google My Maps KMZ → geo_entity records, GeoJSON route files, and trip content (day articles, destinations, tourist_trip). |
 | `map_page` | Full-page Leaflet map with custom paragraph types; GeoJSON endpoint at `/map-page/map-items/{bundle}`. |
-| `external_pg` | Service layer (`ExternalPgService`) for the external PostgreSQL TrailMapper DB. |
+| `external_pg` | Deprecated: direct DB link to TrailMapper, to be removed once the TrailMapper API client exists (see docs/architecture/decisions.md). (`ExternalPgService`) |
 | `trailmapper_safeguards` | Project-level data-integrity safeguards (e.g. invalid `menu_name` on MenuLinkContent). |
 
 ---
@@ -241,8 +255,8 @@ The article hook calls both data services and composes their output —
 `trail_mapper.article_geo_data` (`ArticleGeoData`, track/geo/stats) and
 `seanmontague_map.article_map_data` (`ArticleMapData`, markers + map config) —
 then computes the unified `has_map` (any geo source **or** any marker, so a
-marker-only article still gets a map). See the map/geo module split doc for which
-module owns what.
+marker-only article still gets a map). See `docs/architecture/custom-modules.md`, section "Where new map/geo code
+goes", for which module owns what.
 
 **Geofield accessor (verified):** `entity.schema_geo.lat` / `.lon` (Twig) or
 `$e->get('schema_geo')->lat` / `->lon` (PHP) returns the float **directly**.
