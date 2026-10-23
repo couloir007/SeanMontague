@@ -164,3 +164,9 @@ backup-*.tar.gz
 *.zip
 
 settings.local.php.pg-bak
+
+/public_html/error_log
+error_log
+/public_html/sites/*/settings*.php
+*.bak
+*.pg-bak
