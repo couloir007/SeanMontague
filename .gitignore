@@ -161,3 +161,4 @@ public_html/themes/custom/surface/storybook/css/Oswald-VariableFont_wght.css
 backup-*.tar.gz
 
 /vtchoice
+*.zip

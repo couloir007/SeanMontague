@@ -34,7 +34,7 @@ customisation. Read `STORYBOOK.md` before touching anything in `source/`.
 - **CMS:** Drupal 10/11 (PHP 8.4, Composer, Drush)
 - **Hosting:** AcuGIS (cPanel, shared) — no Node build on the server, so `dist/` is committed
 - **Local dev:** Lando (`drupal10` recipe, PHP 8.4) — `lando start` to start services
-- **Database:** PostgreSQL 18.6 with PostGIS in production; Lando runs PostgreSQL 17
+- **Database:** PostgreSQL 18.6 with PostGIS in production; Lando runs PostgreSQL 17; a move to MariaDB is planned
 - **Theme:** Surface — Storybook-driven pattern library, Vite build
 - **Content model:** Schema.org Blueprints (`drupal/schemadotorg`)
 - **Mapping:** Leaflet + GeoJSON, custom `trail_mapper`, `seanmontague_map`, and `map_page` modules
@@ -57,7 +57,7 @@ part of code work.
 ├── docs/                              # Architecture, reference, integrations, trail-guides (see docs/README.md)
 ├── composer.json / .lock              # Drupal + PHP dependencies
 ├── config/                            # Drupal config export (drush cex/cim)
-├── public_html/
+└── public_html/
 │   ├── modules/custom/
 │   │   ├── trail_mapper/              # GeoJSON/GPX engine, elevation, ArticleGeoData
 │   │   ├── seanmontague_map/          # Site-specific map aggregation, ArticleMapData
@@ -76,7 +76,6 @@ part of code work.
 │           │   └── patterns/          # elements/ → components/ → collections/ → layouts/
 │           ├── dist/                  # Vite build output (committed; no server build)
 │           └── templates/             # Drupal twig overrides
-└── upstream-configuration/            # Pantheon upstream
 ```
 
 ---

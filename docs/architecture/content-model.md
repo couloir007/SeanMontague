@@ -1,6 +1,6 @@
 # Content model
 
-Overview of the content types and the thinking behind them. Field-level detail for existing types lives in `schema-mappings.md` and the Drupal config (`config/sync/`). Route geometry and stats are owned by TrailMapper (see `docs/integrations/trailmapper-interface.md`), never by Drupal fields in this model.
+Overview of the content types and the thinking behind them. Field-level detail for existing types lives in `schema-mappings.md` and the Drupal config (`config/sync/`). Route geometry and live route stats are owned by TrailMapper (see `docs/integrations/trailmapper-interface.md`). Drupal stores only curated estimated times and editorial reference snapshots (see `decisions.md`).
 
 ## Philosophy
 
@@ -31,7 +31,7 @@ Not built. None of these bundles exist in `config/sync/` yet. Source: kingdom-tr
 | Article / Guide | `Article` + `HowTo` | Step-by-step rides as HowTo; editorial as Article (HowTo: open, revisit as the project evolves) |
 | Season / Condition | `Event` + `openingHoursSpecification` | Seasonal trail openings, grooming updates |
 
-POIs and Local Businesses need indexable pages; whether they stay geo_entity or become node bundles is pending the geo_entity canonical-route check.
+Anything that needs a public page is a node; geo_entity is for map markers without pages. Indexable POIs and Local Businesses will be node bundles; existing geo_entity:poi records stay as trip map markers.
 
 The `hasPart` / `isPartOf` relationship between Zone, Trail and Segment gives a machine-readable hierarchy of the whole network. See `docs/reference/darling-hill-technical-spec.md` for a historical worked example of the field model.
 

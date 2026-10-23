@@ -30,7 +30,7 @@ Status: **Proposed.** TrailMapper owns trail data and route stats. This site dis
 | `GET /status/{area}` | Closures, with source and as-of date |
 | `GET /places/{id}` | Gazetteer place, aliases, QID, geometry, site or area |
 
-The base URL, authentication, and transport are undecided. They depend on the open question about where the planner runs.
+Transport is HTTPS and authentication is an API key kept in server-local settings (see `decisions.md`, "TrailMapper stays a separate system"). The base URL depends on where TrailMapper hosts the API, which is still open. Drupal fetches on cron and serves from cache with an as-of date.
 
 ## JSON-LD mapping
 

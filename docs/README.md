@@ -15,6 +15,7 @@
 | `architecture/content-model.md` | Content-model philosophy and the planned Kingdom Trails types (ride guide, trail, zone, POI) with build sequence. |
 | `architecture/schema-mappings.md` | Schema.org Blueprints field model, shared-storage rule, JSON-LD notes, planned sub-modules. |
 | `architecture/tourist-destination.md` | The `tourist_destination` node type: fields, JSON-LD, planning map, template. |
+| `architecture/custom-modules.md` | Current state of the seven custom modules: services, routes, hooks, known problems, and where new map/geo code goes. |
 | `architecture/decisions.md` | Settled decisions and their reasons (templates, map services, metric storage, git, builds). |
 
 ## integrations/
@@ -45,6 +46,8 @@
 | `trail-guides/trail-journal-guidelines.md` | Voice and formatting rules for trail reports and adventure writing. |
 | `trail-guides/voice-and-sensibility.md` | Who Sean is and the site's sensibility. |
 
-## _to_delete/
+## Top-level
 
-Superseded or merged originals, held for manual removal: `HERO-MAP-FIX.md`, `SEAN.md`, `SESSION-CONTEXT-2026-04-24.md`, `TOURIST-DESTINATION.md`, `kingdom-trails-strategy.md`, `source-REFACTOR-NOTES.md`, `surface-source-CLAUDE.md`.
+| File | What it covers |
+|---|---|
+| `learnings.md` | Hosting, environment, doc drift, and open security items not covered elsewhere. |

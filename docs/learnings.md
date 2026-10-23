@@ -11,7 +11,7 @@ Lives in `docs/`; the Claude project copy is refreshed from it. Entries marked *
 - The repo `README.md` is one heading, `# roundybrookfarm`, and carries no project information.
 
 ## Security and config
-- `external_pg` credentials (`external_pg` is deprecated; see decisions.md): verified hardcoded in `ExternalPgService.php` (2026-10-22 module snapshot), with a private LAN host, and the constructor echoes a connection message. Rule: credentials belong in `settings.lando.php` locally (root `CLAUDE.md`: never edit `settings.php` directly) and never in code or knowledge docs. The password has been in the repo, so rotate it if it's used anywhere else. **[GAP]** Production is AcuGIS. A LAN host is unreachable from it, and credentials go in the server's `settings.local.php`, outside the repo.
+- `external_pg` credentials (`external_pg` is deprecated; see decisions.md): verified hardcoded in `ExternalPgService.php` (2026-10-22 module snapshot), with a private LAN host, and the constructor echoes a connection message. Rule: credentials belong in `settings.lando.php` locally (root `CLAUDE.md`: never edit `settings.php` directly) and never in code or knowledge docs. The password has been in the repo, so rotate it if it's used anywhere else. Production is AcuGIS, which can't reach a LAN host, so `external_pg` can't work in production; it's deprecated in favor of the TrailMapper API. Until it's deleted, any credentials belong in the server's `settings.local.php`, outside the repo.
 
 ## Hosting
 - AcuGIS uses CloudLinux PHP Selector. Web PHP is set per directory, and the CLI default differs, so run Drush and Composer on the server through `/opt/alt/php84/usr/bin/php`.
