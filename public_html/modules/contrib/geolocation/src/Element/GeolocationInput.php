@@ -3,6 +3,7 @@
 namespace Drupal\geolocation\Element;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element\FormElementBase;
 
 /**
@@ -16,9 +17,8 @@ use Drupal\Core\Render\Element\FormElementBase;
  *   '#description' => $this->t('Form element type "geolocation_input"'),
  * ];
  * @endcode
- *
- * @FormElement("geolocation_input")
  */
+#[FormElement('geolocation_input')]
 class GeolocationInput extends FormElementBase {
 
   /**

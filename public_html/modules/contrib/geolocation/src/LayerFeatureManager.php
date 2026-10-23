@@ -241,8 +241,15 @@ class LayerFeatureManager extends DefaultPluginManager {
       $values = NestedArray::getValue($values, $parents);
     }
 
+    if (empty($values)) {
+      return;
+    }
+
     foreach ($values as $feature_id => $feature_settings) {
-      if (!$feature_settings['enabled']) {
+      // Switching the map provider leaves the previous provider's values
+      // behind, and unchecked checkboxes are not submitted at all, so the
+      // enabled flag cannot be relied on to be present.
+      if (empty($feature_settings['enabled'])) {
         continue;
       }
 

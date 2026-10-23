@@ -3,7 +3,7 @@ import { LeafletMapFeature } from "./LeafletMapFeature.js";
 /**
  * @typedef {Object} ControlFullscreenSettings
  *
- * @extends {GeolocationMapFeatureSettings}
+ * @augments {GeolocationMapFeatureSettings}
  *
  * @prop {String} position
  */

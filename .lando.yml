@@ -12,7 +12,7 @@ proxy:
 
 services:
   appserver:
-    type: php:8.4
+    type: php:8.3
     webroot: public_html
     via: apache
     overrides:

@@ -89,7 +89,7 @@ abstract class DataProviderBase extends PluginBase implements DataProviderInterf
       $settings = $this->configuration;
     }
 
-    return array_merge($this->defaultSettings(), array_filter($settings));
+    return array_merge($this->defaultSettings(), array_filter($settings, fn ($value) => !is_null($value)));
   }
 
   /**

@@ -1,0 +1,14 @@
+name: 'Geolocation MapLibre Test'
+type: module
+description: 'Serves a self contained style, so that map tests need no tile service.'
+package: Testing
+core_version_requirement: ^10 || ^11 || ^12
+dependencies:
+  - geolocation:geolocation
+  - geolocation:geolocation_maplibre
+hidden: true
+
+# Information added by Drupal.org packaging script on 2026-10-20
+version: '4.1.0'
+project: 'geolocation'
+datestamp: 1792500158

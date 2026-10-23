@@ -3,7 +3,7 @@ import { LeafletLayerFeature } from "./LeafletLayerFeature.js";
 /**
  * @typedef {Object} LeafletMarkerPopupSettings
  *
- * @extends {GeolocationMapFeatureSettings}
+ * @augments {GeolocationMapFeatureSettings}
  *
  * @prop {Boolean} info_auto_display
  * @prop {Number} max_width
@@ -24,7 +24,7 @@ export default class LeafletMarkerPopup extends LeafletLayerFeature {
   onMarkerAdded(marker) {
     super.onMarkerAdded(marker);
 
-    const content = marker.getContent();
+    const content = marker.getContentElement() ?? marker.getContent();
 
     if (!content) {
       return;
@@ -49,12 +49,14 @@ export default class LeafletMarkerPopup extends LeafletLayerFeature {
 
   /**
    * @param {GeolocationShape} shape
+   *   Shape that was added.
    * @param {L.geojson.GeometryObject[]} shape.leafletShapes
+   *   Leaflet geometries backing the shape.
    */
   onShapeAdded(shape) {
     super.onShapeAdded(shape);
 
-    const content = shape.getContent();
+    const content = shape.getContentElement() ?? shape.getContent();
 
     if (!content) {
       return;

@@ -6,12 +6,15 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\geolocation\FilterFormatProvider;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Token Formatter functionality.
  *
  * @group geolocation
  */
+#[RunTestsInSeparateProcesses]
 class GeolocationTokenFormatterTest extends GeolocationJavascriptTestBase {
 
   /**
@@ -89,7 +92,7 @@ class GeolocationTokenFormatterTest extends GeolocationJavascriptTestBase {
         'settings' => [
           'tokenized_text' => [
             'value' => 'Title: [geolocation_current_item:data:title] Lat/Lng: [geolocation_current_item:lat]/[geolocation_current_item:lng]',
-            'format' => filter_default_format(),
+            'format' => FilterFormatProvider::getDefaultFormatId(),
           ],
         ],
         'weight' => 1,

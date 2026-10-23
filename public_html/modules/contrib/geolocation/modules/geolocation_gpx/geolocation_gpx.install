@@ -5,6 +5,7 @@
  * Sth sth dark side.
  */
 
+use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 
 /**
@@ -25,4 +26,61 @@ function geolocation_gpx_requirements(string $phase): array {
   }
 
   return $requirements;
+}
+
+/**
+ * Add missing file and ownership columns to GPX fields.
+ */
+function geolocation_gpx_update_10001(): void {
+  $columns = [
+    'gpx_file_id' => [
+      'description' => 'GPX File',
+      'type' => 'int',
+      'size' => 'big',
+      'not null' => FALSE,
+    ],
+    'gpx_owned' => [
+      'description' => 'Whether removing this item deletes the referenced GPX. Nullable, as items written before this column existed - and any written programmatically - predate the choice and are treated as owning.',
+      'type' => 'int',
+      'size' => 'tiny',
+      'not null' => FALSE,
+    ],
+  ];
+
+  $entity_type_manager = \Drupal::entityTypeManager();
+  $schema = \Drupal::database()->schema();
+  $storage_schema = \Drupal::keyValue('entity.storage_schema.sql');
+
+  /** @var \Drupal\field\FieldStorageConfigInterface $field_storage */
+  foreach ($entity_type_manager->getStorage('field_storage_config')->loadByProperties(['type' => 'geolocation_gpx']) as $field_storage) {
+    $entity_type_id = $field_storage->getTargetEntityTypeId();
+    $entity_storage = $entity_type_manager->getStorage($entity_type_id);
+    if (!$entity_storage instanceof SqlContentEntityStorage) {
+      continue;
+    }
+
+    /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
+    $table_mapping = $entity_storage->getTableMapping();
+    $tables = [$table_mapping->getDedicatedDataTableName($field_storage)];
+    if ($entity_storage->getEntityType()->isRevisionable()) {
+      $tables[] = $table_mapping->getDedicatedRevisionTableName($field_storage);
+    }
+
+    $key = $entity_type_id . '.field_schema_data.' . $field_storage->getName();
+    $field_schema_data = $storage_schema->get($key, []);
+
+    foreach ($columns as $property => $column) {
+      $column_name = $table_mapping->getFieldColumnName($field_storage, $property);
+      foreach ($tables as $table) {
+        if ($schema->tableExists($table) && !$schema->fieldExists($table, $column_name)) {
+          $schema->addField($table, $column_name, $column);
+        }
+        if (isset($field_schema_data[$table])) {
+          $field_schema_data[$table]['fields'][$column_name] = $column;
+        }
+      }
+    }
+
+    $storage_schema->set($key, $field_schema_data);
+  }
 }

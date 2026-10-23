@@ -13,8 +13,8 @@ import { LeafletCircle } from "../LeafletCircle.js";
 /**
  * @typedef LeafletSettings
  *
- * @extends GeolocationMapSettings
- * @extends L.MapOptions
+ * @augments GeolocationMapSettings
+ * @augments L.MapOptions
  */
 
 /**
@@ -33,6 +33,16 @@ export default class Leaflet extends GeolocationMapBase {
     this.container.style.width = this.settings.width ?? "100%";
   }
 
+  onResize() {
+    this.leafletMap?.invalidateSize();
+  }
+
+  destroy() {
+    super.destroy();
+
+    this.leafletMap?.remove();
+  }
+
   initialize() {
     return super.initialize().then(() => {
       return new Promise((resolve) => {
@@ -44,7 +54,7 @@ export default class Leaflet extends GeolocationMapBase {
           doubleClickZoom: this.settings.doubleClickZoom ?? true,
           zoom: this.settings.zoom ?? 10,
           minZoom: this.settings.minZoom ?? 0,
-          maxZoom: this.settings.maxZoom ?? 20,
+          maxZoom: this.settings.maxZoom || undefined,
           zoomControl: this.settings.zoomControl ?? false,
           preferCanvas: this.settings.preferCanvas ?? false,
           zoomSnap: this.settings.zoomSnap ?? 1,
@@ -74,7 +84,6 @@ export default class Leaflet extends GeolocationMapBase {
         this.leafletMap = L.map(this.container, mapOptions);
 
         this.markerLayer = L.layerGroup().addTo(this.leafletMap);
-        this.tileLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(this.leafletMap);
 
         resolve();
       }).then(() => {
@@ -168,12 +177,10 @@ export default class Leaflet extends GeolocationMapBase {
 
     const group = new L.featureGroup(leafletMarkers);
 
-    return this.normalizeBoundaries(group.getBounds());
+    return this.normalizeBoundaries(group.getBounds()) || null;
   }
 
   getShapeBoundaries(shapes) {
-    super.getShapeBoundaries(shapes);
-
     shapes = shapes || this.dataLayers.get("default").shapes;
     if (!shapes.length) {
       return null;
@@ -186,7 +193,9 @@ export default class Leaflet extends GeolocationMapBase {
 
     const group = new L.featureGroup(leafletShapes);
 
-    return this.normalizeBoundaries(group.getBounds());
+    // A shape whose layers never made it onto the map contributes nothing
+    // here, so the coordinates it holds have the last word.
+    return this.normalizeBoundaries(group.getBounds()) || super.getShapeBoundaries(shapes);
   }
 
   getBoundaries() {
@@ -234,6 +243,12 @@ export default class Leaflet extends GeolocationMapBase {
     }
 
     if (boundaries instanceof L.LatLngBounds) {
+      // A group holding nothing yields boundaries without corners, which
+      // cannot be read.
+      if (!boundaries.isValid()) {
+        return false;
+      }
+
       return new GeolocationBoundaries({
         north: boundaries.getNorth(),
         east: boundaries.getEast(),
@@ -271,11 +286,31 @@ export default class Leaflet extends GeolocationMapBase {
     return null;
   }
 
+  /**
+   * @param {String?} position
+   *   Requested control position.
+   * @param {String} fallback
+   *   Position to use if the requested one is none of Leaflet's.
+   *
+   * @return {String}
+   *   Leaflet control position.
+   */
+  getLeafletPosition(position = null, fallback = "topleft") {
+    // Leaflet looks the position up in its control corners, so anything else -
+    // a position stored for another map provider, most of all - takes the map
+    // down with it.
+    if (!["topleft", "topright", "bottomleft", "bottomright"].includes(position)) {
+      return fallback;
+    }
+
+    return position;
+  }
+
   addControl(element) {
     this.controls = this.controls || [];
     const controlElement = new (L.Control.extend({
       options: {
-        position: typeof element.dataset.mapControlPosition === "undefined" ? "topleft" : element.dataset.mapControlPosition,
+        position: this.getLeafletPosition(element.dataset.mapControlPosition ?? null),
       },
       onAdd: () => {
         element.style.display = "block";
@@ -295,9 +330,25 @@ export default class Leaflet extends GeolocationMapBase {
   }
 
   loadTileLayer(layerId, layerSettings) {
-    const layer = L.tileLayer(layerSettings.url, {
+    const options = {
       attribution: layerSettings.attribution,
-    }).addTo(this.leafletMap);
+      zIndex: layerSettings.overlay ? 10 : 1,
+    };
+    if (layerSettings.min_zoom) {
+      options.minZoom = layerSettings.min_zoom;
+    }
+    if (layerSettings.max_zoom) {
+      options.maxNativeZoom = layerSettings.max_zoom;
+      options.maxZoom = Math.max(layerSettings.max_zoom, this.settings.maxZoom || 0);
+    }
+    if (layerSettings.bounds) {
+      options.bounds = layerSettings.bounds;
+    }
+    if (layerSettings.opacity) {
+      options.opacity = layerSettings.opacity;
+    }
+
+    const layer = L.tileLayer(layerSettings.url, options).addTo(this.leafletMap);
 
     if (layer) {
       this.tileLayers.set(layerId, layer);

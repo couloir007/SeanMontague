@@ -13,7 +13,7 @@ import { BaiduCircle } from "../BaiduCircle.js";
 /**
  * @typedef BaiduMapSettings
  *
- * @extends GeolocationMapSettings
+ * @augments GeolocationMapSettings
  *
  * @prop {String} baidu_api_url
  * @prop {MapOptions} baidu_settings
@@ -27,7 +27,7 @@ import { BaiduCircle } from "../BaiduCircle.js";
  */
 export default class Baidu extends GeolocationMapBase {
   /**
-   * @constructor
+   * @class
    *
    * @param {BaiduMapSettings} mapSettings
    *   Settings.
@@ -42,6 +42,12 @@ export default class Baidu extends GeolocationMapBase {
     this.container.style.width = this.settings.baidu_settings.width;
   }
 
+  destroy() {
+    super.destroy();
+
+    this.baiduMap?.destroy();
+  }
+
   initialize() {
     return super
       .initialize()
@@ -53,7 +59,9 @@ export default class Baidu extends GeolocationMapBase {
       .then(() => {
         return new Promise((resolve) => {
           this.baiduMap = new BMapGL.Map(this.container, this.settings.baidu_settings);
-          this.baiduMap.centerAndZoom(new BMapGL.Point(this.settings.lng, this.settings.lat), this.settings.zoom ?? 2);
+          // BMapGL is unusable until centerAndZoom() ran. Map center plugins
+          // apply the real center afterwards, so lat/lng are usually unset.
+          this.baiduMap.centerAndZoom(new BMapGL.Point(this.settings.lng ?? 0, this.settings.lat ?? 0), this.settings.baidu_settings.zoom ?? 2);
           resolve();
         }).then(() => {
           return new Promise((resolve) => {
@@ -81,8 +89,6 @@ export default class Baidu extends GeolocationMapBase {
             });
 
             this.baiduMap.addEventListener("moveend", () => {
-              this.updatingBounds = false;
-
               this.features.forEach((feature) => {
                 feature.onMapIdle();
               });
@@ -197,8 +203,8 @@ export default class Baidu extends GeolocationMapBase {
     return this;
   }
 
-  getZoom() {
-    this.baiduMap.getZoom();
+  async getZoom() {
+    return this.baiduMap.getZoom();
   }
 
   setZoom(zoom, defer) {
@@ -250,7 +256,7 @@ export default class Baidu extends GeolocationMapBase {
     }
 
     if (boundaries instanceof GeolocationBoundaries) {
-      return new BMapGL.Bounds(new BMapGL.Point(boundaries.east, boundaries.north), new BMapGL.Point(boundaries.west, boundaries.south));
+      return new BMapGL.Bounds(new BMapGL.Point(boundaries.west, boundaries.south), new BMapGL.Point(boundaries.east, boundaries.north));
     }
 
     return false;
@@ -279,7 +285,8 @@ export default class Baidu extends GeolocationMapBase {
   }
 
   loadTileLayer(layerId, layerSettings) {
-    const layer = new BMapGL.TileLayer();
+    // Overlay tiles have to composite over the base map instead of hiding it.
+    const layer = new BMapGL.TileLayer({ transparentPng: !!layerSettings.overlay });
 
     layer.getTilesUrl = (tileCoord, zoom) => {
       const offset = 2 ** (zoom - 1);
@@ -292,6 +299,8 @@ export default class Baidu extends GeolocationMapBase {
     this.baiduMap.addTileLayer(layer);
 
     this.tileLayers.set(layerId, layer);
+
+    return layer;
   }
 
   unloadTileLayer(layerId) {
@@ -301,5 +310,7 @@ export default class Baidu extends GeolocationMapBase {
 
     const layer = this.tileLayers.get(layerId);
     this.baiduMap.removeTileLayer(layer);
+
+    this.tileLayers.delete(layerId);
   }
 }

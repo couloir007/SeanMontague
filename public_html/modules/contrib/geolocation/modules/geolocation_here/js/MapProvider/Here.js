@@ -4,16 +4,12 @@ import { GeolocationBoundaries } from "../../../../js/Base/GeolocationBoundaries
 import { HereMapMarker } from "../HereMapMarker.js";
 
 /**
- * @prop {string} drupalSettings.geolocation.hereMapsAppId
- * @prop {string} drupalSettings.geolocation.hereMapsAppCode
- */
-
-/**
  * @typedef HereMapSettings
  *
- * @extends GeolocationMapSettings
+ * @augments GeolocationMapSettings
  *
  * @prop {MapOptions} here_settings
+ * @prop {string} here_settings.api_key
  */
 
 /**
@@ -35,27 +31,37 @@ export default class Here extends GeolocationMapBase {
     }
   }
 
+  onResize() {
+    this.hereMap?.getViewPort().resize();
+  }
+
+  destroy() {
+    super.destroy();
+
+    this.hereMap?.dispose();
+  }
+
   initialize() {
     return (
       super
         .initialize()
         // These scripts have to be loaded in order. Else they fail. *Shrug*
         .then(() => {
-          return Drupal.geolocation.addScript("https://js.api.here.com/v3/3.1/mapsjs-core.js");
+          return Drupal.geolocation.addScript("https://js.api.here.com/v3/3.2/mapsjs-core.js");
         })
         .then(() => {
-          return Drupal.geolocation.addScript("https://js.api.here.com/v3/3.1/mapsjs-service.js");
+          return Drupal.geolocation.addScript("https://js.api.here.com/v3/3.2/mapsjs-service.js");
         })
         .then(() => {
-          return Drupal.geolocation.addScript("https://js.api.here.com/v3/3.1/mapsjs-mapevents.js");
+          return Drupal.geolocation.addScript("https://js.api.here.com/v3/3.2/mapsjs-mapevents.js");
         })
         .then(() => {
-          return Drupal.geolocation.addScript("https://js.api.here.com/v3/3.1/mapsjs-ui.js");
+          return Drupal.geolocation.addScript("https://js.api.here.com/v3/3.2/mapsjs-ui.js");
         })
         .then(() => {
           return new Promise((resolve) => {
             const platform = new H.service.Platform({
-              apikey: "8uBFTG24EHZR5NGnVl7keO6FSEBwE5tFZLhb2qqRSQ4",
+              apikey: this.settings.here_settings.api_key,
             });
 
             const defaultLayers = platform.createDefaultLayers();
@@ -102,8 +108,6 @@ export default class Here extends GeolocationMapBase {
               });
 
               this.hereMap.addEventListener("dragend", () => {
-                this.updatingBounds = false;
-
                 this.features.forEach((feature) => {
                   feature.onMapIdle();
                 });
@@ -138,8 +142,8 @@ export default class Here extends GeolocationMapBase {
     const shape = super.createShapeLine(geometry, settings);
 
     const lineString = new H.geo.LineString();
-    geometry.points.forEach((point) => {
-      lineString.pushPoint({ lat: point.lat, lng: point.lng });
+    geometry.coordinates.forEach((position) => {
+      lineString.pushPoint({ lat: position[1], lng: position[0] });
     });
 
     const line = new H.map.Polyline(lineString, {
@@ -160,8 +164,8 @@ export default class Here extends GeolocationMapBase {
     const shape = super.createShapePolygon(geometry, settings);
 
     const lineString = new H.geo.LineString();
-    geometry.points.forEach((point) => {
-      lineString.pushPoint({ lat: point.lat, lng: point.lng });
+    geometry.coordinates[0].forEach((position) => {
+      lineString.pushPoint({ lat: position[1], lng: position[0] });
     });
 
     const polygon = new H.map.Polygon(lineString, {
@@ -238,8 +242,8 @@ export default class Here extends GeolocationMapBase {
     return this;
   }
 
-  getZoom() {
-    this.hereMap.getZoom();
+  async getZoom() {
+    return this.hereMap.getZoom();
   }
 
   setZoom(zoom, defer) {

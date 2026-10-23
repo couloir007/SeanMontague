@@ -1,0 +1,14 @@
+services:
+  geolocation_search_api.elasticsearch_mapping:
+    class: Drupal\geolocation_search_api\EventSubscriber\ElasticSearchMappingSubscriber
+    tags:
+      - { name: event_subscriber }
+  geolocation_search_api.elasticsearch_query:
+    class: Drupal\geolocation_search_api\EventSubscriber\ElasticSearchQuerySubscriber
+    tags:
+      - { name: event_subscriber }
+  geolocation_search_api.elasticsearch_results:
+    class: Drupal\geolocation_search_api\EventSubscriber\ElasticSearchResultsSubscriber
+    arguments: ['@search_api.fields_helper']
+    tags:
+      - { name: event_subscriber }

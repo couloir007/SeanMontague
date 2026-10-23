@@ -4,12 +4,14 @@ namespace Drupal\Tests\geolocation_leaflet\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\geolocation\GeocoderManager;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the new entity API for the geolocation field type.
  *
  * @group geolocation
  */
+#[RunTestsInSeparateProcesses]
 class NominatimTest extends KernelTestBase {
 
   /**

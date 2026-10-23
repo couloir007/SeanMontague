@@ -91,9 +91,9 @@ trait ProximityTrait {
     $field_latcos = "$table_name.{$field_id}_lat_cos";
     $field_lng    = "$table_name.{$field_id}_lng_rad";
 
-    // deg2rad() is sensitive to empty strings. Replace with integer zero.
-    $filter_lat = empty($filter_lat) ? 0 : $filter_lat;
-    $filter_lng = empty($filter_lng) ? 0 : $filter_lng;
+    // deg2rad() rejects empty and non-numeric strings outright.
+    $filter_lat = (float) $filter_lat;
+    $filter_lng = (float) $filter_lng;
 
     // Pre-calculate filter values.
     $filter_latcos = cos(deg2rad($filter_lat));

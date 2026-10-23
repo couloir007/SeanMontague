@@ -10,7 +10,8 @@ export class BaiduMapMarker extends GeolocationMapMarker {
     super(coordinates, settings, map);
 
     const baiduMarkerSettings = {
-      title: this.settings.title,
+      // BMapGL.Marker reads title.length, so it must never be undefined.
+      title: this.settings.title ?? "",
     };
 
     if (this.settings.icon) {
@@ -20,11 +21,11 @@ export class BaiduMapMarker extends GeolocationMapMarker {
     this.baiduMarker = new BMapGL.Marker(new BMapGL.Point(coordinates.lng, coordinates.lat), baiduMarkerSettings);
 
     if (this.settings.label) {
-      this.baiduMarker.setLabel(new BMapGL.Label(this.settings.label));
+      this.baiduMarker.setLabel(new BMapGL.Label(Drupal.checkPlain(String(this.settings.label))));
     }
 
     this.baiduMarker.addEventListener("click", () => {
-      this.click();
+      this.onClick();
     });
 
     if (this.settings.draggable) {
@@ -48,11 +49,20 @@ export class BaiduMapMarker extends GeolocationMapMarker {
       this.baiduMarker.setTitle(this.settings.title);
     }
     if (this.settings.label) {
-      this.baiduMarker.setLabel(new BMapGL.Label(this.settings.label));
+      this.baiduMarker.setLabel(new BMapGL.Label(Drupal.checkPlain(String(this.settings.label))));
     }
     if (this.settings.icon) {
       this.baiduMarker.setIcon(new BMapGL.Icon(this.settings.icon, new BMapGL.Size(300, 157)));
     }
+  }
+
+  /**
+   * Click the marker through Baidu's own click event, like a real click.
+   */
+  click() {
+    super.click();
+
+    this.baiduMarker.dispatchEvent(new BMapGL.Event("onclick"));
   }
 
   remove() {

@@ -1,7 +1,7 @@
 /**
  * @typedef {Object} LeafletMarkerIconSettings
  *
- * @extends {GeolocationMapFeatureSettings}
+ * @augments {GeolocationMapFeatureSettings}
  *
  * @prop {String} marker_icon_path
  * @prop {Array} icon_size

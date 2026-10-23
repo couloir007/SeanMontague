@@ -22,9 +22,13 @@
   Drupal.behaviors.geolocationWidget = {
     /**
      * @param {Document} context
+     *   The context to attach to.
      * @param {Object} drupalSettings
+     *   Drupal settings.
      * @param {Object} drupalSettings.geolocation
+     *   Geolocation settings.
      * @param {WidgetSettings[]} drupalSettings.geolocation.widgetSettings
+     *   Widget settings keyed by widget ID.
      */
     attach: (context, drupalSettings) => {
       context.querySelectorAll(".geolocation-map-widget").forEach((form) => {

@@ -1,0 +1,7 @@
+field.widget.settings.geolocation_geometry_terra_draw:
+  type: geolocation.field.widget.map.base
+  label: 'Geolocation Geometry Terra Draw Widget settings'
+
+field.widget.settings.geolocation_geometry_terra_draw_multi:
+  type: geolocation.field.widget.map.base
+  label: 'Geolocation Geometry Terra Draw Multi Widget settings'

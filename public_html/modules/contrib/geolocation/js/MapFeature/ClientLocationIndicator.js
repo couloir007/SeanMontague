@@ -21,7 +21,7 @@ export default class ClientLocationIndicator extends GeolocationMapFeature {
     /** @type {GeolocationCoordinates} */
     let currentCoordinates;
 
-    setInterval(() => {
+    this.interval = setInterval(() => {
       navigator.geolocation.getCurrentPosition((currentPosition) => {
         currentCoordinates = new GeolocationCoordinates(currentPosition.coords.latitude, currentPosition.coords.longitude);
 
@@ -42,5 +42,11 @@ export default class ClientLocationIndicator extends GeolocationMapFeature {
         }
       });
     }, 20000);
+  }
+
+  destroy() {
+    super.destroy();
+
+    clearInterval(this.interval);
   }
 }

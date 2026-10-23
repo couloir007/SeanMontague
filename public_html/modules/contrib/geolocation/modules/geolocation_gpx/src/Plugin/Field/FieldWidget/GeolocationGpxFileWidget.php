@@ -2,26 +2,17 @@
 
 namespace Drupal\geolocation_gpx\Plugin\Field\FieldWidget;
 
-use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\file\Entity\File;
 use Drupal\geolocation_gpx\Entity\GeolocationGpx;
-use Drupal\geolocation_gpx\Entity\GeolocationGpxLink;
-use Drupal\geolocation_gpx\Entity\GeolocationGpxRoute;
-use Drupal\geolocation_gpx\Entity\GeolocationGpxTrack;
-use Drupal\geolocation_gpx\Entity\GeolocationGpxTrackSegment;
-use Drupal\geolocation_gpx\Entity\GeolocationGpxWaypoint;
-use phpGPX\Models\GpxFile;
-use phpGPX\Models\Link;
-use phpGPX\Models\Point;
-use phpGPX\Models\Route;
-use phpGPX\Models\Segment;
-use phpGPX\Models\Track;
-use phpGPX\phpGPX;
+use Drupal\geolocation_gpx\Plugin\Field\FieldType\GeolocationGpx as GeolocationGpxItem;
+use Drupal\geolocation_gpx\GeolocationGpxImporter;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a custom field widget.
@@ -34,28 +25,50 @@ use phpGPX\phpGPX;
 class GeolocationGpxFileWidget extends WidgetBase {
 
   /**
-   * Entity Type Manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected EntityTypeManagerInterface $entityTypeManager;
-
-  /**
    * Constructor.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings) {
-    $this->entityTypeManager = \Drupal::entityTypeManager();
-
+  public function __construct(
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    array $third_party_settings,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected GeolocationGpxImporter $importer,
+  ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function formElement(FieldItemListInterface $items, $delta, Array $element, Array &$form, FormStateInterface $form_state): array {
-    $gpx_id = $items[$delta]->gpx_id ?? NULL;
-    $gpx_file_id = $items[$delta]->gpx_file_id ?? NULL;
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+    return new static(
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['third_party_settings'],
+      $container->get('entity_type.manager'),
+      $container->get('geolocation_gpx.importer'),
+    );
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function formElement(FieldItemListInterface $items, $delta, Array $element, Array &$form, FormStateInterface $form_state): array {
+    $item = $items[$delta];
+    $gpx_id = $item->gpx_id ?? NULL;
+    $gpx_file_id = $item->gpx_file_id ?? NULL;
+
+    // Two alternative sources plus their dependency switch read as one thing,
+    // and a multi-value field would otherwise run them together.
+    $element += [
+      '#type' => 'fieldset',
+    ];
+
+    $gpx = NULL;
     if ($gpx_id) {
       /** @var \Drupal\geolocation_gpx\Entity\GeolocationGpx|null $gpx */
       $gpx = $this->entityTypeManager->getStorage('geolocation_gpx')->load($gpx_id) ?? NULL;
@@ -70,9 +83,47 @@ class GeolocationGpxFileWidget extends WidgetBase {
       '#default_value' => $gpx_file_id ? [$gpx_file_id] : NULL,
       '#upload_location' => 'public://uploads/',
       '#upload_validators' => [
-        'file_validate_extensions' => ['gpx xml'],
+        'FileExtension' => ['extensions' => 'gpx xml'],
       ],
       '#description' => $this->t('Allowed file types: <i>gpx, xml</i>. The uploaded file will be parsed and the structure imported, <b>replacing</b> any existing.'),
+    ];
+
+    $element['or'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      '#value' => $this->t('- or -'),
+      '#attributes' => [
+        'class' => ['geolocation-gpx-widget-or'],
+      ],
+    ];
+
+    // A GPX that came out of an upload belongs to the file above, so only an
+    // item without a file is showing a GPX that was referenced by hand.
+    $element['gpx_reference'] = [
+      '#type' => 'entity_autocomplete',
+      '#target_type' => 'geolocation_gpx',
+      '#title' => $this->t('Existing GPX'),
+      '#default_value' => $gpx_file_id ? NULL : $gpx,
+      '#description' => $this->t('Reference a GPX data set that already exists, instead of importing one. Ignored if a file is uploaded as well.'),
+    ];
+
+    $parents = $element['#field_parents'];
+    $parents[] = $this->fieldDefinition->getName();
+    $selector = $root = array_shift($parents);
+    if ($parents) {
+      $selector = $root . '[' . implode('][', $parents) . ']';
+    }
+
+    $element['gpx_owned'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Delete the referenced GPX along with this item'),
+      '#default_value' => ($gpx_id && !$gpx_file_id && $item instanceof GeolocationGpxItem) ? $item->isOwning() : FALSE,
+      '#description' => $this->t('The referenced GPX is otherwise left alone when it is removed here, as it may well be in use elsewhere. An imported file is always deleted with its item.'),
+      '#states' => [
+        'visible' => [
+          ':input[name="' . $selector . '[' . $delta . '][gpx_reference]"]' => ['filled' => TRUE],
+        ],
+      ],
     ];
 
     return $element;
@@ -102,239 +153,97 @@ class GeolocationGpxFileWidget extends WidgetBase {
 
     foreach ($values as $delta => &$value) {
       $old_item = $old_items->get($delta);
-      $old_file_id = $old_item->getValue()['gpx_file_id'] ?? NULL;
-      $old_gpx_id = $old_item->getValue()['gpx_id'] ?? NULL;
+      $old_value = $old_item?->getValue() ?? [];
+      $old_file_id = $old_value['gpx_file_id'] ?? NULL;
+      $old_gpx_id = $old_value['gpx_id'] ?? NULL;
+      $old_owned = $old_item?->isOwning() ?? TRUE;
 
-      if (empty($value['gpx_file_id'])) {
-        if ($old_file_id) {
-          File::load($old_file_id)?->delete();
-        }
-        if ($old_gpx_id) {
-          GeolocationGpx::load($old_gpx_id)?->delete();
-        }
+      // Neither is a stored column, both only ever exist in the widget.
+      unset($value['summary']);
+      $reference_id = $value['gpx_reference'] ?: NULL;
+      unset($value['gpx_reference']);
+
+      $new_file_id = $value['gpx_file_id'][0] ?? NULL;
+      $value['gpx_file_id'] = $new_file_id;
+
+      if (!$new_file_id && !$reference_id) {
+        $this->release($old_file_id, $old_gpx_id, $old_owned);
+
+        $value['gpx_id'] = NULL;
+        $value['gpx_owned'] = NULL;
         continue;
       }
 
-      if ($value['summary']) {
-        unset($value['summary']);
-      }
-      $value['gpx_file_id'] = $value['gpx_file_id'][0];
+      // An existing GPX was picked and no file was given, so nothing has to be
+      // imported. Whether it may be deleted again is the user's call here.
+      if (!$new_file_id) {
+        // Anything the item held before is let go, except the very GPX now
+        // being referenced.
+        $this->release($old_file_id, $old_gpx_id == $reference_id ? NULL : $old_gpx_id, $old_owned);
 
-      $new_gpx_file = File::load($value['gpx_file_id']);
+        $value['gpx_id'] = $reference_id;
+        $value['gpx_owned'] = (int) !empty($value['gpx_owned']);
+        continue;
+      }
+
+      if ($reference_id) {
+        \Drupal::messenger()->addWarning($this->t('A GPX file and an existing GPX were both given. The file takes precedence, the reference was discarded.'));
+      }
+
+      // The file was not touched, so there is nothing to import. Keep the
+      // existing GPX entity instead of replacing it, or every save of the
+      // host entity would discard both the uploaded file and any edits made
+      // to the imported structure.
+      if ($old_gpx_id && $new_file_id == $old_file_id) {
+        $value['gpx_id'] = $old_gpx_id;
+        $value['gpx_owned'] = (int) $old_owned;
+        continue;
+      }
+
+      $new_gpx_file = File::load($new_file_id);
 
       try {
-        $gpxFile = (new phpGPX())->load($new_gpx_file->getFileUri());
+        $gpxFile = $this->importer->parse($new_gpx_file->getFileUri());
       }
       catch (\Exception $e) {
         $value['gpx_file_id'] = $old_file_id;
         $value['gpx_id'] = $old_gpx_id;
-        \Drupal::messenger()->addWarning('Could not instantiate GPX file: ' . $e->getMessage() . '. Reset to previous value.');
+        $value['gpx_owned'] = (int) $old_owned;
+        \Drupal::messenger()->addWarning($this->t('Could not import GPX file: @message Reset to previous value.', [
+          '@message' => $e->getMessage(),
+        ]));
         continue;
       }
 
-      if ($old_file_id) {
-        File::load($old_file_id)?->delete();
-      }
-      if ($old_gpx_id) {
-        GeolocationGpx::load($old_gpx_id)?->delete();
-      }
+      $this->release($old_file_id, $old_gpx_id, $old_owned);
 
-      $gpx = $this->gpxByData($gpxFile);
-
-      $value['gpx_id'] = $gpx->id();
+      $value['gpx_id'] = $this->importer->import($gpxFile, $new_gpx_file->getFilename())->id();
+      // A GPX imported here exists for this item alone.
+      $value['gpx_owned'] = 1;
     }
 
     return $values;
   }
 
   /**
-   * Transform GPX data to Geolocation format.
+   * Let go of what an item pointed at before it was changed.
    *
-   * @param \phpGPX\Models\GpxFile $data
-   *   File.
-   *
-   * @return \Drupal\geolocation_gpx\Entity\GeolocationGpx
-   *   Geolocation GPX.
+   * @param int|string|null $file_id
+   *   Uploaded file to delete, if any. It is only ever the import source of
+   *   this one item, so it always goes.
+   * @param int|string|null $gpx_id
+   *   GPX to delete, if any and if owned.
+   * @param bool $owned
+   *   Whether the item was allowed to delete that GPX.
    */
-  protected function gpxByData(GpxFile $data): GeolocationGpx {
-    $currentUser = \Drupal::currentUser();
-
-    /** @var \Drupal\geolocation_gpx\Entity\GeolocationGpx $gpx */
-    $gpx = $this->entityTypeManager->getStorage('geolocation_gpx')->create([
-      'version' => '1.1',
-      'creator' => $data->creator ?? $currentUser->getAccountName(),
-      'name' => $data->metadata->name ?? '',
-      'description' => $data->metadata->description ?? '',
-      'author' => $data->metadata->author ?? '',
-      'copyright' => $data->metadata->copyright ?? '',
-      'time' => $data->metadata->time->format('Y-m-d H:i:s'),
-      'keywords' => $data->metadata?->keywords,
-    ]);
-    foreach ($data->metadata->links ?? [] as $linkData) {
-      $gpx->get('link')->appendItem($this->linkByData($linkData));
+  protected function release(int|string|null $file_id, int|string|null $gpx_id, bool $owned): void {
+    if ($file_id) {
+      File::load($file_id)?->delete();
     }
 
-    foreach ($data->waypoints as $waypointData) {
-      $gpx->get('waypoints')->appendItem($this->waypointByData($waypointData));
+    if ($gpx_id && $owned) {
+      GeolocationGpx::load($gpx_id)?->delete();
     }
-
-    foreach ($data->routes as $routeData) {
-      $gpx->get('routes')->appendItem($this->routeByData($routeData));
-    }
-
-    foreach ($data->tracks as $trackData) {
-      $gpx->get('tracks')->appendItem($this->trackByData($trackData));
-    }
-
-    $gpx->save();
-
-    return $gpx;
-  }
-
-  /**
-   * Transform GPX data to Geolocation format.
-   *
-   * @param \phpGPX\Models\Point $data
-   *   Waypoint.
-   *
-   * @return \Drupal\geolocation_gpx\Entity\GeolocationGpxWaypoint
-   *   Geolocation waypoint.
-   */
-  protected function waypointByData(Point $data): GeolocationGpxWaypoint {
-    /** @var \Drupal\geolocation_gpx\Entity\GeolocationGpxWaypoint $waypoint */
-    $waypoint = $this->entityTypeManager->getStorage('geolocation_gpx_waypoint')->create([
-      'latitude' => $data->latitude,
-      'longitude' => $data->longitude,
-      'elevation' => $data->elevation ?? NULL,
-      'time' => $data->time?->format('Y-m-d H:i:s') ?? NULL,
-      'magnetic_variation' => $data->time ?? NULL,
-      'geoidheight' => $data->geoidHeight ?? NULL,
-      'name' => $data->name ?? '',
-      'comment' => $data->comment ?? '',
-      'description' => $data->description ?? '',
-      'source' => $data->source ?? '',
-      'symbol' => $data->symbol ?? '',
-      'type' => $data->type ?? NULL,
-      'satellites' => $data->satellitesNumber,
-      'horizontal_dilution' => $data->hdop,
-      'vertical_dilution' => $data->vdop,
-      'position_dilution' => $data->pdop,
-      'age_of_dgps_data' => $data->ageOfGpsData,
-    ]);
-
-    foreach ($data->links as $linkData) {
-      $link = $this->linkByData($linkData);
-      $waypoint->get('link')->appendItem($link);
-    }
-    $waypoint->save();
-
-    return $waypoint;
-  }
-
-  /**
-   * Transform GPX data to Geolocation format.
-   *
-   * @param \phpGPX\Models\Link $data
-   *   Link.
-   *
-   * @return \Drupal\geolocation_gpx\Entity\GeolocationGpxLink
-   *   Geolocation link.
-   */
-  protected function linkByData(Link $data): GeolocationGpxLink {
-    /** @var \Drupal\geolocation_gpx\Entity\GeolocationGpxLink $link */
-    $link = $this->entityTypeManager->getStorage('geolocation_gpx_link')->create([
-      'href' => $data->href,
-      'type' => $data->type,
-      'text' => $data->text,
-    ]);
-    $link->save();
-
-    return $link;
-  }
-
-  /**
-   * Transform GPX data to Geolocation format.
-   *
-   * @param \phpGPX\Models\Route $data
-   *   Route.
-   *
-   * @return \Drupal\geolocation_gpx\Entity\GeolocationGpxRoute
-   *   Geolocation link.
-   */
-  protected function routeByData(Route $data): GeolocationGpxRoute {
-    /** @var \Drupal\geolocation_gpx\Entity\GeolocationGpxRoute $route */
-    $route = $this->entityTypeManager->getStorage('geolocation_gpx_route')->create([
-      'name' => $data->name ?? '',
-      'comment' => $data->comment ?? '',
-      'description' => $data->description ?? '',
-      'source' => $data->source ?? '',
-      'number' => $data->type ?? NULL,
-      'type' => $data->type ?? NULL,
-    ]);
-
-    foreach ($data->points as $waypointData) {
-      $route->get('route_points')->appendItem($this->waypointByData($waypointData));
-    }
-
-    foreach ($data->links as $linkData) {
-      $route->get('link')->appendItem($this->linkByData($linkData));
-    }
-
-    $route->save();
-    return $route;
-  }
-
-  /**
-   * Transform GPX data to Geolocation format.
-   *
-   * @param \phpGPX\Models\Track $data
-   *   Track.
-   *
-   * @return \Drupal\geolocation_gpx\Entity\GeolocationGpxTrack
-   *   Geolocation track.
-   */
-  protected function trackByData(Track $data): GeolocationGpxTrack {
-    /** @var \Drupal\geolocation_gpx\Entity\GeolocationGpxTrack $track */
-    $track = $this->entityTypeManager->getStorage('geolocation_gpx_track')->create([
-      'name' => $data->name ?? '',
-      'comment' => $data->comment ?? '',
-      'description' => $data->description ?? '',
-      'source' => $data->source ?? '',
-      'number' => $data->type ?? NULL,
-      'type' => $data->type ?? NULL,
-    ]);
-
-    foreach ($data->segments as $segmentData) {
-      $track->get('track_segments')->appendItem($this->trackSegmentByData($segmentData));
-    }
-
-    foreach ($data->links as $linkData) {
-      $track->get('link')->appendItem($this->linkByData($linkData));
-    }
-
-    $track->save();
-    return $track;
-  }
-
-  /**
-   * Transform GPX data to Geolocation format.
-   *
-   * @param \phpGPX\Models\Segment $data
-   *   Segment.
-   *
-   * @return \Drupal\geolocation_gpx\Entity\GeolocationGpxTrackSegment
-   *   Geolocation segment.
-   */
-  protected function trackSegmentByData(Segment $data): GeolocationGpxTrackSegment {
-    /** @var \Drupal\geolocation_gpx\Entity\GeolocationGpxTrackSegment $track_segment */
-    $track_segment = $this->entityTypeManager->getStorage('geolocation_gpx_track_segment')->create();
-
-    foreach ($data->points as $waypointData) {
-      $track_segment->get('track_points')->appendItem($this->waypointByData($waypointData));
-    }
-
-    $track_segment->save();
-    return $track_segment;
   }
 
 }

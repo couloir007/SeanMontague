@@ -2,17 +2,16 @@ import GeolocationFieldMapWidget from "../../../../js/WidgetSubscriber/Geolocati
 
 /**
  * @prop {GeolocationMapBase} map
- * @prop {GeolocationMapFeature} mapFeature
+ * @prop {GeolocationGeometryFieldWidgetMapConnector} mapFeature
  */
 export default class GeolocationGeometryFieldMapWidget extends GeolocationFieldMapWidget {
   /**
-   * @return {Promise<GeolocationMapFeature>}
+   * @return {Promise<GeolocationGeometryFieldWidgetMapConnector>}
+   *   Resolves with the geometry widget map feature.
    */
   getMapFeature() {
     return super.getMapFeature();
   }
-
-  onClick() {}
 
   /**
    * @param {GeolocationGeometry} geometry

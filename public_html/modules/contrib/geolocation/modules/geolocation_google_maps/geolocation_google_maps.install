@@ -39,7 +39,7 @@ function geolocation_google_maps_requirements(string $phase): array {
 }
 
 /**
- * Implements hook_requirements().
+ * Implements hook_uninstall().
  */
 function geolocation_google_maps_uninstall(): void {
   Drupal::configFactory()->getEditable('geolocation_google_maps.settings')->delete();

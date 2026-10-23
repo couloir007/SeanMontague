@@ -100,9 +100,18 @@ class TileLayerProviderManager extends DefaultPluginManager {
       $tile_layers_form[$tile_layer_provider_id]['layers'] = [
         '#type' => 'table',
         '#weight' => 100,
+        '#caption' => $this->t('Select tile layers and arrange them bottom to top.'),
         '#header' => [
           $this->t('Enable'),
           $this->t('Layer'),
+          $this->t('Weight'),
+        ],
+        '#tabledrag' => [
+          [
+            'action' => 'order',
+            'relationship' => 'sibling',
+            'group' => 'geolocation-tile-layer-option-weight',
+          ],
         ],
       ];
 
@@ -112,21 +121,36 @@ class TileLayerProviderManager extends DefaultPluginManager {
         $tile_layer_enable_id = Html::getUniqueId($tile_layer_provider_id . '_' . $tile_layer_id . '_enabled');
 
         $tile_layers_form[$tile_layer_provider_id]['layers'][$tile_layer_id] = [
+          '#attributes' => [
+            'class' => [
+              'draggable',
+            ],
+          ],
           'enabled' => [
             '#attributes' => [
               'id' => $tile_layer_enable_id,
             ],
             '#type' => 'checkbox',
-            '#default_value' => $settings[$tile_layer_provider_id]['layers'][$tile_layer_id]['enabled'] ?? FALSE,
+            '#disabled' => !($tile_layer_info['toggleable'] ?? TRUE),
+            '#default_value' => ($tile_layer_info['toggleable'] ?? TRUE) ? ($settings[$tile_layer_provider_id]['layers'][$tile_layer_id]['enabled'] ?? FALSE) : TRUE,
             '#wrapper_attributes' => ['style' => 'vertical-align: top'],
           ],
           'layer' => [
             'label' => [
               '#type' => 'label',
               '#title' => $tile_layer_info['name'],
-              '#suffix' => $tile_layer_info['description'],
+              '#suffix' => $tile_layer_info['description'] ?? '',
             ],
             'settings' => [],
+          ],
+          '#weight' => $settings[$tile_layer_provider_id]['layers'][$tile_layer_id]['weight'] ?? $tile_layer_info['default_weight'] ?? 0,
+          'weight' => [
+            '#type' => 'weight',
+            '#title' => $this->t('Weight for @option', ['@option' => $tile_layer_info['name']]),
+            '#title_display' => 'invisible',
+            '#size' => 4,
+            '#default_value' => $settings[$tile_layer_provider_id]['layers'][$tile_layer_id]['weight'] ?? $tile_layer_info['default_weight'] ?? 0,
+            '#attributes' => ['class' => ['geolocation-tile-layer-option-weight']],
           ],
         ];
 
@@ -168,23 +192,55 @@ class TileLayerProviderManager extends DefaultPluginManager {
    *   Render array.
    */
   public function alterMap(array $render_array, array $layers = [], array $context = []): array {
+    foreach ($this->getEnabledLayers($layers, $context) as $tile_layer_id => $tile_layer) {
+      $render_array = $tile_layer['provider']->alterMap($render_array, $tile_layer_id, $tile_layer['settings'], $context);
+    }
 
+    return $render_array;
+  }
+
+  /**
+   * Get enabled tile layers of all providers, sorted bottom to top.
+   *
+   * @param array $layers
+   *   Layer settings per tile layer provider.
+   * @param array $context
+   *   Context.
+   *
+   * @return array
+   *   Enabled layers keyed by tile layer ID, each with the instantiated
+   *   "provider", its "settings", the "label" and whether it is an "overlay".
+   */
+  public function getEnabledLayers(array $layers = [], array $context = []): array {
     uasort($layers, [SortArray::class, 'sortByWeightProperty']);
 
+    $enabled_layers = [];
     foreach ($layers as $tile_layer_provider_id => $tile_layer_provider_settings) {
       if (!$this->hasDefinition($tile_layer_provider_id)) {
         continue;
       }
-      $tile_layer_provider = $this->createInstance($tile_layer_provider_id, $tile_layer_provider_settings['settings']);
+      $tile_layer_provider = $this->createInstance($tile_layer_provider_id, $tile_layer_provider_settings['settings'] ?? []);
 
-      foreach ($tile_layer_provider_settings['layers'] as $tile_layer_id => $tile_layer_settings) {
-        if ($tile_layer_settings['enabled']) {
-          $render_array = $tile_layer_provider->alterMap($render_array, $tile_layer_id, $tile_layer_settings ?? [], $context);
+      foreach ($tile_layer_provider_settings['layers'] ?? [] as $tile_layer_id => $tile_layer_settings) {
+        if (!($tile_layer_settings['enabled'] ?? FALSE)) {
+          continue;
         }
+
+        $default_settings = $tile_layer_provider::getDefaultSettings($tile_layer_id, $tile_layer_settings, $context);
+
+        $enabled_layers[$tile_layer_id] = [
+          'provider' => $tile_layer_provider,
+          'settings' => $tile_layer_settings,
+          'label' => $tile_layer_provider->getLabel($tile_layer_id, $tile_layer_settings, $context),
+          'overlay' => (bool) ($tile_layer_settings['overlay'] ?? $default_settings['overlay'] ?? FALSE),
+          '#weight' => (int) ($tile_layer_settings['weight'] ?? $default_settings['weight'] ?? 0),
+        ];
       }
     }
 
-    return $render_array;
+    uasort($enabled_layers, [SortArray::class, 'sortByWeightProperty']);
+
+    return $enabled_layers;
   }
 
 }

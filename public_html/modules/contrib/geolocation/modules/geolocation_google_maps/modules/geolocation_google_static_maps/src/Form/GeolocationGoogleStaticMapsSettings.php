@@ -16,7 +16,7 @@ class GeolocationGoogleStaticMapsSettings extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
-    $config = $this->configFactory->get('geolocation_google_static_maps.settings');
+    $config = $this->config('geolocation_google_static_maps.settings');
 
     $form['google_static_maps_url_secret'] = [
       '#type' => 'textfield',

@@ -1,3 +1,11 @@
+geolocation_here.settings:
+  type: config_object
+  label: 'Geolocation settings'
+  mapping:
+    api_key:
+      type: string
+      label: 'HERE Maps API Key'
+
 geolocation.map_provider.here:
   type: geolocation_map_provider
   label: 'HERE Maps settings'

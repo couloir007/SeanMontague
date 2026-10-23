@@ -29,7 +29,9 @@ class GeoJSON implements GeometryFormatInterface {
     $json = json_decode($text);
 
     if (is_object($json->geometry ?? FALSE)) {
-      return static::geometryByText((string) $json->geometry);
+      $geometry_string = json_encode($json->geometry);
+
+      return static::geometryByText($geometry_string);
     }
 
     if (!is_string($json->type ?? FALSE)) {

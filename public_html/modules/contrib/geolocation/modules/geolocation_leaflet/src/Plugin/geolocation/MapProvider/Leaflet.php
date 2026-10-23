@@ -16,17 +16,22 @@ use Drupal\geolocation\MapProviderBase;
 class Leaflet extends MapProviderBase {
 
   /**
+   * Weight of the fallback base layer, below any configurable weight.
+   */
+  const DEFAULT_BASE_LAYER_WEIGHT = -100;
+
+  /**
    * {@inheritdoc}
    */
   protected array $scripts = [
-    'https://unpkg.com/leaflet@1.9.3/dist/leaflet.js',
+    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
   ];
 
   /**
    * {@inheritdoc}
    */
   protected array $stylesheets = [
-    'https://unpkg.com/leaflet@1.9.3/dist/leaflet.css',
+    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   ];
 
   /**
@@ -81,12 +86,33 @@ class Leaflet extends MapProviderBase {
               'position' => 'bottomright',
             ],
           ],
-          'leaflet_marker_popup' => [
-            'enabled' => TRUE,
+        ],
+        'data_layers' => [
+          'geolocation_default_layer:default' => [
+            'settings' => [
+              'features' => [
+                'leaflet_marker_popup' => [
+                  'enabled' => TRUE,
+                ],
+              ],
+            ],
           ],
         ],
       ]
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSettings(array $settings): array {
+    $settings = parent::getSettings($settings);
+
+    $settings['zoom'] = (int) $settings['zoom'];
+    $settings['minZoom'] = (int) $settings['minZoom'];
+    $settings['maxZoom'] = (int) $settings['maxZoom'];
+
+    return $settings;
   }
 
   /**
@@ -130,7 +156,7 @@ class Leaflet extends MapProviderBase {
       '#group' => $parents_string,
       '#type' => 'select',
       '#title' => $this->t('Zoom level'),
-      '#options' => range(0, 20),
+      '#options' => range(0, 30),
       '#description' => $this->t('The initial resolution at which to display the map, where zoom 0 corresponds to a map of the Earth fully zoomed out, and higher zoom levels zoom in at a higher resolution.'),
       '#default_value' => $settings['zoom'],
       '#process' => [
@@ -152,8 +178,8 @@ class Leaflet extends MapProviderBase {
       '#group' => $advanced_parents_string,
       '#type' => 'select',
       '#title' => $this->t('Min Zoom level'),
-      '#options' => range(0, 20),
-      '#description' => $this->t('Minimum zoom level of the map. If not specified and at least one GridLayer or TileLayer is in the map, the lowest of their minZoom options will be used instead. 0 to skip.'),
+      '#options' => range(0, 30),
+      '#description' => $this->t('Minimum zoom level of the map.'),
       '#default_value' => $settings['minZoom'],
       '#process' => [
         ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
@@ -167,8 +193,8 @@ class Leaflet extends MapProviderBase {
       '#group' => $advanced_parents_string,
       '#type' => 'select',
       '#title' => $this->t('Max Zoom level'),
-      '#options' => range(0, 20),
-      '#description' => $this->t('Maximum zoom level of the map. If not specified and at least one GridLayer or TileLayer is in the map, the highest of their maxZoom options will be used instead. 0 to skip.'),
+      '#options' => range(0, 30),
+      '#description' => $this->t('Maximum zoom level of the map. Tile layers keep showing their most detailed tiles, scaled up, beyond their own maximum. 0 to use the highest maximum of the tile layers instead.'),
       '#default_value' => $settings['maxZoom'],
       '#process' => [
         ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
@@ -457,6 +483,27 @@ class Leaflet extends MapProviderBase {
    * {@inheritdoc}
    */
   public function alterRenderArray(array $render_array, array $map_settings, array $context = []): array {
+    // Leaflet brings no base map of its own, so a map without an enabled base
+    // layer renders blank. Map features are altered off '#settings', so the
+    // fallback has to be added to both to stay visible in the tile layer
+    // control.
+    $enabled_layers = $this->tileLayerProviderManager->getEnabledLayers($map_settings['tile_layers'] ?? [], $context);
+    if (!array_filter($enabled_layers, fn ($tile_layer) => !$tile_layer['overlay'])) {
+      $map_settings['tile_layers']['geolocation_tile_openstreetmap'] = array_replace_recursive(
+        $map_settings['tile_layers']['geolocation_tile_openstreetmap'] ?? [],
+        [
+          'layers' => [
+            'geolocation_tile_openstreetmap:mapnik' => [
+              'enabled' => 1,
+              'weight' => static::DEFAULT_BASE_LAYER_WEIGHT,
+            ],
+          ],
+        ]
+      );
+
+      $render_array['#settings']['tile_layers']['geolocation_tile_openstreetmap'] = $map_settings['tile_layers']['geolocation_tile_openstreetmap'];
+    }
+
     if (
       !empty($map_settings['maxBounds'])
       && !empty($map_settings['maxBounds']['north_east_bound'])

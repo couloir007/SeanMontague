@@ -10,8 +10,8 @@ export class BaiduShapeLine extends GeolocationShapeLine {
     this.baiduShapes = [];
 
     const points = [];
-    geometry.points.forEach((value) => {
-      points.push(new BMapGL.Point(value.lng, value.lat));
+    geometry.coordinates.forEach((value) => {
+      points.push(new BMapGL.Point(value[0], value[1]));
     });
 
     const line = new BMapGL.Polyline(points, {
@@ -21,8 +21,8 @@ export class BaiduShapeLine extends GeolocationShapeLine {
     });
 
     if (this.title) {
-      /** @type BMapGL.InfoWindow */
-      const infoWindow = new BMapGL.InfoWindow(this.title);
+      /** @type {BMapGL.InfoWindow} */
+      const infoWindow = new BMapGL.InfoWindow(Drupal.checkPlain(this.title));
       line.addEventListener("mouseover", (e) => {
         this.map.baiduMap.openInfoWindow(infoWindow, e.point);
       });

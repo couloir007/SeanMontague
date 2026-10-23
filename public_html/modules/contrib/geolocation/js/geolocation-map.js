@@ -2,6 +2,7 @@
  * @file
  * Javascript for the Geolocation map formatter.
  */
+
 (function (Drupal) {
   Drupal.geolocation.maps = {
     /**
@@ -12,6 +13,12 @@
     delayedInitialization: new Map(),
     mapProviderSettings: new Map(),
     addInitializedMap(map) {
+      this.initializedMaps.forEach((initializedMap, mapId) => {
+        if (initializedMap.wrapper && !document.contains(initializedMap.wrapper)) {
+          this.removeMap(mapId);
+        }
+      });
+
       this.initializedMaps.set(map.id, map);
       if (this.mapPromises.has(map.id)) {
         for (const resolve of this.mapPromises.get(map.id)) {
@@ -21,8 +28,24 @@
       }
     },
     /**
+     * Destroy a map that left the page for good and forget it.
+     *
      * @param {string} mapId
-     * @returns {Promise<GeolocationMapBase>} Promise object represents the sum of a and b
+     *   ID of the map to remove.
+     */
+    removeMap(mapId) {
+      try {
+        this.initializedMaps.get(mapId)?.destroy();
+      } catch (e) {
+        console.error(e, `Geolocation - Map ${mapId} failed destroy: ${e.toString()}`);
+      }
+      this.initializedMaps.delete(mapId);
+    },
+    /**
+     * @param {string} mapId
+     *   ID of the map to retrieve.
+     * @return {Promise<GeolocationMapBase>}
+     *   Resolves with the map once it has been initialized.
      */
     getMap(mapId) {
       return new Promise((resolve) => {
@@ -54,11 +77,13 @@
       }
     },
     mapProviderCallback(mapProviderId) {
-      if (!this.mapProviderSettings.has(mapProviderId)) {
-        console.error(mapProviderId, "Geolocation: Could not initialize callback for map provider.");
-        return false;
-      }
-      const mapProviderSettings = this.mapProviderSettings.get(mapProviderId);
+      // A provider library can finish loading before any map got as far as
+      // registering for it, so readiness is recorded either way - otherwise a
+      // callback added afterwards would wait for a signal already given.
+      const mapProviderSettings = this.mapProviderSettings.get(mapProviderId) ?? {
+        ready: false,
+        callbacks: [],
+      };
       mapProviderSettings.ready = true;
 
       while (mapProviderSettings.callbacks.length) {
@@ -110,7 +135,6 @@
     template.innerHTML = response.data.trim();
     const newContent = template.content.firstElementChild;
 
-    Drupal.detachBehaviors(oldContent, response.settings);
     oldContent.insertAdjacentElement("afterend", newContent);
 
     new Promise((resolve) => {
@@ -135,7 +159,7 @@
 
         const newMapWrapper = newContent.querySelector(".geolocation-map-wrapper");
         if (!newMapWrapper) {
-          Drupal.geolocation.maps.initializedMaps.delete(mapId);
+          // Detaching the old content below removes the map.
           console.error(`Ajax.replaceCommonMapView: New Map wrapper '${mapId}' not found.`);
           return;
         }
@@ -160,6 +184,8 @@
 
       resolve(Promise.all(mapPromises));
     }).then(() => {
+      // Only now, so detaching does not forget the maps carried over above.
+      Drupal.detachBehaviors(oldContent, response.settings);
       oldContent.remove();
       Drupal.attachBehaviors(newContent, response.settings);
     });
@@ -175,10 +201,14 @@
    */
   Drupal.behaviors.geolocationMap = {
     /**
-     * @param context
-     * @param drupalSettings
+     * @param {HTMLDocument|HTMLElement} context
+     *   The context to attach to.
+     * @param {Object} drupalSettings
+     *   Drupal settings.
      * @param {Object} drupalSettings.geolocation
+     *   Geolocation settings.
      * @param {GeolocationMapSettings[]} drupalSettings.geolocation.maps
+     *   Settings keyed by map ID.
      */
     attach: (context, drupalSettings) => {
       context.querySelectorAll(".geolocation-map-wrapper").forEach(function (mapWrapper) {
@@ -312,7 +342,6 @@
                 return map.initialize();
               })
               .then((map) => {
-                Drupal.geolocation.maps.initializedMaps.set(map.id, map);
                 return map.loadCenterOptions();
               })
               .then((map) => {
@@ -321,7 +350,13 @@
               .then((map) => {
                 map.removeControls();
                 map.wrapper.querySelectorAll(".geolocation-map-controls > *").forEach((control) => {
-                  map.addControl(control);
+                  // A single broken control must not cost the map its tile
+                  // layers, markers and centering further down the chain.
+                  try {
+                    map.addControl(control);
+                  } catch (e) {
+                    console.error(e, `Control ${control.className} could not be added to the map.`);
+                  }
                 });
                 return map;
               });
@@ -342,12 +377,19 @@
           })
           .then((map) => {
             // Only _after_ markers are loaded.
-            map.setCenterByOptions();
+            if (map.keepViewport) {
+              map.keepViewport = false;
+            } else {
+              map.setCenterByOptions();
+            }
 
             // Just in case.
             map.wrapper.classList.remove("ajax-loading");
 
             map.wrapper.querySelectorAll(".geolocation-location").forEach((element) => {
+              if (element.closest(".geolocation-map-wrapper") !== map.wrapper) {
+                return;
+              }
               element.style.display = "none";
             });
 
@@ -364,6 +406,35 @@
           });
       });
     },
-    detach: (context, drupalSettings) => {},
+    /**
+     * @param {Document|Element} context
+     *   The context being detached.
+     * @param {Object} drupalSettings
+     *   Drupal settings.
+     * @param {String} trigger
+     *   Why the behaviour is detaching.
+     */
+    detach: (context, drupalSettings, trigger) => {
+      // Behaviours are also detached to serialize a form, where the maps stay
+      // exactly where they are.
+      if (trigger !== "unload") {
+        return;
+      }
+
+      // A map moved on to a new wrapper by replaceCommonMapView is kept.
+      context.querySelectorAll?.(".geolocation-map-wrapper").forEach((mapWrapper) => {
+        const { maps } = Drupal.geolocation;
+        const map = maps.initializedMaps.get(mapWrapper.id);
+        if (map && map.wrapper !== mapWrapper) {
+          return;
+        }
+
+        maps.removeMap(mapWrapper.id);
+
+        // Nor may a map still waiting to be initialized come to life later.
+        maps.delayedInitialization.delete(mapWrapper.id);
+        maps.mapPromises.delete(mapWrapper.id);
+      });
+    },
   };
 })(Drupal);

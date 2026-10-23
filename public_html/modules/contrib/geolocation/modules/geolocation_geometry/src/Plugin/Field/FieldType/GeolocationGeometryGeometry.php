@@ -25,7 +25,7 @@ class GeolocationGeometryGeometry extends GeolocationGeometryBase {
     $schema = parent::schema($field_definition);
 
     $schema['columns']['geometry']['pgsql_type'] = 'geometry';
-    $schema['columns']['geometry']['mysql_type'] = 'geometry';
+    $schema['columns']['geometry']['mysql_type'] = 'GEOMETRY';
 
     return $schema;
   }

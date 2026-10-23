@@ -3,7 +3,7 @@ import { LeafletMapFeature } from "./LeafletMapFeature.js";
 /**
  * @typedef {Object} WMSSettings
  *
- * @extends {GeolocationMapFeatureSettings}
+ * @augments {GeolocationMapFeatureSettings}
  *
  * @prop {String} url
  * @prop {String} version

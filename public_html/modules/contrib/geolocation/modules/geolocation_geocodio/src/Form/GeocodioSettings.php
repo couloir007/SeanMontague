@@ -16,7 +16,7 @@ class GeocodioSettings extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->configFactory->get('geolocation_geocodio.settings');
+    $config = $this->config('geolocation_geocodio.settings');
 
     $form['api_key'] = [
       '#type' => 'textfield',

@@ -45,21 +45,14 @@ geolocation_google_maps.map_control_feature_settings:
         position:
           type: string
           label: 'Position'
-        behavior:
-          type: string
-          label: 'Behavior'
 
 plugin.plugin_configuration.geolocation.map_feature.control_zoom:
   type: geolocation_google_maps.map_control_feature_settings
   label: 'Control Zoom'
-  mapping:
-    settings:
-      type: mapping
-      label: 'Settings'
-      mapping:
-        style:
-          type: string
-          label: 'Style'
+
+plugin.plugin_configuration.geolocation.map_feature.control_camera:
+  type: geolocation_google_maps.map_control_feature_settings
+  label: 'Control Camera'
 
 plugin.plugin_configuration.geolocation.map_feature.control_rotate:
   type: geolocation_google_maps.map_control_feature_settings

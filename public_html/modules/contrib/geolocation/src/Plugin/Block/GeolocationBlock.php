@@ -9,6 +9,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\geolocation\FilterFormatProvider;
 use Drupal\geolocation\MapCenterManager;
 use Drupal\geolocation\MapProviderManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -227,7 +228,7 @@ class GeolocationBlock extends BlockBase implements ContainerFactoryPluginInterf
       'marker_title' => '',
       'marker_content' => [
         'value' => '',
-        'format' => filter_default_format(),
+        'format' => FilterFormatProvider::getDefaultFormatId(),
       ],
       'marker_coordinates' => [],
     ];

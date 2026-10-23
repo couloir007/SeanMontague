@@ -9,7 +9,7 @@ use Drupal\Core\Utility\Error;
 use Drupal\geolocation\GeocoderBase;
 use Drupal\geolocation\GeocoderInterface;
 use Drupal\geolocation\GeolocationAddress;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TransferException;
 
 /**
  * Provides the Nominatim API.
@@ -60,7 +60,7 @@ class Nominatim extends GeocoderBase implements GeocoderInterface {
     try {
       $result = Json::decode(\Drupal::httpClient()->get($url->toString())->getBody());
     }
-    catch (RequestException $e) {
+    catch (TransferException $e) {
       $logger = \Drupal::logger('geolocation');
       Error::logException($logger, $e);
       return NULL;
@@ -115,7 +115,7 @@ class Nominatim extends GeocoderBase implements GeocoderInterface {
     try {
       $result = Json::decode(\Drupal::httpClient()->get($url->toString())->getBody());
     }
-    catch (RequestException $e) {
+    catch (TransferException $e) {
       $logger = \Drupal::logger('geolocation');
       Error::logException($logger, $e);
       return NULL;
@@ -169,7 +169,7 @@ class Nominatim extends GeocoderBase implements GeocoderInterface {
     try {
       $result = Json::decode(\Drupal::httpClient()->get($url->toString())->getBody());
     }
-    catch (RequestException $e) {
+    catch (TransferException $e) {
       $logger = \Drupal::logger('geolocation');
       Error::logException($logger, $e);
       return NULL;
@@ -284,7 +284,7 @@ class Nominatim extends GeocoderBase implements GeocoderInterface {
       $request_email = $config->get('nominatim_email');
     }
     else {
-      $request_email = \Drupal::config('system.site')->get('mail');
+      $request_email = \Drupal::config('system.site')->get('mail') ?? '';
     }
     return $request_email;
   }

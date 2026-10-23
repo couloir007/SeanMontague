@@ -10,7 +10,7 @@ use Drupal\Core\Utility\Error;
 use Drupal\geolocation\GeocoderBase;
 use Drupal\geolocation\GeocoderInterface;
 use Drupal\geolocation_yandex\Plugin\geolocation\MapProvider\Yandex as YandexMapProvider;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TransferException;
 
 /**
  * Provides the Yandex.
@@ -21,7 +21,7 @@ use GuzzleHttp\Exception\RequestException;
   description: new \Drupal\Core\StringTranslation\TranslatableMarkup('See https://tech.yandex.com/maps/doc/geocoder/desc/concepts/about-docpage/ for details.'),
   locationCapable: TRUE,
   boundaryCapable: TRUE,
-  frontendCapable: TRUE
+  frontendCapable: FALSE
 )]
 class Yandex extends GeocoderBase implements GeocoderInterface {
 
@@ -69,7 +69,7 @@ class Yandex extends GeocoderBase implements GeocoderInterface {
     try {
       $result = Json::decode(\Drupal::httpClient()->get($url->toString())->getBody());
     }
-    catch (RequestException $e) {
+    catch (TransferException $e) {
       $logger = \Drupal::logger('geolocation');
       Error::logException($logger, $e);
       return NULL;
@@ -124,7 +124,7 @@ class Yandex extends GeocoderBase implements GeocoderInterface {
     try {
       $result = Json::decode(\Drupal::httpClient()->get($url->toString())->getBody());
     }
-    catch (RequestException $e) {
+    catch (TransferException $e) {
       $logger = \Drupal::logger('geolocation');
       Error::logException($logger, $e);
       return NULL;

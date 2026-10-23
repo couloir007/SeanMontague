@@ -1,0 +1,17 @@
+name: 'Geolocation Leaflet Views Test'
+type: module
+description: 'Support module for Geolocation Leaflet Views tests'
+package: Testing
+dependencies:
+  - geolocation:geolocation
+  - geolocation:geolocation_leaflet
+  - drupal:views
+  - drupal:node
+  - drupal:field
+hidden: true
+core_version_requirement: ^10 || ^11 || ^12
+
+# Information added by Drupal.org packaging script on 2026-10-20
+version: '4.1.0'
+project: 'geolocation'
+datestamp: 1792500158

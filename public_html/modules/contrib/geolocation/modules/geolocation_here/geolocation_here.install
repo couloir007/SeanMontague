@@ -17,17 +17,14 @@ function geolocation_here_requirements(string $phase): array {
   if ($phase == 'runtime') {
     $requirements['geolocation_here_api_key'] = [
       'title' => t('Geolocation - HERE Maps Key'),
-      'value' => t('HERE Maps ID & Code set'),
-      'description' => t('A HERE Maps key is set in the <a href=":geolocation_here_settings_url">Geolocation settings</a>.', [':geolocation_here_settings_url' => Url::fromRoute('geolocation_here.settings')->toString()]),
+      'value' => t('HERE Maps API key set'),
+      'description' => t('A HERE Maps API key is set in the <a href=":geolocation_here_settings_url">Geolocation settings</a>.', [':geolocation_here_settings_url' => Url::fromRoute('geolocation_here.settings')->toString()]),
       'severity' => REQUIREMENT_OK,
     ];
 
-    if (
-      empty(\Drupal::config('here_maps.settings')->get('app_id'))
-      || empty(\Drupal::config('here_maps.settings')->get('app_code'))
-    ) {
-      $requirements['geolocation_here_api_key']['value'] = t('HERE maps ID or code missing');
-      $requirements['geolocation_here_api_key']['description'] = t('A HERE maps ID or code is missing in the <a href=":geolocation_here_settings_url">Geolocation settings</a>.', [':geolocation_here_settings_url' => Url::fromRoute('geolocation_here.settings')->toString()]);
+    if (empty(\Drupal::config('geolocation_here.settings')->get('api_key'))) {
+      $requirements['geolocation_here_api_key']['value'] = t('HERE Maps API key missing');
+      $requirements['geolocation_here_api_key']['description'] = t('A HERE Maps API key is missing in the <a href=":geolocation_here_settings_url">Geolocation settings</a>.', [':geolocation_here_settings_url' => Url::fromRoute('geolocation_here.settings')->toString()]);
       $requirements['geolocation_here_api_key']['severity'] = REQUIREMENT_WARNING;
     }
   }
@@ -36,8 +33,8 @@ function geolocation_here_requirements(string $phase): array {
 }
 
 /**
- * Implements hook_requirements().
+ * Implements hook_uninstall().
  */
 function geolocation_here_uninstall(): void {
-  Drupal::configFactory()->getEditable('here_maps.settings')->delete();
+  Drupal::configFactory()->getEditable('geolocation_here.settings')->delete();
 }

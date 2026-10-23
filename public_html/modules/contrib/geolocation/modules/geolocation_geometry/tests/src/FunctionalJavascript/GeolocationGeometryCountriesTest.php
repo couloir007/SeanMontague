@@ -3,21 +3,21 @@
 namespace Drupal\Tests\geolocation_geometry\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
-use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the common map style AJAX JavaScript functionality.
  *
  * @group geolocation
  */
+#[RunTestsInSeparateProcesses]
 class GeolocationGeometryCountriesTest extends WebDriverTestBase {
 
   /**
    * Admin User.
-   *
-   * @var \Drupal\user\Entity\User
    */
-  public User $adminUser;
+  public UserInterface $adminUser;
 
   /**
    * {@inheritdoc}

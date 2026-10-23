@@ -12,7 +12,7 @@ export class GeolocationBoundaries {
    *   - northEast, southWest objects
    *   - north, east, south, west primitives
    *
-   * @todo: Add range checks.
+   * @todo Add range checks.
    */
   constructor(...args) {
     switch (arguments.length) {

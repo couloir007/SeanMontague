@@ -16,7 +16,7 @@
  */
 export class GeolocationLayerFeature {
   /**
-   * @constructor
+   * @class
    *
    * @param {GeolocationLayerFeatureSettings} settings
    *   Settings.
@@ -27,6 +27,11 @@ export class GeolocationLayerFeature {
     this.settings = settings;
     this.layer = layer;
   }
+
+  /**
+   * Called before the feature is discarded, e.g. when its layer reloads.
+   */
+  destroy() {}
 
   /**
    * @param {GeolocationMapMarker} marker

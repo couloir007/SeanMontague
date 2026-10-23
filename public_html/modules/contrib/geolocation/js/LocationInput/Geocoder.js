@@ -3,7 +3,7 @@ import { GeolocationLocationInputBase } from "./GeolocationLocationInputBase.js"
 /**
  * @typedef {Object} GeocoderLocationInputSettings
  *
- * @extends GeolocationLocationInputSettings
+ * @augments GeolocationLocationInputSettings
  *
  * @prop {Boolean} auto_submit
  * @prop {Boolean} hide_form

@@ -187,6 +187,22 @@ geolocation.tile_layer_provider_settings:
     settings:
       type: mapping
       label: 'Settings'
+    layers:
+      type: sequence
+      label: 'Available layers'
+      sequence:
+        type: mapping
+        label: 'Layer'
+        mapping:
+          enabled:
+            type: integer
+            label: 'Enabled'
+          weight:
+            type: integer
+            label: 'Weight'
+          settings:
+            type: mapping
+            label: 'Layer settings'
 
 plugin.plugin_configuration.geolocation.tile_layer_provider.*:
   type: geolocation.tile_layer_provider_settings

@@ -14,6 +14,7 @@ use Drupal\Core\Render\Element;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\geolocation\DataProviderInterface;
 use Drupal\geolocation\DataProviderManager;
+use Drupal\geolocation\FilterFormatProvider;
 use Drupal\geolocation\MapCenterManager;
 use Drupal\geolocation\MapProviderInterface;
 use Drupal\geolocation\MapProviderManager;
@@ -29,9 +30,9 @@ abstract class GeolocationMapFormatterBase extends FormatterBase {
   /**
    * Map provider.
    *
-   * @var \Drupal\geolocation\MapProviderInterface
+   * @var \Drupal\geolocation\MapProviderInterface|null
    */
-  protected MapProviderInterface $mapProvider;
+  protected ?MapProviderInterface $mapProvider = NULL;
 
   /**
    * Data provider ID.
@@ -120,7 +121,7 @@ abstract class GeolocationMapFormatterBase extends FormatterBase {
     $settings['map_provider_settings'] = [];
     $settings['info_text'] = [
       'value' => '',
-      'format' => filter_fallback_format(),
+      'format' => FilterFormatProvider::getDefaultFormatId(),
     ];
     $settings['use_overridden_map_settings'] = FALSE;
     return $settings;
@@ -239,48 +240,23 @@ abstract class GeolocationMapFormatterBase extends FormatterBase {
       ],
     ];
 
+    // The map provider form has to know its own form parents, which depend on
+    // the form embedding the formatter - Field UI nests it below
+    // fields[<field>][settings_edit_form][settings], Views UI below options.
+    // Only #process runs late enough to see the parents the form builder
+    // actually assigned.
+    // No #type: the map provider form below carries the same #parents, and two
+    // group-capable elements sharing them make Drupal's group pre-render inject
+    // the provider form twice.
     $element['map_provider_settings'] = [
-      '#type' => 'html_tag',
-      '#tag' => 'span',
-      '#value' => $this->t("No settings available."),
+      '#tree' => TRUE,
+      '#prefix' => '<div id="map-provider-settings">',
+      '#suffix' => '</div>',
+      '#process' => [[static::class, 'processMapProviderSettings']],
+      '#map_provider_options' => $map_provider_options,
+      '#map_provider_id' => $settings['map_provider_id'],
+      '#map_provider_settings' => $settings['map_provider_settings'],
     ];
-
-    $parents = [
-      'fields',
-      $this->fieldDefinition->getName(),
-      'settings_edit_form',
-      'settings',
-    ];
-
-    $user_input = $form_state->getUserInput();
-    $map_provider_id = NestedArray::getValue($user_input, array_merge($parents, ['map_provider_id']));
-    if (empty($map_provider_id)) {
-      $map_provider_id = $settings['map_provider_id'];
-    }
-    if (empty($map_provider_id)) {
-      $map_provider_id = key($map_provider_options);
-    }
-
-    $map_provider_settings = NestedArray::getValue($user_input, array_merge($parents, ['map_provider_settings']));
-    if (empty($map_provider_settings)) {
-      $map_provider_settings = $settings['map_provider_settings'];
-    }
-
-    if (!empty($map_provider_id)) {
-      $map_provider = $this->mapProviderManager->createInstance($map_provider_id, $map_provider_settings);
-      $element['map_provider_settings'] = $map_provider->getSettingsForm(
-          $map_provider_settings,
-          array_merge($parents, ['map_provider_settings'])
-        );
-    }
-
-    $element['map_provider_settings'] = array_replace(
-      $element['map_provider_settings'],
-      [
-        '#prefix' => '<div id="map-provider-settings">',
-        '#suffix' => '</div>',
-      ]
-    );
 
     $element['use_overridden_map_settings'] = [
       '#type' => 'checkbox',
@@ -288,6 +264,68 @@ abstract class GeolocationMapFormatterBase extends FormatterBase {
       '#description' => $this->t('The field map widget optionally allows to define custom map settings to use here.'),
       '#default_value' => $settings['use_overridden_map_settings'],
     ];
+
+    return $element;
+  }
+
+  /**
+   * Form #process callback to attach the selected map provider settings form.
+   *
+   * @param array $element
+   *   Element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   Form state.
+   * @param array $complete_form
+   *   Complete form.
+   *
+   * @return array
+   *   Element.
+   */
+  public static function processMapProviderSettings(array &$element, FormStateInterface $form_state, array &$complete_form): array {
+    $map_provider_options = $element['#map_provider_options'];
+
+    // The map provider select is this element's sibling, so its input can be
+    // read relative to the parents assigned by the form builder.
+    $map_provider_id_parents = $element['#parents'];
+    array_pop($map_provider_id_parents);
+    $map_provider_id_parents[] = 'map_provider_id';
+
+    $map_provider_id = NestedArray::getValue($form_state->getUserInput(), $map_provider_id_parents);
+    if (empty($map_provider_id)) {
+      $map_provider_id = $element['#map_provider_id'];
+    }
+    if (empty($map_provider_id)) {
+      $map_provider_id = key($map_provider_options);
+    }
+
+    // On a map provider switch the submitted settings still describe the
+    // previous provider - control positions for instance are provider
+    // specific - so they must not be fed into the new provider's form.
+    $triggering_element = $form_state->getTriggeringElement();
+    if (($triggering_element['#parents'] ?? NULL) === $map_provider_id_parents) {
+      $user_input = $form_state->getUserInput();
+      NestedArray::unsetValue($user_input, $element['#parents']);
+      $form_state->setUserInput($user_input);
+    }
+
+    /** @var \Drupal\geolocation\MapProviderManager $map_provider_manager */
+    $map_provider_manager = \Drupal::service('plugin.manager.geolocation.mapprovider');
+    $map_provider = $map_provider_id ? $map_provider_manager->getMapProvider($map_provider_id, $element['#map_provider_settings']) : NULL;
+
+    if (!$map_provider) {
+      $element['empty'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'span',
+        '#value' => t("No settings available."),
+      ];
+
+      return $element;
+    }
+
+    // Seed the form from the stored settings only. Anything the user already
+    // entered is restored by the form builder from the input it collected for
+    // these very parents.
+    $element['form'] = $map_provider->getSettingsForm($element['#map_provider_settings'], $element['#parents']);
 
     return $element;
   }
@@ -309,8 +347,14 @@ abstract class GeolocationMapFormatterBase extends FormatterBase {
         !empty($settings['info_text']['value'])
         && !empty($settings['info_text']['format'])
       ) {
+        $build = [
+          '#type' => 'processed_text',
+          '#text' => $settings['info_text']['value'],
+          '#format' => $settings['info_text']['format'],
+        ];
+
         $summary[] = $this->t('Marker Info Text: @type', [
-          '@type' => current(explode(chr(10), wordwrap(check_markup($settings['info_text']['value'], $settings['info_text']['format']), 30))),
+          '@type' => current(explode(chr(10), wordwrap(\Drupal::service('renderer')->renderInIsolation($build), 30))),
         ]);
       }
 

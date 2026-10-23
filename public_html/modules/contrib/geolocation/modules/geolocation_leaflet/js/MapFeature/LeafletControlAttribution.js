@@ -3,7 +3,7 @@ import { LeafletMapFeature } from "./LeafletMapFeature.js";
 /**
  * @typedef {Object} ControlAttributionSettings
  *
- * @extends {GeolocationMapFeatureSettings}
+ * @augments {GeolocationMapFeatureSettings}
  *
  * @prop {String} prefix
  * @prop {String} position
@@ -22,7 +22,7 @@ export default class LeafletControlAttribution extends LeafletMapFeature {
 
     L.control
       .attribution({
-        prefix: `${this.settings.prefix} | &copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors`,
+        prefix: this.settings.prefix,
         position: this.getLeafletPosition(this.settings.position),
       })
       .addTo(map.leafletMap);

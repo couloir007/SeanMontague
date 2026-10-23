@@ -8,3 +8,20 @@ geolocation.element.input:
     lng:
       type: float
       label: 'Longitude'
+
+geolocation.element.boundary:
+  type: mapping
+  label: 'FormElement geolocation boundary'
+  mapping:
+    lat_north_east:
+      type: float
+      label: 'North East Latitude'
+    lng_north_east:
+      type: float
+      label: 'North East Longitude'
+    lat_south_west:
+      type: float
+      label: 'South West Latitude'
+    lng_south_west:
+      type: float
+      label: 'South West Longitude'

@@ -31,7 +31,7 @@ class ShapefileParser extends ParserBase {
    *
    * @var \Drupal\Core\File\FileSystemInterface
    */
-  private FileSystemInterface $fileSystem;
+  protected FileSystemInterface $fileSystem;
 
   /**
    * {@inheritdoc}

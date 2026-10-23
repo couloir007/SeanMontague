@@ -16,7 +16,7 @@ class YandexMapsSettings extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
-    $config = $this->configFactory->get('geolocation_yandex.settings');
+    $config = $this->config('geolocation_yandex.settings');
 
     $form['api_key'] = [
       '#type' => 'textfield',

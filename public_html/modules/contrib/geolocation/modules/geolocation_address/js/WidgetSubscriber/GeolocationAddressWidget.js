@@ -38,7 +38,7 @@ export default class GeolocationAddressWidget extends FieldWidgetBase {
 
   onFormChange(element, index) {
     let requiredSet = true;
-    element.querySelectorAll(".form-element.required").forEach((formElement) => {
+    element.querySelectorAll(".required").forEach((formElement) => {
       if (!formElement.value) requiredSet = false;
     });
 
@@ -70,7 +70,7 @@ export default class GeolocationAddressWidget extends FieldWidgetBase {
   triggerAddMoreElement() {
     let error = false;
     this.getAllInputElements().forEach((element) => {
-      if (element.querySelector(".form-element.error")) {
+      if (element.querySelector(".error")) {
         console.error("Cannot add new element while errors present.");
         error = true;
       }

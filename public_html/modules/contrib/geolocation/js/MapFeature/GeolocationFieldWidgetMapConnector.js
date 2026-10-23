@@ -3,6 +3,7 @@
  *
  * @prop {int} cardinality
  * @prop {string} field_type
+ * @prop {boolean} set_result_on_geocode
  */
 
 import { GeolocationMapFeature } from "./GeolocationMapFeature.js";
@@ -203,5 +204,19 @@ export default class GeolocationFieldWidgetMapConnector extends GeolocationMapFe
     if (marker.geolocationWidgetIgnore ?? false) return;
 
     this.subscriber?.coordinatesRemoved(this.getIndexByMarker(marker));
+  }
+
+  onGeocodedResult(result) {
+    super.onGeocodedResult(result);
+
+    if (!this.settings.set_result_on_geocode || !result.coordinates) return;
+
+    const marker = this.getMarkerByIndex(0);
+    if (marker && this.settings.cardinality === 1) {
+      marker.update(result.coordinates);
+      return;
+    }
+
+    this.onClick(result.coordinates);
   }
 }

@@ -16,12 +16,18 @@ export class GoogleShapePolygon extends GeolocationShapePolygon {
 
     this.googleShapes = [];
 
+    this.addShape();
+  }
+
+  addShape() {
     const polygon = new google.maps.Polygon({
-      paths: [
-        geometry.coordinates[0].map((value) => {
-          return { lat: value[1], lng: value[0] };
-        }),
-      ],
+      // The outer ring comes first, any further ring is a hole - which is what
+      // Google reads a list of paths as.
+      paths: this.geometry.coordinates.map((ring) => {
+        return ring.map((position) => {
+          return { lat: position[1], lng: position[0] };
+        });
+      }),
       strokeColor: this.strokeColor,
       strokeOpacity: this.strokeOpacity,
       strokeWeight: this.strokeWidth,
@@ -42,10 +48,16 @@ export class GoogleShapePolygon extends GeolocationShapePolygon {
     this.googleShapes.push(polygon);
   }
 
+  update(geometry, settings) {
+    super.update(geometry, settings);
+
+    // Google shapes take no new geometry, so they are replaced.
+    this.detachShapes();
+    this.addShape();
+  }
+
   remove() {
-    this.googleShapes.forEach((googleShape) => {
-      googleShape.setMap();
-    });
+    this.detachShapes();
 
     super.remove();
   }

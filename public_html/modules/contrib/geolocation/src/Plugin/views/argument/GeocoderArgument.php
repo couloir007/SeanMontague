@@ -127,47 +127,50 @@ class GeocoderArgument extends ProximityArgument implements ContainerFactoryPlug
    *   The calculated values.
    */
   public function getParsedReferenceLocation(): array {
-    // Cache the vales so this only gets processed once.
-    static $values;
-
-    if (!isset($values)) {
-      $matches = [];
-      preg_match('/^([^<>=]+)([<>=]+)([0-9.]+)(.*$)/', $this->getValue(), $matches);
-
-      if (count($matches) < 4) {
-        return [];
-      }
-
-      $geocoder = $this->geocoderManager->getGeocoder($this->options['geocoder'], $this->options['geocoder_settings']);
-      if (empty($geocoder)) {
-        return [];
-      }
-
-      $coordinates = $geocoder->geocode($matches[1]);
-      if (empty($coordinates)) {
-        return [];
-      }
-
-      $values = $coordinates['location'];
-
-      if (in_array($matches[2], [
-        '<>',
-        '=',
-        '>=',
-        '<=',
-        '>',
-        '<',
-      ])) {
-        $values['operator'] = $matches[2];
-      }
-      else {
-        return [];
-      }
-      $values['distance'] = floatval($matches[3]);
-      $values['unit'] = empty($matches[4]) ? 'km' : $matches[4];
+    // Cache the values so this only gets processed once per handler - this
+    // geocodes, so it must not run again for every caller.
+    if (isset($this->parsedReferenceLocation)) {
+      return $this->parsedReferenceLocation;
     }
 
-    return $values;
+    $matches = [];
+    preg_match('/^([^<>=]+)([<>=]+)([0-9.]+)(.*$)/', $this->getValue(), $matches);
+
+    if (count($matches) < 4) {
+      return [];
+    }
+
+    $geocoder = $this->geocoderManager->getGeocoder($this->options['geocoder'], $this->options['geocoder_settings']);
+    if (empty($geocoder)) {
+      return [];
+    }
+
+    $coordinates = $geocoder->geocode($matches[1]);
+    if (empty($coordinates)) {
+      return [];
+    }
+
+    $values = $coordinates['location'];
+
+    if (in_array($matches[2], [
+      '<>',
+      '=',
+      '>=',
+      '<=',
+      '>',
+      '<',
+    ])) {
+      $values['operator'] = $matches[2];
+    }
+    else {
+      return [];
+    }
+    $values['distance'] = floatval($matches[3]);
+    $values['unit'] = empty($matches[4]) ? 'km' : $matches[4];
+
+    $this->parsedReferenceLocation = $values;
+
+    return $this->parsedReferenceLocation;
   }
 
 }

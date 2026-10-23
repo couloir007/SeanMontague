@@ -69,3 +69,35 @@ plugin.plugin_configuration.geolocation.layer_feature.marker_label:
         font_weight:
           type: string
           label: 'Font Weight'
+
+plugin.plugin_configuration.geolocation.layer_feature.marker_icon:
+  type: geolocation.layer_feature_settings
+  label: 'Marker Icon'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        marker_icon_path:
+          type: string
+          label: 'Icon path'
+        size:
+          type: mapping
+          label: 'Size'
+          mapping:
+            width:
+              type: integer
+              label: 'Width'
+            height:
+              type: integer
+              label: 'Height'
+        anchor:
+          type: mapping
+          label: 'Anchor'
+          mapping:
+            left:
+              type: string
+              label: 'Left'
+            top:
+              type: string
+              label: 'Top'

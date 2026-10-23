@@ -26,6 +26,13 @@ class EntityArgument extends ProximityArgument implements ContainerFactoryPlugin
   protected array $bundleInfo = [];
 
   /**
+   * Parsed reference location.
+   *
+   * @var array|null
+   */
+  protected ?array $parsedReferenceLocation = NULL;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(
@@ -107,12 +114,12 @@ class EntityArgument extends ProximityArgument implements ContainerFactoryPlugin
    * @param int $entity_id
    *   Entity ID.
    *
-   * @return array|null
-   *   Coordinates.
+   * @return array
+   *   Coordinates, or an empty array when the entity has none.
    */
-  protected function getCoordinatesFromEntityId(int $entity_id): ?array {
+  protected function getCoordinatesFromEntityId(int $entity_id): array {
     if (empty($this->options['geolocation_entity_argument_source'])) {
-      return NULL;
+      return [];
     }
 
     $values = [];
@@ -124,18 +131,18 @@ class EntityArgument extends ProximityArgument implements ContainerFactoryPlugin
       empty($entity_type)
       || empty($field_name)
     ) {
-      return NULL;
+      return [];
     }
 
     /** @var \Drupal\Core\Entity\ContentEntityInterface|null $entity */
     $entity = $this->entityTypeManager->getStorage($entity_type)->load($entity_id);
     if (empty($entity)) {
-      return NULL;
+      return [];
     }
 
     $field = $entity->get($field_name);
     if ($field->isEmpty()) {
-      return NULL;
+      return [];
     }
 
     /** @var \Drupal\geolocation\Plugin\Field\FieldType\GeolocationItem $item */
@@ -154,46 +161,49 @@ class EntityArgument extends ProximityArgument implements ContainerFactoryPlugin
    *   The calculated values.
    */
   public function getParsedReferenceLocation(): array {
-    // Cache the vales so this only gets processed once.
-    static $values;
-
-    if (!isset($values)) {
-      if (empty($this->getValue())) {
-        return [];
-      }
-
-      preg_match('/^([0-9]+)([<>=]+)([0-9.]+)(.*$)/', $this->getValue(), $values);
-
-      if (
-        empty($values)
-        && is_numeric($this->getValue())
-      ) {
-        $values = $this->getCoordinatesFromEntityId($this->getValue());
-        return $values;
-      }
-
-      $values = [
-        'id' => intval($values[1]),
-        'operator' => (isset($values[2]) && in_array($values[2], [
-          '<>',
-          '=',
-          '>=',
-          '<=',
-          '>',
-          '<',
-        ])) ? $values[2] : '<=',
-        'distance' => (isset($values[3])) ? floatval($values[3]) : FALSE,
-        'unit' => !empty($values[4]) ? $values[4] : 'km',
-      ];
-
-      $coordinates = $this->getCoordinatesFromEntityId($values['id']);
-      if (empty($coordinates)) {
-        return [];
-      }
-
-      $values = array_replace($values, $coordinates);
+    // Cache the values so this only gets processed once per handler.
+    if (isset($this->parsedReferenceLocation)) {
+      return $this->parsedReferenceLocation;
     }
-    return $values;
+
+    $value = $this->getValue();
+
+    if (empty($value)) {
+      return [];
+    }
+
+    preg_match('/^([0-9]+)([<>=]+)([0-9.]+)(.*$)/', $value, $values);
+
+    if (
+      empty($values)
+      && is_numeric($value)
+    ) {
+      $this->parsedReferenceLocation = $this->getCoordinatesFromEntityId($value);
+      return $this->parsedReferenceLocation;
+    }
+
+    $values = [
+      'id' => intval($values[1]),
+      'operator' => (isset($values[2]) && in_array($values[2], [
+        '<>',
+        '=',
+        '>=',
+        '<=',
+        '>',
+        '<',
+      ])) ? $values[2] : '<=',
+      'distance' => (isset($values[3])) ? floatval($values[3]) : FALSE,
+      'unit' => !empty($values[4]) ? $values[4] : 'km',
+    ];
+
+    $coordinates = $this->getCoordinatesFromEntityId($values['id']);
+    if (empty($coordinates)) {
+      return [];
+    }
+
+    $this->parsedReferenceLocation = array_replace($values, $coordinates);
+
+    return $this->parsedReferenceLocation;
   }
 
 }

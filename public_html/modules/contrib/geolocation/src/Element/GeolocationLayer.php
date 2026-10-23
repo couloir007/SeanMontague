@@ -3,6 +3,7 @@
 namespace Drupal\geolocation\Element;
 
 use Drupal\Component\Utility\SortArray;
+use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Template\Attribute;
@@ -19,9 +20,8 @@ use Drupal\Core\Template\Attribute;
  *   'location_1' => [...],
  * ];
  * @endcode
- *
- * @RenderElement("geolocation_layer")
  */
+#[RenderElement('geolocation_layer')]
 class GeolocationLayer extends RenderElementBase {
 
   /**
@@ -36,7 +36,7 @@ class GeolocationLayer extends RenderElementBase {
       ],
       '#pre_render' => [
         [$class, 'preRenderGroup'],
-        [$this, 'preRenderLayer'],
+        [$class, 'preRenderLayer'],
       ],
     ];
   }
@@ -50,7 +50,7 @@ class GeolocationLayer extends RenderElementBase {
    * @return array
    *   Renderable layer.
    */
-  public function preRenderLayer(array $render_array): array {
+  public static function preRenderLayer(array $render_array): array {
     $render_array['#theme'] = 'geolocation_map_layer';
 
     $render_array['#cache'] = array_merge_recursive(

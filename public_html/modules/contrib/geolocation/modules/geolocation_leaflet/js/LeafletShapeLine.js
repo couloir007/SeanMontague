@@ -28,7 +28,7 @@ export class LeafletShapeLine extends GeolocationShapeLine {
     );
 
     if (this.title) {
-      line.bindTooltip(this.title);
+      line.bindTooltip(Drupal.checkPlain(this.title));
     }
 
     line.on("click", (event) => {
@@ -43,9 +43,12 @@ export class LeafletShapeLine extends GeolocationShapeLine {
   update(geometry, settings) {
     super.update(geometry, settings);
 
+    // Shapes left in the list would keep being counted - by the boundaries the
+    // map fits itself to, among others - long after leaving the map.
     this.leafletShapes.forEach((leafletShape) => {
       leafletShape.remove();
     });
+    this.leafletShapes = [];
 
     this.addShape();
   }

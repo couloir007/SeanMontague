@@ -3,7 +3,7 @@ import { GoogleLayerFeature } from "./GoogleLayerFeature.js";
 /**
  * @typedef {Object} MarkerInfoWindowSettings
  *
- * @extends {GeolocationMapFeatureSettings}
+ * @augments {GeolocationMapFeatureSettings}
  *
  * @prop {Boolean} info_auto_display
  * @prop {Boolean} disable_auto_pan
@@ -56,9 +56,12 @@ export default class GoogleMarkerInfoWindow extends GoogleLayerFeature {
 
     // Set the info popup text.
     marker.infoWindow = new google.maps.InfoWindow({
-      content: marker.getContent(),
+      content: marker.getContentElement() ?? marker.getContent(),
       disableAutoPan: this.settings.disable_auto_pan,
       maxWidth: this.settings.max_width ?? undefined,
+    });
+    marker.infoWindow.addListener("close", () => {
+      marker.infoWindowOpened = false;
     });
 
     if (marker.title) {
@@ -77,10 +80,14 @@ export default class GoogleMarkerInfoWindow extends GoogleLayerFeature {
 
   /**
    * @param {GeolocationShape}        shape
+   *   Shape that was clicked.
    * @param {google.maps.InfoWindow}  shape.infoWindow
+   *   Info window attached to the shape.
    * @param {boolean}                 shape.infoWindowOpened
+   *   Whether the info window is currently open.
    *
    * @param {GeolocationCoordinates}  coordinates
+   *   Coordinates that were clicked.
    */
   onShapeClicked(shape, coordinates) {
     super.onShapeClicked(shape, coordinates);
@@ -115,7 +122,7 @@ export default class GoogleMarkerInfoWindow extends GoogleLayerFeature {
 
     // Set the info popup text.
     shape.infoWindow = new google.maps.InfoWindow({
-      content: shape.getContent(),
+      content: shape.getContentElement() ?? shape.getContent(),
       disableAutoPan: this.settings.disable_auto_pan,
       maxWidth: this.settings.max_width ?? undefined,
     });

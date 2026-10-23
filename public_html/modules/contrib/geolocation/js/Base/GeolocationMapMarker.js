@@ -20,6 +20,7 @@
  * @prop {GeolocationMapBase} map
  * @prop {String} content
  * @prop {GeolocationMarkerSettings} settings
+ * @prop {Boolean} [geolocationWidgetIgnore] @internal Usage
  */
 export class GeolocationMapMarker {
   /**
@@ -48,6 +49,14 @@ export class GeolocationMapMarker {
     }
 
     return this.content;
+  }
+
+  getContentElement() {
+    if (typeof this.contentElement === "undefined") {
+      this.contentElement = this.wrapper?.querySelector(".location-content") ?? null;
+    }
+
+    return this.contentElement;
   }
 
   /**
@@ -98,13 +107,23 @@ export class GeolocationMapMarker {
     });
   }
 
-  click() {
+  /**
+   * React to the marker having been clicked.
+   */
+  onClick() {
     this.map.dataLayers.forEach((layer) => {
       layer.markerClicked(this);
     });
   }
 
+  /**
+   * Click the marker.
+   */
+  click() {
+    // Implemented by provider-specific code.
+  }
+
   animate() {
-    // TODO: Hu?
+    // Implemented by provider-specific code.
   }
 }

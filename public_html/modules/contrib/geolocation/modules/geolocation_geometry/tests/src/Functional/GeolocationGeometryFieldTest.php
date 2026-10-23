@@ -5,13 +5,15 @@ namespace Drupal\Tests\geolocation_geometry\Functional;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the creation of geolocation fields.
  *
  * @group geolocation
  */
+#[RunTestsInSeparateProcesses]
 class GeolocationGeometryFieldTest extends BrowserTestBase {
 
   /**
@@ -33,10 +35,8 @@ class GeolocationGeometryFieldTest extends BrowserTestBase {
 
   /**
    * Test user.
-   *
-   * @var \Drupal\user\Entity\User
    */
-  protected User $articleCreator;
+  protected UserInterface $articleCreator;
 
   /**
    * {@inheritdoc}

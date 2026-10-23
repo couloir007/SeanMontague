@@ -14,13 +14,20 @@ export class GoogleShapeMultiPolygon extends GeolocationShapeMultiPolygon {
     Object.assign(this, GoogleShapeTrait);
 
     this.googleShapes = [];
-    this.geometry.coordinates.forEach((polygonGeometry) => {
+
+    this.addShape();
+  }
+
+  addShape() {
+    this.geometry.coordinates.forEach((polygonCoordinates) => {
       const polygon = new google.maps.Polygon({
-        paths: [
-          polygonGeometry.coordinates[0].map((value) => {
-            return { lat: value[1], lng: value[0] };
-          }),
-        ],
+        // The outer ring comes first, any further ring is a hole - which is
+        // what Google reads a list of paths as.
+        paths: polygonCoordinates.map((ring) => {
+          return ring.map((position) => {
+            return { lat: position[1], lng: position[0] };
+          });
+        }),
         strokeColor: this.strokeColor,
         strokeOpacity: this.strokeOpacity,
         strokeWeight: this.strokeWidth,
@@ -41,10 +48,17 @@ export class GoogleShapeMultiPolygon extends GeolocationShapeMultiPolygon {
     });
   }
 
+  update(geometry, settings) {
+    super.update(geometry, settings);
+
+    // Google shapes take no new geometry, so they are replaced - and a multi
+    // geometry can have gained or lost parts along the way.
+    this.detachShapes();
+    this.addShape();
+  }
+
   remove() {
-    this.googleShapes.forEach((googleShape) => {
-      googleShape.setMap();
-    });
+    this.detachShapes();
 
     super.remove();
   }

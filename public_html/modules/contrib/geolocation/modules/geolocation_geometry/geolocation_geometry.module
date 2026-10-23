@@ -24,7 +24,9 @@ function geolocation_geometry_geolocation_google_maps_parameters(): array {
  */
 #[LegacyHook]
 function geolocation_geometry_field_views_data(FieldStorageConfigInterface $field_storage): array {
-  $views = new Views();
+  /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager */
+  $entity_field_manager = \Drupal::service('entity_field.manager');
+  $views = new Views(\Drupal::entityTypeManager(), $entity_field_manager);
   return $views->fieldViewsData($field_storage);
 }
 
@@ -33,6 +35,8 @@ function geolocation_geometry_field_views_data(FieldStorageConfigInterface $fiel
  */
 #[LegacyHook]
 function geolocation_geometry_field_views_data_views_data_alter(array &$data, FieldStorageConfigInterface $field_storage): void {
-  $views = new Views();
+  /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager */
+  $entity_field_manager = \Drupal::service('entity_field.manager');
+  $views = new Views(\Drupal::entityTypeManager(), $entity_field_manager);
   $views->fieldViewsDataViewsDataAlter($data, $field_storage);
 }

@@ -8,6 +8,8 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\geolocation\BoundaryTrait;
 use Drupal\geolocation\GeocoderManager;
+use Drupal\search_api\Plugin\views\query\SearchApiQuery;
+use Drupal\search_api\Query\QueryInterface;
 use Drupal\views\Plugin\views\filter\FilterPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -321,16 +323,72 @@ class GeolocationSearchApiFilterBoundary extends FilterPluginBase implements Con
       return;
     }
 
-    /** @var \Drupal\search_api\Query\Query $query */
+    /** @var \Drupal\search_api\Plugin\views\query\SearchApiQuery $query */
     $query = $this->query;
 
+    static::addBoundaryOptions(
+      $query,
+      $this->realField,
+      (float) $lat_north_east,
+      (float) $lng_north_east,
+      (float) $lat_south_west,
+      (float) $lng_south_west
+    );
+  }
+
+  /**
+   * Restricts a Search API query to a boundary.
+   *
+   * Shared with the map facet.
+   *
+   * @param \Drupal\search_api\Query\QueryInterface|\Drupal\search_api\Plugin\views\query\SearchApiQuery $query
+   *   Search API query, or the Views query plugin wrapping it.
+   * @param string $field
+   *   Search API field identifier.
+   * @param float $lat_north_east
+   *   North east latitude.
+   * @param float $lng_north_east
+   *   North east longitude.
+   * @param float $lat_south_west
+   *   South west latitude.
+   * @param float $lng_south_west
+   *   South west longitude.
+   *
+   * @see \Drupal\geolocation_search_api\Plugin\facets\query_type\GeolocationBoundary::execute()
+   */
+  public static function addBoundaryOptions(QueryInterface|SearchApiQuery $query, string $field, float $lat_north_east, float $lng_north_east, float $lat_south_west, float $lng_south_west): void {
+    // The Solr backend reads the heatmap keys off this option without
+    // guarding them, so they have to be present even though this filter only
+    // wants the bounding box. The values are the ones the Search API Location
+    // facet widget uses.
+    // @see \Drupal\search_api_solr\Plugin\search_api\backend\SearchApiSolrBackend::setRpt()
+    // @see \Drupal\facets_map_widget\Plugin\facets\query_type\SearchApiRpt
     $location_options = [
       [
-        'field' => $this->realField,
-        'geom' => "[$lat_south_west,$lng_south_west TO $lat_north_east,$lng_north_east]",
+        'field' => $field,
+        // Plain decimals, floats would be cast to exponent notation.
+        'geom' => sprintf('[%F,%F TO %F,%F]', $lat_south_west, $lng_south_west, $lat_north_east, $lng_north_east),
+        'format' => 'ints2D',
+        'maxCells' => '35554432',
+        'gridLevel' => '2',
+        'distErr' => '',
+        'distErrPct' => '',
       ],
     ];
     $query->setOption('search_api_rpt', $location_options);
+
+    // "search_api_rpt" carries the boundary in Solr's own syntax. Backends
+    // without a boundary convention of their own read the plain coordinates
+    // instead, the way proximity uses "search_api_location".
+    $boundaries = (array) $query->getOption('geolocation_boundary', []);
+    $boundaries[] = [
+      'field' => $field,
+      'lat_north_east' => $lat_north_east,
+      'lng_north_east' => $lng_north_east,
+      'lat_south_west' => $lat_south_west,
+      'lng_south_west' => $lng_south_west,
+    ];
+    $query->setOption('geolocation_boundary', $boundaries);
   }
 
   /**

@@ -3,7 +3,7 @@ import { LeafletMapFeature } from "./LeafletMapFeature.js";
 /**
  * @typedef {Object} ControlZoomSettings
  *
- * @extends {GeolocationMapFeatureSettings}
+ * @augments {GeolocationMapFeatureSettings}
  *
  * @prop {("topleft" | "topright" | "bottomleft" | "bottomright")} position
  */

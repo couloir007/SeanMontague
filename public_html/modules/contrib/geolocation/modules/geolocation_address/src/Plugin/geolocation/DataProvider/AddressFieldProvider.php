@@ -128,8 +128,10 @@ class AddressFieldProvider extends DataProviderBase implements DataProviderInter
     ));
 
     return !empty($coordinates['location']) ? [
-      '#type' => 'geolocation_map_location',
-      '#coordinates' => $coordinates['location'],
+      [
+        '#type' => 'geolocation_map_location',
+        '#coordinates' => $coordinates['location'],
+      ],
     ] : [];
   }
 

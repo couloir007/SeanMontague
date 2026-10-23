@@ -6,7 +6,7 @@
 /**
  * @typedef {Object} GeolocationViewsFilterGeocoderSettings
  *
- * @extends {GeolocationGeocoderSettings}
+ * @augments {GeolocationGeocoderSettings}
  *
  * @prop {String} import_path
  */
@@ -23,22 +23,25 @@
   Drupal.behaviors.geolocationViewsFilterGeocoder = {
     /**
      * @param {Object} context
+     *   The context to attach to.
      * @param {Object} drupalSettings
+     *   Drupal settings.
      * @param {Object.<String, GeolocationViewsFilterGeocoderSettings>} drupalSettings.geolocation.geocoder.viewsFilterGeocoder
+     *   Geocoder settings keyed by exposed filter element ID.
      */
     attach: (context, drupalSettings) => {
       for (const [elementId, filterSettings] of Object.entries(drupalSettings.geolocation.geocoder.viewsFilterGeocoder)) {
-        const form = document.querySelector(`.views-exposed-form .geolocation-geocoder-address[data-source-identifier="${elementId}"]`);
-
-        if (form.classList.contains("processed")) {
-          return;
-        }
-        form.classList.add("processed");
+        const form = document.querySelector(`form[id^="views-exposed-form-"] .geolocation-geocoder-address[data-source-identifier="${elementId}"]`);
 
         if (!form) {
           console.warn("Could not find views exposed filter form.");
-          return;
+          continue;
         }
+
+        if (form.classList.contains("processed")) {
+          continue;
+        }
+        form.classList.add("processed");
 
         import(filterSettings.settings.import_path)
           /** @param {GeolocationGeocoder} geocoder */

@@ -9,6 +9,13 @@ use Drupal\Core\TypedData\DataDefinition;
 
 /**
  * Plugin implementation of the 'geolocation_gpx' field type.
+ *
+ * @property ?int $gpx_id
+ *   GPX ID.
+ * @property ?int $gpx_file_id
+ *   GPX file ID.
+ * @property ?bool $gpx_owned
+ *   Whether removing this item deletes the referenced GPX.
  */
 #[FieldType(id: 'geolocation_gpx',
   label: new \Drupal\Core\StringTranslation\TranslatableMarkup('Geolocation GPX - File & Data'),
@@ -33,6 +40,12 @@ class GeolocationGpx extends FieldItemBase {
           'size' => 'big',
           'not null' => FALSE,
         ],
+        'gpx_owned' => [
+          'description' => 'Whether removing this item deletes the referenced GPX. Nullable, as items written before this column existed - and any written programmatically - predate the choice and are treated as owning.',
+          'type' => 'int',
+          'size' => 'tiny',
+          'not null' => FALSE,
+        ],
       ],
       'indexes' => [
         'gpx_id' => ['gpx_id'],
@@ -46,6 +59,12 @@ class GeolocationGpx extends FieldItemBase {
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition): array {
     $properties['gpx_id'] = DataDefinition::create('integer')
       ->setLabel(t('GPX'));
+
+    $properties['gpx_file_id'] = DataDefinition::create('integer')
+      ->setLabel(t('GPX File'));
+
+    $properties['gpx_owned'] = DataDefinition::create('boolean')
+      ->setLabel(t('GPX owned'));
 
     return $properties;
   }
@@ -62,9 +81,9 @@ class GeolocationGpx extends FieldItemBase {
    */
   public function delete(): void {
 
-    $gpx_id = $this->values['gpx_id'] ?? FALSE;
+    $gpx_id = $this->gpx_id;
 
-    if ($gpx_id) {
+    if ($gpx_id && $this->isOwning()) {
       try {
         /** @var \Drupal\geolocation_gpx\Entity\GeolocationGpx|NULL $gpx */
         $gpx = \Drupal::entityTypeManager()->getStorage('geolocation_gpx')->load(
@@ -79,6 +98,20 @@ class GeolocationGpx extends FieldItemBase {
     }
 
     parent::delete();
+  }
+
+  /**
+   * Whether this item owns the GPX it points to.
+   *
+   * Only an explicit opt-out releases the GPX. Anything else - a referenced
+   * GPX the user declared a dependency on, an imported one, or a value stored
+   * before this column existed - is owned, so the GPX goes when the item does.
+   *
+   * @return bool
+   *   TRUE if removing this item must delete the referenced GPX.
+   */
+  public function isOwning(): bool {
+    return (bool) ($this->gpx_owned ?? TRUE);
   }
 
 }

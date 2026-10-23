@@ -5,12 +5,14 @@ namespace Drupal\Tests\geolocation_google_maps\FunctionalJavascript;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\geolocation\MapProviderInterface;
 use Drupal\views\Entity\View;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the GoogleMaps JavaScript functionality.
  *
  * @group geolocation
  */
+#[RunTestsInSeparateProcesses]
 class GeolocationGoogleJavascriptTest extends WebDriverTestBase {
 
   /**
@@ -91,12 +93,7 @@ class GeolocationGoogleJavascriptTest extends WebDriverTestBase {
     $result = $this->assertSession()->elementExists('css', '.field-content span[typeof="GeoCoordinates"]');
     $this->assertNotEmpty($result, "Location field content present.");
 
-    $result = $this->assertSession()->waitForElementVisible('css', '.geolocation-map-container div[class$=pin-view]', 5000);
-
-    // Google randomly refuses to load due to key restrictions. Just ignore.
-    if (!$result) {
-      return;
-    }
+    $result = $this->assertSession()->waitForElement('css', '.geolocation-map-container gmp-advanced-marker', 10000);
     $this->assertNotEmpty($result, "Marker element present.");
   }
 
@@ -122,20 +119,18 @@ class GeolocationGoogleJavascriptTest extends WebDriverTestBase {
 
     $this->assertSession()->elementNotExists('css', 'div.gm-style-iw');
 
-    $result = $this->assertSession()->waitForElementVisible('css', '.geolocation-map-container div[class$=marker-view]:last-child div[class$=pin-view]', 5000);
-
-    // Google randomly refuses to load due to key restrictions. Just ignore.
-    if (!$result) {
-      return;
-    }
-
-    try {
-      $result->click();
-    }
-    catch (\Exception $e) {
-      $result = $this->assertSession()->waitForElementVisible('css', '.geolocation-map-container div[class$=marker-view]:nth-child(5) div[class$=pin-view]', 5000);
-      $result->click();
-    }
+    // Markers overlap, so wait for one no other marker covers, and click it.
+    $this->assertTrue($this->getSession()->wait(10000, <<<'JS'
+      !![...document.querySelectorAll('.geolocation-map-container gmp-advanced-marker')].find((marker) => {
+        const rect = marker.getBoundingClientRect();
+        if (!marker.contains(document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2))) {
+          return false;
+        }
+        marker.setAttribute('data-test-uncovered', '');
+        return true;
+      })
+      JS), "Clickable marker present.");
+    $this->click('.geolocation-map-container gmp-advanced-marker[data-test-uncovered]');
 
     $this->assertSession()->elementExists('css', 'div.gm-style-iw');
   }
@@ -170,12 +165,7 @@ class GeolocationGoogleJavascriptTest extends WebDriverTestBase {
     }
     $this->assertEmpty($googleErrorMessage, "No Google error messages");
 
-    $result = $this->assertSession()->waitForElementVisible('css', 'div[title^="Cluster"]', 5000);
-
-    // Google randomly refuses to load due to key restrictions. Just ignore.
-    if (!$result) {
-      return;
-    }
+    $result = $this->assertSession()->waitForElement('css', '.geolocation-map-container gmp-advanced-marker[title^="Cluster"]', 10000);
     $this->assertNotEmpty($result, "Cluster element present.");
   }
 

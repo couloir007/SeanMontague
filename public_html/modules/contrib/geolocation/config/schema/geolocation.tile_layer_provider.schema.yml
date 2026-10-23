@@ -1,3 +1,105 @@
+plugin.plugin_configuration.geolocation.tile_layer_provider.geolocation_tile_azuremaps:
+  type: geolocation.tile_layer_provider_settings
+  label: 'Azure Maps Tiles'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        subscription_key:
+          type: string
+          label: 'Subscription key'
+        use_current_language:
+          type: boolean
+          label: 'Use current user language'
+
+plugin.plugin_configuration.geolocation.tile_layer_provider.geolocation_tile_cartodb:
+  type: geolocation.tile_layer_provider_settings
+  label: 'CARTO Tiles'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        key:
+          type: string
+          label: 'API key'
+
+plugin.plugin_configuration.geolocation.tile_layer_provider.geolocation_tile_jawg:
+  type: geolocation.tile_layer_provider_settings
+  label: 'Jawg Maps Tiles'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        access_token:
+          type: string
+          label: 'Access token'
+        use_current_language:
+          type: boolean
+          label: 'Use current user language'
+
+plugin.plugin_configuration.geolocation.tile_layer_provider.geolocation_tile_mapbox:
+  type: geolocation.tile_layer_provider_settings
+  label: 'Mapbox Tiles'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        access_token:
+          type: string
+          label: 'Access token'
+
+plugin.plugin_configuration.geolocation.tile_layer_provider.geolocation_tile_maptiler:
+  type: geolocation.tile_layer_provider_settings
+  label: 'MapTiler Tiles'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        key:
+          type: string
+          label: 'API key'
+
+plugin.plugin_configuration.geolocation.tile_layer_provider.geolocation_tile_nls:
+  type: geolocation.tile_layer_provider_settings
+  label: 'National Library of Scotland Tiles'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        key:
+          type: string
+          label: 'MapTiler API key'
+
+plugin.plugin_configuration.geolocation.tile_layer_provider.geolocation_tile_openweathermap:
+  type: geolocation.tile_layer_provider_settings
+  label: 'OpenWeatherMap Tiles'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        api_key:
+          type: string
+          label: 'API key'
+
+plugin.plugin_configuration.geolocation.tile_layer_provider.geolocation_tile_stadia:
+  type: geolocation.tile_layer_provider_settings
+  label: 'Stadia Maps Tiles'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        api_key:
+          type: string
+          label: 'API key'
+
 plugin.plugin_configuration.geolocation.tile_layer_provider.geolocation_tile_thunderforest:
   type: geolocation.tile_layer_provider_settings
   label: 'Thunderforest Tiles'
@@ -8,13 +110,41 @@ plugin.plugin_configuration.geolocation.tile_layer_provider.geolocation_tile_thu
       mapping:
         apikey:
           type: string
-          label: 'API Key'
-    layers:
-      type: sequence
-      label: 'Available layers'
-      sequence:
-        type: mapping
-        mapping:
-          enabled:
-            type: integer
+          label: 'API key'
 
+plugin.plugin_configuration.geolocation.tile_layer_provider.geolocation_tile_tomtom:
+  type: geolocation.tile_layer_provider_settings
+  label: 'TomTom Tiles'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        key:
+          type: string
+          label: 'API key'
+        use_current_language:
+          type: boolean
+          label: 'Use current user language'
+
+plugin.plugin_configuration.geolocation.tile_layer_provider.geolocation_tile_custom:
+  type: geolocation.tile_layer_provider_settings
+  label: 'Custom Tiles'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        url:
+          type: string
+          label: 'Tile URL'
+        attribution:
+          type: string
+          label: 'Attribution'
+        max_zoom:
+          type: integer
+          label: 'Maximum zoom'
+          nullable: true
+        overlay:
+          type: boolean
+          label: 'Overlay'

@@ -5,13 +5,15 @@ namespace Drupal\Tests\geolocation\Functional;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the creation of geolocation fields.
  *
  * @group geolocation
  */
+#[RunTestsInSeparateProcesses]
 class GeolocationFieldTest extends BrowserTestBase {
 
   /**
@@ -35,10 +37,8 @@ class GeolocationFieldTest extends BrowserTestBase {
 
   /**
    * Article creator.
-   *
-   * @var \Drupal\user\Entity\User
    */
-  protected User $articleCreator;
+  protected UserInterface $articleCreator;
 
   /**
    * {@inheritdoc}
@@ -85,8 +85,9 @@ class GeolocationFieldTest extends BrowserTestBase {
     $lat_sexagesimal = '49° 52\' 50.3652"';
     $lng = '10.869212';
     $lng_sexagesimal = '10° 52\' 9.1632"';
+    $title = $this->randomMachineName();
     $edit = [
-      'title[0][value]' => $this->randomMachineName(),
+      'title[0][value]' => $title,
       'field_geolocation_demo_single[0][lat]' => $lat,
       'field_geolocation_demo_single[0][lng]' => $lng,
     ];
@@ -96,8 +97,9 @@ class GeolocationFieldTest extends BrowserTestBase {
     $this->assertSession()->responseContains($lat);
     $this->assertSession()->responseContains($lng);
 
-    // @todo Figure out the actually created NID instead of guessing.
-    $this->drupalGet('node/101/edit');
+    $node = $this->drupalGetNodeByTitle($title);
+    $this->assertNotEmpty($node, 'Node created.');
+    $this->drupalGet('node/' . $node->id() . '/edit');
 
     $this->assertSession()->responseContains(htmlspecialchars($lat_sexagesimal, ENT_QUOTES));
     $this->assertSession()->responseContains(htmlspecialchars($lng_sexagesimal, ENT_QUOTES));

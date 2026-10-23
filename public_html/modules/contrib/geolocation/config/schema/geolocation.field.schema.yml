@@ -40,7 +40,7 @@ geolocation.field.formatter.map.base:
       type: sequence
       label: 'Center option settings'
       sequence:
-        type: plugin.plugin_configuration.geolocation.map_center_option.[%key]
+        type: plugin.plugin_configuration.geolocation.map_center_option.[map_center_id]
         label: 'The settings for a map center option'
     map_provider_id:
       type: string
@@ -88,11 +88,14 @@ geolocation.field.widget.map.base:
     hide_inputs:
       type: boolean
       label: 'Hide inputs'
+    set_result_on_geocode:
+      type: boolean
+      label: 'Set result on geocode'
     centre:
       type: sequence
       label: 'Center option settings'
       sequence:
-        type: plugin.plugin_configuration.geolocation.map_center_option.[%key]
+        type: plugin.plugin_configuration.geolocation.map_center_option.[map_center_id]
         label: 'The settings for a map center option'
 
 field.widget.settings.geolocation_map:

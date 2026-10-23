@@ -117,6 +117,10 @@ export default class GeolocationDataLayer {
     }
 
     this.map.wrapper.querySelectorAll(selector).forEach((location) => {
+      if (location.closest(".geolocation-map-wrapper") !== this.map.wrapper) {
+        return;
+      }
+
       const marker = this.map.createMarker(new GeolocationCoordinates(location.getAttribute("data-lat"), location.getAttribute("data-lng")), {
         id: location.getAttribute("id"),
         title: location.querySelector(".location-title")?.textContent.trim(),
@@ -184,8 +188,13 @@ export default class GeolocationDataLayer {
 
   removeMarkers() {
     while (this.markers.length) {
-      const removedMarker = this.markers.pop();
+      const removedMarker = this.markers[this.markers.length - 1];
       this.markerRemoved(removedMarker);
+      const index = this.markers.indexOf(removedMarker);
+      if (index !== -1) {
+        this.markers.splice(index, 1);
+      }
+
       removedMarker.remove();
     }
   }
@@ -225,16 +234,24 @@ export default class GeolocationDataLayer {
     }
 
     this.map.wrapper.querySelectorAll(selector).forEach((shapeElement) => {
+      if (shapeElement.closest(".geolocation-map-wrapper") !== this.map.wrapper) {
+        return;
+      }
+
       const settings = {
         wrapper: shapeElement,
         title: shapeElement.querySelector("h2.title")?.textContent ?? "",
         content: shapeElement.querySelector("div.content")?.innerHTML ?? "",
         strokeColor: shapeElement.getAttribute("data-stroke-color") ?? "#0000FF",
-        strokeWidth: shapeElement.getAttribute("data-stroke-width") ?? 2,
-        strokeOpacity: shapeElement.getAttribute("data-stroke-opacity") ?? 1,
+        strokeWidth: parseInt(shapeElement.getAttribute("data-stroke-width")),
+        strokeOpacity: parseFloat(shapeElement.getAttribute("data-stroke-opacity")),
         fillColor: shapeElement.getAttribute("data-fill-color") ?? "#0000FF",
-        fillOpacity: shapeElement.getAttribute("data-fill-opacity") ?? 0.2,
+        fillOpacity: parseFloat(shapeElement.getAttribute("data-fill-opacity")),
       };
+
+      if (Number.isNaN(settings.strokeWidth)) settings.strokeWidth = 2;
+      if (Number.isNaN(settings.strokeOpacity)) settings.strokeOpacity = 1;
+      if (Number.isNaN(settings.fillOpacity)) settings.fillOpacity = 0.2;
 
       const geometry = JSON.parse(shapeElement.querySelector(".geometry")?.textContent);
 
@@ -287,6 +304,8 @@ export default class GeolocationDataLayer {
         console.error(e, `Feature  ${feature.constructor.name} failed onShapeAdded: ${e.toString()}`);
       }
     });
+
+    return shape;
   }
 
   /**
@@ -329,6 +348,21 @@ export default class GeolocationDataLayer {
       this.shapeRemoved(removedShape);
       removedShape.remove();
     }
+  }
+
+  destroy() {
+    this.removeMarkers();
+    this.removeShapes();
+
+    this.features.forEach((feature) => {
+      try {
+        feature.destroy();
+      } catch (e) {
+        console.error(e, `Feature  ${feature.constructor.name} failed destroy: ${e.toString()}`);
+      }
+    });
+
+    this.features.clear();
   }
 
   getShapeById(id) {

@@ -1,7 +1,13 @@
-import { LeafletMapFeature } from "./LeafletMapFeature.js";
 import { GeolocationCoordinates } from "../../../../js/Base/GeolocationCoordinates.js";
+import GeolocationGeometryFieldWidgetMapConnector from "../../../geolocation_geometry/js/MapFeature/GeolocationGeometryFieldWidgetMapConnector.js";
 
-export default class LeafletGeometryWidgetMapConnector extends LeafletMapFeature {
+/**
+ * Leaflet Draw based geometry widget connector.
+ *
+ * @prop {L.Map} map
+ * @prop {L.FeatureGroup} drawnItemsGroup
+ */
+export default class LeafletGeometryWidgetMapConnector extends GeolocationGeometryFieldWidgetMapConnector {
   constructor(settings, map) {
     super(settings, map);
 
@@ -68,7 +74,7 @@ export default class LeafletGeometryWidgetMapConnector extends LeafletMapFeature
 
     this.map.leafletMap.on(
       L.Draw.Event.CREATED,
-      /** @param {DrawEvents.Created} event */ (event) => {
+      /** @param {DrawEvents.Created} event Draw event for the newly created shape. */ (event) => {
         let currentElementCount = 0;
         this.drawnItemsGroup.eachLayer(() => {
           currentElementCount++;
@@ -78,8 +84,11 @@ export default class LeafletGeometryWidgetMapConnector extends LeafletMapFeature
         if (this.settings.cardinality > currentElementCount || this.settings.cardinality === -1) {
           this.drawnItemsGroup.eachLayer(
             /**
+             * @param {Layer} element
+             *   Layer already present in the drawn items group.
              * @param {int} element.widgetIndex
-             * */
+             *   Widget index the layer is associated with.
+             */
             (element) => {
               if (typeof element.widgetIndex === "undefined") {
                 return;
@@ -100,8 +109,8 @@ export default class LeafletGeometryWidgetMapConnector extends LeafletMapFeature
 
         switch (event.layerType) {
           case "marker":
-            const geometry = event.layer.toGeoJSON().geometry;
-            const marker = this.createMarker(new GeolocationCoordinates(geometry.coordinates[1], geometry.coordinates[0]));
+            const { geometry } = event.layer.toGeoJSON();
+            const marker = this.map.createMarker(new GeolocationCoordinates(geometry.coordinates[1], geometry.coordinates[0]));
             this.setIndexByMarker(marker, newIndex);
             this.map.dataLayers.get("default").markerAdded(marker);
             break;
@@ -129,6 +138,7 @@ export default class LeafletGeometryWidgetMapConnector extends LeafletMapFeature
       L.Draw.Event.EDITVERTEX,
       /**
        * @param {DrawEvents.EditVertex} event
+       *   Draw event for the edited vertex.
        */
       (event) => {
         if (typeof event.poly === "undefined") {
@@ -140,7 +150,7 @@ export default class LeafletGeometryWidgetMapConnector extends LeafletMapFeature
          *
          * @prop {int} widgetIndex
          */
-        const poly = event.poly;
+        const { poly } = event;
 
         if (typeof poly.widgetIndex === "undefined") {
           return console.error("Updated poly could not be associated to shape.");
@@ -156,12 +166,15 @@ export default class LeafletGeometryWidgetMapConnector extends LeafletMapFeature
       L.Draw.Event.DELETED,
       /**
        * @param {DrawEvents.Deleted} event
+       *   Draw event for the deleted layers.
        */
       (event) => {
         event.layers.eachLayer(
           /**
            * @param {Layer} layer
+           *   Layer that was deleted.
            * @param {int} layer.widgetIndex
+           *   Widget index the layer is associated with.
            */
           (layer) => {
             if (typeof layer.widgetIndex === "undefined") {
@@ -174,64 +187,6 @@ export default class LeafletGeometryWidgetMapConnector extends LeafletMapFeature
         );
       }
     );
-  }
-
-  setWidgetSubscriber(subscriber) {
-    this.subscriber = subscriber;
-  }
-
-  /**
-   * @param {GeolocationShape} shape
-   *   Marker.
-   *
-   * @return {int|null}
-   *   Index.
-   */
-  getIndexByShape(shape) {
-    return Number(shape.wrapper.dataset.geolocationWidgetIndex ?? 0);
-  }
-
-  /**
-   * @param {int} index
-   *   Index.
-   *
-   * @return {GeolocationShape|null}
-   *   Shape.
-   */
-  getShapeByIndex(index) {
-    let returnValue = null;
-    this.map.dataLayers.get("default").shapes.forEach((shape) => {
-      if (index === this.getIndexByShape(shape)) {
-        returnValue = shape;
-      }
-    });
-
-    return returnValue;
-  }
-
-  /**
-   * @param {GeolocationShape} shape
-   *   Marker.
-   * @param {int|false} index
-   *   Index.
-   */
-  setIndexByShape(shape, index = false) {
-    if (index === false) {
-      delete shape.wrapper.dataset.geolocationWidgetIndex;
-    } else {
-      shape.wrapper.dataset.geolocationWidgetIndex = index.toString();
-    }
-  }
-
-  /**
-   * @param {Number} index
-   *   Index.
-   *
-   * @return {String}
-   *   Title.
-   */
-  getShapeTitle(index) {
-    return `${index + 1}`;
   }
 
   addShapeSilently(index, geometry) {
@@ -286,22 +241,6 @@ export default class LeafletGeometryWidgetMapConnector extends LeafletMapFeature
     return shape;
   }
 
-  reorderSilently(newOrder) {
-    this.map.dataLayers.get("default").markers.forEach((marker) => {
-      const oldIndex = this.getIndexByMarker(marker);
-      const newIndex = newOrder.indexOf(oldIndex);
-
-      marker.geolocationWidgetIgnore = true;
-      marker.update(null, {
-        title: this.getShapeTitle(newIndex),
-        label: newIndex + 1,
-      });
-      delete marker.geolocationWidgetIgnore;
-
-      this.setIndexByMarker(marker, newIndex);
-    });
-  }
-
   updateShapeSilently(index, geometry, settings = null) {
     const shape = this.getShapeByIndex(index);
 
@@ -327,36 +266,5 @@ export default class LeafletGeometryWidgetMapConnector extends LeafletMapFeature
     shape.remove();
 
     this.map.fitMapToElements();
-  }
-
-  onShapeAdded(shape) {
-    super.onShapeAdded(shape);
-
-    if (shape.geolocationWidgetIgnore ?? false) return;
-
-    this.subscriber?.geometryAdded(shape.geometry, this.getIndexByShape(shape) ?? 0);
-  }
-
-  onShapeClicked(shape, coordinates) {
-    super.onShapeClicked(shape, coordinates);
-
-    // Will trigger onShapeRemove and notify broker.
-    shape.remove();
-  }
-
-  onShapeUpdated(shape) {
-    super.onShapeUpdated(shape);
-
-    if (shape.geolocationWidgetIgnore ?? false) return;
-
-    this.subscriber?.geometryAltered(shape.geometry, this.getIndexByShape(shape));
-  }
-
-  onShapeRemove(shape) {
-    super.onShapeRemove(shape);
-
-    if (shape.geolocationWidgetIgnore ?? false) return;
-
-    this.subscriber?.geometryRemoved(this.getIndexByShape(shape));
   }
 }

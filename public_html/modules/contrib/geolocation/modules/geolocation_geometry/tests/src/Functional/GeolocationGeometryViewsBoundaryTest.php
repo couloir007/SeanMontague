@@ -4,12 +4,14 @@ namespace Drupal\Tests\geolocation_geometry\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the grid style plugin.
  *
  * @group geolocation
  */
+#[RunTestsInSeparateProcesses]
 class GeolocationGeometryViewsBoundaryTest extends BrowserTestBase {
 
   /**

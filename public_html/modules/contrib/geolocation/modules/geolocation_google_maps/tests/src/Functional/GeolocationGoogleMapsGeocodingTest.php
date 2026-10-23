@@ -3,12 +3,14 @@
 namespace Drupal\Tests\geolocation_google_maps\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the creation of geolocation fields.
  *
  * @group geolocation
  */
+#[RunTestsInSeparateProcesses]
 class GeolocationGoogleMapsGeocodingTest extends BrowserTestBase {
 
   /**

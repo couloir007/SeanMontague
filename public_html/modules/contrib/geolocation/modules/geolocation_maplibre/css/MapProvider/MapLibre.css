@@ -1,0 +1,9 @@
+.geolocation-map-container.maplibregl-map {
+  overflow: hidden;
+}
+
+/* Themes tend to cap image width, which would shrink a marker icon. */
+.geolocation-maplibre-marker-icon {
+  max-width: none;
+  cursor: pointer;
+}

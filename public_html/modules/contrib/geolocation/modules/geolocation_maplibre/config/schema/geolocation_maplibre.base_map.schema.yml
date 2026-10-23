@@ -1,0 +1,82 @@
+plugin.plugin_configuration.geolocation_maplibre.base_map.*:
+  type: mapping
+  label: 'Base map settings'
+  mapping:
+    style:
+      type: string
+      label: 'Style'
+
+plugin.plugin_configuration.geolocation_maplibre.base_map.openfreemap:
+  type: mapping
+  label: 'OpenFreeMap'
+  mapping:
+    style:
+      type: string
+      label: 'Style'
+    use_current_language:
+      type: boolean
+      label: 'Use current user language'
+
+plugin.plugin_configuration.geolocation_maplibre.base_map.maplibre_demo:
+  type: mapping
+  label: 'MapLibre Demo'
+  mapping:
+    style:
+      type: string
+      label: 'Style'
+
+plugin.plugin_configuration.geolocation_maplibre.base_map.maptiler:
+  type: mapping
+  label: 'MapTiler'
+  mapping:
+    style:
+      type: string
+      label: 'Style'
+    key:
+      type: string
+      label: 'API key'
+    use_current_language:
+      type: boolean
+      label: 'Use current user language'
+
+plugin.plugin_configuration.geolocation_maplibre.base_map.stadia:
+  type: mapping
+  label: 'Stadia Maps'
+  mapping:
+    style:
+      type: string
+      label: 'Style'
+    api_key:
+      type: string
+      label: 'API key'
+    use_current_language:
+      type: boolean
+      label: 'Use current user language'
+
+plugin.plugin_configuration.geolocation_maplibre.base_map.mapbox:
+  type: mapping
+  label: 'Mapbox'
+  mapping:
+    style:
+      type: string
+      label: 'Style'
+    custom_style:
+      type: string
+      label: 'Mapbox Studio style'
+    access_token:
+      type: string
+      label: 'Access token'
+    use_current_language:
+      type: boolean
+      label: 'Use current user language'
+
+plugin.plugin_configuration.geolocation_maplibre.base_map.custom:
+  type: mapping
+  label: 'Custom'
+  mapping:
+    style_url:
+      type: string
+      label: 'Style URL'
+    attribution:
+      type: string
+      label: 'Attribution'

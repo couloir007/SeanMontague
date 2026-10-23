@@ -33,6 +33,17 @@ class Yandex extends MapProviderBase {
         'max_zoom' => 20,
         'height' => '400px',
         'width' => '100%',
+        'data_layers' => [
+          'geolocation_default_layer:default' => [
+            'settings' => [
+              'features' => [
+                'yandex_marker_popup' => [
+                  'enabled' => TRUE,
+                ],
+              ],
+            ],
+          ],
+        ],
       ]
     );
   }
@@ -43,7 +54,11 @@ class Yandex extends MapProviderBase {
   public function getSettings(array $settings): array {
     $settings = parent::getSettings($settings);
 
+    // Yandex validates the zoom range with a raw '>=', which compares
+    // lexicographically on the strings the select elements return: '3' >= '20'.
     $settings['zoom'] = (int) $settings['zoom'];
+    $settings['min_zoom'] = (int) $settings['min_zoom'];
+    $settings['max_zoom'] = (int) $settings['max_zoom'];
 
     return $settings;
   }
@@ -221,7 +236,7 @@ class Yandex extends MapProviderBase {
                 'scripts' => [
                   $this->getApiUrl(),
                 ],
-                'yandex_settings' => $map_settings,
+                'yandex_settings' => $this->getMapProviderSettings($map_settings),
               ],
             ],
           ],

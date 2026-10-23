@@ -45,40 +45,6 @@ plugin.plugin_configuration.geolocation.map_feature.leaflet_control_scale:
           type: boolean
           label: 'Imperial'
 
-plugin.plugin_configuration.geolocation.map_feature.leaflet_control_layer:
-  type: geolocation.map_feature_settings.leaflet.control
-  label: 'Control Layer'
-  mapping:
-    settings:
-      type: mapping
-      label: 'Settings'
-      mapping:
-        default_label:
-          type: string
-          label: 'Label'
-        tile_layer_providers:
-          type: sequence
-          label: 'Providers'
-          sequence:
-            type: sequence
-            label: 'MapType'
-            sequence:
-              type: mapping
-              label: 'Enabled'
-              mapping:
-                checkbox:
-                  type: boolean
-                  label: 'Enabled'
-                label:
-                  type: string
-                  label: 'Label'
-        tile_providers_options:
-          type: sequence
-          label: 'Providers'
-          sequence:
-            type: geolocation.map_feature_settings.leaflet.tile_layer_provider.[%key]
-            label: 'Provider Options'
-
 plugin.plugin_configuration.geolocation.map_feature.leaflet_max_bounds:
   type: geolocation.map_feature_settings
   label: 'Max Bounds'
@@ -99,64 +65,6 @@ plugin.plugin_configuration.geolocation.map_feature.leaflet_max_bounds:
         west:
           type: float
           label: 'West'
-
-plugin.plugin_configuration.geolocation.map_feature.leaflet_custom_tile_layer:
-  type: geolocation.map_feature_settings
-  label: 'Custom Tile Layer'
-  mapping:
-    settings:
-      type: mapping
-      label: 'Settings'
-      mapping:
-        tile_layer_url:
-          type: string
-          label: 'Url'
-        tile_layer_attribution:
-          type: string
-          label: 'Attribution'
-        tile_layer_subdomains:
-          type: string
-          label: 'Subdomains'
-        tile_layer_zoom:
-          type: integer
-          label: 'Zoom'
-
-plugin.plugin_configuration.geolocation.map_feature.leaflet_tile_layer:
-  type: geolocation.map_feature_settings
-  label: 'Tile Layer'
-  mapping:
-    settings:
-      type: mapping
-      label: 'Settings'
-      mapping:
-        tile_layer_provider:
-          type: string
-          label: 'Overlay'
-        tile_provider_options:
-          type: sequence
-          label: 'Provider Options'
-          sequence:
-            type: geolocation.map_feature_settings.leaflet.tile_layer_provider.[%key]
-            label: 'Provider Options'
-
-plugin.plugin_configuration.geolocation.map_feature.leaflet_tile_layer_overlay:
-  type: geolocation.map_feature_settings
-  label: 'Tile Layer Overlay'
-  mapping:
-    settings:
-      type: mapping
-      label: 'Settings'
-      mapping:
-        tile_layer_overlay:
-          type: string
-          label: 'Overlay'
-        tile_overlay_options:
-          type: mapping
-          label: 'Options'
-          mapping:
-            apiKey:
-              type: string
-              label: 'API key'
 
 plugin.plugin_configuration.geolocation.map_feature.leaflet_wms:
   type: geolocation.map_feature_settings

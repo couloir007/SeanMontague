@@ -1,0 +1,5 @@
+geolocation_gpx.upload:
+  route_name: geolocation_gpx.upload
+  title: 'Upload GPX file'
+  appears_on:
+    - view.geolocation_gpx.page_1

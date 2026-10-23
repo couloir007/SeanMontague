@@ -23,20 +23,20 @@ export class LeafletMapMarker extends GeolocationMapMarker {
     this.leafletMarker = L.marker([coordinates.lat, coordinates.lng], markerOptions).addTo(this.map.markerLayer);
 
     if (this.settings.label) {
-      this.leafletMarker.bindTooltip(String(this.settings.label), {
+      this.leafletMarker.bindTooltip(Drupal.checkPlain(String(this.settings.label)), {
         permanent: true,
         direction: "top",
       });
     }
 
     this.leafletMarker.on("click", () => {
-      this.click();
+      this.onClick();
     });
 
     if (this.settings.draggable) {
       this.leafletMarker.dragging.enable();
       this.leafletMarker.on("dragend", (e) => {
-        /** @type LatLng */
+        /** @type {L.LatLng} */
         const latLng = e.target.getLatLng();
         this.update(new GeolocationCoordinates(latLng.lat, latLng.lng));
       });
@@ -53,7 +53,7 @@ export class LeafletMapMarker extends GeolocationMapMarker {
     }
 
     if (this.settings.label) {
-      this.leafletMarker.unbindTooltip().bindTooltip(String(this.settings.label), {
+      this.leafletMarker.unbindTooltip().bindTooltip(Drupal.checkPlain(String(this.settings.label)), {
         permanent: true,
         direction: "top",
       });
@@ -62,6 +62,15 @@ export class LeafletMapMarker extends GeolocationMapMarker {
     if (this.settings.icon) {
       this.leafletMarker.setIcon(L.icon({ iconUrl: this.settings.icon }));
     }
+  }
+
+  /**
+   * Leaflet reacts to marker clicks itself, e.g. by opening a bound popup.
+   */
+  click() {
+    super.click();
+
+    this.leafletMarker.fire("click", { latlng: this.leafletMarker.getLatLng() });
   }
 
   remove() {

@@ -25,7 +25,7 @@ class GeolocationGeometryMultiLinestring extends GeolocationGeometryBase {
     $schema = parent::schema($field_definition);
 
     $schema['columns']['geometry']['pgsql_type'] = "geometry('MULTILINESTRING')";
-    $schema['columns']['geometry']['mysql_type'] = 'multilinestring';
+    $schema['columns']['geometry']['mysql_type'] = 'MULTILINESTRING';
 
     return $schema;
   }

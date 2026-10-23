@@ -33,7 +33,7 @@ export default class ClientLocation extends GeolocationLocationInputBase {
     super.setCoordinates(coordinates);
 
     if (this.settings.auto_submit ?? false) {
-      this.form.querySelector("input").form.submit();
+      this.submit();
     }
   }
 }

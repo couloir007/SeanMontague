@@ -16,7 +16,9 @@
   Drupal.behaviors.geolocationGpxElevationChart = {
     /**
      * @param {Document} context
+     *   The context to attach to.
      * @param {Object} drupalSettings
+     *   Drupal settings.
      */
     attach: (context, drupalSettings) => {
       context.querySelectorAll(".geolocation-gpx-elevation-chart").forEach((wrapper) => {

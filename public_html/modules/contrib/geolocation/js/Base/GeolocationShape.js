@@ -25,8 +25,8 @@ import { GeolocationBoundaries } from "./GeolocationBoundaries.js";
  * @prop {String} strokeColor
  * @prop {float} strokeOpacity
  * @prop {int} strokeWidth
- * @prop {String} [fillColor]
- * @prop {float} [fillOpacity]
+ * @prop {String} fillColor
+ * @prop {float} fillOpacity
  */
 export class GeolocationShape {
   /**
@@ -47,21 +47,14 @@ export class GeolocationShape {
     this.map = map;
     this.content = settings.content ?? this.getContent();
 
-    if (typeof settings.strokeColor !== "undefined") {
-      this.strokeColor = settings.strokeColor;
-    }
-    if (typeof settings.strokeOpacity !== "undefined") {
-      this.strokeOpacity = settings.strokeOpacity;
-    }
-    if (typeof settings.strokeWidth !== "undefined") {
-      this.strokeWidth = settings.strokeWidth;
-    }
-    if (typeof settings.fillColor !== "undefined") {
-      this.fillColor = settings.fillColor;
-    }
-    if (typeof settings.fillOpacity !== "undefined") {
-      this.fillOpacity = settings.fillOpacity;
-    }
+    // Shapes are not only created from rendered markup carrying every style -
+    // a widget adding one from a geocoded result passes none of them - and an
+    // undefined reaching a map provider draws nothing at all.
+    this.strokeColor = settings.strokeColor ?? "#0000FF";
+    this.strokeOpacity = settings.strokeOpacity ?? 1;
+    this.strokeWidth = settings.strokeWidth ?? 2;
+    this.fillColor = settings.fillColor ?? "#0000FF";
+    this.fillOpacity = settings.fillOpacity ?? 0.2;
   }
 
   getContent() {
@@ -70,6 +63,14 @@ export class GeolocationShape {
     }
 
     return this.content;
+  }
+
+  getContentElement() {
+    if (typeof this.contentElement === "undefined") {
+      this.contentElement = this.wrapper?.querySelector(".location-content") ?? null;
+    }
+
+    return this.contentElement;
   }
 
   /**
@@ -127,37 +128,34 @@ export class GeolocationShape {
       east: null,
       west: null,
     };
-    switch (this.type) {
-      case "line":
-      case "polygon":
-        this.geometry.coordinates.forEach((value) => {
-          bounds.north = bounds.north === null || value[1] > bounds.north ? value[1] : bounds.north;
-          bounds.south = bounds.south === null || value[1] < bounds.south ? value[1] : bounds.south;
-          bounds.east = bounds.east === null || value[0] > bounds.east ? value[0] : bounds.east;
-          bounds.west = bounds.west === null || value[0] < bounds.west ? value[0] : bounds.west;
-        });
-        break;
-      case "multiline":
-        this.geometry.coordinates.forEach((line) => {
-          line.coordinates.forEach((value) => {
-            bounds.north = bounds.north === null || value[1] > bounds.north ? value[1] : bounds.north;
-            bounds.south = bounds.south === null || value[1] < bounds.south ? value[1] : bounds.south;
-            bounds.east = bounds.east === null || value[0] > bounds.east ? value[0] : bounds.east;
-            bounds.west = bounds.west === null || value[0] < bounds.west ? value[0] : bounds.west;
-          });
-        });
-        break;
-      case "multipolygon":
-        this.geometry.coordinates.forEach((polygon) => {
-          polygon.coordinates.forEach((value) => {
-            bounds.north = bounds.north === null || value[1] > bounds.north ? value[1] : bounds.north;
-            bounds.south = bounds.south === null || value[1] < bounds.south ? value[1] : bounds.south;
-            bounds.east = bounds.east === null || value[0] > bounds.east ? value[0] : bounds.east;
-            bounds.west = bounds.west === null || value[0] < bounds.west ? value[0] : bounds.west;
-          });
-        });
-        break;
-    }
+
+    /**
+     * Extend the boundaries by a position, or by every position nested in it.
+     *
+     * Geometry types differ only in how deeply their coordinates nest
+     * positions - a LineString holds them directly, a MultiPolygon three levels
+     * down - so this descends until it reaches one instead of assuming a depth.
+     *
+     * @param {Array} coordinates
+     *   A position, or an array of them at any nesting depth.
+     */
+    const extendBounds = (coordinates) => {
+      if (!Array.isArray(coordinates)) {
+        return;
+      }
+
+      if (typeof coordinates[0] === "number") {
+        bounds.north = bounds.north === null || coordinates[1] > bounds.north ? coordinates[1] : bounds.north;
+        bounds.south = bounds.south === null || coordinates[1] < bounds.south ? coordinates[1] : bounds.south;
+        bounds.east = bounds.east === null || coordinates[0] > bounds.east ? coordinates[0] : bounds.east;
+        bounds.west = bounds.west === null || coordinates[0] < bounds.west ? coordinates[0] : bounds.west;
+        return;
+      }
+
+      coordinates.forEach(extendBounds);
+    };
+
+    extendBounds(this.geometry?.coordinates);
 
     if (bounds.east === null || bounds.west === null || bounds.north === null || bounds.south === null) {
       return null;
@@ -175,7 +173,7 @@ export class GeolocationShape {
   /**
    * Click handler delegation.
    *
-   * @param {GeolocationCoordinates} coordinates
+   * @param {GeolocationCoordinates} coordinates Coordinates that were clicked.
    */
   click(coordinates) {
     this.map.dataLayers.forEach((layer) => {

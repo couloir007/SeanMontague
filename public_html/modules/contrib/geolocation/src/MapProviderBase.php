@@ -274,7 +274,7 @@ abstract class MapProviderBase extends PluginBase implements MapProviderInterfac
             if (empty($feature_settings['settings'])) {
               $feature_settings['settings'] = [];
             }
-            $render_array = $feature->alterMap($render_array, $feature->getSettings($feature_settings['settings']), $context, $this);
+            $render_array = $feature->alterMap($render_array, $feature->getSettings($feature_settings['settings'], $this), $context, $this);
           }
         }
       }
@@ -302,6 +302,31 @@ abstract class MapProviderBase extends PluginBase implements MapProviderInterfac
     );
 
     return $render_array;
+  }
+
+  /**
+   * Get the settings this map provider itself defines.
+   *
+   * Map features, data layers, tile layers and the conditional loading
+   * behaviour are handled here and attached in their own right. Map provider
+   * Javascript modules tend to hand their settings straight to the third-party
+   * map API, so restrict them to what the provider actually declares.
+   *
+   * @param array $map_settings
+   *   Map settings.
+   *
+   * @return array
+   *   Settings declared by this map provider.
+   */
+  protected function getMapProviderSettings(array $map_settings): array {
+    // Deliberately self:: instead of static::, to get the settings shared by
+    // all map providers rather than those of this particular one.
+    $shared_settings = self::getDefaultSettings();
+
+    return array_intersect_key(
+      $map_settings,
+      array_diff_key(static::getDefaultSettings(), $shared_settings)
+    );
   }
 
   /**

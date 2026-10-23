@@ -167,12 +167,12 @@ class GeolocationGpxFieldDataProvider extends DataProviderBase implements DataPr
       return [];
     }
 
-    if (empty($fieldItem->getValue()['gpx_id'] ?? NULL)) {
+    if (empty($fieldItem->gpx_id)) {
       return [];
     }
 
     /** @var \Drupal\geolocation_gpx\Entity\GeolocationGpx|null $gpx */
-    $gpx = \Drupal::entityTypeManager()->getStorage('geolocation_gpx')->load($fieldItem->getValue()['gpx_id']);
+    $gpx = \Drupal::entityTypeManager()->getStorage('geolocation_gpx')->load($fieldItem->gpx_id);
 
     if (!$gpx) {
       return [];
@@ -180,47 +180,57 @@ class GeolocationGpxFieldDataProvider extends DataProviderBase implements DataPr
 
     $shapes = [];
 
-    foreach ($gpx->tracks as $track) {
-      $geometry = [
-        'type' => 'line',
-        'points' => [],
-      ];
-      foreach ($track->entity->track_segments as $segment) {
-        foreach ($segment->entity?->track_points as $waypoint) {
-          $geometry['points'][] = [
-            'lat' => (float) $waypoint->entity?->latitude->value,
-            'lng' => (float) $waypoint->entity?->longitude->value,
+    foreach ($gpx->getTracks() as $track) {
+      $lines = [];
+      foreach ($track->getSegments() as $delta => $segment) {
+        foreach ($segment->getWaypoints() as $waypoint) {
+          $lines[$delta][] = [
+            (float) $waypoint->longitude->value,
+            (float) $waypoint->latitude->value,
           ];
         }
+      }
+      $lines = array_values($lines);
+
+      if (!$lines) {
+        continue;
       }
 
       $shapes[] = [
         '#type' => 'geolocation_map_shape',
-        '#geometry' => $geometry,
-        '#title' => $track->entity->name->value ?? $gpx->name->value,
+        '#geometry' => json_encode([
+          'type' => count($lines) === 1 ? 'LineString' : 'MultiLineString',
+          'coordinates' => count($lines) === 1 ? $lines[0] : $lines,
+        ]),
+        '#geometry_type' => count($lines) === 1 ? 'line' : 'multiline',
+        '#title' => $track->getDisplayName() ?: $gpx->getDisplayName(),
         '#stroke_color' => $settings['track_stroke_color_randomize'] ? sprintf('#%06X', mt_rand(0, 0xFFFFFF)) : $settings['track_stroke_color'],
         '#stroke_width' => (int) $settings['track_stroke_width'],
         '#stroke_opacity' => (float) $settings['track_stroke_opacity'],
       ];
     }
 
-    foreach ($gpx->routes as $route) {
-      $geometry = [
-        'type' => 'line',
-        'points' => [],
-      ];
-      foreach ($route->entity->route_points as $waypoint) {
-        $geometry['points'][] = [
-          'lat' => (float) $waypoint->entity?->latitude->value,
-          'lng' => (float) $waypoint->entity?->longitude->value,
+    foreach ($gpx->getRoutes() as $route) {
+      $line = [];
+      foreach ($route->getWaypoints() as $waypoint) {
+        $line[] = [
+          (float) $waypoint->longitude->value,
+          (float) $waypoint->latitude->value,
         ];
+      }
+
+      if (!$line) {
+        continue;
       }
 
       $shapes[] = [
         '#type' => 'geolocation_map_shape',
-        '#geometry' => $geometry,
-        // @phpstan-ignore-next-line
-        '#title' => $route->entity->name->toString(),
+        '#geometry' => json_encode([
+          'type' => 'LineString',
+          'coordinates' => $line,
+        ]),
+        '#geometry_type' => 'line',
+        '#title' => $route->name->value ?: $gpx->getDisplayName(),
         '#stroke_color' => $settings['track_stroke_color_randomize'] ? sprintf('#%06X', mt_rand(0, 0xFFFFFF)) : $settings['track_stroke_color'],
         '#stroke_width' => (int) $settings['track_stroke_width'],
         '#stroke_opacity' => (float) $settings['track_stroke_opacity'],
@@ -239,12 +249,12 @@ class GeolocationGpxFieldDataProvider extends DataProviderBase implements DataPr
       return [];
     }
 
-    if (empty($fieldItem->getValue()['gpx_id'] ?? NULL)) {
+    if (empty($fieldItem->gpx_id)) {
       return [];
     }
 
     /** @var \Drupal\geolocation_gpx\Entity\GeolocationGpx|null $gpx */
-    $gpx = \Drupal::entityTypeManager()->getStorage('geolocation_gpx')->load($fieldItem->getValue()['gpx_id']);
+    $gpx = \Drupal::entityTypeManager()->getStorage('geolocation_gpx')->load($fieldItem->gpx_id);
 
     if (!$gpx) {
       return [];

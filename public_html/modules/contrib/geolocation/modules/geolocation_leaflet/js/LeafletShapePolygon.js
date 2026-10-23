@@ -15,11 +15,13 @@ export class LeafletShapePolygon extends GeolocationShapePolygon {
 
   addShape() {
     const polygon = L.polygon(
-      [
-        this.geometry.coordinates[0].map((value) => {
-          return { lat: value[1], lng: value[0] };
-        }),
-      ],
+      // The outer ring comes first, any further ring is a hole - which is what
+      // Leaflet reads a list of rings as.
+      this.geometry.coordinates.map((ring) => {
+        return ring.map((position) => {
+          return { lat: position[1], lng: position[0] };
+        });
+      }),
       {
         color: this.strokeColor,
         opacity: this.strokeOpacity,
@@ -34,7 +36,7 @@ export class LeafletShapePolygon extends GeolocationShapePolygon {
     polygon.parent = this;
 
     if (this.title) {
-      polygon.bindTooltip(this.title);
+      polygon.bindTooltip(Drupal.checkPlain(this.title));
     }
 
     polygon.on("click", (event) => {
@@ -49,9 +51,12 @@ export class LeafletShapePolygon extends GeolocationShapePolygon {
   update(geometry, settings) {
     super.update(geometry, settings);
 
+    // Shapes left in the list would keep being counted - by the boundaries the
+    // map fits itself to, among others - long after leaving the map.
     this.leafletShapes.forEach((leafletShape) => {
       leafletShape.remove();
     });
+    this.leafletShapes = [];
 
     this.addShape();
   }

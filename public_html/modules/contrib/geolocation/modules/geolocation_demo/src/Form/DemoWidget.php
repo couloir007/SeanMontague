@@ -37,8 +37,6 @@ abstract class DemoWidget extends FormBase {
 
   /**
    * {@inheritdoc}
-   *
-   * @phpstan-ignore-next-line
    */
   public static function create(ContainerInterface $container) {
     return new static(

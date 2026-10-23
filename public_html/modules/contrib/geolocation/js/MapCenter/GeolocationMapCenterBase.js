@@ -1,6 +1,6 @@
 export class GeolocationMapCenterBase {
   /**
-   * @constructor
+   * @class
    *
    * @param {GeolocationMapBase} map
    *   Map.
@@ -19,4 +19,9 @@ export class GeolocationMapCenterBase {
   setCenter() {
     return true;
   }
+
+  /**
+   * Called before the map is discarded.
+   */
+  destroy() {}
 }

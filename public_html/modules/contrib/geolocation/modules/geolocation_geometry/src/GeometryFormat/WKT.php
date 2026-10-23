@@ -61,14 +61,14 @@ class WKT implements GeometryFormatInterface { // phpcs:ignore
 
     switch ($type) {
       case 'Point':
-        return new Point(preg_split('/\s+/', $value));
+        return new Point(preg_split('/\s+/', trim($value)));
 
       case 'MultiPoint':
       case 'LineString':
       case 'LinearRing':
         $points = [];
         foreach (explode(',', $value) as $point) {
-          $points[] = new Point(preg_split('/\s+/', $point));
+          $points[] = new Point(preg_split('/\s+/', trim($point)));
         }
 
         $geometry = match($type) {

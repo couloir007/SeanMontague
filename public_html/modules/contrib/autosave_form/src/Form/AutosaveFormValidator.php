@@ -2,19 +2,13 @@
 
 namespace Drupal\autosave_form\Form;
 
-use Drupal\Core\Access\CsrfTokenGenerator;
-use Drupal\Core\Form\FormErrorHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Form\FormValidator;
 use Drupal\Core\Form\FormValidatorInterface;
-use Drupal\Core\StringTranslation\TranslationInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Provides validation of form submissions with AutosaveForm enabled.
  */
-class AutosaveFormValidator extends FormValidator  {
+class AutosaveFormValidator implements FormValidatorInterface {
 
   use AutosaveButtonClickedTrait;
 
@@ -30,20 +24,16 @@ class AutosaveFormValidator extends FormValidator  {
    *
    * @param \Drupal\Core\Form\FormValidatorInterface $form_validator
    *   The form validator service.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation service.
-   * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
-   *   The CSRF token generator.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   * @param \Drupal\Core\Form\FormErrorHandlerInterface $form_error_handler
-   *   The form error handler.
    */
-  public function __construct(FormValidatorInterface $form_validator, RequestStack $request_stack, TranslationInterface $string_translation, CsrfTokenGenerator $csrf_token, LoggerInterface $logger, FormErrorHandlerInterface $form_error_handler) {
+  public function __construct(FormValidatorInterface $form_validator) {
     $this->formValidator = $form_validator;
-    parent::__construct($request_stack, $string_translation, $csrf_token, $logger, $form_error_handler);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function executeValidateHandlers(&$form, FormStateInterface &$form_state) {
+    $this->formValidator->executeValidateHandlers($form, $form_state);
   }
 
   /**
@@ -75,6 +65,13 @@ class AutosaveFormValidator extends FormValidator  {
     if ($autosave_submission && $form_state::hasAnyErrors()) {
       $form_state->clearErrors();
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setInvalidTokenError(FormStateInterface $form_state) {
+    $this->formValidator->setInvalidTokenError($form_state);
   }
 
 }

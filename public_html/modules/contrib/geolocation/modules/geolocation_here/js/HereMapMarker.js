@@ -19,7 +19,7 @@ export class HereMapMarker extends GeolocationMapMarker {
     this.hereMarker = new H.map.Marker(coordinates, settings);
 
     this.hereMarker.addEventListener("click", () => {
-      this.click();
+      this.onClick();
     });
   }
 

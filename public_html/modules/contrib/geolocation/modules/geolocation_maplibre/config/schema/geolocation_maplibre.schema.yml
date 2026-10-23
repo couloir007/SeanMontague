@@ -1,0 +1,31 @@
+geolocation.map_provider.maplibre:
+  type: geolocation_map_provider
+  label: 'MapLibre GL settings'
+  mapping:
+    library_url:
+      type: string
+      label: 'MapLibre GL JS module URL'
+    base_map_id:
+      type: string
+      label: 'Base map'
+    base_map_settings:
+      type: sequence
+      label: 'Base map settings'
+      sequence:
+        type: plugin.plugin_configuration.geolocation_maplibre.base_map.[%key]
+        label: 'Base map settings'
+    zoom:
+      type: integer
+      label: 'Zoom level'
+    min_zoom:
+      type: integer
+      label: 'Min Zoom level'
+    max_zoom:
+      type: integer
+      label: 'Max Zoom level'
+    height:
+      type: string
+      label: 'Height value'
+    width:
+      type: string
+      label: 'Width value'

@@ -1,4 +1,5 @@
 import { GeolocationShapeMultiPolygon } from "../../../js/Base/GeolocationShapeMultiPolygon.js";
+import { clampCoordinates } from "./YandexCoordinates.js";
 
 /* global ymaps3 */
 
@@ -16,20 +17,10 @@ export class YandexShapeMultiPolygon extends GeolocationShapeMultiPolygon {
 
     const { YMapFeature } = ymaps3;
 
-    const polygons = [];
-    geometry.polygons.forEach((polygonGeometry) => {
-      const points = [];
-      polygonGeometry.points.forEach((value) => {
-        points.push([value.lng < 180 ? value.lng : 179.99, value.lat]);
-      });
-
-      polygons.push(points);
-    });
-
     const multipolygon = new YMapFeature({
       geometry: {
         type: "MultiPolygon",
-        coordinates: [polygons],
+        coordinates: clampCoordinates(geometry.coordinates),
       },
       style: {
         stroke: [{ color: this.strokeColor, width: this.strokeWidth }],

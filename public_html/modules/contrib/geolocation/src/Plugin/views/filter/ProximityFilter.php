@@ -111,6 +111,12 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
       $identifier = $this->options['expose']['identifier'];
       $form[$identifier . '_center'] = $center_form;
       $form[$identifier . '_center']['#tree'] = TRUE;
+
+      $group_identifier = $this->options['group_info']['identifier'];
+      if ($this->wrapCenterForm($form, $group_identifier)) {
+        // The group label went to the wrapper.
+        $form[$group_identifier . '_wrapper'][$group_identifier]['#title_display'] = 'invisible';
+      }
     }
   }
 
@@ -150,6 +156,55 @@ class ProximityFilter extends NumericFilter implements ContainerFactoryPluginInt
 
     $form[$identifier . '_center'] = $this->locationInputManager->getForm($this->options['location_input'], ['views_filter' => $this], empty($this->value['center']) ? NULL : $this->value['center'], $this->t('Center Coordinates'));
     $form[$identifier . '_center']['#tree'] = TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildExposedForm(&$form, FormStateInterface $form_state): void {
+    parent::buildExposedForm($form, $form_state);
+
+    $identifier = $this->options['expose']['identifier'] ?? '';
+    if (empty($this->options['exposed']) || !$identifier) {
+      return;
+    }
+
+    if (!$this->wrapCenterForm($form, $identifier)) {
+      return;
+    }
+
+    // Views drops the value title, the distance needs it next to the center.
+    if (($form[$identifier . '_wrapper'][$identifier]['#type'] ?? NULL) === 'number') {
+      $form[$identifier . '_wrapper'][$identifier]['#title'] = $this->t('Distance');
+    }
+  }
+
+  /**
+   * Moves the center input into the value wrapper, e.g. for BEF grouping.
+   */
+  protected function wrapCenterForm(array &$form, string $identifier): bool {
+    $center = $this->options['expose']['identifier'] . '_center';
+    $wrapper = $identifier . '_wrapper';
+
+    if (
+      empty($form[$center])
+      || (!isset($form[$identifier]) && !isset($form[$wrapper]))
+    ) {
+      return FALSE;
+    }
+
+    $this->buildValueWrapper($form, $wrapper);
+
+    if (isset($form[$identifier])) {
+      $form[$wrapper][$identifier] = $form[$identifier];
+      unset($form[$identifier]);
+    }
+
+    // Center first, the distance is measured from it.
+    $form[$wrapper] = [$center => $form[$center]] + $form[$wrapper];
+    unset($form[$center]);
+
+    return TRUE;
   }
 
   /**

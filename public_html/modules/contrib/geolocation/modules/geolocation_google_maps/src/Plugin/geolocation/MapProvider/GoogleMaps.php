@@ -41,18 +41,27 @@ class GoogleMaps extends GoogleMapsProviderBase {
         'maxZoom' => static::$maxZoomLevel,
         'gestureHandling' => 'auto',
         'mapId' => '',
+        'fitBoundsPadding' => 0,
         'map_features' => [
-          'marker_infowindow' => [
-            'enabled' => TRUE,
-          ],
           'control_locate' => [
             'enabled' => TRUE,
           ],
-          'control_zoom' => [
+          'control_camera' => [
             'enabled' => TRUE,
           ],
           'control_maptype' => [
             'enabled' => TRUE,
+          ],
+        ],
+        'data_layers' => [
+          'geolocation_default_layer:default' => [
+            'settings' => [
+              'features' => [
+                'marker_infowindow' => [
+                  'enabled' => TRUE,
+                ],
+              ],
+            ],
           ],
         ],
       ]
@@ -64,18 +73,31 @@ class GoogleMaps extends GoogleMapsProviderBase {
    */
   public static function getControlPositions(): array {
     return [
-      'LEFT_TOP' => t('Left top'),
-      'LEFT_CENTER' => t('Left center'),
-      'LEFT_BOTTOM' => t('Left bottom'),
-      'TOP_LEFT' => t('Top left'),
-      'TOP_CENTER' => t('Top center'),
-      'TOP_RIGHT' => t('Top right'),
-      'RIGHT_TOP' => t('Right top'),
-      'RIGHT_CENTER' => t('Right center'),
-      'RIGHT_BOTTOM' => t('Right bottom'),
-      'BOTTOM_LEFT' => t('Bottom left'),
-      'BOTTOM_CENTER' => t('Bottom center'),
-      'BOTTOM_RIGHT' => t('Bottom right'),
+      // Logical positions flip with the language direction, legacy ones do not.
+      'BLOCK_START_INLINE_START' => t('Block start, inline start'),
+      'BLOCK_START_INLINE_CENTER' => t('Block start, inline center'),
+      'BLOCK_START_INLINE_END' => t('Block start, inline end'),
+      'INLINE_START_BLOCK_START' => t('Inline start, block start'),
+      'INLINE_START_BLOCK_CENTER' => t('Inline start, block center'),
+      'INLINE_START_BLOCK_END' => t('Inline start, block end'),
+      'INLINE_END_BLOCK_START' => t('Inline end, block start'),
+      'INLINE_END_BLOCK_CENTER' => t('Inline end, block center'),
+      'INLINE_END_BLOCK_END' => t('Inline end, block end'),
+      'BLOCK_END_INLINE_START' => t('Block end, inline start'),
+      'BLOCK_END_INLINE_CENTER' => t('Block end, inline center'),
+      'BLOCK_END_INLINE_END' => t('Block end, inline end'),
+      'LEFT_TOP' => t('Left top (legacy)'),
+      'LEFT_CENTER' => t('Left center (legacy)'),
+      'LEFT_BOTTOM' => t('Left bottom (legacy)'),
+      'TOP_LEFT' => t('Top left (legacy)'),
+      'TOP_CENTER' => t('Top center (legacy)'),
+      'TOP_RIGHT' => t('Top right (legacy)'),
+      'RIGHT_TOP' => t('Right top (legacy)'),
+      'RIGHT_CENTER' => t('Right center (legacy)'),
+      'RIGHT_BOTTOM' => t('Right bottom (legacy)'),
+      'BOTTOM_LEFT' => t('Bottom left (legacy)'),
+      'BOTTOM_CENTER' => t('Bottom center (legacy)'),
+      'BOTTOM_RIGHT' => t('Bottom right (legacy)'),
     ];
   }
 
@@ -87,6 +109,7 @@ class GoogleMaps extends GoogleMapsProviderBase {
 
     $settings['minZoom'] = (int) $settings['minZoom'];
     $settings['maxZoom'] = (int) $settings['maxZoom'];
+    $settings['fitBoundsPadding'] = (int) $settings['fitBoundsPadding'];
 
     return $settings;
   }
@@ -155,6 +178,22 @@ class GoogleMaps extends GoogleMapsProviderBase {
       ],
     ];
 
+    $form['fitBoundsPadding'] = [
+      '#group' => $parents_string . 'general_settings',
+      '#type' => 'number',
+      '#min' => 0,
+      '#title' => $this->t('Fit bounds padding (px)'),
+      '#description' => $this->t('Padding, in pixels, kept between the map edge and elements when the map automatically fits its boundaries (e.g. fitting to markers, a fixed boundary, or a proximity search radius).'),
+      '#default_value' => $settings['fitBoundsPadding'],
+      '#process' => [
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'processGroup'],
+      ],
+      '#pre_render' => [
+        ['\Drupal\Core\Render\Element\Number', 'preRenderNumber'],
+        ['\Drupal\Core\Render\Element\RenderElementBase', 'preRenderGroup'],
+      ],
+    ];
+
     $form['behavior_settings'] = [
       '#type' => 'details',
       '#title' => $this->t('Behavior'),
@@ -205,7 +244,7 @@ class GoogleMaps extends GoogleMapsProviderBase {
             'maps' => [
               $render_array['#id'] => [
                 'async_scripts' => [$google_url],
-                'google_map_settings' => $map_settings,
+                'google_map_settings' => $this->getMapProviderSettings($map_settings),
               ],
             ],
           ],

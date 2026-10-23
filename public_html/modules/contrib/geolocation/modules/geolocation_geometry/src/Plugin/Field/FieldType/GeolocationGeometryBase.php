@@ -7,6 +7,7 @@ use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\MapDataDefinition;
+use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 
 /**
  * Class Geolocation Geometry Base.
@@ -81,7 +82,7 @@ abstract class GeolocationGeometryBase extends FieldItemBase {
     $entity = $this->getEntity();
     $entity_storage = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId());
 
-    if (!is_a($entity_storage, '\Drupal\Core\Entity\Sql\SqlContentEntityStorage')) {
+    if (!is_a($entity_storage, SqlContentEntityStorage::class)) {
       return FALSE;
     }
 

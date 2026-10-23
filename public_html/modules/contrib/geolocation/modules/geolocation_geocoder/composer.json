@@ -1,0 +1,9 @@
+{
+  "name": "drupal/geolocation_geocoder",
+  "type": "drupal-module",
+  "description": "Geocoder module integration.",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "drupal/geocoder": "^4.29"
+  }
+}

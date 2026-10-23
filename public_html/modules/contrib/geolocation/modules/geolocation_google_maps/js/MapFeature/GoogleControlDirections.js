@@ -3,7 +3,7 @@ import { GoogleMapFeature } from "./GoogleMapFeature.js";
 /**
  * @typedef {Object} MapFeatureDirectionsSettings
  *
- * @extends {GeolocationMapFeatureSettings}
+ * @augments {GeolocationMapFeatureSettings}
 
  * @prop {string} directions_container_custom_id
  */

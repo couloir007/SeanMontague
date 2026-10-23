@@ -1,9 +1,6 @@
 import { GeolocationMapFeature } from "./GeolocationMapFeature.js";
 
 export default class ControlCustomRecenter extends GeolocationMapFeature {
-  /**
-   * @inheritDoc
-   */
   constructor(settings, map) {
     super(settings, map);
 

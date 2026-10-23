@@ -3,7 +3,7 @@ import { GoogleLayerFeature } from "./GoogleLayerFeature.js";
 /**
  * @typedef {Object} MarkerClustererSettings
  *
- * @extends {GeolocationMapFeatureSettings}
+ * @augments {GeolocationMapFeatureSettings}
  *
  * @prop {String} image_path
  * @prop {Object} styles

@@ -17,13 +17,13 @@ geolocation.map_provider.yandex:
   label: 'Yandex Maps settings'
   mapping:
     zoom:
-      type: string
+      type: integer
       label: 'Zoom level'
     max_zoom:
-      type: string
+      type: integer
       label: 'Max Zoom level'
     min_zoom:
-      type: string
+      type: integer
       label: 'Min Zoom level'
     height:
       type: string

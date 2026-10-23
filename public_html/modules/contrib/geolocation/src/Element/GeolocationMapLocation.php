@@ -2,6 +2,7 @@
 
 namespace Drupal\geolocation\Element;
 
+use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Template\Attribute;
@@ -26,9 +27,8 @@ use Drupal\Core\Template\Attribute;
  *   '#label' => NULL,
  * ];
  * @endcode
- *
- * @RenderElement("geolocation_map_location")
  */
+#[RenderElement('geolocation_map_location')]
 class GeolocationMapLocation extends RenderElementBase {
 
   /**
@@ -43,7 +43,7 @@ class GeolocationMapLocation extends RenderElementBase {
       ],
       '#pre_render' => [
         [$class, 'preRenderGroup'],
-        [$this, 'preRenderLocation'],
+        [$class, 'preRenderLocation'],
       ],
       '#title' => NULL,
       '#coordinates' => NULL,
@@ -64,7 +64,7 @@ class GeolocationMapLocation extends RenderElementBase {
    * @return array
    *   Renderable map.
    */
-  public function preRenderLocation(array $render_array): array {
+  public static function preRenderLocation(array $render_array): array {
     $render_array['#theme'] = 'geolocation_map_location';
 
     if (!isset($render_array['#id'])) {

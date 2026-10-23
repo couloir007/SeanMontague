@@ -16,7 +16,7 @@ class BaiduMapsSettings extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
-    $config = $this->configFactory->get('geolocation_baidu.settings');
+    $config = $this->config('geolocation_baidu.settings');
 
     $form['key'] = [
       '#type' => 'textfield',

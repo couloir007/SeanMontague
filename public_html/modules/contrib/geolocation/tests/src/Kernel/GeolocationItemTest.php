@@ -6,12 +6,14 @@ use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the new entity API for the geolocation field type.
  *
  * @group geolocation
  */
+#[RunTestsInSeparateProcesses]
 class GeolocationItemTest extends FieldKernelTestBase {
 
   /**

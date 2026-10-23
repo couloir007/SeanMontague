@@ -15,12 +15,14 @@ export class GoogleShapeLine extends GeolocationShapeLine {
 
     this.googleShapes = [];
 
+    this.addShape();
+  }
+
+  addShape() {
     const line = new google.maps.Polyline({
-      path: [
-        geometry.coordinates.map((value) => {
-          return { lat: value[1], lng: value[0] };
-        }),
-      ],
+      path: this.geometry.coordinates.map((position) => {
+        return { lat: position[1], lng: position[0] };
+      }),
       strokeColor: this.strokeColor,
       strokeOpacity: this.strokeOpacity,
       strokeWeight: this.strokeWidth,
@@ -39,10 +41,16 @@ export class GoogleShapeLine extends GeolocationShapeLine {
     this.googleShapes.push(line);
   }
 
+  update(geometry, settings) {
+    super.update(geometry, settings);
+
+    // Google shapes take no new geometry, so they are replaced.
+    this.detachShapes();
+    this.addShape();
+  }
+
   remove() {
-    this.googleShapes.forEach((googleShape) => {
-      googleShape.setMap();
-    });
+    this.detachShapes();
 
     super.remove();
   }

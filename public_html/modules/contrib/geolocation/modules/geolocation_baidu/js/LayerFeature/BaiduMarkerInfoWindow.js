@@ -11,10 +11,10 @@ export default class BaiduMarkerInfoWindow extends BaiduLayerFeature {
     super.onMarkerClicked(marker);
 
     this.layer.map.baiduMap.openInfoWindow(
-      new BMapGL.InfoWindow(marker.getContent(), {
+      new BMapGL.InfoWindow(marker.getContentElement() ?? marker.getContent(), {
         width: 200,
         height: 100,
-        title: marker.title,
+        title: marker.title ? Drupal.checkPlain(marker.title) : "",
       }),
       marker.baiduMarker.getPosition()
     );

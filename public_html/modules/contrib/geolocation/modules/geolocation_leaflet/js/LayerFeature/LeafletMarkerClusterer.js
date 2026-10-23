@@ -3,7 +3,7 @@ import { LeafletLayerFeature } from "./LeafletLayerFeature.js";
 /**
  * @typedef {Object} MarkerClustererSettings
  *
- * @extends {GeolocationMapFeatureSettings}
+ * @augments {GeolocationMapFeatureSettings}
  *
  * @prop {String} zoom_to_bounds_on_click
  * @prop {String} show_coverage_on_hover
@@ -61,5 +61,21 @@ export default class LeafletMarkerClusterer extends LeafletLayerFeature {
     super.onMarkerAdded(marker);
 
     this.cluster.addLayer(marker.leafletMarker);
+  }
+
+  onMarkerRemove(marker) {
+    super.onMarkerRemove(marker);
+
+    this.cluster.removeLayer(marker.leafletMarker);
+  }
+
+  destroy() {
+    super.destroy();
+
+    // The constructor took markerLayer off the map and into the cluster.
+    // Undo that.
+    this.cluster.removeLayer(this.layer.map.markerLayer);
+    this.layer.map.leafletMap.removeLayer(this.cluster);
+    this.layer.map.leafletMap.addLayer(this.layer.map.markerLayer);
   }
 }

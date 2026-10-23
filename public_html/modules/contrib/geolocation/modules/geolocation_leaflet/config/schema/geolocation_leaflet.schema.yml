@@ -127,6 +127,9 @@ geolocation.geocoder.photon:
     location_priority:
       type: geolocation.element.input
       label: 'Location Priority'
+    bbox:
+      type: geolocation.element.boundary
+      label: 'Bounding Box'
     remove_duplicates:
       type: boolean
       label: 'Remove Duplicates'

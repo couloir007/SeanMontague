@@ -18,10 +18,10 @@ import { GeolocationCoordinates } from "./GeolocationCoordinates.js";
  */
 export class GeolocationCircle {
   /**
-   * @param {GeolocationCoordinates} center
-   * @param {int} radius
-   * @param {GeolocationMapBase} map
-   * @param {GeolocationCircleSettings} settings
+   * @param {GeolocationCoordinates} center Center of the circle.
+   * @param {int} radius Radius of the circle in meters.
+   * @param {GeolocationMapBase} map Map the circle is drawn on.
+   * @param {GeolocationCircleSettings} settings Stroke and fill styling.
    */
   constructor(center, radius, map, settings = {}) {
     this.center = center;
@@ -37,9 +37,9 @@ export class GeolocationCircle {
   }
 
   /**
-   * @param {GeolocationCoordinates} center
-   * @param {int} radius
-   * @param {GeolocationCircleSettings} [settings]
+   * @param {GeolocationCoordinates} center New center of the circle.
+   * @param {int} radius New radius of the circle in meters.
+   * @param {GeolocationCircleSettings} [settings] Updated stroke and fill styling.
    */
   update(center, radius, settings = {}) {
     if (center) {

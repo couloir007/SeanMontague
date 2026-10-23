@@ -116,3 +116,18 @@ plugin.plugin_configuration.geolocation.map_feature.control_geocoder:
           label: 'Geocoder'
         geocoder_settings:
           type: geolocation.geocoder.[%parent.geocoder]
+        show_marker:
+          type: boolean
+          label: 'Set marker at geocoded location'
+
+plugin.plugin_configuration.geolocation.map_feature.control_view_fullscreen:
+  type: geolocation.map_feature_settings
+  label: 'Map Control - View Fullscreen'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        position:
+          type: string
+          label: 'Position'

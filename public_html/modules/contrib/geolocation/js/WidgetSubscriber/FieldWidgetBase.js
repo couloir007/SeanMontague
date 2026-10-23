@@ -135,7 +135,9 @@ export class FieldWidgetBase extends WidgetSubscriberBase {
    * Get input elements directly or as map.
    *
    * @param {boolean} returnElements
+   *   Return the raw element list instead of a map keyed by widget index.
    * @return {Map<int, Element>|NodeListOf<Element>}
+   *   Input elements, keyed by widget index unless returnElements is set.
    */
   getAllInputElements(returnElements = false) {
     const map = new Map();
@@ -216,13 +218,17 @@ export class FieldWidgetBase extends WidgetSubscriberBase {
 
   /**
    * @param {GeolocationCoordinates} coordinates
+   *   Coordinates to write.
    * @param {Element} element
+   *   Input element to write to.
    */
   setCoordinatesByElement(coordinates, element) {}
 
   /**
    * @param {GeolocationGeometry} geometry
+   *   Geometry to write.
    * @param {Element} element
+   *   Input element to write to.
    */
   setGeometryByElement(geometry, element) {}
 

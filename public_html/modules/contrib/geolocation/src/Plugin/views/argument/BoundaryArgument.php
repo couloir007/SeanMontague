@@ -22,6 +22,13 @@ class BoundaryArgument extends ArgumentPluginBase {
   use BoundaryTrait;
 
   /**
+   * Parsed boundary, empty array if the argument is unusable.
+   *
+   * @var array|null
+   */
+  protected ?array $parsedBoundary = NULL;
+
+  /**
    * {@inheritdoc}
    *
    * @param array $form
@@ -60,30 +67,35 @@ class BoundaryArgument extends ArgumentPluginBase {
    *   The calculated values.
    */
   public function getParsedBoundary(): array {
-    // Cache the vales so this only gets processed once.
-    static $values;
-
-    if (!isset($values)) {
-      // Process argument values into an array.
-      preg_match('/^([0-9\-.]+),+([0-9\-.]+),+([0-9\-.]+),+([0-9\-.]+)(.*$)/', $this->getValue(), $values);
-      // Validate and return the passed argument.
-      $values = [
-        'lat_north_east' => (isset($values[1]) && is_numeric($values[1]) && $values[1] >= -90 && $values[1] <= 90) ? floatval($values[1]) : FALSE,
-        'lng_north_east' => (isset($values[2]) && is_numeric($values[2]) && $values[2] >= -180 && $values[2] <= 180) ? floatval($values[2]) : FALSE,
-        'lat_south_west' => (isset($values[2]) && is_numeric($values[3]) && $values[3] >= -90 && $values[3] <= 90) ? floatval($values[3]) : FALSE,
-        'lng_south_west' => (isset($values[2]) && is_numeric($values[4]) && $values[4] >= -180 && $values[4] <= 180) ? floatval($values[4]) : FALSE,
-      ];
-
-      if (
-        $values['lat_north_east'] === FALSE
-        || $values['lng_north_east'] === FALSE
-        || $values['lat_south_west'] === FALSE
-        || $values['lng_south_west'] === FALSE
-      ) {
-        $values = FALSE;
-      }
+    // Cache the values so this only gets processed once per handler.
+    if (isset($this->parsedBoundary)) {
+      return $this->parsedBoundary;
     }
-    return $values;
+
+    // Process argument values into an array.
+    $matches = [];
+    preg_match('/^([0-9\-.]+),+([0-9\-.]+),+([0-9\-.]+),+([0-9\-.]+)(.*$)/', $this->getValue(), $matches);
+
+    // Validate the passed argument.
+    $values = [
+      'lat_north_east' => (isset($matches[1]) && is_numeric($matches[1]) && $matches[1] >= -90 && $matches[1] <= 90) ? floatval($matches[1]) : FALSE,
+      'lng_north_east' => (isset($matches[2]) && is_numeric($matches[2]) && $matches[2] >= -180 && $matches[2] <= 180) ? floatval($matches[2]) : FALSE,
+      'lat_south_west' => (isset($matches[3]) && is_numeric($matches[3]) && $matches[3] >= -90 && $matches[3] <= 90) ? floatval($matches[3]) : FALSE,
+      'lng_south_west' => (isset($matches[4]) && is_numeric($matches[4]) && $matches[4] >= -180 && $matches[4] <= 180) ? floatval($matches[4]) : FALSE,
+    ];
+
+    if (
+      $values['lat_north_east'] === FALSE
+      || $values['lng_north_east'] === FALSE
+      || $values['lat_south_west'] === FALSE
+      || $values['lng_south_west'] === FALSE
+    ) {
+      $values = [];
+    }
+
+    $this->parsedBoundary = $values;
+
+    return $this->parsedBoundary;
   }
 
 }

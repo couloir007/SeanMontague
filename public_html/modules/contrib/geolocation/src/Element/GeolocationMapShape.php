@@ -2,6 +2,7 @@
 
 namespace Drupal\geolocation\Element;
 
+use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Template\Attribute;
@@ -23,9 +24,8 @@ use Drupal\Core\Template\Attribute;
  *   '#fill_opacity' => NULL,
  * ];
  * @endcode
- *
- * @RenderElement("geolocation_map_shape")
  */
+#[RenderElement('geolocation_map_shape')]
 class GeolocationMapShape extends RenderElementBase {
 
   /**
@@ -40,7 +40,7 @@ class GeolocationMapShape extends RenderElementBase {
       ],
       '#pre_render' => [
         [$class, 'preRenderGroup'],
-        [$this, 'preRenderGeolocationShape'],
+        [$class, 'preRenderGeolocationShape'],
       ],
       '#title' => NULL,
       '#geometry' => NULL,
@@ -63,7 +63,7 @@ class GeolocationMapShape extends RenderElementBase {
    * @return array
    *   Renderable map.
    */
-  public function preRenderGeolocationShape(array $render_array): array {
+  public static function preRenderGeolocationShape(array $render_array): array {
     $render_array['#theme'] = 'geolocation_map_shape';
 
     $render_array['#attributes'] = new Attribute($render_array['#attributes'] ?? []);

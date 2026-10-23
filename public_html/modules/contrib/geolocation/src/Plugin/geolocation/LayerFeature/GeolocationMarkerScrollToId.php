@@ -49,33 +49,45 @@ class GeolocationMarkerScrollToId extends LayerFeatureBase {
   public function alterLayer(array $render_array, string $layer_id, array $feature_settings = [], array $context = []): array {
     $render_array = parent::alterLayer($render_array, $layer_id, $feature_settings, $context);
 
-    if (empty($render_array['#children']['locations'])) {
+    // Depending on the render stage this feature runs at, the location render
+    // arrays can either live under '#children' or directly under 'locations'
+    // (they are only moved into '#children' later, in GeolocationMap's
+    // pre-render). Support both so the attribute is reliably emitted.
+    if (!empty($render_array['#children']['locations'])) {
+      $locations = &$render_array['#children']['locations'];
+    }
+    elseif (!empty($render_array['locations'])) {
+      $locations = &$render_array['locations'];
+    }
+    else {
       return $render_array;
     }
 
-    if (!empty($context['view'])) {
-      /** @var \Drupal\views\ViewExecutable $view */
-      $view = $context['view'];
+    if (empty($context['view'])) {
+      return $render_array;
     }
+    /** @var \Drupal\views\ViewExecutable $view */
+    $view = $context['view'];
 
-    foreach ($render_array['#children']['locations'] as &$location) {
-      $scroll_target_id = $this->token->replace($feature_settings['scroll_target_id'], $context);
-
-      if (empty($view)) {
+    foreach ($locations as &$location) {
+      if (!is_array($location)) {
         continue;
       }
+
+      $scroll_target_id = $this->token->replace($feature_settings['scroll_target_id'], $context);
 
       if (empty($location['#attributes'])) {
         $location['#attributes'] = [];
       }
       elseif (!is_array($location['#attributes'])) {
+        /** @var array{"#attributes": array|\Drupal\Core\Template\Attribute} $location */
         $location['#attributes'] = new Attribute($location['#attributes']);
         $location['#attributes'] = $location['#attributes']->toArray();
       }
 
       if (isset($location['#attributes']['data-views-row-index'])) {
         $scroll_target_id = $view->getStyle()->tokenizeValue($scroll_target_id, (int) $location['#attributes']['data-views-row-index']);
-        $location['#attributes']['data-scroll-target-id'] = $scroll_target_id;
+        $location['#attributes']['data-scroll-target-id'] = preg_replace('/\s+/', '', strip_tags($scroll_target_id));
       }
     }
 

@@ -5,7 +5,7 @@ dependencies:
     - field.storage.node.field_geolocation
   module:
     - geolocation
-    - geolocation_google_maps
+    - geolocation_leaflet
     - node
     - user
 id: geolocation_common_map_ajax_test
@@ -290,23 +290,11 @@ display:
               content_editor: '0'
               administrator: '0'
             input_by_geocoding_widget: 0
-            geocoder: google_geocoding_api
+            geocoder: nominatim
             geocoder_settings:
               label: Address
               description: 'Enter an address to be localized.'
               autocomplete_min_length: 1
-              component_restrictions:
-                route: ''
-                country: ''
-                administrative_area: ''
-                locality: ''
-                postal_code: ''
-              boundary_restriction:
-                south: ''
-                west: ''
-                north: ''
-                east: ''
-              region: ''
           is_grouped: false
           group_info:
             label: ''
@@ -431,231 +419,16 @@ display:
                 north: ''
                 east: ''
               map_center_id: fixed_boundaries
-          map_provider_id: google_maps
+          map_provider_id: leaflet
           map_provider_settings:
-            conditional_initialization: 'no'
-            conditional_description: 'Clicking this button will embed a map.'
-            conditional_label: 'Show map'
-            map_features:
-              google_maps_layer_bicycling:
-                enabled: false
-                weight: 0
-              client_location_indicator:
-                enabled: false
-                weight: 0
-              context_popup:
-                enabled: false
-                weight: 0
-                settings:
-                  content:
-                    value: ''
-                    format: basic_html
-              geolocation_google_maps_control_directions:
-                enabled: false
-                weight: 0
-                settings:
-                  position: RIGHT_CENTER
-                  origin_source: exposed
-                  origin_static_value: ''
-                  destination_source: exposed
-                  destination_static_value: ''
-                  travel_mode: exposed
-                  directions_container: below
-                  directions_container_custom_id: ''
-              map_disable_tilt:
-                enabled: false
-                weight: 0
-              map_disable_user_interaction:
-                enabled: false
-                weight: 0
-              geolocation_shapes:
-                enabled: false
-                weight: 0
-                settings:
-                  remove_markers: false
-                  polyline: true
-                  polyline_title: ''
-                  strokeColor: '#FF0000'
-                  strokeOpacity: 0.8
-                  strokeWidth: '2'
-                  polygon: false
-                  polygon_title: ''
-                  fillColor: '#FF0000'
-                  fillOpacity: 0.35
-              control_fullscreen:
-                enabled: false
-                weight: 0
-                settings:
-                  position: RIGHT_CENTER
-              control_geocoder:
-                enabled: false
-                weight: 0
-                settings:
-                  position: TOP_LEFT
-                  geocoder: google_geocoding_api
-                  geocoder_settings:
-                    label: Address
-                    description: 'Enter an address to be localized.'
-                    autocomplete_min_length: 1
-                    component_restrictions:
-                      route: ''
-                      country: ''
-                      administrative_area: ''
-                      locality: ''
-                      postal_code: ''
-                    boundary_restriction:
-                      south: ''
-                      west: ''
-                      north: ''
-                      east: ''
-                    region: ''
-              control_loading_indicator:
-                enabled: false
-                weight: 0
-                settings:
-                  position: TOP_LEFT
-                  loading_label: Loading
-              control_locate:
-                enabled: false
-                weight: 0
-                settings:
-                  position: TOP_LEFT
-              control_maptype:
-                enabled: true
-                weight: 0
-                settings:
-                  position: RIGHT_BOTTOM
-                  style: DEFAULT
-              control_recenter:
-                enabled: false
-                weight: 0
-                settings:
-                  position: TOP_LEFT
-              control_rotate:
-                enabled: false
-                weight: 0
-                settings:
-                  position: RIGHT_CENTER
-              control_streetview:
-                enabled: false
-                weight: 0
-                settings:
-                  position: TOP_LEFT
-              control_zoom:
-                enabled: true
-                weight: 0
-                settings:
-                  position: RIGHT_CENTER
-              map_restriction:
-                enabled: false
-                weight: 0
-                settings:
-                  north: ''
-                  south: ''
-                  east: ''
-                  west: ''
-                  strict: true
-              google_maps_layer_traffic:
-                enabled: false
-                weight: 0
-              google_maps_layer_transit:
-                enabled: false
-                weight: 0
-            type: ROADMAP
             zoom: 3
-            minZoom: 0
-            maxZoom: 18
             height: 400px
             width: 100%
-            gestureHandling: auto
             data_layers:
-              'geolocation_debug:default':
-                enabled: false
-                weight: 0
-                settings:
-                  features:
-                    marker_clusterer:
-                      enabled: false
-                      weight: 0
-                    marker_infowindow:
-                      enabled: false
-                      weight: 0
-                      settings:
-                        info_window_solitary: true
-                        disable_auto_pan: true
-                        info_auto_display: false
-                        max_width: null
-                    marker_label:
-                      enabled: false
-                      weight: 0
-                      settings:
-                        color: ''
-                        font_family: ''
-                        font_size: ''
-                        font_weight: ''
-                    marker_zoom_by_anchor:
-                      enabled: false
-                      weight: 0
-                      settings:
-                        marker_zoom_anchor_id: ''
-              'geolocation_test:default':
-                enabled: false
-                weight: 0
-                settings:
-                  features:
-                    marker_clusterer:
-                      enabled: false
-                      weight: 0
-                    marker_infowindow:
-                      enabled: false
-                      weight: 0
-                      settings:
-                        info_window_solitary: true
-                        disable_auto_pan: true
-                        info_auto_display: false
-                        max_width: null
-                    marker_label:
-                      enabled: false
-                      weight: 0
-                      settings:
-                        color: ''
-                        font_family: ''
-                        font_size: ''
-                        font_weight: ''
-                    marker_zoom_by_anchor:
-                      enabled: false
-                      weight: 0
-                      settings:
-                        marker_zoom_anchor_id: ''
               'geolocation_default_layer:default':
                 enabled: true
                 weight: 1
-                settings:
-                  features:
-                    marker_clusterer:
-                      enabled: false
-                      weight: 0
-                    marker_infowindow:
-                      enabled: false
-                      weight: 0
-                      settings:
-                        info_window_solitary: true
-                        disable_auto_pan: true
-                        info_auto_display: false
-                        max_width: null
-                    marker_label:
-                      enabled: false
-                      weight: 0
-                      settings:
-                        color: ''
-                        font_family: ''
-                        font_size: ''
-                        font_weight: ''
-                    marker_zoom_by_anchor:
-                      enabled: false
-                      weight: 0
-                      settings:
-                        marker_zoom_anchor_id: ''
+                settings: {  }
       row:
         type: fields
         options:

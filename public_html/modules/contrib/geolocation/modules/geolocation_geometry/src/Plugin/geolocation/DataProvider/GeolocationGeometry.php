@@ -250,8 +250,8 @@ class GeolocationGeometry extends DataProviderBase implements DataProviderInterf
           $position = [
             '#type' => 'geolocation_map_location',
             '#coordinates' => [
-              'lat' => $point->coordinates[1],
-              'lng' => $point->coordinates[0],
+              'lat' => $point[1],
+              'lng' => $point[0],
             ],
           ];
           $container[$key] = $position;

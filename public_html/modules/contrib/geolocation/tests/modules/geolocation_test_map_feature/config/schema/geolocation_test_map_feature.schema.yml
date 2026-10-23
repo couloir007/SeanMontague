@@ -1,0 +1,23 @@
+plugin.plugin_configuration.geolocation.map_feature.test_control_move:
+  type: geolocation.map_feature_settings
+  label: 'Test - Move map'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        position:
+          type: string
+          label: 'Position'
+        north:
+          type: float
+          label: 'North'
+        east:
+          type: float
+          label: 'East'
+        south:
+          type: float
+          label: 'South'
+        west:
+          type: float
+          label: 'West'

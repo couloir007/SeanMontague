@@ -3,7 +3,7 @@ import { LeafletMapFeature } from "./LeafletMapFeature.js";
 /**
  * @typedef {Object} ControlRotateSettings
  *
- * @extends {GeolocationMapFeatureSettings}
+ * @augments {GeolocationMapFeatureSettings}
  *
  * @prop {Number} bearing
  * @prop {Boolean} display_control

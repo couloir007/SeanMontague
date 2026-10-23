@@ -22,6 +22,7 @@ export class GeolocationGeocoder {
 
   /**
    * @param {function(GeolocationGeocodedResult)} callback
+   *   Called with each geocoded result.
    */
   addResultCallback(callback) {
     this.resultCallbacks.push(callback);
@@ -29,9 +30,10 @@ export class GeolocationGeocoder {
 
   /**
    * @param {function()} callback
+   *   Called when the current result is cleared.
    */
   addClearCallback(callback) {
-    this.resultCallbacks.push(callback);
+    this.clearCallbacks.push(callback);
   }
 
   /**
@@ -111,7 +113,7 @@ export class GeolocationGeocoder {
    * Option form autocomplete selected.
    *
    * @param {Object} request - See jquery doc
-   * @param {function} response - See jquery doc
+   * @param {Function} response - See jquery doc
    */
   autoCompleteSource(request, response) {
     const autocompleteResults = [];

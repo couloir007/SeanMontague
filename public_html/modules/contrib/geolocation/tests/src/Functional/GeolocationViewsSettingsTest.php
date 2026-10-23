@@ -3,12 +3,14 @@
 namespace Drupal\Tests\geolocation\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Views integration.
  *
  * @group geolocation
  */
+#[RunTestsInSeparateProcesses]
 class GeolocationViewsSettingsTest extends BrowserTestBase {
 
   /**
@@ -39,45 +41,33 @@ class GeolocationViewsSettingsTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Tests the Views admin UI and field handlers.
+   * Tests the Views admin UI for the map style and the proximity handlers.
+   *
+   * Both cases share the same fixture, and every test method reinstalls the
+   * site, so they are asserted in one go.
    */
-  public function testViewsMapSettings(): void {
-    $permissions = [
+  public function testViewsSettingsForms(): void {
+    $admin_user = $this->drupalCreateUser([
       'access administration pages',
       'administer views',
-    ];
-    $admin_user = $this->drupalCreateUser($permissions);
+    ]);
     $this->drupalLogin($admin_user);
 
+    // Map style settings of the common map display.
     $this->drupalGet('admin/structure/views/view/geolocation_demo_common_map');
-
-    // Add click sorting for all fields where this is possible.
     $this->clickLink('Settings');
-    $edit = [
+    $this->submitForm([
       'style_options[centre][fit_bounds][enable]' => 1,
-    ];
-    $this->submitForm($edit, 'Apply');
-  }
+    ], 'Apply');
+    $this->assertSession()->statusCodeEquals(200);
 
-  /**
-   * Tests the Views admin UI and field handlers.
-   */
-  public function testViewsProximitySettings(): void {
-    $permissions = [
-      'access administration pages',
-      'administer views',
-    ];
-    $admin_user = $this->drupalCreateUser($permissions);
-    $this->drupalLogin($admin_user);
-
+    // Proximity filter settings.
     $this->drupalGet('admin/structure/views/view/geolocation_demo_proximity_filter_sort');
-
-    // Add click sorting for all fields where this is possible.
     $this->clickLink('Content: Geolocation Demo Single - Proximity Form');
-    $edit = [
+    $this->submitForm([
       'options[center][coordinates][enable]' => 1,
-    ];
-    $this->submitForm($edit, 'Apply');
+    ], 'Apply');
+    $this->assertSession()->statusCodeEquals(200);
   }
 
 }

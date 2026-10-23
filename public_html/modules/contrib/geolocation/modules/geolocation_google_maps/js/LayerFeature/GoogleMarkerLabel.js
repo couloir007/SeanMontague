@@ -3,7 +3,7 @@ import { GoogleLayerFeature } from "./GoogleLayerFeature.js";
 /**
  * @typedef {Object} MarkerLabelSettings
  *
- * @extends {GeolocationMapFeatureSettings}
+ * @augments {GeolocationMapFeatureSettings}
  *
  * @prop {String} color
  * @prop {String} fontFamily

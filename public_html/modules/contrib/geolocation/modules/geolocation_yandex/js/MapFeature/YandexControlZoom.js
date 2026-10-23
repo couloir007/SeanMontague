@@ -1,4 +1,5 @@
 import { YandexMapFeature } from "./YandexMapFeature.js";
+import { importDefaultUiTheme } from "../YandexPackages.js";
 
 /* global ymaps3 */
 
@@ -8,8 +9,8 @@ export default class YandexControlZoom extends YandexMapFeature {
 
     const { YMapControls } = ymaps3;
 
-    ymaps3.import("@yandex/ymaps3-controls@0.0.1").then((ymapsControls) => {
-      const { YMapZoomControl } = ymapsControls;
+    importDefaultUiTheme().then((ymaps3Theme) => {
+      const { YMapZoomControl } = ymaps3Theme;
 
       this.map.yandexMap.addChild(
         new YMapControls({

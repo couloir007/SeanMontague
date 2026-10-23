@@ -1,10 +1,11 @@
 /* eslint-disable max-classes-per-file */
+import { hint as hintPackage } from "./YandexPackages.js";
 /* global ymaps3 */
 
 export class YandexHint {
   addHintToMap() {
     return new Promise((resolve) => {
-      ymaps3.import("@yandex/ymaps3-hint@0.0.1").then((ymaps3hint) => {
+      ymaps3.import(hintPackage).then((ymaps3hint) => {
         const { YMapHint, YMapHintContext } = ymaps3hint;
         const { YMapEntity } = ymaps3;
         const hint = new YMapHint({

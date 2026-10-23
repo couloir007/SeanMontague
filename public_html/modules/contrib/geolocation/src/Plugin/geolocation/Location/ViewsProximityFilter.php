@@ -22,6 +22,11 @@ class ViewsProximityFilter extends LocationBase implements LocationInterface {
   use ViewsContextTrait;
 
   /**
+   * Views filter plugin ID to derive the center from.
+   */
+  protected string $filterPluginId = 'geolocation_filter_proximity';
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(
@@ -51,18 +56,14 @@ class ViewsProximityFilter extends LocationBase implements LocationInterface {
   public function getAvailableLocationOptions(array $context = []): array {
     $options = [];
 
-    if (empty($context['views_filter'])) {
-      return $options;
-    }
-
     if ($displayHandler = self::getViewsDisplayHandler($context)) {
       /** @var \Drupal\views\Plugin\views\filter\FilterPluginBase $filter */
       foreach ($displayHandler->getHandlers('filter') as $delta => $filter) {
         if (
-          $filter->getPluginId() === 'geolocation_filter_proximity'
-          && $filter !== $context['views_filter']
+          $filter->getPluginId() === $this->filterPluginId
+          && $filter !== ($context['views_filter'] ?? NULL)
         ) {
-          $options[$delta] = $this->t('Proximity filter') . ' - ' . $filter->adminLabel();
+          $options[$delta] = $this->getPluginDefinition()['name'] . ' - ' . $filter->adminLabel();
         }
       }
     }

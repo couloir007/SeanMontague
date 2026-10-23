@@ -1,0 +1,3 @@
+plugin.plugin_configuration.geolocation.map_center_option.geometry_views_boundary_filter:
+  type: plugin.plugin_configuration.geolocation.map_center_option.views_boundary_filter
+  label: 'Geometry boundary filter'

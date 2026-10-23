@@ -4,7 +4,7 @@ import { GeolocationCoordinates } from "../../../../js/Base/GeolocationCoordinat
 /**
  * @typedef {Object} ContextPopupSettings
  *
- * @extends {GeolocationMapFeatureSettings}
+ * @augments {GeolocationMapFeatureSettings}
  *
  * @prop {String} content
  */

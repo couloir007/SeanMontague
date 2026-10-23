@@ -22,7 +22,8 @@
     "no-jquery/no-ajax-events": "off",
     "no-case-declarations": "off",
     "no-restricted-syntax": "off",
-    "no-bitwise": "off"
+    "no-bitwise": "off",
+    "default-param-last": "off"
   },
   "parserOptions": {
     "ecmaVersion": 2020,

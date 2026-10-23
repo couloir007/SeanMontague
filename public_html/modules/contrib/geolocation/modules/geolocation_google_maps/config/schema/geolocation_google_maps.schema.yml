@@ -119,3 +119,6 @@ geolocation.map_provider.google_maps:
     mapId:
       type: string
       label: 'Map ID'
+    fitBoundsPadding:
+      type: integer
+      label: 'Fit bounds padding'

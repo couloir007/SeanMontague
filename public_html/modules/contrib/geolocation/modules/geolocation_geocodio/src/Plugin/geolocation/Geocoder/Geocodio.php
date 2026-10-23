@@ -8,7 +8,7 @@ use Drupal\geolocation\GeocoderBase;
 use Drupal\geolocation\GeocoderInterface;
 use Drupal\geolocation\KeyProvider;
 use Geocodio\Geocodio as GeocodioApi;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TransferException;
 
 /**
  * Provides a Geocodio integration.
@@ -55,7 +55,7 @@ class Geocodio extends GeocoderBase implements GeocoderInterface {
         $result = $geocoder->geocode($address);
       }
     }
-    catch (RequestException $e) {
+    catch (TransferException $e) {
       $logger = \Drupal::logger('geolocation');
       Error::logException($logger, $e);
       return NULL;

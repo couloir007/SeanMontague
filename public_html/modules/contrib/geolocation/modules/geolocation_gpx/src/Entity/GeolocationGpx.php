@@ -4,12 +4,19 @@ namespace Drupal\geolocation_gpx\Entity;
 
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityAccessControlHandler;
+use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\Form\DeleteMultipleForm;
+use Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\geolocation_geometry\GeometryType\GeometryTypeBase;
+use Drupal\geolocation_gpx\Form\GeolocationGpxDeleteForm;
+use Drupal\geolocation_gpx\Form\GeolocationGpxForm;
+use Drupal\geolocation_gpx\ViewsData\GeolocationGpxViewsData;
 
 /**
  * Defines the GPX entity.
@@ -24,9 +31,30 @@ use Drupal\geolocation_geometry\GeometryType\GeometryTypeBase;
 #[ContentEntityType(
   id: 'geolocation_gpx',
   label: new \Drupal\Core\StringTranslation\TranslatableMarkup('Geolocation GPX'),
-  entity_keys: ['id' => 'id', 'uuid' => 'uuid'],
-  handlers: ['views_data' => ''],
-  admin_permission: 'administer geolocation_gpx',
+  entity_keys: [
+    'id' => 'id',
+    'uuid' => 'uuid',
+  ],
+  handlers: [
+    'views_data' => GeolocationGpxViewsData::class,
+    'list_builder' => EntityListBuilder::class,
+    'access' => EntityAccessControlHandler::class,
+    'form' => [
+      'default' => GeolocationGpxForm::class,
+      'edit' => GeolocationGpxForm::class,
+      'delete' => GeolocationGpxDeleteForm::class,
+      'delete-multiple-confirm' => DeleteMultipleForm::class,
+    ],
+    'route_provider' => [
+      'html' => DefaultHtmlRouteProvider::class,
+    ],
+  ],
+  links: [
+    'edit-form' => '/geolocation-gpx/{geolocation_gpx}/edit',
+    'delete-form' => '/geolocation-gpx/{geolocation_gpx}/delete',
+    'delete-multiple-form' => '/geolocation-gpx/delete',
+  ],
+  admin_permission: 'access administration pages',
   base_table: 'geolocation_gpx'
 )]
 class GeolocationGpx extends ContentEntityBase {
@@ -63,12 +91,22 @@ class GeolocationGpx extends ContentEntityBase {
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))
       ->setDescription(t('GPS name of route.'))
-      ->setTranslatable(TRUE);
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => 0,
+      ])
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['description'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Description'))
       ->setDescription(t('Text description of route for user. Not sent to GPS.'))
-      ->setTranslatable(TRUE);
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => 1,
+      ])
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['author'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Author'))
@@ -129,13 +167,20 @@ class GeolocationGpx extends ContentEntityBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function label(): string {
+    return $this->getDisplayName();
+  }
+
+  /**
    * Get name to display for element.
    *
    * @return string
    *   Name.
    */
   public function getDisplayName(): string {
-    return $this->name->value ?? $this->author->value ?? $this->creator->value ?? '';
+    return $this->name->value ?: $this->author->value ?: $this->creator->value ?: '';
   }
 
   /**
@@ -299,7 +344,7 @@ class GeolocationGpx extends ContentEntityBase {
 
     $route_waypoints = 0;
     foreach ($this->getRoutes() as $route) {
-      $route_waypoints = $route_waypoints + count($route->waypoints);
+      $route_waypoints = $route_waypoints + count($route->getWaypoints());
     }
 
     $track_segments = $track_waypoints = 0;

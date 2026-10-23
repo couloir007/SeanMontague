@@ -11,12 +11,14 @@
 /**
  * Base class.
  *
+ * @abstract
+ *
  * @prop {GeolocationMapFeatureSettings} settings
  * @prop {GeolocationMapBase} map
  */
 export class GeolocationMapFeature {
   /**
-   * @constructor
+   * @class
    *
    * Called when map is initialized, but no map content is loaded yet.
    *
@@ -58,6 +60,11 @@ export class GeolocationMapFeature {
    * Called when map content is fully loaded.
    */
   onMapReady() {}
+
+  /**
+   * Called before the map is discarded.
+   */
+  destroy() {}
 
   onMapIdle() {}
 
@@ -116,4 +123,10 @@ export class GeolocationMapFeature {
    *   Coordinates.
    */
   onShapeClicked(shape, coordinates) {}
+
+  /**
+   * @param {GeolocationGeocodedResult} result
+   *   Geocoded result.
+   */
+  onGeocodedResult(result) {}
 }

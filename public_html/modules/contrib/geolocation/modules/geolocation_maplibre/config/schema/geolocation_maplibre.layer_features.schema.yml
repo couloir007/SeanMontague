@@ -1,0 +1,26 @@
+plugin.plugin_configuration.geolocation.layer_feature.maplibre_marker_popup:
+  type: geolocation.layer_feature_settings
+  label: 'Marker Popup'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        info_auto_display:
+          type: boolean
+          label: 'Open every popup on load'
+        max_width:
+          type: integer
+          label: 'Maximum width'
+        close_button:
+          type: boolean
+          label: 'Show close button'
+        close_on_click:
+          type: boolean
+          label: 'Close on map click'
+        close_on_move:
+          type: boolean
+          label: 'Close on map move'
+        class_name:
+          type: string
+          label: 'Custom CSS class'

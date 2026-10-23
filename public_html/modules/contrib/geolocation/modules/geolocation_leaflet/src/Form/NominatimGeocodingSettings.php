@@ -14,7 +14,7 @@ class NominatimGeocodingSettings extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
-    $config = $this->configFactory->get('geolocation_leaflet.nominatim_settings');
+    $config = $this->config('geolocation_leaflet.nominatim_settings');
 
     $form['nominatim_base_url'] = [
       '#type' => 'textfield',

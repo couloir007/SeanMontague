@@ -8,6 +8,7 @@ import { YandexShapeMultiLine } from "../YandexShapeMultiLine.js";
 import { YandexShapeMultiPolygon } from "../YandexShapeMultiPolygon.js";
 import { YandexCircle } from "../YandexCircle.js";
 import { YandexHint } from "../YandexHint.js";
+import { importDefaultUiTheme } from "../YandexPackages.js";
 
 /* global ymaps3 */
 /* global turf */
@@ -15,7 +16,7 @@ import { YandexHint } from "../YandexHint.js";
 /**
  * @typedef YandexMapSettings
  *
- * @extends GeolocationMapSettings
+ * @augments GeolocationMapSettings
  *
  * @prop {MapOptions} yandex_settings
  * @prop {Number} yandex_settings.zoom
@@ -26,12 +27,14 @@ import { YandexHint } from "../YandexHint.js";
 /**
  * @prop {ymaps3.YMap} yandexMap
  * @prop {YandexMapSettings} settings
+ * @prop {Map<String, Object>} tileDataSources
  */
 export default class Yandex extends GeolocationMapBase {
   constructor(mapSettings) {
     super(mapSettings);
 
     this.customControls = [];
+    this.tileDataSources = new Map();
 
     this.container.style.position = "relative";
 
@@ -40,12 +43,18 @@ export default class Yandex extends GeolocationMapBase {
     this.container.style.width = this.settings.yandex_settings.width;
   }
 
+  destroy() {
+    super.destroy();
+
+    this.yandexMap?.destroy();
+  }
+
   initialize() {
     return super
       .initialize()
       .then(() => {
         return ymaps3.ready.then(() => {
-          return ymaps3.import("@yandex/ymaps3-markers@0.0.1");
+          return importDefaultUiTheme();
         });
       })
       .then(() => {
@@ -78,13 +87,11 @@ export default class Yandex extends GeolocationMapBase {
             const mapListener = new YMapListener({
               layer: "any",
               onActionEnd: (object) => {
-                this.updatingBounds = false;
-
                 this.features.forEach((feature) => {
                   feature.onMapIdle();
                 });
 
-                const bounds = this.yandexMap.bounds;
+                const { bounds } = this.yandexMap;
                 if (!bounds) {
                   return;
                 }
@@ -156,7 +163,7 @@ export default class Yandex extends GeolocationMapBase {
     super.getMarkerBoundaries(markers);
 
     markers = markers || this.dataLayers.get("default").markers;
-    if (!markers) {
+    if (!markers?.length) {
       return null;
     }
 
@@ -225,7 +232,7 @@ export default class Yandex extends GeolocationMapBase {
   }
 
   getCenter() {
-    return this.normalizeCoordinates(this.yandexMap.getCenter());
+    return this.normalizeCoordinates(this.yandexMap.center);
   }
 
   setCenterByCoordinates(coordinates, accuracy) {
@@ -241,7 +248,7 @@ export default class Yandex extends GeolocationMapBase {
       return coordinates;
     }
 
-    return new GeolocationCoordinates(coordinates[0], coordinates[1]);
+    return new GeolocationCoordinates(coordinates[1], coordinates[0]);
   }
 
   denormalizeCoordinates(coordinates) {
@@ -285,6 +292,7 @@ export default class Yandex extends GeolocationMapBase {
     element.style.right = "";
     element.style.top = "";
     element.style.bottom = "";
+    element.style.transform = "";
 
     const position = element.dataset.mapControlPosition ?? "left";
     switch (position) {
@@ -300,11 +308,6 @@ export default class Yandex extends GeolocationMapBase {
       case "top left":
         element.style.left = "2%";
         element.style.top = "2%";
-        break;
-      case "left":
-        element.style.left = "2%";
-        element.style.top = "50%";
-        element.style.transform = "translateY(-50%)";
         break;
       case "right":
         element.style.right = "2%";
@@ -323,6 +326,12 @@ export default class Yandex extends GeolocationMapBase {
       case "bottom left":
         element.style.left = "2%";
         element.style.bottom = "2%";
+        break;
+      case "left":
+      default:
+        element.style.left = "2%";
+        element.style.top = "50%";
+        element.style.transform = "translateY(-50%)";
         break;
     }
 
@@ -348,6 +357,7 @@ export default class Yandex extends GeolocationMapBase {
       },
     });
     this.yandexMap.addChild(layerSource);
+    this.tileDataSources.set(layerId, layerSource);
 
     const layer = new YMapLayer({
       id: layerId,
@@ -364,9 +374,19 @@ export default class Yandex extends GeolocationMapBase {
   }
 
   unloadTileLayer(layerId) {
-    this.yandexMap.removeChild(this.tileLayers.get(layerId));
+    if (!this.tileLayers.has(layerId)) {
+      return;
+    }
 
+    this.yandexMap.removeChild(this.tileLayers.get(layerId));
     this.tileLayers.delete(layerId);
+
+    // The data source holds the layer ID, so it has to go along with the
+    // layer or loading the same layer again collides with it.
+    if (this.tileDataSources.has(layerId)) {
+      this.yandexMap.removeChild(this.tileDataSources.get(layerId));
+      this.tileDataSources.delete(layerId);
+    }
   }
 
   addHintWindow() {

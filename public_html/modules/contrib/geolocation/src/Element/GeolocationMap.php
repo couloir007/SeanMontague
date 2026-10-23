@@ -3,6 +3,7 @@
 namespace Drupal\geolocation\Element;
 
 use Drupal\Component\Utility\SortArray;
+use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\RenderElementBase;
@@ -23,9 +24,8 @@ use Drupal\geolocation\MapProviderManager;
  *   '#id' => 'thisisanid',
  * ];
  * @endcode
- *
- * @RenderElement("geolocation_map")
  */
+#[RenderElement('geolocation_map')]
 class GeolocationMap extends RenderElementBase {
 
   /**
@@ -56,7 +56,7 @@ class GeolocationMap extends RenderElementBase {
       ],
       '#pre_render' => [
         [$class, 'preRenderGroup'],
-        [$this, 'preRenderMap'],
+        [$class, 'preRenderMap'],
       ],
       '#maptype' => NULL,
       '#centre' => NULL,
@@ -76,7 +76,7 @@ class GeolocationMap extends RenderElementBase {
    * @return array
    *   Renderable map.
    */
-  public function preRenderMap(array $render_array): array {
+  public static function preRenderMap(array $render_array): array {
     $render_array['#theme'] = 'geolocation_map_wrapper';
 
     $render_array['#cache'] = array_merge_recursive(
@@ -111,7 +111,7 @@ class GeolocationMap extends RenderElementBase {
       }
     }
 
-    $map_provider = $this->mapProviderManager->getMapProvider($render_array['#maptype']);
+    $map_provider = \Drupal::service('plugin.manager.geolocation.mapprovider')->getMapProvider($render_array['#maptype']);
     if (empty($map_provider)) {
       return $render_array;
     }
@@ -152,18 +152,6 @@ class GeolocationMap extends RenderElementBase {
 
     if (!empty($render_array['#centre']['zoom'])) {
       $render_array['#attributes']->setAttribute('data-zoom', $render_array['#centre']['zoom']);
-    }
-
-    if (
-      !empty($render_array['#centre']['lat_north_east'])
-      && !empty($render_array['#centre']['lng_north_east'])
-      && !empty($render_array['#centre']['lat_south_west'])
-      && !empty($render_array['#centre']['lng_south_west'])
-    ) {
-      $render_array['#attributes']->setAttribute('data-centre-lat-north-east', $render_array['#centre']['lat_north_east']);
-      $render_array['#attributes']->setAttribute('data-centre-lng-north-east', $render_array['#centre']['lng_north_east']);
-      $render_array['#attributes']->setAttribute('data-centre-lat-south-west', $render_array['#centre']['lat_south_west']);
-      $render_array['#attributes']->setAttribute('data-centre-lng-south-west', $render_array['#centre']['lng_south_west']);
     }
 
     $context = [];

@@ -3,6 +3,7 @@
 namespace Drupal\geolocation_google_maps\Plugin\geolocation\MapFeature;
 
 use Drupal\geolocation\Attribute\MapFeature;
+use Drupal\geolocation\FilterFormatProvider;
 use Drupal\geolocation\MapFeatureBase;
 use Drupal\geolocation\MapProviderInterface;
 
@@ -24,7 +25,7 @@ class GoogleContextPopup extends MapFeatureBase {
     return [
       'content' => [
         'value' => '',
-        'format' => filter_default_format(),
+        'format' => FilterFormatProvider::getDefaultFormatId(),
       ],
     ];
   }
@@ -58,7 +59,11 @@ class GoogleContextPopup extends MapFeatureBase {
       !empty($feature_settings['content']['value'])
       && !empty($feature_settings['content']['format'])
     ) {
-      $feature_settings['content'] = check_markup($this->token->replace($feature_settings['content']['value'], $context), $feature_settings['content']['format']);
+      $feature_settings['content'] = [
+        '#type' => 'processed_text',
+        '#text' => $this->token->replace($feature_settings['content']['value'], $context),
+        '#format' => $feature_settings['content']['format'],
+      ];
     }
 
     return parent::alterMap($render_array, $feature_settings, $context, $mapProvider);

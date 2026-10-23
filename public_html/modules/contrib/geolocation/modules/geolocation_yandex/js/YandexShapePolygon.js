@@ -1,4 +1,5 @@
 import { GeolocationShapePolygon } from "../../../js/Base/GeolocationShapePolygon.js";
+import { clampCoordinates } from "./YandexCoordinates.js";
 
 /* global ymaps3 */
 
@@ -13,15 +14,10 @@ export class YandexShapePolygon extends GeolocationShapePolygon {
 
     const { YMapFeature } = ymaps3;
 
-    const coordinates = [];
-    geometry.points.forEach((value) => {
-      coordinates.push([value.lng < 180 ? value.lng : 179.99, value.lat]);
-    });
-
     const polygon = new YMapFeature({
       geometry: {
         type: "Polygon",
-        coordinates: [coordinates],
+        coordinates: clampCoordinates(geometry.coordinates),
       },
       style: {
         stroke: [{ color: this.strokeColor, width: this.strokeWidth }],
@@ -45,7 +41,7 @@ export class YandexShapePolygon extends GeolocationShapePolygon {
 
   remove() {
     this.yandexShapes.forEach((yandexShape) => {
-      yandexShape.remove();
+      this.map.yandexMap.removeChild(yandexShape);
     });
 
     super.remove();

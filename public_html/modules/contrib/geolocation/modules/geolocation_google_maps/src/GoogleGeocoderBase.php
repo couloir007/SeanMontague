@@ -4,6 +4,7 @@ namespace Drupal\geolocation_google_maps;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\geolocation\GeocoderBase;
 use Drupal\geolocation\GeocoderCountryFormattingManager;
 use Drupal\geolocation\GeocoderInterface;
@@ -100,6 +101,24 @@ abstract class GoogleGeocoderBase extends GeocoderBase implements GeocoderInterf
     }
 
     return $settings;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function alterRenderArray(array &$render_array, string $identifier): ?array {
+    parent::alterRenderArray($render_array, $identifier);
+
+    $render_array['#attached'] = BubbleableMetadata::mergeAttachments(
+      $render_array['#attached'] ?? [],
+      [
+        'library' => [
+          'geolocation_google_maps/geolocation_google_maps.loader',
+        ],
+      ]
+    );
+
+    return $render_array;
   }
 
   /**

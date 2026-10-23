@@ -5,7 +5,7 @@
  */
 export class GeolocationLocationInputBase {
   /**
-   * @constructor
+   * @class
    *
    * @param {Element} form
    *   Form.
@@ -36,6 +36,21 @@ export class GeolocationLocationInputBase {
   }
 
   submit() {
-    this.form.querySelector("input")?.form?.submit();
+    const form = this.form.querySelector("input")?.form;
+
+    if (!form) {
+      return;
+    }
+
+    // Views binds its AJAX handling to the exposed form submit buttons, so a
+    // native form submit would always reload the page.
+    const submitButton = [...form.querySelectorAll('input[type="submit"], button[type="submit"], input[type="image"]')].find((button) => button.dataset.drupalSelector !== "edit-reset");
+
+    if (submitButton) {
+      submitButton.click();
+      return;
+    }
+
+    form.submit();
   }
 }

@@ -8,8 +8,11 @@ import { GeolocationGeometry } from "../../../js/Base/GeolocationGeometry.js";
 export const GoogleShapeTrait = {
   /**
    * @param {google.maps.MVCObject} shape
+   *   Shape to attach the title to.
    * @param {String} title
+   *   Title shown in the info window on hover.
    * @param {GoogleMaps} map
+   *   Map the shape belongs to.
    */
   setTitle(shape, title, map) {
     const infoWindow = new google.maps.InfoWindow({
@@ -18,7 +21,7 @@ export const GoogleShapeTrait = {
     });
     google.maps.event.addListener(shape, "mouseover", (e) => {
       infoWindow.setPosition(e.latLng);
-      infoWindow.setContent(title);
+      infoWindow.setContent(Drupal.checkPlain(title));
       infoWindow.open({
         map: map.googleMap,
       });
@@ -29,8 +32,22 @@ export const GoogleShapeTrait = {
   },
 
   /**
+   * Take every Google shape off the map and forget it.
    *
+   * Shapes left in the list would keep being counted - by the boundaries the
+   * map fits itself to, among others - long after leaving the map.
+   */
+  detachShapes() {
+    this.googleShapes.forEach((googleShape) => {
+      googleShape.setMap(null);
+    });
+
+    this.googleShapes = [];
+  },
+
+  /**
    * @param {google.maps.Polyline|google.maps.Polygon|google.maps.Rectangle} googleShape
+   *   Google shape to read the geometry from.
    */
   updateByGoogleShape(googleShape) {
     if (googleShape instanceof google.maps.Rectangle) {
@@ -48,7 +65,7 @@ export const GoogleShapeTrait = {
       googleShape.getPath().forEach((coordinate) => {
         coordinates.push([coordinate.lng(), coordinate.lat()]);
       });
-      this.geometry = new GeolocationGeometry("Polyline", coordinates);
+      this.geometry = new GeolocationGeometry("LineString", coordinates);
     } else if (googleShape instanceof google.maps.Polygon) {
       const coordinates = [];
       googleShape.getPaths().forEach((path) => {
@@ -66,6 +83,7 @@ export const GoogleShapeTrait = {
       return false;
     }
 
+    this.detachShapes();
     this.googleShapes.push(googleShape);
   },
 };

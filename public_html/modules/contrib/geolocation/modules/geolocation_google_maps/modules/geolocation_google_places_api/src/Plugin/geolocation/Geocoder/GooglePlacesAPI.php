@@ -7,7 +7,7 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Utility\Error;
 use Drupal\geolocation_google_maps\GoogleGeocoderBase;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TransferException;
 
 /**
  * Provides the Google Places API.
@@ -76,7 +76,7 @@ class GooglePlacesAPI extends GoogleGeocoderBase {
     try {
       $result = Json::decode(\Drupal::httpClient()->request('GET', $request_url)->getBody());
     }
-    catch (RequestException $e) {
+    catch (TransferException $e) {
       $logger = \Drupal::logger('geolocation');
       Error::logException($logger, $e);
       return NULL;
@@ -102,7 +102,7 @@ class GooglePlacesAPI extends GoogleGeocoderBase {
       $details_url = $this->googleMapsService->getGoogleMapsApiUrl($params, '/maps/api/place/details/json');
       $details = Json::decode(\Drupal::httpClient()->request('GET', $details_url)->getBody());
     }
-    catch (RequestException $e) {
+    catch (TransferException $e) {
       $logger = \Drupal::logger('geolocation');
       Error::logException($logger, $e);
       return NULL;

@@ -28,9 +28,23 @@ import { GeolocationBoundaries } from "../../../../js/Base/GeolocationBoundaries
  *
  * @prop {Object} location_priority
  * @prop {float} location_priority.lat
- * @prop {float} location_priority.lon
+ * @prop {float} location_priority.lng
+ *
+ * @prop {Object} bbox
+ * @prop {float} bbox.lat_north_east
+ * @prop {float} bbox.lng_north_east
+ * @prop {float} bbox.lat_south_west
+ * @prop {float} bbox.lng_south_west
+ *
  * @prop {Boolean} remove_duplicates
  */
+
+/**
+ * Photon request timeout in milliseconds.
+ *
+ * @type {int}
+ */
+const requestTimeout = 5000;
 
 /**
  * @prop {PhotonSettings} settings
@@ -48,16 +62,22 @@ export default class Photon extends GeolocationGeocoder {
         url.searchParams.append("lang", document.documentElement.lang);
       }
 
-      if (this.settings.location_priority.lat && this.settings.location_priority.lon) {
+      if (this.settings.location_priority.lat && this.settings.location_priority.lng) {
         url.searchParams.append("lat", this.settings.location_priority.lat.toString());
-        url.searchParams.append("lon", this.settings.location_priority.lon.toString());
+        url.searchParams.append("lon", this.settings.location_priority.lng.toString());
       }
 
-      fetch(url)
+      const bbox = this.settings.bbox ?? {};
+      if (bbox.lng_south_west && bbox.lat_south_west && bbox.lng_north_east && bbox.lat_north_east) {
+        url.searchParams.append("bbox", [bbox.lng_south_west, bbox.lat_south_west, bbox.lng_north_east, bbox.lat_north_east].join(","));
+      }
+
+      fetch(url, { signal: AbortSignal.timeout(requestTimeout) })
         .then((response) => response.json())
         .then((data) => {
           if (typeof data.features === "undefined") {
             resolve(results);
+            return;
           }
 
           /**
@@ -117,6 +137,22 @@ export default class Photon extends GeolocationGeocoder {
             }
           });
           resolve(results);
+        })
+        .catch((error) => {
+          const message = new Drupal.Message();
+          const messageId = "geolocation-photon-error";
+
+          if (!message.select(messageId)) {
+            message.add(error.name === "TimeoutError" ? Drupal.t("Address lookup timed out. Please try again or enter coordinates manually.") : Drupal.t("Address lookup failed. Please try again or enter coordinates manually."), {
+              type: "warning",
+              id: messageId,
+            });
+          }
+
+          console.error(`Geolocation - Photon: ${error}`);
+
+          // Resolve empty, so the autocomplete gets its response and stops loading.
+          resolve([]);
         });
     });
   }

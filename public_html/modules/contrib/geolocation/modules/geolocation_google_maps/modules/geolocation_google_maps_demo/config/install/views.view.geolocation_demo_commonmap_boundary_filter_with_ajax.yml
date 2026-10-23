@@ -773,7 +773,7 @@ display:
                       enabled: false
                       weight: 0
                     marker_infowindow:
-                      enabled: false
+                      enabled: true
                       weight: 0
                       settings:
                         info_window_solitary: true

@@ -3,12 +3,14 @@
 namespace Drupal\Tests\geolocation_leaflet\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the grid style plugin.
  *
  * @group geolocation
  */
+#[RunTestsInSeparateProcesses]
 class LeafletCommonMapTest extends BrowserTestBase {
 
   /**

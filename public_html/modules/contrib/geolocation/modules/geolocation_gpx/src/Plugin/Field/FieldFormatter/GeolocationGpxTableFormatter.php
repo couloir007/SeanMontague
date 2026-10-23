@@ -7,6 +7,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
+use Drupal\geolocation_gpx\Plugin\Field\FieldType\GeolocationGpx as GeolocationGpxItem;
 
 /**
  * Plugin implementation of the 'geofield' formatter.
@@ -27,8 +28,12 @@ class GeolocationGpxTableFormatter extends FormatterBase {
     $element = [];
 
     foreach ($items as $delta => $item) {
+      if (!$item instanceof GeolocationGpxItem) {
+        continue;
+      }
+
       /** @var \Drupal\geolocation_gpx\Entity\GeolocationGpx|NULL $gpx */
-      $gpx = \Drupal::entityTypeManager()->getStorage('geolocation_gpx')->load($item->getValue()['gpx_id']);
+      $gpx = \Drupal::entityTypeManager()->getStorage('geolocation_gpx')->load($item->gpx_id);
 
       if (!$gpx) {
         continue;
@@ -39,13 +44,20 @@ class GeolocationGpxTableFormatter extends FormatterBase {
         'summary' => $gpx->renderedSummaryTable(),
       ];
 
-      if ($file = File::load($item->getValue()['gpx_file_id']) ?? NULL) {
-        $element[$delta]['file'] = [
-          '#type' => 'link',
-          '#title' => $this->t('Source file: %file', ['%file' => $file->getFilename()]),
-          '#url' => Url::fromUri($file->createFileUrl(FALSE)),
-        ];
+      if (!$item->gpx_file_id) {
+        continue;
       }
+
+      $file = File::load($item->gpx_file_id);
+      if (!$file) {
+        continue;
+      }
+
+      $element[$delta]['file'] = [
+        '#type' => 'link',
+        '#title' => $this->t('Source file: %file', ['%file' => $file->getFilename()]),
+        '#url' => Url::fromUri($file->createFileUrl(FALSE)),
+      ];
     }
 
     return $element;

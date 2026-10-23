@@ -1,0 +1,7 @@
+facet_map:
+  js:
+    js/geolocation-facet-map.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - geolocation/geolocation.map

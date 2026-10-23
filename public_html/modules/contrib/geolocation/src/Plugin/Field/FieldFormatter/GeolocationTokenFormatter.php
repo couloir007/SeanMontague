@@ -11,6 +11,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\geolocation\DataProviderInterface;
 use Drupal\geolocation\DataProviderManager;
+use Drupal\geolocation\FilterFormatProvider;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -71,7 +72,7 @@ class GeolocationTokenFormatter extends FormatterBase {
     $settings = [];
     $settings['tokenized_text'] = [
       'value' => '',
-      'format' => filter_default_format(),
+      'format' => FilterFormatProvider::getDefaultFormatId(),
     ];
     $settings += parent::defaultSettings();
 
@@ -113,9 +114,15 @@ class GeolocationTokenFormatter extends FormatterBase {
       !empty($settings['tokenized_text']['value'])
       && !empty($settings['tokenized_text']['format'])
     ) {
+      $build = [
+        '#type' => 'processed_text',
+        '#text' => $settings['tokenized_text']['value'],
+        '#format' => $settings['tokenized_text']['format'],
+      ];
+
       $summary[] = $this->t('Tokenized Text: %text', [
         '%text' => Unicode::truncate(
-          check_markup($settings['tokenized_text']['value'], $settings['tokenized_text']['format']),
+          \Drupal::service('renderer')->renderInIsolation($build),
           100,
           TRUE,
           TRUE

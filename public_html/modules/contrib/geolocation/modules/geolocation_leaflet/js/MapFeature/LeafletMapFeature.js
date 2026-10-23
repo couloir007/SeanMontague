@@ -37,14 +37,13 @@ export class LeafletMapFeature extends GeolocationMapFeature {
   }
 
   /**
-   *
    * @param {String?} position
+   *   Requested control position. Falls back to "bottomright" if unknown.
+   *
+   * @return {String}
+   *   Leaflet control position.
    */
   getLeafletPosition(position = null) {
-    if (!["topleft", "topright", "bottomleft", "bottomright"].includes(position)) {
-      return "bottomright";
-    }
-
-    return position;
+    return this.map.getLeafletPosition(position, "bottomright");
   }
 }

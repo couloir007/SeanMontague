@@ -14,13 +14,16 @@ export class GoogleShapeMultiLine extends GeolocationShapeMultiLine {
     Object.assign(this, GoogleShapeTrait);
 
     this.googleShapes = [];
-    this.geometry.lines.forEach((lineGeometry) => {
+
+    this.addShape();
+  }
+
+  addShape() {
+    this.geometry.coordinates.forEach((lineCoordinates) => {
       const line = new google.maps.Polyline({
-        path: [
-          lineGeometry.coordinates.map((value) => {
-            return { lat: value[1], lng: value[0] };
-          }),
-        ],
+        path: lineCoordinates.map((position) => {
+          return { lat: position[1], lng: position[0] };
+        }),
         strokeColor: this.strokeColor,
         strokeOpacity: this.strokeOpacity,
         strokeWeight: this.strokeWidth,
@@ -40,10 +43,17 @@ export class GoogleShapeMultiLine extends GeolocationShapeMultiLine {
     });
   }
 
+  update(geometry, settings) {
+    super.update(geometry, settings);
+
+    // Google shapes take no new geometry, so they are replaced - and a multi
+    // geometry can have gained or lost parts along the way.
+    this.detachShapes();
+    this.addShape();
+  }
+
   remove() {
-    this.googleShapes.forEach((googleShape) => {
-      googleShape.setMap();
-    });
+    this.detachShapes();
 
     super.remove();
   }

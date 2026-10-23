@@ -23,6 +23,7 @@ class MarkerZoomByAnchor extends LayerFeatureBase {
   public static function getDefaultSettings(): array {
     return [
       'marker_zoom_anchor_id' => '',
+      'click_marker' => FALSE,
     ];
   }
 
@@ -39,6 +40,13 @@ class MarkerZoomByAnchor extends LayerFeatureBase {
       '#default_value' => $settings['marker_zoom_anchor_id'],
     ];
 
+    $form['click_marker'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Click marker after zoom'),
+      '#description' => $this->t('Behave as if the marker was clicked, e.g. to open its popup. Other features reacting to marker clicks, like "Marker Scroll-to-ID", will run as well.'),
+      '#default_value' => $settings['click_marker'],
+    ];
+
     return $form;
   }
 
@@ -48,7 +56,17 @@ class MarkerZoomByAnchor extends LayerFeatureBase {
   public function alterLayer(array $render_array, string $layer_id, array $feature_settings = [], array $context = []): array {
     $render_array = parent::alterLayer($render_array, $layer_id, $feature_settings, $context);
 
-    if (empty($render_array['#children']['locations'])) {
+    // Depending on the render stage this feature runs at, the location render
+    // arrays can either live under '#children' or directly under 'locations'
+    // (they are only moved into '#children' later, in GeolocationMap's
+    // pre-render). Support both so the attribute is reliably emitted.
+    if (!empty($render_array['#children']['locations'])) {
+      $locations = &$render_array['#children']['locations'];
+    }
+    elseif (!empty($render_array['locations'])) {
+      $locations = &$render_array['locations'];
+    }
+    else {
       return $render_array;
     }
 
@@ -57,7 +75,7 @@ class MarkerZoomByAnchor extends LayerFeatureBase {
       $view = $context['view'];
     }
 
-    foreach ($render_array['#children']['locations'] as &$location) {
+    foreach ($locations as &$location) {
       $anchor_id = $this->token->replace($feature_settings['marker_zoom_anchor_id'], $context);
 
       if (empty($view)) {
@@ -68,13 +86,14 @@ class MarkerZoomByAnchor extends LayerFeatureBase {
         $location['#attributes'] = [];
       }
       elseif (!is_array($location['#attributes'])) {
+        /** @var array{"#attributes": array|\Drupal\Core\Template\Attribute} $location */
         $location['#attributes'] = new Attribute($location['#attributes']);
         $location['#attributes'] = $location['#attributes']->toArray();
       }
 
       if (isset($location['#attributes']['data-views-row-index'])) {
         $anchor_id = $view->getStyle()->tokenizeValue($anchor_id, (int) $location['#attributes']['data-views-row-index']);
-        $location['#attributes']['data-marker-zoom-anchor-id'] = trim($anchor_id);
+        $location['#attributes']['data-marker-zoom-anchor-id'] = preg_replace('/\s+/', '', strip_tags($anchor_id));
       }
     }
 

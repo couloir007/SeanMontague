@@ -3,11 +3,9 @@ import { GoogleMapFeature } from "./GoogleMapFeature.js";
 /**
  * @typedef {Object} ControlZoomSettings
  *
- * @extends {GeolocationMapFeatureSettings}
+ * @augments {GeolocationMapFeatureSettings}
  *
- * @prop {String} behavior
  * @prop {String} position
- * @prop {String} style
  */
 export default class GoogleControlZoom extends GoogleMapFeature {
   constructor(settings, map) {
@@ -16,9 +14,8 @@ export default class GoogleControlZoom extends GoogleMapFeature {
     this.map.googleMap.setOptions({
       zoomControlOptions: {
         position: google.maps.ControlPosition[this.settings.position],
-        style: google.maps.ZoomControlStyle[this.settings.style],
       },
-      zoomControl: this.settings.behavior === "always" ? true : undefined,
+      zoomControl: true,
     });
   }
 }

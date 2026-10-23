@@ -1,0 +1,11 @@
+# Deliberately "upload" and not "add", so a hand-crafted GPX creation form can
+# be added alongside it later without either route having to be renamed.
+geolocation_gpx.upload:
+  path: '/geolocation-gpx/upload'
+  defaults:
+    _form: '\Drupal\geolocation_gpx\Form\GeolocationGpxUploadForm'
+    _title: 'Upload GPX file'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE

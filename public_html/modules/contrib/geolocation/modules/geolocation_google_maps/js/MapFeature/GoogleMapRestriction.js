@@ -3,7 +3,7 @@ import { GoogleMapFeature } from "./GoogleMapFeature.js";
 /**
  * @typedef {Object} MapRestrictionSettings
  *
- * @extends {GeolocationMapFeatureSettings}
+ * @augments {GeolocationMapFeatureSettings}
  *
  * @prop {String} north
  * @prop {String} south

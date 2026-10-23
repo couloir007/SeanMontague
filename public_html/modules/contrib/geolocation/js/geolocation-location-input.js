@@ -7,9 +7,13 @@
   Drupal.behaviors.geolocationLocationInput = {
     /**
      * @param {Element} context
+     *   The context to attach to.
      * @param {Object} drupalSettings
+     *   Drupal settings.
      * @param {Object} drupalSettings.geolocation
+     *   Geolocation settings.
      * @param {Object} drupalSettings.geolocation.locationInput
+     *   Location input settings keyed by identifier.
      */
     attach: (context, drupalSettings) => {
       for (const identifier of Object.keys(drupalSettings.geolocation.locationInput)) {

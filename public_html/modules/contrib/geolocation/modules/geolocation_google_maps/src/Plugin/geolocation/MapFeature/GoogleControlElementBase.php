@@ -15,7 +15,6 @@ abstract class GoogleControlElementBase extends ControlElementBase {
   public static function getDefaultSettings(): array {
     $settings = parent::getDefaultSettings();
     $settings['position'] = 'RIGHT_CENTER';
-    $settings['behavior'] = 'default';
 
     return $settings;
   }

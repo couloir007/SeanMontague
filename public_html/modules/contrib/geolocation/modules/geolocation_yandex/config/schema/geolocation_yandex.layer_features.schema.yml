@@ -1,0 +1,17 @@
+plugin.plugin_configuration.geolocation.layer_feature.yandex_marker_popup:
+  type: geolocation.layer_feature_settings
+  label: 'Marker Popup'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        info_auto_display:
+          type: boolean
+          label: 'Open every popup on load'
+        position:
+          type: string
+          label: 'Popup position'
+        offset:
+          type: integer
+          label: 'Offset'

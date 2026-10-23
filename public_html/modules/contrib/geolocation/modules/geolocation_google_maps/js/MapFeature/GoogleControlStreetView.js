@@ -3,10 +3,9 @@ import { GoogleMapFeature } from "./GoogleMapFeature.js";
 /**
  * @typedef {Object} ControlStreetViewSettings
  *
- * @extends {GeolocationMapFeatureSettings}
+ * @augments {GeolocationMapFeatureSettings}
 
  * @prop {String} position
- * @prop {String} behavior
  */
 
 export default class GoogleControlStreetView extends GoogleMapFeature {
@@ -17,7 +16,7 @@ export default class GoogleControlStreetView extends GoogleMapFeature {
       streetViewControlOptions: {
         position: google.maps.ControlPosition[this.settings.position],
       },
-      streetViewControl: this.settings.behavior === "always" ? true : undefined,
+      streetViewControl: true,
     });
   }
 }

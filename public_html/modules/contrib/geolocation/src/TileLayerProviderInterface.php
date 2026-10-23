@@ -12,6 +12,10 @@ interface TileLayerProviderInterface extends PluginInspectionInterface {
   /**
    * Get default settings.
    *
+   * Besides plugin specific settings, these keys are handed to the map:
+   * "min_zoom", "max_zoom", "bounds", "opacity" and "overlay". Layers flagged
+   * as overlay are stacked above the base map instead of replacing it.
+   *
    * @param string $tile_layer_option_id
    *   Data Layer Option ID.
    * @param array $settings

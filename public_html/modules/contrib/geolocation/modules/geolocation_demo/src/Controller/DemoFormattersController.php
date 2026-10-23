@@ -6,6 +6,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Field\FormatterPluginManager;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\geolocation\FilterFormatProvider;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -75,7 +76,7 @@ class DemoFormattersController extends ControllerBase {
         'settings' => [
           'tokenized_text' => [
             'value' => 'The latitude value of this item is: [geolocation_current_item:lat]',
-            'format' => filter_default_format(),
+            'format' => FilterFormatProvider::getDefaultFormatId(),
           ],
         ],
         'third_party_settings' => [],

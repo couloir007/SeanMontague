@@ -9,13 +9,15 @@ export class LeafletShapeMultiLine extends GeolocationShapeMultiLine {
     super(geometry, settings, map);
 
     this.leafletShapes = [];
+
+    this.addShape();
   }
 
   addShape() {
-    this.geometry.coordinates.forEach((lineGeometry) => {
+    this.geometry.coordinates.forEach((lineCoordinates) => {
       const line = L.polyline(
         [
-          lineGeometry.map((value) => {
+          lineCoordinates.map((value) => {
             return { lat: value[1], lng: value[0] };
           }),
         ],
@@ -27,7 +29,7 @@ export class LeafletShapeMultiLine extends GeolocationShapeMultiLine {
       );
 
       if (this.title) {
-        line.bindTooltip(this.title);
+        line.bindTooltip(Drupal.checkPlain(this.title));
       }
 
       line.on("click", (event) => {
@@ -43,9 +45,12 @@ export class LeafletShapeMultiLine extends GeolocationShapeMultiLine {
   update(geometry, settings) {
     super.update(geometry, settings);
 
+    // Shapes left in the list would keep being counted - by the boundaries the
+    // map fits itself to, among others - long after leaving the map.
     this.leafletShapes.forEach((leafletShape) => {
       leafletShape.remove();
     });
+    this.leafletShapes = [];
 
     this.addShape();
   }

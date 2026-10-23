@@ -3,12 +3,14 @@
 namespace Drupal\Tests\geolocation_leaflet\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Views integration.
  *
  * @group geolocation
  */
+#[RunTestsInSeparateProcesses]
 class LeafletViewsSettingsTest extends BrowserTestBase {
 
   /**

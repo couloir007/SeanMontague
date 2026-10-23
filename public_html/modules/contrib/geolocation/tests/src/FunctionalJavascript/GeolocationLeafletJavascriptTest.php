@@ -7,12 +7,14 @@ use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the leaflet JavaScript functionality.
  *
  * @group geolocation
  */
+#[RunTestsInSeparateProcesses]
 class GeolocationLeafletJavascriptTest extends GeolocationJavascriptTestBase {
 
   /**

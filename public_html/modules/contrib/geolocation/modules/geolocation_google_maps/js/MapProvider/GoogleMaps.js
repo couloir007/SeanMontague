@@ -11,7 +11,7 @@ import { GoogleCircle } from "../GoogleCircle.js";
 /**
  * @typedef GoogleMapSettings
  *
- * @extends GeolocationMapSettings
+ * @augments GeolocationMapSettings
  *
  * @prop {String} google_url
  * @prop {MapOptions} google_map_settings
@@ -30,6 +30,15 @@ export default class GoogleMaps extends GeolocationMapBase {
     this.container.style.width = this.settings.google_map_settings.width;
   }
 
+  destroy() {
+    super.destroy();
+
+    // Google Maps offers no way to dispose of a map, only of its listeners.
+    if (this.googleMap) {
+      google.maps.event.clearInstanceListeners(this.googleMap);
+    }
+  }
+
   initialize() {
     return super
       .initialize()
@@ -43,7 +52,8 @@ export default class GoogleMaps extends GeolocationMapBase {
           this.googleMap = new google.maps.Map(
             this.container,
             Object.assign(this.settings.google_map_settings, {
-              mapId: this.settings.google_map_settings.mapId ?? this.id,
+              // The setting defaults to an empty string.
+              mapId: this.settings.google_map_settings.mapId || this.id,
               zoom: this.settings.zoom ?? this.settings.google_map_settings.zoom ?? 2,
               maxZoom: this.settings.google_map_settings.maxZoom ?? 20,
               minZoom: this.settings.google_map_settings.minZoom ?? 0,
@@ -53,6 +63,7 @@ export default class GoogleMaps extends GeolocationMapBase {
               zoomControl: false, // Handled by feature.
               streetViewControl: false, // Handled by feature.
               rotateControl: false, // Handled by feature.
+              cameraControl: false, // Handled by feature.
               fullscreenControl: false, // Handled by feature.
               scaleControl: this.settings.google_map_settings.scaleControl ?? false,
               panControl: this.settings.google_map_settings.panControl ?? false,
@@ -95,8 +106,6 @@ export default class GoogleMaps extends GeolocationMapBase {
               });
 
               this.googleMap.addListener("idle", () => {
-                this.updatingBounds = false;
-
                 this.features.forEach((feature) => {
                   feature.onMapIdle();
                 });
@@ -133,8 +142,8 @@ export default class GoogleMaps extends GeolocationMapBase {
     super.getMarkerBoundaries(markers);
 
     markers = markers || this.dataLayers.get("default").markers;
-    if (!markers) {
-      return false;
+    if (!markers.length) {
+      return null;
     }
 
     // A Google Maps API tool to re-center the map on its content.
@@ -144,7 +153,7 @@ export default class GoogleMaps extends GeolocationMapBase {
       bounds.extend(marker.googleMarker.position);
     });
 
-    return this.normalizeBoundaries(bounds);
+    return this.normalizeBoundaries(bounds) || null;
   }
 
   setBoundaries(boundaries) {
@@ -152,7 +161,7 @@ export default class GoogleMaps extends GeolocationMapBase {
       return false;
     }
 
-    return this.googleMap.fitBounds(this.denormalizeBoundaries(boundaries) ?? null, 0);
+    return this.googleMap.fitBounds(this.denormalizeBoundaries(boundaries) ?? null, this.settings.google_map_settings.fitBoundsPadding ?? 0);
   }
 
   getZoom() {
@@ -198,6 +207,10 @@ export default class GoogleMaps extends GeolocationMapBase {
     }
 
     if (boundaries instanceof google.maps.LatLngBounds) {
+      if (boundaries.isEmpty()) {
+        return false;
+      }
+
       const northEast = boundaries.getNorthEast();
       const southWest = boundaries.getSouthWest();
 
@@ -232,21 +245,31 @@ export default class GoogleMaps extends GeolocationMapBase {
       position = google.maps.ControlPosition[customPosition];
     }
 
-    let controlIndex = -1;
-    this.googleMap.controls.forEach((control, index) => {
-      if (element.classList === control.classList) {
-        controlIndex = index;
-      }
-    });
-
-    if (controlIndex === -1) {
-      element.classList.remove("hidden");
-      this.googleMap.controls[position].push(element);
+    // Google keeps one list of controls per position, so the position says
+    // which list this control belongs in - and an unknown one has none.
+    const controls = this.googleMap.controls[position];
+    if (!controls) {
+      console.error(element, `Google Maps: Unknown control position ${position}.`);
       return element;
     }
 
-    element.remove();
-    return this.googleMap.controls[position].getAt(controlIndex);
+    // The map is handed the element itself, so adding it twice would show it
+    // twice.
+    let existing = null;
+    controls.forEach((control) => {
+      if (control === element) {
+        existing = control;
+      }
+    });
+
+    if (existing) {
+      return existing;
+    }
+
+    element.classList.remove("hidden");
+    controls.push(element);
+
+    return element;
   }
 
   removeControls() {
@@ -266,28 +289,52 @@ export default class GoogleMaps extends GeolocationMapBase {
   }
 
   /**
+   * @param {GeolocationGeometry} geometry
+   *   Geometry.
+   * @param {GeolocationShapeSettings} settings
+   *   Settings.
+   *
    * @return {GoogleShapeLine}
+   *   Shape.
    */
   createShapeLine(geometry, settings) {
     return new GoogleShapeLine(geometry, settings, this);
   }
 
   /**
+   * @param {GeolocationGeometry} geometry
+   *   Geometry.
+   * @param {GeolocationShapeSettings} settings
+   *   Settings.
+   *
    * @return {GoogleShapePolygon}
+   *   Shape.
    */
   createShapePolygon(geometry, settings) {
     return new GoogleShapePolygon(geometry, settings, this);
   }
 
   /**
+   * @param {GeolocationGeometry} geometry
+   *   Geometry.
+   * @param {GeolocationShapeSettings} settings
+   *   Settings.
+   *
    * @return {GoogleShapeMultiLine}
+   *   Shape.
    */
   createShapeMultiLine(geometry, settings) {
     return new GoogleShapeMultiLine(geometry, settings, this);
   }
 
   /**
+   * @param {GeolocationGeometry} geometry
+   *   Geometry.
+   * @param {GeolocationShapeSettings} settings
+   *   Settings.
+   *
    * @return {GoogleShapeMultiPolygon}
+   *   Shape.
    */
   createShapeMultiPolygon(geometry, settings) {
     return new GoogleShapeMultiPolygon(geometry, settings, this);
@@ -316,20 +363,24 @@ export default class GoogleMaps extends GeolocationMapBase {
   }
 
   loadTileLayer(layerId, layerSettings) {
-    this.googleMap.mapTypes.unbind(layerId);
-
     const layer = new google.maps.ImageMapType({
-      name: layerId,
+      name: layerSettings.label || layerId,
       getTileUrl(coord, zoom) {
         return layerSettings.url.replace("{x}", coord.x.toString()).replace("{y}", coord.y.toString()).replace("{z}", zoom.toString()).replace("{s}", "a");
       },
       tileSize: new google.maps.Size(256, 256),
-      minZoom: 1,
-      maxZoom: 20,
+      minZoom: layerSettings.min_zoom || 1,
+      maxZoom: layerSettings.max_zoom || 20,
+      opacity: layerSettings.opacity || 1,
     });
 
-    this.googleMap.mapTypes.set(layerId, layer);
-    this.googleMap.setMapTypeId(layerId);
+    if (layerSettings.overlay) {
+      this.googleMap.overlayMapTypes.push(layer);
+    } else {
+      this.googleMap.mapTypes.unbind(layerId);
+      this.googleMap.mapTypes.set(layerId, layer);
+      this.googleMap.setMapTypeId(layerId);
+    }
 
     if (layer) {
       this.tileLayers.set(layerId, layer);
@@ -339,12 +390,18 @@ export default class GoogleMaps extends GeolocationMapBase {
   }
 
   unloadTileLayer(layerId) {
-    this.googleMap.setMapTypeId("roadmap");
-    this.googleMap.mapTypes.unbind(layerId);
-
     if (!this.tileLayers.has(layerId)) {
       return;
     }
+
+    const overlayIndex = this.googleMap.overlayMapTypes.getArray().indexOf(this.tileLayers.get(layerId));
+    if (overlayIndex > -1) {
+      this.googleMap.overlayMapTypes.removeAt(overlayIndex);
+    } else {
+      this.googleMap.setMapTypeId(google.maps.MapTypeId[this.settings.google_map_settings.type] ?? "roadmap");
+      this.googleMap.mapTypes.unbind(layerId);
+    }
+
     this.tileLayers.delete(layerId);
   }
 }

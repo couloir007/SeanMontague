@@ -18,26 +18,6 @@ class GeometryViewsProximityFilter extends ViewsProximityFilter {
   /**
    * {@inheritdoc}
    */
-  public function getAvailableLocationOptions(array $context = []): array {
-    $options = [];
-
-    if ($context['views_filter'] ?? FALSE) {
-      return $options;
-    }
-
-    if ($displayHandler = self::getViewsDisplayHandler($context)) {
-      /** @var \Drupal\views\Plugin\views\filter\FilterPluginBase $filter */
-      foreach ($displayHandler->getHandlers('filter') as $delta => $filter) {
-        if (
-          $filter->getPluginId() === 'geolocation_geometry_filter_proximity'
-          && $filter !== $context['views_filter']
-        ) {
-          $options[$delta] = $this->t('Geo Proximity filter') . ' - ' . $filter->adminLabel();
-        }
-      }
-    }
-
-    return $options;
-  }
+  protected string $filterPluginId = 'geolocation_geometry_filter_proximity';
 
 }

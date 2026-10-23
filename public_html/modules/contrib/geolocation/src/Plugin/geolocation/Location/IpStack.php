@@ -6,7 +6,7 @@ use Drupal\geolocation\Attribute\Location;
 use Drupal\geolocation\LocationBase;
 use Drupal\geolocation\LocationInterface;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TransferException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -96,7 +96,7 @@ class IpStack extends LocationBase implements LocationInterface {
       ]);
       $json = $response->getBody()->getContents();
     }
-    catch (RequestException $e) {
+    catch (TransferException $e) {
       return [];
     }
 

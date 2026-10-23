@@ -13,8 +13,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Geometry joins.
  *
  * @ingroup views_relationship_handlers
- *
- * @ViewsRelationship("geolocation_geometry")
  */
 #[ViewsRelationship(id: 'geolocation_geometry')]
 class GeolocationGeometry extends RelationshipPluginBase {

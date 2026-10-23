@@ -33,8 +33,19 @@ class Baidu extends MapProviderBase {
         'height' => '400px',
         'width' => '100%',
         'map_features' => [
-          'baidu_navigation_control' => [
+          'baidu_zoom_control' => [
             'enabled' => TRUE,
+          ],
+        ],
+        'data_layers' => [
+          'geolocation_default_layer:default' => [
+            'settings' => [
+              'features' => [
+                'baidu_marker_infowindow' => [
+                  'enabled' => TRUE,
+                ],
+              ],
+            ],
           ],
         ],
       ]
@@ -151,7 +162,7 @@ class Baidu extends MapProviderBase {
             'maps' => [
               $render_array['#id'] => [
                 'scripts' => [$this->getApiUrl()],
-                'baidu_settings' => $map_settings,
+                'baidu_settings' => $this->getMapProviderSettings($map_settings),
               ],
             ],
           ],

@@ -10,19 +10,9 @@ use Drupal\geolocation\Attribute\MapFeature;
 #[MapFeature(
   id: 'control_zoom',
   name: new \Drupal\Core\StringTranslation\TranslatableMarkup('Map Control - Zoom'),
-  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('Add button to toggle map type.'),
+  description: new \Drupal\Core\StringTranslation\TranslatableMarkup('Add buttons to zoom in and out.'),
   type: 'google_maps'
 )]
 class GoogleControlZoom extends GoogleControlElementBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getDefaultSettings(): array {
-    $settings = parent::getDefaultSettings();
-    $settings['style'] = 'LARGE';
-
-    return $settings;
-  }
 
 }

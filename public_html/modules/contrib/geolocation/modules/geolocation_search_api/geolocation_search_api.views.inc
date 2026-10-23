@@ -46,6 +46,31 @@ function geolocation_search_api_views_data_alter(array &$data): void {
           'real field' => $field_alias,
         ],
       ];
+
+      // A distance only exists for point data, and only relative to the center
+      // a proximity filter sets. Backends declaring the pseudo field themselves
+      // have already put it on the table, so leave theirs alone.
+      // @see \Drupal\search_api_solr\Plugin\search_api\backend\SearchApiSolrBackend::getBackendDefinedFields()
+      $field_alias_distance = $field_alias . '_distance';
+      if (
+        $field->getType() !== 'geolocation_coordinates'
+        || isset($table[$field_alias_distance])
+      ) {
+        continue;
+      }
+
+      $table[$field_alias_distance] = [
+        'group' => $field->getLabel(),
+        'title' => t('Distance (@field_name)', ['@field_name' => $field_alias]),
+        'help' => t('Distance to the center of the proximity filter, in kilometers.'),
+        'real field' => $field_id . '__distance',
+        'field' => [
+          'id' => 'search_api_numeric',
+        ],
+        'sort' => [
+          'id' => 'search_api',
+        ],
+      ];
     }
   }
 }

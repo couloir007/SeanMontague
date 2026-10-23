@@ -1,0 +1,17 @@
+geolocation.geocoder.geocoder_provider:
+  type: geolocation_geocoder
+  label: 'Geocoder module'
+  mapping:
+    providers:
+      type: sequence
+      label: 'Geocoder providers'
+      sequence:
+        type: mapping
+        label: 'Geocoder provider'
+        mapping:
+          checked:
+            type: boolean
+            label: 'Enabled'
+          weight:
+            type: integer
+            label: 'Weight'

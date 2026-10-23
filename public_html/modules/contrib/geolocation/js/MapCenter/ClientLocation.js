@@ -16,18 +16,26 @@ export default class ClientLocation extends GeolocationMapCenterBase {
       return false;
     }
 
-    navigator.geolocation.getCurrentPosition((position) => {
+    const centerOnPosition = (position) => {
       this.map.setCenterByCoordinates(new GeolocationCoordinates(position.coords.latitude, position.coords.longitude));
-    });
+    };
+
+    navigator.geolocation.getCurrentPosition(centerOnPosition);
 
     if (this.settings.follow_client) {
-      setInterval(() => {
-        navigator.geolocation.getCurrentPosition((position) => {
-          this.map.setCenterByCoordinates(new GeolocationCoordinates(position.coords.latitude, position.coords.longitude));
-        });
+      // A reused map is centered again on every rebuild.
+      clearInterval(this.followInterval);
+      this.followInterval = setInterval(() => {
+        navigator.geolocation.getCurrentPosition(centerOnPosition);
       }, 20000);
     }
 
     return true;
+  }
+
+  destroy() {
+    super.destroy();
+
+    clearInterval(this.followInterval);
   }
 }

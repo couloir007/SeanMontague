@@ -5,9 +5,11 @@
  * @prop {String} url
  * @prop {String} attribution
  * @prop {Object} settings
- * @prop {GeolocationBoundaries} [bounds]
- * @prop {Integer} [minZoom]
- * @prop {Integer} [maxZoom]
+ * @prop {Array} [bounds]
+ * @prop {Number} [min_zoom]
+ * @prop {Number} [max_zoom]
+ * @prop {Number} [opacity]
+ * @prop {Boolean} [overlay]
  */
 
 /**
@@ -52,10 +54,13 @@ import { GeolocationShape } from "../Base/GeolocationShape.js";
  * @prop {Map<String, Object>} tileLayers
  * @prop {Map<String, GeolocationMapFeature>} features
  * @prop {GeolocationMapCenterBase[]} mapCenter
+ * @prop {Boolean} keepViewport
+ *   Skip centering on the next rebuild, as the content was loaded for the
+ *   viewport the map already has.
  */
 export class GeolocationMapBase {
   constructor(mapSettings) {
-    this.updatingBounds = false;
+    this.keepViewport = false;
     this.settings = mapSettings || {};
     this.wrapper = mapSettings.wrapper;
     this.container = mapSettings.wrapper.querySelector(".geolocation-map-container");
@@ -70,6 +75,49 @@ export class GeolocationMapBase {
     this.tileLayers = new Map();
 
     this.id = mapSettings.id ?? `map${Math.floor(Math.random() * 10000)}`;
+
+    if (typeof ResizeObserver !== "undefined") {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.onResize();
+      });
+      this.resizeObserver.observe(this.container);
+    }
+  }
+
+  onResize() {}
+
+  /**
+   * Release everything the map set up, once it left the page for good.
+   *
+   * Map providers extend this to tear down their library's map.
+   */
+  destroy() {
+    // Features go first, so emptying the layers below reports the removed
+    // markers and shapes to none of them, above all not to a widget.
+    this.features.forEach((feature) => {
+      try {
+        feature.destroy();
+      } catch (e) {
+        console.error(e, `Feature ${feature.constructor.name} failed destroy: ${e.toString()}`);
+      }
+    });
+    this.features.clear();
+
+    this.dataLayers.forEach((layer, layerId) => {
+      try {
+        layer.destroy();
+      } catch (e) {
+        console.error(e, `Layer ${layerId} failed destroy: ${e.toString()}`);
+      }
+    });
+    this.dataLayers.clear();
+
+    this.mapCenter.forEach((center) => {
+      center.destroy();
+    });
+    this.mapCenter = [];
+
+    this.resizeObserver?.disconnect();
   }
 
   readyFeatures() {
@@ -277,12 +325,13 @@ export class GeolocationMapBase {
       return false;
     }
 
-    this.updatingBounds = true;
+    return true;
   }
 
   /**
-   *
    * @param {Array.<GeolocationMapMarker|GeolocationShape>} elements
+   *   Elements to measure. Defaults to the markers and shapes of the default
+   *   data layer.
    *
    * @return {GeolocationBoundaries}
    *   Boundaries.
@@ -386,8 +435,6 @@ export class GeolocationMapBase {
    *   Accuracy.
    */
   setCenterByCoordinates(coordinates, accuracy = undefined) {
-    this.updatingBounds = true;
-
     if (typeof accuracy === "undefined") {
       return;
     }
@@ -415,10 +462,10 @@ export class GeolocationMapBase {
 
     // Fade circle away.
     const intervalId = setInterval(() => {
-      let fillOpacity = circle.fillOpacity;
+      let { fillOpacity } = circle;
       fillOpacity -= 0.03;
 
-      let strokeOpacity = circle.strokeOpacity;
+      let { strokeOpacity } = circle;
       strokeOpacity -= 0.06;
 
       if (strokeOpacity > 0 && fillOpacity > 0) {
@@ -604,15 +651,18 @@ export class GeolocationMapBase {
       })
       .then((layerImport) => {
         try {
+          const layerKey = layerId === "geolocation_default_layer_default" ? "default" : layerId;
+
+          // The map outlives its layers, so a replaced layer has to release
+          // whatever it attached.
+          const previousLayer = this.dataLayers.get(layerKey);
+          if (previousLayer) {
+            previousLayer.destroy();
+          }
+
           /** @type {GeolocationDataLayer} */
           const layer = new layerImport.default(this, layerId, layerSettings);
-
-          // Default data layer.
-          if (layerId === "geolocation_default_layer_default") {
-            this.dataLayers.set("default", layer);
-          } else {
-            this.dataLayers.set(layerId, layer);
-          }
+          this.dataLayers.set(layerKey, layer);
 
           return layer.loadFeatures();
         } catch (e) {
@@ -634,6 +684,7 @@ export class GeolocationMapBase {
    * Load data layers.
    *
    * @return {Promise<GeolocationMapBase>}
+   *   Resolves with this map once every data layer is loaded.
    */
   async loadDataLayers() {
     const dataLayerImports = [];
@@ -653,7 +704,9 @@ export class GeolocationMapBase {
 
   /**
    * @param {string} layerId
+   *   Machine name of the tile layer.
    * @param {GeolocationTileLayerSettings} layerSettings
+   *   Settings for the tile layer.
    */
   loadTileLayer(layerId, layerSettings) {
     // Example: this.tileLayers.set(layerId, layer);
@@ -661,6 +714,12 @@ export class GeolocationMapBase {
 
   async loadTileLayers() {
     Object.keys(this.settings.tile_layers ?? {}).forEach((layerId) => {
+      // An Ajax refresh re-runs the init chain on the very same map, so
+      // loading again would stack a second, untracked copy of every layer.
+      if (this.tileLayers.has(layerId)) {
+        return;
+      }
+
       this.loadTileLayer(layerId, this.settings.tile_layers[layerId] ?? {});
     });
 
@@ -669,6 +728,7 @@ export class GeolocationMapBase {
 
   /**
    * @param {string} layerId
+   *   Machine name of the tile layer to remove.
    */
   unloadTileLayer(layerId) {
     // this.tileLayers.delete(layerId);

@@ -15,6 +15,23 @@ use Drupal\geolocation\TileLayerProviderInterface;
 class Thunderforest extends TileLayerProviderBase implements TileLayerProviderInterface {
 
   /**
+   * Tile URL per layer option.
+   *
+   * @var string[]
+   */
+  protected array $urls = [
+    'cycle' => 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png',
+    'transport' => 'https://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png',
+    'transport-dark' => 'https://{s}.tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png',
+    'spinal-map' => 'https://{s}.tile.thunderforest.com/spinal-map/{z}/{x}/{y}.png',
+    'landscape' => 'https://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png',
+    'outdoors' => 'https://{s}.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png',
+    'pioneer' => 'https://{s}.tile.thunderforest.com/pioneer/{z}/{x}/{y}.png',
+    'mobile-atlas' => 'https://{s}.tile.thunderforest.com/mobile-atlas/{z}/{x}/{y}.png',
+    'neighbourhood' => 'https://{s}.tile.thunderforest.com/neighbourhood/{z}/{x}/{y}.png',
+  ];
+
+  /**
    * {@inheritdoc}
    */
   public function getSettingsForm(array $settings = [], ?array $context = NULL): array {
@@ -24,7 +41,7 @@ class Thunderforest extends TileLayerProviderBase implements TileLayerProviderIn
         '#title' => $this->t('API key'),
         '#default_value' => $settings['apikey'] ?? '',
         '#description' => $this->t('Get your @key here <a href="@url">@provider</a>.', [
-          '@key' => $this->t('API Key'),
+          '@key' => $this->t('API key'),
           '@url' => 'https://www.thunderforest.com/',
           '@provider' => 'Thunderforest',
         ]),
@@ -45,14 +62,20 @@ class Thunderforest extends TileLayerProviderBase implements TileLayerProviderIn
    * {@inheritdoc}
    */
   public function getTileLayerUrl(string $tile_layer_option_id = 'default', array $settings = [], ?array $context = NULL): string {
-    return 'https://{s}.tile.thunderforest.com/' . $this->getOptionTitleById($tile_layer_option_id) . '/{z}/{x}/{y}.png?apikey=' . $this->configuration['apikey'];
+    $url = $this->urls[static::getOptionTitleById($tile_layer_option_id)] ?? reset($this->urls);
+
+    if ($this->configuration['apikey'] ?? FALSE) {
+      $url .= (str_contains($url, '?') ? '&' : '?') . 'apikey=' . $this->configuration['apikey'];
+    }
+
+    return $url;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getAttribution(string $tile_layer_option_id, array $settings = [], ?array $context = NULL): string {
-    return '&copy; <a href="https://www.thunderforest.com/">Thunderforest</a>';
+    return '&copy; <a href="https://www.thunderforest.com/">Thunderforest</a>, map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
   }
 
   /**
@@ -62,39 +85,30 @@ class Thunderforest extends TileLayerProviderBase implements TileLayerProviderIn
     return [
       'cycle' => [
         'name' => $this->t('OpenCycleMap'),
-        'description' => $this->t('Online <a href="@url" target="_blank">Description</a>', ['@url' => 'https://www.thunderforest.com/maps/cycle/']),
       ],
       'transport' => [
         'name' => $this->t('Transport'),
-        'description' => $this->t('Online <a href="@url" target="_blank">Description</a>', ['@url' => 'https://www.thunderforest.com/maps/transport/']),
       ],
       'transport-dark' => [
         'name' => $this->t('Transport Dark'),
-        'description' => $this->t('Online <a href="@url" target="_blank">Description</a>', ['@url' => 'https://www.thunderforest.com/maps/transport-dark/']),
       ],
       'spinal-map' => [
         'name' => $this->t('Spinal Map'),
-        'description' => $this->t('Online <a href="@url" target="_blank">Description</a>', ['@url' => 'https://www.thunderforest.com/maps/spinal-map/']),
       ],
       'landscape' => [
         'name' => $this->t('Landscape'),
-        'description' => $this->t('Online <a href="@url" target="_blank">Description</a>', ['@url' => 'https://www.thunderforest.com/maps/landscape/']),
       ],
       'outdoors' => [
         'name' => $this->t('Outdoors'),
-        'description' => $this->t('Online <a href="@url" target="_blank">Description</a>', ['@url' => 'https://www.thunderforest.com/maps/outdoors/']),
       ],
       'pioneer' => [
         'name' => $this->t('Pioneer'),
-        'description' => $this->t('Online <a href="@url" target="_blank">Description</a>', ['@url' => 'https://www.thunderforest.com/maps/pioneer/']),
       ],
       'mobile-atlas' => [
         'name' => $this->t('Mobile Atlas'),
-        'description' => $this->t('Online <a href="@url" target="_blank">Description</a>', ['@url' => 'https://www.thunderforest.com/maps/mobile-atlas/']),
       ],
       'neighbourhood' => [
         'name' => $this->t('Neighbourhood'),
-        'description' => $this->t('Online <a href="@url" target="_blank">Description</a>', ['@url' => 'https://www.thunderforest.com/maps/neighbourhood/']),
       ],
     ];
   }

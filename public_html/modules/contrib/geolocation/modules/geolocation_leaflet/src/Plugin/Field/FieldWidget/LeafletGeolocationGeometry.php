@@ -13,7 +13,6 @@ use Drupal\geolocation_geometry\Plugin\Field\FieldWidget\GeolocationGeometryMapW
   label: new \Drupal\Core\StringTranslation\TranslatableMarkup('Geolocation Geometry Leaflet - GeoJSON'),
   field_types: [
     'geolocation_geometry_point',
-    'geolocation_geometry_multi_point',
     'geolocation_geometry_linestring',
     'geolocation_geometry_polygon',
   ]

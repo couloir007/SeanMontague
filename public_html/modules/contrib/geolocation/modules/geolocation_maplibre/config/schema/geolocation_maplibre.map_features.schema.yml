@@ -1,0 +1,54 @@
+geolocation.map_feature_settings.maplibre.control:
+  type: geolocation.map_feature_settings
+  label: 'Control Element'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        position:
+          type: string
+          label: 'Position'
+
+plugin.plugin_configuration.geolocation.map_feature.maplibre_control_navigation:
+  type: geolocation.map_feature_settings.maplibre.control
+  label: 'Control Navigation'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        position:
+          type: string
+          label: 'Position'
+        show_zoom:
+          type: boolean
+          label: 'Show zoom buttons'
+        show_compass:
+          type: boolean
+          label: 'Show compass'
+        visualize_pitch:
+          type: boolean
+          label: 'Visualize pitch'
+
+plugin.plugin_configuration.geolocation.map_feature.maplibre_control_scale:
+  type: geolocation.map_feature_settings.maplibre.control
+  label: 'Control Scale'
+  mapping:
+    settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        position:
+          type: string
+          label: 'Position'
+        unit:
+          type: string
+          label: 'Unit'
+        max_width:
+          type: integer
+          label: 'Maximum width'
+
+plugin.plugin_configuration.geolocation.map_feature.maplibre_control_fullscreen:
+  type: geolocation.map_feature_settings.maplibre.control
+  label: 'Control Fullscreen'

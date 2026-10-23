@@ -45,7 +45,15 @@ class GeocoderCountryFormattingManager extends DefaultPluginManager {
     $country_code = strtolower($country_code);
 
     foreach ($this->getDefinitions() as $plugin_id => $definition) {
-      if (isset($definition['country_code']) && $definition['country_code'] == $country_code && $definition['geocoder'] == $geocoder_id) {
+      if (empty($definition['countryCode'])) {
+        continue;
+      }
+
+      if (empty($definition['geocoder'])) {
+        continue;
+      }
+
+      if ($definition['countryCode'] == $country_code && $definition['geocoder'] == $geocoder_id) {
         $instance = $this->createInstance($plugin_id);
         break;
       }

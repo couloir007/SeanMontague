@@ -1,0 +1,17 @@
+{
+  "version": 8,
+  "name": "Geolocation test style",
+  "metadata": {
+    "comment": "Draws a flat background and nothing else. A map test wants a canvas to paint on, markers, shapes and controls - none of which need tiles, glyphs or sprites - so this style names no source at all and the test reaches no service."
+  },
+  "sources": {},
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "#dfe7ec"
+      }
+    }
+  ]
+}

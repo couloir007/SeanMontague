@@ -2,18 +2,19 @@
 
 namespace Drupal\geolocation_search_api\Plugin\search_api\data_type;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\geolocation_search_api\Attribute\GeolocationSearchApiDataType;
 use Drupal\search_api\DataType\DataTypePluginBase;
 
 /**
  * Provides the location data type.
- *
- * @SearchApiDataType(
- *   id = "geolocation_coordinates",
- *   label = @Translation("Geolocation Coordinates"),
- *   description = @Translation("Location data type implementation"),
- *   prefix = "loc"
- * )
  */
+#[GeolocationSearchApiDataType(
+  id: 'geolocation_coordinates',
+  label: new TranslatableMarkup('Geolocation Coordinates'),
+  description: new TranslatableMarkup('Location data type implementation'),
+  prefix: 'loc',
+)]
 class GeolocationCoordinates extends DataTypePluginBase {
 
   /**

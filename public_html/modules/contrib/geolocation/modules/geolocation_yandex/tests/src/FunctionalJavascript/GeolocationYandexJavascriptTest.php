@@ -4,12 +4,14 @@ namespace Drupal\Tests\geolocation_yandex\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\geolocation\MapProviderInterface;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Yandex JavaScript functionality.
  *
  * @group geolocation
  */
+#[RunTestsInSeparateProcesses]
 class GeolocationYandexJavascriptTest extends WebDriverTestBase {
 
   /**
@@ -57,14 +59,23 @@ class GeolocationYandexJavascriptTest extends WebDriverTestBase {
     $result = $this->assertSession()->waitForElementVisible('css', '.geolocation-map-container .ymaps3--map-container', 5000);
     $this->assertNotEmpty($result, "Yandex map present.");
 
-    $result = $this->assertSession()->waitForElementVisible('css', '.geolocation-map-container .ymaps3--map-container .ymaps3--marker:last-child .ymaps3--default-marker__icon', 5000);
+    // Only the marker background carries a box. The wrapping elements are
+    // zero-sized, and __icon stays empty unless an icon preset is configured.
+    $result = $this->assertSession()->waitForElementVisible('css', '.geolocation-map-container .ymaps3--map-container .ymaps3--marker .ymaps3--default-marker__background', 5000);
     $this->assertNotEmpty($result, "Marker element present.");
 
-    $this->assertSession()->elementExists('css', '.ymaps3--marker:last-child .ymaps3--default-marker__popup.ymaps3--default-marker__hider');
+    // The popup is a layer feature loading its own package, so it shows up
+    // after the marker it belongs to, and starts out hidden.
+    $popup = $this->assertSession()->waitForElement('css', '.ymaps3--popup-marker.ymaps3--popup-marker__hide', 5000);
+    $this->assertNotEmpty($popup, "Marker popup present and hidden.");
 
-    $result->click();
+    // Every marker carries a static hint label wide enough to cover its
+    // neighbours, so with a view this size no marker can be hit through the
+    // DOM. Click the marker the map itself holds instead.
+    $this->getSession()->executeScript("Drupal.geolocation.maps.initializedMaps.values().next().value.dataLayers.get('default').markers[0].click();");
 
-    $this->assertSession()->elementExists('css', '.ymaps3--marker:last-child .ymaps3--default-marker__popup:not(.ymaps3--default-marker__hider)');
+    $popup = $this->assertSession()->waitForElementVisible('css', '.ymaps3--popup-marker:not(.ymaps3--popup-marker__hide) .ymaps3--popup-marker_container', 5000);
+    $this->assertNotEmpty($popup, "Marker popup opened on click.");
   }
 
 }

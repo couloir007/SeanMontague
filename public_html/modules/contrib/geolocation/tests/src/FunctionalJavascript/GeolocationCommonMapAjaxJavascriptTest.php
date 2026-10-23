@@ -7,12 +7,18 @@ use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the common map style AJAX JavaScript functionality.
  *
+ * Leaflet is used as the map provider here on purpose - the dynamic map update
+ * is provided by the CommonMap views style, so the tests must not depend on the
+ * Google Maps JS API.
+ *
  * @group geolocation
  */
+#[RunTestsInSeparateProcesses]
 class GeolocationCommonMapAjaxJavascriptTest extends GeolocationJavascriptTestBase {
 
   /**
@@ -25,7 +31,7 @@ class GeolocationCommonMapAjaxJavascriptTest extends GeolocationJavascriptTestBa
     'views',
     'views_test_config',
     'geolocation',
-    'geolocation_google_maps',
+    'geolocation_leaflet',
     'geolocation_test_views',
   ];
 
@@ -108,32 +114,24 @@ class GeolocationCommonMapAjaxJavascriptTest extends GeolocationJavascriptTestBa
   }
 
   /**
-   * Tests the CommonMap style.
+   * Tests the boundary filter to update the attached view via AJAX.
    */
-  public function testCommonMap(): void {
+  public function testCommonMapAjax(): void {
     $this->drupalGet('geolocation-common-map-ajax-test');
 
     $this->assertSession()->elementExists('css', '.geolocation-map-container');
     $this->assertSession()->elementExists('css', '.geolocation-location');
 
-    $anchor = $this->assertSession()->waitForElement('css', 'a[href^="https://maps.google.com"][href*="hl="]');
-    $this->assertNotEmpty($anchor, "Wait for GoogleMaps to be loaded.");
-
-    // If Google works, either gm-style or gm-err-container will be present.
-    $this->assertSession()->elementExists('css', '.geolocation-map-container [class^="gm-"]');
-  }
-
-  /**
-   * Tests the CommonMap style.
-   */
-  public function testCommonMapAjax(): void {
-    $this->drupalGet('geolocation-common-map-ajax-test');
-
-    $session = $this->getSession();
+    $this->assertNotEmpty(
+      $this->assertSession()->waitForElementVisible('css', '.geolocation-map-container.leaflet-container .leaflet-marker-pane'),
+      'Leaflet map initialized.'
+    );
+    $this->assertJsCondition('document.querySelectorAll(".leaflet-marker-pane > *").length === 3');
 
     $this->assertSession()->responseContains('Location 1');
     $this->assertSession()->responseContains('Location 3');
 
+    // Narrow the boundary filter down to Location 1 only.
     $this->submitForm(
       [
         'field_geolocation_boundary[lat_north_east]' => '53',
@@ -146,7 +144,12 @@ class GeolocationCommonMapAjaxJavascriptTest extends GeolocationJavascriptTestBa
     );
     $this->assertSession()->assertWaitOnAjaxRequest();
 
-    $html = $session->getPage()->getHtml();
+    // The map re-initializes on the AJAX response and may itself trigger
+    // another update, so wait for the rendered rows to settle instead of
+    // sampling the markup once.
+    $this->assertJsCondition('document.body.textContent.includes("Location 1") && !document.body.textContent.includes("Location 3")');
+
+    $html = $this->getSession()->getPage()->getHtml();
     $this->assertStringContainsString('Location 1', $html);
     $this->assertStringNotContainsString('Location 3', $html);
   }

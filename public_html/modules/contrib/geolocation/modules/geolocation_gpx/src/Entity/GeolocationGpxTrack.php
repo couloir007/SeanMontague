@@ -42,8 +42,8 @@ class GeolocationGpxTrack extends ContentEntityBase {
       ->setReadOnly(TRUE);
 
     $fields['track_segments'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Links'))
-      ->setDescription(t('Links to external information about the route.'))
+      ->setLabel(t('Track Segments'))
+      ->setDescription(t('A list of track segments.'))
       ->setSetting('target_type', 'geolocation_gpx_track_segment')
       ->setSetting('handler', 'default')
       ->setDisplayConfigurable('form', TRUE)

@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\autosave_form\FunctionalJavascript\ContentEntity;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Drupal\node\Entity\NodeType;
 
 /**
@@ -9,6 +11,8 @@ use Drupal\node\Entity\NodeType;
  *
  * @group autosave_form
  */
+#[Group('autosave_form')]
+#[RunTestsInSeparateProcesses]
 class NodeAutosaveFormTest extends ContentEntityAutosaveFormTestBase {
 
   /**

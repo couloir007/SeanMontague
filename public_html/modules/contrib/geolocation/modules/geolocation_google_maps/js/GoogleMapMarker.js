@@ -25,14 +25,14 @@ export class GoogleMapMarker extends GeolocationMapMarker {
       }).element;
     }
 
-    if (this.icon || this.map.settings.google_map_settings.marker_icon_path) {
+    if (this.icon) {
       const icon = document.createElement("img");
-      icon.src = this.icon ?? this.map.settings.google_map_settings.marker_icon_path;
+      icon.src = this.icon;
       this.googleMarker.content = icon;
     }
 
     this.googleMarker.addListener("gmp-click", () => {
-      this.click();
+      this.onClick();
     });
 
     if (this.settings.draggable) {
@@ -47,7 +47,7 @@ export class GoogleMapMarker extends GeolocationMapMarker {
     super.update(newCoordinates, settings);
 
     if (newCoordinates) {
-      const position = this.googleMarker.position;
+      const { position } = this.googleMarker;
       const lat = typeof position.lat === "function" ? position.lat() : position.lat;
       const lng = typeof position.lng === "function" ? position.lng() : position.lng;
 
@@ -70,11 +70,20 @@ export class GoogleMapMarker extends GeolocationMapMarker {
       }).element;
     }
 
-    if (this.icon || this.map.settings.google_map_settings.marker_icon_path) {
+    if (this.icon) {
       const icon = document.createElement("img");
-      icon.src = this.icon ?? this.map.settings.google_map_settings.marker_icon_path;
+      icon.src = this.icon;
       this.googleMarker.content = icon;
     }
+  }
+
+  /**
+   * Click the marker through Google's own click event, like a real click.
+   */
+  click() {
+    super.click();
+
+    google.maps.event.trigger(this.googleMarker, "gmp-click");
   }
 
   remove() {

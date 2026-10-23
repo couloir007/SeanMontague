@@ -5,3 +5,14 @@ views.filter.geolocation_search_api_filter_boundary:
 views.filter.geolocation_search_api_filter_proximity:
   type: views.filter.geolocation_filter_proximity
   label: 'Geolocation Proximity Filter'
+
+facet.widget.config.geolocation_map:
+  type: mapping
+  label: 'Geolocation map widget configuration'
+  mapping:
+    map_provider_id:
+      type: string
+      label: 'Map provider ID'
+    map_provider_settings:
+      type: geolocation.map_provider.[%parent.map_provider_id]
+      label: 'Map provider settings'

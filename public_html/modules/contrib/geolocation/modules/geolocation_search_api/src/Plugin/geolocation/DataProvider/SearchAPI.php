@@ -6,6 +6,7 @@ use Drupal\geolocation\Attribute\DataProvider;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\geolocation\DataProviderBase;
 use Drupal\geolocation\DataProviderInterface;
+use Drupal\geolocation\Plugin\Field\FieldType\GeolocationItem;
 use Drupal\geolocation_geometry\Plugin\Field\FieldType\GeolocationGeometryPoint;
 use Drupal\geolocation_geometry\Plugin\geolocation\DataProvider\GeolocationGeometry;
 use Drupal\search_api\Entity\Index;
@@ -119,88 +120,71 @@ class SearchAPI extends DataProviderBase implements DataProviderInterface {
       return [];
     }
 
-    $search_api_data_type = $this->getSearchApiDataType($viewsField);
-    if (!in_array($search_api_data_type, ['location', 'geolocation_coordinates'])) {
+    if (!in_array($this->getSearchApiDataType($viewsField), ['location', 'geolocation_coordinates'])) {
       return [];
     }
 
     foreach ($viewsField->getItems($row) as $item) {
+      $coordinates = NULL;
+      $raw = $item['raw'] ?? NULL;
+
+      // A geometry field yields GeoJSON here, a geolocation field "lat,lng".
       if (!empty($item['value'])) {
-        switch ($search_api_data_type) {
-          case 'geolocation_coordinates':
-            $geojson = json_decode($item['value']);
-            if (
-              !is_object($geojson)
-              || empty($geojson->coordinates)
-            ) {
-              continue 2;
-            }
-            $locations[] = [
-              '#type' => 'geolocation_map_location',
-              '#coordinates' => [
-                'lat' => $geojson->coordinates[1],
-                'lng' => $geojson->coordinates[0],
-              ],
-            ];
-            break;
+        $value = (string) $item['value'];
+        $geojson = json_decode($value);
 
-          case 'location':
-            $pieces = explode(',', $item['value']);
-            if (count($pieces) != 2) {
-              continue 2;
-            }
-
-            $locations[] = [
-              '#type' => 'geolocation_map_location',
-              '#coordinates' => [
-                'lat' => $pieces[0],
-                'lng' => $pieces[1],
-              ],
-            ];
-            break;
-
-          default:
-            continue 2;
+        if (
+          is_object($geojson)
+          && !empty($geojson->coordinates)
+        ) {
+          $coordinates = [
+            'lat' => $geojson->coordinates[1],
+            'lng' => $geojson->coordinates[0],
+          ];
         }
-
-      }
-      elseif (!empty($item['raw'])) {
-
-        switch ($search_api_data_type) {
-          case 'geolocation_coordinates':
-            if (!is_a($item['raw'], GeolocationGeometryPoint::class)) {
-              continue 2;
-            }
-
-            $geojson = json_decode($item['raw']->get('geojson')->getValue());
-            if (
-              !is_object($geojson)
-              || empty($geojson->coordinates)
-            ) {
-              continue 2;
-            }
-            $locations[] = [
-              '#type' => 'geolocation_map_location',
-              '#coordinates' => [
-                'lat' => $geojson->coordinates[1],
-                'lng' => $geojson->coordinates[0],
-              ],
+        else {
+          $pieces = array_map('trim', explode(',', $value));
+          if (
+            count($pieces) === 2
+            && is_numeric($pieces[0])
+            && is_numeric($pieces[1])
+          ) {
+            $coordinates = [
+              'lat' => $pieces[0],
+              'lng' => $pieces[1],
             ];
-            break;
-
-          case 'location':
-            /** @var \Drupal\geolocation\Plugin\Field\FieldType\GeolocationItem $geolocation_item */
-            $geolocation_item = $item['raw'];
-            $locations[] = [
-              '#type' => 'geolocation_map_location',
-              '#coordinates' => [
-                'lat' => $geolocation_item->get('lat')->getValue(),
-                'lng' => $geolocation_item->get('lng')->getValue(),
-              ],
-            ];
-            break;
+          }
         }
       }
+      // Which raw item arrives depends on the field type indexed, not on the
+      // data type it was indexed as.
+      elseif ($raw instanceof GeolocationItem) {
+        $coordinates = [
+          'lat' => $raw->get('lat')->getValue(),
+          'lng' => $raw->get('lng')->getValue(),
+        ];
+      }
+      elseif ($raw instanceof GeolocationGeometryPoint) {
+        $geojson = json_decode($raw->get('geojson')->getValue());
+        if (
+          is_object($geojson)
+          && !empty($geojson->coordinates)
+        ) {
+          $coordinates = [
+            'lat' => $geojson->coordinates[1],
+            'lng' => $geojson->coordinates[0],
+          ];
+        }
+      }
+
+      if (!$coordinates) {
+        continue;
+      }
+
+      $locations[] = [
+        '#type' => 'geolocation_map_location',
+        '#coordinates' => $coordinates,
+      ];
     }
 
     return $locations;

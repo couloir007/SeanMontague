@@ -29,9 +29,8 @@ class ViewsBoundaryFilter extends LocationBase implements LocationInterface {
       /** @var \Drupal\views\Plugin\views\filter\FilterPluginBase $filter */
       foreach ($displayHandler->getHandlers('filter') as $delta => $filter) {
         if (
-          // @phpstan-ignore-next-line
           $filter->getPluginId() === 'geolocation_filter_boundary'
-          && $filter !== $context['views_filter'] ?? NULL
+          && $filter !== ($context['views_filter'] ?? NULL)
         ) {
           $options[$delta] = $this->t('Boundary filter') . ' - ' . $filter->adminLabel();
         }

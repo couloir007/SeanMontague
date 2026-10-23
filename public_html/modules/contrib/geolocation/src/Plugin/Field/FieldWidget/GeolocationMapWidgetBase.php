@@ -90,6 +90,7 @@ abstract class GeolocationMapWidgetBase extends WidgetBase implements ContainerF
     $settings['allow_override_map_settings'] = FALSE;
     $settings['map_provider_id'] = NULL;
     $settings['map_provider_settings'] = [];
+    $settings['set_result_on_geocode'] = FALSE;
     $settings['centre'] = [
       'fit_bounds' => [
         'enable' => TRUE,
@@ -112,6 +113,12 @@ abstract class GeolocationMapWidgetBase extends WidgetBase implements ContainerF
       '#type' => 'checkbox',
       '#title' => $this->t('Hide field inputs in favor of map.'),
       '#default_value' => $settings['hide_inputs'],
+    ];
+
+    $element['set_result_on_geocode'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Set result on geocode.'),
+      '#default_value' => $settings['set_result_on_geocode'],
     ];
 
     $element['allow_override_map_settings'] = [
@@ -213,6 +220,22 @@ abstract class GeolocationMapWidgetBase extends WidgetBase implements ContainerF
   /**
    * {@inheritdoc}
    */
+  public function calculateDependencies(): array {
+    $dependencies = parent::calculateDependencies();
+
+    $map_provider_id = $this->mapProviderId ?: ($this->getSettings()['map_provider_id'] ?? NULL);
+    if (empty($map_provider_id) || !$this->mapProviderManager->hasDefinition($map_provider_id)) {
+      return $dependencies;
+    }
+
+    $definition = $this->mapProviderManager->getDefinition($map_provider_id);
+
+    return array_merge_recursive($dependencies, ['module' => [$definition['provider']]]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function form(FieldItemListInterface $items, array &$form, FormStateInterface $form_state, $get_delta = NULL): array {
     $element = parent::form($items, $form, $form_state, $get_delta);
 
@@ -284,18 +307,20 @@ abstract class GeolocationMapWidgetBase extends WidgetBase implements ContainerF
       $element['map_provider_settings']['#title'] .= ' - ' . $this->t('Override Map Default Preset');
     }
 
-    $element['map']['#settings'] = array_merge($element['map']['#settings'], [
-      'map_features' => [
+    $element['map']['#settings']['map_features'] = array_merge(
+      $element['map']['#settings']['map_features'] ?? [],
+      [
         $this->getWidgetFeatureId() => [
           'enabled' => TRUE,
           'settings' => [
             'field_name' => $this->fieldDefinition->getName(),
             'field_type' => $this->fieldDefinition->getType(),
             'cardinality' => $this->fieldDefinition->getFieldStorageDefinition()->getCardinality(),
+            'set_result_on_geocode' => $this->getSetting('set_result_on_geocode'),
           ],
         ],
-      ],
-    ]);
+      ]
+    );
 
     $element['map'] = $this->mapCenterManager->alterMap($element['map'], $settings['centre']);
 

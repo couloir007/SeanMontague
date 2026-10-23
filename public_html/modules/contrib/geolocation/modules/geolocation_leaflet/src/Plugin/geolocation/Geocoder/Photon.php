@@ -8,7 +8,7 @@ use Drupal\Core\Url;
 use Drupal\Core\Utility\Error;
 use Drupal\geolocation\GeocoderBase;
 use Drupal\geolocation\GeocoderInterface;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TransferException;
 
 /**
  * Provides the Photon.
@@ -43,6 +43,13 @@ class Photon extends GeocoderBase implements GeocoderInterface {
       'lng' => '',
     ];
 
+    $default_settings['bbox'] = [
+      'lat_north_east' => '',
+      'lng_north_east' => '',
+      'lat_south_west' => '',
+      'lng_south_west' => '',
+    ];
+
     $default_settings['remove_duplicates'] = FALSE;
 
     return $default_settings;
@@ -63,6 +70,44 @@ class Photon extends GeocoderBase implements GeocoderInterface {
       '#default_value' => [
         'lat' => $settings['location_priority']['lat'],
         'lng' => $settings['location_priority']['lng'],
+      ],
+    ];
+
+    $form['bbox'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Bounding box'),
+      '#description' => $this->t('Unlike the location priority above, this is a hard filter. Addresses outside the box yield no result at all. Leave any value empty to search worldwide.'),
+      'lat_north_east' => [
+        '#type' => 'number',
+        '#title' => $this->t('North East latitude'),
+        '#default_value' => $settings['bbox']['lat_north_east'],
+        '#min' => -90,
+        '#max' => 90,
+        '#step' => 'any',
+      ],
+      'lng_north_east' => [
+        '#type' => 'number',
+        '#title' => $this->t('North East longitude'),
+        '#default_value' => $settings['bbox']['lng_north_east'],
+        '#min' => -180,
+        '#max' => 180,
+        '#step' => 'any',
+      ],
+      'lat_south_west' => [
+        '#type' => 'number',
+        '#title' => $this->t('South West latitude'),
+        '#default_value' => $settings['bbox']['lat_south_west'],
+        '#min' => -90,
+        '#max' => 90,
+        '#step' => 'any',
+      ],
+      'lng_south_west' => [
+        '#type' => 'number',
+        '#title' => $this->t('South West longitude'),
+        '#default_value' => $settings['bbox']['lng_south_west'],
+        '#min' => -180,
+        '#max' => 180,
+        '#step' => 'any',
       ],
     ];
 
@@ -94,6 +139,30 @@ class Photon extends GeocoderBase implements GeocoderInterface {
       $options['lang'] = $lang;
     }
 
+    $settings = $this->getSettings();
+
+    if (
+      is_numeric($settings['location_priority']['lat'])
+      && is_numeric($settings['location_priority']['lng'])
+    ) {
+      $options['lat'] = $settings['location_priority']['lat'];
+      $options['lon'] = $settings['location_priority']['lng'];
+    }
+
+    if (
+      is_numeric($settings['bbox']['lng_south_west'])
+      && is_numeric($settings['bbox']['lat_south_west'])
+      && is_numeric($settings['bbox']['lng_north_east'])
+      && is_numeric($settings['bbox']['lat_north_east'])
+    ) {
+      $options['bbox'] = implode(',', [
+        $settings['bbox']['lng_south_west'],
+        $settings['bbox']['lat_south_west'],
+        $settings['bbox']['lng_north_east'],
+        $settings['bbox']['lat_north_east'],
+      ]);
+    }
+
     $url = Url::fromUri($this->requestBaseUrl . '/api/', [
       'query' => $options,
     ]);
@@ -101,7 +170,7 @@ class Photon extends GeocoderBase implements GeocoderInterface {
     try {
       $result = Json::decode(\Drupal::httpClient()->get($url->toString())->getBody());
     }
-    catch (RequestException $e) {
+    catch (TransferException $e) {
       $logger = \Drupal::logger('geolocation');
       Error::logException($logger, $e);
       return NULL;
@@ -150,7 +219,7 @@ class Photon extends GeocoderBase implements GeocoderInterface {
     try {
       $result = Json::decode(\Drupal::httpClient()->get($url->toString())->getBody());
     }
-    catch (RequestException $e) {
+    catch (TransferException $e) {
       $logger = \Drupal::logger('geolocation');
       Error::logException($logger, $e);
       return NULL;

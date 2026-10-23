@@ -1,0 +1,4 @@
+services:
+  geolocation_gpx.importer:
+    class: Drupal\geolocation_gpx\GeolocationGpxImporter
+    arguments: ['@entity_type.manager', '@current_user']

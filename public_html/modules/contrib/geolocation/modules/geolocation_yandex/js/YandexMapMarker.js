@@ -1,4 +1,5 @@
 import { GeolocationMapMarker } from "../../../js/Base/GeolocationMapMarker.js";
+import { importDefaultUiTheme } from "./YandexPackages.js";
 
 /* global ymaps3 */
 
@@ -10,16 +11,15 @@ export class YandexMapMarker extends GeolocationMapMarker {
   constructor(coordinates, settings = {}, map = null) {
     super(coordinates, settings, map);
 
-    ymaps3.import("@yandex/ymaps3-markers@0.0.1").then((ymaps3Markers) => {
-      const { YMapDefaultMarker } = ymaps3Markers;
+    importDefaultUiTheme().then((ymaps3Theme) => {
+      const { YMapDefaultMarker } = ymaps3Theme;
       const { YMapMarker } = ymaps3;
 
       const props = {
         coordinates: [coordinates.lng, coordinates.lat],
-        popup: { content: this.getContent() },
         title: this.settings.title ?? "",
         onClick: () => {
-          this.click();
+          this.onClick();
         },
       };
 
@@ -28,6 +28,8 @@ export class YandexMapMarker extends GeolocationMapMarker {
         markerElement.className = "icon-marker";
         markerElement.src = this.settings.icon;
         markerElement.style.maxWidth = "unset";
+        this.markerElement = markerElement;
+
         this.yandexMarker = new YMapMarker(props, markerElement);
       } else {
         this.yandexMarker = new YMapDefaultMarker(props);
@@ -47,25 +49,42 @@ export class YandexMapMarker extends GeolocationMapMarker {
   }
 
   update(newCoordinates, settings) {
+    const previousCoordinates = this.coordinates;
+
     super.update(newCoordinates, settings);
 
-    const currentCoordinates = this.map.normalizeCoordinates(this.yandexMarker.geometry.getCoordinates());
+    if (!this.yandexMarker) {
+      return;
+    }
 
-    if (newCoordinates) {
-      if (!newCoordinates.equals(currentCoordinates.lat, currentCoordinates.lng)) {
-        this.yandexMarker.geometry.setCoordinates(this.map.denormalizeCoordinates(newCoordinates));
+    if (newCoordinates && !newCoordinates.equals(previousCoordinates.lat, previousCoordinates.lng)) {
+      const coordinates = this.map.denormalizeCoordinates(newCoordinates);
+
+      this.yandexMarker.update({ coordinates });
+    }
+
+    if (this.markerElement) {
+      if (this.settings.icon) {
+        this.markerElement.src = this.settings.icon;
       }
+    } else if (this.settings.title) {
+      this.yandexMarker.update({ title: this.settings.title });
     }
+  }
 
-    if (this.settings.title) {
-      this.yandexMarker.update.set("title", this.settings.title);
-    }
-    if (this.settings.label) {
-      this.yandexMarker.options.set("label", this.settings.label);
-    }
-    if (this.settings.icon) {
-      this.yandexMarker.options.set("iconImageHref", this.settings.icon);
-    }
+  /**
+   * Click the marker element, like a real click.
+   *
+   * Yandex finds the clicked marker by position, so the event has to carry
+   * the element's coordinates. Default markers wrap the actual marker.
+   */
+  click() {
+    super.click();
+
+    const element = this.yandexMarker.element ?? this.yandexMarker.children[0].element;
+    const rect = element.getBoundingClientRect();
+
+    element.dispatchEvent(new MouseEvent("click", { bubbles: true, clientX: rect.x + rect.width / 2, clientY: rect.y + rect.height / 2 }));
   }
 
   remove() {

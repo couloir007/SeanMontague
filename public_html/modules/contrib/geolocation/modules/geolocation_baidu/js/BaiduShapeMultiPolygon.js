@@ -9,10 +9,10 @@ export class BaiduShapeMultiPolygon extends GeolocationShapeMultiPolygon {
 
     this.baiduShapes = [];
 
-    geometry.polygons.forEach((polygonGeometry) => {
+    geometry.coordinates.forEach((polygonCoordinates) => {
       const points = [];
-      polygonGeometry.points.forEach((value) => {
-        points.push(new BMapGL.Point(value.lng, value.lat));
+      polygonCoordinates[0].forEach((value) => {
+        points.push(new BMapGL.Point(value[0], value[1]));
       });
 
       const polygon = new BMapGL.Polygon(points, {
@@ -23,8 +23,8 @@ export class BaiduShapeMultiPolygon extends GeolocationShapeMultiPolygon {
         fillOpacity: this.fillOpacity,
       });
       if (this.title) {
-        /** @type BMapGL.InfoWindow */
-        const infoWindow = new BMapGL.InfoWindow(this.title);
+        /** @type {BMapGL.InfoWindow} */
+        const infoWindow = new BMapGL.InfoWindow(Drupal.checkPlain(this.title));
         polygon.addEventListener("mouseover", (e) => {
           this.map.baiduMap.openInfoWindow(infoWindow, e.point);
         });

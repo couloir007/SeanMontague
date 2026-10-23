@@ -1,4 +1,5 @@
 import { GeolocationShapeMultiLine } from "../../../js/Base/GeolocationShapeMultiLine.js";
+import { clampCoordinates } from "./YandexCoordinates.js";
 
 /* global ymaps3 */
 
@@ -13,20 +14,10 @@ export class YandexShapeMultiLine extends GeolocationShapeMultiLine {
 
     const { YMapFeature } = ymaps3;
 
-    const lines = [];
-    geometry.lines.forEach((lineGeometry) => {
-      const points = [];
-      lineGeometry.points.forEach((value) => {
-        points.push([value.lng < 180 ? value.lng : 179.99, value.lat]);
-      });
-
-      lines.push(points);
-    });
-
     const multiline = new YMapFeature({
       geometry: {
         type: "MultiLineString",
-        coordinates: [lines],
+        coordinates: clampCoordinates(geometry.coordinates),
       },
       style: { stroke: [{ color: this.strokeColor, width: this.strokeWidth }] },
     });
@@ -46,7 +37,7 @@ export class YandexShapeMultiLine extends GeolocationShapeMultiLine {
 
   remove() {
     this.yandexShapes.forEach((yandexShape) => {
-      yandexShape.remove();
+      this.map.yandexMap.removeChild(yandexShape);
     });
 
     super.remove();

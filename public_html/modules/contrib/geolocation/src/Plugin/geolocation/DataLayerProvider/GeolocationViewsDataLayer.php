@@ -40,6 +40,12 @@ class GeolocationViewsDataLayer extends DataLayerProviderBase implements DataLay
   public function getLayerOptions(?array $context = NULL): array {
     $options = [];
 
+    // Geolocation does not depend on Views, so this plugin has to stay silent
+    // instead of asking for the view entity type.
+    if (!\Drupal::moduleHandler()->moduleExists('views')) {
+      return $options;
+    }
+
     /** @var \Drupal\views\Entity\View[] $views */
     $views = \Drupal::entityTypeManager()
       ->getStorage('view')
@@ -76,6 +82,11 @@ class GeolocationViewsDataLayer extends DataLayerProviderBase implements DataLay
    * {@inheritdoc}
    */
   public function alterMap(array $render_array, string $data_layer_option_id = 'default', array $settings = [], array $context = []): array {
+    // Stored settings can outlive an uninstalled Views module.
+    if (!\Drupal::moduleHandler()->moduleExists('views')) {
+      return $render_array;
+    }
+
     [$view_id] = explode('|', $data_layer_option_id);
 
     $view = Views::getView($view_id);

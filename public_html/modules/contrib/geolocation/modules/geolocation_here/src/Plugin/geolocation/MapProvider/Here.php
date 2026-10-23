@@ -18,6 +18,16 @@ class Here extends MapProviderBase {
 
   /**
    * {@inheritdoc}
+   *
+   * Required by the controls created via H.ui.UI.createDefault(). The scripts
+   * themselves are loaded in Here.js, as they must load sequentially.
+   */
+  protected array $stylesheets = [
+    'https://js.api.here.com/v3/3.2/mapsjs-ui.css',
+  ];
+
+  /**
+   * {@inheritdoc}
    */
   public static function getDefaultSettings(): array {
     return array_replace_recursive(
@@ -101,17 +111,23 @@ class Here extends MapProviderBase {
    * {@inheritdoc}
    */
   public function alterRenderArray(array $render_array, array $map_settings, array $context = []): array {
-    $config = \Drupal::config('here_maps.settings');
+    $here_settings = $this->getMapProviderSettings($map_settings);
+    $here_settings['api_key'] = \Drupal::config('geolocation_here.settings')->get('api_key');
 
-    $render_array['#attached'] = BubbleableMetadata::mergeAttachments($render_array['#attached'] ?? [],
-    [
-      'drupalSettings' => [
-        'geolocation' => [
-          'hereMapsAppId' => $config->get('app_id'),
-          'hereMapsAppCode' => $config->get('app_code'),
+    $render_array['#attached'] = BubbleableMetadata::mergeAttachments(
+      $render_array['#attached'] ?? [],
+      [
+        'drupalSettings' => [
+          'geolocation' => [
+            'maps' => [
+              $render_array['#id'] => [
+                'here_settings' => $here_settings,
+              ],
+            ],
+          ],
         ],
-      ],
-    ]);
+      ]
+    );
 
     return parent::alterRenderArray($render_array, $map_settings, $context);
   }

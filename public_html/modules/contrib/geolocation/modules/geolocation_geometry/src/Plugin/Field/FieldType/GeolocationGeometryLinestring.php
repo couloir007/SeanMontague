@@ -25,7 +25,7 @@ class GeolocationGeometryLinestring extends GeolocationGeometryBase {
     $schema = parent::schema($field_definition);
 
     $schema['columns']['geometry']['pgsql_type'] = "geometry('LINESTRING')";
-    $schema['columns']['geometry']['mysql_type'] = 'linestring';
+    $schema['columns']['geometry']['mysql_type'] = 'LINESTRING';
 
     return $schema;
   }

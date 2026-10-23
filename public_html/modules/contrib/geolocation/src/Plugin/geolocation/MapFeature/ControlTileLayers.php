@@ -61,24 +61,17 @@ class ControlTileLayers extends ControlCustomElementBase {
   public function alterMap(array $render_array, array $feature_settings = [], array $context = [], ?MapProviderInterface $mapProvider = NULL): array {
     $render_array = parent::alterMap($render_array, $feature_settings, $context, $mapProvider);
 
-    $enabled_tile_layers = [];
-    foreach ($render_array['#settings']['tile_layers'] ?? [] as $tile_layer_provider_id => $tile_layer_provider_data) {
-      $tileLayer = $this->tileLayerProviderManager->createInstance($tile_layer_provider_id, $tile_layer_provider_data['settings'] ?? []);
-      foreach ($tile_layer_provider_data['layers'] ?? [] as $tile_layer_id => $tile_layer_data) {
-        if (!($tile_layer_data['enabled'] ?? FALSE)) {
-          continue;
-        }
-        $enabled_tile_layers[$tile_layer_id] = $tileLayer->getLabel($tile_layer_id);
-      }
-    }
-
-    if (!$enabled_tile_layers) {
+    $tile_layers = $this->tileLayerProviderManager->getEnabledLayers($render_array['#settings']['tile_layers'] ?? [], $context);
+    if (!$tile_layers) {
       return $render_array;
     }
 
+    $base_layers = array_filter($tile_layers, fn ($tile_layer) => !$tile_layer['overlay']);
+    $overlays = array_filter($tile_layers, fn ($tile_layer) => $tile_layer['overlay']);
+
     $render_array['#controls'][$this->pluginId]['control_tile_layers'] = [
       '#type' => 'details',
-      '#title' => t('Tile layers'),
+      '#title' => $this->t('Tile layers'),
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
       '#attributes' => [
@@ -87,13 +80,32 @@ class ControlTileLayers extends ControlCustomElementBase {
         ],
       ],
     ];
+    $control = &$render_array['#controls'][$this->pluginId]['control_tile_layers'];
 
-    foreach ($enabled_tile_layers as $enabled_tile_layer_id => $enabled_tile_layer_label) {
-      $render_array['#controls'][$this->pluginId]['control_tile_layers'][$enabled_tile_layer_id] = [
+    // Base layers exclude each other, the topmost one starts out active.
+    $active_base_layer_id = array_key_last($base_layers);
+    foreach ($base_layers as $tile_layer_id => $tile_layer) {
+      $control[$tile_layer_id] = [
+        '#type' => 'radio',
+        '#title' => $tile_layer['label'],
+        '#name' => $this->pluginId . '_base_layer',
+        '#return_value' => $tile_layer_id,
+        '#value' => $active_base_layer_id,
+        '#attributes' => [
+          'data-tile-layer-id' => $tile_layer_id,
+        ],
+      ];
+    }
+
+    foreach ($overlays as $tile_layer_id => $tile_layer) {
+      $control[$tile_layer_id] = [
         '#type' => 'checkbox',
-        '#title' => $enabled_tile_layer_label,
+        '#title' => $tile_layer['label'],
         '#checked' => TRUE,
-        '#name' => $enabled_tile_layer_id,
+        '#name' => $tile_layer_id,
+        '#attributes' => [
+          'data-tile-layer-id' => $tile_layer_id,
+        ],
       ];
     }
 

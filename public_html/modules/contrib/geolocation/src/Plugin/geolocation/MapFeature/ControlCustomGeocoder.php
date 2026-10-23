@@ -64,6 +64,7 @@ class ControlCustomGeocoder extends ControlCustomElementBase {
       [
         'geocoder' => 'google_geocoding_api',
         'geocoder_settings' => [],
+        'show_marker' => FALSE,
       ]
     );
   }
@@ -117,8 +118,8 @@ class ControlCustomGeocoder extends ControlCustomElementBase {
     ];
 
     $geocoder_plugin = $this->geocoderManager->getGeocoder(
-      $settings['geocoder'],
-      $settings['geocoder_settings']
+      $settings['geocoder'] ?? '',
+      $settings['geocoder_settings'] ?? []
     );
 
     if ($geocoder_plugin) {
@@ -138,6 +139,13 @@ class ControlCustomGeocoder extends ControlCustomElementBase {
       '#suffix' => '</div>',
     ]);
 
+    $form['show_marker'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Set marker at geocoded location'),
+      '#description' => $this->t('Add a marker to the map at the geocoded result. Clicking the marker or clearing the address input removes it again. Do NOT use on map widget. See the map widget option "Set result on geocode" for related functionality.'),
+      '#default_value' => $settings['show_marker'],
+    ];
+
     return $form;
   }
 
@@ -147,7 +155,7 @@ class ControlCustomGeocoder extends ControlCustomElementBase {
   public function alterMap(array $render_array, array $feature_settings = [], array $context = [], ?MapProviderInterface $mapProvider = NULL): array {
     $render_array = parent::alterMap($render_array, $feature_settings, $context, $mapProvider);
 
-    $geocoder_plugin = $this->geocoderManager->getGeocoder($feature_settings['geocoder'], $feature_settings['geocoder_settings']);
+    $geocoder_plugin = $this->geocoderManager->getGeocoder($feature_settings['geocoder'] ?? '', $feature_settings['geocoder_settings'] ?? []);
     if (empty($geocoder_plugin)) {
       return $render_array;
     }

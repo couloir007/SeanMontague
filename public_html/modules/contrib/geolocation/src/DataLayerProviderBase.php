@@ -93,7 +93,7 @@ abstract class DataLayerProviderBase extends PluginBase implements DataLayerProv
    * {@inheritdoc}
    */
   public function getLabel(string $data_layer_option_id, array $settings = [], ?array $context = NULL): string {
-    return $this->getPluginDefinition()['label'] ?? $this->t('Layer');
+    return $this->getPluginDefinition()['name'] ?? $this->t('Layer');
   }
 
   /**

@@ -28,6 +28,13 @@ class ProximityArgument extends Formula {
   protected float $distance = 0;
 
   /**
+   * Parsed reference location, empty array if the argument is unusable.
+   *
+   * @var array|null
+   */
+  protected ?array $parsedReferenceLocation = NULL;
+
+  /**
    * {@inheritdoc}
    *
    * @param array $form
@@ -97,50 +104,51 @@ class ProximityArgument extends Formula {
    * Processes the passed argument into an array of relevant geolocation data.
    */
   public function getParsedReferenceLocation(): ?array {
-    // Cache the vales so this only gets processed once.
-    static $values;
-
-    if (!isset($values)) {
-      // Get the value.
-      $value = $this->getValue();
-
-      // Set static values to empty array and return early if no argument.
-      if (empty($value)) {
-        $values = [];
-        return NULL;
-      }
-      // Process argument values into an array.
-      preg_match('/^([0-9\-.]+),+([0-9\-.]+)([<>=]+)([0-9.]+)(.*$)/', $this->getValue(), $values);
-
-      // Validate latitude is set and in range.
-      if (!(isset($values[1]) && $values[1] >= -90 && $values[1] <= 90)) {
-        return NULL;
-      }
-
-      // Validate longitude is set and in range.
-      if (!($values[2] >= -180 && $values[2] <= 180)) {
-        return NULL;
-      }
-
-      // Validate operator is in a list of permitted values.
-      if (!in_array($values[3], ['<>', '=', '>=', '<=', '>', '<'])) {
-        return NULL;
-      }
-
-      // Validate distance is positive and non-zero.
-      if (!($values[4] > 0)) {
-        return NULL;
-      }
-
-      $values = [
-        'lat' => floatval($values[1]),
-        'lng' => floatval($values[2]),
-        'operator' => $values[3],
-        'distance' => floatval($values[4]),
-        'unit' => $values[5] ?: 'km',
-      ];
+    // Cache the values so this only gets processed once per handler.
+    if (isset($this->parsedReferenceLocation)) {
+      return $this->parsedReferenceLocation ?: NULL;
     }
-    return $values;
+
+    $value = $this->getValue();
+
+    // Return early if no argument.
+    if (empty($value)) {
+      $this->parsedReferenceLocation = [];
+      return NULL;
+    }
+
+    // Process argument values into an array.
+    preg_match('/^([0-9\-.]+),+([0-9\-.]+)([<>=]+)([0-9.]+)(.*$)/', $value, $values);
+
+    // Validate latitude is set and in range.
+    if (!(isset($values[1]) && $values[1] >= -90 && $values[1] <= 90)) {
+      return NULL;
+    }
+
+    // Validate longitude is set and in range.
+    if (!($values[2] >= -180 && $values[2] <= 180)) {
+      return NULL;
+    }
+
+    // Validate operator is in a list of permitted values.
+    if (!in_array($values[3], ['<>', '=', '>=', '<=', '>', '<'])) {
+      return NULL;
+    }
+
+    // Validate distance is positive and non-zero.
+    if (!($values[4] > 0)) {
+      return NULL;
+    }
+
+    $this->parsedReferenceLocation = [
+      'lat' => floatval($values[1]),
+      'lng' => floatval($values[2]),
+      'operator' => $values[3],
+      'distance' => floatval($values[4]),
+      'unit' => $values[5] ?: 'km',
+    ];
+
+    return $this->parsedReferenceLocation;
   }
 
 }

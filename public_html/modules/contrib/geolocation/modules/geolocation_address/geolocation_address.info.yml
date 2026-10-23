@@ -7,7 +7,7 @@ dependencies:
   - geolocation:geolocation
   - address:address
 
-# Information added by Drupal.org packaging script on 2026-06-21
-version: '4.0.0'
+# Information added by Drupal.org packaging script on 2026-10-20
+version: '4.1.0'
 project: 'geolocation'
-datestamp: 1782057431
+datestamp: 1792500158

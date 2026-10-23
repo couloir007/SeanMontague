@@ -21,3 +21,6 @@ plugin.plugin_configuration.geolocation.layer_feature.marker_zoom_by_anchor:
         marker_zoom_anchor_id:
           type: string
           label: 'Anchor ID'
+        click_marker:
+          type: boolean
+          label: 'Click marker after zoom'

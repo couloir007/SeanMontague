@@ -1,0 +1,47 @@
+/**
+ * @file
+ * Terra Draw geometry widget map control.
+ */
+
+.geolocation-map-control.terra-draw-control button,
+.geolocation-map-control.terra-draw-control span {
+  display: inline-block;
+  margin-right: 0.5em;
+  vertical-align: middle;
+}
+
+.geolocation-map-control.terra-draw-control button {
+  width: auto;
+  padding: 0 0.75em;
+  color: #000;
+  background: #fff;
+  font-size: 14px;
+}
+
+.geolocation-map-control.terra-draw-control button::before {
+  display: none;
+}
+
+.geolocation-map-control.terra-draw-control button.active {
+  color: #fff;
+  background: #156dfe;
+}
+
+.geolocation-map-control.terra-draw-control button.terra-draw-delete:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.geolocation-map-control.terra-draw-control .terra-draw-message,
+.geolocation-map-control.terra-draw-control .terra-draw-warning {
+  padding: 0 0.75em;
+  color: #fff;
+  border-radius: 2px;
+  background: rgb(0, 0, 0, 0.7);
+  font-size: 14px;
+  line-height: 32px;
+}
+
+.geolocation-map-control.terra-draw-control .terra-draw-message:empty {
+  display: none;
+}
