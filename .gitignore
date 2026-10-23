@@ -162,3 +162,5 @@ backup-*.tar.gz
 
 /vtchoice
 *.zip
+
+settings.local.php.pg-bak

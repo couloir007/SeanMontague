@@ -1,0 +1,5 @@
+use_key_module: false
+opensolr_credentials:
+  email: ''
+  api_key: ''
+  api_key_raw: ''

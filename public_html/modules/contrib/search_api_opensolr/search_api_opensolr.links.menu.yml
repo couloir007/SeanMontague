@@ -1,0 +1,33 @@
+search_api_opensolr.opensolr_config_form:
+  title: 'OpenSolr'
+  route_name: search_api_opensolr.opensolr_config_form
+  description: 'Configure the opensolr settings'
+  parent: search_api.overview
+
+search_api_opensolr.opensolr_overview:
+  title: 'opensolr'
+  route_name: search_api_opensolr.opensolr_overview
+  parent: system.admin_config
+  description: 'Configure opensolr.'
+  weight: -10
+
+search_api_opensolr.opensolr_get_started:
+  title: 'Get started with opensolr'
+  route_name: search_api_opensolr.get_started_form
+  parent: search_api_opensolr.opensolr_overview
+  description: 'The four steps from an Opensolr account to a working Search API index.'
+  weight: 0
+
+search_api_opensolr.opensolr_overview_settings:
+  title: 'Settings'
+  route_name: search_api_opensolr.opensolr_config_form
+  parent: search_api_opensolr.opensolr_overview
+  description: 'Configure the required opensolr settings.'
+  weight: 1
+
+search_api_opensolr.opensolr_overview_autocreate:
+  title: 'Autoconfigure'
+  route_name: search_api_opensolr.autoconfigure_form
+  parent: search_api_opensolr.opensolr_overview
+  description: 'Get started with the autoconfiguration of your opensolr index and server.'
+  weight: 2

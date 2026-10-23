@@ -97,6 +97,7 @@
         "drupal/schemadotorg_experimental": "^1.0@alpha",
         "drupal/schemadotorg_starterkit_organization": "^1.0@alpha",
         "drupal/search_api": "^1.38",
+        "drupal/search_api_opensolr": "^2.4",
         "drupal/search_api_solr": "^4.3",
         "drupal/search_api_sorts": "^1.2",
         "drupal/smart_date": "^4.2",

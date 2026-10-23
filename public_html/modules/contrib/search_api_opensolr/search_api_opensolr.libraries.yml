@@ -1,0 +1,15 @@
+admin-tweaks:
+  version: 2.x
+  css:
+    theme:
+      assets/css/pass-show.css: {}
+  js:
+    assets/js/admin-tweaks.js: {}
+  dependencies:
+    - core/jquery
+
+get_started:
+  version: 2.x
+  css:
+    theme:
+      assets/css/get-started.css: {}

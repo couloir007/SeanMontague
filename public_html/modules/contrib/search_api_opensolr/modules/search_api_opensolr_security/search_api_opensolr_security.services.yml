@@ -1,0 +1,13 @@
+services:
+  search_api_opensolr.client_security:
+    parent: search_api_opensolr.base
+    class: '\Drupal\search_api_opensolr_security\OpenSolrApi\Components\OpenSolrSecurity'
+
+  logger.channel.search_api_opensolr_security:
+    parent: logger.channel_base
+    arguments: [ 'search_api_opensolr_security' ]
+
+  # OOP hook implementations (Drupal 11.1+); autowired (class resolver injected).
+  Drupal\search_api_opensolr_security\Hook\SearchApiOpensolrSecurityHooks:
+    class: Drupal\search_api_opensolr_security\Hook\SearchApiOpensolrSecurityHooks
+    autowire: true

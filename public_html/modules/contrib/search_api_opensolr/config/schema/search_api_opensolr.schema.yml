@@ -1,0 +1,21 @@
+# Config schema for the global opensolr settings (search_api_opensolr.opensolrconfig).
+search_api_opensolr.opensolrconfig:
+  type: config_object
+  label: 'Opensolr configuration'
+  mapping:
+    use_key_module:
+      type: boolean
+      label: 'Store the API key with the Key module (explicit opt-in)'
+    opensolr_credentials:
+      type: mapping
+      label: 'Opensolr API credentials'
+      mapping:
+        email:
+          type: email
+          label: 'Opensolr account email'
+        api_key:
+          type: string
+          label: 'ID of the Key entity holding the API key (Key integration only)'
+        api_key_raw:
+          type: string
+          label: 'API key stored directly in configuration'

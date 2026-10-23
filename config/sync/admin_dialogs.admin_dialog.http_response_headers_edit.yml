@@ -13,5 +13,5 @@ dialog_width: '750'
 dialog_title_override: ''
 selection_criteria:
   entity_type: response_header
-  bundles: {  }
   key: edit
+  bundles: {  }

@@ -1,0 +1,100 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the search_api_opensolr module.
+ */
+
+use Drupal\Component\Utility\NestedArray;
+
+/**
+ * Enable the key module for existing installations.
+ */
+function search_api_opensolr_update_8001(&$sandbox) {
+  // Add update to enable the key module for existing installations.
+  \Drupal::service('module_installer')->install(['key']);
+}
+
+/**
+ * Add new key to opensolr global configuration.
+ */
+function search_api_opensolr_update_10001() {
+  $config_factory = \Drupal::configFactory();
+  $config = $config_factory->getEditable('search_api_opensolr.opensolrconfig');
+  $data = $config->get('opensolr_credentials');
+  if (!isset($data['api_key_raw'])) {
+    // @todo Need to evaluate if we can preserve the original key for some cases.
+    $data['api_key_raw'] = '';
+    $config->set('opensolr_credentials', $data);
+    $config->save();
+  }
+}
+
+/**
+ * Convert deprecated opensolr servers to opensolr with basic auth.
+ */
+function search_api_opensolr_update_10002() {
+  /** @var \Drupal\search_api_opensolr\OpenSolrApi\Components\OpenSolrIndexInterface $opensolrIndex */
+  $opensolrIndex = \Drupal::service('search_api_opensolr.client_index');
+  /** @var \Drupal\search_api\ServerInterface[] $servers */
+  $servers = \Drupal::entityTypeManager()->getStorage('search_api_server')->loadMultiple();
+  foreach ($servers as $server) {
+    $config = $server->getBackendConfig();
+    if ($config['connector'] == 'opensolr') {
+      $config['connector'] = 'basic_auth_opensolr';
+      $coreName = $config['connector_config']['core'];
+      $core = $opensolrIndex->getCoreInfo($coreName);
+      $config['connector_config']['username'] = NestedArray::getValue($core, ['info', 'auth_username']);
+      $config['connector_config']['password'] = NestedArray::getValue($core, ['info', 'auth_password']);
+      $server->setBackendConfig($config);
+      $server->save();
+    }
+  }
+}
+
+/**
+ * Update the solr port in opensolr servers.
+ */
+function search_api_opensolr_update_10003() {
+  /** @var \Drupal\search_api_opensolr\OpenSolrApi\Components\OpenSolrIndexInterface $opensolrIndex */
+  $opensolrIndex = \Drupal::service('search_api_opensolr.client_index');
+  /** @var \Drupal\search_api\ServerInterface[] $servers */
+  $servers = \Drupal::entityTypeManager()->getStorage('search_api_server')->loadMultiple();
+  foreach ($servers as $server) {
+    $config = $server->getBackendConfig();
+    if ($config['connector'] == 'basic_auth_opensolr') {
+      $coreName = $config['connector_config']['core'];
+      $core = $opensolrIndex->getCoreInfo($coreName);
+      $index_info = $core['info'] ?? [];
+      if (!empty($index_info)) {
+        $solr_url = parse_url($index_info['connection_url']);
+        $port = isset($index_info['port']) && is_numeric($index_info['port']) ? (int) $index_info['port'] : $solr_url['port'];
+        $config['connector_config']['port'] = $port;
+        $server->setBackendConfig($config);
+        $server->save();
+      }
+    }
+  }
+}
+
+/**
+ * Make the Key module integration an explicit opt-in (use_key_module).
+ *
+ * Until now the module switched to Key automatically whenever Key was
+ * installed, which broke sites that installed Key for something else. Sites
+ * that really stored their opensolr key in a Key entity keep working: they get
+ * use_key_module = TRUE; everybody else stays on direct storage.
+ */
+function search_api_opensolr_update_10004() {
+  $config = \Drupal::configFactory()->getEditable('search_api_opensolr.opensolrconfig');
+  if ($config->get('use_key_module') !== NULL) {
+    return;
+  }
+  $credentials = $config->get('opensolr_credentials') ?? [];
+  $useKey = FALSE;
+  if (\Drupal::moduleHandler()->moduleExists('key') && !empty($credentials['api_key'])) {
+    // Only opt in when the referenced Key entity actually exists.
+    $useKey = \Drupal::service('key.repository')->getKey($credentials['api_key']) !== NULL;
+  }
+  $config->set('use_key_module', $useKey)->save();
+}

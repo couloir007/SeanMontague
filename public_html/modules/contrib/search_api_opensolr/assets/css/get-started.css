@@ -1,0 +1,57 @@
+/* "Get started" guide (search_api_opensolr): numbered steps, done state. */
+.opensolr-get-started {
+  max-width: 48rem;
+}
+.opensolr-get-started__intro,
+.opensolr-get-started__help {
+  color: #55565b;
+}
+.opensolr-get-started__steps {
+  margin: 1.5rem 0;
+  padding: 0;
+  list-style: none;
+}
+.opensolr-get-started__step {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0 1.25rem;
+  border-top: 1px solid #d3d4d9;
+}
+.opensolr-get-started__step:last-child {
+  border-bottom: 1px solid #d3d4d9;
+}
+.opensolr-get-started__marker {
+  flex: 0 0 2.25rem;
+  height: 2.25rem;
+  text-align: center;
+  color: #fff;
+  border-radius: 50%;
+  background: #003ecc;
+  font-weight: 700;
+  line-height: 2.25rem;
+}
+.opensolr-get-started__step.is-done .opensolr-get-started__marker {
+  background: #1a7f37;
+}
+.opensolr-get-started__title {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.1rem;
+}
+.opensolr-get-started__badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.05rem 0.5rem;
+  vertical-align: middle;
+  color: #1a7f37;
+  border-radius: 1rem;
+  background: #e5f5ea;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.opensolr-get-started__description {
+  margin: 0 0 0.75rem;
+  line-height: 1.5;
+}
+.opensolr-get-started__link {
+  margin: 0;
+}

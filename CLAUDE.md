@@ -34,7 +34,7 @@ customisation. Read `STORYBOOK.md` before touching anything in `source/`.
 - **CMS:** Drupal 10/11 (PHP 8.4, Composer, Drush)
 - **Hosting:** AcuGIS (cPanel, shared) — no Node build on the server, so `dist/` is committed
 - **Local dev:** Lando (`drupal10` recipe, PHP 8.4) — `lando start` to start services
-- **Database:** PostgreSQL 18.6 with PostGIS in production; Lando runs PostgreSQL 17; a move to MariaDB is planned
+- **Database:** MariaDB 10.11 (local and production). TrailMapper's PostGIS database is a separate system behind its API
 - **Theme:** Surface — Storybook-driven pattern library, Vite build
 - **Content model:** Schema.org Blueprints (`drupal/schemadotorg`)
 - **Mapping:** Leaflet + GeoJSON, custom `trail_mapper`, `seanmontague_map`, and `map_page` modules
@@ -335,7 +335,7 @@ lando drush cim && lando drush cr
   `public_html/themes/contrib`
 - Config changes (`config/sync`) should be committed with the feature
   that requires them — never separately unless a config-only change
-- Do not edit `settings.php` directly — local overrides go in `settings.lando.php`
+- Do not edit `settings.php` directly — local overrides go in `settings.local.php`
 
 ---
 

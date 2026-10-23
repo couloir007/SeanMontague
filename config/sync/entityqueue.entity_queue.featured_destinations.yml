@@ -6,6 +6,7 @@ dependencies:
     - node
 id: featured_destinations
 label: 'Featured Destinations'
+description: null
 handler: simple
 handler_configuration: {  }
 entity_settings:

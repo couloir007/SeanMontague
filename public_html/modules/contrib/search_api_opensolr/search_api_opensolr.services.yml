@@ -1,0 +1,42 @@
+services:
+  search_api_opensolr.config:
+    class: 'Drupal\search_api_opensolr\Services\OpenSolrConfig'
+    arguments: [ '@config.factory' ]
+
+  search_api_opensolr.local_action_access_check:
+    class: Drupal\search_api_opensolr\Access\LocalActionAccessCheck
+    arguments: ['@current_user']
+    tags:
+      - { name: access_check, applies_to: _search_api_opensolr_access_check }
+
+  search_api_opensolr.base:
+    abstract: true
+    arguments: ['@http_client', '@serialization.json', '@search_api_opensolr.config', '@file_url_generator', '@logger.channel.search_api_opensolr']
+
+  search_api_opensolr.client_index:
+    parent: search_api_opensolr.base
+    class: '\Drupal\search_api_opensolr\OpenSolrApi\Components\OpenSolrIndex'
+
+  search_api_opensolr.client_config_files:
+    parent: search_api_opensolr.base
+    class: '\Drupal\search_api_opensolr\OpenSolrApi\Components\OpenSolrConfigFiles'
+
+  search_api_opensolr.zip_manager:
+    class: 'Drupal\search_api_opensolr\Services\ZipManager'
+    arguments: ['@search_api_opensolr.client_config_files', '@file_system', '@tempstore.private', '@messenger', '@extension.list.module', '@logger.channel.search_api_opensolr']
+
+  logger.channel.search_api_opensolr:
+    parent: logger.channel_base
+    arguments: [ 'search_api_opensolr' ]
+
+  # Blocks "uninstall Key" while use_key_module is on (the Key entity holds our API key).
+  search_api_opensolr.key_uninstall_validator:
+    class: Drupal\search_api_opensolr\KeyModuleUninstallValidator
+    arguments: ['@config.factory']
+    tags:
+      - { name: module_install.uninstall_validator }
+
+  # OOP hook implementations (Drupal 11.1+); autowired (class resolver injected).
+  Drupal\search_api_opensolr\Hook\SearchApiOpensolrHooks:
+    class: Drupal\search_api_opensolr\Hook\SearchApiOpensolrHooks
+    autowire: true

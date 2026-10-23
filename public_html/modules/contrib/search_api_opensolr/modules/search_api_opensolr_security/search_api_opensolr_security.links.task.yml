@@ -1,0 +1,6 @@
+search_api_opensolr_security.manage_security:
+  route_name: search_api_opensolr_security.manage_security
+  base_route: entity.search_api_server.canonical
+  parent_id: search_api_opensolr.opensolr_server
+  title: 'Opensolr Security'
+  weight: 20

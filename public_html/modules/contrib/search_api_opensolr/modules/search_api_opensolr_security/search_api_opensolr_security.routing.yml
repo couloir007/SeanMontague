@@ -1,0 +1,12 @@
+search_api_opensolr_security.manage_security:
+  path: '/admin/config/search/search-api/server/{search_api_server}/opensolr-security'
+  defaults:
+    _form: 'Drupal\search_api_opensolr_security\Form\SecurityAdminForm'
+    _title: 'Manage opensolr security'
+  options:
+    parameters:
+      search_api_server:
+        type: entity:search_api_server
+  requirements:
+    _permission: 'search_api_server.edit'
+    _search_api_opensolr_access_check: 'TRUE'

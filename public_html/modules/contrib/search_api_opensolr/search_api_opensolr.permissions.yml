@@ -1,0 +1,3 @@
+'administer search_api_opensolr':
+  title: 'Administer Search API OpenSolr'
+  description: 'Manage the OpenSolr settings.'

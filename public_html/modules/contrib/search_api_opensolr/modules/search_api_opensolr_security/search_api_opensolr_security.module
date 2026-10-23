@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Hooks and preprocess functions for search_api_opensolr_security module.
+ *
+ * The hook logic lives in the SearchApiOpensolrSecurityHooks class (OOP hooks,
+ * Drupal 11.1+); the procedural wrapper below is kept for Drupal 10 only.
+ */
+
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\search_api_opensolr_security\Hook\SearchApiOpensolrSecurityHooks;
+
+/**
+ * Implements hook_entity_operation().
+ *
+ * @see \Drupal\search_api_opensolr_security\Hook\SearchApiOpensolrSecurityHooks::entityOperation()
+ */
+#[LegacyHook]
+function search_api_opensolr_security_entity_operation(EntityInterface $entity, ?CacheableMetadata $cacheability = NULL) {
+  return \Drupal::service(SearchApiOpensolrSecurityHooks::class)->entityOperation($entity, $cacheability);
+}

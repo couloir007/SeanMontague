@@ -1,0 +1,50 @@
+search_api_opensolr.opensolr_overview:
+  path: '<none>'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'opensolr'
+  requirements:
+    _permission: 'administer search_api_opensolr'
+search_api_opensolr.opensolr_config_form:
+  path: '/admin/config/search/search-api/opensolr'
+  defaults:
+    _form: '\Drupal\search_api_opensolr\Form\OpenSolrConfigForm'
+    _title: 'opensolr'
+  requirements:
+    _permission: 'administer search_api_opensolr'
+search_api_opensolr.get_started_form:
+  path: '/admin/config/search/search-api/opensolr/get-started'
+  defaults:
+    _controller: '\Drupal\search_api_opensolr\Controller\GetStartedController::page'
+    _title: 'Get started with opensolr'
+  requirements:
+    _permission: 'administer search_api_opensolr'
+search_api_opensolr.autoconfigure_form:
+  path: '/admin/config/search/search-api/opensolr/autoconfigure'
+  defaults:
+    _form: '\Drupal\search_api_opensolr\Form\AutoConfigureForm'
+    _title: 'Auto configure'
+  requirements:
+    _permission: 'administer search_api_opensolr'
+search_api_opensolr.opensolr_config_zip_import:
+  path: '/admin/config/search/search-api/opensolr-zip-import/{search_api_server}'
+  defaults:
+    _form: '\Drupal\search_api_opensolr\Form\OpenSolrConfigZipImport'
+    _title: 'Import Config Zip'
+  requirements:
+    _entity_access: 'search_api_server.edit'
+  options:
+    parameters:
+      search_api_server:
+        type: entity:search_api_server
+search_api_opensolr.opensolr_config_files_import:
+  path: '/admin/config/search/search-api/opensolr-files-import/{search_api_server}'
+  defaults:
+    _form: '\Drupal\search_api_opensolr\Form\OpenSolrConfigFilesImport'
+    _title: 'Import Config Files'
+  requirements:
+    _entity_access: 'search_api_server.edit'
+  options:
+    parameters:
+      search_api_server:
+        type: entity:search_api_server

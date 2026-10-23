@@ -1,0 +1,36 @@
+search_api_opensolr.search_api:
+  route_name: search_api.overview
+  title: 'Search API'
+  base_route: search_api.overview
+  weight: 0
+search_api_opensolr.opensolr:
+  route_name: search_api_opensolr.opensolr_config_form
+  title: 'opensolr'
+  base_route: search_api.overview
+  weight: 1
+search_api_opensolr.get_started:
+  route_name: search_api_opensolr.get_started_form
+  title: 'Get started'
+  weight: 0
+  parent_id: search_api_opensolr.opensolr
+search_api_opensolr.opensolr_config_form:
+  route_name: search_api_opensolr.opensolr_config_form
+  title: 'Settings'
+  weight: 0
+  parent_id: search_api_opensolr.opensolr
+search_api_opensolr.autoconfigure_form:
+  route_name: search_api_opensolr.autoconfigure_form
+  title: 'Autoconfigure'
+  weight: 1
+  parent_id: search_api_opensolr.opensolr
+search_api_opensolr.opensolr_server:
+  route_name: search_api_opensolr.opensolr_config_zip_import
+  title: 'Opensolr'
+  base_route: entity.search_api_server.canonical
+  weight: 20
+search_api_opensolr.zip_config_import:
+  route_name: search_api_opensolr.opensolr_config_zip_import
+  title: 'Import Config Zip'
+  base_route: entity.search_api_server.canonical
+  parent_id: search_api_opensolr.opensolr_server
+  weight: 0

@@ -1,0 +1,28 @@
+{#
+/**
+ * @file
+ * The opensolr "Get started" guide: numbered steps with a live done/todo state.
+ *
+ * Available variables:
+ * - steps: list of steps, each with title, description, done (bool), link
+ *   (\Drupal\Core\Url) and link_title.
+ */
+#}
+<div class="opensolr-get-started">
+  <p class="opensolr-get-started__intro">{{ 'Four steps from a fresh site to a working Opensolr-powered Search API index. Steps you have already completed are ticked.'|t }}</p>
+  <ol class="opensolr-get-started__steps">
+    {% for step in steps %}
+      <li class="opensolr-get-started__step{{ step.done ? ' is-done' : '' }}">
+        <span class="opensolr-get-started__marker" aria-hidden="true">{{ step.done ? '✓' : loop.index }}</span>
+        <div class="opensolr-get-started__body">
+          <h3 class="opensolr-get-started__title">{{ step.title }}
+            {% if step.done %}<span class="opensolr-get-started__badge">{{ 'Done'|t }}</span>{% endif %}
+          </h3>
+          <p class="opensolr-get-started__description">{{ step.description }}</p>
+          <a class="button{{ step.done ? '' : ' button--primary' }} opensolr-get-started__link" href="{{ step.link.toString() }}"{% if step.link.isExternal() %} target="_blank" rel="noopener"{% endif %}>{{ step.link_title }}</a>
+        </div>
+      </li>
+    {% endfor %}
+  </ol>
+  <p class="opensolr-get-started__help">{{ 'Need a hand? <a href=":url" target="_blank" rel="noopener">Contact Opensolr support</a>.'|t({':url': 'https://opensolr.com/contact'}) }}</p>
+</div>

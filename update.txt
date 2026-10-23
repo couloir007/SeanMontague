@@ -30,6 +30,9 @@ drush cr
 
 # 4. Import DB if needed
 lando ssh -s database -c "psql -h us17.acugis-dns.com -U roundybr -d roundybr_drupal < snapshot-local.sql.gz"
+lando ssh -s mariadb -c "mariadb -h us19.acugis-dns.com -u roundybr_drupal -p roundybr_drupal -e 'SHOW TABLES;' | wc -l"
+lando ssh -s mariadb -c "zcat /app/sm-cutover.sql.gz | mariadb -h us19.acugis-dns.com -u roundybr_drupal -p roundybr_drupal"
+rm ./sm-cutover.sql.gz
 
 # 5. Import config
 ssh -p 38391 roundybr@152.53.80.197
@@ -44,3 +47,6 @@ drush cr
 # 8. Disable maintenance mode
 drush sset system.maintenance_mode 0 -y
 drush cr
+
+# SSH KEY no Pass
+ssh roundybr@152.53.80.197

@@ -1,0 +1,13 @@
+type: module
+name: 'Search API opensolr'
+description: 'Offers an implementation of the Search API that uses opensolr 3rd party service.'
+core_version_requirement: ^10.1 || ^11
+package: Search
+configure: search_api_opensolr.opensolr_config_form
+dependencies:
+  - search_api_solr:search_api_solr
+
+# Information added by Drupal.org packaging script on 2026-08-18
+version: '2.4.0'
+project: 'search_api_opensolr'
+datestamp: 1787073344

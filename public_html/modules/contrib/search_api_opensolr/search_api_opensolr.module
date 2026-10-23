@@ -1,0 +1,34 @@
+<?php
+
+/**
+ * @file
+ * Provides the main functionality for search_api_opensolr module.
+ *
+ * The hook logic lives in the SearchApiOpensolrHooks class (OOP hooks, Drupal
+ * 11.1+). The procedural functions below are kept only for Drupal 10 and are
+ * marked #[LegacyHook] so Drupal 11 does not run them twice.
+ */
+
+use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\search_api\ServerInterface;
+use Drupal\search_api_opensolr\Hook\SearchApiOpensolrHooks;
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for search_api_server.
+ *
+ * @see \Drupal\search_api_opensolr\Hook\SearchApiOpensolrHooks::searchApiServerInsert()
+ */
+#[LegacyHook]
+function search_api_opensolr_search_api_server_insert(ServerInterface $entity) {
+  return \Drupal::service(SearchApiOpensolrHooks::class)->searchApiServerInsert($entity);
+}
+
+/**
+ * Implements hook_theme().
+ *
+ * @see \Drupal\search_api_opensolr\Hook\SearchApiOpensolrHooks::theme()
+ */
+#[LegacyHook]
+function search_api_opensolr_theme($existing, $type, $theme, $path) {
+  return \Drupal::service(SearchApiOpensolrHooks::class)->theme($existing, $type, $theme, $path);
+}

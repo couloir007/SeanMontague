@@ -31,8 +31,26 @@ services:
       extensions:
         - postgis
 
+  mariadb:
+    type: mariadb:10.11
+    creds:
+      user: drupal
+      password: drupal
+      database: drupal
+
 tooling:
   composer:
     service: appserver
   drush:
     service: appserver
+  mariadb:
+    service: mariadb
+    cmd: mariadb -udrupal -pdrupal drupal
+  dsql:
+    service: appserver
+    description: drush sql:query with --skip-ssl for the local MariaDB client
+    cmd: drush sql:query --extra=--skip-ssl
+  ddump:
+    service: appserver
+    description: drush sql:dump with --skip-ssl
+    cmd: drush sql:dump --extra-dump=--skip-ssl

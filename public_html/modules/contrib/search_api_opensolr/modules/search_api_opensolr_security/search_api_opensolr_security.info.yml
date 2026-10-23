@@ -1,0 +1,12 @@
+type: module
+name: 'Search API opensolr Security'
+description: 'Manages the IPs and HTTP Auth settings on opensolr cores.'
+core_version_requirement: ^10.1 || ^11
+package: Search
+dependencies:
+  - search_api_opensolr:search_api_opensolr
+
+# Information added by Drupal.org packaging script on 2026-08-18
+version: '2.4.0'
+project: 'search_api_opensolr'
+datestamp: 1787073344

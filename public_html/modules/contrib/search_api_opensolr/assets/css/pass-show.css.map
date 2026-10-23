@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,kBAAmB;EACjB,QAAQ,EAAE,QAAQ;EAElB,4CAA0B;IACxB,MAAM,EAAE,OAAO;IACf,WAAW,EAAE,GAAG;IAChB,KAAK,EAAE,OAAO;IACd,UAAU,EAAE,YAAY;IAExB,kDAAQ;MACN,KAAK,EAAE,OAAO",
+"sources": ["scss/pass-show.scss"],
+"names": [],
+"file": "pass-show.css"
+}

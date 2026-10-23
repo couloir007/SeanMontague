@@ -59,6 +59,7 @@ hidden:
   schema_email: true
   schema_family_name: true
   schema_given_name: true
+  schema_knows_about: true
   schema_knows_language: true
   schema_member_of: true
   schema_related_link: true

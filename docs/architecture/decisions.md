@@ -142,3 +142,12 @@ re-upload. Files in `docs/_to_delete/` are removed by Sean by hand.
 
 ### Claude Code is the only coding agent
 Junie is retired as of 2026-10-22. `.junie/` is gone and nothing should reference it.
+
+### Drupal runs on MariaDB
+Drupal's database is MariaDB 10.11, locally and in production. TrailMapper keeps
+its own PostGIS database behind the API.
+**Why:** Drupal core and contrib are tested primarily on MySQL/MariaDB, it keeps a
+move to Pantheon possible, and TrailMapper's PostGIS data stays behind its API.
+**Rules out:** PostgreSQL-specific SQL in Drupal code.
+Migrated 2026-10-23 by installing from config and copying table data
+(`scripts/mariadb-migration/`).
