@@ -57,6 +57,7 @@ part of code work.
 ├── docs/                              # Architecture, reference, integrations, trail-guides (see docs/README.md)
 ├── composer.json / .lock              # Drupal + PHP dependencies
 ├── config/                            # Drupal config export (drush cex/cim)
+├── trailmapper/                       # TrailMapper web planner, outside the docroot, owned by the TrailMapper project; see trailmapper/CLAUDE.md
 └── public_html/
 │   ├── modules/custom/
 │   │   ├── trail_mapper/              # GeoJSON/GPX engine, elevation, ArticleGeoData

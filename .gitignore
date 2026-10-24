@@ -55,7 +55,6 @@
 
 # Ignore SimpleTest multi-site environment.
 /public_html/sites/simpletest
-/public_html/mapping
 /public_html/libraries/chosen
 
 
@@ -156,7 +155,7 @@ public_html/themes/custom/surface/storybook/css/Oswald-VariableFont_wght.css
 *.log
 *.sql
 *.mysql
-*.mysql.gz
+*.mysql.gz/
 *.sql.gz
 backup-*.tar.gz
 
@@ -170,3 +169,6 @@ error_log
 /public_html/sites/*/settings*.php
 *.bak
 *.pg-bak
+
+# TrailMapper planner credentials
+/trailmapper/config/settings.php

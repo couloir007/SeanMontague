@@ -1,0 +1,26 @@
+# /public_html/mapping/.htaccess
+
+DirectoryIndex index.php
+Options -Indexes
+
+<FilesMatch "^\.">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+
+# Block access to sensitive file types
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|bak|sql|yml)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+
+# mapping/.htaccess
+<IfModule mod_rewrite.c>
+  RewriteEngine Off
+</IfModule>
+
+
+# Serve your HTML files first, then PHP
+DirectoryIndex index.html index.php

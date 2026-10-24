@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kingdom Trails</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <script
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
+
+    <!-- Load Leaflet from CDN -->
+    <script type="text/javascript" src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+        integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+        crossorigin=""></script>
+
+    <!-- Load Esri Leaflet from CDN -->
+    <script type="text/javascript" src="https://unpkg.com/esri-leaflet@2.3.1/dist/esri-leaflet.js"
+        integrity="sha512-Np+ry4Dro5siJ1HZ0hTwn2jsmu/hMNrYw1EIK9EjsEVbDge4AaQhjeTGRg2ispHg7ZgDMVrSDjNrzH/kAO9Law=="
+        crossorigin=""></script>
+
+    <script type="text/javascript" src="js/leaflet.ajax.min.js"></script>
+    <script type="text/javascript" src="js/leafletembed.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/leaflet.css"/>
+    <link rel="stylesheet" type="text/css" href="css/map.css"/>
+</head>
+<body>
+    <div id="list-container" class="table-up">
+        <div id="top-stuff">
+            <div id="basemaps-wrapper" class="leaflet-bar">
+                <select id="basemaps">
+                    <option value="Topographic">Topographic</option>
+                    <option value="Streets">Streets</option>
+                    <option value="NationalGeographic">National Geographic</option>
+                    <option value="Oceans">Oceans</option>
+                    <option value="Gray">Gray</option>
+                    <option value="DarkGray">Dark Gray</option>
+                    <option value="Imagery">Imagery</option>
+                    <option value="ImageryClarity">Imagery (Clarity)</option>
+                    <option value="ImageryFirefly">Imagery (Firefly)</option>
+                    <option value="ShadedRelief">Shaded Relief</option>
+                    <option value="Physical">Physical</option>
+                </select>
+            </div>
+        </div>
+        <div id="totalDist" style="padding: 10px 0">0 Miles</div>
+        <ul id="list" tabindex="0"></ul>
+    </div>
+
+    <div class="profile-wrapper"><a href="#" id="close">X</a><div class="profile-inner"></div></div>
+
+    <div id="map"></div>
+    <div id="getProfile">Get Profile</div>
+    <div id="clearSelection">Clear Selection</div>
+    <div id="exportGPX">Export to GPX</div>
+
+    <div id="cloneListWrapper">
+        <li tabindex="-1">
+            <div class="thumb" style="background-image: url('images/profile.png');"></div>
+            <div class="info">
+                <div class="name"></div>
+                <div class="length"></div>
+            </div>
+        </li>
+    </div>
+
+    <script type="text/javascript" src="js/site.js"></script>
+</body>
+</html>
