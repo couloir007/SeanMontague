@@ -15,20 +15,20 @@ interface LockInterface {
   public function shutdown();
 
   /**
-   * Relock.
+   * Re-lock.
    *
    * @param string $lock_id
-   *   The lock id to relock.
+   *   The lock id to re-lock.
    * @param float $timeout
    *   The timeout in seconds for the lock.
    *
    * @return boolean
-   *   TRUE if relock was successful.
+   *   TRUE if re-lock was successful.
    */
   public function reLock($lock_id, $timeout = 30.0);
 
   /**
-   * Dont release lock on shutdown.
+   * Don't release lock on shutdown.
    *
    * @param string $lock_id
    *   The lock id to persist.

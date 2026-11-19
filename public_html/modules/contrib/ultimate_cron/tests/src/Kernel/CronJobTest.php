@@ -13,27 +13,27 @@ use Drupal\ultimate_cron\Entity\CronJob;
  */
 class CronJobTest extends KernelTestBase {
 
-  protected static $modules = array('ultimate_cron');
+  protected static $modules = ['ultimate_cron'];
 
   public function setup(): void {
     parent::setUp();
 
-    $this->installSchema('ultimate_cron', array(
+    $this->installSchema('ultimate_cron', [
         'ultimate_cron_log',
-        'ultimate_cron_lock'
-      ));
+        'ultimate_cron_lock',
+      ]);
   }
 
   /**
    * Tests adding and editing a cron job.
    */
   function testGeneratedJob() {
-    $values = array(
+    $values = [
       'title' => 'ultimate cron fake cronjob title',
       'id' => 'ultimate_cron_fake_job',
       'module' => 'ultimate_cron_fake',
       'callback' => 'ultimate_cron_fake_cron',
-    );
+    ];
 
     $job = CronJob::create($values);
     $job->save();
@@ -65,7 +65,7 @@ class CronJobTest extends KernelTestBase {
 
     // Update new start_time in the future so the next cron job should not run.
     \Drupal::database()->update('ultimate_cron_log')
-      ->fields(array('start_time' => $log_entry_future))
+      ->fields(['start_time' => $log_entry_future])
       ->condition('name', $values['id'])
       ->execute();
 
@@ -84,7 +84,7 @@ class CronJobTest extends KernelTestBase {
 
     // Update new start_time in the past so the next cron job should run.
     \Drupal::database()->update('ultimate_cron_log')
-      ->fields(array('start_time' => $log_entry_past))
+      ->fields(['start_time' => $log_entry_past])
       ->condition('name', $values['id'])
       ->execute();
 

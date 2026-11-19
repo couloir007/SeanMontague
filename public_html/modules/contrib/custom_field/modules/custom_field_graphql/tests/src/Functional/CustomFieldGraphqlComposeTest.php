@@ -8,11 +8,14 @@ use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\graphql_compose\Functional\GraphQLComposeBrowserTestBase;
+use Drupal\custom_field\Plugin\DataType\CustomFieldStringLongInterface;
 use Drupal\custom_field\Service\GenerateDataInterface;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\filter\Entity\FilterFormat;
 use Drupal\node\NodeInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Test the Custom Field integration.
@@ -25,6 +28,18 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('custom_field_graphql')]
 #[RunTestsInSeparateProcesses]
 class CustomFieldGraphqlComposeTest extends GraphQLComposeBrowserTestBase {
+
+  /**
+   * The formatted long text stored on the test node.
+   *
+   * The em tag is not allowed by the test text format, so it is filtered out.
+   */
+  protected const FORMATTED_TEXT = '<p>Some <strong>formatted</strong> <em>text</em>.</p>';
+
+  /**
+   * The processed value expected for the formatted long text.
+   */
+  protected const FORMATTED_TEXT_PROCESSED = '<p>Some <strong>formatted</strong> text.</p>';
 
   /**
    * We aren't concerned with strict config schema for contrib.
@@ -94,10 +109,27 @@ class CustomFieldGraphqlComposeTest extends GraphQLComposeBrowserTestBase {
         'graphql_1' => 'graphql_1',
       ],
     ];
+    // A text format that allows strong but not em, so the processed value
+    // proves that filtering happened.
+    FilterFormat::create([
+      'format' => 'basic_html',
+      'name' => 'Basic HTML',
+      'filters' => [
+        'filter_html' => [
+          'status' => TRUE,
+          'settings' => [
+            'allowed_html' => '<p> <strong>',
+          ],
+        ],
+      ],
+    ])->save();
+    $field_settings['string_long']['formatted'] = TRUE;
+    $field_settings['string_long']['default_format'] = 'basic_html';
     $field_config->setSetting('field_settings', $field_settings);
     $field_config->save();
 
     $field_data = $this->customFieldDataGenerator->generateFieldData($field_config->getSettings(), $field_config->getTargetEntityTypeId());
+    $field_data['string_long'] = self::FORMATTED_TEXT;
 
     // Set a graphql view display.
     $field_data['viewfield'] = 'custom_field_graphql_test';
@@ -361,7 +393,10 @@ class CustomFieldGraphqlComposeTest extends GraphQLComposeBrowserTestBase {
     // String long type.
     $this->assertEquals($item->get('string_long')->getValue(), $custom_field['string_long']['value']);
     $this->assertNotEmpty($custom_field['string_long']['format']);
-    $this->assertNotEmpty($custom_field['string_long']['processed']);
+    $this->assertSame(self::FORMATTED_TEXT_PROCESSED, $custom_field['string_long']['processed']);
+    $string_long = $item->get('string_long');
+    $this->assertInstanceOf(CustomFieldStringLongInterface::class, $string_long);
+    $this->assertSame((string) $string_long->getProcessed(), $custom_field['string_long']['processed']);
 
     $this->assertEquals($item->get('telephone')->getValue(), $custom_field['telephone']);
     $this->assertEquals($item->get('time')->getValue(), $custom_field['time']);
@@ -380,6 +415,151 @@ class CustomFieldGraphqlComposeTest extends GraphQLComposeBrowserTestBase {
     $viewfield = $custom_field['viewfield'];
     $this->assertEquals('CustomFieldTestGraphqlResult', $viewfield['views']['__typename']);
     $this->assertEquals('NodeArticle', $viewfield['views']['results'][0]['__typename']);
+  }
+
+  /**
+   * Formatted long text is filtered and carries its text format's cache tag.
+   *
+   * @throws \Throwable
+   */
+  public function testFormattedLongTextIsFilteredAndCacheable(): void {
+    $response = $this->getStringLongResponse();
+    $string_long = $this->getJson($response)['data']['node']['test']['string_long'] ?? NULL;
+
+    $this->assertIsArray($string_long);
+    $this->assertSame(self::FORMATTED_TEXT, $string_long['value']);
+    $this->assertSame(self::FORMATTED_TEXT_PROCESSED, $string_long['processed']);
+    $this->assertSame('basic_html', $string_long['format']);
+    $this->assertContains('config:filter.format.basic_html', explode(' ', $response->getHeaderLine('X-Drupal-Cache-Tags')));
+  }
+
+  /**
+   * Unformatted long text goes through the fallback format, staying cacheable.
+   *
+   * @throws \Throwable
+   */
+  public function testUnformattedLongTextIsEscaped(): void {
+    $this->setStringLongFormatted(FALSE);
+
+    $text = "Line one\n<script>alert(1)</script> & <b>bold</b>";
+    $item = $this->node->get('field_test')->first();
+    $this->assertNotNull($item);
+    $item->set('string_long', $text);
+    $this->node->save();
+
+    $response = $this->getStringLongResponse();
+    $string_long = $this->getJson($response)['data']['node']['test']['string_long'] ?? NULL;
+
+    $this->assertIsArray($string_long);
+    $this->assertSame($text, $string_long['value']);
+    $this->assertSame("<p>Line one<br />\n&lt;script&gt;alert(1)&lt;/script&gt; &amp; &lt;b&gt;bold&lt;/b&gt;</p>\n", $string_long['processed']);
+    $this->assertSame('plain_text', $string_long['format']);
+    $this->assertContains('config:filter.format.plain_text', explode(' ', $response->getHeaderLine('X-Drupal-Cache-Tags')));
+    $max_age = $response->getHeaderLine('X-Drupal-Cache-Max-Age');
+    $this->assertNotSame('', $max_age, 'The response reports its max-age.');
+    $this->assertNotSame('0 (Uncacheable)', $max_age);
+  }
+
+  /**
+   * Changing the formatted setting updates a cached response.
+   *
+   * The node is not saved again, so only the field's own cache tag can
+   * invalidate the cached result.
+   *
+   * @throws \Throwable
+   */
+  public function testFormattedSettingChangeUpdatesCachedResponse(): void {
+    $this->enableStringLongSubfield();
+
+    $response = $this->queryStringLong();
+    $string_long = $this->getJson($response)['data']['node']['test']['string_long'] ?? NULL;
+    $this->assertIsArray($string_long);
+    $this->assertSame(self::FORMATTED_TEXT_PROCESSED, $string_long['processed']);
+    $tags = explode(' ', $response->getHeaderLine('X-Drupal-Cache-Tags'));
+    $this->assertContains('config:field.field.node.custom_field_entity_test.field_test', $tags);
+    $this->assertContains('config:field.storage.node.field_test', $tags);
+
+    // Changing the field config does not flush the GraphQL result cache.
+    $this->setStringLongFormatted(FALSE);
+
+    $string_long = $this->getJson($this->queryStringLong())['data']['node']['test']['string_long'] ?? NULL;
+    $this->assertIsArray($string_long);
+    $this->assertSame('plain_text', $string_long['format']);
+    $this->assertSame("<p>&lt;p&gt;Some &lt;strong&gt;formatted&lt;/strong&gt; &lt;em&gt;text&lt;/em&gt;.&lt;/p&gt;</p>\n", $string_long['processed']);
+  }
+
+  /**
+   * Sets whether the string_long subfield is formatted.
+   *
+   * @param bool $formatted
+   *   TRUE to format the subfield with its default format.
+   */
+  protected function setStringLongFormatted(bool $formatted): void {
+    $field_config = FieldConfig::loadByName('node', 'custom_field_entity_test', 'field_test');
+    $this->assertInstanceOf(FieldConfig::class, $field_config);
+    $field_settings = $field_config->getSetting('field_settings');
+    $field_settings['string_long']['formatted'] = $formatted;
+    $field_config->setSetting('field_settings', $field_settings);
+    // Cache tags are invalidated only once per process, and setUp() already
+    // saved this field. The test process outlives a request, so reset that
+    // record, or the save would leave the field's cache tag valid.
+    $this->container->get('cache_tags.invalidator')->resetChecksums();
+    $field_config->save();
+  }
+
+  /**
+   * Enables only the string_long subfield in the GraphQL schema.
+   *
+   * This also flushes the GraphQL caches.
+   */
+  protected function enableStringLongSubfield(): void {
+    $this->setFieldConfig('node', 'custom_field_entity_test', 'field_test', [
+      'subfields' => [
+        'string_long' => [
+          'enabled' => TRUE,
+          'name_sdl' => 'string_long',
+        ],
+      ],
+    ]);
+  }
+
+  /**
+   * Enables and queries only the string_long subfield of the test node.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   The GraphQL response.
+   */
+  protected function getStringLongResponse(): ResponseInterface {
+    $this->enableStringLongSubfield();
+    return $this->queryStringLong();
+  }
+
+  /**
+   * Queries the string_long subfield of the test node.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   The GraphQL response.
+   */
+  protected function queryStringLong(): ResponseInterface {
+    $query = <<<GQL
+      query {
+        node(id: "{$this->node->uuid()}") {
+          ... on NodeCustomFieldEntityTest {
+            test {
+              string_long {
+                value
+                processed
+                format
+              }
+            }
+          }
+        }
+      }
+    GQL;
+
+    $response = $this->getResponse($query);
+    $this->assertSame(200, $response->getStatusCode());
+    return $response;
   }
 
   /**

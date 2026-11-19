@@ -1,0 +1,10 @@
+_core:
+  default_config_hash: '-qGl-Ncj1YlWh8g8Bf0ejCfigiahgrGdytwe47zcqCI'
+areas:
+  kt:
+    path: kingdom-trails
+    label: 'Kingdom Trails'
+    center:
+      - 44.59
+      - -71.85
+    zoom: 12

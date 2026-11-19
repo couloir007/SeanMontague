@@ -37,76 +37,76 @@ class LoggerSettingsForm extends ConfigFormBase {
     // Settings for Cache logger.
     $form['cache'] = [
       '#type' => 'details',
-      '#title' => t('Cache'),
+      '#title' => $this->t('Cache'),
       '#group' => 'settings_tabs',
       '#tree' => TRUE,
     ];
 
-    $form['cache']['bin'] = array(
+    $form['cache']['bin'] = [
       '#type' => 'textfield',
-      '#title' => t('Cache bin'),
-      '#description' => t('Select which cache bin to use for storing logs.'),
+      '#title' => $this->t('Cache bin'),
+      '#description' => $this->t('Select which cache bin to use for storing logs.'),
       '#default_value' => $config->get('logger.cache.bin'),
       '#fallback' => TRUE,
       '#required' => TRUE,
-    );
-    $form['cache']['timeout'] = array(
+    ];
+    $form['cache']['timeout'] = [
       '#type' => 'textfield',
-      '#title' => t('Cache timeout'),
-      '#description' => t('Seconds before cache entry expires (0 = never, -1 = on next general cache wipe).'),
+      '#title' => $this->t('Cache timeout'),
+      '#description' => $this->t('Seconds before cache entry expires (0 = never, -1 = on next general cache wipe).'),
       '#default_value' => $config->get('logger.cache.timeout'),
       '#fallback' => TRUE,
       '#required' => TRUE,
-    );
+    ];
 
     // Settings for Database logger.
     $form['database'] = [
       '#type' => 'details',
-      '#title' => t('Database'),
+      '#title' => $this->t('Database'),
       '#group' => 'settings_tabs',
       '#tree' => TRUE,
     ];
     $options['method'] = [
-      1 => t('Disabled'),
-      2 => t('Remove logs older than a specified age'),
-      3 => t('Retain only a specific amount of log entries'),
+      1 => $this->t('Disabled'),
+      2 => $this->t('Remove logs older than a specified age'),
+      3 => $this->t('Retain only a specific amount of log entries'),
     ];
-    $form['database']['method'] = array(
+    $form['database']['method'] = [
       '#type' => 'select',
-      '#title' => t('Log entry cleanup method'),
-      '#description' => t('Select which method to use for cleaning up logs.'),
+      '#title' => $this->t('Log entry cleanup method'),
+      '#description' => $this->t('Select which method to use for cleaning up logs.'),
       '#options' => $options['method'],
       '#default_value' => $config->get('logger.database.method'),
       '#fallback' => TRUE,
       '#required' => TRUE,
-    );
+    ];
 
-    $states = array('expire' => array(), 'retain' => array());
-    $form['database']['method_expire'] = array(
+    $states = ['expire' => [], 'retain' => []];
+    $form['database']['method_expire'] = [
       '#type' => 'fieldset',
-      '#title' => t('Remove logs older than a specified age'),
-    ) + $states['expire'];
-    $form['database']['method_expire']['expire'] = array(
+      '#title' => $this->t('Remove logs older than a specified age'),
+    ] + $states['expire'];
+    $form['database']['method_expire']['expire'] = [
       '#type' => 'textfield',
-      '#title' => t('Log entry expiration'),
-      '#description' => t('Remove log entries older than X seconds.'),
+      '#title' => $this->t('Log entry expiration'),
+      '#description' => $this->t('Remove log entries older than X seconds.'),
       '#default_value' => $config->get('logger.database.method_expire.expire'),
       '#fallback' => TRUE,
       '#required' => TRUE,
-    ) + $states['expire'];
+    ] + $states['expire'];
 
-    $form['database']['method_retain'] = array(
+    $form['database']['method_retain'] = [
       '#type' => 'fieldset',
-      '#title' => t('Retain only a specific amount of log entries'),
-    ) + $states['retain'];
-    $form['database']['method_retain']['retain'] = array(
+      '#title' => $this->t('Retain only a specific amount of log entries'),
+    ] + $states['retain'];
+    $form['database']['method_retain']['retain'] = [
       '#type' => 'textfield',
-      '#title' => t('Retain logs'),
-      '#description' => t('Retain X amount of log entries.'),
+      '#title' => $this->t('Retain logs'),
+      '#description' => $this->t('Retain X amount of log entries.'),
       '#default_value' => $config->get('logger.database.method_retain.retain'),
       '#fallback' => TRUE,
       '#required' => TRUE,
-    ) + $states['retain'];
+    ] + $states['retain'];
 
     return parent::buildForm($form, $form_state);
   }

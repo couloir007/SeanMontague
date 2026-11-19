@@ -11,7 +11,7 @@ ultimate_cron.settings:
       mapping:
         enabled:
           type: boolean
-          label: Toggle queing jobs
+          label: Toggle queueing jobs
         timeouts:
           type: mapping
           label: Timeouts
@@ -28,7 +28,7 @@ ultimate_cron.settings:
           mapping:
             empty_delay:
               type: float
-              lebel: Time to idle when queue is empty
+              label: Time to idle when queue is empty
             item_delay:
               type: float
               label: Time to idle when finished with item
@@ -90,7 +90,7 @@ ultimate_cron.settings:
               label: Maximum number of logs to keep
     scheduler:
       type: mapping
-      label: Schedulr
+      label: Scheduler
       mapping:
         crontab:
           type: mapping

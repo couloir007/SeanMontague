@@ -6,12 +6,15 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Queue\QueueWorkerManagerInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\ultimate_cron\Entity\CronJob;
 
 /**
  * Discovery and instantiation of default cron jobs.
  */
 class CronJobDiscovery {
+
+  use StringTranslationTrait;
 
   /**
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
@@ -74,7 +77,7 @@ class CronJobDiscovery {
       $job_id = str_replace(':', '__', CronJobInterface::QUEUE_ID_PREFIX . $id);
       if (!CronJob::load($job_id)) {
         $values = [
-          'title' => t('Queue: @title', ['@title' => $definition['title']]),
+          'title' => $this->t('Queue: @title', ['@title' => $definition['title']]),
           'id' => $job_id,
           'module' => $definition['provider'],
           // Process queue jobs later by default.
@@ -85,7 +88,7 @@ class CronJobDiscovery {
             'configuration' => [
               'rules' => ['* * * * *'],
             ],
-          ]
+          ],
         ];
 
         $job = CronJob::create($values);
@@ -103,19 +106,43 @@ class CronJobDiscovery {
    *   Module name.
    */
   protected function ensureCronJobExists($info, $id) {
-    $job = NULL;
-    if (!CronJob::load($id)) {
-      $values = array(
-        'title' => $this->getJobTitle($id),
-        'id' => $id,
-        'module' => $info['module'],
-        'callback' => $info['callback'],
-      );
-
-      $job = CronJob::create($values);
-
-      $job->save();
+    if (CronJob::load($id)) {
+      return;
     }
+
+    $settings = $this->configFactory->get('ultimate_cron.settings');
+    $job = CronJob::create([
+      'title' => $this->getJobTitle($id),
+      'id' => $id,
+      'module' => $info['module'],
+      'callback' => $info['callback'],
+      'scheduler' => [
+        'id' => 'simple',
+        'configuration' => [
+          'rules' => [$settings->get('scheduler.simple.rule')],
+        ],
+      ],
+      'launcher' => [
+        'id' => 'serial',
+        'configuration' => [
+          'timeouts' => [
+            'lock_timeout' => $settings->get('launcher.lock_timeout'),
+          ],
+          'launcher' => [
+            'thread' => 0,
+          ],
+        ],
+      ],
+      'logger' => [
+        'id' => 'database',
+        'configuration' => [
+          'method' => $settings->get('logger.database.method'),
+          'expire' => $settings->get('logger.database.expire'),
+          'retain' => $settings->get('logger.database.retain'),
+        ],
+      ],
+    ]);
+    $job->save();
   }
 
   /**
@@ -128,52 +155,52 @@ class CronJobDiscovery {
    *   The default job title.
    */
   protected function getJobTitle($id) {
-    $titles = array();
+    $titles = [];
 
-    $titles['aggregator_cron'] = t('Refresh feeds');
-    $titles['comment_cron'] = t('Store the maximum possible comments per thread');
-    $titles['dblog_cron'] = t('Remove expired log messages and flood control events');
-    $titles['field_cron'] = t('Purge deleted Field API data');
-    $titles['file_cron'] = t('Delete temporary files');
-    $titles['history_cron'] = t('Delete history');
-    $titles['layout_builder_cron'] = t('Remove unused inline block entity operations');
-    $titles['locale_cron'] = t('Update translations');
-    $titles['node_cron'] = t('Update search rankings for nodes');
-    $titles['search_cron'] = t('Update indexable active search pages');
-    $titles['statistics_cron'] = t('Reset counts and clean up');
-    $titles['system_cron'] = t('Cleanup (caches, batch, flood, temp-files, etc.)');
-    $titles['tracker_cron'] = t('Update tracker index');
-    $titles['update_cron'] = t('Check for updates');
-    $titles['workspaces_cron'] = t('Purge deleted workspaces');
+    $titles['aggregator_cron'] = $this->t('Refresh feeds');
+    $titles['comment_cron'] = $this->t('Store the maximum possible comments per thread');
+    $titles['dblog_cron'] = $this->t('Remove expired log messages and flood control events');
+    $titles['field_cron'] = $this->t('Purge deleted Field API data');
+    $titles['file_cron'] = $this->t('Delete temporary files');
+    $titles['history_cron'] = $this->t('Delete history');
+    $titles['layout_builder_cron'] = $this->t('Remove unused inline block entity operations');
+    $titles['locale_cron'] = $this->t('Update translations');
+    $titles['node_cron'] = $this->t('Update search rankings for nodes');
+    $titles['search_cron'] = $this->t('Update indexable active search pages');
+    $titles['statistics_cron'] = $this->t('Reset counts and clean up');
+    $titles['system_cron'] = $this->t('Cleanup (caches, batch, flood, temp-files, etc.)');
+    $titles['tracker_cron'] = $this->t('Update tracker index');
+    $titles['update_cron'] = $this->t('Check for updates');
+    $titles['workspaces_cron'] = $this->t('Purge deleted workspaces');
 
     // Contrib modules.
-    $titles['backup_migrate_cron'] = t('Run scheduled backups');
-    $titles['captcha_cron'] = t('Remove old sessions');
-    $titles['content_lock_timeout_cron'] = t('Release stale locks');
-    $titles['core_event_dispatcher_cron'] = t('Dispatch cron events');
-    $titles['flysystem_cron'] = t('Check the sanity of installed filesystems');
-    $titles['hook_event_dispatcher_cron'] = t('Dispatch cron events');
-    $titles['mailchimp_cron'] = t('Send queued (un)subscribe actions to Mailchimp');
-    $titles['password_policy_cron'] = t('Indicate expired passwords for users');
-    $titles['preview_link_cron'] = t('Delete expired preview links');
-    $titles['purge_processor_cron_cron'] = t('Invalidate cache items');
-    $titles['redirect_404_cron'] = t('Delete old 404 errors');
-    $titles['scheduler_cron'] = t('(Un)publish scheduled entities');
-    $titles['search_api_cron'] = t('Execute pending server tasks and update indexes');
-    $titles['search_api_solr_cron'] = t('Optimize Solr servers');
-    $titles['simple_oauth_cron'] = t('Delete expired tokens');
-    $titles['simple_sitemap_cron'] = t('Generate sitemaps');
-    $titles['simple_sitemap_engines_cron'] = t('Submit sitemaps to search engines');
-    $titles['ultimate_cron_cron'] = t('Run internal cleanup operations');
-    $titles['webform_cron'] = t('Purge old submissions');
-    $titles['webform_scheduled_email_cron'] = t('Sends scheduled emails for submissions');
-    $titles['xmlsitemap_cron'] = t('Regenerate XML sitemaps');
-    $titles['xmlsitemap_engines_cron'] = t('Submit XML sitemaps to search engines');
+    $titles['backup_migrate_cron'] = $this->t('Run scheduled backups');
+    $titles['captcha_cron'] = $this->t('Remove old sessions');
+    $titles['content_lock_timeout_cron'] = $this->t('Release stale locks');
+    $titles['core_event_dispatcher_cron'] = $this->t('Dispatch cron events');
+    $titles['flysystem_cron'] = $this->t('Check the sanity of installed filesystems');
+    $titles['hook_event_dispatcher_cron'] = $this->t('Dispatch cron events');
+    $titles['mailchimp_cron'] = $this->t('Send queued (un)subscribe actions to Mailchimp');
+    $titles['password_policy_cron'] = $this->t('Indicate expired passwords for users');
+    $titles['preview_link_cron'] = $this->t('Delete expired preview links');
+    $titles['purge_processor_cron_cron'] = $this->t('Invalidate cache items');
+    $titles['redirect_404_cron'] = $this->t('Delete old 404 errors');
+    $titles['scheduler_cron'] = $this->t('(Un)publish scheduled entities');
+    $titles['search_api_cron'] = $this->t('Execute pending server tasks and update indexes');
+    $titles['search_api_solr_cron'] = $this->t('Optimize Solr servers');
+    $titles['simple_oauth_cron'] = $this->t('Delete expired tokens');
+    $titles['simple_sitemap_cron'] = $this->t('Generate sitemaps');
+    $titles['simple_sitemap_engines_cron'] = $this->t('Submit sitemaps to search engines');
+    $titles['ultimate_cron_cron'] = $this->t('Run internal cleanup operations');
+    $titles['webform_cron'] = $this->t('Purge old submissions');
+    $titles['webform_scheduled_email_cron'] = $this->t('Sends scheduled emails for submissions');
+    $titles['xmlsitemap_cron'] = $this->t('Regenerate XML sitemaps');
+    $titles['xmlsitemap_engines_cron'] = $this->t('Submit XML sitemaps to search engines');
 
     if (isset($titles[$id])) {
       return $titles[$id];
     }
-    return t('Default cron handler');
+    return $this->t('Default cron handler');
   }
 
   /**
@@ -183,7 +210,7 @@ class CronJobDiscovery {
    *   All hook definitions available.
    */
   protected function getHooks() {
-    $hooks = array();
+    $hooks = [];
     // Generate list of jobs provided by modules.
     $modules = array_keys($this->moduleHandler->getModuleList());
     foreach ($modules as $module) {
@@ -203,7 +230,7 @@ class CronJobDiscovery {
    *   Hook definitions for the specified module.
    */
   protected function getModuleHooks($module) {
-    $items = array();
+    $items = [];
 
     // Add hook_cron() if applicable.
     if (method_exists($this->moduleHandler, 'hasImplementations')) {
@@ -217,11 +244,7 @@ class CronJobDiscovery {
       $id = "{$module}_cron";
       $items[$id] = [
         'module' => $module,
-        'title' => isset($titles[$id]) ? $titles[$id] : 'Default cron handler',
-        'configure' => empty($info['configure']) ? NULL : $info['configure'],
         'callback' => "{$module}#cron",
-        'tags' => ['core'],
-        'pass job argument' => FALSE,
       ];
     }
 

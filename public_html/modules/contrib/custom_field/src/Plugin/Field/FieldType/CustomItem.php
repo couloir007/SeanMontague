@@ -318,7 +318,7 @@ class CustomItem extends FieldItemBase {
         if ($has_translations && !$is_default_translation && !$is_subfield_translatable) {
           // Fetch the value from the default language for this delta.
           $default_value = $original_field->{$name};
-          if (!empty($default_value)) {
+          if ($default_value !== NULL && $default_value !== '') {
             $current_field->{$name} = $default_value;
             // Set extra default language properties for image.
             if ($field_type === 'image') {
@@ -1316,9 +1316,9 @@ class CustomItem extends FieldItemBase {
     }
 
     foreach ($custom_items as $name => $custom_item) {
-      $widget_settings = $custom_item->onDependencyRemoval($custom_item, $dependencies);
-      if (!empty($widget_settings)) {
-        $field_settings[$name]['widget_settings']['settings'] = $widget_settings;
+      $changed_settings = $custom_item->onDependencyRemoval($custom_item, $dependencies);
+      if (!empty($changed_settings)) {
+        $field_settings[$name] = $changed_settings;
         $settings_changed = TRUE;
       }
     }

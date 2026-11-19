@@ -52,7 +52,7 @@ trait DynamicEntityReferenceOptionsTrait {
    *
    * @see \Drupal\dynamic_entity_reference\Plugin\Field\FieldType\DynamicEntityReferenceItem::getSettableOptions()
    */
-  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state): array {
     foreach ($values as $index => $value) {
       [$values[$index]['target_type'], $values[$index]['target_id']] = explode('-', $value['target_id']);
     }

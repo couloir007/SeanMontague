@@ -99,3 +99,13 @@ function trash_post_update_hashed_storage_classes(): void {
   // the files generated under the old names are never loaded again.
   PhpStorageFactory::get('trash')->deleteAll();
 }
+
+/**
+ * Invalidate the container for changed service constructor arguments.
+ */
+function trash_post_update_invalidate_container(): void {
+  // 3.x has trash_post_update_rebuild_container(). This one has a different
+  // name so that sites that ran it on 3.x still get a fresh container when
+  // they move to 3.1.x.
+  \Drupal::service('kernel')->invalidateContainer();
+}

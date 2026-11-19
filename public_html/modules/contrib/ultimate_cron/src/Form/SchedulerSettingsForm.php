@@ -32,9 +32,9 @@ class SchedulerSettingsForm extends ConfigFormBase {
     $rules = is_array($values->get('rules')) ? implode(';', $values->get('rules')) : '';
 
     // Setup vertical tabs.
-    $form['settings_tabs'] = array(
+    $form['settings_tabs'] = [
       '#type' => 'vertical_tabs',
-    );
+    ];
 
     // Settings for crontab.
     $form['crontab'] = [
@@ -44,38 +44,38 @@ class SchedulerSettingsForm extends ConfigFormBase {
       '#tree' => TRUE,
     ];
 
-    $form['crontab']['catch_up'] = array(
-      '#title' => t("Catch up"),
+    $form['crontab']['catch_up'] = [
+      '#title' => $this->t("Catch up"),
       '#type' => 'textfield',
       '#default_value' => $values->get('catch_up'),
-      '#description' => t("Don't run job after X seconds of rule."),
+      '#description' => $this->t("Don't run job after X seconds of rule."),
       '#fallback' => TRUE,
       '#required' => TRUE,
-    );
+    ];
 
-    $form['crontab']['rules'] = array(
-      '#title' => t("Rules"),
+    $form['crontab']['rules'] = [
+      '#title' => $this->t("Rules"),
       '#type' => 'textfield',
       '#default_value' => $rules,
-      '#description' => t('Semi-colon separated list of crontab rules.'),
+      '#description' => $this->t('Semi-colon separated list of crontab rules.'),
       '#fallback' => TRUE,
       '#required' => TRUE,
-      '#element_validate' => array('ultimate_cron_plugin_crontab_element_validate_rule'),
-    );
-    $form['crontab']['rules_help'] = array(
+      '#element_validate' => ['ultimate_cron_plugin_crontab_element_validate_rule'],
+    ];
+    $form['crontab']['rules_help'] = [
       '#type' => 'fieldset',
-      '#title' => t('Rules help'),
+      '#title' => $this->t('Rules help'),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
-    );
-    $form['crontab']['rules_help']['info'] = array(
+    ];
+    $form['crontab']['rules_help']['info'] = [
       '#markup' => file_get_contents(\Drupal::service('extension.list.module')->getPath('ultimate_cron') . '/help/rules.html'),
-    );
+    ];
 
     // Settings for Simple scheduler.
     $form['simple'] = [
       '#type' => 'details',
-      '#title' => t('Simple'),
+      '#title' => $this->t('Simple'),
       '#group' => 'settings_tabs',
       '#tree' => TRUE,
     ];
@@ -91,15 +91,15 @@ class SchedulerSettingsForm extends ConfigFormBase {
       '0+@ 0 * * *' => 'Every day',
       '0+@ 0 * * 0' => 'Every week',
     ];
-    $form['simple']['rule'] = array(
+    $form['simple']['rule'] = [
       '#type' => 'select',
-      '#title' => t('Run cron every'),
+      '#title' => $this->t('Run cron every'),
       '#default_value' => $values->get('rule'),
-      '#description' => t('Select the interval you wish cron to run on.'),
+      '#description' => $this->t('Select the interval you wish cron to run on.'),
       '#options' => $options,
       '#fallback' => TRUE,
       '#required' => TRUE,
-    );
+    ];
 
     return parent::buildForm($form, $form_state);
   }

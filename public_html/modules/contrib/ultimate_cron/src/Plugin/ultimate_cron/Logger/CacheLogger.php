@@ -46,10 +46,10 @@ class CacheLogger extends LoggerBase implements ContainerFactoryPluginInterface 
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array(
+    return [
       'bin' => 'ultimate_cron_logger',
       'timeout' => Cache::PERMANENT,
-    );
+    ];
   }
 
   /**
@@ -78,30 +78,30 @@ class CacheLogger extends LoggerBase implements ContainerFactoryPluginInterface 
    */
   public function getLogEntries($name, array $log_types, $limit = 10) {
     $log_entry = $this->load($name);
-    return $log_entry->lid ? array($log_entry) : array();
+    return $log_entry->lid ? [$log_entry] : [];
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form['bin'] = array(
+    $form['bin'] = [
       '#type' => 'textfield',
-      '#title' => t('Cache bin'),
-      '#description' => t('Select which cache bin to use for storing logs.'),
+      '#title' => $this->t('Cache bin'),
+      '#description' => $this->t('Select which cache bin to use for storing logs.'),
       '#default_value' => $this->configuration['bin'],
       '#fallback' => TRUE,
       '#required' => TRUE,
-    );
+    ];
 
-    $form['timeout'] = array(
+    $form['timeout'] = [
       '#type' => 'textfield',
-      '#title' => t('Cache timeout'),
-      '#description' => t('Seconds before cache entry expires (0 = never, -1 = on next general cache wipe).'),
+      '#title' => $this->t('Cache timeout'),
+      '#description' => $this->t('Seconds before cache entry expires (0 = never, -1 = on next general cache wipe).'),
       '#default_value' => $this->configuration['timeout'],
       '#fallback' => TRUE,
       '#required' => TRUE,
-    );
+    ];
 
     return $form;
   }

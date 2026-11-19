@@ -51,13 +51,13 @@ class JobController extends ControllerBase {
    */
   public function showLogs(CronJob $ultimate_cron_job) {
 
-    $header = array(
+    $header = [
       $this->t('Severity'),
       $this->t('Start Time'),
       $this->t('End Time'),
       $this->t('Message'),
       $this->t('Duration'),
-    );
+    ];
 
     $build['ultimate_cron_job_logs_table'] = [
       '#type' => 'table',
@@ -101,11 +101,11 @@ class JobController extends ControllerBase {
     // Unlock the process.
     if ($ultimate_cron_job->unlock($lock_id, TRUE)) {
       $user = \Drupal::currentUser();
-      \Drupal::logger('ultimate_cron')->warning('@name manually unlocked by user @username (@uid)', array(
+      \Drupal::logger('ultimate_cron')->warning('@name manually unlocked by user @username (@uid)', [
         '@name' => $ultimate_cron_job->id(),
         '@username' => $user->getDisplayName(),
         '@uid' => $user->id(),
-      ));
+      ]);
 
       $this->messenger()
         ->addStatus($this->t('Cron job @name unlocked successfully.', [

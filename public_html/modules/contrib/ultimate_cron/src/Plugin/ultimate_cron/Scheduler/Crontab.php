@@ -22,10 +22,10 @@ class Crontab extends SchedulerBase {
    * @todo: $catch_up is randomly failing when value is low in some situation. 0 value is ignoring catch_up checks.
    */
   public function defaultConfiguration() {
-    return array(
-      'rules' => array('0+@ */3 * * *'),
+    return [
+      'rules' => ['0+@ */3 * * *'],
       'catch_up' => '0',
-    );
+    ];
   }
 
   /**
@@ -54,9 +54,9 @@ class Crontab extends SchedulerBase {
         $next_schedule = $next_schedule > $result ? $result : $next_schedule;
       }
     }
-    $parsed .= t('Next scheduled run at @datetime', array(
-      '@datetime' => \Drupal::service('date.formatter')->format($next_schedule, 'custom', 'Y-m-d H:i:s')
-    ));
+    $parsed .= $this->t('Next scheduled run at @datetime', [
+      '@datetime' => \Drupal::service('date.formatter')->format($next_schedule, 'custom', 'Y-m-d H:i:s'),
+    ]);
     return $parsed;
   }
 
@@ -64,36 +64,36 @@ class Crontab extends SchedulerBase {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form['rules'][0] = array(
-      '#title' => t("Rules"),
+    $form['rules'][0] = [
+      '#title' => $this->t("Rules"),
       '#type' => 'textfield',
       '#default_value' =>  $this->configuration['rules'],
-      '#description' => t('Comma separated list of crontab rules.'),
+      '#description' => $this->t('Comma separated list of crontab rules.'),
       '#fallback' => TRUE,
       '#required' => TRUE,
       // @todo: check this out.
-      //'#element_validate' => array('ultimate_cron_plugin_crontab_element_validate_rule'),
-    );
+      //'#element_validate' => ['ultimate_cron_plugin_crontab_element_validate_rule'],
+    ];
 
-    $form['rules_help'] = array(
+    $form['rules_help'] = [
       '#type' => 'fieldset',
-      '#title' => t('Rules help'),
+      '#title' => $this->t('Rules help'),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
-    );
+    ];
 
-    $form['rules_help']['info'] = array(
+    $form['rules_help']['info'] = [
       '#markup' => file_get_contents(\Drupal::service('extension.list.module')->getPath('ultimate_cron') . '/help/rules.html'),
-    );
+    ];
 
-    $form['catch_up'] = array(
-      '#title' => t("Catch up"),
+    $form['catch_up'] = [
+      '#title' => $this->t("Catch up"),
       '#type' => 'textfield',
       '#default_value' => $this->configuration['catch_up'],
-      '#description' => t("Don't run job after X seconds of rule."),
+      '#description' => $this->t("Don't run job after X seconds of rule."),
       '#fallback' => TRUE,
       '#required' => TRUE,
-    );
+    ];
 
     return $form;
   }
@@ -106,7 +106,7 @@ class Crontab extends SchedulerBase {
     $rule = $form_state->getValues()['scheduler']['configuration']['rules'][0];
     $cron = CronRule::factory($rule);
     if (!$cron->isValid()) {
-      $form_state->setErrorByName('scheduler][configuration][rules][0', t('Rule is invalid'));
+      $form_state->setErrorByName('scheduler][configuration][rules][0', $this->t('Rule is invalid'));
     }
   }
 

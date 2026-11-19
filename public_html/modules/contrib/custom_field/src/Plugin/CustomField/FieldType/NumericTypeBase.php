@@ -116,15 +116,22 @@ class NumericTypeBase extends CustomFieldTypeBase {
       ]),
     ];
 
+    // Choose the message from the bounds the Range constraint ends up with,
+    // not from the settings: Range refuses minMessage or maxMessage when it has
+    // both bounds. Without a configured bound, Range keeps its default message.
     $message_type = NULL;
-    if ($min_set && $max_set) {
-      $message_type = 'notInRangeMessage';
-    }
-    elseif ($min_set) {
-      $message_type = ($min !== NULL && $max !== NULL) ? 'notInRangeMessage' : 'minMessage';
-    }
-    elseif ($max_set) {
-      $message_type = ($min !== NULL && $max !== NULL) ? 'notInRangeMessage' : 'maxMessage';
+    if ($min_set || $max_set) {
+      $has_min = isset($constraints['Range']['min']);
+      $has_max = isset($constraints['Range']['max']);
+      if ($has_min && $has_max) {
+        $message_type = 'notInRangeMessage';
+      }
+      elseif ($has_min) {
+        $message_type = 'minMessage';
+      }
+      elseif ($has_max) {
+        $message_type = 'maxMessage';
+      }
     }
 
     if (!is_null($message_type)) {

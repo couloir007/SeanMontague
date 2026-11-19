@@ -138,12 +138,12 @@ class UltimateCronCommands extends DrushCommands {
     $extended = $options['extended'];
     $statuses = $options['status'];
     $scheduled = $options['scheduled'];
-    $showname = $options['name'];
+    $show_name = $options['name'];
 
     $modules = $modules ? explode(',', $modules) : [];
     $statuses = $statuses ? explode(',', $statuses) : [];
 
-    $title = $showname ? dt('Name') : dt('Title');
+    $title = $show_name ? dt('Name') : dt('Title');
 
     $table = [];
     $table[] = [
@@ -217,7 +217,7 @@ class UltimateCronCommands extends DrushCommands {
       $table[$name][] = $legend;
       $table[$name][] = $job->id();
       $table[$name][] = $job->getModuleName();
-      $table[$name][] = $showname ? $job->id() : $job->getTitle();
+      $table[$name][] = $show_name ? $job->id() : $job->getTitle();
       $table[$name][] = $job->getPlugin('scheduler')->formatLabel($job);
       $table[$name][] = $log_entry->formatStartTime();
       $table[$name][] = $log_entry->formatDuration() . ' ' . $progress;
@@ -279,7 +279,7 @@ class UltimateCronCommands extends DrushCommands {
     }
 
     if ($force || $job->isScheduled()) {
-      $job->run(t('Launched by drush'));
+      $job->run(dt('Launched by drush'));
     }
 
   }
@@ -365,12 +365,6 @@ class UltimateCronCommands extends DrushCommands {
       // Unlock the process.
       if ($job->unlock($lock_id, TRUE)) {
         $log_entry = $job->resumeLog($lock_id);
-        global $user;
-        $this->logger->warning('@name manually unlocked by user @username (@uid)', [
-          '@name' => $job->id(),
-          '@username' => $user->getDisplayName(),
-          '@uid' => $user->id(),
-        ]);
         $log_entry->finish();
 
         $this->output->writeln(dt('Cron job @name unlocked', ['@name' => $job->id()]));

@@ -165,6 +165,7 @@ backup-*.tar.gz
 settings.local.php.pg-bak
 
 /public_html/error_log
+/public_html/mapping
 error_log
 /public_html/sites/*/settings*.php
 *.bak

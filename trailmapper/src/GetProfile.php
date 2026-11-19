@@ -24,8 +24,6 @@ class GetProfile {
 
   public $theTable;
 
-  public $junctions;
-
   public $db;
 
   private $conn;
@@ -37,6 +35,9 @@ class GetProfile {
   private $theCnt;
 
   private $flipArray;
+
+  // Segment indexes where the route is not connected
+  private $gaps = [];
 
   private $bboxArray;
 
@@ -57,14 +58,19 @@ class GetProfile {
   /**
    * Table names per area. Table names come from here, never from input.
    */
+  /**
+   * Two end points closer than this (map units, metres for EPSG:6589) meet.
+   */
+  const SNAP_DISTANCE = 1.0;
+
   const AREAS = [
     'kt' => [
       'trails' => 'kt_trails',
-      'junctions' => 'kt_junctions',
       'profiles' => 'kt_profiles',
       'profiles_rev' => 'kt_profiles2',
       'trax' => 'kt_trax',
       'trax_rev' => 'kt_trax2',
+      'srid' => 6589,
     ],
   ];
 
@@ -97,7 +103,6 @@ class GetProfile {
     $this->tables = self::AREAS[$area];
 
     $this->theTable = $this->tables['trails'];
-    $this->junctions = $this->tables['junctions'];
   }
 
   /**
@@ -109,149 +114,145 @@ class GetProfile {
     return $stmt;
   }
 
-  public function getDirection() {
-    // Variable for calculating distance
-    $this->ln = 0;
-    $flipArray1 = [];
+  /**
+   * Returns the computed flip array (0 = digitized direction, 1 = reversed).
+   */
+  public function getFlipArray() {
+    return $this->flipArray;
+  }
 
-    //Determine profile direction
-    $this->flipArray = '';
+  /**
+   * Returns the segment indexes where the route is not connected.
+   */
+  public function getGaps() {
+    return $this->gaps;
+  }
 
-    $thePrTrl = '';
-    $thePrEndPts = [];
+  /**
+   * Fetches length and end points for the selected segments in one query.
+   *
+   * Points are in the native SRID of the trails table (metres for EPSG:6589);
+   * only the first part of the geometry is used.
+   *
+   * @return array
+   *   Keyed by objectid: ['length' => float, 'start' => [x, y], 'end' => [x, y]].
+   */
+  private function fetchSegments() {
+    $query = "SELECT objectid,
+            ST_Length(ST_Transform(geom, 26915)) AS length,
+            ST_X(ST_StartPoint(g)) AS sx, ST_Y(ST_StartPoint(g)) AS sy,
+            ST_X(ST_EndPoint(g)) AS ex, ST_Y(ST_EndPoint(g)) AS ey
+        FROM (
+            SELECT objectid, geom, ST_GeometryN(geom, 1) AS g
+            FROM public.{$this->theTable}
+            WHERE objectid = ANY(string_to_array(:ids, ','))
+        ) t";
 
-    $t = 0;
-    $i = 0;
-    $flip = 0;
-    $flip2 = -1;
-    $prevFlip = -1;
+    $segments = [];
+    foreach ($this->run($query, ['ids' => implode(',', array_unique($this->points))]) as $row) {
+      $segments[$row['objectid']] = [
+        'length' => (float) $row['length'],
+        'start' => [(float) $row['sx'], (float) $row['sy']],
+        'end' => [(float) $row['ex'], (float) $row['ey']],
+      ];
+    }
+    return $segments;
+  }
 
-    foreach ($this->points as $idx => $ptId) {
-      $query = "SELECT name, objectid,  ST_Length(ST_Transform(geom,26915)) As length FROM public.{$this->theTable} WHERE objectid = :id";
+  /**
+   * TRUE if two points are within SNAP_DISTANCE of each other.
+   */
+  private function samePoint(array $a, array $b) {
+    return hypot($a[0] - $b[0], $a[1] - $b[1]) <= self::SNAP_DISTANCE;
+  }
 
-      // Only one row is selected...I think.
-      foreach ($this->run($query, ['id' => $ptId]) as $row) {
-        //add up distance
-        $this->ln = $this->ln + $row['length'];
+  /**
+   * Walks the route from the first segment's orientation.
+   *
+   * @return array
+   *   [flips, gaps].
+   */
+  private function walk(array $segs, $firstFlip) {
+    $flips = [$firstFlip];
+    $gaps = [];
+    $node = $segs[0] ? $segs[0][$firstFlip ? 'start' : 'end'] : NULL;
 
-        // For last segment. Not sure it is usefule yet.
-        $flip3 = 0;
-
-        $TheLastFlip = 0;
-
-        /* Set first trail = to previous trail for comparison later */
-        if ($t == 0) {
-          $thePrTrl = $row['objectid'];
-        } else {
-          $flip = 0;
-
-          //Select endpoints of Trail
-          $objID = $row['objectid'];
-          $query_endpoints = "SELECT objectid, id, start FROM public.{$this->junctions} WHERE objectid ~ :pat";
-
-          $x = 0;
-          $prev_touch = 0;
-          $last_array = [];
-          foreach ($this->run($query_endpoints, ['pat' => ',' . $objID . ',']) as $row_endpoint) {
-            $objectIDs = trim($row_endpoint['objectid'], ',');
-
-            //Select objectid and place into an array
-            $trailArray = explode(",", $objectIDs);
-
-            /*
-                Iterate trough trails that touch each endpoint
-                Variable to determine when last trail start point has been determined.
-            */
-
-            $last_array[$row_endpoint['id']] = [$row_endpoint, $objID, 0];
-
-            foreach ($trailArray as $trl) {
-              //If the previous trail touches one of the two current endpoints, it's the junction
-
-              if ($thePrTrl == ltrim($trl)) {
-                $last_array[$row_endpoint['id']] = [$row_endpoint, $objID, 1];
-                $trailArray2 = explode(" ", $row_endpoint['start']);
-
-                // Identify which the two last points touch previous trail.
-                foreach ($trailArray2 as $trl2) {
-                  //Check to see if starts the previous trail...if so, it gets flipped.
-                  if ($trl2 == $thePrTrl) {
-                    if ($thePrTrl != $objID) {
-                      // If both have same starting point...this is key. Flip the previous trail.
-                      $flip = 1;
-                    } else {
-                    }
-                  } else {
-                  }
-
-                  //Check to see if it starts the current trail...if so, it is not flipped.
-                  if ($trl2 == $ptId) {
-                    // Check if the same trail is selected twice to ensure proper direction. Set the previous trail
-                    // to previous flip status and ensure the current is the opposite.
-
-                    $query_endpoints1 = "SELECT objectid, id, start FROM public.{$this->junctions} WHERE objectid ~ :pat";
-                    $endPTS1 = $this->run($query_endpoints1, ['pat' => ',' . $objID . ',']);
-                    $endPTS2 = $this->run($query_endpoints1, ['pat' => ',' . $thePrTrl . ',']);
-                    $arraysAreEqual = ($endPTS1->fetchAll() == $endPTS2->fetchAll());
-
-                    if ($arraysAreEqual) {
-                      $flip = $prevFlip;
-                      $flip2 = (1 == $prevFlip) ? 0 : 1; // $flip2 is the opposite of $prevFlip
-                    } else {
-                      $flip2 = 0;
-                    }
-                  } else {
-                    $flip2 = 1;
-                  }
-
-                  if ($i == ($this->theCnt - 1)) {
-                    //                                        $flip3 = 1;
-                  }
-                }
-              }
-            }
-            $x++;
-            $thePrEndPts[] = $row_endpoint;
-          }
-
-          if ($i == ($this->theCnt - 1)) {
-            foreach ($last_array as $idx => $last) {
-              if ($last[2] == 0) {
-                $start_array = explode(' ', $last[0]['start']);
-
-                $TheLastFlip = 1;
-
-                if (in_array($last[1], $start_array)) {
-                  $flip3 = 1;
-                } else {
-                  $flip3 = 0;
-                }
-              }
-            }
-          }
-
-          $thePrTrl = $row['objectid'];
-        }
-
-        if ($t != 0) {
-          $prevFlip = $flip;
-          $flipArray1[] = $flip;
-
-          if ($flip2 != -1) {
-            $prevFlip = $flip2;
-          }
-
-          if ($TheLastFlip == 1) {
-            $flipArray1[] = $flip3;
-          }
-        }
-        $t++;
+    for ($i = 1; $i < count($segs); $i++) {
+      $seg = $segs[$i];
+      if (!$seg || !$node) {
+        // Unknown segment id: nothing to follow, keep the current node.
+        $flips[] = 0;
+        $gaps[] = $i;
+        continue;
       }
+      if ($this->samePoint($seg['start'], $node)) {
+        $flips[] = 0;
+        $node = $seg['end'];
+      }
+      elseif ($this->samePoint($seg['end'], $node)) {
+        $flips[] = 1;
+        $node = $seg['start'];
+      }
+      else {
+        $flips[] = 0;
+        $node = $seg['end'];
+        $gaps[] = $i;
+      }
+    }
+    return [$flips, $gaps];
+  }
 
-      $i++;
+  /**
+   * Determines each segment's direction from the selection order and the
+   * segment end points: the walk starts at the end of the first segment that
+   * is not shared with the second, then follows the connected end points.
+   */
+  public function getDirection() {
+    $points = array_values($this->points);
+    $segments = $this->fetchSegments();
+
+    $this->ln = 0;
+    $segs = [];
+    foreach ($points as $ptId) {
+      $segs[] = $segments[$ptId] ?? NULL;
+      $this->ln += $segments[$ptId]['length'] ?? 0;
     }
 
-    $this->flipArray = $flipArray1;
+    $this->flipArray = [];
+    $this->gaps = [];
+
+    if (!$segs) {
+      return;
+    }
+    if (count($segs) == 1 || !$segs[0]) {
+      $this->flipArray = array_fill(0, count($segs), 0);
+      return;
+    }
+
+    $first = $segs[0];
+    $second = $segs[1];
+    $firstFlip = 0;
+
+    if ($second && !$this->samePoint($first['start'], $first['end'])) {
+      $startShared = $this->samePoint($first['start'], $second['start']) || $this->samePoint($first['start'], $second['end']);
+      $endShared = $this->samePoint($first['end'], $second['start']) || $this->samePoint($first['end'], $second['end']);
+
+      if ($startShared && !$endShared) {
+        // The route leaves by the start, so it begins at the end.
+        $firstFlip = 1;
+      }
+      elseif ($startShared && $endShared) {
+        // Both ends touch the second segment: keep the orientation whose
+        // whole walk stays connected, digitized direction on a tie.
+        $walk0 = $this->walk($segs, 0);
+        $walk1 = $this->walk($segs, 1);
+        if (count($walk1[1]) < count($walk0[1])) {
+          $firstFlip = 1;
+        }
+      }
+    }
+
+    [$this->flipArray, $this->gaps] = $this->walk($segs, $firstFlip);
   }
 
   public function assembleProfileSegments() {
@@ -286,16 +287,6 @@ class GetProfile {
     //        }
 
     foreach ($this->points as $idx => $objID) {
-      if ($idx < ($this->theCnt - 2)) {
-        if ($objID == $this->points[$idx + 1]) {
-          if ($this->flipArray[$idx + 1] == 0) {
-            $this->flipArray[$idx] = 1;
-          } else {
-            $this->flipArray[$idx] = 0;
-          }
-        }
-      }
-
       if ($this->flipArray[$idx] == 0) {
         $table = 'public.' . $this->tables['profiles'];
       } else {
@@ -445,16 +436,6 @@ class GetProfile {
     $trackArray = [];
 
     foreach ($this->points as $idx => $objID) {
-      if ($idx < ($this->theCnt - 2)) {
-        if ($objID == $this->points[$idx + 1]) {
-          if ($this->flipArray[$idx + 1] == 0) {
-            $this->flipArray[$idx] = 1;
-          } else {
-            $this->flipArray[$idx] = 0;
-          }
-        }
-      }
-
       if ($this->flipArray[$idx] == 0) {
         $tracks = 'public.' . $this->tables['trax'];
       } else {

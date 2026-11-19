@@ -1,6 +1,6 @@
 # Custom modules: current state
 
-Snapshot of `public_html/modules/custom/` as of 2026-10-22. It describes what the code does today, not what it should do. Refresh it when a module changes. Seven modules, all `package: Sean Montague`, all `core_version_requirement: ^10 || ^11`. For JSON-LD hooks and gotchas, see `public_html/modules/custom/seanmontague_schemadotorg/seanmontague_schemadotorg-README.md`. For the KMZ importer, see `public_html/modules/custom/trip_import/CLAUDE.md`.
+Snapshot of `public_html/modules/custom/` as of 2026-10-22. It describes what the code does today, not what it should do. Refresh it when a module changes. Eight modules (seven listed in the first inventory pass plus the `trail_mapper_planner` submodule), all `package: Sean Montague`, all `core_version_requirement: ^10 || ^11`. For JSON-LD hooks and gotchas, see `public_html/modules/custom/seanmontague_schemadotorg/seanmontague_schemadotorg-README.md`. For the KMZ importer, see `public_html/modules/custom/trip_import/CLAUDE.md`.
 
 This is a summary. Read a module's files before changing them.
 
@@ -19,6 +19,7 @@ This is a summary. Read a module's files before changing them.
 | `seanmontague_schemadotorg` | node, schemadotorg, schemadotorg_jsonld, geo_entity | none | none | `schemadotorg_jsonld_alter`, `schemadotorg_jsonld_schema_type_entity_alter` |
 | `trip_import` | file, node, media | none | `/admin/config/trip-import` | none (form + batch) |
 | `map_page` | field, views, geofield, taxonomy, datetime, text, paragraphs, serialization, geo_entity | `map_page.map_items` | `/map-page/map-items/{bundle}` and `/map-page/map-items` (access content), `/admin/config/map-page/settings` | `theme`, `preprocess_html`, `theme_suggestions_views_view_alter`, `form_alter`, `views_pre_render`, `install`, `uninstall` |
+| `trail_mapper_planner` | trail_mapper | `trail_mapper_planner.planner` | `/{area path}/map` (+ `/network.json`, `/profile`, `/gpx`: access content; `/refresh`: administer site configuration), generated per area from config (`/kingdom-trails/map`) | none |
 | `external_pg` | none | `external_pg.service` | none | none |
 | `trailmapper_safeguards` | menu_link_content | none | none | `module_implements_alter`, `menu_link_content_presave`, `node_presave`, `entity_presave` |
 
@@ -33,6 +34,8 @@ This is a summary. Read a module's files before changing them.
 **`trip_import`**: Google My Maps KMZ importer creating `geo_entity:poi`, `geo_entity:lodging`, `node:tourist_destination`, one `node:article` per Day folder, and `node:tourist_trip`. Has its own `CLAUDE.md`.
 
 **`map_page`**: older full-page Leaflet map. Ships config in `config/install`: a `geo_entity:map_story` bundle with fields, three paragraph types (`map_field_link`, `map_full_text`, `map_related_content`), a `mapping` vocabulary, and the `map_page` view. Its install hook enables a Views display extender and creates a "Map Story" term. Uses jQuery and `once` (module JS, not Surface). Has a README.
+
+**`trail_mapper_planner`** (submodule at `trail_mapper/modules/trail_mapper_planner/`, built): serves the KT trail planner at `/kingdom-trails/map`. Interim: the page is a complete standalone HTML document (no Drupal theme, regions or theme CSS), ported from `public_html/mapping/leaflet/` with its JS/CSS/images copied into `assets/`; `/mapping` stays as the reference. Areas live in `trail_mapper_planner.settings` (`areas.kt`: path, label, center, zoom), and routes are generated per area, so adding White Mountains is config only (the table names must also exist in `trailmapper/src/GetProfile::AREAS`). One-service rule: `PlannerService` is the only code that touches `trailmapper/` at the repo root (`dirname(DRUPAL_ROOT) . '/trailmapper'`). It exposes `network()`, `profile()`, `gpx()` and `isAvailable()`, validates ids (`^[a-z]+[0-9]+$`, max 200, known area), and the controller returns 400 for bad input and 503 when `trailmapper/` is missing or the DB fails. `network.json` is built live from PostGIS and cached in Drupal under tag `trail_mapper_planner:kt` (max-age 86400). `/kingdom-trails/map/refresh` invalidates that tag and redirects to the map; it replaces visiting the old `index.php` after a QGIS export. Depends on `trailmapper/` and its PostGIS credentials being present on the server; this is a direct link, which supersedes `trailmapper/CLAUDE.md`'s "Drupal must never require anything from here" until the TrailMapper API client exists.
 
 **`external_pg`**: one service that registers an `external_pg` pgsql connection to the `TrailMapper` database and exposes `fetchData($query)` for raw SQL.
 Status: deprecated. Direct DB link to TrailMapper, to be removed once the TrailMapper API client exists (see `decisions.md`).

@@ -674,10 +674,10 @@ custom_field.field_settings.*:
       label: 'Empty text'
     # integer|float|decimal subfields.
     min:
-      type: integer
+      type: float
       label: 'Minimum'
     max:
-      type: integer
+      type: float
       label: 'Maximum'
     # telephone subfields.
     pattern:

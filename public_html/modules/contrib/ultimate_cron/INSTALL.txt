@@ -1,2 +1,2 @@
-Set your crontab to wget cron.php once per minute (* * * * *). If this is not possible, activate the Poormans cron function in the Ultimate Cron settings.
+Set your crontab to wget cron.php once per minute (* * * * *). If this is not possible, activate the poor man's cron function in the Ultimate Cron settings.
 

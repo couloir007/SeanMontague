@@ -18,15 +18,14 @@ class UltimateCronQueueTest extends CronQueueTest {
    *
    * @var array
    */
-  protected static $modules = array('ultimate_cron');
+  protected static $modules = ['ultimate_cron'];
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    \Drupal::moduleHandler()->loadInclude('ultimate_cron', 'install');
-    ultimate_cron_install();
+    \Drupal::service('ultimate_cron.discovery')->discoverCronJobs();
     $this->installSchema('ultimate_cron', [
       'ultimate_cron_log',
       'ultimate_cron_lock',
@@ -41,7 +40,7 @@ class UltimateCronQueueTest extends CronQueueTest {
     $queue = $this->container->get('queue')->get('cron_queue_test_exception');
 
     // Enqueue an item for processing.
-    $queue->createItem(array($this->randomMachineName() => $this->randomMachineName()));
+    $queue->createItem([$this->randomMachineName() => $this->randomMachineName()]);
 
     // Run cron; the worker for this queue should throw an exception and handle
     // it.

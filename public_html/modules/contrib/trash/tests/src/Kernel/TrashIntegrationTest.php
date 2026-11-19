@@ -723,16 +723,34 @@ class TrashIntegrationTest extends TrashKernelTestBase {
     $config = \Drupal::configFactory()->getEditable('trash.settings');
     $enabled = $config->get('enabled_entity_types');
 
-    // Enabling an entity type whose storage cannot support trash must be
-    // reported on config save.
+    $storage_not_supported = static fn (array $record): bool => ($record['context']['@entity_type_id'] ?? '') === 'entity_test_no_id'
+      && str_contains($record['message'], 'storage does not support Trash');
+
+    // Entity types that aren't defined yet must not be reported on config
+    // save, because a config sync saves trash.settings before installing the
+    // modules that provide them.
     $enabled['foo'] = [];
+    $enabled['entity_test_no_id'] = [];
     $config->set('enabled_entity_types', $enabled)->save();
-    $this->assertTrue($logger->hasRecordThatPasses(
-      static fn (array $record): bool => ($record['context']['@entity_type_id'] ?? '') === 'foo'
-        && str_contains($record['message'], 'storage does not support Trash'),
-      RfcLogLevel::ERROR,
-    ));
+    $this->assertFalse($logger->hasRecords(RfcLogLevel::ERROR));
     unset($enabled['foo']);
+
+    // Creating an enabled entity type whose storage cannot support trash must
+    // be reported.
+    $this->enableModules(['entity_test']);
+    $this->container->get(LoggerChannelFactoryInterface::class)
+      ->get('trash')
+      ->addLogger($logger);
+    $this->installEntitySchema('entity_test_no_id');
+    $this->assertTrue($logger->hasRecordThatPasses($storage_not_supported, RfcLogLevel::ERROR));
+
+    // Enabling an existing entity type whose storage cannot support trash
+    // must be reported on config save.
+    $logger->reset();
+    $config = \Drupal::configFactory()->getEditable('trash.settings');
+    $config->set('enabled_entity_types', $enabled)->save();
+    $this->assertTrue($logger->hasRecordThatPasses($storage_not_supported, RfcLogLevel::ERROR));
+    unset($enabled['entity_test_no_id']);
 
     // Enabling an entity type whose 'deleted' field belongs to another module
     // must be reported as well: the field cannot be installed over, so every

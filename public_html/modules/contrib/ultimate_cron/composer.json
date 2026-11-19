@@ -1,7 +1,7 @@
 {
   "name": "drupal/ultimate_cron",
   "type": "drupal-module",
-  "license": "GPL-2.0+",
+  "license": "GPL-2.0-or-later",
   "description": "Ultimate cron",
   "extra": {
     "drush": {

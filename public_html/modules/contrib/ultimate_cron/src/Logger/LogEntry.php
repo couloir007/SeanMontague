@@ -4,6 +4,7 @@ namespace Drupal\ultimate_cron\Logger;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\user\Entity\User;
 
 /**
@@ -14,6 +15,9 @@ use Drupal\user\Entity\User;
  *     - The maximum number of characters of the message in the log entry.
  */
 class LogEntry {
+
+  use StringTranslationTrait;
+
   public $lid = NULL;
   public $name = '';
   public $log_type = ULTIMATE_CRON_LOG_TYPE_NORMAL;
@@ -27,7 +31,7 @@ class LogEntry {
   // Default 1MiB log entry.
   public $log_entry_size = 1048576;
 
-  public $log_entry_fields = array(
+  public $log_entry_fields = [
     'lid',
     'uid',
     'log_type',
@@ -36,7 +40,7 @@ class LogEntry {
     'init_message',
     'message',
     'severity',
-  );
+  ];
 
   public $logger;
   public $job;
@@ -66,7 +70,7 @@ class LogEntry {
    *   Log entry data.
    */
   public function getData() {
-    $result = array();
+    $result = [];
     foreach ($this->log_entry_fields as $field) {
       $result[$field] = $this->$field;
     }
@@ -105,11 +109,11 @@ class LogEntry {
    * @param string $message
    *   The message to log.
    * @param array $variables
-   *   Replacement variables for t().
+   *   Replacement variables for $this->t().
    * @param int $level
    *   The log level, see \Drupal\Core\Logger\RfcLogLevel.
    */
-  public function log($message, $variables = array(), $level = RfcLogLevel::NOTICE) {
+  public function log($message, $variables = [], $level = RfcLogLevel::NOTICE) {
 
     if (!empty($variables) && gettype($message) === 'string') {
       $message = new FormattableMarkup($message, $variables);
@@ -125,13 +129,13 @@ class LogEntry {
     // Make sure that message doesn't become too big.
     if (mb_strlen($this->message) > $this->log_entry_size) {
       while (mb_strlen($this->message) > $this->log_entry_size) {
-        $firstline = mb_strpos(rtrim($this->message, "\n"), "\n");
-        if ($firstline === FALSE || $firstline == mb_strlen($this->message)) {
+        $first_line = mb_strpos(rtrim($this->message, "\n"), "\n");
+        if ($first_line === FALSE || $first_line == mb_strlen($this->message)) {
           // Only one line? That's a big line ... truncate it without mercy!
           $this->message = mb_substr($this->message, -$this->log_entry_size);
           break;
         }
-        $this->message = mb_substr($this->message, $firstline + 1);
+        $this->message = mb_substr($this->message, $first_line + 1);
       }
       $this->message = '.....' . $this->message;
     }
@@ -168,14 +172,14 @@ class LogEntry {
       default:
         $format = 'i:s';
     }
-    return isset($duration) ? gmdate($format, $duration) : t('N/A');
+    return isset($duration) ? gmdate($format, $duration) : $this->t('N/A');
   }
 
   /**
    * Format start time.
    */
   public function formatStartTime() {
-    return $this->start_time ? \Drupal::service('date.formatter')->format((int) $this->start_time, 'custom', 'Y-m-d H:i:s') : t('Never');
+    return $this->start_time ? \Drupal::service('date.formatter')->format((int) $this->start_time, 'custom', 'Y-m-d H:i:s') : $this->t('Never');
   }
 
   /**
@@ -189,10 +193,13 @@ class LogEntry {
    * Format user.
    */
   public function formatUser() {
-    $username = t('anonymous') . ' (0)';
+    $username = $this->t('anonymous') . ' (0)';
     if ($this->uid) {
       $user = User::load($this->uid);
-      $username = $user ? new FormattableMarkup('@username (@uid)', array('@username' => $user->getDisplayName(), '@uid' => $user->id())) : t('N/A');
+      $username = $user ? new FormattableMarkup('@username (@uid)', [
+        '@username' => $user->getDisplayName(),
+        '@uid' => $user->id(),
+      ]) : $this->t('N/A');
     }
     return $username;
   }
@@ -201,7 +208,7 @@ class LogEntry {
    * Format initial message.
    */
   public function formatInitMessage() {
-    return $this->init_message ? $this->init_message . ' ' . t('by') . ' ' . $this->formatUser() : t('N/A');
+    return $this->init_message ? $this->init_message . ' ' . $this->t('by') . ' ' . $this->formatUser() : $this->t('N/A');
   }
 
   /**
@@ -231,11 +238,11 @@ class LogEntry {
         $file = 'core/misc/icons/73b355/check.svg';
     }
     $status = ['#theme' => 'image', '#uri' => $file];
-    $severity_levels = array(
-        -1 => t('no info'),
-      ) + RfcLogLevel::getLevels();
+    $severity_levels = [
+      -1 => $this->t('no info'),
+    ] + RfcLogLevel::getLevels();
     $title = $severity_levels[$this->severity];
-    return array($status, $title);
+    return [$status, $title];
   }
 
   /**

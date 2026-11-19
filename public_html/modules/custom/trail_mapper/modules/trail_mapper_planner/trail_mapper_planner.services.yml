@@ -1,0 +1,10 @@
+services:
+  trail_mapper_planner.planner:
+    class: Drupal\trail_mapper_planner\Service\PlannerService
+    arguments:
+      - '@config.factory'
+      - '@logger.channel.trail_mapper_planner'
+
+  logger.channel.trail_mapper_planner:
+    parent: logger.channel_base
+    arguments: ['trail_mapper_planner']

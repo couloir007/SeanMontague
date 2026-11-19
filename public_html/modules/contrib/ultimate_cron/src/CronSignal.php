@@ -17,7 +17,7 @@ class CronSignal {
   static public function peek($name, $signal) {
     $database = \Drupal::service('ultimate_cron.database_factory');
     return $database->select('ultimate_cron_signal', 's')
-      ->fields('s', array('job_name'))
+      ->fields('s', ['job_name'])
       ->condition('job_name', $name)
       ->condition('signal_name', $signal)
       ->condition('claimed', 0)
@@ -40,7 +40,7 @@ class CronSignal {
   static public function get($name, $signal) {
     $database = \Drupal::service('ultimate_cron.database_factory');
     $claimed = $database->update('ultimate_cron_signal')
-      ->fields(array('claimed' => 1))
+      ->fields(['claimed' => 1])
       ->condition('job_name', $name)
       ->condition('signal_name', $signal)
       ->condition('claimed', 0)
@@ -70,11 +70,11 @@ class CronSignal {
   static public function set($name, $signal) {
     $database = \Drupal::service('ultimate_cron.database_factory');
     return $database->merge('ultimate_cron_signal')
-      ->keys(array(
+      ->keys([
         'job_name' => $name,
         'signal_name' => $signal,
-      ))
-      ->fields(array('claimed' => 0))
+      ])
+      ->fields(['claimed' => 0])
       ->execute();
   }
 

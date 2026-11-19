@@ -35,6 +35,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * that renders a field outside that pipeline does.
  *
  * @group custom_field
+ * @runTestsInSeparateProcesses
  */
 #[Group('custom_field')]
 #[RunTestsInSeparateProcesses]

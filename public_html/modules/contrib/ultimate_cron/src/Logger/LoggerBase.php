@@ -46,7 +46,7 @@ abstract class LoggerBase extends CronPlugin implements LoggerInterface {
    * {@inheritdoc}
    */
   public function loadLatestLogEntries(array $jobs, array $log_types) {
-    $logs = array();
+    $logs = [];
     foreach ($jobs as $job) {
       $logs[$job->id()] = $job->loadLatestLogEntry($log_types);
     }

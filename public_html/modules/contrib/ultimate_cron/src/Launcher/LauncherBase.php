@@ -46,7 +46,7 @@ abstract class LauncherBase extends CronPlugin implements LauncherInterface {
    * {@inheritdoc}
    */
   public function isLockedMultiple(array $jobs) {
-    $lock_ids = array();
+    $lock_ids = [];
     foreach ($jobs as $name => $job) {
       $lock_ids[$name] = $this->isLocked($job);
     }
@@ -69,8 +69,8 @@ abstract class LauncherBase extends CronPlugin implements LauncherInterface {
   public function formatRunning(CronJobInterface $job) {
     $file = \Drupal::service('extension.list.module')->getPath('ultimate_cron') . '/icons/hourglass.png';
     $status = ['#theme' => 'image', '#uri' => $file];
-    $title = t('running');
-    return array($status, $title);
+    $title = $this->t('running');
+    return [$status, $title];
   }
 
   /**
@@ -79,8 +79,8 @@ abstract class LauncherBase extends CronPlugin implements LauncherInterface {
   public function formatUnfinished(CronJobInterface $job) {
     $file = \Drupal::service('extension.list.module')->getPath('ultimate_cron') . '/icons/lock_open.png';
     $status = ['#theme' => 'image', '#uri' => $file];
-    $title = t('unfinished but not locked?');
-    return array($status, $title);
+    $title = $this->t('unfinished but not locked?');
+    return [$status, $title];
   }
 
   /**

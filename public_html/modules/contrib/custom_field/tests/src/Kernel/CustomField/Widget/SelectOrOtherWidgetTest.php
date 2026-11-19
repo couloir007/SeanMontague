@@ -11,6 +11,7 @@ use Drupal\Tests\custom_field\Kernel\CustomField\CustomFieldWidgetKernelTestBase
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Tests the select_or_other widget.
@@ -518,6 +519,7 @@ class SelectOrOtherWidgetTest extends CustomFieldWidgetKernelTestBase {
    *
    * @dataProvider providerNumericTypes
    */
+  #[DataProvider('providerNumericTypes')]
   public function testWidgetNumericInput(string $type, array $column_extras, mixed $stored_value, string $expected_step): void {
     $column = [
       'name' => 'amount',

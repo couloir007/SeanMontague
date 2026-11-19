@@ -20,16 +20,16 @@ define('ULTIMATE_CRON_LOG_TYPE_ALL', -1);
  * Pseudo define.
  */
 function _ultimate_cron_define_log_type_all() {
-  return array(ULTIMATE_CRON_LOG_TYPE_NORMAL, ULTIMATE_CRON_LOG_TYPE_ADMIN);
+  return [ULTIMATE_CRON_LOG_TYPE_NORMAL, ULTIMATE_CRON_LOG_TYPE_ADMIN];
 }
 
-$GLOBALS['ultimate_cron_shutdown_functions'] = array();
+$GLOBALS['ultimate_cron_shutdown_functions'] = [];
 
 /**
  * The shutdown function itself is also overridable.
  *
  * In case it is necessary to add it earlier, say settings.php.
- * Remeber to invoke the registered ultimate cron shutdown handlers.
+ * Remember to invoke the registered ultimate cron shutdown handlers.
  * If the function exists, we assume that the register_shutdown_handler() has
  * also been setup correctly.
  *
@@ -37,7 +37,7 @@ $GLOBALS['ultimate_cron_shutdown_functions'] = array();
  */
 if (!function_exists('_ultimate_cron_out_of_memory_protection')) {
   /**
-   * Shutdown hander that unleash the memory reserved.
+   * Shutdown handler that unleash the memory reserved.
    */
   function _ultimate_cron_out_of_memory_protection() {
     if (isset($GLOBALS['ultimate_cron_shutdown_functions']) && is_array($GLOBALS['ultimate_cron_shutdown_functions'])) {
@@ -54,16 +54,19 @@ if (!function_exists('_ultimate_cron_out_of_memory_protection')) {
   // The minor overhead in _drupal_shutdown_function() can mean the
   // difference between life and death for our shutdown handlers in
   // a memory exhaust situation. We want our shutdown handler to be
-  // called as early as possible. If no callbacks have been registrered
+  // called as early as possible. If no callbacks have been registered
   // yet, we use PHPs built-in register_shutdown_function() otherwise
-  // we ensure, that we are the first in the list of Drupals registered
+  // we ensure, that we are the first in the list of Drupal's registered
   // shutdown functions.
   $callbacks = &drupal_register_shutdown_function();
   if (empty($callbacks)) {
     register_shutdown_function('_ultimate_cron_out_of_memory_protection');
   }
   else {
-    array_unshift($callbacks, array('callback' => '_ultimate_cron_out_of_memory_protection', 'arguments' => array()));
+    array_unshift($callbacks, [
+      'callback' => '_ultimate_cron_out_of_memory_protection',
+      'arguments' => [],
+    ]);
     // Reset internal array pointer just in case ...
     reset($callbacks);
   }
@@ -89,10 +92,10 @@ if (!function_exists('_ultimate_cron_out_of_memory_protection')) {
 function ultimate_cron_register_shutdown_function($callback) {
   $args = func_get_args();
   array_shift($args);
-  $GLOBALS['ultimate_cron_shutdown_functions'][] = array(
+  $GLOBALS['ultimate_cron_shutdown_functions'][] = [
     'callback' => $callback,
     'arguments' => $args,
-  );
+  ];
 }
 
 /**
@@ -107,7 +110,7 @@ function ultimate_cron_register_shutdown_function($callback) {
  *   The instance of the plugin (singleton).
  */
 function ultimate_cron_plugin_load($type, $name) {
-  $cache = &drupal_static('ultimate_cron_plugin_load_all', array());
+  $cache = &drupal_static('ultimate_cron_plugin_load_all', []);
   if (!isset($cache[$type][$name])) {
     ultimate_cron_plugin_load_all($type);
     $cache[$type][$name] = isset($cache[$type][$name]) ? $cache[$type][$name] : FALSE;
@@ -132,7 +135,7 @@ function ultimate_cron_fake_cron() {
  *   The instances of the plugin type (singletons).
  */
 function ultimate_cron_plugin_load_all($type, $reset = FALSE) {
-  $cache = &drupal_static('ultimate_cron_plugin_load_all', array());
+  $cache = &drupal_static('ultimate_cron_plugin_load_all', []);
   if (!$reset && isset($cache[$type])) {
     return $cache[$type];
   }
@@ -154,10 +157,10 @@ function ultimate_cron_plugin_load_all($type, $reset = FALSE) {
  * Implements hook_hook_info().
  */
 function ultimate_cron_hook_info() {
-  $hooks = array();
-  $hooks['background_process_shutdown'] = array(
+  $hooks = [];
+  $hooks['background_process_shutdown'] = [
     'group' => 'background_process_legacy',
-  );
+  ];
   return $hooks;
 }
 
@@ -169,7 +172,7 @@ function ultimate_cron_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
     case 'help.page.ultimate_cron':
       // Return a line-break version of the module README.
-      return '<pre>' . file_get_contents(dirname(__FILE__) . '/README.txt') . '</pre>';
+      return '<pre>' . file_get_contents(dirname(__FILE__) . '/README.md') . '</pre>';
   }
 }
 
@@ -190,10 +193,12 @@ function ultimate_cron_cron() {
 }
 
 /**
- * * Implements hook_modules_installed().
+ * Implements hook_modules_installed().
  */
-function ultimate_cron_modules_installed($modules) {
-  \Drupal::service('ultimate_cron.discovery')->discoverCronJobs();
+function ultimate_cron_modules_installed($modules, $is_syncing) {
+  if (!$is_syncing) {
+    \Drupal::service('ultimate_cron.discovery')->discoverCronJobs();
+  }
 }
 
 /**
@@ -219,11 +224,11 @@ function ultimate_cron_form_system_cron_settings_alter(&$form, &$form_state) {
  *   Array with same keys as input, but with blank values (empty string).
  */
 function ultimate_cron_blank_values($array) {
-  $result = array();
+  $result = [];
   foreach ($array as $key => $value) {
     switch (gettype($value)) {
       case 'array':
-        $result[$key] = array();
+        $result[$key] = [];
         break;
 
       default:

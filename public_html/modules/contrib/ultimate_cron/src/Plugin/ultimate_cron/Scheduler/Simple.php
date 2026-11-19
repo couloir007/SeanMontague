@@ -16,7 +16,7 @@ use Drupal\ultimate_cron\Entity\CronJob;
  */
 class Simple extends Crontab {
 
-  public $presets = array(
+  public $presets = [
     '* * * * *' => 60,
     '*/5+@ * * * *' => 300,
     '*/15+@ * * * *' => 900,
@@ -27,15 +27,15 @@ class Simple extends Crontab {
     '0+@ */12 * * *' => 43200,
     '0+@ 0 * * *' => 86400,
     '0+@ 0 * * 0' => 604800,
-  );
+  ];
 
   /**
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array(
-      'rules' => array('*/15+@ * * * *'),
-    ) + parent::defaultConfiguration();
+    return [
+      'rules' => ['*/15+@ * * * *'],
+    ] + parent::defaultConfiguration();
   }
 
   /**
@@ -53,9 +53,9 @@ class Simple extends Crontab {
    * {@inheritdoc}
    */
   public function formatLabel(CronJob $job) {
-    return t('Every @interval', array(
+    return $this->t('Every @interval', [
       '@interval' => \Drupal::service('date.formatter')->formatInterval($this->presets[$this->configuration['rules'][0]]),
-    ));
+    ]);
   }
 
   /**
@@ -63,17 +63,17 @@ class Simple extends Crontab {
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $date_formatter = \Drupal::service('date.formatter');
-    $intervals = array_map(array($date_formatter, 'formatInterval'), $this->presets);
+    $intervals = array_map([$date_formatter, 'formatInterval'], $this->presets);
 
-    $form['rules'][0] = array(
+    $form['rules'][0] = [
       '#type' => 'select',
-      '#title' => t('Run cron every'),
+      '#title' => $this->t('Run cron every'),
       '#default_value' => $this->configuration['rules'][0],
-      '#description' => t('Select the interval you wish cron to run on.'),
+      '#description' => $this->t('Select the interval you wish cron to run on.'),
       '#options' => $intervals,
       '#fallback' => TRUE,
       '#required' => TRUE,
-    );
+    ];
 
     return $form;
   }

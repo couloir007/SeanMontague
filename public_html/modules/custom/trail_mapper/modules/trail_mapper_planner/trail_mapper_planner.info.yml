@@ -1,0 +1,7 @@
+name: 'Trail Mapper Planner'
+type: module
+description: 'Serves the TrailMapper trail planner (map, profile, GPX) from the trailmapper/ directory at the repo root.'
+core_version_requirement: ^11
+package: Sean Montague
+dependencies:
+  - trail_mapper:trail_mapper

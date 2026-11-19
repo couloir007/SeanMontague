@@ -6,6 +6,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Session\AnonymousUserSession;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Error;
 use Drupal\ultimate_cron\CronJobInterface;
 
@@ -59,6 +60,9 @@ use Drupal\ultimate_cron\CronJobInterface;
  * )
  */
 class CronJob extends ConfigEntityBase implements CronJobInterface {
+
+  use StringTranslationTrait;
+
   static public $signals;
   static public $currentJob;
   public $progressUpdated = 0;
@@ -109,17 +113,17 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
   /**
    * @var array
    */
-  protected $scheduler = array('id' => 'simple');
+  protected $scheduler = ['id' => 'simple'];
 
   /**
    * @var array
    */
-  protected $launcher = array('id' => 'serial');
+  protected $launcher = ['id' => 'serial'];
 
   /**
    * @var array
    */
-  protected $logger = array('id' => 'database');
+  protected $logger = ['id' => 'database'];
 
   /**
    * @var \Drupal\ultimate_cron\CronPlugin
@@ -150,7 +154,6 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
     parent::__construct($values, $entity_type);
     $this->classResolver = \Drupal::service('class_resolver');
     $this->moduleExtensionList = \Drupal::service('extension.list.module');
-
   }
 
   /**
@@ -160,7 +163,7 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
     parent::postSave($storage, $update);
     if ($update && empty($this->dont_log)) {
       $log = $this->startLog(uniqid($this->id(), TRUE), '', ULTIMATE_CRON_LOG_TYPE_ADMIN);
-      $log->log('Job modified by ' . $log->formatUser(), array(), RfcLogLevel::INFO);
+      $log->log('Job modified by ' . $log->formatUser(), [], RfcLogLevel::INFO);
       $log->finish();
     }
   }
@@ -185,7 +188,7 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
       if (empty($entity->dont_log)) {
         /** @var \Drupal\ultimate_cron\Entity\CronJob $entity */
         $log = $entity->startLog(uniqid($entity->id(), TRUE), 'modification', ULTIMATE_CRON_LOG_TYPE_ADMIN);
-        $log->log('Job deleted by ' . $log->formatUser(), array(), RfcLogLevel::INFO);
+        $log->log('Job deleted by ' . $log->formatUser(), [], RfcLogLevel::INFO);
         $log->finish();
       }
     }
@@ -295,7 +298,7 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
     }
     /* @var \Drupal\Core\Plugin\DefaultPluginManager $manager */
     $manager = \Drupal::service('plugin.manager.ultimate_cron.' . $plugin_type);
-    $this->plugins[$plugin_type] = $manager->createInstance($name, isset($this->{$plugin_type}['configuration']) ? $this->{$plugin_type}['configuration'] : array());
+    $this->plugins[$plugin_type] = $manager->createInstance($name, isset($this->{$plugin_type}['configuration']) ? $this->{$plugin_type}['configuration'] : []);
     return $this->plugins[$plugin_type];
   }
 
@@ -335,7 +338,9 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
     }
     else {
       $callback = $this->getCallback();
-      call_user_func($callback, $this);
+      if (is_callable($callback)) {
+        call_user_func($callback, $this);
+      }
     }
   }
 
@@ -383,10 +388,10 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
    * Check job schedule.
    */
   public function isScheduled() {
-    \Drupal::moduleHandler()->invokeAll('cron_pre_schedule', array($this));
+    \Drupal::moduleHandler()->invokeAll('cron_pre_schedule', [$this]);
     $result = $this->status() && !$this->isLocked() && $this->getPlugin('scheduler')
         ->isScheduled($this);
-    \Drupal::moduleHandler()->invokeAll('cron_post_schedule', array($this));
+    \Drupal::moduleHandler()->invokeAll('cron_post_schedule', [$this]);
     return $result;
   }
 
@@ -407,14 +412,14 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
     $launcher = $this->getPlugin('launcher');
     $lock_id = $launcher->lock($this);
     if (!$lock_id) {
-      \Drupal::logger('ultimate_cron')->error('Could not get lock for job @name', array(
+      \Drupal::logger('ultimate_cron')->error('Could not get lock for job @name', [
         '@name' => $this->id(),
-      ));
+      ]);
       return FALSE;
     }
-    $this->sendMessage('lock', array(
+    $this->sendMessage('lock', [
       'lock_id' => $lock_id,
-    ));
+    ]);
     return $lock_id;
   }
 
@@ -434,9 +439,9 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
     if ($lock_id) {
       $result = $this->getPlugin('launcher')->unlock($lock_id, $manual);
     }
-    $this->sendMessage('unlock', array(
+    $this->sendMessage('unlock', [
       'lock_id' => $lock_id,
-    ));
+    ]);
     return $result;
   }
 
@@ -454,11 +459,11 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
    *   Jobs to check locks for.
    */
   static public function isLockedMultiple($jobs) {
-    $launchers = array();
+    $launchers = [];
     foreach ($jobs as $job) {
       $launchers[$job->getPlugin('launcher')->name][$job->id()] = $job;
     }
-    $locked = array();
+    $locked = [];
     foreach ($launchers as $launcher => $jobs) {
       $locked += ultimate_cron_plugin_load('launcher', $launcher)->isLockedMultiple($jobs);
     }
@@ -470,7 +475,7 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
    */
   public function run($init_message = NULL) {
     if (!$init_message) {
-      $init_message = t('Launched manually');
+      $init_message = $this->t('Launched manually');
     }
 
     $lock_id = $this->lock();
@@ -484,7 +489,7 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
     try {
       $this->clearSignals();
       $this->initializeProgress();
-      \Drupal::moduleHandler()->invokeAll('cron_pre_run', array($this));
+      \Drupal::moduleHandler()->invokeAll('cron_pre_run', [$this]);
 
       // Force the current user to anonymous to ensure consistent permissions
       // on cron runs.
@@ -517,7 +522,7 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
     finally {
       self::$currentJob = NULL;
       $log_entry->finish();
-      \Drupal::moduleHandler()->invokeAll('cron_post_run', array($this));
+      \Drupal::moduleHandler()->invokeAll('cron_post_run', [$this]);
       $this->finishProgress();
 
       // Restore original user account.
@@ -561,7 +566,7 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
    * @return LogEntry
    *   The latest log entry for this job.
    */
-  public function loadLatestLogEntry($log_types = array(ULTIMATE_CRON_LOG_TYPE_NORMAL)) {
+  public function loadLatestLogEntry($log_types = [ULTIMATE_CRON_LOG_TYPE_NORMAL]) {
     return $this->getPlugin('logger')->load($this->id(), NULL, $log_types);
   }
 
@@ -574,12 +579,12 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
    * @return array
    *   Array of UltimateCronLogEntry objects.
    */
-  static public function loadLatestLogEntries($jobs, $log_types = array(ULTIMATE_CRON_LOG_TYPE_NORMAL)) {
-    $loggers = array();
+  static public function loadLatestLogEntries($jobs, $log_types = [ULTIMATE_CRON_LOG_TYPE_NORMAL]) {
+    $loggers = [];
     foreach ($jobs as $job) {
       $loggers[$job->getPlugin('logger')->name][$job->id()] = $job;
     }
-    $log_entries = array();
+    $log_entries = [];
     foreach ($loggers as $logger => $jobs) {
       $log_entries += ultimate_cron_plugin_load('logger', $logger)->loadLatestLogEntries($jobs, $log_types);
     }
@@ -597,7 +602,7 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
   }
 
   /**
-   * Resume a previosly saved log.
+   * Resume a previously saved log.
    *
    * @param string $lock_id
    *   The lock id of the log to resume.
@@ -617,7 +622,7 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
    * Get module name for this job.
    */
   public function getModuleName() {
-    static $names = array();
+    static $names = [];
     if (!isset($names[$this->module])) {
       $info = $this->moduleExtensionList->getExtensionInfo($this->module);
       $names[$this->module] = $info && !empty($info['name']) ? $info['name'] : $this->module;
@@ -629,7 +634,7 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
    * Get module description for this job.
    */
   public function getModuleDescription() {
-    static $descs = array();
+    static $descs = [];
     if (!isset($descs[$this->module])) {
       $info = $this->moduleExtensionList->getExtensionInfo($this->module);
       $descs[$this->module] = $info && !empty($info['description']) ? $info['description'] : '';
@@ -671,11 +676,11 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
    *   Progress of jobs, keyed by job name.
    */
   static public function getProgressMultiple($jobs) {
-    $launchers = array();
+    $launchers = [];
     foreach ($jobs as $job) {
       $launchers[$job->getPlugin('launcher')->name][$job->id()] = $job;
     }
-    $progresses = array();
+    $progresses = [];
     foreach ($launchers as $launcher => $jobs) {
       $progresses += ultimate_cron_plugin_load('launcher', $launcher)->getProgressMultiple($jobs);
     }
@@ -690,9 +695,9 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
    */
   public function setProgress($progress) {
     if ($this->getPlugin('launcher')->setProgress($this, $progress)) {
-      $this->sendMessage('setProgress', array(
+      $this->sendMessage('setProgress', [
         'progress' => $progress,
-      ));
+      ]);
       return TRUE;
     }
     return FALSE;
@@ -730,7 +735,7 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
    * @param array $data
    *   Data blob for the given action.
    */
-  public function sendMessage($action, $data = array()) {
+  public function sendMessage($action, $data = []) {
     // @TODO: Nodejs integration has not been ported to 8.x yet.
     if (FALSE && \Drupal::moduleHandler()->moduleExists('nodejs')) {
       $settings = ultimate_cron_plugin_load('settings', 'general')->getDefaultSettings();
@@ -738,11 +743,11 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
         return;
       }
 
-      $elements = array();
+      $elements = [];
 
       $build = clone $this;
 
-      $cell_idxs = array();
+      $cell_idxs = [];
 
       switch ($action) {
         case 'lock':
@@ -750,41 +755,41 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
           if (empty($data['log_entry'])) {
             $build->lock_id = $data['lock_id'];
             $build->log_entry = $logger->factoryLogEntry($build->name);
-            $build->log_entry->setData(array(
+            $build->log_entry->setData([
               'lid' => $data['lock_id'],
               'start_time' => microtime(TRUE),
-            ));
+            ]);
           }
           else {
             $build->log_entry = $data['log_entry'];
           }
-          $cell_idxs = array(
+          $cell_idxs = [
             'tr#' . $build->name . ' .ctools-export-ui-start-time' => 3,
             'tr#' . $build->name . ' .ctools-export-ui-duration' => 4,
             'tr#' . $build->name . ' .ctools-export-ui-status' => 5,
             'tr#' . $build->name . ' .ctools-export-ui-operations' => 7,
-          );
+          ];
           break;
 
         case 'unlock':
           $build->log_entry = $build->loadLogEntry($data['lock_id']);
           $build->lock_id = FALSE;
-          $cell_idxs = array(
+          $cell_idxs = [
             'tr#' . $build->name . ' .ctools-export-ui-start-time' => 3,
             'tr#' . $build->name . ' .ctools-export-ui-duration' => 4,
             'tr#' . $build->name . ' .ctools-export-ui-status' => 5,
             'tr#' . $build->name . ' .ctools-export-ui-operations' => 7,
-          );
+          ];
           break;
 
         case 'setProgress':
           $build->lock_id = $build->isLocked();
           $build->log_entry = $build->loadLogEntry($build->lock_id);
-          $cell_idxs = array(
+          $cell_idxs = [
             'tr#' . $build->name . ' .ctools-export-ui-start-time' => 3,
             'tr#' . $build->name . ' .ctools-export-ui-duration' => 4,
             'tr#' . $build->name . ' .ctools-export-ui-status' => 5,
-          );
+          ];
           break;
       }
       $cells = $build->rebuild_ctools_export_ui_table_row();
@@ -792,16 +797,16 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
         $elements[$selector] = $cells[$cell_idx];
       }
 
-      $message = (object) array(
+      $message = (object) [
         'channel' => 'ultimate_cron',
-        'data' => (object) array(
+        'data' => (object) [
           'action' => $action,
           'job' => $build,
           'timestamp' => microtime(TRUE),
           'elements' => $elements,
-        ),
+        ],
         'callback' => 'nodejsUltimateCron',
-      );
+      ];
       nodejs_send_content_channel_message($message);
     }
   }
@@ -854,7 +859,7 @@ class CronJob extends ConfigEntityBase implements CronJobInterface {
    * {@inheritdoc}
    */
   public function getSchedulerId() {
-    return $this->scheduler;
+    return $this->scheduler['id'];
   }
 
   /**

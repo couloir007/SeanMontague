@@ -19,7 +19,7 @@ class CronJobInstallTest extends BrowserTestBase {
    *
    * @var array
    */
-  protected static $modules = array('ultimate_cron');
+  protected static $modules = ['ultimate_cron'];
 
   /**
    * A user with permission to create and edit books and to administer blocks.
@@ -38,23 +38,21 @@ class CronJobInstallTest extends BrowserTestBase {
    */
   public function testManageJob() {
     // Create user with correct permission.
-    $this->adminUser = $this->drupalCreateUser(array('administer ultimate cron'));
+    $this->adminUser = $this->drupalCreateUser(['administer ultimate cron']);
     $this->drupalLogin($this->adminUser);
 
-    // Check default modules
-    \Drupal::service('module_installer')->install(array('field'));
+    // Check default modules.
     $this->drupalGet('admin/config/system/cron/jobs');
-    $this->assertSession()->pageTextContains('Purge deleted Field API data');
     $this->assertSession()->pageTextContains('Cleanup (caches, batch, flood, temp-files, etc.)');
     $this->assertSession()->pageTextNotContains('Delete temporary files');
 
     // Install new module.
-    \Drupal::service('module_installer')->install(array('file'));
+    \Drupal::service('module_installer')->install(['file']);
     $this->drupalGet('admin/config/system/cron/jobs');
     $this->assertSession()->pageTextContains('Delete temporary files');
 
     // Uninstall new module.
-    \Drupal::service('module_installer')->uninstall(array('file'));
+    \Drupal::service('module_installer')->uninstall(['file']);
     $this->drupalGet('admin/config/system/cron/jobs');
     $this->assertSession()->pageTextNotContains('Delete temporary files');
   }
@@ -64,16 +62,15 @@ class CronJobInstallTest extends BrowserTestBase {
    */
   public function testRequirements() {
     $element = ultimate_cron_requirements('runtime')['cron_jobs'];
-    $this->assertEquals($element['value'], t("Cron is running properly."));
-    $this->assertEquals($element['severity'], REQUIREMENT_OK);
+    $this->assertEquals('Cron is running properly.', $element['value']);
+    $this->assertEquals(REQUIREMENT_OK, $element['severity']);
 
-
-    $values = array(
+    $values = [
       'title' => 'ultimate cron fake cronjob title',
       'id' => 'ultimate_cron_fake_job',
       'module' => 'ultimate_cron_fake',
       'callback' => 'ultimate_cron_fake_cron',
-    );
+    ];
 
     $job = CronJob::create($values);
     $job->save();

@@ -30,7 +30,7 @@ interface CronJobInterface extends ConfigEntityInterface {
    * @return array
    *   Array of UltimateCronLogEntry objects.
    */
-  public static function loadLatestLogEntries($jobs, $log_types = array(ULTIMATE_CRON_LOG_TYPE_NORMAL));
+  public static function loadLatestLogEntries($jobs, $log_types = [ULTIMATE_CRON_LOG_TYPE_NORMAL]);
 
   /**
    * Get multiple job progresses.
@@ -76,26 +76,26 @@ interface CronJobInterface extends ConfigEntityInterface {
   public function getModule();
 
   /**
-   * Gets scheduler array which holds info about the scheduler settings.
+   * Gets the scheduler plugin ID.
    *
-   * @return array
-   *  Scheduler settings
+   * @return string
+   *  Scheduler ID
    */
   public function getSchedulerId();
 
   /**
-   * Gets launcher array which holds info about the launcher settings.
+   * Gets the launcher plugin ID.
    *
-   * @return array
-   *  Launcher settings
+   * @return string
+   *  Launcher ID
    */
   public function getLauncherId();
 
   /**
-   * Gets logger array which holds info about the logger settings.
+   * Gets the logger plugin ID.
    *
-   * @return array
-   *  Logger settings
+   * @return string
+   *  Logger ID
    */
   public function getLoggerId();
 
@@ -127,29 +127,26 @@ interface CronJobInterface extends ConfigEntityInterface {
   public function setModule($module);
 
   /**
-   * Sets scheduler array which holds info about the scheduler settings.
+   * Sets the scheduler plugin ID.
    *
-   * @param $scheduler_id
-   * @return array
-   *  Scheduler settings
+   * @param string $scheduler_id
+   * @return $this
    */
   public function setSchedulerId($scheduler_id);
 
   /**
-   * Sets launcher array which holds info about the launcher settings.
+   * Sets the launcher plugin ID.
    *
-   * @param $launcher_id
-   * @return array
-   *  Launcher settings
+   * @param string $launcher_id
+   * @return $this
    */
   public function setLauncherId($launcher_id);
 
   /**
-   * Sets logger array which holds info about the logger settings.
+   * Sets the logger plugin ID.
    *
-   * @param $logger_id
-   * @return array
-   *  Logger settings
+   * @param string $logger_id
+   * @return $this
    */
   public function setLoggerId($logger_id);
 
@@ -266,7 +263,7 @@ interface CronJobInterface extends ConfigEntityInterface {
    * @return LogEntry
    *   The latest log entry for this job.
    */
-  public function loadLatestLogEntry($log_types = array(ULTIMATE_CRON_LOG_TYPE_NORMAL));
+  public function loadLatestLogEntry($log_types = [ULTIMATE_CRON_LOG_TYPE_NORMAL]);
 
   /**
    * Start logging.
@@ -282,7 +279,7 @@ interface CronJobInterface extends ConfigEntityInterface {
   public function startLog($lock_id, $init_message = '', $log_type = ULTIMATE_CRON_LOG_TYPE_NORMAL);
 
   /**
-   * Resume a previosly saved log.
+   * Resume a previously saved log.
    *
    * @param string $lock_id
    *   The lock id of the log to resume.

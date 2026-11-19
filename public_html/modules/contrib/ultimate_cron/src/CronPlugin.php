@@ -16,9 +16,9 @@ use Drupal\Core\Plugin\PluginFormInterface;
  */
 class CronPlugin extends PluginBase implements PluginInspectionInterface, ConfigurableInterface, DependentPluginInterface, PluginFormInterface {
   static public $multiple = FALSE;
-  static public $instances = array();
+  static public $instances = [];
   public $weight = 0;
-  static public $globalOptions = array();
+  static public $globalOptions = [];
 
   /**
    * {@inheritdoc}
@@ -34,11 +34,11 @@ class CronPlugin extends PluginBase implements PluginInspectionInterface, Config
    * @return array
    */
   public static function getPluginTypes() {
-    return array(
+    return [
       'scheduler' => t('Scheduler'),
       'launcher' => t('Launcher'),
-      'logger' => t('Logger')
-    );
+      'logger' => t('Logger'),
+    ];
   }
 
 
@@ -63,14 +63,14 @@ class CronPlugin extends PluginBase implements PluginInspectionInterface, Config
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array();
+    return [];
   }
 
   /**
    * {@inheritdoc}
    */
   public function calculateDependencies() {
-    return array();
+    return [];
   }
 
   /**
@@ -84,7 +84,7 @@ class CronPlugin extends PluginBase implements PluginInspectionInterface, Config
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    return array();
+    return [];
   }
 
   /**

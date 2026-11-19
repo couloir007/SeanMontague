@@ -7,6 +7,9 @@ namespace Drupal\Tests\custom_field\Unit;
 use Drupal\Core\Form\FormState;
 use Drupal\custom_field\Element\MultiValue;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Unit test for the MultiValue element class.
@@ -14,6 +17,8 @@ use Drupal\Tests\UnitTestCase;
  * @group custom_field
  * @coversDefaultClass \Drupal\custom_field\Element\MultiValue
  */
+#[Group('custom_field')]
+#[CoversClass(MultiValue::class)]
 class MultiValueElementTest extends UnitTestCase {
 
   /**
@@ -30,6 +35,7 @@ class MultiValueElementTest extends UnitTestCase {
    * @covers ::valueCallback
    * @dataProvider valueCallbackDataProvider
    */
+  #[DataProvider('valueCallbackDataProvider')]
   public function testValueCallback(array $element, $input, $expected): void {
     $this->assertEquals($expected, MultiValue::valueCallback($element, $input, new FormState()));
   }

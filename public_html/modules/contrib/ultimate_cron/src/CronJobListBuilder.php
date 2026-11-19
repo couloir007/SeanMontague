@@ -2,6 +2,7 @@
 
 namespace Drupal\ultimate_cron;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\DraggableListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
@@ -23,13 +24,13 @@ class CronJobListBuilder extends DraggableListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header = array();
-    $header['label'] = array('data' => t('Title'));
-    $header['module'] = array('data' => t('Module'));
-    $header['scheduled'] = array('data' => t('Scheduled'));
-    $header['started'] = array('data' => t('Last Run'));
-    $header['duration'] = array('data' => t('Duration'));
-    $header['status'] = array('data' => t('Status'));
+    $header = [];
+    $header['label'] = ['data' => $this->t('Title')];
+    $header['module'] = ['data' => $this->t('Module')];
+    $header['scheduled'] = ['data' => $this->t('Scheduled')];
+    $header['started'] = ['data' => $this->t('Last Run')];
+    $header['duration'] = ['data' => $this->t('Duration')];
+    $header['status'] = ['data' => $this->t('Status')];
     return $header + parent::buildHeader();
   }
   /**
@@ -38,7 +39,12 @@ class CronJobListBuilder extends DraggableListBuilder {
   public function buildRow(EntityInterface $entity) {
     /* @var \Drupal\ultimate_cron\CronJobInterface $entity */
     $icon = \Drupal::service('extension.list.module')->getPath('ultimate_cron') . '/icons/hourglass.png';
-    $behind_icon = ['#prefix' => ' ', '#theme' => 'image', '#uri' => \Drupal::service('file_url_generator')->generateAbsoluteString($icon), '#title' => t('Job is behind schedule!')];
+    $behind_icon = [
+      '#prefix' => ' ',
+      '#theme' => 'image',
+      '#uri' => \Drupal::service('file_url_generator')->generateAbsoluteString($icon),
+      '#title' => $this->t('Job is behind schedule!'),
+    ];
 
     $log_entry = $entity->loadLatestLogEntry();
     $row['label'] = $entity->label();
@@ -90,32 +96,32 @@ class CronJobListBuilder extends DraggableListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOperations(EntityInterface $entity) {
-    $operations = parent::getDefaultOperations($entity);
+  public function getDefaultOperations(EntityInterface $entity, ?CacheableMetadata $cacheability = NULL) {
+    $operations = parent::getDefaultOperations($entity, $cacheability);
     if ($entity->status() && $entity->isValid()) {
       if (!$entity->isLocked()) {
         $operations += [
           'run' => [
-            'title' => t('Run'),
+            'title' => $this->t('Run'),
             'weight' => 9,
             'url' => $entity->toUrl('run'),
-          ]
+          ],
         ];
       }
       else {
         $operations += [
           'unlock' => [
-            'title' => t('Unlock'),
+            'title' => $this->t('Unlock'),
             'weight' => 9,
             'url' => $entity->toUrl('unlock'),
-          ]
+          ],
         ];
       }
     }
 
     $operations += [
       'logs' => [
-        'title' => t('Logs'),
+        'title' => $this->t('Logs'),
         'weight' => 10,
         'url' => $entity->toUrl('logs'),
       ],

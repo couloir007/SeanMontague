@@ -9,17 +9,17 @@ class CronRule {
   public $skew = 0;
 
   public $allow_shorthand = FALSE;
-  private static $ranges = array(
-    'minutes' => array(0, 59),
-    'hours' => array(0, 23),
-    'days' => array(1, 31),
-    'months' => array(1, 12),
-    'weekdays' => array(0, 6),
-  );
+  private static $ranges = [
+    'minutes' => [0, 59],
+    'hours' => [0, 23],
+    'days' => [1, 31],
+    'months' => [1, 12],
+    'weekdays' => [0, 6],
+  ];
 
   private $type = NULL;
-  static private $cache = array();
-  static private $instances = array();
+  static private $cache = [];
+  static private $instances = [];
   private $last_run;
   private $next_run;
   private $parsed;
@@ -69,7 +69,7 @@ class CronRule {
   }
 
   /**
-   * Expand interval from cronrule part.
+   * Expand interval from cron rule part.
    *
    * @param array $matches
    *   (e.g. 4-43/5+2).
@@ -83,7 +83,7 @@ class CronRule {
    *   Comma-separated list of values.
    */
   public function expandInterval($matches) {
-    $result = array();
+    $result = [];
 
     $lower = $matches[1];
     $upper = isset($matches[2]) && $matches[2] != '' ? $matches[2] : $lower;
@@ -120,7 +120,7 @@ class CronRule {
   }
 
   /**
-   * Expand range from cronrule part.
+   * Expand range from cron rule part.
    *
    * @param string $rule
    *   Cronrule part, e.g.: 1,2,3,4-43/5.
@@ -132,16 +132,16 @@ class CronRule {
    */
   public function expandRange($part, $type) {
     $this->type = $type;
-    $part = preg_replace_callback('!(\d+)(?:-(\d+))?((/(\d+))?(\+(\d+))?)?!', array(
+    $part = preg_replace_callback('!(\d+)(?:-(\d+))?((/(\d+))?(\+(\d+))?)?!', [
       $this,
-      'expandInterval'
-    ), $part);
+      'expandInterval',
+    ], $part);
     if (!preg_match('/([^0-9\,])/', $part)) {
       $part = explode(',', $part);
       rsort($part);
     }
     else {
-      $part = array();
+      $part = [];
     }
     return $part;
   }
@@ -154,7 +154,7 @@ class CronRule {
    */
   public function preProcessRule(&$parts) {
     // Allow JAN-DEC.
-    $months = array(
+    $months = [
       1 => 'jan',
       'feb',
       'mar',
@@ -166,12 +166,12 @@ class CronRule {
       'sep',
       'oct',
       'nov',
-      'dec'
-    );
+      'dec',
+    ];
     $parts[3] = strtr(strtolower($parts[3]), array_flip($months));
 
     // Allow SUN-SUN.
-    $days = array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat');
+    $days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
     $parts[4] = strtr(strtolower($parts[4]), array_flip($days));
     $parts[4] = str_replace('7', '0', $parts[4]);
 
@@ -197,7 +197,7 @@ class CronRule {
    * Generate regex rules.
    *
    * @return array
-   *   Date and time regular expression for mathing rule.
+   *   Date and time regular expression for matching rule.
    */
   public function getIntervals() {
     if (isset(self::$cache['intervals'][$this->rule][$this->skew])) {
@@ -207,14 +207,14 @@ class CronRule {
     $parts = preg_split('/\s+/', $this->rule);
     if ($this->allow_shorthand) {
       // Allow short rules by appending wildcards?
-      $parts += array('*', '*', '*', '*', '*');
+      $parts += ['*', '*', '*', '*', '*'];
       $parts = array_slice($parts, 0, 5);
     }
     if (count($parts) != 5) {
       return self::$cache['intervals'][$this->rule][$this->skew] = FALSE;
     }
     $this->preProcessRule($parts);
-    $intervals = array();
+    $intervals = [];
     $intervals['parts'] = $parts;
     $intervals['minutes'] = $this->expandRange($parts[0], 'minutes');
     if (empty($intervals['minutes'])) {
@@ -288,7 +288,7 @@ class CronRule {
 
     // Get starting points.
     $start_year = date('Y', $time);
-    // Go back max 28 years (leapyear * weekdays).
+    // Go back max 28 years (leap year * weekdays).
     $end_year = $start_year - 28;
     $start_month = date('n', $time);
     $start_day = date('j', $time);
@@ -403,7 +403,7 @@ class CronRule {
       }
       else {
         // Increase interval by doubling up.
-        // (we've already halved it, so now we quadrouple it).
+        // (we've already halved it, so now we quadruple it).
         $offset = $interval *= 4;
       }
     } while ($interval > 30);

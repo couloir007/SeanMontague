@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\custom_field\Traits;
 
+use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -27,6 +28,11 @@ trait CustomFieldTestTrait {
    *   Entity type id.
    * @param string $bundle
    *   Bundle name.
+   * @param int $cardinality
+   *   Storage cardinality. Defaults to unlimited, which is what every existing
+   *   caller relies on. Pass 1 to mirror the shipped `field_test` field, whose
+   *   cardinality is 1 — emptiness and filterEmptyItems() behavior can differ
+   *   between the two.
    *
    * @return \Drupal\field\Entity\FieldConfig
    *   The field config.
@@ -40,12 +46,13 @@ trait CustomFieldTestTrait {
     array $field_settings = [],
     string $entity_type = 'node',
     string $bundle = 'page',
+    int $cardinality = FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
   ): FieldConfig {
     $storage = FieldStorageConfig::create([
       'field_name' => $field_name,
       'entity_type' => $entity_type,
       'type' => 'custom',
-      'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
+      'cardinality' => $cardinality,
       'settings' => [
         'columns' => $columns,
       ],
@@ -161,6 +168,31 @@ trait CustomFieldTestTrait {
     /** @var \Drupal\node\NodeInterface $node */
     $node = \Drupal::entityTypeManager()->getStorage('node')->loadUnchanged($id);
     return $node;
+  }
+
+  /**
+   * Reads one field item back from storage, bypassing the static entity cache.
+   *
+   * Replaces the storedValues() helper that each type test previously rolled
+   * for itself. Returns NULL rather than failing when the item is absent,
+   * because an item whose every subfield is empty is dropped on save and
+   * "the item was dropped" is a legitimate expectation to assert.
+   *
+   * @param \Drupal\node\NodeInterface|string|int $node
+   *   The saved node, or its id.
+   * @param string $field_name
+   *   The custom field machine name.
+   * @param int $delta
+   *   The delta to read. Defaults to the first item.
+   *
+   * @return \Drupal\Core\Field\FieldItemInterface|null
+   *   The stored item, or NULL if that delta does not exist.
+   */
+  protected function storedItem(NodeInterface|string|int $node, string $field_name, int $delta = 0): ?FieldItemInterface {
+    $id = $node instanceof NodeInterface ? $node->id() : $node;
+    $this->assertNotNull($id, 'storedItem() requires a saved node.');
+
+    return $this->reloadNode($id)->get($field_name)[$delta] ?? NULL;
   }
 
 }

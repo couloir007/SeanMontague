@@ -46,19 +46,17 @@ class UltimateCron extends Cron {
 
       ->execute();
 
-    $launcher_jobs = array();
+    $launcher_jobs = [];
     foreach (CronJob::loadMultiple($job_ids) as $job) {
       /* @var \Drupal\Core\Plugin\DefaultPluginManager $manager */
       $manager = \Drupal::service('plugin.manager.ultimate_cron.' . 'launcher');
       $launcher = $manager->createInstance($job->getLauncherId());
       $launcher_definition = $launcher->getPluginDefinition();
 
-      if (!isset($launchers) || in_array($launcher->getPluginId(), $launchers)) {
-        $launcher_jobs[$launcher_definition['id']]['launcher'] = $launcher;
-        $launcher_jobs[$launcher_definition['id']]['sort'] = array($launcher_definition['weight']);
-        $launcher_jobs[$launcher_definition['id']]['jobs'][$job->id()] = $job;
-        $launcher_jobs[$launcher_definition['id']]['jobs'][$job->id()]->sort = array($job->loadLatestLogEntry()->start_time);
-      }
+      $launcher_jobs[$launcher_definition['id']]['launcher'] = $launcher;
+      $launcher_jobs[$launcher_definition['id']]['sort'] = [$launcher_definition['weight']];
+      $launcher_jobs[$launcher_definition['id']]['jobs'][$job->id()] = $job;
+      $launcher_jobs[$launcher_definition['id']]['jobs'][$job->id()]->sort = [$job->loadLatestLogEntry()->start_time];
     }
 
     foreach ($launcher_jobs as $name => $launcher_job) {

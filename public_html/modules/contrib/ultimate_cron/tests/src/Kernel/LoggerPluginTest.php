@@ -20,7 +20,7 @@ class LoggerPluginTest extends KernelTestBase {
    *
    * @var array
    */
-  protected static $modules = array('ultimate_cron', 'ultimate_cron_logger_test', 'system');
+  protected static $modules = ['ultimate_cron', 'ultimate_cron_logger_test', 'system'];
 
   /**
    * Tests that scheduler plugins are discovered correctly.
@@ -107,6 +107,7 @@ class LoggerPluginTest extends KernelTestBase {
 
     $job = CronJob::load('ultimate_cron_logger_test_cron');
     $job->setLoggerId('cache');
+    $job->setConfiguration('logger', []);
     $job->save();
 
     // Launch the job twice.

@@ -1,0 +1,2 @@
+route_callbacks:
+  - '\Drupal\trail_mapper_planner\Routing\PlannerRoutes::routes'

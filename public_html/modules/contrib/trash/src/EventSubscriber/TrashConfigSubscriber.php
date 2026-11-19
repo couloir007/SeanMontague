@@ -10,10 +10,10 @@ use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\trash\TrashManagerInterface;
 use Drupal\views\ViewsData;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -28,7 +28,8 @@ class TrashConfigSubscriber implements EventSubscriberInterface {
     protected EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository,
     protected RouteBuilderInterface $routeBuilder,
     protected DrupalKernelInterface $kernel,
-    protected LoggerChannelFactoryInterface $loggerFactory,
+    #[Autowire(service: 'logger.channel.trash')]
+    protected LoggerInterface $logger,
     #[Autowire(service: 'plugin.manager.action')]
     protected ?ActionManager $actionManager = NULL,
     protected ?ViewsData $viewsData = NULL,
@@ -77,15 +78,22 @@ class TrashConfigSubscriber implements EventSubscriberInterface {
       // type throws instead of just filtering. Surface the drift loudly
       // instead of leaving it silent.
       foreach (array_keys($enabled_entity_types ?? []) as $entity_type_id) {
+        // Skip entity types that aren't defined. A config sync saves
+        // trash.settings when Trash is installed, before modules like Node
+        // and Media. These entity types are checked when they are created.
+        // @see \Drupal\trash\EventSubscriber\TrashEntitySchemaSubscriber::onEntityTypeCreate()
+        if (!$this->entityTypeManager->hasDefinition($entity_type_id)) {
+          continue;
+        }
         if (!isset($supported_entity_types[$entity_type_id])) {
-          $this->loggerFactory->get('trash')->error("'@entity_type_id' is enabled in trash.settings but its storage does not support Trash; entity queries for this type will fail until it is removed from the 'enabled_entity_types' configuration.", [
+          $this->logger->error("'@entity_type_id' is enabled in trash.settings but its storage does not support Trash; entity queries for this type will fail until it is removed from the 'enabled_entity_types' configuration.", [
             '@entity_type_id' => $entity_type_id,
           ]);
           continue;
         }
         $field_storage_definitions = $this->entityLastInstalledSchemaRepository->getLastInstalledFieldStorageDefinitions($entity_type_id);
         if (!isset($field_storage_definitions['deleted']) || $field_storage_definitions['deleted']->getProvider() !== 'trash') {
-          $this->loggerFactory->get('trash')->error("'@entity_type_id' is enabled in trash.settings but its 'deleted' field does not belong to Trash; entity queries for this type will filter on the wrong field until this is resolved.", [
+          $this->logger->error("'@entity_type_id' is enabled in trash.settings but its 'deleted' field does not belong to Trash; entity queries for this type will filter on the wrong field until this is resolved.", [
             '@entity_type_id' => $entity_type_id,
           ]);
         }

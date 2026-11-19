@@ -17,7 +17,7 @@ class CronJobKernelTest extends KernelTestBase {
    *
    * @var array
    */
-  protected static $modules = array('system', 'ultimate_cron');
+  protected static $modules = ['system', 'ultimate_cron'];
 
   protected function setup(): void {
     parent::setUp();
@@ -32,11 +32,11 @@ class CronJobKernelTest extends KernelTestBase {
    * Tests CRUD operations for cron jobs.
    */
   public function testCRUD() {
-    $values = array(
+    $values = [
       'id' => 'example',
       'title' => $this->randomMachineName(),
       'description' => $this->randomMachineName(),
-    );
+    ];
 
     /** @var \Drupal\ultimate_cron\Entity\CronJob $cron_job */
     $cron_job = CronJob::create($values);

@@ -38,7 +38,7 @@
         "drupal/dashboard": "^2.2",
         "drupal/default_content": "^2.0@alpha",
         "drupal/devel": "^5.1",
-        "drupal/diff": "^1.9",
+        "drupal/diff": "^2.1",
         "drupal/draggableviews": "^2.1",
         "drupal/dynamic_entity_reference": "^3.2",
         "drupal/easy_breadcrumb": "^2.0",

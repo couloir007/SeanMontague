@@ -63,11 +63,11 @@ class DatabaseLogger extends LoggerBase implements PluginCleanupInterface, Conta
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array(
+    return [
       'method' => static::CLEANUP_METHOD_RETAIN,
       'expire' => 86400 * 14,
       'retain' => 1000,
-    );
+    ];
   }
 
   /**
@@ -101,10 +101,10 @@ class DatabaseLogger extends LoggerBase implements PluginCleanupInterface, Conta
     }
     if ($count_deleted) {
       \Drupal::logger('database_logger')
-        ->info('@count_entries log entries removed for @jobs_count jobs', array(
+        ->info('@count_entries log entries removed for @jobs_count jobs', [
           '@count_entries' => array_sum($count_deleted),
           '@jobs_count' => count($count_deleted),
-        ));
+        ]);
     }
   }
 
@@ -125,9 +125,9 @@ class DatabaseLogger extends LoggerBase implements PluginCleanupInterface, Conta
 
       case static::CLEANUP_METHOD_RETAIN:
         $expire = 0;
-        $max = $this->connection->query("SELECT COUNT(lid) FROM {ultimate_cron_log} WHERE name = :name", array(
+        $max = $this->connection->query("SELECT COUNT(lid) FROM {ultimate_cron_log} WHERE name = :name", [
           ':name' => $job->id(),
-        ))->fetchField();
+        ])->fetchField();
         $max -= $this->configuration['retain'];
         if ($max <= 0) {
           return;
@@ -136,9 +136,9 @@ class DatabaseLogger extends LoggerBase implements PluginCleanupInterface, Conta
         break;
 
       default:
-        \Drupal::logger('ultimate_cron')->warning('Invalid cleanup method: @method', array(
+        \Drupal::logger('ultimate_cron')->warning('Invalid cleanup method: @method', [
           '@method' => $this->configuration['method'],
-        ));
+        ]);
         return;
     }
 
@@ -146,7 +146,7 @@ class DatabaseLogger extends LoggerBase implements PluginCleanupInterface, Conta
     $count = 0;
     do {
       $lids = $this->connection->select('ultimate_cron_log', 'l')
-        ->fields('l', array('lid'))
+        ->fields('l', ['lid'])
         ->condition('l.name', $job->id())
         ->condition('l.start_time', microtime(TRUE) - $expire, '<')
         ->range(0, $chunk)
@@ -170,45 +170,45 @@ class DatabaseLogger extends LoggerBase implements PluginCleanupInterface, Conta
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form['method'] = array(
+    $form['method'] = [
       '#type' => 'select',
-      '#title' => t('Log entry cleanup method'),
-      '#description' => t('Select which method to use for cleaning up logs.'),
+      '#title' => $this->t('Log entry cleanup method'),
+      '#description' => $this->t('Select which method to use for cleaning up logs.'),
       '#options' => $this->getMethodOptions(),
       '#default_value' => $this->configuration['method'],
-    );
+    ];
 
-    $form['expire'] = array(
+    $form['expire'] = [
       '#type' => 'textfield',
-      '#title' => t('Log entry expiration'),
-      '#description' => t('Remove log entries older than X seconds.'),
+      '#title' => $this->t('Log entry expiration'),
+      '#description' => $this->t('Remove log entries older than X seconds.'),
       '#default_value' => $this->configuration['expire'],
       '#fallback' => TRUE,
-      '#states' => array(
-        'visible' => array(
-          ':input[name="logger[settings][method]"]' => array('value' => static::CLEANUP_METHOD_EXPIRE),
-        ),
-        'required' => array(
-          ':input[name="logger[settings][method]"]' => array('value' => static::CLEANUP_METHOD_EXPIRE),
-        ),
-      ),
-    );
+      '#states' => [
+        'visible' => [
+          ':input[name="logger[settings][method]"]' => ['value' => static::CLEANUP_METHOD_EXPIRE],
+        ],
+        'required' => [
+          ':input[name="logger[settings][method]"]' => ['value' => static::CLEANUP_METHOD_EXPIRE],
+        ],
+      ],
+    ];
 
-    $form['retain'] = array(
+    $form['retain'] = [
       '#type' => 'textfield',
-      '#title' => t('Retain logs'),
-      '#description' => t('Retain X amount of log entries.'),
+      '#title' => $this->t('Retain logs'),
+      '#description' => $this->t('Retain X amount of log entries.'),
       '#default_value' => $this->configuration['retain'],
       '#fallback' => TRUE,
-      '#states' => array(
-        'visible' => array(
-          ':input[name="logger[settings][method]"]' => array('value' => static::CLEANUP_METHOD_RETAIN),
-        ),
-        'required' => array(
-          ':input[name="logger[settings][method]"]' => array('value' => static::CLEANUP_METHOD_RETAIN),
-        ),
-      ),
-    );
+      '#states' => [
+        'visible' => [
+          ':input[name="logger[settings][method]"]' => ['value' => static::CLEANUP_METHOD_RETAIN],
+        ],
+        'required' => [
+          ':input[name="logger[settings][method]"]' => ['value' => static::CLEANUP_METHOD_RETAIN],
+        ],
+      ],
+    ];
 
     return $form;
   }
@@ -222,7 +222,7 @@ class DatabaseLogger extends LoggerBase implements PluginCleanupInterface, Conta
         ->fields('l')
         ->condition('l.lid', $lock_id)
         ->execute()
-        ->fetchObject(LogEntry::class, array($name, $this));
+        ->fetchObject(LogEntry::class, [$name, $this]);
     }
     else {
       $log_entry = $this->connection->select('ultimate_cron_log', 'l')
@@ -233,7 +233,7 @@ class DatabaseLogger extends LoggerBase implements PluginCleanupInterface, Conta
         ->orderBy('l.end_time', 'DESC')
         ->range(0, 1)
         ->execute()
-        ->fetchObject(LogEntry::class, array($name, $this));
+        ->fetchObject(LogEntry::class, [$name, $this]);
     }
     if ($log_entry) {
       $log_entry->finished = TRUE;
@@ -264,9 +264,9 @@ class DatabaseLogger extends LoggerBase implements PluginCleanupInterface, Conta
         LIMIT 1
       ) AS lid FROM {ultimate_cron_log} l3
       GROUP BY l3.name
-    ) l2 on l2.lid = l.lid", array(':log_types' => $log_types));
+    ) l2 on l2.lid = l.lid", [':log_types' => $log_types]);
 
-    $log_entries = array();
+    $log_entries = [];
     while ($object = $result->fetchObject()) {
       if (isset($jobs[$object->name])) {
         $log_entries[$object->name] = new LogEntry($object->name, $this);
@@ -295,11 +295,11 @@ class DatabaseLogger extends LoggerBase implements PluginCleanupInterface, Conta
       ->orderBy('l.start_time', 'DESC')
       ->execute();
 
-    $log_entries = array();
-    while ($object = $result->fetchObject(LogEntry::class, array(
+    $log_entries = [];
+    while ($object = $result->fetchObject(LogEntry::class, [
       $name,
-      $this
-    ))) {
+      $this,
+    ])) {
       $log_entries[$object->lid] = $object;
     }
 
@@ -348,10 +348,10 @@ class DatabaseLogger extends LoggerBase implements PluginCleanupInterface, Conta
         // Row was not updated, someone must have beaten us to it.
         // Let's create a new log entry.
         $lid = $log_entry->lid . '-' . uniqid('', TRUE);
-        $log_entry->message = (string) t('Lock #@original_lid was already closed and logged. Creating a new log entry #@lid', [
-            '@original_lid' => $log_entry->lid,
-            '@lid' => $lid,
-          ]) . "\n" . $log_entry->message;
+        $log_entry->message = (string) $this->t('Lock #@original_lid was already closed and logged. Creating a new log entry #@lid', [
+          '@original_lid' => $log_entry->lid,
+          '@lid' => $lid,
+        ]) . "\n" . $log_entry->message;
         $log_entry->severity = $log_entry->severity >= 0 && $log_entry->severity < RfcLogLevel::ERROR ? $log_entry->severity : RfcLogLevel::ERROR;
         $log_entry->lid = $lid;
 
@@ -390,11 +390,11 @@ class DatabaseLogger extends LoggerBase implements PluginCleanupInterface, Conta
    * @return array
    */
   protected function getMethodOptions() {
-    return array(
-      static::CLEANUP_METHOD_DISABLED => t('Disabled'),
-      static::CLEANUP_METHOD_EXPIRE => t('Remove logs older than a specified age'),
-      static::CLEANUP_METHOD_RETAIN => t('Retain only a specific amount of log entries'),
-    );
+    return [
+      static::CLEANUP_METHOD_DISABLED => $this->t('Disabled'),
+      static::CLEANUP_METHOD_EXPIRE => $this->t('Remove logs older than a specified age'),
+      static::CLEANUP_METHOD_RETAIN => $this->t('Retain only a specific amount of log entries'),
+    ];
   }
 
 }

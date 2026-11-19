@@ -18,7 +18,7 @@ class SchedulerPluginTest extends KernelTestBase {
    *
    * @var array
    */
-  protected static $modules = array('ultimate_cron');
+  protected static $modules = ['ultimate_cron'];
 
   /**
    * Tests that scheduler plugins are discovered correctly.

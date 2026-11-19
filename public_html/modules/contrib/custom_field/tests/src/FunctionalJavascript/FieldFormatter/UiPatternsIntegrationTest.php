@@ -28,6 +28,11 @@ final class UiPatternsIntegrationTest extends FormatterJavascriptTestBase {
   private const READY_CSS = 'select[name*="[component_id]"]';
 
   /**
+   * Selector for the slot's top-level source select.
+   */
+  private const SOURCE_SELECT = 'select.uip-source-selector[name*="[slots][subheading][sources][0][source_id]"], select[name*="[slots][subheading][add_more_button]"]';
+
+  /**
    * The component exposing the slot under test.
    */
   private const COMPONENT_ID = 'custom_field_sdc_test:card';
@@ -86,9 +91,9 @@ final class UiPatternsIntegrationTest extends FormatterJavascriptTestBase {
   public function testFieldFormatterSourceAndSubfieldAjax(): void {
     $this->openComponentSlotSettings();
 
-    // Select source [Field] Formatter (an empty slot uses add_more_button).
+    // Select source [Field] Formatter.
     $source = $this->waitForVisible(
-      'select[name*="' . self::SLOT . '[add_more_button]"]',
+      self::SOURCE_SELECT,
       'Slot source select did not appear.',
     );
     $this->selectOptionMatching(
@@ -109,7 +114,7 @@ final class UiPatternsIntegrationTest extends FormatterJavascriptTestBase {
 
     // Select source [Entity] → [Field] (entity_field).
     $source = $this->waitForVisible(
-      'select[name*="' . self::SLOT . '[add_more_button]"]',
+      self::SOURCE_SELECT,
       'Slot source select did not appear.',
     );
     $this->selectOptionMatching(
@@ -131,9 +136,15 @@ final class UiPatternsIntegrationTest extends FormatterJavascriptTestBase {
       'No option ending with :' . $this->fieldName . ' in Field select.',
     );
 
+    // The nested slot is empty too: use its own "Add content" button when the
+    // installed ui_patterns has one, then pick the nested source (named
+    // …[source][field:…][value][sources][0][source_id], unlike the top-level
+    // …[sources][0][source_id]).
+    $this->clickAddContentIfPresent('input.uip-slot-add[name*="_sources_0_source_"]');
+
     // Nested source: [Field] Formatter.
     $nested_source = $this->waitForVisible(
-      'select[name*="' . self::SLOT . '"][name*="[source_id]"]',
+      'select[name*="' . self::SLOT . '"][name*="[source_id]"]:not([name*="[sources][0][source_id]"]), select.uip-source-selector[name*="' . self::SLOT . '[sources][0][source]["][name$="[source_id]"]',
       'Expected nested source select after choosing field.',
     );
     $this->selectOptionMatching(
@@ -154,7 +165,27 @@ final class UiPatternsIntegrationTest extends FormatterJavascriptTestBase {
     $component = $this->openFormatterSettings(self::READY_CSS);
     $this->selectOption($component, self::COMPONENT_ID);
 
-    $this->clickElement('details[data-drupal-selector*="-slots-subheading"] > summary');
+    $slot = 'details[data-drupal-selector*="-slots-subheading"]';
+    $this->clickElement($slot . ' > summary');
+
+    $this->clickAddContentIfPresent($slot . ' .uip-slot-add');
+  }
+
+  /**
+   * Clicks an "Add content" button if the installed ui_patterns renders one.
+   *
+   * Since ui_patterns 2.0.23 an empty slot shows an "Add content" button and
+   * the source select only appears after it is used. Earlier releases render
+   * the source select directly, so there is nothing to click.
+   *
+   * @param string $css
+   *   The CSS selector of the button.
+   */
+  private function clickAddContentIfPresent(string $css): void {
+    if ($this->getSession()->getPage()->find('css', $css) !== NULL) {
+      $this->clickElement($css);
+      $this->waitForAjax();
+    }
   }
 
   /**

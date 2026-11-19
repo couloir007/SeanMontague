@@ -7,6 +7,10 @@ services:
     class: Drupal\trash\TrashManager
   Drupal\trash\TrashManagerInterface: '@trash.manager'
 
+  logger.channel.trash:
+    parent: logger.channel_base
+    arguments: ['trash']
+
   Drupal\trash\TrashEntityPurger: ~
 
   Drupal\trash\EventSubscriber\TrashConfigSubscriber:

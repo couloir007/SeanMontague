@@ -7,9 +7,7 @@ reach it.
 
 ## Rules
 
-- **Drupal code must never `require` anything from here or connect to this
-  database.** The only link between Drupal and TrailMapper is HTTPS (see
-  `docs/architecture/decisions.md`).
+- **Only trail_mapper_planner's PlannerService may require trailmapper/src; no other Drupal code touches it or the TrailMapper database.**
 - **Credentials live only in `config/settings.php`** (gitignored). Copy
   `config/settings.example.php` to create it. Never hardcode them elsewhere,
   and never print them.

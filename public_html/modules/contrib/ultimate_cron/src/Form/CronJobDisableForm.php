@@ -12,9 +12,9 @@ class CronJobDisableForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->t('Do you really want to disable @cronjob_id cron job?', array(
+    return $this->t('Do you really want to disable @cronjob_id cron job?', [
       '@cronjob_id' => $this->getEntity()->label(),
-    ));
+    ]);
   }
 
   /**
@@ -47,5 +47,5 @@ class CronJobDisableForm extends EntityConfirmFormBase {
       ->addStatus($this->t('Disabled cron job %cronjob.', ['%cronjob' => $this->entity->label()]));
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
-  
+
 }

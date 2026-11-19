@@ -86,7 +86,7 @@ class LoggerWebTest extends BrowserTestBase {
     $this->assertSession()->responseContains('/core/misc/icons/e32700/error.svg');
     $this->assertSession()->responseContains('Call to undefined function call_to_undefined_function');
 
-    // Empty the logfile, our fatal errors are expected.
+    // Empty the log file, our fatal errors are expected.
     $filename = DRUPAL_ROOT . '/' . $this->siteDirectory . '/error.log';
     file_put_contents($filename, '');
   }

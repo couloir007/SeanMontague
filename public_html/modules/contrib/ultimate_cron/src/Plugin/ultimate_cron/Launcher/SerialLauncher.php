@@ -24,61 +24,61 @@ class SerialLauncher extends LauncherBase implements PluginCleanupInterface {
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array(
-      'timeouts' => array(
+    return [
+      'timeouts' => [
         'lock_timeout' => 3600,
         'max_execution_time' => 3600,
-      ),
-      'launcher' => array(
+      ],
+      'launcher' => [
         'max_threads' => 1,
         'thread' => 'any',
-      ),
-    ) + parent::defaultConfiguration();
+      ],
+    ] + parent::defaultConfiguration();
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form['timeouts'] = array(
+    $form['timeouts'] = [
       '#type' => 'fieldset',
-      '#title' => t('Timeouts'),
-    );
+      '#title' => $this->t('Timeouts'),
+    ];
 
-    $form['launcher'] = array(
+    $form['launcher'] = [
       '#type' => 'fieldset',
-      '#title' => t('Launching options'),
-    );
+      '#title' => $this->t('Launching options'),
+    ];
 
-    $form['timeouts']['lock_timeout'] = array(
-      '#title' => t("Job lock timeout"),
+    $form['timeouts']['lock_timeout'] = [
+      '#title' => $this->t("Job lock timeout"),
       '#type' => 'textfield',
       '#default_value' => $this->configuration['timeouts']['lock_timeout'],
-      '#description' => t('Number of seconds to keep lock on job.'),
+      '#description' => $this->t('Number of seconds to keep lock on job.'),
       '#fallback' => TRUE,
       '#required' => TRUE,
-    );
+    ];
 
     // @todo: Figure this out when converting global settings to use plugin
     // classes.
     if (FALSE) {
-      $form['timeouts']['max_execution_time'] = array(
-        '#title' => t("Maximum execution time"),
+      $form['timeouts']['max_execution_time'] = [
+        '#title' => $this->t("Maximum execution time"),
         '#type' => 'textfield',
         '#default_value' => $this->configuration['timeouts']['max_execution_time'],
-        '#description' => t('Maximum execution time for a cron run in seconds.'),
+        '#description' => $this->t('Maximum execution time for a cron run in seconds.'),
         '#fallback' => TRUE,
         '#required' => TRUE,
-      );
-      $form['launcher']['max_threads'] = array(
-        '#title' => t("Maximum number of launcher threads"),
+      ];
+      $form['launcher']['max_threads'] = [
+        '#title' => $this->t("Maximum number of launcher threads"),
         '#type' => 'number',
         '#default_value' => $this->configuration['launcher']['max_threads'],
-        '#description' => t('The maximum number of launch threads that can be running at any given time.'),
+        '#description' => $this->t('The maximum number of launch threads that can be running at any given time.'),
         '#fallback' => TRUE,
         '#required' => TRUE,
         '#weight' => 1,
-      );
+      ];
 
       return $form;
     }
@@ -86,25 +86,25 @@ class SerialLauncher extends LauncherBase implements PluginCleanupInterface {
       $max_threads = isset($this->configuration['launcher']['max_threads']) ? $this->configuration['launcher']['max_threads'] : 1;
     }
 
-    $options = array(
-      'any' => t('-- Any -- '),
-      'fixed' => t('-- Fixed -- '),
-    );
+    $options = [
+      'any' => $this->t('-- Any -- '),
+      'fixed' => $this->t('-- Fixed -- '),
+    ];
     for ($i = 1; $i <= $max_threads; $i++) {
       $options[$i] = $i;
     }
 
 
-    $form['launcher']['thread'] = array(
-      '#title' => t("Run in thread"),
+    $form['launcher']['thread'] = [
+      '#title' => $this->t("Run in thread"),
       '#type' => 'select',
       '#default_value' => isset($this->configuration['launcher']['thread']) ? $this->configuration['launcher']['thread'] : 'any',
       '#options' => $options,
-      '#description' => t('Which thread to run in when invoking with ?thread=N. Note: This setting only has an effect when cron is run through cron.php with an argument ?thread=N or through Drush with --options=thread=N.'),
+      '#description' => $this->t('Which thread to run in when invoking with ?thread=N. Note: This setting only has an effect when cron is run through cron.php with an argument ?thread=N or through Drush with --options=thread=N.'),
       '#fallback' => TRUE,
       '#required' => TRUE,
       '#weight' => 2,
-    );
+    ];
     return $form;
   }
 
@@ -149,7 +149,7 @@ class SerialLauncher extends LauncherBase implements PluginCleanupInterface {
    * {@inheritdoc}
    */
   public function isLockedMultiple(array $jobs) {
-    $names = array();
+    $names = [];
     foreach ($jobs as $job) {
       $names[] = $job->id();
     }
@@ -173,20 +173,20 @@ class SerialLauncher extends LauncherBase implements PluginCleanupInterface {
    * {@inheritdoc}
    */
   public function launch(CronJobInterface $job) {
-    \Drupal::moduleHandler()->invokeAll('cron_pre_launch', array($this));
+    \Drupal::moduleHandler()->invokeAll('cron_pre_launch', [$this]);
 
     if ($this->currentThread) {
-      $init_message = t('Launched in thread @current_thread', array(
+      $init_message = $this->t('Launched in thread @current_thread', [
         '@current_thread' => $this->currentThread,
-      ));
+      ]);
     }
     else {
-      $init_message = t('Launched manually');
+      $init_message = $this->t('Launched manually');
     }
 
     // Run job.
     $job_launch = $job->run($init_message);
-    \Drupal::moduleHandler()->invokeAll('cron_post_launch', array($this));
+    \Drupal::moduleHandler()->invokeAll('cron_post_launch', [$this]);
 
     return $job_launch;
   }
@@ -209,11 +209,11 @@ class SerialLauncher extends LauncherBase implements PluginCleanupInterface {
           if (!$lock_service->isLocked($lock_name)) {
             if ($lock) {
               if ($lock_id = $lock_service->lock($lock_name, $lock_timeout)) {
-                return array($thread, $lock_id);
+                return [$thread, $lock_id];
               }
             }
             else {
-              return array($thread, FALSE);
+              return [$thread, FALSE];
             }
           }
         }
@@ -226,7 +226,7 @@ class SerialLauncher extends LauncherBase implements PluginCleanupInterface {
         $sleep = min(500000, $sleep + 25000, $delay);
       }
     } while ($delay > 0);
-    return array(FALSE, FALSE);
+    return [FALSE, FALSE];
   }
 
   /**
@@ -261,9 +261,9 @@ class SerialLauncher extends LauncherBase implements PluginCleanupInterface {
         $lock_id = $lock->lock($lock_name, $lock_timeout);
       }
       if (!$lock_id) {
-        \Drupal::logger('serial_launcher')->warning("Thread @thread is already running", array(
+        \Drupal::logger('serial_launcher')->warning("Thread @thread is already running", [
           '@thread' => $thread,
-        ));
+        ]);
       }
     }
     else {
@@ -293,9 +293,9 @@ class SerialLauncher extends LauncherBase implements PluginCleanupInterface {
     $lock_name = 'ultimate_cron_serial_launcher_' . $thread;
     foreach ($jobs as $job) {
       $configuration = $job->getConfiguration('launcher');
-      $configuration['launcher'] += array(
+      $configuration['launcher'] += [
         'thread' => 'any',
-      );
+      ];
       switch ($configuration['launcher']['thread']) {
         case 'any':
           $configuration['launcher']['thread'] = $thread;

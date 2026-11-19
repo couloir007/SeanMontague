@@ -31,33 +31,33 @@ class LauncherSettingsForm extends ConfigFormBase {
 
     $form['timeouts'] = [
       '#type' => 'fieldset',
-      '#title' => t('Timeouts'),
+      '#title' => $this->t('Timeouts'),
     ];
     $form['launcher'] = [
       '#type' => 'fieldset',
-      '#title' => t('Launching options'),
+      '#title' => $this->t('Launching options'),
     ];
     $form['timeouts']['lock_timeout'] = [
-      '#title' => t('Job lock timeout'),
+      '#title' => $this->t('Job lock timeout'),
       '#type' => 'textfield',
       '#default_value' => $values->get('launcher.lock_timeout'),
-      '#description' => t('Number of seconds to keep lock on job.'),
+      '#description' => $this->t('Number of seconds to keep lock on job.'),
       '#fallback' => TRUE,
       '#required' => TRUE,
     ];
     $form['timeouts']['max_execution_time'] = [
-      '#title' => t('Maximum execution time'),
+      '#title' => $this->t('Maximum execution time'),
       '#type' => 'textfield',
       '#default_value' => $values->get('launcher.max_execution_time'),
-      '#description' => t('Maximum execution time for a cron run in seconds.'),
+      '#description' => $this->t('Maximum execution time for a cron run in seconds.'),
       '#fallback' => TRUE,
       '#required' => TRUE,
     ];
     $form['launcher']['max_threads'] = [
-      '#title' => t('Maximum number of launcher threads'),
+      '#title' => $this->t('Maximum number of launcher threads'),
       '#type' => 'textfield',
       '#default_value' => $values->get('launcher.max_threads'),
-      '#description' => t('The maximum number of launch threads that can be running at any given time.'),
+      '#description' => $this->t('The maximum number of launch threads that can be running at any given time.'),
       '#fallback' => TRUE,
       '#required' => TRUE,
       '#weight' => 1,
@@ -66,14 +66,14 @@ class LauncherSettingsForm extends ConfigFormBase {
     $options = ['any', '-- fixed --', '1'];
 
     $form['launcher']['thread'] = [
-      '#title' => t('Run in thread'),
+      '#title' => $this->t('Run in thread'),
       '#type' => 'select',
       '#default_value' => $values->get('launcher.thread'),
       '#options' => $options,
-      '#description' => t('Which thread to run jobs in.') . '<br/>' .
-        t('<strong>Any</strong>: Just use any available thread') . '<br/>' .
-        t('<strong>Fixed</strong>: Only run in one specific thread. The maximum number of threads is spread across the jobs.') . '<br/>' .
-        t('<strong>1-?</strong>: Only run when a specific thread is invoked. This setting only has an effect when cron is run through cron.php with an argument ?thread=N or through Drush with --options=thread=N.'),
+      '#description' => $this->t('Which thread to run jobs in.') . '<br/>' .
+        $this->t('<strong>Any</strong>: Just use any available thread') . '<br/>' .
+        $this->t('<strong>Fixed</strong>: Only run in one specific thread. The maximum number of threads is spread across the jobs.') . '<br/>' .
+        $this->t('<strong>1-?</strong>: Only run when a specific thread is invoked. This setting only has an effect when cron is run through cron.php with an argument ?thread=N or through Drush with --options=thread=N.'),
       '#fallback' => TRUE,
       '#required' => TRUE,
       '#weight' => 2,

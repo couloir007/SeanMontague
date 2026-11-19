@@ -34,7 +34,7 @@ class Lock implements LockInterface {
   }
 
   /**
-   * Dont release lock on shutdown.
+   * Don't release lock on shutdown.
    *
    * @param string $lock_id
    *   The lock id to persist.
@@ -59,11 +59,11 @@ class Lock implements LockInterface {
   public function lock($job_id, $timeout = 30.0) {
     // First, ensure cleanup.
     if (!isset($this->locks)) {
-      $this->locks = array();
-      ultimate_cron_register_shutdown_function(array(
+      $this->locks = [];
+      ultimate_cron_register_shutdown_function([
         $this,
-        'shutdown'
-      ));
+        'shutdown',
+      ]);
     }
 
     $this->connection->setTarget(_ultimate_cron_get_transactional_safe_connection());
@@ -79,11 +79,11 @@ class Lock implements LockInterface {
 
       // Now we try to acquire the lock.
       $lock_id = $this->connection->insert('ultimate_cron_lock')
-        ->fields(array(
+        ->fields([
           'name' => $job_id,
           'current' => 0,
           'expire' => $expire,
-        ))
+        ])
       ->execute();
 
       $this->locks[$lock_id] = TRUE;
@@ -132,24 +132,24 @@ class Lock implements LockInterface {
   }
 
   /**
-   * Relock.
+   * Re-lock.
    *
    * @param string $lock_id
-   *   The lock id to relock.
+   *   The lock id to re-lock.
    * @param float $timeout
    *   The timeout in seconds for the lock.
    *
    * @return boolean
-   *   TRUE if relock was successful.
+   *   TRUE if re-lock was successful.
    */
   public function reLock($lock_id, $timeout = 30.0) {
     // Ensure that the timeout is at least 1 ms.
     $timeout = max($timeout, 0.001);
     $expire = microtime(TRUE) + $timeout;
     return (bool) $this->connection->update('ultimate_cron_lock')
-      ->fields(array(
+      ->fields([
         'expire' => $expire,
-      ))
+      ])
       ->condition('lid', $lock_id)
       ->condition('current', 0)
       ->execute();
@@ -170,7 +170,7 @@ class Lock implements LockInterface {
   public function isLocked($job_id, $ignore_expiration = FALSE) {
     $now = microtime(TRUE);
     $result = $this->connection->select('ultimate_cron_lock', 'l')
-      ->fields('l', array('lid', 'expire'))
+      ->fields('l', ['lid', 'expire'])
       ->condition('name', $job_id)
       ->condition('current', 0)
       ->execute()
@@ -190,7 +190,7 @@ class Lock implements LockInterface {
   public function isLockedMultiple($job_ids) {
     $now = microtime(TRUE);
     $result = $this->connection->select('ultimate_cron_lock', 'l')
-      ->fields('l', array('lid', 'name', 'expire'))
+      ->fields('l', ['lid', 'name', 'expire'])
       ->condition('name', $job_ids, 'IN')
       ->condition('current', 0)
       ->execute()
@@ -210,7 +210,6 @@ class Lock implements LockInterface {
    * Cleanup expired locks.
    */
   public function cleanup() {
-    $count = 0;
     $class = \Drupal::entityTypeManager()->getDefinition('ultimate_cron_job')->getClass();
     $now = microtime(TRUE);
 
@@ -221,28 +220,23 @@ class Lock implements LockInterface {
 
     do {
       $lids = $this->connection->select('ultimate_cron_lock', 'l')
-        ->fields('l', array('lid'))
+        ->fields('l', ['lid'])
         ->where('l.current = l.lid')
         ->range(0, 100)
         ->execute()
         ->fetchCol();
 
       if ($lids) {
-        $count += count($lids);
         $this->connection->delete('ultimate_cron_lock')
           ->condition('lid', $lids, 'IN')
           ->execute();
       }
       if ($job = $class::$currentJob) {
         if ($job->getSignal('kill')) {
-          \Drupal::logger('ultimate_cron')->warning('kill signal recieved');
+          \Drupal::logger('ultimate_cron')->warning('kill signal received');
           return;
         }
       }
     } while ($lids);
-
-    if ($count) {
-      \Drupal::logger('ultimate_cron_lock')->info('Cleaned up @count expired locks', ['@count' => $count]);
-    }
   }
 }

@@ -176,7 +176,9 @@ export class FieldWidgetBase extends WidgetSubscriberBase {
   }
 
   triggerAddMoreElement() {
-    this.form.querySelector(`[name="${this.settings.field_name}_add_more"]`)?.dispatchEvent(new Event("mousedown"));
+    // Nested forms, e.g. paragraphs, prefix the button name with the parents.
+    const name = `${this.settings.field_name}_add_more`;
+    this.form.querySelector(`[name="${name}"], [name$="_${name}"]`)?.dispatchEvent(new Event("mousedown"));
   }
 
   /**

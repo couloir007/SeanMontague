@@ -27,46 +27,46 @@ class CronJobForm extends EntityForm {
     /* @var \Drupal\ultimate_cron\Entity\CronJob $job */
     $job = $this->entity;
 
-    $form['title'] = array(
-      '#title' => t('Title'),
-      '#description' => t('This will appear in the administrative interface to easily identify it.'),
+    $form['title'] = [
+      '#title' => $this->t('Title'),
+      '#description' => $this->t('This will appear in the administrative interface to easily identify it.'),
       '#type' => 'textfield',
       '#default_value' => $job->getTitle(),
-    );
+    ];
 
-    $form['id'] = array(
+    $form['id'] = [
       '#type' => 'machine_name',
       '#default_value' => $job->id(),
-      '#machine_name' => array(
+      '#machine_name' => [
         'exists' => '\Drupal\ultimate_cron\Entity\CronJob::load',
-        'source' => array('title'),
-      ),
+        'source' => ['title'],
+      ],
       '#disabled' => !$job->isNew(),
-    );
+    ];
 
-    $form['status'] = array(
+    $form['status'] = [
       '#type' => 'checkbox',
-      '#title' => t('Enabled'),
+      '#title' => $this->t('Enabled'),
       '#default_value' => $job->status(),
-      '#description' => t('This checkbox enables the cron job. Disabled Cron jobs are not run.'),
-    );
+      '#description' => $this->t('This checkbox enables the cron job. Disabled Cron jobs are not run.'),
+    ];
 
-    $form['module_info'] = array(
+    $form['module_info'] = [
       '#type' => 'item',
       '#title' => $this->t('Module'),
       '#markup' => $job->getModule(),
-    );
+    ];
 
-    $form['callback_info'] = array(
+    $form['callback_info'] = [
       '#type' => 'item',
       '#title' => $this->t('Callback'),
       '#markup' => $job->getCallbackString(),
-    );
+    ];
 
     // Setup vertical tabs.
-    $form['settings_tabs'] = array(
+    $form['settings_tabs'] = [
       '#type' => 'vertical_tabs',
-    );
+    ];
 
     // Load settings for each plugin in its own vertical tab.
     $plugin_types = CronPlugin::getPluginTypes();
@@ -78,52 +78,52 @@ class CronJobForm extends EntityForm {
       $plugin_settings = $job->get($plugin_type);
 
       // Generate select options.
-      $options = array();
+      $options = [];
       foreach ($plugins as $value => $key) {
         if (!empty($key['default']) && $key['default'] == TRUE) {
-          $options = array($value => t('@title (Default)', array('@title' => $key['title']))) + $options;
+          $options = [$value => $this->t('@title (Default)', ['@title' => $key['title']])] + $options;
         }
         else {
           $options[$value] = $key['title'];
         }
       }
 
-      $form[$plugin_type] = array(
+      $form[$plugin_type] = [
         '#type' => 'details',
         '#title' => $plugin_label,
         '#group' => 'settings_tabs',
         '#tree' => TRUE,
-      );
+      ];
 
-      $form[$plugin_type]['id'] = array(
+      $form[$plugin_type]['id'] = [
         '#type' => 'select',
         '#title' => $plugin_label,
         '#options' => $options,
         '#plugin_type' => $plugin_type,
         '#default_value' => $plugin_settings['id'],
-        '#description' => $this->t("Select which @plugin to use for this job.", array('@plugin' => $plugin_type)),
+        '#description' => $this->t("Select which @plugin to use for this job.", ['@plugin' => $plugin_type]),
         '#group' => 'settings_tabs',
         '#executes_submit_callback' => TRUE,
-        '#ajax' => array(
-          'callback' => array($this, 'updateSelectedPluginType'),
+        '#ajax' => [
+          'callback' => [$this, 'updateSelectedPluginType'],
           'wrapper' => $plugin_type . '_settings',
-          'method' => 'replace',
-        ),
-        '#submit' => array('::submitForm', '::rebuild'),
-        '#limit_validation_errors' => array(array($plugin_type, 'id')),
-      );
+          'method' => 'replaceWith',
+        ],
+        '#submit' => ['::submitForm', '::rebuild'],
+        '#limit_validation_errors' => [[$plugin_type, 'id']],
+      ];
 
-      $form[$plugin_type]['select'] = array(
+      $form[$plugin_type]['select'] = [
         '#type' => 'submit',
         '#name' => $plugin_type . '_select',
-        '#value' => t('Select'),
-        '#submit' => array('::submitForm', '::rebuild'),
-        '#limit_validation_errors' => array(array($plugin_type, 'id')),
-        '#attributes' => array('class' => array('js-hide')),
-      );
+        '#value' => $this->t('Select'),
+        '#submit' => ['::submitForm', '::rebuild'],
+        '#limit_validation_errors' => [[$plugin_type, 'id']],
+        '#attributes' => ['class' => ['js-hide']],
+      ];
 
       $plugin = $job->getPlugin($plugin_type);
-      $temp_form = array();
+      $temp_form = [];
       $form[$plugin_type]['configuration'] = $plugin->buildConfigurationForm($temp_form, $form_state);
       $form[$plugin_type]['configuration']['#prefix'] = '<div id="' . $plugin_type . '_settings' . '">';
       $form[$plugin_type]['configuration']['#suffix'] = '</div>';
@@ -159,7 +159,7 @@ class CronJobForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     parent::save($form, $form_state);
     $this->messenger()
-      ->addStatus(t('job %label has been updated.', ['%label' => $this->entity->label()]));
+      ->addStatus($this->t('job %label has been updated.', ['%label' => $this->entity->label()]));
     $form_state->setRedirect('entity.ultimate_cron_job.collection');
 
   }

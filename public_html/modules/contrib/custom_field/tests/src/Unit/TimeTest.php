@@ -6,6 +6,8 @@ namespace Drupal\Tests\custom_field\Unit;
 
 use Drupal\custom_field\Time;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Time class.
@@ -13,6 +15,8 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass \Drupal\custom_field\Time
  * @group custom_field
  */
+#[Group('custom_field')]
+#[CoversClass(Time::class)]
 class TimeTest extends TestCase {
 
   /**

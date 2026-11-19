@@ -1,7 +1,7 @@
 .ultimate-cron-admin-status a {
+  display: block;
   width: 16px;
   height: 16px;
-  display: block;
 }
 
 .ultimate-cron-admin-status span {
@@ -13,8 +13,8 @@
 .ultimate-cron-admin-status-success,
 .ultimate-cron-admin-status-warning,
 .ultimate-cron-admin-status-running {
-  background-position: center;
   background-repeat: no-repeat;
+  background-position: center;
 }
 
 a.ultimate-cron-admin-status-info,
@@ -28,10 +28,9 @@ a.ultimate-cron-admin-status-warning:hover,
 a.ultimate-cron-admin-status-running,
 a.ultimate-cron-admin-status-running:hover {
   padding-left: 24px !important;
-  background-position: 5px center !important;
   background-repeat: no-repeat !important;
+  background-position: 5px center !important;
 }
-
 
 .ultimate-cron-admin-status-info {
   background-image: url(../icons/message-16-info.png) !important;

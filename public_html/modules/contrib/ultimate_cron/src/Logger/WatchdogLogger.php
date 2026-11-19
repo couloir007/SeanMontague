@@ -49,7 +49,7 @@ class WatchdogLogger implements PsrLoggerInterface {
   /**
    * {@inheritdoc}
    */
-  public function log($level, $message, array $context = array()): void {
+  public function log($level, $message, array $context = []): void {
 
     if ($this->logEntries) {
 
@@ -77,12 +77,10 @@ class WatchdogLogger implements PsrLoggerInterface {
     // Since we may already be inside a drupal_register_shutdown_function()
     // we cannot use that. Use PHPs register_shutdown_function() instead.
     if (!$this->shutdownRegistered) {
-      ultimate_cron_register_shutdown_function(
-        array(
-          $this,
-          'catchMessagesShutdownWrapper'
-        ), 'catch_messages'
-      );
+      ultimate_cron_register_shutdown_function([
+        $this,
+        'catchMessagesShutdownWrapper',
+      ], 'catch_messages');
       $this->shutdownRegistered = TRUE;
     }
 
