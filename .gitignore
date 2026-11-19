@@ -173,3 +173,7 @@ error_log
 
 # TrailMapper planner credentials
 /trailmapper/config/settings.php
+
+# DDEV
+/.ddev/config.local.yaml
+/.ddev/.env

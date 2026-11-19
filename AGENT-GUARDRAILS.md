@@ -12,13 +12,12 @@ the rules that are expensive to get wrong; obey them over any inferred default.
   directly is overwritten on the next build and ships broken assets.
 
 ## Build & commands
-- **`npm` runs on the HOST**, not Lando — the appserver is PHP-only, so
-  `lando npm` does not exist. Build: `npm run build` (from the theme dir).
-- Prefix **Drupal/PHP** commands with `lando`: `lando drush …`,
-  `lando composer …`, `lando php …`, `lando phpunit …`.
-- PHP/Twig-only changes need **no build** — just `lando drush cr`. Only a
+- **`npm` runs on the HOST**, not DDEV. Build: `npm run build` (from the theme dir).
+- Prefix **Drupal/PHP** commands with `ddev`: `ddev drush …`,
+  `ddev composer …`, `ddev php …`, `ddev phpunit …`.
+- PHP/Twig-only changes need **no build** — just `ddev drush cr`. Only a
   change under `source/` (CSS/JS) needs `npm run build` + committing `dist/`.
-- Config: export UI changes with `lando drush cex` and commit them with the
+- Config: export UI changes with `ddev drush cex` and commit them with the
   feature that needs them.
 
 ## Verified field accessors (the codebase gets these wrong constantly)
