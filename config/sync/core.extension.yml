@@ -185,6 +185,7 @@ module:
   token_filter: 0
   toolbar: 0
   trail_mapper: 0
+  trail_mapper_planner: 0
   trash: 0
   trip_import: 0
   twig_field_value: 0
