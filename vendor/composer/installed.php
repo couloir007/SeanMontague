@@ -3,7 +3,7 @@
         'name' => 'drupal/recommended-project',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '58fdbc94c486f5138f9205cfa4dbd5d181ccff7a',
+        'reference' => '945cbcfa3bc1ba3d9d247e4ca85b38669d9aea7b',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -296,6 +296,17 @@
             'type' => 'drupal-module',
             'install_path' => __DIR__ . '/../../public_html/modules/contrib/anchor_link',
             'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'drupal/apitools' => array(
+            'pretty_version' => 'dev-2.0.x',
+            'version' => 'dev-2.0.x',
+            'reference' => '5b1c1e46eae060a2e10243681b3377a4dd593444',
+            'type' => 'drupal-module',
+            'install_path' => __DIR__ . '/../../public_html/modules/contrib/apitools',
+            'aliases' => array(
+                0 => '2.0.x-dev',
+            ),
             'dev_requirement' => false,
         ),
         'drupal/auto_entitylabel' => array(
@@ -1018,6 +1029,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'drupal/key' => array(
+            'pretty_version' => '1.23.0',
+            'version' => '1.23.0.0',
+            'reference' => '8.x-1.23',
+            'type' => 'drupal-module',
+            'install_path' => __DIR__ . '/../../public_html/modules/contrib/key',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'drupal/language_switcher_extended' => array(
             'pretty_version' => '1.2.0',
             'version' => '1.2.0.0',
@@ -1309,7 +1329,7 @@
         'drupal/recommended-project' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '58fdbc94c486f5138f9205cfa4dbd5d181ccff7a',
+            'reference' => '945cbcfa3bc1ba3d9d247e4ca85b38669d9aea7b',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
