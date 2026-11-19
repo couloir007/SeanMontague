@@ -1,0 +1,32 @@
+#ddev-silent-no-warn
+# Local PostGIS 17 for TrailMapper. Drupal itself stays on MariaDB.
+#
+# Database name and credentials match what external_pg hard-codes
+# (ExternalPgService.php: TrailMapper / postgres / postgres). That module also
+# hard-codes host 192.168.86.112; for a local copy the host would be `postgis`
+# (port 5432). Query it with:  ddev exec -s postgis psql -U postgres TrailMapper
+services:
+  postgis:
+    container_name: ddev-${DDEV_SITENAME}-postgis
+    image: postgis/postgis:17-3.5
+    restart: "no"
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: ${DDEV_APPROOT}
+    expose:
+      - "5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: TrailMapper
+    volumes:
+      - postgis:/var/lib/postgresql/data
+      - ".:/mnt/ddev_config:ro"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d TrailMapper"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  postgis:

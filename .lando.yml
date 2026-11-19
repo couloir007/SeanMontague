@@ -1,10 +1,10 @@
 name: seanmontague
 recipe: drupal10
 config:
-  webroot: web
-  php: '8.4'
+  webroot: public_html
+  php: '8.3'
   composer_version: '2'
-  database: postgres:17
+  database: mariadb:10.11
 
 proxy:
   appserver:
@@ -22,6 +22,18 @@ services:
         DRUSH_OPTIONS_URI: "https://seanmontague.lndo.site"
 
   database:
+    type: mariadb:10.11
+    creds:
+      user: drupal
+      password: drupal
+      database: drupal
+    overrides:
+      networks:
+        default:
+          aliases:
+            - mariadb
+
+  postgis:
     type: postgres:17
     creds:
       database: drupal
@@ -31,21 +43,17 @@ services:
       extensions:
         - postgis
 
-  mariadb:
-    type: mariadb:10.11
-    creds:
-      user: drupal
-      password: drupal
-      database: drupal
-
 tooling:
   composer:
     service: appserver
   drush:
     service: appserver
   mariadb:
-    service: mariadb
+    service: database
     cmd: mariadb -udrupal -pdrupal drupal
+  psql:
+    service: postgis
+    cmd: psql -U drupal drupal
   dsql:
     service: appserver
     description: drush sql:query with --skip-ssl for the local MariaDB client

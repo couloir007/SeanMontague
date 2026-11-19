@@ -1,0 +1,16 @@
+name: seanmontague
+type: drupal11
+docroot: public_html
+# PHP matches CLAUDE.md (8.4). The AcuGIS production PHP version is not recorded
+# in this repo: confirm it in cPanel and change it here if it differs.
+php_version: "8.4"
+# apache-fpm keeps the repo's .htaccess rules working, as under Lando (via: apache).
+webserver_type: apache-fpm
+xdebug_enabled: false
+additional_hostnames: []
+additional_fqdns: []
+database:
+    type: mariadb
+    version: "10.11"
+use_dns_when_possible: true
+composer_version: "2"

@@ -24,6 +24,7 @@
         "drupal/admin_dialogs": "^1.0",
         "drupal/admin_toolbar": "^3.5",
         "drupal/anchor_link": "^3.0",
+        "drupal/apitools": "2.0.x-dev@dev",
         "drupal/autosave_form": "^1.10",
         "drupal/backup_migrate": "^5.1",
         "drupal/better_exposed_filters": "^7.1",

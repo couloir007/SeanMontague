@@ -33,16 +33,16 @@ customisation. Read `STORYBOOK.md` before touching anything in `source/`.
 
 - **CMS:** Drupal 10/11 (PHP 8.4, Composer, Drush)
 - **Hosting:** AcuGIS (cPanel, shared) — no Node build on the server, so `dist/` is committed
-- **Local dev:** Lando (`drupal10` recipe, PHP 8.4) — `lando start` to start services
+- **Local dev:** DDEV (`drupal11` type, PHP 8.4, MariaDB 10.11) — `ddev start` to start services
 - **Database:** MariaDB 10.11 (local and production). TrailMapper's PostGIS database is a separate system behind its API
 - **Theme:** Surface — Storybook-driven pattern library, Vite build
 - **Content model:** Schema.org Blueprints (`drupal/schemadotorg`)
 - **Mapping:** Leaflet + GeoJSON, custom `trail_mapper`, `seanmontague_map`, and `map_page` modules
-- **URL:** https://seanmontague.lndo.site
+- **URL:** https://seanmontague.ddev.site
 
-Always prefix PHP/Drupal commands with `lando` — never run `drush` or `composer`
-directly on the host. `npm` is the exception: it runs on the **host**
-(the Lando appserver is PHP-only), from the theme directory.
+Always prefix PHP/Drupal commands with `ddev` — never run `drush` or `composer`
+directly on the host. `npm` is the exception: it runs on the **host**,
+from the theme directory.
 
 `docs/trail-guides/` is editorial reference for field design; don't edit it as
 part of code work.
@@ -84,11 +84,11 @@ part of code work.
 ## Quick Start (local dev)
 
 ```bash
-composer install
-lando start
-lando db-import snapshot.sql.gz       # latest DB snapshot
-lando drush cim -y                    # import config
-lando drush cr                        # clear cache
+ddev start
+ddev composer install
+ddev import-db --file=snapshot.sql.gz  # latest DB snapshot
+ddev drush cim -y                    # import config
+ddev drush cr                        # clear cache
 
 # Theme development
 cd public_html/themes/custom/surface
@@ -97,8 +97,8 @@ npm run watch                   # Storybook + Vite dev server (localhost:6007)
 npm run build                   # compile source → dist/
 
 # Tests
-lando php public_html/modules/custom/trail_mapper/tests/Unit/GeoElevationCalculatorTest.php
-lando php vendor/bin/phpunit public_html/modules/custom
+ddev php public_html/modules/custom/trail_mapper/tests/Unit/GeoElevationCalculatorTest.php
+ddev php vendor/bin/phpunit public_html/modules/custom
 ```
 
 ---
@@ -141,14 +141,14 @@ on the server.
 
 ```bash
 # Drupal
-lando drush cr                    # clear cache
-lando drush cim                   # config import
-lando drush cex                   # config export
-lando drush schemadotorg:create-type node:Place
+ddev drush cr                    # clear cache
+ddev drush cim                   # config import
+ddev drush cex                   # config export
+ddev drush schemadotorg:create-type node:Place
 
 # Composer
-lando composer require drupal/module_name
-lando composer install
+ddev composer require drupal/module_name
+ddev composer install
 
 # Frontend (from theme directory)
 npm run build
@@ -209,14 +209,14 @@ navigation. There is no separate `trail_report` bundle.
 Always create in dependency order:
 
 ```bash
-lando drush schemadotorg:create-type taxonomy_term:DefinedTerm
-lando drush schemadotorg:create-type media:ImageObject
-lando drush schemadotorg:create-type media:AudioObject
-lando drush schemadotorg:create-type node:Person
-lando drush schemadotorg:create-type node:Place
-lando drush schemadotorg:create-type node:BlogPosting
-lando drush schemadotorg:create-type node:TouristTrip
-lando drush schemadotorg:create-type node:Event
+ddev drush schemadotorg:create-type taxonomy_term:DefinedTerm
+ddev drush schemadotorg:create-type media:ImageObject
+ddev drush schemadotorg:create-type media:AudioObject
+ddev drush schemadotorg:create-type node:Person
+ddev drush schemadotorg:create-type node:Place
+ddev drush schemadotorg:create-type node:BlogPosting
+ddev drush schemadotorg:create-type node:TouristTrip
+ddev drush schemadotorg:create-type node:Event
 ```
 
 ---
@@ -316,7 +316,7 @@ Set manually on each node. No Pathauto automation.
 Always export after UI changes before committing:
 
 ```bash
-lando drush cex
+ddev drush cex
 git add config/sync
 git commit -m "Export config for [feature]"
 ```
@@ -324,7 +324,7 @@ git commit -m "Export config for [feature]"
 Always import on environment setup or after pulling:
 
 ```bash
-lando drush cim && lando drush cr
+ddev drush cim && ddev drush cr
 ```
 
 ---
