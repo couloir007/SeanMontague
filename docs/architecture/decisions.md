@@ -72,11 +72,11 @@ in production.
 **Why:** the AcuGIS server has no Node build; prod serves the committed assets.
 **Rules out:** assuming CI will build; hand-editing `dist/` (it's regenerated).
 
-### npm on the host; drush/composer via Lando
-The Lando appserver is PHP-only (no node service), so `npm` runs on the host,
-while PHP tooling runs inside Lando (`lando drush`, `lando composer`,
-`lando php`, `lando phpunit`).
-**Why:** container scope — node simply isn't in the appserver.
+### Local dev uses DDEV; npm on the host
+Local dev uses DDEV (replaced Lando 2026-11-19). PHP tooling runs in the
+container (`ddev drush`, `ddev composer`, `ddev php`), while `npm` runs on the
+host from the theme directory.
+**Why:** replaced Lando 2026-11-19; reason **[GAP]** for Sean to fill.
 
 ### Sean does all git; agents never commit
 AI agents show diffs and stop; commits, branches, and pushes are Sean's.

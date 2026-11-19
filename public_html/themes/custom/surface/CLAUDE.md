@@ -328,7 +328,7 @@ choice where wanted.
 ```bash
 npm run build    # compile source → dist/
 npm run watch    # Storybook (localhost:6007) + Vite watch
-lando drush cr         # clear Drupal cache after template changes
+ddev drush cr         # clear Drupal cache after template changes
 ```
 
 `npm run build` runs Biome lint, format check, and Stylelint before `vite:build`, so a lint failure blocks the `dist/` rebuild. `npm run vite:build` builds without the checks.

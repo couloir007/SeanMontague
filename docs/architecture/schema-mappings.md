@@ -56,7 +56,7 @@ out of pattern with the rest of the site.
 **How to check if a storage already exists:**
 
 ```bash
-lando drush php-eval "
+ddev drush php-eval "
   \$storages = \Drupal::entityTypeManager()
     ->getStorage('field_storage_config')
     ->loadByProperties(['entity_type' => 'node']);
@@ -113,7 +113,7 @@ in the Blueprints mapping, but uses the Drupal default name.
 
 4. **Export config:**
    ```bash
-   lando drush cex -y
+   ddev drush cex -y
    ```
 
 5. **Commit** — config ships with the feature.
@@ -233,7 +233,7 @@ If it's not, it isn't — regardless of what fields exist on the bundle.
 ## Checking what a mapping outputs
 
 ```bash
-lando drush config:get schemadotorg.schemadotorg_mapping.node.article
+ddev drush config:get schemadotorg.schemadotorg_mapping.node.article
 ```
 
 The `schema_properties` section maps Drupal field names to Schema.org
@@ -321,7 +321,7 @@ Full traversal for `schema_geoshape` (a `data_download` media reference):
 ## Verifying fields exist on a bundle
 
 ```bash
-lando drush php-eval "
+ddev drush php-eval "
   \$fields = \Drupal::service('entity_field.manager')
     ->getFieldDefinitions('node', 'article');
   foreach (\$fields as \$name => \$def) {
@@ -442,7 +442,7 @@ have complex geo or cross-referencing requirements. Standard types like
 | Reuse existing `schema_*` shared storages | Create new storages for schema-mapped properties |
 | Add non-schema fields manually after Blueprints | Create `schema_*` fields manually via Manage fields |
 | Extend JSON-LD via `hook_schemadotorg_jsonld_schema_type_entity_alter` | Add `hook_node_view()` JSON-LD output for mapped types |
-| Export config with `lando drush cex` after every UI change | Hand-edit Blueprints mapping YAML |
+| Export config with `ddev drush cex` after every UI change | Hand-edit Blueprints mapping YAML |
 | Check existing storages before adding a field | Assume a storage doesn't exist |
 | Check `$data['@type']` in the alter hook (fires twice) | Target node alter hook output without type guard |
 | Access geo values with `.value` suffix | Use `schema_geo.lat` directly in string context |

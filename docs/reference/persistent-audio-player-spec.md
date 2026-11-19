@@ -29,8 +29,8 @@ module. TAL achieves the same result via a custom SPA shell in D7.
 ### Drupal module
 
 ```bash
-lando composer require drupal/turbo
-lando drush en turbo
+ddev composer require drupal/turbo
+ddev drush en turbo
 ```
 
 The `drupal/turbo` module wires Turbo into Drupal's AJAX system, BigPipe,
@@ -290,7 +290,7 @@ Fixture: static audio URL (public domain recording). Stories for:
 
 ## Pending
 
-- [ ] `lando composer require drupal/turbo` + enable + test with existing theme
+- [ ] `ddev composer require drupal/turbo` + enable + test with existing theme
 - [ ] Audit existing JS for Turbo compatibility (IIFE maps/elevation — should be fine)
 - [ ] `data-turbo-permanent` on player wrapper in `page.html.twig`
 - [ ] Create `surface_player` module with `/api/audio/{node}` controller
