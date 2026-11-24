@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "10588daebe15a7d9997da811ad0e3426",
+    "content-hash": "191a6b1772924755e85c027baf3f256f",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -4652,6 +4652,10 @@
             ],
             "description": "Entity browser inline entity form integration.",
             "homepage": "https://www.drupal.org/project/entity_browser",
+            "keywords": [
+                "Actively maintained",
+                "Content editing experience"
+            ],
             "support": {
                 "source": "https://git.drupalcode.org/project/entity_browser"
             },
@@ -20115,5 +20119,8 @@
         "ext-zip": "*"
     },
     "platform-dev": {},
+    "platform-overrides": {
+        "php": "8.3.37"
+    },
     "plugin-api-version": "2.11.0"
 }

@@ -135,7 +135,10 @@
             "phpstan/extension-installer": true,
             "wikimedia/composer-merge-plugin": true
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "platform": {
+            "php": "8.3.37"
+        }
     },
     "extra": {
         "drupal-scaffold": {
