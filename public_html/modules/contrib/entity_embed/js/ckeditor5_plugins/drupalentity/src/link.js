@@ -1,4 +1,4 @@
-/* eslint-disable import/no-extraneous-dependencies, import/no-unresolved */
+/* eslint-disable import/no-extraneous-dependencies */
 
 import { Plugin } from 'ckeditor5/src/core';
 import EntityEmbedLinkEditing from './linkediting';

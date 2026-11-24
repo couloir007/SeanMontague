@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Core\Recipe;
 
-use Composer\InstalledVersions;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Tests\Composer\ComposerIntegrationTrait;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -16,8 +14,6 @@ use Symfony\Component\Process\Process;
  * Contains helper methods for interacting with recipes in functional tests.
  */
 trait RecipeTestTrait {
-
-  use ComposerIntegrationTrait;
 
   /**
    * Creates a recipe in a temporary directory.
@@ -54,15 +50,15 @@ trait RecipeTestTrait {
    * @param string $path
    *   The path of the recipe to apply. Must be a directory.
    * @param int $expected_exit_code
-   *   The expected exit code of the `dr recipe` process. Defaults to 0,
+   *   The expected exit code of the `drupal recipe` process. Defaults to 0,
    *   which indicates that no error occurred.
    * @param string[] $options
-   *   (optional) Additional options to pass to the `dr recipe` command.
+   *   (optional) Additional options to pass to the `drupal recipe` command.
    * @param string $command
    *   (optional) The name of the command to run. Defaults to `recipe`.
    *
    * @return \Symfony\Component\Process\Process
-   *   The `dr recipe` command process, after having run.
+   *   The `drupal recipe` command process, after having run.
    */
   protected function applyRecipe(string $path, int $expected_exit_code = 0, array $options = [], string $command = 'recipe'): Process {
     $process = $this->runDrupalCommand([
@@ -87,7 +83,7 @@ trait RecipeTestTrait {
   }
 
   /**
-   * Runs the `core/scripts/dr` script with the given arguments.
+   * Runs the `core/scripts/drupal` script with the given arguments.
    *
    * @param array<string|int> $arguments
    *   The arguments and options to pass to the script.
@@ -101,12 +97,10 @@ trait RecipeTestTrait {
   protected function runDrupalCommand(array $arguments, int $timeout = 500): Process {
     assert($this instanceof BrowserTestBase);
 
-    // `dr` must be run from the project root.
-    ['install_path' => $project_root] = InstalledVersions::getRootPackage();
-    array_unshift($arguments, (new PhpExecutableFinder())->find(), static::binDir() . '/dr');
+    array_unshift($arguments, (new PhpExecutableFinder())->find(), 'core/scripts/drupal');
 
     $process = (new Process($arguments))
-      ->setWorkingDirectory($project_root)
+      ->setWorkingDirectory($this->getDrupalRoot())
       ->setEnv([
         'DRUPAL_DEV_SITE_PATH' => $this->siteDirectory,
         // Ensure that the command boots Drupal into a state where it knows it's

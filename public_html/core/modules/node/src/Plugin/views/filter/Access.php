@@ -3,7 +3,6 @@
 namespace Drupal\node\Plugin\views\filter;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\node\NodeGrantsHelper;
 use Drupal\views\Attribute\ViewsFilter;
 use Drupal\views\Plugin\views\filter\FilterPluginBase;
 
@@ -40,7 +39,7 @@ class Access extends FilterPluginBase {
     if (!$account->hasPermission('bypass node access') && $this->moduleHandler->hasImplementations('node_grants')) {
       $table = $this->ensureMyTable();
       $grants = $this->query->getConnection()->condition('OR');
-      foreach (\Drupal::service(NodeGrantsHelper::class)->nodeAccessGrants('view', $account) as $realm => $gids) {
+      foreach (node_access_grants('view', $account) as $realm => $gids) {
         foreach ($gids as $gid) {
           $grants->condition(($this->query->getConnection()->condition('AND'))
             ->condition($table . '.gid', $gid)

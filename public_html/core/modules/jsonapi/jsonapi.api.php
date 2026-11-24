@@ -31,7 +31,7 @@ use Drupal\jsonapi\JsonApiFilter;
  * reconciled with the specification, the module will always choose the
  * implementation most faithful to the specification.
  *
- * @see https://jsonapi.org/
+ * @see http://jsonapi.org/
  *
  * @section resources Resources
  * Every unit of data in the specification is a "resource". The specification
@@ -201,7 +201,7 @@ use Drupal\jsonapi\JsonApiFilter;
  * versions *will* remain backwards-compatible as only additions may be
  * released.
  *
- * @see https://jsonapi.org/faq/#what-is-the-meaning-of-json-apis-version
+ * @see http://jsonapi.org/faq/#what-is-the-meaning-of-json-apis-version
  *
  * Tests: subclasses of base test classes may contain BC breaks between minor
  * releases, to allow minor releases to A) comply better with the JSON:API spec,
@@ -308,10 +308,7 @@ function hook_jsonapi_ENTITY_TYPE_filter_access(EntityTypeInterface $entity_type
   return ([
     JsonApiFilter::AMONG_ALL => AccessResult::allowedIfHasPermission($account, 'administer llamas'),
     JsonApiFilter::AMONG_PUBLISHED => AccessResult::allowedIfHasPermission($account, 'view all published llamas'),
-    JsonApiFilter::AMONG_OWN => AccessResult::allowedIfHasPermissions($account, [
-      'view own published llamas',
-      'view own unpublished llamas',
-    ], 'AND'),
+    JsonApiFilter::AMONG_OWN => AccessResult::allowedIfHasPermissions($account, ['view own published llamas', 'view own unpublished llamas'], 'AND'),
   ]);
 }
 

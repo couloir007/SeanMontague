@@ -9,10 +9,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Tests the Time class.
@@ -26,9 +24,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class TimeTest extends TestCase {
 
   /**
-   * The request stack stub.
+   * The mocked request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected RequestStack&Stub $requestStack;
+  protected $requestStack;
 
   /**
    * The mocked time class.
@@ -43,7 +43,7 @@ class TimeTest extends TestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->requestStack = $this->createStub(RequestStack::class);
+    $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->getMock();
     $this->time = new Time($this->requestStack);
   }
 
@@ -57,7 +57,7 @@ class TimeTest extends TestCase {
     $request->server->set('REQUEST_TIME', $expected);
 
     // Mocks a the request stack getting the current request.
-    $this->requestStack
+    $this->requestStack->expects($this->any())
       ->method('getCurrentRequest')
       ->willReturn($request);
 
@@ -74,7 +74,7 @@ class TimeTest extends TestCase {
     $request->server->set('REQUEST_TIME_FLOAT', $expected);
 
     // Mocks a the request stack getting the current request.
-    $this->requestStack
+    $this->requestStack->expects($this->any())
       ->method('getCurrentRequest')
       ->willReturn($request);
 

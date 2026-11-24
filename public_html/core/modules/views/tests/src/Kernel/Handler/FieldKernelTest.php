@@ -795,7 +795,6 @@ class FieldKernelTest extends ViewsKernelTestBase {
       'của hãng bao gồm ba dòng',
       'сд асд асд ас',
       'асд асд асд ас',
-      'हिंदी परीक्षण स्ट्रिंग',
     ];
     // Just test maxlength without word boundary.
     $alter = [
@@ -810,7 +809,6 @@ class FieldKernelTest extends ViewsKernelTestBase {
       'của hãng b',
       'сд асд асд',
       'асд асд ас',
-      'हिंदी परीक',
     ];
 
     foreach ($text as $key => $line) {
@@ -829,7 +827,6 @@ class FieldKernelTest extends ViewsKernelTestBase {
       'của hãng',
       'сд асд',
       'асд асд',
-      'हिंदी',
     ];
 
     foreach ($text as $key => $line) {

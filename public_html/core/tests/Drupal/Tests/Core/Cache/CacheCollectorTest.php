@@ -5,14 +5,10 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Cache;
 
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheCollector;
-use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
-use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\Core\Cache\CacheCollector.
@@ -23,18 +19,24 @@ class CacheCollectorTest extends UnitTestCase {
 
   /**
    * The cache backend that should be used.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected CacheBackendInterface&MockObject $cacheBackend;
+  protected $cacheBackend;
 
   /**
    * The cache tags invalidator.
+   *
+   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected CacheTagsInvalidatorInterface&MockObject $cacheTagsInvalidator;
+  protected $cacheTagsInvalidator;
 
   /**
    * The lock backend that should be used.
+   *
+   * @var \PHPUnit\Framework\MockObject\MockObject
    */
-  protected LockBackendInterface&MockObject $lock;
+  protected $lock;
 
   /**
    * The cache id used for the test.

@@ -46,7 +46,7 @@ create the template, then the matching hook. Suggestions can be bundle
    protected method and call it from both** — do not duplicate the loop.
 5. **Reduce** the template to includes + the one `body` render.
 6. **Write** `README-node--<type>.md` (see the convention below).
-7. **Verify**: `ddev drush cr`, render the page, no PHP notices; and confirm any
+7. **Verify**: `lando drush cr`, render the page, no PHP notices; and confirm any
    code path you extracted still behaves identically for its original caller
    (a shared method must be behaviour-preserving).
 

@@ -113,13 +113,27 @@ class FloatType extends NumericTypeBase {
   public static function generateSampleValue(CustomFieldTypeInterface $field, string $target_entity_type): float {
     $field_settings = $field->getFieldSettings();
     if (!empty($field_settings['allowed_values'])) {
-      return static::getRandomOptions($field_settings['allowed_values']);
+      return (float) static::getRandomOptions($field_settings['allowed_values']);
     }
-    $precision = rand(10, 32);
-    $scale = rand(0, 2);
-    $default_min = $field->isUnsigned() ? 0 : -pow(10, ($precision - $scale)) + 1;
+
+    $size = $field->getSetting('size') ?? 'normal';
+    // Only 'big' maps to a double-precision DOUBLE column; every other size
+    // (tiny/small/medium/normal) maps to a single-precision FLOAT column,
+    // which reliably holds only ~7 significant digits. Bound the generated
+    // range/scale so it never exceeds what the actual column can store.
+    if ($size === 'big') {
+      $scale = rand(0, 4);
+      $default_min = $field->isUnsigned() ? 0 : -1000000;
+      $default_max = 1000000;
+    }
+    else {
+      $scale = rand(0, 2);
+      $default_min = $field->isUnsigned() ? 0 : -9999;
+      $default_max = 9999;
+    }
+
     $min = isset($field_settings['min']) && is_numeric($field_settings['min']) ? $field_settings['min'] : $default_min;
-    $max = isset($field_settings['max']) && is_numeric($field_settings['max']) ? $field_settings['max'] : pow(10, ($precision - $scale)) - 1;
+    $max = isset($field_settings['max']) && is_numeric($field_settings['max']) ? $field_settings['max'] : $default_max;
     $random_decimal = $min + mt_rand() / mt_getrandmax() * ($max - $min);
 
     return static::truncateDecimal((float) $random_decimal, $scale);

@@ -142,12 +142,18 @@ class PathProcessorTest extends UnitTestCase {
     // First, test the processor manager with the processors in the incorrect
     // order. The alias processor will run before the language processor,
     // meaning aliases will not be found.
-    $processor_manager = new PathProcessorManager([
-      $alias_processor,
-      $decode_processor,
-      $front_processor,
-      $language_processor,
-    ]);
+    $priorities = [
+      1000 => $alias_processor,
+      500 => $decode_processor,
+      300 => $front_processor,
+      200 => $language_processor,
+    ];
+
+    // Create the processor manager and add the processors.
+    $processor_manager = new PathProcessorManager();
+    foreach ($priorities as $priority => $processor) {
+      $processor_manager->addInbound($processor, $priority);
+    }
 
     // Test resolving the French homepage using the incorrect processor order.
     $test_path = '/fr';
@@ -161,14 +167,18 @@ class PathProcessorTest extends UnitTestCase {
     $processed = $processor_manager->processInbound($test_path, $request);
     $this->assertEquals('/foo', $processed, 'Processing in the incorrect order fails to resolve the system path from an alias');
 
-    // Now create a new processor manager with the processors in the correct
-    // order.
-    $processor_manager = new PathProcessorManager([
-      $decode_processor,
-      $language_processor,
-      $front_processor,
-      $alias_processor,
-    ]);
+    // Now create a new processor manager and add the processors, this time in
+    // the correct order.
+    $processor_manager = new PathProcessorManager();
+    $priorities = [
+      1000 => $decode_processor,
+      500 => $language_processor,
+      300 => $front_processor,
+      200 => $alias_processor,
+    ];
+    foreach ($priorities as $priority => $processor) {
+      $processor_manager->addInbound($processor, $priority);
+    }
 
     // Test resolving the French homepage using the correct processor order.
     $test_path = '/fr';

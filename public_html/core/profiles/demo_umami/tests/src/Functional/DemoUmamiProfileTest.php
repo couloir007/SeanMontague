@@ -15,7 +15,7 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\SchemaCheckTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolation;
 
 /**
  * Tests demo_umami profile.
@@ -102,7 +102,7 @@ class DemoUmamiProfileTest extends BrowserTestBase {
       }
 
       $this->assertSame([], array_map(
-        function (ConstraintViolationInterface $v) {
+        function (ConstraintViolation $v) {
           return (string) $v->getMessage();
         },
         iterator_to_array(CKEditor5::validatePair(
@@ -204,9 +204,25 @@ class DemoUmamiProfileTest extends BrowserTestBase {
   }
 
   /**
-   * Tests that the navigation warning only appears on the admin pages.
+   * Tests that the toolbar warning only appears on the admin pages.
    */
   protected function testDemonstrationWarningMessage(): void {
+    $permissions = [
+      'access content overview',
+      'access toolbar',
+      'administer nodes',
+      'edit any recipe content',
+      'create recipe content',
+      'use editorial transition create_new_draft',
+    ];
+    $this->assertDemonstrationWarningMessage($permissions);
+  }
+
+  /**
+   * Tests that the navigation warning only appears on the admin pages.
+   */
+  protected function testNavigationDemonstrationWarningMessage(): void {
+    \Drupal::service('module_installer')->install(['navigation']);
     $permissions = [
       'access content overview',
       'access navigation',
@@ -298,15 +314,15 @@ class DemoUmamiProfileTest extends BrowserTestBase {
     $web_assert->statusCodeEquals(200);
     $web_assert->pageTextContains('This site is intended for demonstration purposes.');
 
-    // Check when viewing a node, the warning is visible.
+    // Check when viewing a node, the warning is not visible.
     $this->drupalGet($recipe_node->toUrl());
     $web_assert->statusCodeEquals(200);
-    $web_assert->pageTextContains('This site is intended for demonstration purposes.');
+    $web_assert->pageTextNotContains('This site is intended for demonstration purposes.');
 
-    // Check when viewing the homepage, the warning is visible.
+    // Check when viewing the homepage, the warning is not visible.
     $this->drupalGet('<front>');
     $web_assert->statusCodeEquals(200);
-    $web_assert->pageTextContains('This site is intended for demonstration purposes.');
+    $web_assert->pageTextNotContains('This site is intended for demonstration purposes.');
   }
 
 }

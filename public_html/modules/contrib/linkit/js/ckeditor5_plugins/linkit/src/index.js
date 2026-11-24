@@ -37,13 +37,7 @@ class Linkit extends Plugin {
     editor.plugins
       .get('ContextualBalloon')
       .on('set:visibleView', (evt, propertyName, newValue, oldValue) => {
-        if (newValue !== linkFormView) {
-          return;
-        }
-
-        this._autocompleteSelection = undefined;
-
-        if (wasAutocompleteAdded) {
+        if (newValue !== linkFormView || wasAutocompleteAdded) {
           return;
         }
 
@@ -94,7 +88,7 @@ class Linkit extends Plugin {
             }
 
             event.target.value = item.path ?? '';
-            this._autocompleteSelection = selected = true;
+            selected = true;
             return false;
           },
           openHandler: (event) => {
@@ -117,7 +111,7 @@ class Linkit extends Plugin {
     const linkFormView = editor.plugins.get('LinkUI').formView;
     const linkCommand = editor.commands.get('link');
 
-    // Only autocomplete selections preserve converter attributes after a URL change.
+    // Only selections from autocomplete set converter attributes.
     const linkit = editor.plugins.get('Linkit');
     this.listenTo(linkFormView, 'submit', () => {
       // Stop the execution of the link command caused by closing the form.
@@ -129,19 +123,9 @@ class Linkit extends Plugin {
         if (typeof linkFormView.displayedTextInputView != 'undefined') {
           displayedText = linkFormView.displayedTextInputView.fieldView.element.value;
         }
-        // linkCommand.value reflects the selection's href as of right now,
-        // before this execution mutates it (this is the highest-priority
-        // 'execute' listener, so nothing has run yet) - it's a reliable
-        // "href before this edit" baseline that isn't affected by how many
-        // times the link balloon's visible view has changed (e.g. opening
-        // and closing a Bookmarks link-provider list), unlike a value
-        // snapshotted earlier from the form.
-        const hrefChanged = args[0] !== linkCommand.value;
-        // Metadata is only preserved for unchanged links and explicit
-        // autocomplete selections. Any other way the URL field's value could
-        // have changed (typing, a CKEditor 5 link provider like Bookmark,
-        // etc.) means it no longer targets the previously selected entity.
-        if (this._isValidHttpUrl(args[0]) || (hrefChanged && this._autocompleteSelection !== true)) {
+        // Clear out linkit attributes for external URLs but leave attributes
+        // to prevent issues (see #3535098).
+        if (this._isValidHttpUrl(args[0])) {
           args[1]['linkit_attributes'] = {
             'displayedText': displayedText,
           }

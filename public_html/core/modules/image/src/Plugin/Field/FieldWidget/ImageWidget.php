@@ -13,7 +13,6 @@ use Drupal\file\Element\ManagedFile;
 use Drupal\file\Entity\File;
 use Drupal\file\Plugin\Field\FieldWidget\FileWidget;
 use Drupal\image\Entity\ImageStyle;
-use Drupal\image\ImageDerivativeUtilities;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
@@ -75,7 +74,7 @@ class ImageWidget extends FileWidget {
     $element['preview_image_style'] = [
       '#title' => $this->t('Preview image style'),
       '#type' => 'select',
-      '#options' => \Drupal::service(ImageDerivativeUtilities::class)->styleOptions(FALSE),
+      '#options' => image_style_options(FALSE),
       '#empty_option' => '<' . $this->t('no preview') . '>',
       '#default_value' => $this->getSetting('preview_image_style'),
       '#description' => $this->t('The preview image will be shown while editing the content.'),
@@ -91,7 +90,7 @@ class ImageWidget extends FileWidget {
   public function settingsSummary() {
     $summary = parent::settingsSummary();
 
-    $image_styles = \Drupal::service(ImageDerivativeUtilities::class)->styleOptions(FALSE);
+    $image_styles = image_style_options(FALSE);
     // Unset possible 'No defined styles' option.
     unset($image_styles['']);
     // Styles could be lost because of enabled/disabled modules that defines

@@ -48,7 +48,20 @@ class CustomFieldEntityReference extends CustomFieldEntityReferenceBase {
       $this->entity = $entity;
       $value = $entity?->id();
     }
-    $this->value = $value['target_id'] ?? $value;
+
+    $new_value = is_array($value) ? ($value['target_id'] ?? NULL) : $value;
+
+    // Invalidate the cached entity whenever the target changes without an
+    // explicit entity object being supplied, so a stale reference can't be
+    // returned for a different target_id.
+    if ($entity instanceof EntityInterface) {
+      $this->entity = $entity;
+    }
+    elseif ($new_value !== $this->value) {
+      $this->entity = NULL;
+    }
+
+    $this->value = $new_value;
   }
 
   /**

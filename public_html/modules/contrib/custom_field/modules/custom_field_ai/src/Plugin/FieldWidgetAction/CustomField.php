@@ -114,7 +114,7 @@ class CustomField extends AutomatorBaseAction {
         ]);
         return;
       }
-      $base_field = $automator->get('base_field') ?? NULL;
+      $base_field = $automator->get('base_field');
     }
 
     // The automator must have a base field.

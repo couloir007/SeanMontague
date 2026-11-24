@@ -48,7 +48,7 @@ class MigrateBlockNoBlockContentTest extends MigrateDrupal7TestBase {
       'd7_user_role',
       'd7_block',
     ]);
-    $blockRebuild = \Drupal::service(BlockHooks::class);
+    $blockRebuild = new BlockHooks();
     $blockRebuild->rebuild();
   }
 

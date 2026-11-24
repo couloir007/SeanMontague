@@ -32,7 +32,6 @@ class TelephoneWidget extends TextWidget {
     assert($field instanceof TelephoneType);
     $field_settings = $field->getFieldSettings();
     $element['#type'] = 'tel';
-    $element['#maxlength'] = TelephoneType::MAX_LENGTH;
     if (!empty($field_settings['pattern'])) {
       $format = $field->getTelephoneFormats()[$field_settings['pattern']];
       $element['#attributes']['pattern'] = $format['pattern'];

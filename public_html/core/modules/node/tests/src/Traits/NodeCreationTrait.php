@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Traits;
 
-use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\node\Entity\Node;
 use Drupal\user\Entity\User;
 
@@ -60,7 +59,7 @@ trait NodeCreationTrait {
    *     @code
    *       $values['body'][0] = [
    *         'value' => $this->randomMachineName(32),
-   *         'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id(),
+   *         'format' => filter_default_format(),
    *       ];
    *     @endcode
    *   - title: Random string.
@@ -85,7 +84,7 @@ trait NodeCreationTrait {
     if (!array_key_exists('body', $values) && $node->hasField('body')) {
       $body = [
         'value' => $this->randomMachineName(32),
-        'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id(),
+        'format' => filter_default_format(),
       ];
       $node->set('body', $body);
     }

@@ -24,7 +24,7 @@ use Twig\TwigTest;
  *
  * @author Jérôme Tamarelle <jerome@tamarelle.net>
  */
-class AttributeExtension extends AbstractExtension
+final class AttributeExtension extends AbstractExtension
 {
     private array $filters;
     private array $functions;
@@ -33,50 +33,21 @@ class AttributeExtension extends AbstractExtension
     /**
      * Use a runtime class using PHP attributes to define filters, functions, and tests.
      *
-     * Subclasses do not need to call this constructor: they read the attributes from their own class.
-     *
-     * @param class-string|null $class The class to read the attributes from, or null when the extension is extended
+     * @param class-string $class
      */
-    public function __construct(private ?string $class = null)
+    public function __construct(private string $class)
     {
-        if (self::class === static::class && (null === $class || self::class === $class)) {
-            throw new \InvalidArgumentException(\sprintf('"%s" requires the name of a class with attributes.', self::class));
-        }
-
-        if (self::class !== static::class && null !== $class && static::class !== $class) {
-            throw new \InvalidArgumentException(\sprintf('Do not call the parent constructor when extending "%s", the attributes are read from the extension class itself.', self::class));
-        }
     }
 
     /**
      * @return class-string
      */
-    final public function getClass(): string
+    public function getClass(): string
     {
-        return $this->class ?? static::class;
+        return $this->class;
     }
 
-    final public function getTokenParsers(): array
-    {
-        return [];
-    }
-
-    final public function getNodeVisitors(): array
-    {
-        return [];
-    }
-
-    final public function getOperators(): array
-    {
-        return [[], []];
-    }
-
-    final public function getExpressionParsers(): array
-    {
-        return [];
-    }
-
-    final public function getFilters(): array
+    public function getFilters(): array
     {
         if (!isset($this->filters)) {
             $this->initFromAttributes();
@@ -85,7 +56,7 @@ class AttributeExtension extends AbstractExtension
         return $this->filters;
     }
 
-    final public function getFunctions(): array
+    public function getFunctions(): array
     {
         if (!isset($this->functions)) {
             $this->initFromAttributes();
@@ -94,7 +65,7 @@ class AttributeExtension extends AbstractExtension
         return $this->functions;
     }
 
-    final public function getTests(): array
+    public function getTests(): array
     {
         if (!isset($this->tests)) {
             $this->initFromAttributes();
@@ -103,7 +74,7 @@ class AttributeExtension extends AbstractExtension
         return $this->tests;
     }
 
-    final public function getLastModified(): int
+    public function getLastModified(): int
     {
         return max(
             filemtime(__FILE__),
@@ -111,17 +82,10 @@ class AttributeExtension extends AbstractExtension
         );
     }
 
-    /** @internal Implementing {@see GlobalsInterface} is not supported */
-    final protected function getGlobals(): array
-    {
-        return [];
-    }
-
     private function initFromAttributes(): void
     {
         $filters = $functions = $tests = [];
         $reflectionClass = new \ReflectionClass($this->getClass());
-
         foreach ($reflectionClass->getMethods() as $method) {
             foreach ($method->getAttributes(AsTwigFilter::class) as $reflectionAttribute) {
                 /** @var AsTwigFilter $attribute */

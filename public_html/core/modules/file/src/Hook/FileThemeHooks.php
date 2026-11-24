@@ -95,7 +95,7 @@ class FileThemeHooks {
 
     $url = $this->fileUrlGenerator->generate($file->getFileUri());
 
-    $mime_type = $file->getMimeType() ?? 'application/octet-stream';
+    $mime_type = $file->getMimeType();
     $options['attributes']['type'] = $mime_type;
 
     // Use the description as the link text if available.
@@ -261,7 +261,7 @@ class FileThemeHooks {
       $operations_elements = [];
       foreach (Element::children($widget) as $key) {
         if (isset($widget[$key]['#type']) && $widget[$key]['#type'] == 'submit') {
-          $widget[$key]['#printed'] = TRUE;
+          hide($widget[$key]);
           $operations_elements[] = &$widget[$key];
         }
       }
@@ -269,9 +269,9 @@ class FileThemeHooks {
       // Delay rendering of the "Display" option and the weight selector, so
       // that each can be rendered later in its own column.
       if ($element['#display_field']) {
-        $widget['display']['#printed'] = TRUE;
+        hide($widget['display']);
       }
-      $widget['_weight']['#printed'] = TRUE;
+      hide($widget['_weight']);
       $widget['_weight']['#attributes']['class'] = [$weight_class];
 
       // Render everything else together in a column, without the normal
@@ -293,10 +293,9 @@ class FileThemeHooks {
       ];
 
       // Show the buttons that had previously been marked as hidden in this
-      // preprocess function. We use ['#printed'] = FALSE to undo the earlier
-      // ['#printed'] = TRUE.
+      // preprocess function. We use show() to undo the earlier hide().
       foreach (Element::children($operations_elements) as $key) {
-        $operations_elements[$key]['#printed'] = FALSE;
+        show($operations_elements[$key]);
       }
       $row[] = [
         'data' => $operations_elements,

@@ -34,8 +34,8 @@ class AttributeBridgeDecoratorTest extends TestCase {
       'id' => 'bar',
       'class' => 'com\example\PluginNamespace\AttributeDiscoveryTest1',
     ];
-    $discovery = $this->createStub(DiscoveryInterface::class);
-    $discovery
+    $discovery = $this->createMock(DiscoveryInterface::class);
+    $discovery->expects($this->any())
       ->method('getDefinitions')
       ->willReturn($definitions);
 

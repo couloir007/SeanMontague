@@ -41,11 +41,11 @@ class UnversionedAssetTest extends BrowserTestBase {
     // Test aggregation with a custom file_assets_path.
     $this->config('system.performance')->set('css', [
       'preprocess' => TRUE,
-      'compress' => TRUE,
+      'gzip' => TRUE,
     ])->save();
     $this->config('system.performance')->set('js', [
       'preprocess' => TRUE,
-      'compress' => TRUE,
+      'gzip' => TRUE,
     ])->save();
 
     // Ensure that the library discovery cache is empty before the page is

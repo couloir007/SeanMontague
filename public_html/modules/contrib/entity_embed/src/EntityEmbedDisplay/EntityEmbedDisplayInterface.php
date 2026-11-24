@@ -35,7 +35,7 @@ use Drupal\Component\Plugin\DependentPluginInterface;
  * many Entity Embed Display plugins. It is available for all entities that can
  * be rendered (that have a view builder).
  *
- * @see \Drupal\entity_embed\Attribute\EntityEmbedDisplay
+ * @see \Drupal\entity_embed\Annotation\EntityEmbedDisplay
  * @see \Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayBase
  * @see \Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayManager
  * @see plugin_api
@@ -50,7 +50,7 @@ interface EntityEmbedDisplayInterface extends ConfigurableInterface, DependentPl
    * This method allows base implementations to add general access restrictions
    * that should apply to all extending Entity Embed display plugins.
    *
-   * @param \Drupal\Core\Session\AccountInterface|null $account
+   * @param \Drupal\Core\Session\AccountInterface $account
    *   (optional) The user for which to check access, or NULL to check access
    *   for the current user. Defaults to NULL.
    *

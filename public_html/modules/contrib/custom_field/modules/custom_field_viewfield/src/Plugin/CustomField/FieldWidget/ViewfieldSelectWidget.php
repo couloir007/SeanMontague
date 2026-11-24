@@ -195,7 +195,7 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
     $element['view_options']['arguments'] = [
       '#title' => $this->t('Arguments'),
       '#type' => 'textfield',
-      '#default_value' => $default_arguments ?? NULL,
+      '#default_value' => $default_arguments,
       '#description' => Markup::create($this->t('Separate contextual filters with a "/". Each filter may use "+" or "," for multi-value arguments.<br> @tokens', [
         '@tokens' => $token_module_installed ? $this->t('This field supports tokens.') : '',
       ])),

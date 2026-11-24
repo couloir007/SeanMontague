@@ -9,7 +9,6 @@ use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Http\Message\ResponseInterface;
 
@@ -17,7 +16,6 @@ use Psr\Http\Message\ResponseInterface;
  * Tests the History endpoints.
  */
 #[Group('history')]
-#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class HistoryTest extends BrowserTestBase {
 

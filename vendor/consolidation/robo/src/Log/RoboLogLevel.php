@@ -8,10 +8,10 @@ class RoboLogLevel extends \Psr\Log\LogLevel
      * Command did something in simulated mode.
      * Displayed at VERBOSITY_NORMAL.
      */
-    public const SIMULATED_ACTION = 'simulated';
+    const SIMULATED_ACTION = 'simulated';
 
     /**
      * Successful action; equivalent to 'NOTICE'
      */
-    public const SUCCESS = 'success';
+    const SUCCESS = 'success';
 }

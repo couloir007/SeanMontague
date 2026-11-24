@@ -120,10 +120,7 @@ class UserCreateTest extends BrowserTestBase {
 
       $this->drupalGet('admin/people');
       $this->assertSession()->pageTextContains($edit['name']);
-      $users = \Drupal::entityTypeManager()
-        ->getStorage('user')
-        ->loadByProperties(['name' => $name]);
-      $user = reset($users);
+      $user = user_load_by_name($name);
       $this->assertTrue($user->isActive(), 'User is not blocked');
     }
 

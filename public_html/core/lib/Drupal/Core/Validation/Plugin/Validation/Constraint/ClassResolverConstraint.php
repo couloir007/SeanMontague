@@ -6,7 +6,6 @@ namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**
@@ -30,6 +29,13 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 class ClassResolverConstraint extends SymfonyConstraint {
 
   /**
+   * The error message if validation fails.
+   *
+   * @var string
+   */
+  public string $message = "Calling '@method' method with value '@value' on '@classOrService' evaluated as invalid.";
+
+  /**
    * Class or service.
    *
    * @var array
@@ -42,20 +48,6 @@ class ClassResolverConstraint extends SymfonyConstraint {
    * @var string
    */
   public string $method;
-
-  #[HasNamedArguments]
-  public function __construct(
-    mixed $options = NULL,
-    ?string $classOrService = NULL,
-    ?string $method = NULL,
-    public string $message = "Calling '@method' method with value '@value' on '@classOrService' evaluated as invalid.",
-    ?array $groups = NULL,
-    mixed $payload = NULL,
-  ) {
-    parent::__construct($options, $groups, $payload);
-    $this->classOrService = $classOrService ?? $this->classOrService;
-    $this->method = $method ?? $this->method;
-  }
 
   /**
    * {@inheritdoc}

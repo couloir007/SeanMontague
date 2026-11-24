@@ -3,8 +3,6 @@
 namespace Drupal\text;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\Render\AttachmentsInterface;
-use Drupal\Core\Render\AttachmentsTrait;
 use Drupal\Core\Serialization\Attribute\JsonSchema;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
@@ -18,9 +16,7 @@ use Drupal\filter\Render\FilteredMarkup;
  * Required settings (below the definition's 'settings' key) are:
  *  - text source: The text property containing the to be processed text.
  */
-class TextProcessed extends TypedData implements CacheableDependencyInterface, AttachmentsInterface {
-
-  use AttachmentsTrait;
+class TextProcessed extends TypedData implements CacheableDependencyInterface {
 
   /**
    * Cached processed text.
@@ -114,15 +110,6 @@ class TextProcessed extends TypedData implements CacheableDependencyInterface, A
    */
   protected function getRenderer() {
     return \Drupal::service('renderer');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getAttachments() {
-    $this->getValue();
-    $this->addAttachments($this->processed->getAttachments());
-    return $this->attachments;
   }
 
 }

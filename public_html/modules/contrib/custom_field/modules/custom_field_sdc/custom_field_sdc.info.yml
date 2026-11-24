@@ -1,12 +1,12 @@
 name: Custom Field - SDC display
 type: module
 description: Integrates fields and view modes with single directory components.
-core_version_requirement: ^10.3 || ^11
+core_version_requirement: ^10.3 || >=11.0 <11.4
 package: Components
 dependencies:
   - custom_field:custom_field
 
-# Information added by Drupal.org packaging script on 2026-05-23
-version: '4.0.8'
+# Information added by Drupal.org packaging script on 2026-10-26
+version: '4.0.13'
 project: 'custom_field'
-datestamp: 1779512400
+datestamp: 1792997277

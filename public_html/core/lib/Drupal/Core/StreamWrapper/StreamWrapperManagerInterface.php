@@ -152,7 +152,7 @@ interface StreamWrapperManagerInterface {
    * @param string $scheme
    *   Stream scheme.
    *
-   * @return class-string<\Drupal\Core\StreamWrapper\StreamWrapperInterface>|false
+   * @return string|false
    *   Return string if a scheme has a registered handler, or FALSE.
    */
   public function getClass($scheme);

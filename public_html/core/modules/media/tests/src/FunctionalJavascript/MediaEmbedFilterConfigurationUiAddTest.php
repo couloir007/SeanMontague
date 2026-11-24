@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\FunctionalJavascript;
 
-use Drupal\media\Hook\MediaHooks;
-use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -15,7 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('media')]
 #[Group('#slow')]
-#[CoversMethod(MediaHooks::class, 'formatEditFormValidate')]
+#[CoversFunction('media_filter_format_edit_form_validate')]
 #[RunTestsInSeparateProcesses]
 class MediaEmbedFilterConfigurationUiAddTest extends MediaEmbedFilterTestBase {
 

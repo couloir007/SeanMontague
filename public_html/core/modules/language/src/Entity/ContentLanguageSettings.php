@@ -34,11 +34,9 @@ use Drupal\language\ContentLanguageSettingsInterface;
   ],
   constraints: [
     'ImmutableProperties' => [
-      'properties' => [
-        'id',
-        'target_entity_type_id',
-        'target_bundle',
-      ],
+      'id',
+      'target_entity_type_id',
+      'target_bundle',
     ],
   ],
   config_export: [

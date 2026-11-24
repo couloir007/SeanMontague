@@ -8,7 +8,6 @@ use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
-use Drupal\filter\FilterFormatRepositoryInterface;
 
 /**
  * Base class for 'text' configurable field types.
@@ -135,7 +134,7 @@ abstract class TextItemBase extends FieldItemBase {
 
     if (empty($settings['max_length'])) {
       // Textarea handling.
-      $value = $random->paragraphs(2);
+      $value = $random->paragraphs();
     }
     else {
       // Textfield handling.
@@ -146,7 +145,7 @@ abstract class TextItemBase extends FieldItemBase {
     $values = [
       'value' => $value,
       'summary' => $value,
-      'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getFallbackFormatId(),
+      'format' => filter_fallback_format(),
     ];
     return $values;
   }

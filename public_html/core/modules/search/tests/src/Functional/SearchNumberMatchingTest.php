@@ -22,7 +22,7 @@ class SearchNumberMatchingTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['dblog', 'node', 'search', 'search_node'];
+  protected static $modules = ['dblog', 'node', 'search'];
 
   /**
    * {@inheritdoc}

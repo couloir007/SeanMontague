@@ -4,7 +4,6 @@ namespace Drupal\field_ui;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -251,15 +250,11 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  protected function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
-    $args = func_get_args();
-    $cacheability = $args[1] ?? new CacheableMetadata();
+  public function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
     /** @var \Drupal\field\FieldConfigInterface $entity */
-    $operations = parent::getDefaultOperations($entity, $cacheability);
+    $operations = parent::getDefaultOperations($entity);
 
-    $update_access = $entity->access('update', return_as_object: TRUE);
-    $cacheability->addCacheableDependency($update_access);
-    if ($update_access->isAllowed() && $entity->hasLinkTemplate("{$entity->getTargetEntityTypeId()}-field-edit-form")) {
+    if ($entity->access('update') && $entity->hasLinkTemplate("{$entity->getTargetEntityTypeId()}-field-edit-form")) {
       $operations['edit'] = [
         'title' => $this->t('Edit'),
         'weight' => 10,
@@ -274,9 +269,7 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
         ],
       ];
     }
-    $delete_access = $entity->access('delete', return_as_object: TRUE);
-    $cacheability->addCacheableDependency($delete_access);
-    if ($delete_access->isAllowed() && $entity->hasLinkTemplate("{$entity->getTargetEntityTypeId()}-field-delete-form")) {
+    if ($entity->access('delete') && $entity->hasLinkTemplate("{$entity->getTargetEntityTypeId()}-field-delete-form")) {
       $operations['delete'] = [
         'title' => $this->t('Delete'),
         'weight' => 100,

@@ -4,14 +4,13 @@ namespace Drupal\system\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Form\WorkspaceSafeFormInterface;
 
 /**
  * Clear caches for this site.
  *
  * @internal
  */
-class ClearCacheForm extends FormBase implements WorkspaceSafeFormInterface {
+class ClearCacheForm extends FormBase {
 
   /**
    * {@inheritdoc}

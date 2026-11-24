@@ -1,11 +1,11 @@
 <?php
-
 use Symfony\Component\Finder\Finder;
+
 use Robo\Symfony\ConsoleIO;
 
 class RoboFile extends \Robo\Tasks
 {
-    public const MAIN_BRANCH = '5.x';
+    const MAIN_BRANCH = '5.x';
 
     /**
      * Run the Robo unit tests.
@@ -37,43 +37,35 @@ class RoboFile extends \Robo\Tasks
         }
 
         return $collection;
-    }
+     }
 
     /**
-     * Code style check.
+     * Code sniffer.
      *
-     * Check the code style (PSR-12) with PHP CS Fixer, using the rules and
-     * paths configured in .php-cs-fixer.dist.php.
+     * Run the PHP Codesniffer on a file or directory.
      *
-     * @aliases sniff
-     *
-     * @param array $paths
-     *    Files or directories to check. Defaults to the paths configured in
-     *    .php-cs-fixer.dist.php.
-     * @option $autofix Fix the reported violations without asking.
+     * @param string $file
+     *    A file or directory to analyze.
+     * @option $autofix Whether to run the automatic fixer or not.
+     * @option $strict Show warnings as well as errors.
+     *    Default is to show only errors.
      */
-    public function cs(
+    public function sniff(
         ConsoleIO $io,
-        array $paths,
+        $file = 'src/',
         $options = [
             'autofix' => false,
+            'strict' => false,
         ]
     ) {
-        $result = $this->collectionBuilder($io)
-            ->taskExec(PHP_BINARY)
-            ->args(__DIR__ . '/vendor/bin/php-cs-fixer', 'check', '--diff')
-            ->args($paths)
-            ->run();
+        $strict = $options['strict'] ? '' : '-n';
+        $result = $this->collectionBuilder($io)->taskExec("./vendor/bin/phpcs --standard=PSR2 {$strict} {$file}")->run();
         if (!$result->wasSuccessful()) {
             if (!$options['autofix']) {
-                $options['autofix'] = $this->confirm('Would you like to run php-cs-fixer to fix the reported violations?');
+                $options['autofix'] = $this->confirm('Would you like to run phpcbf to fix the reported errors?');
             }
             if ($options['autofix']) {
-                $result = $this->collectionBuilder($io)
-                    ->taskExec(PHP_BINARY)
-                    ->args(__DIR__ . '/vendor/bin/php-cs-fixer', 'fix')
-                    ->args($paths)
-                    ->run();
+                $result = $this->taskExec("./vendor/bin/phpcbf --standard=PSR2 {$file}")->run();
             }
         }
         return $result;
@@ -103,7 +95,8 @@ class RoboFile extends \Robo\Tasks
         $stable = !$opts['beta'];
         if ($stable) {
             $version = preg_replace('/-.*/', '', $version);
-        } else {
+        }
+        else {
             $version = $this->incrementVersion($version, 'beta');
         }
         $this->writeVersion($this->collectionBuilder($io), $version);
@@ -215,7 +208,7 @@ class RoboFile extends \Robo\Tasks
         $version = preg_replace('/-.*/', '', $version);
         $versionParts = explode('.', $version);
         if ($stable) {
-            $versionParts[count($versionParts) - 1]++;
+            $versionParts[count($versionParts)-1]++;
         }
         $version = implode('.', $versionParts);
         if (!$stable) {
@@ -325,21 +318,8 @@ class RoboFile extends \Robo\Tasks
                 }
             )->processMethodDocBlock(
                 function (\ReflectionMethod $m, $text) {
-                    // The generator lists the @param/@return tags first
-                    // ("* `param ...`") and the description after them.
-                    // Only keep the first line of the description.
-                    foreach (explode("\n", (string) $text) as $line) {
-                        $line = trim($line);
-                        if ($line !== '' && strpos($line, '* `') !== 0) {
-                            return $line;
-                        }
-                    }
-                    return '';
-                }
-            )->processMethod(
-                function (\ReflectionMethod $m, $text) {
-                    // Put the summary on the same line as the signature.
-                    return rtrim(preg_replace('~\n\n~', ' ', $text, 1));
+
+                    return $text ? ' ' . trim(strtok($text, "\n"), "\n") : '';
                 }
             );
         }

@@ -41,9 +41,9 @@ abstract class EntityBase implements EntityInterface {
   protected $enforceIsNew;
 
   /**
-   * A weak reference to the typed data object wrapping this entity.
+   * A typed data object wrapping this entity.
    *
-   * @var \WeakReference
+   * @var \Drupal\Core\TypedData\ComplexDataInterface
    */
   protected $typedData;
 
@@ -214,7 +214,6 @@ abstract class EntityBase implements EntityInterface {
       if (isset($bundles[$bundle]['uri_callback'])) {
         $uri_callback = $bundles[$bundle]['uri_callback'];
       }
-      // @phpstan-ignore method.deprecated
       elseif ($entity_uri_callback = $this->getEntityType()->getUriCallback()) {
         $uri_callback = $entity_uri_callback;
       }
@@ -626,19 +625,12 @@ abstract class EntityBase implements EntityInterface {
   /**
    * {@inheritdoc}
    */
-  #[\NoDiscard]
   public function getTypedData() {
-    if ($this->typedData instanceof \WeakReference) {
-      $return = $this->typedData->get();
-      if ($return !== NULL) {
-        return $return;
-      }
+    if (!isset($this->typedData)) {
+      $class = $this->getTypedDataClass();
+      $this->typedData = $class::createFromEntity($this);
     }
-
-    $class = $this->getTypedDataClass();
-    $return = $class::createFromEntity($this);
-    $this->typedData = \WeakReference::create($return);
-    return $return;
+    return $this->typedData;
   }
 
   /**

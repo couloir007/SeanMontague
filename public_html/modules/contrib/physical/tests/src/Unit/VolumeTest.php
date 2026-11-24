@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\physical\Unit;
 
-use PHPUnit\Framework\Attributes\Group;
 use Drupal\Tests\UnitTestCase;
 use Drupal\physical\Volume;
 
@@ -12,7 +11,6 @@ use Drupal\physical\Volume;
  * @coversDefaultClass \Drupal\physical\Volume
  * @group physical
  */
-#[Group('physical')]
 class VolumeTest extends UnitTestCase {
 
   /**

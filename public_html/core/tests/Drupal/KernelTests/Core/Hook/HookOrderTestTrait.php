@@ -6,6 +6,8 @@ namespace Drupal\KernelTests\Core\Hook;
 
 /**
  * Provides methods to support testing hooks.
+ *
+ * @group Hook
  */
 trait HookOrderTestTrait {
 

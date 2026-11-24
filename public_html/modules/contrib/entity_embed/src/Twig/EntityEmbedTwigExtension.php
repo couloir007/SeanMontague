@@ -60,7 +60,7 @@ class EntityEmbedTwigExtension extends AbstractExtension {
   /**
    * {@inheritdoc}
    */
-  public function getFunctions(): array {
+  public function getFunctions() {
     return [
       new TwigFunction('entity_embed', [$this, 'getRenderArray']),
     ];

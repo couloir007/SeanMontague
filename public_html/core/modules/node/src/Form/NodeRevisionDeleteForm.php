@@ -7,7 +7,6 @@ use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -17,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @internal
  */
-class NodeRevisionDeleteForm extends ConfirmFormBase implements WorkspaceSafeFormInterface {
+class NodeRevisionDeleteForm extends ConfirmFormBase {
 
   /**
    * The node revision.

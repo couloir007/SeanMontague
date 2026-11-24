@@ -386,9 +386,7 @@ class PageCacheTest extends BrowserTestBase {
       $this->drupalGet($content_url);
       $this->assertSession()->statusCodeEquals($code);
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
-      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', '4xx-response config:user.role.anonymous http_response rendered');
-      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', 'languages:language_interface theme url.query_args:_wrapper_format user.permissions user.roles:authenticated');
-      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Max-Age', '-1 (Permanent)');
+      $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', '4xx-response');
       $this->drupalGet($content_url);
       $this->assertSession()->statusCodeEquals($code);
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
@@ -445,9 +443,6 @@ class PageCacheTest extends BrowserTestBase {
       $this->drupalGet($content_url);
       $this->assertSession()->statusCodeEquals($code);
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
-      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', '4xx-response config:user.role.anonymous http_response rendered');
-      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', 'languages:language_interface theme url.query_args:_wrapper_format user.permissions user.roles:authenticated');
-      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Max-Age', '-1 (Permanent)');
     }
     // Restore 403 and 404 caching.
     $settings['settings']['cache_ttl_4xx'] = (object) [

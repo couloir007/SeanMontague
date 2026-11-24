@@ -50,16 +50,12 @@ abstract class FixturesBase {
   /**
    * Gets an IO fixture.
    *
-   * @param bool $reset
-   *   Whether to reset the io fixture. This is useful for tests that need to
-   *   write to the io fixture multiple times.
-   *
    * @return \Composer\IO\IOInterface
    *   A Composer IOInterface to write to; output may be retrieved via
    *   Fixtures::getOutput().
    */
-  public function io(bool $reset = FALSE): IOInterface {
-    if ($reset || !isset($this->io)) {
+  public function io(): IOInterface {
+    if (!isset($this->io)) {
       $this->io = new BufferIO();
     }
     return $this->io;

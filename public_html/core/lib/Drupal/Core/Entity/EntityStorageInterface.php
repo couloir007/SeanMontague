@@ -206,7 +206,7 @@ interface EntityStorageInterface {
    *   (optional) A specific entity type bundle identifier. Can be omitted in
    *   the case of entity types without bundles, like User.
    *
-   * @return class-string<\Drupal\Core\Entity\EntityInterface>
+   * @return string
    *   The entity class name.
    */
   public function getEntityClass(?string $bundle = NULL): string;

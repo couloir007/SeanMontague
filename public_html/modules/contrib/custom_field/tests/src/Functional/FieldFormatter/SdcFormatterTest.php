@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\custom_field\Functional\FieldFormatter;
 
-use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Theme\ComponentPluginManager;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -38,16 +37,7 @@ final class SdcFormatterTest extends FormatterTestBase {
   protected ComponentPluginManager $componentPluginManager;
 
   /**
-   * The view display to use for testing.
-   *
-   * @var string
-   */
-  protected string $viewDisplay = 'node.custom_field_entity_test.default';
-
-  /**
-   * The display type to use for testing.
-   *
-   * @var string
+   * {@inheritdoc}
    */
   protected string $displayType = 'custom_field_sdc';
 
@@ -83,14 +73,7 @@ final class SdcFormatterTest extends FormatterTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->componentPluginManager = $this->container->get('plugin.manager.sdc');
-    $display = EntityViewDisplay::load($this->viewDisplay);
-    $display->setComponent($this->fieldName, [
-      'type' => $this->displayType,
-      'label' => 'above',
-      'settings' => $this->defaultComponentSettings,
-      'weight' => 1,
-      'region' => 'content',
-    ])->save();
+    $this->configureFormatter($this->defaultComponentSettings);
     $this->drupalLogin($this->adminUser);
   }
 
@@ -347,14 +330,10 @@ final class SdcFormatterTest extends FormatterTestBase {
       $this->componentPluginManager->find($componentId),
       sprintf('Component %s must exist before testing.', $componentId),
     );
-    $display = EntityViewDisplay::load($this->viewDisplay);
-    $component = $display->getComponent($this->fieldName);
-    $component['settings'] = array_merge(
-      $component['settings'],
+    $this->configureFormatter(array_merge(
       ['component' => $componentId],
       $settings,
-    );
-    $display->setComponent($this->fieldName, $component)->save();
+    ));
     $node = $this->drupalCreateNode([
       'type' => 'custom_field_entity_test',
       ...$fieldValues,

@@ -1,13 +1,10 @@
 <?php
-
 /**
  * This is a PHP library that handles calling reCAPTCHA.
  *
  * BSD 3-Clause License
- *
  * @copyright (c) 2019, Google Inc.
- *
- * @see https://www.google.com/recaptcha
+ * @link https://www.google.com/recaptcha
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,7 +43,6 @@ interface RequestMethod
      * Submit the request with the specified parameters.
      *
      * @param RequestParameters $params Request parameters
-     *
      * @return string Body of the reCAPTCHA response
      */
     public function submit(RequestParameters $params);

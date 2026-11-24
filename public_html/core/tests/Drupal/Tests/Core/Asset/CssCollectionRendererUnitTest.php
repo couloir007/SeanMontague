@@ -44,7 +44,7 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
       ->willReturnCallback(function ($uri) {
          return 'generated-relative-url:' . $uri;
       });
-    $assetQueryString->get()->willReturn('');
+    $assetQueryString->get()->shouldBeCalledOnce()->willReturn('');
     $this->renderer = new CssCollectionRenderer($assetQueryString->reveal(), $file_url_generator);
     $this->fileCssGroup = [
       'group' => -100,

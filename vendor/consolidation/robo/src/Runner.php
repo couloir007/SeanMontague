@@ -20,8 +20,8 @@ class Runner implements ContainerAwareInterface
     use IO;
     use ContainerAwareTrait;
 
-    public const ROBOCLASS = 'RoboFile';
-    public const ROBOFILE = 'RoboFile.php';
+    const ROBOCLASS = 'RoboFile';
+    const ROBOFILE = 'RoboFile.php';
 
     /**
      * @var string

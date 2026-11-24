@@ -57,7 +57,8 @@ final class Exporter implements LoggerAwareInterface {
     $field_definitions = $entity->getFieldDefinitions();
     // Ignore serial (integer) entity IDs by default, along with a number of
     // other keys that aren't useful for default content.
-    if ($entity->getEntityType()->hasIntegerId()) {
+    $id_key = $entity->getEntityType()->getKey('id');
+    if ($id_key && $field_definitions[$id_key]->getType() === 'integer') {
       $event->setEntityKeyExportable('id', FALSE);
     }
     $event->setEntityKeyExportable('uuid', FALSE);
@@ -304,11 +305,12 @@ final class Exporter implements LoggerAwareInterface {
       // Mark the referenced entity as a dependency of the one we're exporting.
       $metadata->addDependency($entity);
 
+      $entity_type = $entity->getEntityType();
       // If the referenced entity ID is numeric, refer to it by UUID, which is
       // portable. If the ID isn't numeric, assume it's meant to be consistent
       // (like a config entity ID) and leave the reference as-is. Workspaces
       // are an example of an entity type that should be treated this way.
-      if ($entity->getEntityType()->hasIntegerId()) {
+      if ($entity_type->hasKey('id') && $entity->getFieldDefinition($entity_type->getKey('id'))->getType() === 'integer') {
         $values['entity'] = $entity->uuid();
         unset($values['target_id']);
       }

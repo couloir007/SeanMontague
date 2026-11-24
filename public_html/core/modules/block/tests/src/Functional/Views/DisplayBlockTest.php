@@ -294,6 +294,7 @@ class DisplayBlockTest extends ViewTestBase {
     $this->assertSession()->elementNotExists('xpath', "{$block_xpath}/h2");
 
     $this->assertCacheTags(array_merge($block->getCacheTags(), [
+      'block_view',
       'config:block_list',
       'config:system.site',
       'config:views.view.test_view_block',
@@ -333,6 +334,7 @@ class DisplayBlockTest extends ViewTestBase {
     // Ensure that the view cacheability metadata is propagated even, for an
     // empty block.
     $this->assertCacheTags(array_merge($block->getCacheTags(), [
+      'block_view',
       'config:block_list',
       'config:views.view.test_view_block',
       'http_response',
@@ -356,6 +358,7 @@ class DisplayBlockTest extends ViewTestBase {
     $this->drupalGet($url);
     $this->assertSession()->elementsCount('xpath', $block_xpath, 1);
     $this->assertCacheTags(array_merge($block->getCacheTags(), [
+      'block_view',
       'config:block_list',
       'config:views.view.test_view_block',
       'http_response',
@@ -379,6 +382,7 @@ class DisplayBlockTest extends ViewTestBase {
     $this->drupalGet($url);
     $this->assertSession()->elementNotExists('xpath', $block_xpath);
     $this->assertCacheTags(array_merge($block->getCacheTags(), [
+      'block_view',
       'config:block_list',
       'config:views.view.test_view_block',
       'http_response',
@@ -401,6 +405,7 @@ class DisplayBlockTest extends ViewTestBase {
     $this->drupalGet($url);
     $this->assertSession()->elementsCount('xpath', $block_xpath, 1);
     $this->assertCacheTags(array_merge($block->getCacheTags(), [
+      'block_view',
       'config:block_list',
       'config:views.view.test_view_block',
       'http_response',

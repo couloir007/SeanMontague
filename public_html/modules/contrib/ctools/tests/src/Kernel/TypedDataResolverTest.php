@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\ctools\Kernel;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
@@ -17,8 +15,6 @@ use Drupal\user\Entity\User;
  *
  * @group CTools
  */
-#[Group('CTools')]
-#[RunTestsInSeparateProcesses]
 class TypedDataResolverTest extends KernelTestBase {
 
   /**

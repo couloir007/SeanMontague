@@ -200,7 +200,7 @@ class ConfigEntityType extends EntityType implements ConfigEntityTypeInterface {
     $id_key = $this->getKey('id');
     if ($id_key) {
       $constraints += [
-        'ImmutableProperties' => ['properties' => [$id_key]],
+        'ImmutableProperties' => [$id_key],
       ];
     }
     return $constraints;

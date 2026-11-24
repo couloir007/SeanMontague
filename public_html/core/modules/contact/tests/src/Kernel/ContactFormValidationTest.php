@@ -8,7 +8,6 @@ use Drupal\contact\ContactFormInterface;
 use Drupal\contact\Entity\ContactForm;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -17,7 +16,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('contact')]
 #[Group('config')]
 #[Group('Validation')]
-#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class ContactFormValidationTest extends ConfigEntityValidationTestBase {
 

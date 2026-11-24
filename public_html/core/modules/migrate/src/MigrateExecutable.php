@@ -288,11 +288,8 @@ class MigrateExecutable implements MigrateExecutableInterface {
   public function rollback() {
     // Only begin the rollback operation if the migration is currently idle.
     if ($this->migration->getStatus() !== MigrationInterface::STATUS_IDLE) {
-      $this->message->display($this->t('Migration @id is busy with another operation: @status', [
-        '@id' => $this->migration->id(),
-        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
-        '@status' => $this->t($this->migration->getStatusLabel()),
-      ]), 'error');
+      // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
+      $this->message->display($this->t('Migration @id is busy with another operation: @status', ['@id' => $this->migration->id(), '@status' => $this->t($this->migration->getStatusLabel())]), 'error');
       return MigrationInterface::RESULT_FAILED;
     }
 

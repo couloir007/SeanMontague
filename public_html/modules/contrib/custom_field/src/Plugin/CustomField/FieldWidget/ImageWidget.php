@@ -103,7 +103,7 @@ class ImageWidget extends FileWidget {
     }
 
     $field_settings['uri_scheme'] = $uri_scheme;
-    $is_config_form = $form_state->getBuildInfo()['base_form_id'] == 'field_config_form';
+    $is_config_form = ($form_state->getBuildInfo()['base_form_id'] ?? NULL) === 'field_config_form';
 
     // Add image validation.
     $element['#upload_validators']['FileIsImage'] = [];

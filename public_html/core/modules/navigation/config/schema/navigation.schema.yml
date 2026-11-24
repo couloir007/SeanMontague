@@ -47,11 +47,9 @@ navigation.settings:
                 NotNull: [ ]
                 PositiveOrZero: ~
           constraints:
-            ValidKeys:
-              allowedKeys: '<infer>'
+            ValidKeys: '<infer>'
       constraints:
-        ValidKeys:
-          allowedKeys: '<infer>'
+        ValidKeys: '<infer>'
 
 navigation.block_layout:
   type: config_object

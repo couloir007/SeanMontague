@@ -22,7 +22,7 @@ class WorkspaceContentModerationIntegrationTest extends ModerationStateTestBase 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'workspaces', 'workspaces_ui'];
+  protected static $modules = ['node', 'workspaces'];
 
   /**
    * {@inheritdoc}

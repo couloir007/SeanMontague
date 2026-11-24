@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\package_manager\Unit;
 
 use Drupal\package_manager\Event\EventWithPackageListTrait;
-use Drupal\package_manager\SandboxManagerBase;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -35,7 +34,7 @@ class EventWithPackageListTraitTest extends UnitTestCase {
    */
   #[DataProvider('providerGetPackages')]
   public function testGetPackages(array $runtime_packages, array $dev_packages, array $expected_runtime_packages, array $expected_dev_packages): void {
-    $stage = $this->createStub(SandboxManagerBase::class);
+    $stage = $this->createMock('\Drupal\package_manager\SandboxManagerBase');
 
     $events = [
       '\Drupal\package_manager\Event\PostRequireEvent',

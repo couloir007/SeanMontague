@@ -2,18 +2,16 @@
 
 namespace Drupal\Tests\entity_embed\Functional;
 
-use Drupal\embed\Entity\EmbedButton;
 use Drupal\entity_browser\Entity\EntityBrowser;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Drupal\embed\Entity\EmbedButton;
 
 /**
  * Tests the entity_embed entity_browser integration.
  *
+ * @group entity_embed
+ *
  * @dependencies entity_browser
  */
-#[Group('entity_embed')]
-#[RunTestsInSeparateProcesses]
 class EntityEmbedEntityBrowserTest extends EntityEmbedDialogTest {
 
   /**

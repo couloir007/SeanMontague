@@ -107,7 +107,6 @@ class ImageThemeHooks {
       'image_formatter' => [
         'variables' => [
           'item' => NULL,
-          'attributes' => NULL,
           'item_attributes' => NULL,
           'url' => NULL,
           'image_style' => NULL,
@@ -146,7 +145,7 @@ class ImageThemeHooks {
    * @param array $variables
    *   An associative array containing:
    *   - item: An ImageItem object.
-   *   - attributes: An optional associative array of html attributes to be
+   *   - item_attributes: An optional associative array of html attributes to be
    *     placed in the img tag.
    *   - image_style: An optional image style.
    *   - url: An optional \Drupal\Core\Url object.
@@ -163,10 +162,7 @@ class ImageThemeHooks {
         '#theme' => 'image',
       ];
     }
-    $variables['image']['#attributes'] = $variables['attributes'] ?? $variables['item_attributes'];
-    if (isset($variables['item_attributes'])) {
-      @trigger_error('Usage of #item_attributes is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use #attributes instead. See https://www.drupal.org/node/3554585', E_USER_DEPRECATED);
-    }
+    $variables['image']['#attributes'] = $variables['item_attributes'];
 
     $item = $variables['item'];
 

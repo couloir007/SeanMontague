@@ -159,8 +159,6 @@ class MatcherDumper implements MatcherDumperInterface {
         }
         $insert->execute();
       }
-
-      $transaction->commitOrRelease();
     }
     catch (\Exception $e) {
       if (isset($transaction)) {

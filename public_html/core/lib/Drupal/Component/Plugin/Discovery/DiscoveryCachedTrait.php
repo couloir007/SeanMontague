@@ -10,9 +10,9 @@ trait DiscoveryCachedTrait {
   use DiscoveryTrait;
 
   /**
-   * Cached definitions array, or NULL when not initialized.
+   * Cached definitions array.
    *
-   * @var array|null
+   * @var array
    */
   protected $definitions;
 

@@ -1,9 +1,9 @@
-/* eslint-disable import/no-extraneous-dependencies, import/no-unresolved */
 import { Plugin } from 'ckeditor5/src/core';
 import { Widget, toWidget } from 'ckeditor5/src/widget';
 import InsertEntityEmbedCommand from './command';
 
 export default class EntityEmbedEditing extends Plugin {
+
   /**
    * @inheritdoc
    */
@@ -30,13 +30,11 @@ export default class EntityEmbedEditing extends Plugin {
     };
     const options = this.editor.config.get('entityEmbed');
     if (!options) {
-      throw new Error(
-        'Error on initializing entityEmbed plugin: entityEmbed config is required.',
-      );
+      throw new Error('Error on initializing entityEmbed plugin: entityEmbed config is required.');
     }
     this.options = options;
     this.labelError = Drupal.t('Preview failed');
-    this.previewError = `
+    this.previewError =`
       <p>${Drupal.t(
         'An error occurred while trying to preview the embedded content. Please save your work and reload this page.',
       )}<p>
@@ -59,7 +57,10 @@ export default class EntityEmbedEditing extends Plugin {
     const schema = this.editor.model.schema;
 
     schema.register('drupalEntity', {
-      inheritAllFrom: '$blockObject',
+      isObject: true,
+      isContent: true,
+      isBlock: true,
+      allowWhere: '$block',
       allowAttributes: Object.keys(this.attrs),
     });
     this.editor.editing.view.domConverter.blockElements.push('drupal-entity');
@@ -71,7 +72,7 @@ export default class EntityEmbedEditing extends Plugin {
    * @private
    */
   _defineConverters() {
-    const { conversion } = this.editor;
+    const {conversion} = this.editor;
     const elementMapping = {
       model: 'drupalEntity',
       view: {
@@ -79,9 +80,13 @@ export default class EntityEmbedEditing extends Plugin {
       },
     };
 
-    conversion.for('upcast').elementToElement(elementMapping);
+    conversion
+      .for('upcast')
+      .elementToElement(elementMapping);
 
-    conversion.for('dataDowncast').elementToElement(elementMapping);
+    conversion
+      .for('dataDowncast')
+      .elementToElement(elementMapping);
 
     // Convert the <drupalEntity> model into an editable <drupal-entity> widget.
     conversion
@@ -92,9 +97,7 @@ export default class EntityEmbedEditing extends Plugin {
           // Align classes should be applied to the wrapper element so the
           // alignment is relative to the other editor contents, and not
           // within the container.
-          const alignClass = modelElement.hasAttribute('dataAlign')
-            ? ` align-${modelElement.getAttribute('dataAlign')}`
-            : '';
+          const alignClass = modelElement.hasAttribute('dataAlign') ? ` align-${modelElement.getAttribute('dataAlign')}` : '';
           const container = writer.createContainerElement('figure', {
             class: `drupal-entity${alignClass}`,
           });
@@ -102,7 +105,7 @@ export default class EntityEmbedEditing extends Plugin {
 
           return toWidget(container, writer, {
             label: Drupal.t('Entity Embed widget'),
-          });
+          })
         },
       })
       .add((dispatcher) => {
@@ -115,10 +118,7 @@ export default class EntityEmbedEditing extends Plugin {
           // Use existing container if it exists, create on if it does not.
           if (drupalEntity) {
             // Stop processing if a preview is already loading.
-            if (
-              drupalEntity.getAttribute('data-drupal-entity-preview') !==
-              'ready'
-            ) {
+            if (drupalEntity.getAttribute('data-drupal-entity-preview') !== 'ready') {
               return;
             }
             // Preview is ready meaning that a new preview can be loaded.
@@ -130,14 +130,12 @@ export default class EntityEmbedEditing extends Plugin {
               'loading',
               drupalEntity,
             );
-          } else {
+          }
+          else {
             drupalEntity = viewWriter.createRawElement('div', {
               'data-drupal-entity-preview': 'loading',
             });
-            viewWriter.insert(
-              viewWriter.createPositionAt(container, 0),
-              drupalEntity,
-            );
+            viewWriter.insert(viewWriter.createPositionAt(container, 0), drupalEntity);
           }
 
           this._loadPreview(modelElement).then(({ label, preview }) => {
@@ -151,7 +149,7 @@ export default class EntityEmbedEditing extends Plugin {
             this.editor.editing.view.change((writer) => {
               const drupalEntityPreview = writer.createRawElement(
                 'div',
-                { 'data-drupal-entity-preview': 'ready', 'aria-label': label },
+                {'data-drupal-entity-preview': 'ready', 'aria-label': label},
                 (domElement) => {
                   domElement.innerHTML = preview;
                 },
@@ -159,19 +157,13 @@ export default class EntityEmbedEditing extends Plugin {
               // Insert the new preview before the previous preview element to
               // ensure that the location remains same even if it is wrapped
               // with another element.
-              writer.insert(
-                writer.createPositionBefore(drupalEntity),
-                drupalEntityPreview,
-              );
+              writer.insert(writer.createPositionBefore(drupalEntity), drupalEntityPreview);
               writer.remove(drupalEntity);
             });
           });
-        };
+        }
 
-        dispatcher.on(
-          'attribute:drupalEntityEntityUuid:drupalEntity',
-          converter,
-        );
+        dispatcher.on('attribute:drupalEntityEntityUuid:drupalEntity', converter);
 
         return dispatcher;
       });
@@ -213,12 +205,11 @@ export default class EntityEmbedEditing extends Plugin {
     };
 
     const response = await fetch(
-      Drupal.url(
-        `embed/preview/${this.options.format}?${new URLSearchParams(query)}`,
-      ),
+      Drupal.url('embed/preview/' + this.options.format + '?' + new URLSearchParams(query)),
       {
         headers: {
-          'X-Drupal-EmbedPreview-CSRF-Token': this.options.previewCsrfToken,
+          'X-Drupal-EmbedPreview-CSRF-Token':
+          this.options.previewCsrfToken,
         },
       },
     );
@@ -284,8 +275,6 @@ export default class EntityEmbedEditing extends Plugin {
    * @private
    */
   _getPreviewContainer(children) {
-    // `children` is an iterator that needs the early returns below.
-    // eslint-disable-next-line no-restricted-syntax
     for (const child of children) {
       if (child.hasAttribute('data-drupal-entity-preview')) {
         return child;
@@ -310,4 +299,5 @@ export default class EntityEmbedEditing extends Plugin {
   static get pluginName() {
     return 'EntityEmbedEditing';
   }
+
 }

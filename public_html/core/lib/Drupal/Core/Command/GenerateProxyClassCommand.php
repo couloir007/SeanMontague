@@ -38,7 +38,7 @@ class GenerateProxyClassCommand extends Command {
   /**
    * {@inheritdoc}
    */
-  protected function configure(): void {
+  protected function configure() {
     $this->setName('generate-proxy-class')
       ->setDefinition([
         new InputArgument('class_name', InputArgument::REQUIRED, 'The class to be proxied'),

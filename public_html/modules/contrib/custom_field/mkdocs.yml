@@ -1,0 +1,253 @@
+site_name: Custom Field
+site_author: Andy Marquis
+repo_url: https://git.drupalcode.org/project/custom_field
+repo_name: drupal/custom_field
+site_dir: site
+docs_dir: docs
+exclude_docs: |
+  snippets/
+theme:
+  name: material
+  font:
+    code: Roboto Mono
+    #text: default
+  palette:
+    # See https://squidfunk.github.io/mkdocs-material/setup/changing-the-colors/
+    primary: indigo
+    scheme: default
+    accent: deep purple
+  features:
+    - content.code.copy
+    - content.code.select
+    - content.action.edit
+    #- navigation.sections
+    - navigation.indexes
+    - navigation.path
+    - navigation.tracking
+    - navigation.footer
+    - navigation.edit
+    - content.tooltips
+dev_addr: '0.0.0.0:8000'
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - codehilite:
+      linenums: true
+  - def_list
+  - footnotes
+  - md_in_html
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - attr_list
+  - pymdownx.blocks.admonition
+  - pymdownx.blocks.details
+  - pymdownx.emoji:
+      # eslint-disable-next-line yml/no-empty-mapping-value
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      # eslint-disable-next-line yml/no-empty-mapping-value
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      linenums: true
+      extend_pygments_lang:
+        - name: php
+          lang: php
+          options:
+            startinline: true
+  - pymdownx.inlinehilite
+  - pymdownx.quotes:
+      callouts: true
+  - pymdownx.snippets:
+      base_path: docs/snippets
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          # eslint-disable-next-line yml/no-empty-mapping-value
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - tables
+  - toc:
+      permalink: "#"
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/gitlab
+      link: https://git.drupalcode.org/project/custom_field
+    - icon: fontawesome/brands/slack
+      link: https://drupal.slack.com/archives/C09312M6Y4A
+nav:
+  - Home: index.md
+  - Field Configuration:
+      - field-configuration/index.md
+      - Subfield Types:
+          - plugins/type/index.md
+          - Boolean: plugins/type/boolean.md
+          - Color: plugins/type/color.md
+          - Datetime: plugins/type/datetime.md
+          - Date range: plugins/type/daterange.md
+          - Duration: plugins/type/duration.md
+          - Email: plugins/type/email.md
+          - Entity reference: plugins/type/entity-reference.md
+          - File: plugins/type/file.md
+          - Image: plugins/type/image.md
+          - Link: plugins/type/link.md
+          - Number:
+              - Decimal: plugins/type/decimal.md
+              - Float: plugins/type/float.md
+              - Integer: plugins/type/integer.md
+          - Map (serialized array):
+              - Serialized - Key/Value: plugins/type/map.md
+              - Serialized - Text (plain): plugins/type/map-string.md
+          - Telephone: plugins/type/telephone.md
+          - Text:
+              - Text (plain): plugins/type/string.md
+              - Text (long): plugins/type/string-long.md
+          - Time: plugins/type/time.md
+          - Time range: plugins/type/time-range.md
+          - URI: plugins/type/uri.md
+          - UUID: plugins/type/uuid.md
+          - Viewfield: plugins/type/viewfield.md
+      - Multilingual support: field-configuration/multilingual.md
+  - Form Display:
+      - Field Widgets:
+          - field-widgets/index.md
+          - Stacked (default): field-widgets/stacked.md
+          - Flexbox: field-widgets/flexbox.md
+      - Subfield Widgets:
+          - plugins/widget/index.md
+          - Checkbox: plugins/widget/checkbox.md
+          - Color:
+              - Color (default): plugins/widget/color.md
+              - Color boxes: plugins/widget/color-boxes.md
+          - Date and time:
+              - Date and time (default): plugins/widget/datetime-default.md
+              - Date and time (local): plugins/widget/datetime-local.md
+              - Select list: plugins/widget/datetime-datelist.md
+          - Date range: plugins/widget/daterange-default.md
+          - Duration: plugins/widget/duration.md
+          - Email: plugins/widget/email.md
+          - Entity reference:
+              - Autocomplete: plugins/widget/entity-reference-autocomplete.md
+              - Radios: plugins/widget/entity-reference-radios.md
+              - Select: plugins/widget/entity-reference-select.md
+              - Media library: plugins/widget/media-library.md
+              - Entity browser: plugins/widget/entity-reference-entity-browser.md
+              - Hierarchical select: plugins/widget/hierarchical-select.md
+          - File: plugins/widget/file-generic.md
+          - Hidden: plugins/widget/hidden.md
+          - Image: plugins/widget/image-image.md
+          - Link:
+              - Link (default): plugins/widget/link-default.md
+              - Linkit: plugins/widget/linkit.md
+          - Map (serialized array):
+              - Key/Value: plugins/widget/map-key-value.md
+              - Text: plugins/widget/map-text.md
+          - Number:
+              - Decimal: plugins/widget/decimal.md
+              - Float: plugins/widget/float.md
+              - Integer: plugins/widget/integer.md
+          - Radios: plugins/widget/radios.md
+          - Select: plugins/widget/select.md
+          - Select or Other: plugins/widget/select-or-other.md
+          - Telephone: plugins/widget/telephone.md
+          - Text: plugins/widget/text.md
+          - Textarea: plugins/widget/textarea.md
+          - Time: plugins/widget/time-widget.md
+          - Time range: plugins/widget/time-range.md
+          - URL:
+              - Url (default): plugins/widget/url.md
+              - Linkit: plugins/widget/linkit-url.md
+          - UUID: plugins/widget/uuid.md
+          - Viewfield select: plugins/widget/viewfield-select.md
+  - View Display:
+      - Field Formatters:
+          - field-formatters/index.md
+          - Default: field-formatters/default.md
+          - Inline: field-formatters/inline.md
+          - HTML list: field-formatters/html-list.md
+          - Table: field-formatters/table.md
+          - Table (flipped): field-formatters/flipped-table.md
+          - Custom template: field-formatters/custom-template.md
+          - SDC (Single Directory Component): field-formatters/sdc.md
+      - Subfield Formatters:
+          - plugins/formatter/index.md
+          - Boolean: plugins/formatter/boolean.md
+          - Date and time:
+              - Default: plugins/formatter/datetime-default.md
+              - Advanced: plugins/formatter/datetime-advanced.md
+              - Custom: plugins/formatter/datetime-custom.md
+              - Time ago: plugins/formatter/datetime-time-ago.md
+          - Date range: plugins/formatter/daterange-default.md
+          - Duration: plugins/formatter/duration.md
+          - Email: plugins/formatter/email.md
+          - Entity reference:
+              - Label: plugins/formatter/entity-reference-label.md
+              - Entity ID: plugins/formatter/entity-reference-entity-id.md
+              - Rendered entity: plugins/formatter/entity-reference-entity-view.md
+              - Hierarchical term: plugins/formatter/hierarchical-term.md
+          - Generic file: plugins/formatter/file-default.md
+          - Hidden: plugins/formatter/hidden.md
+          - Image:
+              - Image: plugins/formatter/image.md
+              - URL to image: plugins/formatter/image-url.md
+          - Link:
+              - Link (default): plugins/formatter/link.md
+              - Link (text): plugins/formatter/link-text.md
+              - Linkit: plugins/formatter/linkit.md
+          - Map (serialized array):
+              - Inline: plugins/formatter/map-inline.md
+              - List: plugins/formatter/map-list.md
+              - Table: plugins/formatter/map-table.md
+          - Numeric:
+              - Decimal: plugins/formatter/number-decimal.md
+              - Integer: plugins/formatter/number-integer.md
+              - Unformatted: plugins/formatter/number-unformatted.md
+          - Telephone link: plugins/formatter/telephone-link.md
+          - Text:
+              - Text (plain): plugins/formatter/string.md
+              - Text (default): plugins/formatter/text-default.md
+          - Time:
+              - Default: plugins/formatter/time.md
+              - Advanced: plugins/formatter/time-advanced.md
+          - Time range: plugins/formatter/time-range.md
+          - URL:
+              - Link: plugins/formatter/uri-link.md
+              - Linkit: plugins/formatter/linkit-url.md
+          - URL to file: plugins/formatter/file-url-plain.md
+          - Viewfield: plugins/formatter/viewfield.md
+  - Integrations:
+      - integrations/index.md
+      - AI (Artificial Intelligence): integrations/ai.md
+      - Entity Browser: integrations/entity-browser.md
+      - Feeds: integrations/feeds.md
+      - GraphQL Compose: integrations/graphql.md
+      - JSON:API: integrations/jsonapi.md
+      - Linkit: integrations/linkit.md
+      - Search API: integrations/search-api.md
+      - Single Directory Components: integrations/sdc.md
+      - Views:
+          - integrations/views/index.md
+          - Argument: integrations/views/argument.md
+          - Field: integrations/views/field.md
+          - Filters: integrations/views/filter.md
+          - Sort: integrations/views/sort.md
+  - How to:
+      - Add/remove columns using the updater service: documentation/updater-service.md
+      - Custom link attributes: documentation/link-attributes.md
+      - Entity Query custom fields: documentation/entity-query.md
+      - Use Custom field as BaseFieldDefinition: documentation/base-field-definition.md
+      - Extend subfield plugins:
+          - How to extend a formatter plugin: documentation/extend-formatter-plugin.md
+          - How to extend a widget plugin: documentation/extend-widget-plugin.md
+      - Migrate data from external sources: documentation/migrate-external-data.md
+      - Migrate data from other fields: documentation/migrate-fields.md
+  - Contributing: contributing.md

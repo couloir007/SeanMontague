@@ -10,6 +10,7 @@ use Drupal\Core\Plugin\Plugin\Validation\Constraint\PluginExistsConstraint;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
@@ -33,19 +34,21 @@ class PluginExistsConstraintTest extends UnitTestCase {
   }
 
   /**
-   * Tests plugin is created when manager option is set to a valid service ID.
+   * Tests with different option keys.
    *
    * @legacy-covers ::create
    * @legacy-covers ::__construct
    */
-  public function testManagerOption(): void {
+  #[TestWith(["value"])]
+  #[TestWith(["manager"])]
+  public function testOption(string $option_key): void {
     $container = $this->createMock(ContainerInterface::class);
     $manager = $this->createMock(PluginManagerInterface::class);
     $container->expects($this->any())
       ->method('get')
       ->with('plugin.manager.mock')
       ->willReturn($manager);
-    $constraint = PluginExistsConstraint::create($container, ['manager' => 'plugin.manager.mock'], 'test_plugin_id', []);
+    $constraint = PluginExistsConstraint::create($container, [$option_key => 'plugin.manager.mock'], 'test_plugin_id', []);
     $this->assertSame($manager, $constraint->pluginManager);
   }
 

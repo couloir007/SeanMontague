@@ -6,14 +6,12 @@ namespace Drupal\Tests\contact\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\AnonResourceTestTrait;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Contact Form Json Anon.
  */
 #[Group('rest')]
-#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class ContactFormJsonAnonTest extends ContactFormResourceTestBase {
 

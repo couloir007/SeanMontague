@@ -27,7 +27,8 @@ final class GenerateData implements GenerateDataInterface {
     $items = [];
     $custom_items = $this->customFieldTypeManager->getCustomFieldItems($settings);
     foreach ($custom_items as $name => $custom_item) {
-      $items[$name] = $custom_item->generateSampleValue($custom_item, $target_entity_type);
+      $value = $custom_item->generateSampleValue($custom_item, $target_entity_type);
+      $items[$name] = $value;
     }
 
     return $items;
@@ -57,24 +58,15 @@ final class GenerateData implements GenerateDataInterface {
 
       // @todo Hardening: floating point calculation can randomly fail.
       $random_values['decimal'] = '0.50';
-      $random_values['float'] = '10.775';
+
       // Cast integer to string.
       $random_values['integer'] = (string) $random_values['integer'];
       // Set a valid time string.
       $random_values['time'] = Time::createFromTimestamp($random_values['time'])->format('h:iA');
-      // @todo Hardening: Add support for time range.
-      unset($random_values['time_range']);
 
       // @todo Hardening: we need to treat maps specially due to ajax.
       unset($random_values['map']);
       unset($random_values['map_string']);
-
-      // @todo Hardening: why do color fields not set using ::submitForm?
-      unset($random_values['color']);
-
-      // @todo Hardening: figure out why an array fails as datetime value.
-      unset($random_values['datetime']);
-      unset($random_values['daterange']);
 
       // @todo Hardening: Add support for entity reference.
       unset($random_values['entity_reference']);
@@ -96,6 +88,39 @@ final class GenerateData implements GenerateDataInterface {
           $form_values["{$element_key}[uri]"] = $value['uri'];
           if (isset($value['title'])) {
             $form_values["{$element_key}[title]"] = $value['title'] ?: 'Test title';
+          }
+        }
+        elseif ($subfield === 'datetime' && is_string($value) && $value !== '') {
+          if (str_contains($value, 'T')) {
+            [$date, $time] = explode('T', $value, 2);
+            $form_values["{$element_key}[value][date]"] = $date;
+            $form_values["{$element_key}[value][time]"] = $time;
+          }
+          else {
+            // Date-only field.
+            $form_values["{$element_key}[value][date]"] = $value;
+          }
+        }
+        elseif ($subfield === 'daterange' && is_array($value)) {
+          $start = $value['value'] ?? NULL;
+          $end = $value['end'] ?? NULL;
+
+          if (is_string($start) && $start !== '') {
+            $form_values["{$element_key}[value][date]"] = $start;
+          }
+          if (is_string($end) && $end !== '') {
+            $form_values["{$element_key}[end_value][date]"] = $end;
+          }
+        }
+        elseif ($subfield === 'time_range' && is_array($value)) {
+          $start = $value['value'] ?? NULL;
+          $end = $value['end'] ?? NULL;
+
+          if (is_numeric($start)) {
+            $form_values["{$element_key}[value]"] = Time::createFromTimestamp($start)->format('h:iA');
+          }
+          if (is_numeric($end)) {
+            $form_values["{$element_key}[end_value]"] = Time::createFromTimestamp($end)->format('h:iA');
           }
         }
         else {

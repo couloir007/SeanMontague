@@ -129,7 +129,7 @@ class NumberFieldTest extends WebDriverTestBase {
     $node->save();
 
     // Go to manage display page.
-    $this->drupalGet("admin/structure/types/manage/$type/display/default");
+    $this->drupalGet("admin/structure/types/manage/$type/display");
 
     // Configure number_decimal formatter for the 'float' field type.
     $thousand_separator = $thousand_separators[array_rand($thousand_separators)];
@@ -164,7 +164,7 @@ class NumberFieldTest extends WebDriverTestBase {
         'type' => 'number_integer',
       ])
       ->save();
-    $this->drupalGet("admin/structure/types/manage/$type/display/default");
+    $this->drupalGet("admin/structure/types/manage/$type/display");
 
     $thousand_separator = $thousand_separators[array_rand($thousand_separators)];
 

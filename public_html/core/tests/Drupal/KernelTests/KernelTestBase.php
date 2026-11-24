@@ -20,19 +20,19 @@ use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\EventSubscriber\FieldStorageCreateCheckSubscriber;
 use Drupal\Core\Test\TestDatabase;
-use Drupal\Tests\BrowserHtmlDebugTrait;
 use Drupal\Tests\ConfigTestTrait;
-use Drupal\Tests\DrupalTestCaseTrait;
 use Drupal\Tests\ExtensionListTestTrait;
-use Drupal\Tests\HttpKernelUiHelperTrait;
 use Drupal\Tests\PhpUnitCompatibilityTrait;
 use Drupal\Tests\RandomGeneratorTrait;
+use Drupal\Tests\TestRequirementsTrait;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
 use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
+use Drupal\TestTools\Extension\Dump\DebugDump;
 use Drupal\TestTools\Extension\SchemaInspector;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\visitor\vfsStreamPrintVisitor;
 use PHPUnit\Framework\Attributes\After;
+use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -40,6 +40,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Base class for functional integration tests.
@@ -95,16 +96,14 @@ use Symfony\Component\Routing\Route;
  */
 abstract class KernelTestBase extends TestCase implements ServiceProviderInterface {
 
-  use DrupalTestCaseTrait;
   use AssertContentTrait;
   use RandomGeneratorTrait;
   use ConfigTestTrait;
   use ExtensionListTestTrait;
+  use TestRequirementsTrait;
   use PhpUnitCompatibilityTrait;
   use ProphecyTrait;
   use ExpectDeprecationTrait;
-  use BrowserHtmlDebugTrait;
-  use HttpKernelUiHelperTrait;
 
   /**
    * {@inheritdoc}
@@ -180,6 +179,13 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   protected KeyValueMemoryFactory $keyValue;
 
   /**
+   * The app root.
+   *
+   * @var string
+   */
+  protected $root;
+
+  /**
    * Set to TRUE to strict check all configuration saved.
    *
    * @var bool
@@ -214,6 +220,16 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   protected bool $usesSuperUserAccessPolicy;
 
   /**
+   * Registers the dumper CLI handler when the DebugDump extension is enabled.
+   */
+  #[BeforeClass]
+  public static function setDebugDumpHandler(): void {
+    if (DebugDump::isEnabled()) {
+      VarDumper::setHandler(DebugDump::class . '::cliHandler');
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -226,6 +242,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     // Allow tests to compare MarkupInterface objects via assertEquals().
     $this->registerComparator(new MarkupInterfaceComparator());
 
+    $this->root = static::getDrupalRoot();
     chdir($this->root);
     $this->initFileCache();
     $this->bootEnvironment();
@@ -521,6 +538,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $this->container = $container;
 
     $container
+      ->register('datetime.time', 'Drupal\Component\Datetime\Time');
+    $container
       ->register('flood', 'Drupal\Core\Flood\MemoryBackend')
       ->addArgument(new Reference('request_stack'));
     $container
@@ -580,8 +599,10 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       ->addTag('event_subscriber');
 
     // Relax the password hashing cost in tests to avoid performance issues.
-    $container->setParameter('password.algorithm', PASSWORD_BCRYPT);
-    $container->setParameter('password.options', ['cost' => 4]);
+    if ($container->hasDefinition('password')) {
+      $container->getDefinition('password')
+        ->setArguments([PASSWORD_BCRYPT, ['cost' => 4]]);
+    }
 
     // Add the on demand rebuild route provider service.
     $route_provider_service_name = 'router.route_provider';
@@ -652,7 +673,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    if ($this->container?->get('request_stack')->getCurrentRequest() !== NULL) {
+    if ($this->container) {
       // Clean up mock session started in DrupalKernel::preHandle().
       /** @var \Symfony\Component\HttpFoundation\Session\Session $session */
       $session = $this->container->get('request_stack')->getSession();

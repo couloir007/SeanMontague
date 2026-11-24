@@ -85,6 +85,7 @@ class NavigationHooks {
     if (!$this->currentUser->hasPermission('access navigation')) {
       return;
     }
+    $this->navigationRenderer->removeToolbar($page_top);
     $this->navigationRenderer->buildNavigation($page_top);
     $this->navigationRenderer->buildTopBar($page_top);
   }
@@ -182,7 +183,7 @@ class NavigationHooks {
   #[Hook('navigation_content_top')]
   public function navigationWorkspaces(): array {
     // This navigation item requires the Workspaces UI module.
-    if (!$this->moduleHandler->moduleExists('workspaces_ui')) {
+    if (!\Drupal::moduleHandler()->moduleExists('workspaces_ui')) {
       return [];
     }
 

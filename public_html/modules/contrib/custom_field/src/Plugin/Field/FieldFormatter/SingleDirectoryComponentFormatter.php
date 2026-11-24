@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\custom_field\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
@@ -103,26 +104,19 @@ class SingleDirectoryComponentFormatter extends BaseFormatter {
    *   The processed form element.
    */
   public function processSdcSettingsForm(array &$element, FormStateInterface $form_state, array $form): array {
-    $field_name = $this->fieldDefinition->getName();
-    $field_display = [];
-    $form_object = $form_state->getFormObject();
-    if (method_exists($form_object, 'getEntity')) {
-      /** @var \Drupal\Core\Entity\Entity\EntityViewDisplay $display */
-      $display = $form_object->getEntity();
-      $field_display = $display->getComponent($field_name);
-    }
-
     $values = $form_state->getValues();
+    $trigger = $form_state->getTriggeringElement();
     if ($form_state instanceof SubformStateInterface) {
-      $values = $form_state->getCompleteFormState()->getValues();
+      $complete_form_state = $form_state->getCompleteFormState();
+      $values = $complete_form_state->getValues();
+      $trigger = $complete_form_state->getTriggeringElement();
     }
 
     $parents = $element['#parents'] ?? [];
     $custom_items = $this->getCustomFieldItems();
-    $trigger = $form_state->getTriggeringElement();
     $trigger_parents = $trigger['#parents'] ?? [];
 
-    $wrapper_id = implode('_', [...$parents, 'sdc_wrapper']);
+    $wrapper_id = Html::cleanCssIdentifier(implode('_', [...$parents, 'sdc_wrapper']));
     $element['#prefix'] = '<div id="' . $wrapper_id . '">';
     $element['#suffix'] = '</div>';
     $ajax_base = [
@@ -137,22 +131,9 @@ class SingleDirectoryComponentFormatter extends BaseFormatter {
     $default_props = $this->getSetting('props');
 
     // UI patterns.
-    $is_ui_pattern = in_array('ui_patterns', $parents);
+    $is_ui_pattern = \in_array('ui_patterns', $parents, TRUE);
     if ($is_ui_pattern) {
-      $index = array_search('sources', $parents, TRUE);
-      $ui_pattern_formatter = NULL;
-      if ($index !== FALSE) {
-        $ui_slot = array_slice($parents, 0, $index);
-        $slot = end($ui_slot);
-        $ui_pattern_formatter = $field_display['settings']['ui_patterns']['slots'][$slot]['sources'][0]['source']['type'] ?? NULL;
-        $slot_value = NestedArray::getValue($values, [...$ui_slot, 'sources', 0, 'source']) ?? [];
-        if (!empty($slot_value['type'])) {
-          $ui_pattern_formatter = $slot_value['type'];
-        }
-      }
-      if (!empty($trigger_parents) && end($trigger_parents) === 'type') {
-        $ui_pattern_formatter = $trigger['#value'];
-      }
+      $ui_pattern_formatter = $this->getUiPatternsSourceType($parents, $values, $trigger);
       $access = !empty($ui_pattern_formatter);
       $element['#access'] = $access;
       if (!$access) {
@@ -200,7 +181,7 @@ class SingleDirectoryComponentFormatter extends BaseFormatter {
     if ($component_id === NULL) {
       $component_id = $this->getSetting('component');
     }
-    if (!empty($trigger_parents) && end($trigger_parents) === 'component') {
+    if ($trigger_parents === [...$parents, 'component']) {
       $component_id = $trigger['#value'] ?? '';
     }
 
@@ -258,7 +239,7 @@ class SingleDirectoryComponentFormatter extends BaseFormatter {
         $visibility_path = $this->customFieldFormatterManager->getInputPathStates($parents, $name, FALSE, 'slots');
         $element['#visibility_path'] = $visibility_path . '[formatter_settings]';
         $element['#field_parents'] = [...$parents, 'slots', $name, 'formatter_settings'];
-        $slot_wrapper_id = implode('_', [...$parents, 'slots', $name, 'wrapper']);
+        $slot_wrapper_id = Html::cleanCssIdentifier(implode('_', [...$parents, 'slots', $name, 'wrapper']));
         $slot_path = [...$parents, 'slots', $name];
 
         // Defaults from stored settings.
@@ -290,10 +271,15 @@ class SingleDirectoryComponentFormatter extends BaseFormatter {
           }
         }
 
-        $field_changed = FALSE;
         // Special handling for the triggering element.
-        if (!empty($trigger_parents) && \in_array('slots', $trigger_parents, TRUE)) {
-          $triggered_slot_name = $trigger_parents[array_search('slots', $trigger_parents, TRUE) + 1] ?? '';
+        $field_changed = FALSE;
+        $parents_count = count($parents);
+        if (
+          !empty($trigger_parents)
+          && \array_slice($trigger_parents, 0, $parents_count) === $parents
+          && ($trigger_parents[$parents_count] ?? NULL) === 'slots'
+        ) {
+          $triggered_slot_name = $trigger_parents[$parents_count + 1] ?? '';
           if ($triggered_slot_name === $name) {
             if (end($trigger_parents) === 'field') {
               $slot_field = $trigger['#value'] ?? '';
@@ -348,7 +334,7 @@ class SingleDirectoryComponentFormatter extends BaseFormatter {
             'wrapper' => $slot_wrapper_id,
           ],
           '#executes_submit_callback' => FALSE,
-          '#limit_validation_errors' => [[...$parents, 'slots', $name, 'field']],
+          '#after_build' => [[static::class, 'limitElementValidation']],
         ];
         $element['slots'][$name]['content'] = [
           '#type' => 'container',
@@ -378,6 +364,7 @@ class SingleDirectoryComponentFormatter extends BaseFormatter {
             ],
             '#executes_submit_callback' => FALSE,
             '#validated' => TRUE,
+            '#after_build' => [[static::class, 'limitElementValidation']],
           ];
           if ($field_changed || !array_key_exists($format_type, $formatter_options)) {
             $element['slots'][$name]['content']['format_type']['#value'] = $format_type;
@@ -569,6 +556,9 @@ class SingleDirectoryComponentFormatter extends BaseFormatter {
    */
   public function viewValue(FieldItemInterface $item, string $langcode): array {
     $field_name = $this->fieldDefinition->getName();
+    $entity = $item->getEntity();
+    $entity_type = $entity->getEntityTypeId();
+    $bundle = $entity->bundle();
     $component = $this->getSetting('component');
     $slots = $this->getSetting('slots');
     $props = $this->getSetting('props') ? \array_filter($this->getSetting('props')) : [];
@@ -585,8 +575,8 @@ class SingleDirectoryComponentFormatter extends BaseFormatter {
     $is_valid = TRUE;
     $bubbleable_metadata = new BubbleableMetadata();
     $context = [
-      'entity_type' => $this->fieldDefinition->getTargetEntityTypeId(),
-      'entity' => $item->getEntity(),
+      'entity_type' => $entity_type,
+      'entity' => $entity,
       'bubbleable_metadata' => $bubbleable_metadata,
     ];
 
@@ -658,12 +648,14 @@ class SingleDirectoryComponentFormatter extends BaseFormatter {
           '#field_name' => $field_name,
           '#name' => $value['name'],
           '#value' => $value['value'],
+          '#raw_value' => $value['raw_value'],
           '#label' => $value['label'],
           '#label_display' => $value['label_display'],
           '#type' => $value['type'],
           '#wrappers' => $value['wrappers'],
-          '#entity_type' => $value['entity_type'],
-          '#lang_code' => $langcode,
+          '#entity_type' => $entity_type,
+          '#bundle' => $bundle,
+          '#language' => $langcode,
         ];
       }
     }
@@ -695,9 +687,11 @@ class SingleDirectoryComponentFormatter extends BaseFormatter {
     $custom_items = $event->getCustomItems();
 
     $values = [];
-    $entity_type = $this->fieldDefinition->getTargetEntityTypeId();
     foreach ($slots as $name => $slot) {
-      $field = $slot['field'] ?? NULL;
+      $field = (string) ($slot['field'] ?? '');
+      if ($field === '') {
+        continue;
+      }
       $custom_item = $custom_items[$field] ?? NULL;
       if (!$custom_item) {
         continue;
@@ -740,14 +734,14 @@ class SingleDirectoryComponentFormatter extends BaseFormatter {
       $markup = [
         'name' => $field,
         'value' => $render_value,
+        'raw_value' => $custom_item->getRawValue($item),
         'label' => $field_label ?: $custom_item->getLabel(),
         'label_display' => $formatter_settings['formatter_settings']['label_display'] ?? 'above',
         'type' => $custom_item->getPluginId(),
         'wrappers' => $formatter_settings['wrappers'],
-        'entity_type' => $entity_type,
       ];
 
-      $values[$name] = $markup;
+      $values[(string) $name] = $markup;
     }
 
     return $values;

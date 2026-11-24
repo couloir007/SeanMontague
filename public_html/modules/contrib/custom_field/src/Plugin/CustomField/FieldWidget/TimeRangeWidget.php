@@ -145,7 +145,7 @@ class TimeRangeWidget extends CustomFieldWidgetBase {
       $start_timestamp = $start_time->getTimestamp();
       $end_timestamp = $end_time->getTimestamp();
       if ($start_timestamp >= $end_timestamp) {
-        $form_state->setError($element, t('The @title end time must be after the start time.', ['@title' => $element['#title']]));
+        $form_state->setError($element, $this->t('The @title end time must be after the start time.', ['@title' => $element['#title']]));
       }
     }
 
@@ -171,7 +171,7 @@ class TimeRangeWidget extends CustomFieldWidgetBase {
 
     return [
       'value' => (int) $start,
-      'end_value' => is_numeric($end) ? (int) $end : NULL,
+      'end' => is_numeric($end) ? (int) $end : NULL,
     ];
   }
 

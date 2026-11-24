@@ -40,7 +40,7 @@ class WorkflowTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    *
-   * @var \Drupal\workflows\WorkflowInterface
+   * @var \Drupal\shortcut\ShortcutSetInterface
    */
   protected $entity;
 

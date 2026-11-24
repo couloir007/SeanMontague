@@ -39,7 +39,6 @@ class BatchTestSimpleForm extends FormBase {
         'batch6' => 'batch 6',
         'batch7' => 'batch 7',
         'batch8' => 'batch 8',
-        'batch9' => 'batch 9',
       ],
       '#multiple' => TRUE,
     ];

@@ -7,39 +7,32 @@
  */
 
 (function ($, Drupal, once) {
+
+  "use strict";
+
   /**
    * Attach behaviors to links for entities.
    */
   Drupal.behaviors.entityEmbedPreviewEntities = {
-    attach(context) {
-      $(context)
-        .find('form.entity-embed-dialog .form-item-entity a')
-        .on('click', Drupal.entityEmbedDialog.openInNewWindow);
+    attach: function (context) {
+      $(context).find('form.entity-embed-dialog .form-item-entity a').on('click', Drupal.entityEmbedDialog.openInNewWindow);
     },
-    detach(context) {
-      $(context)
-        .find('form.entity-embed-dialog .form-item-entity a')
-        .off('click', Drupal.entityEmbedDialog.openInNewWindow);
-    },
+    detach: function (context) {
+      $(context).find('form.entity-embed-dialog .form-item-entity a').off('click', Drupal.entityEmbedDialog.openInNewWindow);
+    }
   };
 
   /**
    * Behaviors for the entityEmbedDialog iframe.
    */
   Drupal.behaviors.entityEmbedDialog = {
-    attach(context, settings) {
-      $(once('js-entity-embed-dialog', 'body')).on(
-        'entityBrowserIFrameAppend',
-        function () {
-          $('.entity-select-dialog').trigger('resize');
-          // Hide the next button, the click is triggered by Drupal.entityEmbedDialog.selectionCompleted.
-          $('#drupal-modal')
-            .parent()
-            .find('.js-button-next')
-            .addClass('visually-hidden');
-        },
-      );
-    },
+    attach: function (context, settings) {
+      $(once('js-entity-embed-dialog', 'body')).on('entityBrowserIFrameAppend', function () {
+        $('.entity-select-dialog').trigger('resize');
+        // Hide the next button, the click is triggered by Drupal.entityEmbedDialog.selectionCompleted.
+        $('#drupal-modal').parent().find('.js-button-next').addClass('visually-hidden');
+      });
+    }
   };
 
   /**
@@ -49,17 +42,14 @@
     /**
      * Open links to entities within forms in a new window.
      */
-    openInNewWindow(event) {
+    openInNewWindow: function (event) {
       event.preventDefault();
       $(this).attr('target', '_blank');
-      window.open(
-        this.href,
-        'entityPreview',
-        'toolbar=0,scrollbars=1,location=1,statusbar=1,menubar=0,resizable=1',
-      );
+      window.open(this.href, 'entityPreview', 'toolbar=0,scrollbars=1,location=1,statusbar=1,menubar=0,resizable=1');
     },
-    selectionCompleted(event, uuid, entities) {
+    selectionCompleted: function(event, uuid, entities) {
       $('.entity-select-dialog .js-button-next').click();
-    },
+    }
   };
+
 })(jQuery, Drupal, once);

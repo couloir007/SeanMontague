@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\Bytes;
+use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -20,6 +21,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[Group('Utility')]
 class BytesTest extends TestCase {
 
+  use ExpectDeprecationTrait;
   use ProphecyTrait;
 
   /**

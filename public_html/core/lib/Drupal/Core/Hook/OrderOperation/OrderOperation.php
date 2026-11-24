@@ -24,18 +24,12 @@ abstract class OrderOperation {
   abstract public function apply(array &$identifiers, array $module_finder): void;
 
   /**
-   * Gets an identifier for the target implementation.
-   *
-   * This is used in HookCollectorPass, to remove order operations where the
-   * target implementation does not exist at all, or is not registered for the
-   * hook that the order operation targets.
+   * Returns the identifier for filtering.
    *
    * The hook implementation identifier, as "$class::$method", to be changed by.
    *
    * @return string
-   *   Identifier for the implementation that should be moved to a new position.
-   *   The format is the class followed by '::', then the method name.
-   *   For example "Drupal\my_module\Hook\MyModuleHooks::methodName".
+   *   The identifier for the OrderOperation.
    */
   abstract public function identify(): string;
 

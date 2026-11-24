@@ -54,8 +54,7 @@ class EntityResourceRestTestCoverageTest extends KernelTestBase {
         $module->status == FALSE &&
         $module->info['package'] !== 'Testing' &&
         $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::DEPRECATED &&
-        $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::EXPERIMENTAL &&
-        $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::OBSOLETE;
+        $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::EXPERIMENTAL;
     });
 
     $this->container->get('module_installer')->install(array_keys($stable_core_modules));

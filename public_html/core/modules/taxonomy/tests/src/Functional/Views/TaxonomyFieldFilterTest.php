@@ -7,7 +7,6 @@ namespace Drupal\Tests\taxonomy\Functional\Views;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
@@ -186,7 +185,7 @@ class TaxonomyFieldFilterTest extends ViewTestBase {
    */
   protected function createTermWithProperties($properties) {
     // Use the first available text format.
-    $filter_formats = \Drupal::service(FilterFormatRepositoryInterface::class)->getAllFormats();
+    $filter_formats = filter_formats();
     $format = array_pop($filter_formats);
 
     $properties += [

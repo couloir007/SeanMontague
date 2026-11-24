@@ -220,8 +220,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
             unlink($this->connectionOptions['database'] . '-' . $prefix);
           }
         }
-        // phpcs:ignore SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch.NonCapturingCatchRequired
-        catch (\Exception $e) {
+        catch (\Exception) {
           // Ignore the exception and continue. There is nothing we can do here
           // to report the error or fail safe.
         }
@@ -402,7 +401,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    */
   public function queryTemporary($query, array $args = [], array $options = []) {
-    $tablename = 'db_temporary_' . bin2hex(random_bytes(12));
+    $tablename = 'db_temporary_' . uniqid();
 
     $this->query('CREATE TEMPORARY TABLE ' . $tablename . ' AS ' . $query, $args, $options);
 

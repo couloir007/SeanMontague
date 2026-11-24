@@ -17,7 +17,7 @@ use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 // cspell:ignore imagecreatefrom rrggbb
 
@@ -58,6 +58,20 @@ class GDToolkit extends ImageToolkitBase {
   protected $preLoadInfo = NULL;
 
   /**
+   * The StreamWrapper manager.
+   *
+   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
+   */
+  protected $streamWrapperManager;
+
+  /**
+   * The file system.
+   *
+   * @var \Drupal\Core\File\FileSystemInterface
+   */
+  protected $fileSystem;
+
+  /**
    * Constructs a GDToolkit object.
    *
    * @param array $configuration
@@ -72,23 +86,31 @@ class GDToolkit extends ImageToolkitBase {
    *   A logger instance.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
+   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
    *   The StreamWrapper manager.
-   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
+   * @param \Drupal\Core\File\FileSystemInterface $file_system
    *   The file system.
    */
-  public function __construct(
-    array $configuration,
-    string $plugin_id,
-    array $plugin_definition,
-    ImageToolkitOperationManagerInterface $operation_manager,
-    #[Autowire('logger.channel.image')]
-    LoggerInterface $logger,
-    ConfigFactoryInterface $config_factory,
-    protected StreamWrapperManagerInterface $streamWrapperManager,
-    protected FileSystemInterface $fileSystem,
-  ) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, ImageToolkitOperationManagerInterface $operation_manager, LoggerInterface $logger, ConfigFactoryInterface $config_factory, StreamWrapperManagerInterface $stream_wrapper_manager, FileSystemInterface $file_system) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $operation_manager, $logger, $config_factory);
+    $this->streamWrapperManager = $stream_wrapper_manager;
+    $this->fileSystem = $file_system;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('image.toolkit.operation.manager'),
+      $container->get('logger.channel.image'),
+      $container->get('config.factory'),
+      $container->get('stream_wrapper_manager'),
+      $container->get('file_system')
+    );
   }
 
   /**

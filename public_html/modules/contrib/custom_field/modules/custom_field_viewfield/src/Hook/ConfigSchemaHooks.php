@@ -3,11 +3,14 @@
 namespace Drupal\custom_field_viewfield\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Provides hooks related to config schemas.
  */
 class ConfigSchemaHooks {
+
+  use StringTranslationTrait;
 
   /**
    * Implements hook_config_schema_info_alter().
@@ -17,19 +20,19 @@ class ConfigSchemaHooks {
     $definitions['custom_field.field_settings.*']['mapping'] += [
       'allowed_views' => [
         'type'  => 'sequence',
-        'label' => t('Views'),
+        'label' => $this->t('Views'),
         'sequence' => [
           'type' => 'sequence',
-          'label' => t('View'),
+          'label' => $this->t('View'),
           'sequence' => [
             'type' => 'string',
-            'label' => t('View display'),
+            'label' => $this->t('View display'),
           ],
         ],
       ],
       'force_default' => [
         'type' => 'boolean',
-        'label' => t('Always use default value'),
+        'label' => $this->t('Always use default value'),
       ],
       'token_browser' => [
         'type' => 'custom_field.token_browser',
@@ -37,7 +40,7 @@ class ConfigSchemaHooks {
     ];
     $definitions['custom_field.formatter_settings']['mapping']['always_build_output'] = [
       'type' => 'boolean',
-      'label' => t('Always build output'),
+      'label' => $this->t('Always build output'),
     ];
   }
 

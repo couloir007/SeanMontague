@@ -17,7 +17,6 @@ use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\editor\Ajax\EditorDialogSave;
 use Drupal\editor\EditorInterface;
 use Drupal\embed\EmbedButtonInterface;
@@ -31,7 +30,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * Provides a form to embed entities by specifying data attributes.
  */
-class EntityEmbedDialog extends FormBase implements WorkspaceSafeFormInterface {
+class EntityEmbedDialog extends FormBase {
 
   /**
    * The entity embed display manager.
@@ -111,7 +110,7 @@ class EntityEmbedDialog extends FormBase implements WorkspaceSafeFormInterface {
    *   The entity field manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator
+   * @param \Drupal\Core\File\FileUrlGeneratorInterface
    *   The file URL generator.
    */
   public function __construct(EntityEmbedDisplayManager $entity_embed_display_manager, FormBuilderInterface $form_builder, EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher, EntityFieldManagerInterface $entity_field_manager, ModuleHandlerInterface $module_handler, FileUrlGeneratorInterface $file_url_generator) {
@@ -176,9 +175,9 @@ class EntityEmbedDialog extends FormBase implements WorkspaceSafeFormInterface {
    *   An associative array containing the structure of the form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\editor\EditorInterface|null $editor
+   * @param \Drupal\editor\EditorInterface $editor
    *   The editor to which this dialog corresponds.
-   * @param \Drupal\embed\EmbedButtonInterface|null $embed_button
+   * @param \Drupal\embed\EmbedButtonInterface $embed_button
    *   The URL button to which this dialog corresponds.
    */
   public function buildForm(array $form, FormStateInterface $form_state, ?EditorInterface $editor = NULL, ?EmbedButtonInterface $embed_button = NULL) {
@@ -194,14 +193,14 @@ class EntityEmbedDialog extends FormBase implements WorkspaceSafeFormInterface {
     // The default values are set directly from \Drupal::request()->request,
     // provided by the editor plugin opening the dialog.
     if (!$form_state->get('entity_element')) {
-      $form_state->set('entity_element', $input['editor_object'] ?? []);
+      $form_state->set('entity_element', isset($input['editor_object']) ? $input['editor_object'] : []);
     }
     $entity_element += $form_state->get('entity_element');
     $entity_element += [
       'data-entity-type' => $embed_button->getTypeSetting('entity_type'),
       'data-entity-uuid' => '',
       'data-entity-embed-display' => 'entity_reference:entity_reference_entity_view',
-      'data-entity-embed-display-settings' => $form_state->get('entity_element')['data-entity-embed-settings'] ?? [],
+      'data-entity-embed-display-settings' => isset($form_state->get('entity_element')['data-entity-embed-settings']) ? $form_state->get('entity_element')['data-entity-embed-settings'] : [],
     ];
     $form_state->set('entity_element', $entity_element);
     $entity = $this->loadEntityByAttributes($entity_element);
@@ -428,7 +427,7 @@ class EntityEmbedDialog extends FormBase implements WorkspaceSafeFormInterface {
         $entity_label = $entity->toLink($entity->label(), 'canonical', $options)->toString();
       }
       elseif ($entity->getEntityTypeId() == 'file') {
-        $entity_label = '<a href="' . $this->fileUrlGenerator->generateAbsoluteString($entity->getFileUri()) . '" target="_blank">' . $entity->label() . '</a>';
+          $entity_label = '<a href="' . $this->fileUrlGenerator->generateAbsoluteString($entity->getFileUri()) . '" target="_blank">' . $entity->label() . '</a>';
       }
       else {
         $entity_label = '<a href="' . $entity->toUrl()->toString() . '" target="_blank">' . $entity->label() . '</a>';
@@ -524,7 +523,7 @@ class EntityEmbedDialog extends FormBase implements WorkspaceSafeFormInterface {
           'center' => $this->t('Center'),
           'right' => $this->t('Right'),
         ],
-        '#default_value' => $entity_element['data-align'] ?? '',
+        '#default_value' => isset($entity_element['data-align']) ? $entity_element['data-align'] : '',
         '#wrapper_attributes' => ['class' => ['container-inline']],
         '#attributes' => ['class' => ['container-inline']],
       ];
@@ -612,20 +611,14 @@ class EntityEmbedDialog extends FormBase implements WorkspaceSafeFormInterface {
     }
     if ($entity = $this->entityTypeManager->getStorage($entity_type)->load($id)) {
       if (!$entity->access('view')) {
-        $form_state->setError($element, $this->t('Unable to access @type entity @id.', [
-          '@type' => $entity_type,
-          '@id' => $id,
-        ]));
+        $form_state->setError($element, $this->t('Unable to access @type entity @id.', ['@type' => $entity_type, '@id' => $id]));
       }
       else {
         if ($uuid = $entity->uuid()) {
           $form_state->setValueForElement($form['attributes']['data-entity-uuid'], $uuid);
         }
         else {
-          $form_state->setError($element, $this->t('Cannot embed @type entity @id because it does not have a UUID.', [
-            '@type' => $entity_type,
-            '@id' => $id,
-          ]));
+          $form_state->setError($element, $this->t('Cannot embed @type entity @id because it does not have a UUID.', ['@type' => $entity_type, '@id' => $id]));
         }
 
         // Ensure that at least one Entity Embed Display plugin is present
@@ -635,9 +628,7 @@ class EntityEmbedDialog extends FormBase implements WorkspaceSafeFormInterface {
         // If no plugin is available after taking the intersection, raise error.
         // Also log an exception.
         if (empty($display_plugin_options)) {
-          $form_state->setError($element, $this->t('No display options available for the selected %entity_type. Please select another %entity_type.', [
-            '%entity_type' => $entity->getEntityType()->getLabel(),
-          ]));
+          $form_state->setError($element, $this->t('No display options available for the selected %entity-type. Please select another %entity_type.', ['%entity_type' => $entity->getEntityType()->getLabel()]));
           $this->logger('entity_embed')->warning('No display options available for "@type:" entity "@id" while embedding using button "@button". Please ensure that at least one Entity Embed Display plugin is allowed for this embed button which is available for this entity.', [
             '@type' => $entity_type,
             '@id' => $entity->id(),
@@ -647,10 +638,7 @@ class EntityEmbedDialog extends FormBase implements WorkspaceSafeFormInterface {
       }
     }
     else {
-      $form_state->setError($element, $this->t('Unable to load @type entity @id.', [
-        '@type' => $entity_type,
-        '@id' => $id,
-      ]));
+      $form_state->setError($element, $this->t('Unable to load @type entity @id.', ['@type' => $entity_type, '@id' => $id]));
     }
   }
 
@@ -848,7 +836,7 @@ class EntityEmbedDialog extends FormBase implements WorkspaceSafeFormInterface {
 
       // Filter out empty attributes.
       $values['attributes'] = array_filter($values['attributes'], function ($value) {
-        return is_array($value) ? !empty($value) : (bool) mb_strlen((string) $value);
+        return (bool) mb_strlen((string) $value);
       });
 
       // Allow other modules to alter the values before getting submitted to the
@@ -901,7 +889,6 @@ class EntityEmbedDialog extends FormBase implements WorkspaceSafeFormInterface {
    * Callbacks are responsible for getting entities from entity browser and
    * updating form values accordingly.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidFunctionName.ScopeNotCamelCaps -- Released public method; renaming it would break callers.
   public function registerJSCallback(RegisterJSCallbacks $event) {
     if ($event->getBrowserID() == $this->entityBrowser->id()) {
       $event->registerCallback('Drupal.entityEmbedDialog.selectionCompleted');

@@ -30,13 +30,11 @@ use Drupal\Core\Field\FieldException;
   ],
   constraints: [
     'ImmutableProperties' => [
-      'properties' => [
-        'id',
-        'entity_type',
-        'bundle',
-        'field_name',
-        'field_type',
-      ],
+      'id',
+      'entity_type',
+      'bundle',
+      'field_name',
+      'field_type',
     ],
   ],
   config_export: [

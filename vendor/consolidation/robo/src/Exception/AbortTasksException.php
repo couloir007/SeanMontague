@@ -10,4 +10,5 @@ namespace Robo\Exception;
  */
 class AbortTasksException extends \Exception
 {
+
 }

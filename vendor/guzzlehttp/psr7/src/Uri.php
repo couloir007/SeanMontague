@@ -138,19 +138,10 @@ class Uri implements UriInterface, \JsonSerializable
             return false;
         }
 
-        $encodedUrl = $prefix.$encodedUrl;
-
-        // Without a scheme, parse_url() reads a port out of a path such as
-        // "/x:80", so references that start with a slash borrow a scheme.
-        $placeholder = $encodedUrl[0] === '/' ? 'x:' : '';
-        $result = parse_url($placeholder.$encodedUrl);
+        $result = parse_url($prefix.$encodedUrl);
 
         if ($result === false) {
             return false;
-        }
-
-        if ($placeholder !== '') {
-            unset($result['scheme']);
         }
 
         return array_map('urldecode', $result);

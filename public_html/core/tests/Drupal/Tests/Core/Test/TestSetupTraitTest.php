@@ -6,7 +6,6 @@ namespace Drupal\Tests\Core\Test;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Test\TestSetupTrait;
-use Drupal\Tests\DrupalTestCaseTrait;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -40,18 +39,7 @@ class TestSetupTraitTest extends UnitTestCase {
     // used to avoid unnecessary set up.
     $test_setup = new class() {
 
-      use DrupalTestCaseTrait;
       use TestSetupTrait;
-
-      /**
-       * Returns the test class name.
-       *
-       * @return string
-       *   The test class name.
-       */
-      public function name(): string {
-        return 'test';
-      }
 
     };
 

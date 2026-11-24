@@ -57,6 +57,10 @@ class CustomFieldGraphqlHooks {
             ':input[name="settings[field_config][' . $entity_type_id . '][' . $bundle . '][' . $field_name . '][enabled]"]' => ['checked' => TRUE],
           ],
         ],
+        '#field_label' => $field->getLabel(),
+        '#element_validate' => [
+          [static::class, 'validateSubfieldsEnabled'],
+        ],
       ];
       // Sort fields alphabetically by name.
       ksort($custom_items);
@@ -129,6 +133,48 @@ class CustomFieldGraphqlHooks {
       ]);
       $form_state->setError($element, $message);
     }
+  }
+
+  /**
+   * Validates that an enabled custom field has at least one enabled subfield.
+   *
+   * @param array $element
+   *   The element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   * @param array $form
+   *   The form.
+   */
+  public static function validateSubfieldsEnabled(array &$element, FormStateInterface &$form_state, array $form): void {
+    $values = $form_state->getValues();
+    $parents = $element['#parents'];
+
+    // Hidden by #states only, so values of disabled fields are still submitted.
+    $field_enabled = NestedArray::getValue(
+      $values,
+      [...array_slice($parents, 0, -1), 'enabled']
+    );
+    // Fields on a disabled bundle are not added to the schema. The parents are
+    // settings, field_config, entity type, bundle, field, subfields.
+    $bundle_enabled = NestedArray::getValue(
+      $values,
+      ['settings', 'entity_config', ...array_slice($parents, 2, 2), 'enabled']
+    );
+    if (!$field_enabled || !$bundle_enabled) {
+      return;
+    }
+
+    $subfields = NestedArray::getValue($values, $parents) ?: [];
+    foreach ($subfields as $subfield) {
+      if (!empty($subfield['enabled'])) {
+        return;
+      }
+    }
+
+    $message = t('@name must have at least one subfield enabled.', [
+      '@name' => $element['#field_label'] ?? 'Field',
+    ]);
+    $form_state->setError($element, $message);
   }
 
 }

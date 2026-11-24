@@ -176,15 +176,6 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
   /**
    * {@inheritdoc}
    */
-  public function getCacheTags() {
-    // Blocks do not use a view cache tag, they have no mechanisms that would
-    // require an invalidation of view related caches.
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function trustedCallbacks() {
     return ['preRender', 'lazyBuilder'];
   }
@@ -234,19 +225,11 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
       // #contextual_links is information about the *entire* block. Therefore,
       // we must move these properties from $content and merge them into the
       // top-level element.
-      if (isset($content['#contextual_links'])) {
-        $build['#contextual_links'] += $content['#contextual_links'];
-        unset($content['#contextual_links']);
-      }
-      if (isset($content['#wrapper_attributes'])) {
-        $build['#attributes'] += $content['#wrapper_attributes'];
-        unset($content['#wrapper_attributes']);
-      }
-      // For BC, if wrapper attributes are not set, and the top-level render
-      // element has neither type nor theme, still pull up the attributes.
-      elseif (!isset($content['#type']) && !isset($content['#theme']) && isset($content['#attributes'])) {
-        $build['#attributes'] += $content['#attributes'];
-        unset($content['#attributes']);
+      foreach (['#attributes', '#contextual_links'] as $property) {
+        if (isset($content[$property])) {
+          $build[$property] += $content[$property];
+          unset($content[$property]);
+        }
       }
       $build['content'] = $content;
     }

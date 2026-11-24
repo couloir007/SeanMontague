@@ -6,6 +6,7 @@ use Drupal\views\Attribute\ViewsSort;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\HandlerBase;
 use Drupal\views\ViewExecutable;
+use Drupal\views\Views;
 
 /**
  * Handler for GROUP BY on simple numeric fields.
@@ -25,7 +26,7 @@ class GroupByNumeric extends SortPluginBase {
     parent::init($view, $display, $options);
 
     // Initialize the original handler.
-    $this->handler = \Drupal::service('plugin.manager.views.sort')->getHandler($options);
+    $this->handler = Views::handlerManager('sort')->getHandler($options);
     $this->handler->init($view, $display, $options);
   }
 

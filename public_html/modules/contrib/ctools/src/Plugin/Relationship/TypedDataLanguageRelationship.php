@@ -2,8 +2,6 @@
 
 namespace Drupal\ctools\Plugin\Relationship;
 
-use Drupal\ctools\Attribute\Relationship;
-use Drupal\ctools\Plugin\Deriver\TypedDataLanguageRelationshipDeriver;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 
@@ -15,10 +13,6 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
  *   deriver = "\Drupal\ctools\Plugin\Deriver\TypedDataLanguageRelationshipDeriver"
  * )
  */
-#[Relationship(
-  id: 'typed_data_language_relationship',
-  deriver: TypedDataLanguageRelationshipDeriver::class,
-)]
 class TypedDataLanguageRelationship extends TypedDataRelationship {
 
   /**

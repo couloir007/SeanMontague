@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\physical\Unit;
 
-use PHPUnit\Framework\Attributes\Group;
 use Drupal\Tests\UnitTestCase;
 use Drupal\physical\Length;
 use Drupal\physical\Measurement;
@@ -13,7 +12,6 @@ use Drupal\physical\Measurement;
  * @coversDefaultClass \Drupal\physical\Measurement
  * @group physical
  */
-#[Group('physical')]
 class MeasurementTest extends UnitTestCase {
 
   /**

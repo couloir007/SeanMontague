@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Access;
 
-use Drupal\Core\Access\AccessArgumentsResolverFactoryInterface;
 use Drupal\Core\Access\AccessCheckInterface;
 use Drupal\Core\Access\AccessException;
 use Drupal\Core\Access\AccessManager;
@@ -12,18 +11,14 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\CheckProvider;
 use Drupal\Core\Access\DefaultAccessCheck;
 use Drupal\Core\Cache\Context\CacheContextsManager;
-use Drupal\Core\ParamConverter\ParamConverterManagerInterface;
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Routing\RouteObjectInterface;
-use Drupal\Core\Routing\RouteProviderInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\router_test\Access\DefinedTestAccessCheck;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Route;
@@ -59,28 +54,36 @@ class AccessManagerTest extends UnitTestCase {
 
   /**
    * The route provider.
+   *
+   * @var \PHPUnit\Framework\MockObject\MockObject
    */
-  protected RouteProviderInterface&MockObject $routeProvider;
+  protected $routeProvider;
 
   /**
    * The parameter converter.
+   *
+   * @var \Drupal\Core\ParamConverter\ParamConverterManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected ParamConverterManagerInterface&MockObject $paramConverter;
+  protected $paramConverter;
 
   /**
    * The mocked account.
+   *
+   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected AccountInterface&MockObject $account;
+  protected $account;
 
   /**
    * The access arguments resolver.
+   *
+   * @var \Drupal\Core\Access\AccessArgumentsResolverFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected AccessArgumentsResolverFactoryInterface&MockObject $argumentsResolverFactory;
+  protected $argumentsResolverFactory;
 
   /**
-   * The current user.
+   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected AccountInterface&MockObject $currentUser;
+  protected $currentUser;
 
   /**
    * @var \Drupal\Core\Access\CheckProvider

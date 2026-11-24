@@ -8,7 +8,6 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -17,7 +16,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Update')]
 #[CoversFunction('views_post_update_update_remember_role_empty')]
 #[RunTestsInSeparateProcesses]
-#[IgnoreDeprecations]
 class UserRememberRolesFilterSettingTest extends UpdatePathTestBase {
 
   /**

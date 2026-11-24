@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\ctools\Unit;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\ctools\Plugin\BlockPluginCollection;
@@ -17,7 +15,6 @@ use Drupal\Tests\UnitTestCase;
  *
  * @group CTools
  */
-#[Group('CTools')]
 class BlockVariantTraitTest extends UnitTestCase {
 
   use ProphecyTrait;
@@ -29,7 +26,6 @@ class BlockVariantTraitTest extends UnitTestCase {
    *
    * @dataProvider providerTestGetRegionAssignments
    */
-  #[DataProvider('providerTestGetRegionAssignments')]
   public function testGetRegionAssignments($expected, $blocks = []) {
     $block_collection = $this->prophesize(BlockPluginCollection::class);
     $block_collection->getAllByRegion()

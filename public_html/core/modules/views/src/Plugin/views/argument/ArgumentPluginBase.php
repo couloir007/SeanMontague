@@ -12,6 +12,7 @@ use Drupal\Core\Render\Element;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\HandlerBase;
+use Drupal\views\Views;
 
 /**
  * @defgroup views_argument_handlers Views argument handlers
@@ -389,7 +390,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
       ],
     ];
 
-    $plugins = \Drupal::service('plugin.manager.views.argument_validator')->getDefinitions();
+    $plugins = Views::pluginManager('argument_validator')->getDefinitions();
     foreach ($plugins as $id => $info) {
       if (!empty($info['no_ui'])) {
         continue;
@@ -650,7 +651,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
    * This is used when the default action provides a default argument.
    */
   public function defaultArgumentForm(&$form, FormStateInterface $form_state) {
-    $plugins = \Drupal::service('plugin.manager.views.argument_default')->getDefinitions();
+    $plugins = Views::pluginManager('argument_default')->getDefinitions();
     $options = [];
 
     $form['default_argument_type'] = [
@@ -709,7 +710,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
    * This is used when the default action displays a summary.
    */
   public function defaultSummaryForm(&$form, FormStateInterface $form_state) {
-    $style_plugins = \Drupal::service('plugin.manager.views.style')->getDefinitions();
+    $style_plugins = Views::pluginManager('style')->getDefinitions();
     $summary_plugins = [];
     $format_options = [];
     foreach ($style_plugins as $key => $plugin) {
@@ -921,7 +922,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
 
     // Change the display style to the summary style for this
     // argument.
-    $this->view->style_plugin = \Drupal::service('plugin.manager.views.style')->createInstance($this->options['summary']['format']);
+    $this->view->style_plugin = Views::pluginManager("style")->createInstance($this->options['summary']['format']);
     $this->view->style_plugin->init($this->view, $this->displayHandler, $this->options['summary_options']);
 
     // Clear out the normal primary field and whatever else may have
@@ -1218,7 +1219,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
       $options = $this->options[$options_name] ?? [];
     }
 
-    $plugin = \Drupal::service('views.plugin_managers')->get($type)->createInstance($name);
+    $plugin = Views::pluginManager($type)->createInstance($name);
     if ($plugin) {
       $plugin->init($this->view, $this->displayHandler, $options);
 

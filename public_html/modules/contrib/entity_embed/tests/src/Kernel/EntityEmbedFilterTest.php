@@ -2,25 +2,14 @@
 
 namespace Drupal\Tests\entity_embed\Kernel;
 
-use Drupal\entity_embed\Plugin\Filter\EntityEmbedFilter;
-use Drupal\filter\Plugin\Filter\FilterAlign;
-use Drupal\filter\Plugin\Filter\FilterCaption;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\filter\FilterProcessResult;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the entity_embed filter.
+ * @coversDefaultClass \Drupal\entity_embed\Plugin\Filter\EntityEmbedFilter
+ * @group entity_embed
  */
-#[Group('entity_embed')]
-#[RunTestsInSeparateProcesses]
-#[CoversClass(EntityEmbedFilter::class)]
-#[CoversClass(FilterAlign::class)]
-#[CoversClass(FilterCaption::class)]
 class EntityEmbedFilterTest extends EntityEmbedFilterTestBase {
 
   /**
@@ -43,8 +32,9 @@ class EntityEmbedFilterTest extends EntityEmbedFilterTestBase {
 
   /**
    * Ensures entities are rendered with correct data attributes.
+   *
+   * @dataProvider providerTestBasics
    */
-  #[DataProvider('providerTestBasics')]
   public function testBasics(array $embed_attributes, $expected_view_mode, array $expected_attributes) {
     $content = $this->createEmbedCode($embed_attributes);
 
@@ -66,18 +56,12 @@ class EntityEmbedFilterTest extends EntityEmbedFilterTestBase {
     $this->assertSame(['entity_embed/caption'], $result->getAttachments()['library']);
   }
 
-  /**
-   * Gets the sorted cache tags of a filter result.
-   */
   private function getCacheTags(FilterProcessResult $result): array {
     $cache_tags = $result->getCacheTags();
     sort($cache_tags);
     return $cache_tags;
   }
 
-  /**
-   * Gets the sorted cache contexts of a filter result.
-   */
   private function getCacheContexts(FilterProcessResult $result): array {
     $cache_contexts = $result->getCacheContexts();
     sort($cache_contexts);
@@ -196,8 +180,9 @@ class EntityEmbedFilterTest extends EntityEmbedFilterTestBase {
 
   /**
    * Tests that entity access is respected by embedding an unpublished entity.
+   *
+   * @dataProvider providerAccessUnpublished
    */
-  #[DataProvider('providerAccessUnpublished')]
   public function testAccessUnpublished($allowed_to_view_unpublished, $expected_rendered, CacheableMetadata $expected_cacheability, array $expected_attachments) {
     // Unpublish the embedded entity so we can test variations in behavior.
     $this->embeddedEntity->setUnpublished()->save();
@@ -270,8 +255,9 @@ class EntityEmbedFilterTest extends EntityEmbedFilterTestBase {
 
   /**
    * Tests the indicator for missing entities.
+   *
+   * @dataProvider providerMissingEntityIndicator
    */
-  #[DataProvider('providerMissingEntityIndicator')]
   public function testMissingEntityIndicator($entity_type_id, $uuid, $expected_missing_text) {
     $content = $this->createEmbedCode([
       'data-entity-type' => $entity_type_id,
@@ -365,9 +351,10 @@ class EntityEmbedFilterTest extends EntityEmbedFilterTestBase {
   }
 
   /**
-   * Tests the filter together with the align and caption filters.
+   * @covers \Drupal\filter\Plugin\Filter\FilterAlign
+   * @covers \Drupal\filter\Plugin\Filter\FilterCaption
+   * @dataProvider providerFilterIntegration
    */
-  #[DataProvider('providerFilterIntegration')]
   public function testFilterIntegration(array $filter_ids, array $additional_attributes, $verification_selector, $expected_verification_success, array $expected_asset_libraries, $prefix = '', $suffix = '') {
     $content = $this->createEmbedCode([
       'data-entity-type' => 'node',

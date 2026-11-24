@@ -6,7 +6,6 @@ namespace Drupal\file\Plugin\Validation\Constraint;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**
@@ -19,22 +18,17 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 class FileEncodingConstraint extends SymfonyConstraint {
 
   /**
+   * The error message.
+   *
+   * @var string
+   */
+  public string $message = "The file is encoded with %detected. It must be encoded with %encoding";
+
+  /**
    * The allowed file encodings.
    *
    * @var array
    */
   public array $encodings;
-
-  #[HasNamedArguments]
-  public function __construct(
-    mixed $options = NULL,
-    ?array $encodings = NULL,
-    public string $message = "The file is encoded with %detected. It must be encoded with %encoding",
-    ?array $groups = NULL,
-    mixed $payload = NULL,
-  ) {
-    parent::__construct($options, $groups, $payload);
-    $this->encodings = $encodings ?? $this->encodings;
-  }
 
 }

@@ -57,8 +57,6 @@ class BlockFilterTest extends WebDriverTestBase {
    * Tests block filter.
    */
   public function testBlockFilter(): void {
-    // @todo skipped due to random test failures, re-enable in https://www.drupal.org/project/drupal/issues/3028968.
-    $this->markTestSkipped();
     $assert_session = $this->assertSession();
     $session = $this->getSession();
     $page = $session->getPage();

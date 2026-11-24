@@ -6,6 +6,7 @@ namespace Drupal\custom_field\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
@@ -167,42 +168,23 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
    */
   public function processFields(array $element, FormStateInterface $form_state, array $form): array {
     $field_name = $this->fieldDefinition->getName();
-    $field_display = [];
-    $form_object = $form_state->getFormObject();
-    if (method_exists($form_object, 'getEntity')) {
-      /** @var \Drupal\Core\Entity\Entity\EntityViewDisplay $display */
-      $display = $form_object->getEntity();
-      $field_display = $display->getComponent($field_name);
-    }
-
     $values = $form_state->getValues();
+    $trigger = $form_state->getTriggeringElement();
     if ($form_state instanceof SubformStateInterface) {
-      $values = $form_state->getCompleteFormState()->getValues();
+      $complete_form_state = $form_state->getCompleteFormState();
+      $values = $complete_form_state->getValues();
+      $trigger = $complete_form_state->getTriggeringElement();
     }
 
     $parents = $element['#parents'] ?? [];
     $field_settings = $this->getSetting('fields') ?? [];
     $custom_items = $this->sortFields($field_settings);
-    $trigger = $form_state->getTriggeringElement();
     $trigger_parents = $trigger['#parents'] ?? [];
 
     // UI patterns.
-    $is_ui_pattern = in_array('ui_patterns', $parents);
+    $is_ui_pattern = \in_array('ui_patterns', $parents, TRUE);
     if ($is_ui_pattern) {
-      $index = array_search('sources', $parents, TRUE);
-      $ui_pattern_formatter = NULL;
-      if ($index !== FALSE) {
-        $ui_slot = array_slice($parents, 0, $index);
-        $slot = end($ui_slot);
-        $ui_pattern_formatter = $field_display['settings']['ui_patterns']['slots'][$slot]['sources'][0]['source']['type'] ?? NULL;
-        $slot_value = NestedArray::getValue($values, [...$ui_slot, 'sources', 0, 'source']) ?? [];
-        if (!empty($slot_value['type'])) {
-          $ui_pattern_formatter = $slot_value['type'];
-        }
-      }
-      if (!empty($trigger_parents) && end($trigger_parents) === 'type') {
-        $ui_pattern_formatter = $trigger['#value'];
-      }
+      $ui_pattern_formatter = $this->getUiPatternsSourceType($parents, $values, $trigger);
       $access = !empty($ui_pattern_formatter);
       $element['#access'] = $access;
       if (!$access) {
@@ -241,11 +223,10 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
       }
 
       // Special handling for the triggering element.
-      if (!empty($trigger_parents) && \in_array($name, $trigger_parents, TRUE)) {
-        if (end($trigger_parents) === 'format_type') {
-          $format_type = $trigger['#value'] ?? '';
-          $formatter_settings = [];
-        }
+      $expected_format_type_parents = [...$parents, $name, 'format_type'];
+      if ($trigger_parents === $expected_format_type_parents) {
+        $format_type = $trigger['#value'] ?? '';
+        $formatter_settings = [];
       }
 
       $tag_options = $this->tagManager->getTagOptions();
@@ -260,7 +241,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
         : [];
 
       // Build the subfields.
-      $wrapper_id = implode('_', [...$parents, $name, 'wrapper']);
+      $wrapper_id = Html::cleanCssIdentifier(implode('_', [...$parents, $name, 'wrapper']));
       $element[$name] = [
         '#attributes' => [
           'class' => ['draggable'],
@@ -285,6 +266,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
           'wrapper' => $wrapper_id,
           'method' => 'replace',
         ],
+        '#after_build' => [[static::class, 'limitElementValidation']],
       ];
       $element[$name]['content']['formatter_settings'] = [
         '#type' => 'container',
@@ -329,6 +311,103 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
     }
 
     return $element;
+  }
+
+  /**
+   * The #after_build callback: scopes validation to this element's real path.
+   *
+   * #array_parents is only reliable once the form builder has actually placed
+   * the element in the tree, which happens right before #after_build runs —
+   * using it here (rather than a hand-assembled path during #process) avoids
+   * mismatches against $form_state's real structure, which caused
+   * #limit_validation_errors to silently drop AJAX requests when nested
+   * several rebuild-generations deep (e.g. new Layout Builder blocks).
+   *
+   * @param array<string, mixed> $element
+   *   The element being built.
+   *
+   * @return array<string, mixed>
+   *   The element, with #limit_validation_errors set from its real parents.
+   */
+  public static function limitElementValidation(array $element): array {
+    $element['#limit_validation_errors'] = [$element['#array_parents']];
+    return $element;
+  }
+
+  /**
+   * Determines whether this element is nested in a UI Patterns source.
+   *
+   * Locates the parents of the UI Patterns "source" array by searching
+   * $parents from the end for the last (innermost) literal 'source' segment,
+   * rather than trimming a fixed number of trailing elements. The segments
+   * after 'source' differ between formatters (BaseFormatter appends
+   * 'settings'/'fields'; SingleDirectoryComponentFormatter appends only
+   * 'settings'), so a length-based slice would need re-verifying per caller
+   * — a class of bug this logic has already broken on more than once.
+   *
+   * Searching right-to-left and stopping at the first match is safe against
+   * component-/user-controlled names (subfield names, UI Patterns slot
+   * names, referenced field machine names) that might themselves be
+   * literally 'source': every such name necessarily sits to the LEFT of the
+   * real, hardcoded UI Patterns schema keys ('source', 'sources', 'value')
+   * in $parents, because those schema keys only appear once UI Patterns has
+   * already navigated into a selected source's own settings — so the search
+   * always finds a genuine schema key before it could ever reach a
+   * user-chosen name occupying the same string.
+   *
+   * IMPORTANT: $parents must be the element's base parents, captured before
+   * any subfield/slot machine name is appended. Both current call sites
+   * (BaseFormatter::processFields(), SingleDirectoryComponentFormatter::
+   * processSdcSettingsForm()) satisfy this by calling this method before
+   * their respective subfield/slot loops begin.
+   *
+   * @param array<int, mixed> $parents
+   *   The '#parents' of the current form element, captured before any
+   *   subfield/slot name has been appended.
+   * @param array<string, mixed> $values
+   *   The full submitted/default form values.
+   * @param array<string, mixed>|null $trigger
+   *   The triggering element info, or NULL if none.
+   *
+   * @return string|null
+   *   The UI Patterns source plugin type/id, or NULL if this element isn't
+   *   nested in UI Patterns, or no source has been selected yet.
+   */
+  protected function getUiPatternsSourceType(array $parents, array $values, ?array $trigger): ?string {
+    if (!\in_array('ui_patterns', $parents, TRUE)) {
+      return NULL;
+    }
+
+    $source_index = NULL;
+    for ($i = count($parents) - 1; $i >= 0; $i--) {
+      if ($parents[$i] === 'source') {
+        $source_index = $i;
+        break;
+      }
+    }
+
+    // A 'source' segment must come after 'ui_patterns' — guards against a
+    // false match if this were ever called with an out-of-precondition
+    // $parents (see docblock above).
+    $ui_patterns_index = \array_search('ui_patterns', $parents, TRUE);
+    if ($source_index === NULL || $source_index <= $ui_patterns_index) {
+      return NULL;
+    }
+    $source_parents = array_slice($parents, 0, $source_index + 1);
+
+    $ui_pattern_type = NULL;
+    $submitted_type = NestedArray::getValue($values, [...$source_parents, 'type']);
+    if (!empty($submitted_type)) {
+      $ui_pattern_type = $submitted_type;
+    }
+
+    $trigger_parents = $trigger['#parents'] ?? [];
+    if (!empty($trigger_parents) && end($trigger_parents) === 'type'
+      && \array_slice($trigger_parents, 0, -1) === $source_parents) {
+      $ui_pattern_type = $trigger['#value'];
+    }
+
+    return $ui_pattern_type;
   }
 
   /**
@@ -479,6 +558,10 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
           $value = $item->{$custom_item->getName()};
           if (!empty($target_type) && !empty($value)) {
             if (isset($target_entities[$target_type][$value])) {
+              // Forcing instantiation here makes prepareView() correct for any
+              // caller, and idempotent: a second call reads back a scalar
+              // rather than the array it wrote the first time.
+              $item->get($custom_item->getName());
               $item->{$custom_item->getName()} = ['entity' => $target_entities[$target_type][$value]];
             }
           }
@@ -492,10 +575,18 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
    */
   public function viewValue(FieldItemInterface $item, string $langcode): array {
     $field_name = $this->fieldDefinition->getName();
+    $entity = $item->getEntity();
+    $entity_type = $entity->getEntityTypeId();
+    $bundle = $entity->bundle();
     $output = [
       '#theme' => 'custom_field',
       '#field_name' => $field_name,
       '#items' => [],
+      '#entity_type' => $entity_type,
+      '#bundle' => $bundle,
+      '#object' => $entity,
+      '#language' => $langcode,
+      '#raw_value' => $item->getValue(),
     ];
 
     $values = $this->getFormattedValues($item, $langcode);
@@ -507,12 +598,14 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
           '#field_name' => $field_name,
           '#name' => $value['name'],
           '#value' => $value['value'],
+          '#raw_value' => $value['raw_value'],
           '#label' => $value['label'],
           '#label_display' => $value['label_display'],
           '#type' => $value['type'],
           '#wrappers' => $value['wrappers'],
-          '#entity_type' => $value['entity_type'],
-          '#lang_code' => $langcode,
+          '#entity_type' => $entity_type,
+          '#bundle' => $bundle,
+          '#language' => $langcode,
         ];
       }
     }
@@ -550,8 +643,8 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
     $custom_items = $event->getCustomItems();
 
     $values = [];
-    $entity_type = $this->fieldDefinition->getTargetEntityTypeId();
-    foreach ($custom_items as $name => $custom_item) {
+    foreach ($custom_items as $custom_item) {
+      $name = $custom_item->getName();
       $value = static::prepareFormattedSubfieldValue($item, $custom_item, $name, $langcode);
       if ($value === '' || $value === NULL) {
         continue;
@@ -590,11 +683,11 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
       $markup = [
         'name' => $name,
         'value' => $render_value,
+        'raw_value' => $custom_item->getRawValue($item),
         'label' => $field_label ?: $custom_item->getLabel(),
         'label_display' => $formatter_settings['formatter_settings']['label_display'] ?? 'above',
         'type' => $custom_item->getPluginId(),
         'wrappers' => $formatter_settings['wrappers'],
-        'entity_type' => $entity_type,
       ];
 
       $values[$name] = $markup;

@@ -47,14 +47,14 @@ final class CustomField extends FieldPluginBase implements MultiItemsFieldHandle
    *
    * @var bool
    */
-  private bool $limitValues;
+  protected bool $limitValues;
 
   /**
    * Does the field supports multiple field values.
    *
    * @var bool
    */
-  private bool $multiple;
+  protected bool $multiple;
 
   /**
    * Static cache for ::getEntityFieldRenderer().
@@ -93,11 +93,11 @@ final class CustomField extends FieldPluginBase implements MultiItemsFieldHandle
     $plugin_definition,
     RendererInterface $renderer,
     EntityFieldManagerInterface $entity_field_manager,
-    private readonly EntityTypeManagerInterface $entityTypeManager,
-    private readonly EntityRepositoryInterface $entityRepository,
-    private readonly CustomFieldTypeManagerInterface $customFieldTypeManager,
-    private readonly CustomFieldFormatterManagerInterface $customFieldFormatterManager,
-    private readonly LanguageManagerInterface $languageManager,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityRepositoryInterface $entityRepository,
+    protected CustomFieldTypeManagerInterface $customFieldTypeManager,
+    protected CustomFieldFormatterManagerInterface $customFieldFormatterManager,
+    protected LanguageManagerInterface $languageManager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityFieldManager = $entity_field_manager;

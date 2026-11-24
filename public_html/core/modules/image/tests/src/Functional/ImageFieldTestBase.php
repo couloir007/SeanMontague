@@ -16,7 +16,7 @@ use Drupal\Tests\BrowserTestBase;
  *   \Drupal\image\ImageStyleInterface::createDerivative()
  *
  * - image.module:
- *   \Drupal::service(ImageDerivativeUtilities::class)->styleOptions()
+ *   image_style_options()
  *   \Drupal\image\ImageStyleInterface::flush()
  */
 

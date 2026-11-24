@@ -15,7 +15,7 @@ class DimensionsConstraintValidator extends ConstraintValidator {
   /**
    * {@inheritdoc}
    */
-  public function validate(mixed $value, Constraint $constraint): void {
+  public function validate($value, Constraint $constraint) {
     $properties = [
       'length' => $this->t('Length'),
       'width' => $this->t('Width'),

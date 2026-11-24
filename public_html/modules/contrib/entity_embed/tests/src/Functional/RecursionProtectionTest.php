@@ -3,16 +3,14 @@
 namespace Drupal\Tests\entity_embed\Functional;
 
 use Drupal\entity_embed\Plugin\Filter\EntityEmbedFilter;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests recursive rendering protection.
  *
+ * @group entity_embed
+ *
  * @see \Drupal\Tests\entity_embed\Kernel\EntityEmbedFilterTest::testRecursionProtection
  */
-#[Group('entity_embed')]
-#[RunTestsInSeparateProcesses]
 class RecursionProtectionTest extends EntityEmbedTestBase {
 
   /**

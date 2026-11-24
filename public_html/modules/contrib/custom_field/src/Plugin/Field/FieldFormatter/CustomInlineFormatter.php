@@ -89,11 +89,18 @@ class CustomInlineFormatter extends BaseFormatter {
   public function settingsSummary(): array {
     $summary = parent::settingsSummary();
 
-    $summary[] = $this->t('Show labels: @show_labels', ['@show_labels' => $this->getSetting('label_display') ? 'Yes' : 'No']);
-    if ($this->getSetting('label_display')) {
-      $summary[] = $this->t('Label separator: @sep', ['@sep' => $this->getSetting('label_separator')]);
+    $show_labels = (bool) $this->getSetting('show_labels');
+    $summary[] = $this->t('Show labels: @show_labels', [
+      '@show_labels' => $show_labels ? 'Yes' : 'No',
+    ]);
+    if ($show_labels) {
+      $summary[] = $this->t('Label separator: @sep', [
+        '@sep' => $this->getSetting('label_separator'),
+      ]);
     }
-    $summary[] = $this->t('Item separator: @sep', ['@sep' => $this->getSetting('item_separator')]);
+    $summary[] = $this->t('Item separator: @sep', [
+      '@sep' => $this->getSetting('item_separator'),
+    ]);
 
     return $summary;
   }
@@ -109,6 +116,9 @@ class CustomInlineFormatter extends BaseFormatter {
     $output = [];
     $values = $this->getFormattedValues($item, $langcode);
     $valid_items = [];
+    $entity = $item->getEntity();
+    $entity_type = $entity->getEntityTypeId();
+    $bundle = $entity->bundle();
 
     // Force no wrappers.
     $inline_wrappers = [
@@ -128,12 +138,14 @@ class CustomInlineFormatter extends BaseFormatter {
         '#field_name' => $field_name,
         '#name' => $value['name'],
         '#value' => $value['value'],
+        '#raw_value' => $value['raw_value'],
         '#label' => $value['label'],
         '#label_display' => 'hidden',
         '#type' => $value['type'],
         '#wrappers' => $inline_wrappers,
-        '#entity_type' => $value['entity_type'],
-        '#lang_code' => $langcode,
+        '#entity_type' => $entity_type,
+        '#bundle' => $bundle,
+        '#language' => $langcode,
       ];
 
       if ($this->getSetting('show_labels')) {

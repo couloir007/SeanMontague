@@ -2,8 +2,6 @@
 
 namespace Drupal\ctools\Plugin\Relationship;
 
-use Drupal\ctools\Attribute\Relationship;
-use Drupal\ctools\Plugin\Deriver\TypedDataRelationshipDeriver;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
@@ -21,10 +19,6 @@ use Drupal\ctools\Plugin\RelationshipBase;
  *   deriver = "\Drupal\ctools\Plugin\Deriver\TypedDataRelationshipDeriver"
  * )
  */
-#[Relationship(
-  id: 'typed_data_relationship',
-  deriver: TypedDataRelationshipDeriver::class,
-)]
 class TypedDataRelationship extends RelationshipBase {
 
   /**
@@ -90,12 +84,17 @@ class TypedDataRelationship extends RelationshipBase {
   /**
    * Gets the value of the relationship's main property.
    *
-   * @return mixed
-   *   The main property value of the related data, or NULL if the 'base'
-   *   context has no value.
+   * @todo This method is broken: getMainPropertyName() requires a
+   *   FieldItemInterface argument and nothing is returned. It is retained only
+   *   for backwards compatibility and should be deprecated and removed in a
+   *   future major release.
    */
   public function getRelationshipValue() {
-    return $this->getRelationship()->getContextValue();
+    // @phpstan-ignore-next-line
+    $property = $this->getMainPropertyName();
+    /** @var \Drupal\Core\TypedData\ComplexDataInterface $data */
+    $data = $this->getRelationship()->getContextData();
+    $data->get($property)->getValue();
   }
 
 }

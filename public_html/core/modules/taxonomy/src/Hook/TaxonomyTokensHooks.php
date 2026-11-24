@@ -119,7 +119,8 @@ class TaxonomyTokensHooks {
             break;
 
           case 'description':
-            // "processed" returns a \Drupal\Component\Render\MarkupInterface.
+            // "processed" returns a \Drupal\Component\Render\MarkupInterface
+            // via check_markup().
             $replacements[$original] = $term->description->processed;
             break;
 

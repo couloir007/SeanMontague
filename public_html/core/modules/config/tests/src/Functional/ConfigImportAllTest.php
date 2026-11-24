@@ -8,7 +8,6 @@ use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\ModuleExtensionList;
-use Drupal\Core\Field\FieldPurger;
 use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\Tests\system\Functional\Module\ModuleTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -73,8 +72,7 @@ class ConfigImportAllTest extends ModuleTestBase {
         || !empty($module->info['hidden'])
         || $module->status == TRUE
         || $module->info['package'] == 'Testing'
-        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED
-        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::OBSOLETE) {
+        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
         return FALSE;
       }
       return TRUE;
@@ -110,7 +108,7 @@ class ConfigImportAllTest extends ModuleTestBase {
     }
 
     // Purge the field data.
-    \Drupal::service(FieldPurger::class)->purgeBatch(1000);
+    field_purge_batch(1000);
 
     $all_modules = \Drupal::service('extension.list.module')->getList();
     $database_module = \Drupal::service('database')->getProvider();

@@ -27,24 +27,19 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
 
   /**
    * Tests validate.
-   *
-   * @param string $url
-   *   The URL returned from LinkItemInterface::getUrl().
-   * @param bool $valid
-   *   TRUE if the URL is valid, FALSE if the URL should cause a build
-   *   violation.
    */
   #[DataProvider('providerValidate')]
   #[RunInSeparateProcess]
-  public function testValidate(string $url, bool $valid): void {
-    $link = $this->createStub(LinkItemInterface::class);
-    $link->method('getUrl')
+  public function testValidate($url, $valid): void {
+    $link = $this->createMock('Drupal\link\LinkItemInterface');
+    $link->expects($this->any())
+      ->method('getUrl')
       ->willReturn(Url::fromUri($url));
     $context = $this->createMock(ExecutionContextInterface::class);
 
     $constraintViolationBuilder = $this->createMock(ConstraintViolationBuilderInterface::class);
-    $constraintViolationBuilder->expects($valid ? $this->never() : $this->once())
-      ->method('atPath')
+    $constraintViolationBuilder->method('atPath')
+      ->with('uri')
       ->willReturn($constraintViolationBuilder);
 
     if ($valid) {
@@ -70,7 +65,7 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
   /**
    * Data provider for ::testValidate.
    */
-  public static function providerValidate(): array {
+  public static function providerValidate() {
     $data = [];
 
     // Test allowed protocols.
@@ -91,8 +86,9 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
    * @see \Drupal\Core\Url::fromUri
    */
   public function testValidateWithMalformedUri(): void {
-    $link = $this->createStub(LinkItemInterface::class);
-    $link->method('getUrl')
+    $link = $this->createMock('Drupal\link\LinkItemInterface');
+    $link->expects($this->any())
+      ->method('getUrl')
       ->willThrowException(new \InvalidArgumentException());
 
     $context = $this->createMock(ExecutionContextInterface::class);
@@ -110,8 +106,9 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
    * Tests validate ignores internal urls.
    */
   public function testValidateIgnoresInternalUrls(): void {
-    $link = $this->createStub(LinkItemInterface::class);
-    $link->method('getUrl')
+    $link = $this->createMock('Drupal\link\LinkItemInterface');
+    $link->expects($this->any())
+      ->method('getUrl')
       ->willReturn(Url::fromRoute('example.test'));
 
     $context = $this->createMock(ExecutionContextInterface::class);
@@ -131,7 +128,7 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
   public function testUnexpectedValue(): void {
     $this->expectException(UnexpectedValueException::class);
     $validator = new LinkExternalProtocolsConstraintValidator();
-    $context = $this->createStub(ExecutionContextInterface::class);
+    $context = $this->createMock(ExecutionContextInterface::class);
     $validator->initialize($context);
     $constraint = new LinkExternalProtocolsConstraint();
     $validator->validate('bad value', $constraint);
@@ -149,7 +146,7 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
       ->method('getUrl');
 
     $validator = new LinkExternalProtocolsConstraintValidator();
-    $context = $this->createStub(ExecutionContextInterface::class);
+    $context = $this->createMock(ExecutionContextInterface::class);
     $validator->initialize($context);
     $constraint = new LinkExternalProtocolsConstraint();
     $validator->validate($link, $constraint);

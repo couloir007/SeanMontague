@@ -4,7 +4,6 @@ namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**
@@ -25,25 +24,15 @@ class ComplexDataConstraint extends SymfonyConstraint {
    */
   public $properties;
 
-  #[HasNamedArguments]
-  public function __construct(
-    mixed $options = NULL,
-    ?array $properties = NULL,
-    ?array $groups = NULL,
-    mixed $payload = NULL,
-    ...$otherProperties,
-  ) {
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct($options = NULL) {
     // Allow skipping the 'properties' key in the options.
-    if (is_array($options)) {
-      if (!array_key_exists('properties', $options)) {
-        $options = ['properties' => $options];
-      }
+    if (is_array($options) && !array_key_exists('properties', $options)) {
+      $options = ['properties' => $options];
     }
-    elseif ($properties === NULL && !empty($otherProperties)) {
-      $properties = $otherProperties;
-    }
-    parent::__construct($options, $groups, $payload);
-    $this->properties = $properties ?? $this->properties;
+    parent::__construct($options);
     $constraint_manager = \Drupal::service('validation.constraint');
 
     // Instantiate constraint objects for array definitions.

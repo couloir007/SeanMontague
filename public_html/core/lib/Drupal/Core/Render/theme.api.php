@@ -27,13 +27,13 @@ use Drupal\Core\Extension\ThemeSettingsProvider;
  * arrays and rendering.
  *
  * @section sec_twig_theme Twig Templating Engine
- * Drupal uses the templating engine Twig. Twig offers developers a fast,
- * secure, and flexible method for building templates for Drupal sites. Twig
+ * Drupal 8 uses the templating engine Twig. Twig offers developers a fast,
+ * secure, and flexible method for building templates for Drupal 8 sites. Twig
  * also offers substantial usability improvements over PHPTemplate, and does
  * not require front-end developers to know PHP to build and manipulate Drupal
- * themes.
+ * 8 themes.
  *
- * For further information on theming in Drupal see
+ * For further information on theming in Drupal 8 see
  * https://www.drupal.org/docs/develop/theming-drupal
  *
  * For further Twig documentation see
@@ -789,7 +789,7 @@ function hook_theme_suggestions_HOOK_alter(array &$suggestions, array &$variable
  */
 function hook_themes_installed($theme_list): void {
   foreach ($theme_list as $theme) {
-    // ...perform some action based on the $theme.
+    block_theme_initialize($theme);
   }
 }
 

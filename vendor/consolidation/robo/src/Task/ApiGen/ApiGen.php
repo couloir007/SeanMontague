@@ -26,8 +26,8 @@ class ApiGen extends BaseTask implements CommandInterface
 {
     use ExecOneCommand;
 
-    public const BOOL_NO = 'no';
-    public const BOOL_YES = 'yes';
+    const BOOL_NO = 'no';
+    const BOOL_YES = 'yes';
 
     /**
      * @var string

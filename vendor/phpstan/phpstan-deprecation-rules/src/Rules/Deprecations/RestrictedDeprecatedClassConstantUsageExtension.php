@@ -24,11 +24,6 @@ class RestrictedDeprecatedClassConstantUsageExtension implements RestrictedClass
 		Scope $scope
 	): ?RestrictedUsage
 	{
-		// Foo::class is reported as a deprecated class name usage
-		if ($constantReflection->getName() === 'class') {
-			return null;
-		}
-
 		if ($this->deprecatedScopeHelper->isScopeDeprecated($scope)) {
 			return null;
 		}
@@ -42,7 +37,7 @@ class RestrictedDeprecatedClassConstantUsageExtension implements RestrictedClass
 						'Fetching class constant %s of deprecated %s %s.',
 						$constantReflection->getName(),
 						strtolower($constantReflection->getDeclaringClass()->getClassTypeDescription()),
-						$constantReflection->getDeclaringClass()->getDisplayName(),
+						$constantReflection->getDeclaringClass()->getName(),
 					),
 					sprintf(
 						'classConstant.deprecated%s',
@@ -56,7 +51,7 @@ class RestrictedDeprecatedClassConstantUsageExtension implements RestrictedClass
 					"Fetching class constant %s of deprecated %s %s:\n%s",
 					$constantReflection->getName(),
 					strtolower($constantReflection->getDeclaringClass()->getClassTypeDescription()),
-					$constantReflection->getDeclaringClass()->getDisplayName(),
+					$constantReflection->getDeclaringClass()->getName(),
 					$classDescription,
 				),
 				sprintf(
@@ -77,7 +72,7 @@ class RestrictedDeprecatedClassConstantUsageExtension implements RestrictedClass
 					'Fetching deprecated class constant %s of %s %s.',
 					$constantReflection->getName(),
 					strtolower($constantReflection->getDeclaringClass()->getClassTypeDescription()),
-					$constantReflection->getDeclaringClass()->getDisplayName(),
+					$constantReflection->getDeclaringClass()->getName(),
 				),
 				'classConstant.deprecated',
 			);
@@ -88,7 +83,7 @@ class RestrictedDeprecatedClassConstantUsageExtension implements RestrictedClass
 				"Fetching deprecated class constant %s of %s %s:\n%s",
 				$constantReflection->getName(),
 				strtolower($constantReflection->getDeclaringClass()->getClassTypeDescription()),
-				$constantReflection->getDeclaringClass()->getDisplayName(),
+				$constantReflection->getDeclaringClass()->getName(),
 				$description,
 			),
 			'classConstant.deprecated',

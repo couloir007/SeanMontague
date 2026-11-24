@@ -41,12 +41,10 @@ use Drupal\field\FieldStorageConfigStorage;
   ],
   constraints: [
     'ImmutableProperties' => [
-      'properties' => [
-        'id',
-        'entity_type',
-        'field_name',
-        'type',
-      ],
+      'id',
+      'entity_type',
+      'field_name',
+      'type',
     ],
   ],
   config_export: [
@@ -446,7 +444,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
     parent::preDelete($storage, $field_storages);
 
     // Keep the field storage definitions in the deleted fields repository so we
-    // can use them later during the field purge process.
+    // can use them later during field_purge_batch().
     /** @var \Drupal\field\FieldStorageConfigInterface $field_storage */
     foreach ($field_storages as $field_storage) {
       // Only mark a field for purging if there is data. Otherwise, just remove

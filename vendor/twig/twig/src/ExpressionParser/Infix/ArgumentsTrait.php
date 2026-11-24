@@ -52,14 +52,11 @@ trait ArgumentsTrait
                 }
             }
 
-            if ($token = $stream->nextIf(Token::OPERATOR_TYPE, '...')) {
-                $value = new SpreadUnary($parser->parseExpression(), $token->getLine());
+            $value = $parser->parseExpression();
+            if ($value instanceof SpreadUnary) {
                 $hasSpread = true;
-            } else {
-                $value = $parser->parseExpression();
-                if ($hasSpread) {
-                    throw new SyntaxError('Normal arguments must be placed before argument unpacking.', $stream->getCurrent()->getLine(), $stream->getSourceContext());
-                }
+            } elseif ($hasSpread) {
+                throw new SyntaxError('Normal arguments must be placed before argument unpacking.', $stream->getCurrent()->getLine(), $stream->getSourceContext());
             }
 
             $name = null;

@@ -2,6 +2,7 @@
 
 namespace Drupal\comment;
 
+use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -96,8 +97,8 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
         continue;
       }
       $links = [];
-      $commenting_status = CommentingStatus::tryFrom((int) $entity->get($field_name)->status);
-      if ($commenting_status != CommentingStatus::Hidden) {
+      $commenting_status = $entity->get($field_name)->status;
+      if ($commenting_status != CommentItemInterface::HIDDEN) {
         // Entity has commenting status open or closed.
         $field_definition = $entity->getFieldDefinition($field_name);
         if ($view_mode == 'teaser') {
@@ -115,8 +116,8 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
             }
           }
           // Provide a link to new comment form.
-          if ($commenting_status == CommentingStatus::Open) {
-            $comment_form_location = FormLocation::tryFrom((int) $field_definition->getSetting('form_location'));
+          if ($commenting_status == CommentItemInterface::OPEN) {
+            $comment_form_location = $field_definition->getSetting('form_location');
             if ($this->currentUser->hasPermission('post comments')) {
               $links['comment-add'] = [
                 'title' => $this->t('Add new comment'),
@@ -124,7 +125,7 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
                 'attributes' => ['title' => $this->t('Share your thoughts and opinions.')],
                 'fragment' => 'comment-form',
               ];
-              if ($comment_form_location == FormLocation::SeparatePage) {
+              if ($comment_form_location == CommentItemInterface::FORM_SEPARATE_PAGE) {
                 $links['comment-add']['url'] = Url::fromRoute('comment.reply', [
                   'entity_type' => $entity->getEntityTypeId(),
                   'entity' => $entity->id(),
@@ -146,18 +147,18 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
           // Entity in other view modes: add a "post comment" link if the user
           // is allowed to post comments and if this entity is allowing new
           // comments.
-          if ($commenting_status == CommentingStatus::Open) {
-            $comment_form_location = FormLocation::tryFrom((int) $field_definition->getSetting('form_location'));
+          if ($commenting_status == CommentItemInterface::OPEN) {
+            $comment_form_location = $field_definition->getSetting('form_location');
             if ($this->currentUser->hasPermission('post comments')) {
               // Show the "post comment" link if the form is on another page, or
               // if there are existing comments that the link will skip past.
-              if ($comment_form_location == FormLocation::SeparatePage || (!empty($entity->get($field_name)->comment_count) && $this->currentUser->hasPermission('access comments'))) {
+              if ($comment_form_location == CommentItemInterface::FORM_SEPARATE_PAGE || (!empty($entity->get($field_name)->comment_count) && $this->currentUser->hasPermission('access comments'))) {
                 $links['comment-add'] = [
                   'title' => $this->t('Add new comment'),
                   'attributes' => ['title' => $this->t('Share your thoughts and opinions.')],
                   'fragment' => 'comment-form',
                 ];
-                if ($comment_form_location == FormLocation::SeparatePage) {
+                if ($comment_form_location == CommentItemInterface::FORM_SEPARATE_PAGE) {
                   $links['comment-add']['url'] = Url::fromRoute('comment.reply', [
                     'entity_type' => $entity->getEntityTypeId(),
                     'entity' => $entity->id(),

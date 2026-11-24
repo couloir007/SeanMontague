@@ -18,19 +18,9 @@ use Drupal\Core\TypedData\TypedDataInternalPropertiesHelper;
 class ComplexDataNormalizer extends NormalizerBase {
 
   /**
-   * Normalizes data into a set of arrays/scalars.
-   *
-   * @param mixed $object
-   *   Data to normalize.
-   * @param string|null $format
-   *   Format the normalization result will be encoded as.
-   * @param array<string, mixed> $context
-   *   Context options for the normalizer.
-   *
-   * @return array
-   *   The normalized data.
+   * {@inheritdoc}
    */
-  public function normalize($object, $format = NULL, array $context = []): array {
+  public function normalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
     $attributes = [];
     // $object will not always match getSupportedTypes().
     // @see \Drupal\serialization\Normalizer\EntityNormalizer

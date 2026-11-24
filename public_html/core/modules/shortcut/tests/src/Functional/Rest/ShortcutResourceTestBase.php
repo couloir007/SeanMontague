@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\shortcut\Functional\Rest;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\Url;
 use Drupal\shortcut\Entity\Shortcut;
 use Drupal\shortcut\Entity\ShortcutSet;
 use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
@@ -78,11 +77,6 @@ abstract class ShortcutResourceTestBase extends EntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getExpectedNormalizedEntity() {
-    $uri = 'internal:/admin/content/comment';
-    $uri_options = [
-      'fragment' => 'new',
-    ];
-    $url = Url::fromUri($uri, $uri_options);
     return [
       'uuid' => [
         [
@@ -108,10 +102,11 @@ abstract class ShortcutResourceTestBase extends EntityResourceTestBase {
       ],
       'link' => [
         [
-          'uri' => $uri,
-          'resolvable_uri' => $url->toString(),
+          'uri' => 'internal:/admin/content/comment',
           'title' => NULL,
-          'options' => $uri_options,
+          'options' => [
+            'fragment' => 'new',
+          ],
         ],
       ],
       'weight' => [

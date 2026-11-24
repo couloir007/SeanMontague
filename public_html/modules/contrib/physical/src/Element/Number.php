@@ -4,7 +4,7 @@ namespace Drupal\physical\Element;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Render\Element\FormElementBase;
+use Drupal\Core\Render\Element\FormElement;
 
 /**
  * Provides a number form element with support for language-specific input.
@@ -26,7 +26,7 @@ use Drupal\Core\Render\Element\FormElementBase;
  *
  * @FormElement("physical_number")
  */
-class Number extends FormElementBase {
+class Number extends FormElement {
 
   /**
    * {@inheritdoc}

@@ -5,22 +5,16 @@
  */
 (function (Drupal, drupalSettings, once) {
   Drupal.behaviors.entityEmbedSetDynamicIcons = {
-    attach(context) {
+    attach: function (context) {
       // Get the available Embed Buttons from Drupal.
-      Object.values(drupalSettings.embedButtons || {}).forEach(
-        function (button) {
-          // Iterate through the embed buttons and set the corresponding background image.
-          const selector = `.ckeditor5-toolbar-button-${button.id}`;
-          const iconUrl = button.icon.endsWith('svg')
-            ? button.icon
-            : `/${drupalSettings.modulePath}/js/ckeditor5_plugins/drupalentity/entity.svg`;
-          once('entityEmbedSetDynamicIcons', selector, context).forEach(
-            (button) => {
-              button.style['background-image'] = `url('${iconUrl}')`;
-            },
-          );
-        },
-      );
+      Object.values(drupalSettings.embedButtons || {}).forEach(function (button) {
+        // Iterate through the embed buttons and set the corresponding background image.
+        const selector = '.ckeditor5-toolbar-button-' + button.id;
+        const iconUrl = button.icon.endsWith('svg') ? button.icon : '/' + drupalSettings.modulePath + '/js/ckeditor5_plugins/drupalentity/entity.svg';
+        once('entityEmbedSetDynamicIcons', selector, context).forEach((button) => {
+          button.style['background-image'] = `url('${iconUrl}')`
+        });
+      });
     },
-  };
+  }
 })(Drupal, drupalSettings, once);

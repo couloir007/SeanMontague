@@ -241,7 +241,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
   public function testValidation(): void {
     // Create a data definition that specifies certain allowed keys.
     $definition = MapDataDefinition::create('mapping')
-      ->addConstraint('ValidKeys', ['allowedKeys' => ['north', 'south', 'west']]);
+      ->addConstraint('ValidKeys', ['north', 'south', 'west']);
     $definition['mapping'] = [
       'north' => ['type' => 'string', 'requiredKey' => FALSE],
       'east' => ['type' => 'string', 'requiredKey' => FALSE],
@@ -339,7 +339,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
     $config = $this->container->get('config.typed')
       ->get('system.site');
     $config->getDataDefinition()
-      ->addConstraint('ValidKeys', ['allowedKeys' => '<infer>'],);
+      ->addConstraint('ValidKeys', '<infer>');
 
     $data = $config->getValue();
     $data['invalid-key'] = "There's a snake in my boots.";
@@ -351,7 +351,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
     // Ensure that ValidKeys will freak out if the option is not exactly
     // `<infer>`.
     $config->getDataDefinition()
-      ->addConstraint('ValidKeys', ['allowedKeys' => 'infer']);
+      ->addConstraint('ValidKeys', 'infer');
     $this->expectExceptionMessage("'infer' is not a valid set of allowed keys.");
     $config->validate();
   }

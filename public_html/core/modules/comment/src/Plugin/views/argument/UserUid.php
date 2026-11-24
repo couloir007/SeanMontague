@@ -5,6 +5,7 @@ namespace Drupal\comment\Plugin\views\argument;
 use Drupal\Core\Database\Connection;
 use Drupal\views\Attribute\ViewsArgument;
 use Drupal\views\Plugin\views\argument\ArgumentPluginBase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The views user ID argument handler.
@@ -41,6 +42,13 @@ class UserUid extends ArgumentPluginBase {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->database = $database;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static($configuration, $plugin_id, $plugin_definition, $container->get('database'));
   }
 
   /**

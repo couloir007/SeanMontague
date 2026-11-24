@@ -94,30 +94,17 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
       throw new InvalidPluginDefinitionException($plugin_id, sprintf('The "%s" layout definition must extend %s', $plugin_id, LayoutDefinition::class));
     }
 
-    if (empty($definition->getLabel())) {
-      @trigger_error('A layout plugin not having a label is deprecated in drupal:11.4.0 and having a label will be enforced in drupal:12.0.0. See https://www.drupal.org/node/3464076', E_USER_DEPRECATED);
-    }
-
-    // Ensure that every plugin has a category.
+    // Add the module or theme path to the 'path'.
     $provider = $definition->getProvider();
     if ($this->moduleHandler->moduleExists($provider)) {
-      $extension = $this->moduleHandler->getModule($provider);
+      $base_path = $this->moduleHandler->getModule($provider)->getPath();
     }
     elseif ($this->themeHandler->themeExists($provider)) {
-      $extension = $this->themeHandler->getTheme($provider);
+      $base_path = $this->themeHandler->getTheme($provider)->getPath();
     }
     else {
-      $extension = NULL;
+      $base_path = '';
     }
-    if (empty($definition->getCategory())) {
-      // Default to the human-readable name if the provider is a module or
-      // theme; otherwise the provider machine name is used.
-      $category = $extension ? $extension->getName() : $provider;
-      $definition->setCategory($category);
-    }
-
-    // Add the module or theme path to the 'path'.
-    $base_path = $extension ? $extension->getPath() : '';
 
     $path = $definition->getPath();
     $path = !empty($path) ? $base_path . '/' . $path : $base_path;

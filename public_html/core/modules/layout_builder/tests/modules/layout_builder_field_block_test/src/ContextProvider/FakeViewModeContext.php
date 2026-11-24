@@ -10,6 +10,8 @@ use Drupal\Core\Plugin\Context\ContextProviderInterface;
 
 /**
  * Provides a global context for view_mode for testing purposes.
+ *
+ * @group layout_builder
  */
 class FakeViewModeContext implements ContextProviderInterface {
 

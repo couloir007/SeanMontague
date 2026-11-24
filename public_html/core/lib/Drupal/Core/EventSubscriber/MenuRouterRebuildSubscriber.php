@@ -57,15 +57,14 @@ class MenuRouterRebuildSubscriber implements EventSubscriberInterface {
   protected function menuLinksRebuild() {
     if ($this->lock->acquire(__FUNCTION__)) {
       try {
-        // Ensure the menu links are up to date.
         $transaction = $this->connection->startTransaction();
+        // Ensure the menu links are up to date.
         $this->menuLinkManager->rebuild();
-        $transaction->commitOrRelease();
         // Ignore any database replicas temporarily.
         $this->replicaKillSwitch->trigger();
       }
       catch (\Exception $e) {
-        if (isset($transaction) && $this->connection->inTransaction()) {
+        if (isset($transaction)) {
           $transaction->rollBack();
         }
         Error::logException($this->logger, $e);

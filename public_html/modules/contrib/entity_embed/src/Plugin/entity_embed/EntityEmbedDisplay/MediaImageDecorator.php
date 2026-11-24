@@ -118,8 +118,8 @@ class MediaImageDecorator implements EntityEmbedDisplayInterface {
       $settings = $entity->{$image_field}->getItemDefinition()->getSettings();
       $attributes = $this->getAttributeValues();
 
-      $alt = $attributes['alt'] ?? NULL;
-      $title = $attributes['title'] ?? NULL;
+      $alt = isset($attributes['alt']) ? $attributes['alt'] : NULL;
+      $title = isset($attributes['title']) ? $attributes['title'] : NULL;
 
       // Setting empty alt to double quotes. See ImageFieldFormatter.
       if ($settings['alt_field_required'] && $alt === '') {
@@ -167,7 +167,7 @@ class MediaImageDecorator implements EntityEmbedDisplayInterface {
       if (!empty($settings['alt_field'])) {
         // When the alt attribute is set to two double quotes, transform it to
         // the empty string: two double quotes signify "empty alt attribute".
-        // See ImageFieldFormatter.
+        // See ImagefieldFormatter.
         if (trim($values['alt']) === static::EMPTY_STRING) {
           $values['alt'] = static::EMPTY_STRING;
         }

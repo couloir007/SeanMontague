@@ -4,6 +4,7 @@ description: 'Install an example site that shows off some of Drupal’s capabili
 version: VERSION
 install:
   - node
+  - history
   - big_pipe
   - block
   - breakpoint
@@ -27,7 +28,9 @@ install:
   - dynamic_page_cache
   - taxonomy
   - dblog
-  - navigation
+  - search
+  - shortcut
+  - toolbar
   - field_ui
   - file
   - views

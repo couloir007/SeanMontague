@@ -3,7 +3,7 @@
 namespace Drupal\physical\Element;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element\FormElementBase;
+use Drupal\Core\Render\Element\FormElement;
 use Drupal\physical\MeasurementType;
 
 /**
@@ -24,7 +24,7 @@ use Drupal\physical\MeasurementType;
  *
  * @FormElement("physical_measurement")
  */
-class Measurement extends FormElementBase {
+class Measurement extends FormElement {
 
   /**
    * {@inheritdoc}

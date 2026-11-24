@@ -25,14 +25,13 @@ class StandardJavascriptTest extends WebDriverTestBase {
    * Tests BigPipe accelerates particular Standard installation profile routes.
    */
   public function testBigPipe(): void {
-    // Standard profile does not include a content type by default.
-    $this->drupalCreateContentType(['type' => 'test_content', 'name' => 'Test Content']);
-
     $this->drupalLogin($this->drupalCreateUser([
       'access content',
+      'post comments',
+      'skip comment approval',
     ]));
 
-    $node = Node::create(['type' => 'test_content'])
+    $node = Node::create(['type' => 'article'])
       ->setTitle($this->randomMachineName())
       ->setPromoted(TRUE)
       ->setPublished();
@@ -46,13 +45,13 @@ class StandardJavascriptTest extends WebDriverTestBase {
     $this->drupalGet('');
     $this->assertBigPipePlaceholderReplacementCount(0);
 
-    // Node page: Four placeholders.
+    // Node page: Five placeholders.
     $this->drupalGet($node->toUrl());
-    $this->assertBigPipePlaceholderReplacementCount(4);
+    $this->assertBigPipePlaceholderReplacementCount(5);
 
-    // Node page second request: Zero placeholders.
+    // Node page second request: One placeholder for the comment form.
     $this->drupalGet($node->toUrl());
-    $this->assertBigPipePlaceholderReplacementCount(0);
+    $this->assertBigPipePlaceholderReplacementCount(1);
   }
 
   /**

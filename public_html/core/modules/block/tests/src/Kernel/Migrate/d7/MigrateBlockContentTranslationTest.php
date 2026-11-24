@@ -49,7 +49,7 @@ class MigrateBlockContentTranslationTest extends MigrateDrupal7TestBase {
       'd7_block',
       'd7_block_translation',
     ]);
-    $blockRebuild = \Drupal::service(BlockHooks::class);
+    $blockRebuild = new BlockHooks();
     $blockRebuild->rebuild();
   }
 

@@ -8,6 +8,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Link;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\help\Attribute\HelpSection;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides the module topics list section for the help page.
@@ -49,6 +50,19 @@ class HookHelpSection extends HelpSectionPluginBase implements ContainerFactoryP
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->moduleHandler = $module_handler;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('module_handler'),
+      $container->get('extension.list.module'),
+    );
   }
 
   /**

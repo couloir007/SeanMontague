@@ -28,7 +28,7 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
     // Create a data definition that specifies the value must be a string with
     // the name of an installed module.
     $definition = DataDefinition::create('string')
-      ->addConstraint('ExtensionExists', ['type' => 'module']);
+      ->addConstraint('ExtensionExists', 'module');
 
     /** @var \Drupal\Core\TypedData\TypedDataManagerInterface $typed_data */
     $typed_data = $this->container->get('typed_data_manager');
@@ -51,7 +51,7 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
     $data->setValue(NULL);
     $this->assertCount(0, $data->validate());
 
-    $definition->setConstraints(['ExtensionExists' => ['type' => 'theme']]);
+    $definition->setConstraints(['ExtensionExists' => 'theme']);
     $data = $typed_data->create($definition, 'stark');
 
     $violations = $data->validate();
@@ -79,7 +79,7 @@ class ExtensionExistsConstraintValidatorTest extends KernelTestBase {
     $this->assertCount(0, $data->validate());
 
     // Anything but a module or theme should raise an exception.
-    $definition->setConstraints(['ExtensionExists' => ['type' => 'profile']]);
+    $definition->setConstraints(['ExtensionExists' => 'profile']);
     $this->expectExceptionMessage("Unknown extension type: 'profile'");
     $data->validate();
   }

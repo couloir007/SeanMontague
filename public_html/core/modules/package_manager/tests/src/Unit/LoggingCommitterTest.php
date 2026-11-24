@@ -27,12 +27,12 @@ class LoggingCommitterTest extends UnitTestCase {
   public function testDecoratedCommitterIsCalled(): void {
     $decorated = $this->createMock(CommitterInterface::class);
 
-    $stagingDir = $this->createStub(PathInterface::class);
-    $stagingDir
+    $stagingDir = $this->createMock(PathInterface::class);
+    $stagingDir->expects($this->any())
       ->method('absolute')
       ->willReturn('staging-dir');
-    $activeDir = $this->createStub(PathInterface::class);
-    $activeDir
+    $activeDir = $this->createMock(PathInterface::class);
+    $activeDir->expects($this->any())
       ->method('absolute')
       ->willReturn('active-dir');
 

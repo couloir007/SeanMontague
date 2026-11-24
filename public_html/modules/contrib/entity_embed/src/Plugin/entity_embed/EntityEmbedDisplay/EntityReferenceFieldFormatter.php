@@ -3,26 +3,29 @@
 namespace Drupal\entity_embed\Plugin\entity_embed\EntityEmbedDisplay;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\FormatterPluginManager;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\entity_embed\Attribute\EntityEmbedDisplay;
+use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\entity_embed\EntityEmbedDisplay\FieldFormatterEntityEmbedDisplayBase;
-use Drupal\entity_embed\Plugin\Derivative\FieldFormatterDeriver;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Entity Embed Display reusing entity reference field formatters.
  *
  * @see \Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayInterface
+ *
+ * @EntityEmbedDisplay(
+ *   id = "entity_reference",
+ *   label = @Translation("Entity Reference"),
+ *   deriver = "Drupal\entity_embed\Plugin\Derivative\FieldFormatterDeriver",
+ *   field_type = "entity_reference",
+ *   supports_image_alt_and_title = TRUE
+ * )
  */
-#[EntityEmbedDisplay(
-  id: 'entity_reference',
-  label: new TranslatableMarkup('Entity Reference'),
-  supports_image_alt_and_title: TRUE,
-  field_type: 'entity_reference',
-  deriver: FieldFormatterDeriver::class,
-)]
 class EntityReferenceFieldFormatter extends FieldFormatterEntityEmbedDisplayBase implements TrustedCallbackInterface {
 
   /**

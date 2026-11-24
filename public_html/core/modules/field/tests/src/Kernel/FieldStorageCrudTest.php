@@ -147,7 +147,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
         'type' => 'test_field',
       ];
       FieldStorageConfig::create($field_storage_definition)->save();
-      $this->fail('Cannot create a field with a name containing an invalid character.');
+      $this->fail('Cannot create a field with a name containing an illegal character.');
     }
     catch (\Exception $e) {
       $this->assertInstanceOf(FieldException::class, $e);

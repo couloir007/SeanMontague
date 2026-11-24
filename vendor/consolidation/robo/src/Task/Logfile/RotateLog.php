@@ -3,7 +3,6 @@
 namespace Robo\Task\Logfile;
 
 use Robo\Result;
-use Symfony\Component\Finder\Finder;
 
 /**
  * Rotates a log (or any other) file
@@ -85,7 +84,8 @@ class RotateLog extends BaseLogfile
     private function process(): self
     {
         $rotation = 0;
-        foreach ($this->createFinder() as $origin) {
+        foreach (scandir($this->logfile->getPath(), SCANDIR_SORT_DESCENDING) as $origin) {
+            $origin = new \SplFileInfo($this->logfile->getPath().'/'.$origin);
             if ($origin->isFile() && $this->isLogfile($origin)) {
                 if ($this->version($origin) < $this->keep) {
                     $rotated = $this->rotate($origin);
@@ -159,17 +159,5 @@ class RotateLog extends BaseLogfile
         $this->filesystem->rename($origin->getPathname(), $rotated);
 
         return $rotated;
-    }
-
-    /**
-     * @return Finder
-     */
-    private function createFinder(): Finder
-    {
-        return (new Finder())->files()
-            ->depth(0)
-            ->sortByName()
-            ->reverseSorting()
-            ->in($this->logfile->getPath());
     }
 }

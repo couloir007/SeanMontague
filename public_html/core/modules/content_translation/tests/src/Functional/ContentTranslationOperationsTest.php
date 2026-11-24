@@ -141,21 +141,20 @@ class ContentTranslationOperationsTest extends NodeTestBase {
   /**
    * Tests the access to the overview page for translations.
    *
-   * @see \Drupal\content_translation\ContentTranslationManagerInterface::access()
+   * @see content_translation_translate_access()
    */
   public function testContentTranslationOverviewAccess(): void {
     $access_control_handler = \Drupal::entityTypeManager()->getAccessControlHandler('node');
-    $content_translation_manager = \Drupal::service('content_translation.manager');
     $user = $this->createUser(['create content translations', 'access content']);
     $this->drupalLogin($user);
 
     $node = $this->drupalCreateNode(['status' => FALSE, 'type' => 'article']);
-    $this->assertFalse($content_translation_manager->access($node)->isAllowed());
+    $this->assertFalse(content_translation_translate_access($node)->isAllowed());
     $access_control_handler->resetCache();
 
     $node->setPublished();
     $node->save();
-    $this->assertTrue($content_translation_manager->access($node)->isAllowed());
+    $this->assertTrue(content_translation_translate_access($node)->isAllowed());
     $access_control_handler->resetCache();
 
     user_role_change_permissions(
@@ -167,7 +166,7 @@ class ContentTranslationOperationsTest extends NodeTestBase {
 
     $user = $this->createUser(['create content translations']);
     $this->drupalLogin($user);
-    $this->assertFalse($content_translation_manager->access($node)->isAllowed());
+    $this->assertFalse(content_translation_translate_access($node)->isAllowed());
     $access_control_handler->resetCache();
   }
 

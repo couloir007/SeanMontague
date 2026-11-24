@@ -59,8 +59,6 @@ class MapType extends CustomFieldTypeBase {
    */
   public function fieldSettingsForm(array &$form, FormStateInterface $form_state): array {
     $element = parent::fieldSettingsForm($form, $form_state);
-    $settings = $this->getFieldSettings();
-
     unset($element['description_display']);
 
     return $element;

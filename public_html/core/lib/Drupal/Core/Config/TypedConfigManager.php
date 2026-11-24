@@ -298,9 +298,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       }
       // Unset type so we try the merge only once per type.
       unset($definition['type']);
-      if (!empty($replacements)) {
-        $this->definitions[$type] = $definition;
-      }
+      $this->definitions[$type] = $definition;
     }
     // Add type and default definition class.
     $definition += [

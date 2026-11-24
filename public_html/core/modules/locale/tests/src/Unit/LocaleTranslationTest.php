@@ -5,14 +5,11 @@ declare(strict_types=1);
 namespace Drupal\Tests\locale\Unit;
 
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\locale\LocaleTranslation;
-use Drupal\locale\StringStorageInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -24,23 +21,31 @@ class LocaleTranslationTest extends UnitTestCase {
 
   /**
    * A mocked storage to use when instantiating LocaleTranslation objects.
+   *
+   * @var \PHPUnit\Framework\MockObject\MockObject
    */
-  protected StringStorageInterface&MockObject $storage;
+  protected $storage;
 
   /**
    * A mocked lock to use when instantiating LocaleTranslation objects.
+   *
+   * @var \Drupal\Core\Lock\LockBackendInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected LockBackendInterface&MockObject $lock;
+  protected LockBackendInterface $lock;
 
   /**
    * A mocked cache to use when instantiating LocaleTranslation objects.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected CacheBackendInterface&MockObject $cache;
+  protected CacheBackendInterface $cache;
 
   /**
    * A mocked language manager built from LanguageManagerInterface.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected LanguageManagerInterface&MockObject $languageManager;
+  protected $languageManager;
 
   /**
    * The request stack.

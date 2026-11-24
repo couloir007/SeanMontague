@@ -232,7 +232,7 @@ class Datelist extends DateElementBase {
         case 'second':
           $format = 's';
           $options = $date_helper->seconds($format, $element['#required'], $element['#date_increment']);
-          $title = t('Second', [], ['context' => 'PHP date format']);
+          $title = t('Second');
           break;
 
         case 'ampm':

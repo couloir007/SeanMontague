@@ -27,9 +27,9 @@ class LoggingStagerTest extends UnitTestCase {
   public function testDecoratedStagerIsCalled(): void {
     $decorated = $this->createMock(StagerInterface::class);
 
-    $activeDir = $this->createStub(PathInterface::class);
-    $stagingDir = $this->createStub(PathInterface::class);
-    $stagingDir
+    $activeDir = $this->createMock(PathInterface::class);
+    $stagingDir = $this->createMock(PathInterface::class);
+    $stagingDir->expects($this->any())
       ->method('absolute')
       ->willReturn('staging-dir');
 

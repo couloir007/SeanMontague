@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\ctools\Unit;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Block\BlockManager;
@@ -22,7 +20,6 @@ use Drupal\Tests\UnitTestCase;
  *
  * @group CTools
  */
-#[Group('CTools')]
 class BlockDisplayVariantTest extends UnitTestCase {
 
   use ProphecyTrait;
@@ -34,7 +31,6 @@ class BlockDisplayVariantTest extends UnitTestCase {
    *
    * @dataProvider providerTestSubmitConfigurationForm
    */
-  #[DataProvider('providerTestSubmitConfigurationForm')]
   public function testSubmitConfigurationForm($values) {
     $account = $this->prophesize(AccountInterface::class);
     $context_handler = $this->prophesize(ContextHandlerInterface::class);

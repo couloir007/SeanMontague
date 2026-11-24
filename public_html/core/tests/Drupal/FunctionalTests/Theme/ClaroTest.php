@@ -18,11 +18,15 @@ class ClaroTest extends BrowserTestBase {
   /**
    * Modules to install.
    *
+   * Install the shortcut module so that claro.settings has its schema checked.
+   * There's currently no way for Claro to provide a default and have valid
+   * configuration as themes cannot react to a module install.
+   *
    * Install dblog and pager_test for testing of pager attributes.
    *
    * @var string[]
    */
-  protected static $modules = ['dblog', 'pager_test'];
+  protected static $modules = ['dblog', 'shortcut', 'pager_test'];
 
   /**
    * {@inheritdoc}
@@ -70,7 +74,6 @@ class ClaroTest extends BrowserTestBase {
     $this->drupalGet('admin/appearance');
     $this->cssSelect('a[title="Install <strong>Test theme</strong> as default theme"]')[0]->click();
     $this->cssSelect('a[title="Uninstall Claro theme"]')[0]->click();
-    $this->submitForm([], 'Uninstall');
     $this->assertSession()->pageTextContains('The Claro theme has been uninstalled.');
   }
 

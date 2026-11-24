@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
-use Drupal\menu_ui\MenuUiUtility;
 use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
@@ -113,7 +112,7 @@ class LayoutBuilderContentModerationIntegrationTest extends BrowserTestBase {
         ],
       ],
     ]);
-    \Drupal::service(MenuUiUtility::class)->menuUiNodeSave($node, [
+    _menu_ui_node_save($node, [
       'title' => 'bar',
       'menu_name' => 'main',
       'description' => 'view bar',

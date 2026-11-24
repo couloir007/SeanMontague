@@ -1,5 +1,5 @@
 services:
-  entity_embed_test.route_subscriber:
+  enitty_embed_test.route_subscriber:
     class: Drupal\entity_embed_test\Routing\RouteSubscriber
     tags:
       - { name: event_subscriber }

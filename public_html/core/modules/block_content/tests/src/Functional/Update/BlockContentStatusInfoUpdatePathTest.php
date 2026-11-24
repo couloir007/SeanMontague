@@ -7,7 +7,6 @@ namespace Drupal\Tests\block_content\Functional\Update;
 use Drupal\block\Entity\Block;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore anotherblock
@@ -16,7 +15,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('block_content')]
 #[RunTestsInSeparateProcesses]
-#[IgnoreDeprecations]
 class BlockContentStatusInfoUpdatePathTest extends UpdatePathTestBase {
 
   /**

@@ -32,12 +32,10 @@ use Drupal\Core\TypedData\TranslatableInterface as TranslatableDataInterface;
   ],
   constraints: [
     'ImmutableProperties' => [
-      'properties' => [
-        'id',
-        'targetEntityType',
-        'bundle',
-        'mode',
-      ],
+      'id',
+      'targetEntityType',
+      'bundle',
+      'mode',
     ],
   ],
   config_export: [

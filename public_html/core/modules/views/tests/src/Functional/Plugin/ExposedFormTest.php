@@ -6,7 +6,6 @@ namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Component\Utility\Html;
 use Drupal\entity_test\Entity\EntityTest;
-use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Entity\View;
@@ -169,8 +168,8 @@ class ExposedFormTest extends ViewTestBase {
 
     $errors = $view->validate();
     $expected = [
-      'default' => ['This identifier has invalid characters.'],
-      'page_1' => ['This identifier has invalid characters.'],
+      'default' => ['This identifier has illegal characters.'],
+      'page_1' => ['This identifier has illegal characters.'],
     ];
     $this->assertEquals($expected, $errors);
 
@@ -385,7 +384,7 @@ class ExposedFormTest extends ViewTestBase {
     // @see https://www.drupal.org/node/535868
     $on_demand_text = 'Select any filter and click Apply to see results.';
     $display['display_options']['exposed_form']['options']['text_input_required'] = $on_demand_text;
-    $display['display_options']['exposed_form']['options']['text_input_required_format'] = \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id();
+    $display['display_options']['exposed_form']['options']['text_input_required_format'] = filter_default_format();
     $view->save();
 
     // Ensure that the "on demand text" is displayed when no exposed filters are

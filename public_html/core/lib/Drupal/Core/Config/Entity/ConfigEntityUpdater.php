@@ -189,6 +189,7 @@ class ConfigEntityUpdater implements ContainerInjectionInterface {
    */
   protected function doOne(ConfigEntityInterface $entity, callable $callback) {
     if (call_user_func($callback, $entity)) {
+      $entity->trustData();
       $entity->save();
     }
   }

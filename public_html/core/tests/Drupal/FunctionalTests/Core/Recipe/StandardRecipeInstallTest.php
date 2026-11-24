@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Core\Recipe;
 
 use Drupal\FunctionalTests\Installer\InstallerTestBase;
+use Drupal\shortcut\Entity\Shortcut;
 use Drupal\Tests\standard\Traits\StandardTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -78,6 +79,9 @@ class StandardRecipeInstallTest extends InstallerTestBase {
       'title[0][value]' => 'Home',
       'link[0][uri]' => '<front>',
     ], 'Save');
+
+    // Standard ships two shortcuts; ensure they exist.
+    $this->assertCount(2, Shortcut::loadMultiple());
 
     // The installer logs you in.
     $this->drupalLogout();

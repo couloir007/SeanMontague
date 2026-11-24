@@ -14,7 +14,7 @@ use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the 'url' widget.
+ * Plugin implementation of the 'link_default' widget.
  */
 #[CustomFieldWidget(
   id: 'link_default',
@@ -113,7 +113,7 @@ class LinkWidget extends UrlWidgetBase {
     $options = $item->{$subfield . '__options'} ?? [];
     if (!$this->isDefaultValueWidget($form_state)) {
       $options = $item->get($subfield . '__options')->getValue() ?? [];
-      $title = $item->get($subfield . '__title')->getValue() ?? NULL;
+      $title = $item->get($subfield . '__title')->getValue();
     }
 
     $attributes = $options['attributes'] ?? [];

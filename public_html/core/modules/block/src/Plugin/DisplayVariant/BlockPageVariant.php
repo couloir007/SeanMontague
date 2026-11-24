@@ -143,10 +143,10 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
           $block_plugin->setMainContent($this->mainContent);
           $main_content_block_displayed = TRUE;
         }
-        if ($block_plugin instanceof TitleBlockPluginInterface) {
+        elseif ($block_plugin instanceof TitleBlockPluginInterface) {
           $block_plugin->setTitle($this->title);
         }
-        if ($block_plugin instanceof MessagesBlockPluginInterface) {
+        elseif ($block_plugin instanceof MessagesBlockPluginInterface) {
           $messages_block_displayed = TRUE;
         }
         $build[$region][$key] = $this->blockViewBuilder->view($block);

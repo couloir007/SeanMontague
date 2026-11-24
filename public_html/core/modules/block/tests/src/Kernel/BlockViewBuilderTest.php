@@ -146,37 +146,6 @@ class BlockViewBuilderTest extends KernelTestBase {
   }
 
   /**
-   * Tests that #attributes are pulled up when no #type or #theme is set.
-   *
-   * This covers the BC case where a block plugin returns a plain render array
-   * (no #type, no #theme) with #attributes at the top level. Those attributes
-   * must be hoisted to the block wrapper element.
-   *
-   * @see \Drupal\block\BlockViewBuilder::preRender()
-   */
-  public function testAttributesPulledUpWithoutTypeOrTheme(): void {
-    \Drupal::keyValue('block_test')->set('content', 'Block content');
-    \Drupal::keyValue('block_test')->set('attributes', ['class' => ['my-wrapper-class'], 'data-foo' => 'bar']);
-
-    $entity = $this->controller->create([
-      'id' => 'test_block_attrs',
-      'theme' => 'stark',
-      'plugin' => 'test_html',
-    ]);
-    $entity->save();
-
-    $builder = \Drupal::entityTypeManager()->getViewBuilder('block');
-    $output = $builder->view($entity, 'block');
-    $rendered = (string) $this->renderer->renderRoot($output);
-
-    // The wrapper <div> must carry the plugin's #attributes.
-    $this->assertStringContainsString('my-wrapper-class', $rendered);
-    $this->assertStringContainsString('data-foo="bar"', $rendered);
-    // The inner content must still be present.
-    $this->assertStringContainsString('Block content', $rendered);
-  }
-
-  /**
    * Tests block render cache handling.
    */
   public function testBlockViewBuilderCache(): void {
@@ -215,7 +184,7 @@ class BlockViewBuilderTest extends KernelTestBase {
     $output = $builder->view($entity, 'block');
 
     $this->assertSame(
-      ['config:block_list', 'custom_cache_tag'],
+      ['block_view', 'config:block.block.test_block_title', 'custom_cache_tag'],
       $output['#cache']['tags']
     );
   }
@@ -346,7 +315,7 @@ class BlockViewBuilderTest extends KernelTestBase {
 
     $default_keys = ['entity_view', 'block', 'test_block'];
     $default_contexts = [];
-    $default_tags = ['config:block_list'];
+    $default_tags = ['block_view', 'config:block.block.test_block'];
     $default_max_age = Cache::PERMANENT;
 
     // hook_block_build_alter() adds an additional cache key.

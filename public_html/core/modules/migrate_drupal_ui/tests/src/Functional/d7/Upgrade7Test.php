@@ -30,12 +30,10 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
     'config_translation',
     'contact',
     'content_translation',
-    'comment',
     'datetime_range',
     'language',
     'migrate_drupal_ui',
     'telephone',
-    'shortcut',
   ];
 
   /**
@@ -63,7 +61,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
 
     $this->loadFixture($this->getModulePath('migrate_drupal') . '/tests/fixtures/drupal7.php');
 
-    $this->expectedLoggedErrors = 27;
+    $this->expectedLoggedErrors = 29;
     // If saving the logs, then set the admin user.
     if ($this->outputLogs) {
       $this->migratedAdminUserName = 'admin';
@@ -82,7 +80,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
    */
   protected function getEntityCounts(): array {
     return [
-      'block' => 24,
+      'block' => 26,
       'block_content' => 1,
       'block_content_type' => 1,
       'comment' => 4,
@@ -95,18 +93,19 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'contact_form' => 2,
       'contact_message' => 0,
       'editor' => 2,
-      'field_config' => 88,
-      'field_storage_config' => 68,
+      'field_config' => 90,
+      'field_storage_config' => 69,
       'file' => 3,
       'filter_format' => 7,
       'image_style' => 7,
       'language_content_settings' => 24,
       'node' => 7,
       'node_type' => 8,
-      'shortcut' => 4,
+      'search_page' => 3,
+      'shortcut' => 6,
       'shortcut_set' => 2,
       'action' => 24,
-      'menu' => 9,
+      'menu' => 7,
       'taxonomy_term' => 25,
       'taxonomy_vocabulary' => 8,
       'path_alias' => 8,
@@ -115,11 +114,11 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'menu_link_content' => 12,
       'view' => 14,
       'date_format' => 12,
-      'entity_form_display' => 22,
+      'entity_form_display' => 23,
       'entity_form_mode' => 1,
-      'entity_view_display' => 31,
-      'entity_view_mode' => 9,
-      'base_field_override' => 1,
+      'entity_view_display' => 33,
+      'entity_view_mode' => 11,
+      'base_field_override' => 2,
     ];
   }
 
@@ -174,6 +173,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'Options',
       'Path',
       'Phone',
+      'Search',
       'Shortcut',
       'String translation',
       'Synchronize translations',
@@ -212,7 +212,6 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'Forum',
       'RDF',
       'References',
-      'Search',
       'Statistics',
       'Translation sets',
       'Variable realm',

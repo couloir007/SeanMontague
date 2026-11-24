@@ -10,8 +10,6 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 
 /**
  * Tests for the UnitTestCase class.
- *
- * @final
  */
 #[Group('Tests')]
 class UnitTestCaseTest extends UnitTestCase {

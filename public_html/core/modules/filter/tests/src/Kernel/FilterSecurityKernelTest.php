@@ -7,7 +7,6 @@ namespace Drupal\Tests\filter\Kernel;
 use Drupal\filter\Plugin\FilterInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\filter\Entity\FilterFormat;
-use Drupal\Tests\filter\Traits\ProcessedTextTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,8 +16,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 #[Group('filter')]
 class FilterSecurityKernelTest extends KernelTestBase {
-
-  use ProcessedTextTestTrait;
 
   /**
    * {@inheritdoc}
@@ -55,13 +52,13 @@ class FilterSecurityKernelTest extends KernelTestBase {
 
     $this->assertSame(
       $expected,
-      (string) $this->processText($text, 'kernel_filtered_html'),
+      (string) check_markup($text, 'kernel_filtered_html', '', []),
       'Expected filter result.'
     );
 
     $this->assertSame(
       $expected,
-      (string) $this->processText($text, 'kernel_filtered_html', filterTypesToSkip: [FilterInterface::TYPE_HTML_RESTRICTOR]),
+      (string) check_markup($text, 'kernel_filtered_html', '', [FilterInterface::TYPE_HTML_RESTRICTOR]),
       'Expected filter result, even when trying to skip security filters.'
     );
   }

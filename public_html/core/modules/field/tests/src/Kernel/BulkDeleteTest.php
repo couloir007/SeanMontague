@@ -6,7 +6,6 @@ namespace Drupal\Tests\field\Kernel;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Field\FieldPurger;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -317,7 +316,7 @@ class BulkDeleteTest extends FieldKernelTestBase {
     $deleted_table_name = $table_mapping->getDedicatedDataTableName($deleted_field_storage, TRUE);
     $active_table_name = $table_mapping->getDedicatedDataTableName($field_storage);
 
-    \Drupal::service(FieldPurger::class)->purgeBatch(50);
+    field_purge_batch(50);
 
     // Ensure the new field still has its table and the deleted one has been
     // removed.
@@ -355,8 +354,6 @@ class BulkDeleteTest extends FieldKernelTestBase {
     // Start recording hook invocations.
     FieldTestHelper::memorize();
 
-    $entity_field_purger = \Drupal::service(FieldPurger::class);
-
     $bundle = reset($this->bundles);
     $field_storage = reset($this->fieldStorages);
     $field_name = $field_storage->getName();
@@ -372,7 +369,7 @@ class BulkDeleteTest extends FieldKernelTestBase {
     $batch_size = 2;
     for ($count = 8; $count >= 0; $count -= $batch_size) {
       // Purge two entities.
-      $entity_field_purger->purgeBatch($batch_size);
+      field_purge_batch($batch_size);
 
       // There are $count deleted entities left.
       $found = \Drupal::entityQuery('entity_test')
@@ -402,7 +399,7 @@ class BulkDeleteTest extends FieldKernelTestBase {
     $this->assertCount(1, $fields, 'There is one deleted field');
 
     // Purge the field.
-    $entity_field_purger->purgeBatch($batch_size);
+    field_purge_batch($batch_size);
 
     // The field is gone.
     $fields = \Drupal::entityTypeManager()
@@ -435,8 +432,6 @@ class BulkDeleteTest extends FieldKernelTestBase {
     // Start recording hook invocations.
     FieldTestHelper::memorize();
 
-    $entity_field_purger = \Drupal::service(FieldPurger::class);
-
     $field_storage = reset($this->fieldStorages);
     $field_name = $field_storage->getName();
 
@@ -450,7 +445,7 @@ class BulkDeleteTest extends FieldKernelTestBase {
     $this->assertCount(0, $mem, 'No field hooks were called.');
 
     // Purge the data.
-    $entity_field_purger->purgeBatch(10);
+    field_purge_batch(10);
 
     // Check hooks invocations.
     // FieldItemInterface::delete() should have been called once for each entity in the
@@ -468,7 +463,8 @@ class BulkDeleteTest extends FieldKernelTestBase {
     $this->assertTrue($fields[$field->uuid()]->isDeleted());
 
     // Purge again to purge the field.
-    $entity_field_purger->purgeBatch(0);
+    field_purge_batch(0);
+
     // The field is gone.
     $fields = \Drupal::entityTypeManager()
       ->getStorage('field_config')
@@ -494,7 +490,7 @@ class BulkDeleteTest extends FieldKernelTestBase {
     $this->assertCount(0, $mem, 'No field hooks were called.');
 
     // Purge the data.
-    $entity_field_purger->purgeBatch(10);
+    field_purge_batch(10);
 
     // Check hooks invocations (same as above, for the 2nd bundle).
     $actual_hooks = FieldTestHelper::memorize();
@@ -518,7 +514,7 @@ class BulkDeleteTest extends FieldKernelTestBase {
     $this->assertTrue($storages[$field_storage->uuid()]->isDeleted());
 
     // Purge again to purge the field and the storage.
-    $entity_field_purger->purgeBatch(0);
+    field_purge_batch(0);
 
     // The field and the storage are gone.
     $fields = \Drupal::entityTypeManager()

@@ -92,6 +92,7 @@ abstract class CustomWidgetBase extends WidgetBase {
     $field_settings = $this->getSetting('fields') ?? [];
     $custom_items = $this->getCustomFieldItems($form_state);
     $values = $form_state->getValues();
+    $form_id = $form_state->getFormObject()->getFormId();
 
     $elements = parent::settingsForm($form, $form_state);
     $elements['#tree'] = TRUE;
@@ -213,6 +214,17 @@ abstract class CustomWidgetBase extends WidgetBase {
         'fields',
         $name,
       ];
+      // Account for views_entity_form module.
+      if ($form_id === 'views_ui_config_item_form') {
+        $value_keys = [
+          'options',
+          'plugin',
+          'settings_edit_form',
+          'settings',
+          'fields',
+          $name,
+        ];
+      }
       $wrapper_id = 'field-' . $field_name . '-' . $name;
 
       // UUid fields have no configuration.
@@ -458,14 +470,33 @@ abstract class CustomWidgetBase extends WidgetBase {
     $columns = $this->getFieldSetting('columns');
     $plugins = $this->getWidgetPlugins();
     foreach ($values as &$item) {
+      $additions = [];
       foreach ($item as $field_name => &$field_value) {
         $plugin = $plugins[$field_name] ?? NULL;
 
         if ($plugin && method_exists($plugin, 'massageFormValue')) {
           $field_value = $plugin->massageFormValue($field_value, $columns[$field_name] ?? '');
         }
+
+        // Some custom field types (e.g. link, image) store additional data
+        // on sibling properties (e.g. link__title, image__alt). Promote each
+        // nested sub-value to an explicit top-level key matching its sibling
+        // property name so it's always present when the item's values get
+        // applied by Drupal core, rather than relying solely on side-effect
+        // writes inside the data type's setValue() method, whose ordering
+        // against core's property resync isn't guaranteed. Any promoted key
+        // that doesn't correspond to an actual sibling property is simply
+        // never looked up by core, so this is safe to do unconditionally.
+        if (is_array($field_value)) {
+          foreach ($field_value as $sub_key => $sub_value) {
+            $additions[$field_name . '__' . $sub_key] = $sub_value;
+          }
+        }
       }
+      unset($field_value);
+      $item += $additions;
     }
+    unset($item);
 
     return $values;
   }

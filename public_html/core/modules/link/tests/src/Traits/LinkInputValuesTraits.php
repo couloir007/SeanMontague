@@ -12,7 +12,7 @@ trait LinkInputValuesTraits {
   /**
    * Link field values use for test.
    *
-   * @return array<int, array<string, string>>
+   * @return array
    *   Values to use at link field setter.
    */
   protected function getLinkInputValues(): array {

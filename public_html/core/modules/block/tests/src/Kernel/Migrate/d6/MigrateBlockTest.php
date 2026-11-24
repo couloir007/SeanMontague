@@ -55,7 +55,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
       'd6_user_role',
       'd6_block',
     ]);
-    $blockRebuild = \Drupal::service(BlockHooks::class);
+    $blockRebuild = new BlockHooks();
     $blockRebuild->rebuild();
   }
 

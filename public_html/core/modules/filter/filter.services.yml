@@ -4,7 +4,6 @@ parameters:
 services:
   _defaults:
     autoconfigure: true
-    autowire: true
 
   plugin.manager.filter:
     class: Drupal\filter\FilterPluginManager
@@ -13,6 +12,3 @@ services:
   filter.uninstall_validator:
     class: Drupal\filter\FilterUninstallValidator
     arguments: ['@plugin.manager.filter', '@entity_type.manager', '@string_translation']
-
-  Drupal\filter\FilterFormatRepositoryInterface:
-    class: Drupal\filter\FilterFormatRepository

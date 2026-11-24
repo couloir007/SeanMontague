@@ -1,34 +1,28 @@
 services:
   ctools.wizard.form:
     class: Drupal\ctools\Controller\WizardFormController
-    autowire: true
+    arguments: ['@http_kernel.controller.argument_resolver', '@form_builder', '@ctools.wizard.factory']
   ctools.wizard.entity.form:
     class: Drupal\ctools\Controller\WizardEntityFormController
-    autowire: true
+    arguments: ['@http_kernel.controller.argument_resolver', '@form_builder', '@ctools.wizard.factory', '@entity_type.manager']
   ctools.wizard_enhancer:
     class: Drupal\ctools\Routing\Enhancer\WizardEnhancer
     tags:
       - { name: route_enhancer }
   ctools.wizard.factory:
     class: Drupal\ctools\Wizard\WizardFactory
-    autowire: true
-    arguments:
-      # Drupal 10.3 has no autowiring alias for the Symfony component
-      # EventDispatcherInterface that the constructor declares.
-      $event_dispatcher: '@event_dispatcher'
-  Drupal\ctools\Wizard\WizardFactoryInterface: '@ctools.wizard.factory'
+    arguments: ['@form_builder', '@event_dispatcher', '@renderer']
   ctools.paramconverter.tempstore:
     class: Drupal\ctools\ParamConverter\TempstoreConverter
-    autowire: true
+    arguments: ['@tempstore.shared', '@entity_type.manager']
     tags:
       - { name: paramconverter }
   ctools.typed_data.resolver:
     class: Drupal\ctools\TypedDataResolver
-    autowire: true
-  Drupal\ctools\TypedDataResolver: '@ctools.typed_data.resolver'
+    arguments: ['@typed_data_manager', '@string_translation']
   ctools.access:
     class: Drupal\ctools\Access\TempstoreAccess
-    autowire: true
+    arguments: ['@tempstore.shared']
     tags:
       - { name: access_check, applies_to: _ctools_access }
   plugin.manager.ctools.relationship:
@@ -36,15 +30,10 @@ services:
     parent: default_plugin_manager
   ctools.context_mapper:
     class: Drupal\ctools\ContextMapper
-    autowire: true
-  Drupal\ctools\ContextMapperInterface: '@ctools.context_mapper'
+    arguments: ['@entity.repository']
   ctools.serializable.tempstore.factory:
     class: Drupal\ctools\SerializableTempstoreFactory
     arguments: ['@keyvalue.expirable', '@lock', '@request_stack', '@current_user', '%tempstore.expire%']
     deprecated: The "%service_id%" service is deprecated. You should use the core shared tempstore factory service instead.
     tags:
       - { name: backend_overridable }
-  # Registered explicitly so the legacy hooks can reach it on Drupal < 11.1.
-  Drupal\ctools\Hook\CtoolsHooks:
-    class: Drupal\ctools\Hook\CtoolsHooks
-    autowire: true

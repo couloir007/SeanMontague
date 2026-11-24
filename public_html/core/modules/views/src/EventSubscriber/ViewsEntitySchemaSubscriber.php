@@ -217,7 +217,11 @@ class ViewsEntitySchemaSubscriber implements EntityTypeListenerInterface, EventS
 
     foreach ($this->viewsToSave as $view) {
       try {
-        $view->save();
+        // All changes done to the views here can be trusted and this might be
+        // called during updates, when it is not safe to rely on configuration
+        // containing valid schema. Trust the data and disable schema validation
+        // and casting.
+        $view->trustData()->save();
       }
       catch (\Exception) {
         // In case the view could not be saved, log an error message that the

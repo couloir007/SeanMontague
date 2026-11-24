@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel;
 
-use Drupal\node\NodeAccessRebuild;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -162,29 +161,29 @@ class NodeAccessTest extends NodeAccessTestBase {
   }
 
   /**
-   * Tests that multiple calls to node access rebuild only result in one batch.
+   * Tests that multiple calls to node_access_rebuild only result in one batch.
    */
   public function testDuplicateBatchRebuild(): void {
     $this->enableModules(['node_access_test']);
     $batch = batch_get();
     $this->assertEmpty($batch);
-    \Drupal::service(NodeAccessRebuild::class)->rebuild(TRUE);
+    node_access_rebuild(TRUE);
     $batch = batch_get();
     $this->assertCount(1, $batch['sets']);
-    \Drupal::service(NodeAccessRebuild::class)->rebuild(TRUE);
+    node_access_rebuild(TRUE);
     $batch = batch_get();
     $this->assertCount(1, $batch['sets']);
   }
 
   /**
-   * Tests rebuild flag is set when NodeAccessRebuild::rebuild() is called.
+   * Tests node_access_needs_rebuild is set when node_access_rebuild is called.
    */
   public function testNodeAccessRebuildNeedsRebuild(): void {
-    $this->assertFalse(\Drupal::service(NodeAccessRebuild::class)->needsRebuild());
+    $this->assertFalse(node_access_needs_rebuild());
     $this->enableModules(['node_access_test']);
     // Call as batch so rebuild is not run immediately.
-    \Drupal::service(NodeAccessRebuild::class)->rebuild(TRUE);
-    $this->assertTrue(\Drupal::service(NodeAccessRebuild::class)->needsRebuild());
+    node_access_rebuild(TRUE);
+    $this->assertTrue(node_access_needs_rebuild());
   }
 
   /**
@@ -195,9 +194,9 @@ class NodeAccessTest extends NodeAccessTestBase {
    */
   #[IgnoreDeprecations]
   public function testNodeAccessViewAllNodesDeprecation(): void {
-    $this->expectUserDeprecationMessage('node_access_view_all_nodes() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use  \Drupal::entityTypeManager()->getAccessControlHandler(\'node\')->checkAllGrants(). See https://www.drupal.org/node/3038909');
+    $this->expectDeprecation('node_access_view_all_nodes() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use  \Drupal::entityTypeManager()->getAccessControlHandler(\'node\')->checkAllGrants(). See https://www.drupal.org/node/3038909');
     $this->assertTrue(node_access_view_all_nodes());
-    $this->expectUserDeprecationMessage('Calling drupal_static_reset() with "node_access_view_all_nodes" as argument is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal::service(\'node.view_all_nodes_memory_cache\')->deleteAll(); instead. See https://www.drupal.org/node/3038909');
+    $this->expectDeprecation('Calling drupal_static_reset() with "node_access_view_all_nodes" as argument is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal::service(\'node.view_all_nodes_memory_cache\')->deleteAll(); instead. See https://www.drupal.org/node/3038909');
     drupal_static_reset('node_access_view_all_nodes');
 
     // Enable a node access module.

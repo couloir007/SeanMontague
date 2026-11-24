@@ -23,7 +23,7 @@ class AddRoleUserTest extends RoleUserTestBase {
       ->method('addRole')
       ->willReturn($this->account);
 
-    $this->account
+    $this->account->expects($this->any())
       ->method('hasRole')
       ->with($this->equalTo('test_role_1'))
       ->willReturn(TRUE);
@@ -42,7 +42,7 @@ class AddRoleUserTest extends RoleUserTestBase {
       ->method('addRole')
       ->willReturn($this->account);
 
-    $this->account
+    $this->account->expects($this->any())
       ->method('hasRole')
       ->with($this->equalTo('test_role_1'))
       ->willReturn(FALSE);

@@ -54,7 +54,7 @@ class MenuCacheTagsTest extends PageCacheTagsTestBase {
         'parent' => '',
       ],
     );
-    $this->drupalPlaceBlock('system_menu_block:llama', [
+    $block = $this->drupalPlaceBlock('system_menu_block:llama', [
       'label' => 'Llama',
       'provider' => 'system',
       'region' => 'footer',
@@ -67,7 +67,9 @@ class MenuCacheTagsTest extends PageCacheTagsTestBase {
     $expected_tags = [
       'http_response',
       'rendered',
+      'block_view',
       'config:block_list',
+      'config:block.block.' . $block->id(),
       'config:system.menu.llama',
       // The cache contexts associated with the (in)accessible menu links are
       // bubbled.

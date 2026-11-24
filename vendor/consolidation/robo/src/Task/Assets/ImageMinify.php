@@ -216,15 +216,15 @@ class ImageMinify extends BaseTask
         }
 
         $amount = (count($files) == 1 ? 'image' : 'images');
-        $message = 'Minified {filecount} out of {filetotal} ' . $amount . ' into {destination}';
+        $message = "Minified {filecount} out of {filetotal} $amount into {destination}";
         $context = ['filecount' => count($this->results['success']), 'filetotal' => count($files), 'destination' => $this->to];
 
-        $this->printTaskInfo($message, $context);
-
         if (count($this->results['success']) == count($files)) {
-            return Result::success($this, ucfirst($amount) . ' minified.');
+            $this->printTaskSuccess($message, $context);
+
+            return Result::success($this, $message, $context);
         } else {
-            return Result::error($this, ucfirst($amount) . ' minification failed.');
+            return Result::error($this, $message, $context);
         }
     }
 
@@ -388,12 +388,6 @@ class ImageMinify extends BaseTask
                     case 'svg':
                         $minifier = 'svgo';
                         break;
-                }
-
-                // Skip files without available minifier
-                if ($minifier === '') {
-                    $this->results['error'][] = $from;
-                    continue;
                 }
             } else {
                 if (!in_array($this->minifier, $this->minifiers, true)

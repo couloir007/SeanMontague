@@ -22,15 +22,7 @@ final class Create
             $wfn = method_exists($value, 'wait') ? [$value, 'wait'] : null;
             $cfn = method_exists($value, 'cancel') ? [$value, 'cancel'] : null;
             $promise = new Promise($wfn, $cfn);
-            try {
-                $value->then([$promise, 'resolve'], [$promise, 'reject']);
-            } catch (\Throwable $e) {
-                if (State::isPending($promise)) {
-                    // The thenable may still hold the callbacks.
-                    $promise = new Promise();
-                    $promise->reject($e);
-                }
-            }
+            $value->then([$promise, 'resolve'], [$promise, 'reject']);
 
             return $promise;
         }

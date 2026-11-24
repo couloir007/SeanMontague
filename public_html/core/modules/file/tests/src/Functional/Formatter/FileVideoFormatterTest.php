@@ -23,13 +23,6 @@ class FileVideoFormatterTest extends FileMediaFormatterTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [
-    'image',
-  ];
-
-  /**
-   * {@inheritdoc}
-   */
   protected $defaultTheme = 'stark';
 
   /**

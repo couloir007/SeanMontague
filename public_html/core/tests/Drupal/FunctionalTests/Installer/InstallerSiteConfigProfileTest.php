@@ -48,10 +48,6 @@ class InstallerSiteConfigProfileTest extends InstallerTestBase {
     // from our install profile.
     unset($parameters['forms']['install_configure_form']['site_mail']);
 
-    // Set 'enable_update_status_module' flag to test that
-    // SiteConfigureForm::submit() handles the container rebuild correctly after
-    // the Update Status module is installed.
-    $parameters['forms']['install_configure_form']['enable_update_status_module'] = TRUE;
     return $parameters;
   }
 
@@ -71,7 +67,6 @@ class InstallerSiteConfigProfileTest extends InstallerTestBase {
   public function testInstaller(): void {
     $this->assertEquals(self::EXPECTED_SITE_MAIL, $this->config('system.site')->get('mail'));
     $this->assertEquals(self::EXPECTED_TIMEZONE, $this->config('system.date')->get('timezone.default'));
-    $this->assertTrue(\Drupal::moduleHandler()->moduleExists('update'));
   }
 
 }

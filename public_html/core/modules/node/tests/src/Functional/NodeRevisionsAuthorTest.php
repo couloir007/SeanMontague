@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\Core\Url;
-use Drupal\filter\FilterFormatRepositoryInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -50,7 +49,7 @@ class NodeRevisionsAuthorTest extends NodeTestBase {
     $revisedBody = $this->randomMachineName(32);
     $node->set('body', [
       'value' => $revisedBody,
-      'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id(),
+      'format' => filter_default_format(),
     ]);
     $node->setOwnerId($initialRevisionAuthor->id());
     $node->setRevisionUserId($initialRevisionUser->id());

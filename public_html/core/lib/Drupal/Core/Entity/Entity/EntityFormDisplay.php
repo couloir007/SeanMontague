@@ -33,12 +33,10 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
   ],
   constraints: [
     'ImmutableProperties' => [
-      'properties' => [
-        'id',
-        'targetEntityType',
-        'bundle',
-        'mode',
-      ],
+      'id',
+      'targetEntityType',
+      'bundle',
+      'mode',
     ],
   ],
   config_export: [

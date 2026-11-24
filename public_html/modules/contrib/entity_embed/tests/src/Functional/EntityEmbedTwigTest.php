@@ -3,14 +3,12 @@
 namespace Drupal\Tests\entity_embed\Functional;
 
 use Drupal\entity_embed\Twig\EntityEmbedTwigExtension;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Twig extension provided by entity_embed.
+ *
+ * @group entity_embed
  */
-#[Group('entity_embed')]
-#[RunTestsInSeparateProcesses]
 class EntityEmbedTwigTest extends EntityEmbedTestBase {
 
   /**

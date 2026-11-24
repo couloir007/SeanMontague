@@ -142,14 +142,6 @@ final class ModuleNode extends Node implements CoercesChildrenToStringInterface
         $compiler
             ->write("protected function doGetParent(array \$context): bool|string|Template|TemplateWrapper\n", "{\n")
             ->indent()
-        ;
-
-        if (!$parent instanceof ConstantExpression) {
-            // a dynamic parent can call macros, directly or from an arrow function
-            $compiler->write("\$macros = \$this->macros;\n");
-        }
-
-        $compiler
             ->addDebugInfo($parent)
             ->write('return ')
         ;
@@ -520,26 +512,15 @@ final class ModuleNode extends Node implements CoercesChildrenToStringInterface
 
     protected function compileGetSourceContext(Compiler $compiler): void
     {
-        // outside debug mode, the loader resolves the path when needed so that the compiled code does not depend on where the project is
-        $lazyPath = !$compiler->getEnvironment()->isDebug() && '' !== $this->getSourceContext()->getPath();
-
         $compiler
             ->write("public function getSourceContext(): Source\n", "{\n")
             ->indent()
-            ->write($lazyPath ? 'return Source::createWithLazyPath(' : 'return new Source(')
+            ->write('return new Source(')
             ->string($compiler->getEnvironment()->isDebug() ? $this->getSourceContext()->getCode() : '')
             ->raw(', ')
             ->string($this->getSourceContext()->getName())
             ->raw(', ')
-        ;
-
-        if ($lazyPath) {
-            $compiler->raw('$this->getSourcePath(...)');
-        } else {
-            $compiler->string($this->getSourceContext()->getPath());
-        }
-
-        $compiler
+            ->string($this->getSourceContext()->getPath())
             ->raw(");\n")
             ->outdent()
             ->write("}\n")

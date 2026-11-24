@@ -7,14 +7,12 @@ namespace Drupal\Tests\contact\Functional\Rest;
 use Drupal\Tests\rest\Functional\CookieResourceTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\XmlEntityNormalizationQuirksTrait;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Contact Form Xml Cookie.
  */
 #[Group('rest')]
-#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class ContactFormXmlCookieTest extends ContactFormResourceTestBase {
 
@@ -29,7 +27,7 @@ class ContactFormXmlCookieTest extends ContactFormResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $mimeType = 'text/xml; charset=utf-8';
+  protected static $mimeType = 'text/xml; charset=UTF-8';
 
   /**
    * {@inheritdoc}

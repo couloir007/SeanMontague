@@ -27,9 +27,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
     'config_translation',
     'contact',
     'content_translation',
-    'comment',
     'migrate_drupal_ui',
-    'shortcut',
   ];
 
   /**
@@ -47,7 +45,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
 
     $this->loadFixture($this->getModulePath('contact') . '/tests/fixtures/drupal7.php');
 
-    $this->expectedLoggedErrors = 16;
+    $this->expectedLoggedErrors = 18;
     // If saving the logs, then set the admin user.
     if ($this->outputLogs) {
       $this->migratedAdminUserName = 'admin';
@@ -67,8 +65,8 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
   protected function getEntityCounts(): array {
     return [
       'action' => 24,
-      'base_field_override' => 1,
-      'block' => 23,
+      'base_field_override' => 2,
+      'block' => 25,
       'block_content' => 1,
       'block_content_type' => 1,
       'comment' => 1,
@@ -78,22 +76,23 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'contact_message' => 0,
       'date_format' => 12,
       'editor' => 2,
-      'entity_form_display' => 12,
+      'entity_form_display' => 13,
       'entity_form_mode' => 1,
-      'entity_view_display' => 18,
-      'entity_view_mode' => 9,
-      'field_config' => 29,
-      'field_storage_config' => 21,
+      'entity_view_display' => 20,
+      'entity_view_mode' => 11,
+      'field_config' => 31,
+      'field_storage_config' => 22,
       'file' => 1,
       'filter_format' => 7,
       'image_style' => 7,
       'language_content_settings' => 14,
-      'menu' => 7,
+      'menu' => 5,
       'menu_link_content' => 2,
       'node' => 1,
       'node_type' => 5,
       'path_alias' => 1,
-      'shortcut' => 4,
+      'search_page' => 3,
+      'shortcut' => 6,
       'shortcut_set' => 2,
       'taxonomy_term' => 2,
       'taxonomy_vocabulary' => 2,
@@ -151,6 +150,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'Node',
       'Options',
       'Path',
+      'Search',
       'Shortcut',
       'String translation',
       'Synchronize translations',
@@ -169,7 +169,6 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
    */
   protected function getMissingPaths(): array {
     return [
-      'Search',
       'Syslog',
       'Translation sets',
       'Update manager',

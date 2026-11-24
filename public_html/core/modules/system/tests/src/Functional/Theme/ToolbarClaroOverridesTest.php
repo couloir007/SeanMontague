@@ -22,7 +22,7 @@ class ToolbarClaroOverridesTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['toolbar', 'test_page_test', 'node'];
+  protected static $modules = ['toolbar', 'test_page_test', 'shortcut', 'node'];
 
   /**
    * {@inheritdoc}
@@ -53,8 +53,12 @@ class ToolbarClaroOverridesTest extends BrowserTestBase {
     $this->themeManager = $this->container->get('theme.manager');
     $this->themeInstaller->install(['claro']);
 
+    // Create user with sufficient permissions to have the shortcut toolbar menu
+    // be available.
     $this->drupalLogin($this->drupalCreateUser([
       'access toolbar',
+      'access shortcuts',
+      'administer shortcuts',
       'access content overview',
     ]));
 
@@ -106,7 +110,7 @@ class ToolbarClaroOverridesTest extends BrowserTestBase {
       $this->assertStringNotContainsString($stylesheet, $head);
     }
 
-    // Confirm toolbar is not processed by ClaroHooks::preprocessToolbar.
+    // Confirm toolbar is not processed by claro_preprocess_toolbar().
     $this->assertFalse($this->getSession()->getPage()->find('css', '#toolbar-administration')->hasAttribute('data-drupal-claro-processed-toolbar'));
 
     // Confirm menu--toolbar.html.twig is not loaded from Claro.
@@ -139,7 +143,7 @@ class ToolbarClaroOverridesTest extends BrowserTestBase {
       $this->assertStringNotContainsString($stylesheet, $head);
     }
 
-    // Confirm toolbar is processed by ClaroHooks::preprocessToolbar.
+    // Confirm toolbar is processed by claro_preprocess_toolbar().
     $this->assertTrue($this->getSession()->getPage()->find('css', '#toolbar-administration')->hasAttribute('data-drupal-claro-processed-toolbar'));
 
     // Confirm toolbar templates are loaded from Claro.

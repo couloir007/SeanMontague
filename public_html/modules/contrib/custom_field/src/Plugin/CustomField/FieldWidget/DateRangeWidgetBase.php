@@ -267,15 +267,18 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
       '#date_date_callbacks' => [],
       '#date_time_element' => 'none',
     ];
-    if ($all_day) {
+    // All-day checkbox and allday storage type both use calendar dates with
+    // no timezone conversion on the form element (same as date-only fields).
+    if ($all_day || $datetime_type === DateRangeType::DATETIME_TYPE_ALLDAY) {
       $element['value']['#date_timezone'] = DateTimeTypeInterface::STORAGE_TIMEZONE;
     }
 
     $element['end_value'] = [
       '#title' => $this->t('@label', ['@label' => $settings['end_label']]),
       '#default_value' => NULL,
-      '#date_year_range' => $this->getSetting('year_range_end'),
+      '#date_year_range' => $settings['year_range_end'],
       '#access' => !$duration_enabled || $duration_value === 'custom' || $all_day || $same_day,
+      '#required' => FALSE,
     ] + $element['value'];
 
     if ($same_day) {
@@ -335,11 +338,12 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
     // The widget form element type has transformed the value to a
     // DrupalDateTime object at this point. We need to convert it back to the
     // storage timezone and format.
+    $settings = $this->getSettings() + static::defaultSettings();
     $datetime_type = $column['datetime_type'];
     $storage_format = $datetime_type === 'date' ? DateTimeTypeInterface::DATE_STORAGE_FORMAT : DateTimeTypeInterface::DATETIME_STORAGE_FORMAT;
     $storage_timezone = timezone_open(DateTimeTypeInterface::STORAGE_TIMEZONE);
     $user_timezone = timezone_open(date_default_timezone_get());
-    $all_day_checkbox = $this->getSetting('all_day_checkbox');
+    $all_day_checkbox = $settings['all_day_checkbox'];
 
     if (!is_array($value)) {
       return NULL;
@@ -379,16 +383,22 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
       }
     }
     if ($datetime_type === DateRangeType::DATETIME_TYPE_ALLDAY || $all_day) {
-      $user_timezone = $storage_timezone;
-      // All day fields start at midnight on the starting date, but are
-      // stored like datetime fields, so we need to adjust the time.
-      // This function is called twice, so to prevent a double conversion,
-      // we need to explicitly set the timezone.
-      /* @phpstan-ignore-next-line */
-      $start_date->setTimeZone($user_timezone)->setTime(0, 0);
+      // Rebuild from the calendar date only so timezone conversion cannot
+      // shift the day (e.g. site TZ east of UTC turning midnight into the
+      // previous UTC date). Stored as datetime with fixed start/end times.
+      $start_ymd = $start_date->format(DateTimeTypeInterface::DATE_STORAGE_FORMAT);
+      $start_date = DrupalDateTime::createFromFormat(
+        DateTimeTypeInterface::DATETIME_STORAGE_FORMAT,
+        $start_ymd . 'T00:00:00',
+        $storage_timezone
+      );
       if ($end_date instanceof DrupalDateTime) {
-        /* @phpstan-ignore-next-line */
-        $end_date->setTimeZone($user_timezone)->setTime(23, 59, 59);
+        $end_ymd = $end_date->format(DateTimeTypeInterface::DATE_STORAGE_FORMAT);
+        $end_date = DrupalDateTime::createFromFormat(
+          DateTimeTypeInterface::DATETIME_STORAGE_FORMAT,
+          $end_ymd . 'T23:59:59',
+          $storage_timezone
+        );
       }
     }
     elseif (!$same_day && is_numeric($duration) && $duration > 0) {
@@ -405,8 +415,9 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
     // Adjust the date for storage.
     $value['value'] = $start_date->setTimezone($storage_timezone)->format($storage_format);
     if ($end_date instanceof DrupalDateTime) {
-      $value['end_value'] = $end_date->setTimezone($storage_timezone)->format($storage_format);
+      $value['end'] = $end_date->setTimezone($storage_timezone)->format($storage_format);
     }
+    unset($value['end_value'], $value['duration']);
 
     return $value;
   }
@@ -424,7 +435,8 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
    */
   public function validateStartEnd(array &$element, FormStateInterface $form_state, array &$complete_form): void {
     // Only validate if the start and end date fields are present.
-    $require_end_date = $this->getSetting('date_end_required');
+    $settings = $this->getSettings() + static::defaultSettings();
+    $require_end_date = $settings['date_end_required'];
     if (!isset($element['end_value']) || !$element['end_value']['#access']) {
       return;
     }

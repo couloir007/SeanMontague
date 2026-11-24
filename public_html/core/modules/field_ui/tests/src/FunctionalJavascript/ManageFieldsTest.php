@@ -207,7 +207,7 @@ class ManageFieldsTest extends WebDriverTestBase {
     $assert_session->elementExists('css', '[name="label"]');
 
     $page->fillField('label', $field_name);
-    $this->assertNotEmpty($text_plain = $page->find('xpath', '//*[text() = "Short text"]')->getParent());
+    $this->assertNotEmpty($text_plain = $page->find('xpath', '//*[text() = "Text (plain)"]')->getParent());
     $text_plain->click();
     $this->assertTrue($assert_session->elementExists('css', '[name="field_options_wrapper"][value="string"]')->isSelected());
     $buttons = $this->assertSession()->elementExists('css', '.ui-dialog-buttonpane');
@@ -269,7 +269,7 @@ class ManageFieldsTest extends WebDriverTestBase {
     $assert_session->assertWaitOnAjaxRequest();
     $assert_session->pageTextContains('Choose a field type');
 
-    $this->assertNotEmpty($number_integer = $page->find('xpath', '//*[text() = "Integer"]')->getParent());
+    $this->assertNotEmpty($number_integer = $page->find('xpath', '//*[text() = "Number (integer)"]')->getParent());
     $number_integer->click();
     $this->assertTrue($assert_session->elementExists('css', '[name="field_options_wrapper"][value="integer"]')->isSelected());
 
@@ -315,12 +315,12 @@ class ManageFieldsTest extends WebDriverTestBase {
       }
       $expected_field_types = match ($field_type_category) {
         'Selection list' => [
-          'Text',
-          'Integer',
+          'List (text)',
+          'List (integer)',
         ],
         'Number' => [
-          'Integer',
-          'Decimal',
+          'Number (integer)',
+          'Number (decimal)',
         ],
       };
       // Assert that the field type options are displayed as per their weights.

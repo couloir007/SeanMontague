@@ -278,7 +278,7 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   The expected result.
    */
   #[DataProvider('providerTestGetFieldColumnName')]
-  public function testGetFieldColumnName(bool $base_field, array $columns, string $column, string $expected): void {
+  public function testGetFieldColumnName($base_field, $columns, $column, $expected): void {
     $definitions['test'] = $this->setUpDefinition('test', $columns, $base_field);
     $table_mapping = new TestDefaultTableMapping($this->entityType, $definitions);
     $result = $table_mapping->getFieldColumnName($definitions['test'], $column);
@@ -295,11 +295,9 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   An array of available field column names.
    * @param string $column
    *   The name of the column to be processed.
-   * @param string $expected
-   *   The expected result.
    */
   #[DataProvider('providerTestGetFieldColumnName')]
-  public function testGetFieldColumnNameInvalid(bool $base_field, array $columns, string $column, string $expected): void {
+  public function testGetFieldColumnNameInvalid($base_field, $columns, $column): void {
     $definitions['test'] = $this->setUpDefinition('test', $columns, $base_field);
 
     // Mark field storage definition as custom storage.

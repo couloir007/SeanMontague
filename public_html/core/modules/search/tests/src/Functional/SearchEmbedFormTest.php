@@ -18,7 +18,7 @@ class SearchEmbedFormTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'search', 'search_embedded_form', 'search_node'];
+  protected static $modules = ['node', 'search', 'search_embedded_form'];
 
   /**
    * {@inheritdoc}

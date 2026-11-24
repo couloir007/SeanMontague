@@ -14,7 +14,7 @@ interface CollectionInterface extends NestedCollectionInterface
      *
      * @var int
      */
-    public const UNNAMEDTASK = 0;
+    const UNNAMEDTASK = 0;
 
     /**
      * Add a task or a list of tasks to our task collection.  Each task

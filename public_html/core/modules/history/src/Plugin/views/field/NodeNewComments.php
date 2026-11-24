@@ -13,6 +13,7 @@ use Drupal\views\Plugin\views\field\NumericField;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Field handler to display the number of new comments.
@@ -71,6 +72,20 @@ class NodeNewComments extends NumericField {
     $this->database = $database;
     $this->entityTypeManager = $entity_type_manager;
     $this->entityFieldManager = $entity_field_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('database'),
+      $container->get('entity_type.manager'),
+      $container->get('entity_field.manager')
+    );
   }
 
   /**

@@ -47,6 +47,7 @@ class MultiValueAjaxAddMoreTest extends WebDriverTestBase {
     // Assert that the "foo" element is empty.
     $assert_session->fieldNotExists('foo[0][textfield]');
     $button_add_more_foo->press();
+    $field_foo_0 = $assert_session->waitForField('foo[0][textfield]');
 
     // Assert that the "bar" element is empty.
     $assert_session->fieldNotExists('bar[0][textfield]');
@@ -54,7 +55,6 @@ class MultiValueAjaxAddMoreTest extends WebDriverTestBase {
     $field_bar_0 = $assert_session->waitForField('bar[0][textfield]');
 
     // Set a value on the first delta of the "foo" multi-value element.
-    $field_foo_0 = $assert_session->waitForField('foo[0][textfield]');
     $field_foo_0->setValue('1');
 
     // Add one more item.

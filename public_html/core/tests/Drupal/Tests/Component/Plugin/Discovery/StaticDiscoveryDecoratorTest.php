@@ -67,7 +67,10 @@ class StaticDiscoveryDecoratorTest extends TestCase {
   #[DataProvider('providerGetDefinition')]
   public function testGetDefinition($expected, $has_register_definitions, $exception_on_invalid, $definitions, $base_plugin_id): void {
     // Mock our StaticDiscoveryDecorator.
-    $mock_decorator = new StaticDiscoveryDecorator($this->createStub(DiscoveryInterface::class));
+    $mock_decorator = $this->getMockBuilder(StaticDiscoveryDecorator::class)
+      ->disableOriginalConstructor()
+      ->onlyMethods([])
+      ->getMock();
 
     // Set up the ::$registerDefinitions property.
     $ref_register_definitions = new \ReflectionProperty($mock_decorator, 'registerDefinitions');
@@ -129,7 +132,10 @@ class StaticDiscoveryDecoratorTest extends TestCase {
   #[DataProvider('providerGetDefinitions')]
   public function testGetDefinitions($has_register_definitions, $definitions): void {
     // Mock our StaticDiscoveryDecorator.
-    $mock_decorator = new StaticDiscoveryDecorator($this->createStub(DiscoveryInterface::class));
+    $mock_decorator = $this->getMockBuilder(StaticDiscoveryDecorator::class)
+      ->disableOriginalConstructor()
+      ->onlyMethods([])
+      ->getMock();
 
     // Set up the ::$registerDefinitions property.
     $ref_register_definitions = new \ReflectionProperty($mock_decorator, 'registerDefinitions');

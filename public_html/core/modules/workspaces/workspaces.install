@@ -302,7 +302,6 @@ function workspaces_update_11302(): void {
         }
       }
     }
-    $transaction->commitOrRelease();
   }
   catch (\Exception $e) {
     $transaction->rollBack();

@@ -2,6 +2,8 @@
 
 namespace Drupal\Component\Datetime;
 
+use Drupal\Component\Utility\ToStringTrait;
+
 /**
  * Wraps DateTime().
  *
@@ -35,7 +37,9 @@ namespace Drupal\Component\Datetime;
  * @method int getTimestamp()
  * @method \DateTimeZone getTimezone()
  */
-class DateTimePlus implements \Stringable {
+class DateTimePlus {
+
+  use ToStringTrait;
 
   const FORMAT = 'Y-m-d H:i:s';
 
@@ -562,20 +566,14 @@ class DateTimePlus implements \Stringable {
    *   TRUE if the datetime parts contain valid values, otherwise FALSE.
    */
   public static function checkArray($array) {
+    $valid_date = FALSE;
     $valid_time = TRUE;
     // Check for a valid date using checkdate(). Only values that
     // meet that test are valid. An empty value, either a string or a 0, is not
     // a valid value.
-    foreach (['year', 'month', 'day'] as $key) {
-      if (
-        empty($array[$key])
-        || filter_var($array[$key], FILTER_VALIDATE_INT) === FALSE
-      ) {
-        return FALSE;
-      }
+    if (!empty($array['year']) && !empty($array['month']) && !empty($array['day'])) {
+      $valid_date = checkdate($array['month'], $array['day'], $array['year']);
     }
-    $valid_date = checkdate($array['month'], $array['day'], $array['year']);
-
     // Testing for valid time is reversed. Missing time is OK,
     // but incorrect values are not.
     foreach (['hour', 'minute', 'second'] as $key) {
@@ -674,16 +672,6 @@ class DateTimePlus implements \Stringable {
    */
   public function getPhpDateTime() {
     return clone $this->dateTimeObject;
-  }
-
-  /**
-   * Returns the string representation of this object.
-   *
-   * @return string
-   *   The string representation.
-   */
-  public function __toString(): string {
-    return (string) $this->render();
   }
 
 }

@@ -224,9 +224,7 @@ class ImageStyleTest extends UnitTestCase {
     \Drupal::setContainer($container);
 
     $image_effect_id = $this->randomMachineName();
-    $image_effect = $this->getMockBuilder('\Drupal\image\ImageEffectBase')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $image_effect = $this->getMockBuilder('\Drupal\image\ImageEffectBase');
 
     $image_style = $this->getImageStyleMock($image_effect_id, $image_effect, ['buildUri', 'getCacheTagsToInvalidate']);
     $image_style->expects($this->any())

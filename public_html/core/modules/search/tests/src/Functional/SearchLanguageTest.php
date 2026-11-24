@@ -6,7 +6,6 @@ namespace Drupal\Tests\search\Functional;
 
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -22,7 +21,7 @@ class SearchLanguageTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['language', 'node', 'search', 'search_node'];
+  protected static $modules = ['language', 'node', 'search'];
 
   /**
    * {@inheritdoc}
@@ -67,7 +66,7 @@ class SearchLanguageTest extends BrowserTestBase {
     $field_storage->save();
 
     // Create a few page nodes with multilingual body values.
-    $default_format = \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id();
+    $default_format = filter_default_format();
     $nodes = [
       [
         'title' => 'First node en',

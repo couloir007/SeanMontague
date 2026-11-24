@@ -35,7 +35,7 @@ class Date extends SortPluginBase {
       '#type' => 'radios',
       '#title' => $this->t('Granularity'),
       '#options' => [
-        'second' => $this->t('Second', [], ['context' => 'PHP date format']),
+        'second' => $this->t('Second'),
         'minute' => $this->t('Minute'),
         'hour'   => $this->t('Hour'),
         'day'    => $this->t('Day'),

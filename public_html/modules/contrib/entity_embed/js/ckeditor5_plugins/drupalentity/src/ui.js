@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies, import/no-unresolved */
 /**
  * @file Registers the entity embed button(s) to the CKEditor instance(s) and binds functionality to it/them.
  */
@@ -8,6 +7,7 @@ import { ButtonView } from 'ckeditor5/src/ui';
 import defaultIcon from '../entity.svg';
 
 export default class EntityEmbedUI extends Plugin {
+
   /**
    * @inheritdoc
    */
@@ -26,16 +26,14 @@ export default class EntityEmbedUI extends Plugin {
       return;
     }
     const { dialogSettings = {} } = options;
-    const embedButtons = options.buttons;
+    const embed_buttons = options.buttons;
 
     // Register each embed button to the toolbar based on configuration.
-    Object.keys(embedButtons).forEach((id) => {
-      const libraryURL = Drupal.url(
-        `entity-embed/dialog/${options.format}/${id}`,
-      );
+    Object.keys(embed_buttons).forEach(id => {
+      const libraryURL = Drupal.url('entity-embed/dialog/' + options.format + '/' + id);
       // Add each button to the toolbar.
       editor.ui.componentFactory.add(id, (locale) => {
-        const button = embedButtons[id];
+        const button = embed_buttons[id];
         const buttonView = new ButtonView(locale);
         // Set the icon to the SVG from config, or set it to the default icon.
         // If the uploaded icon is an SVG, load it. If the icon was provided for
@@ -44,15 +42,14 @@ export default class EntityEmbedUI extends Plugin {
         // embed icon will be used.
         let icon = null;
         if (button.icon.endsWith('svg')) {
-          const XMLrequest = new XMLHttpRequest();
+          let XMLrequest = new XMLHttpRequest();
           XMLrequest.open('GET', button.icon, false);
           XMLrequest.send(null);
           icon = XMLrequest.response;
         } else {
-          console.warn(
-            `CKEditor 5 only supports entity embed icons in SVG format. The icon provided is ${button.icon}`,
-          );
+          console.warn(`CKEditor 5 only supports enity embed icons in SVG format. The icon provided is ${button.icon}`);
         }
+
 
         buttonView.set({
           label: button.label,
@@ -73,7 +70,7 @@ export default class EntityEmbedUI extends Plugin {
         );
 
         return buttonView;
-      });
+      })
     });
   }
 
@@ -83,4 +80,5 @@ export default class EntityEmbedUI extends Plugin {
   static get pluginName() {
     return 'EntityEmbedUI';
   }
+
 }

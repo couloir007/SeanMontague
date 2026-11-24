@@ -3,24 +3,19 @@
 namespace Drupal\Tests\entity_embed\Functional;
 
 use Drupal\Core\Form\FormState;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the view mode entity embed display provided by entity_embed.
+ *
+ * @group entity_embed
  */
-#[Group('entity_embed')]
-#[RunTestsInSeparateProcesses]
 class ViewModeFieldFormatterTest extends EntityEmbedTestBase {
 
-  /**
-   * The view mode display plugins to test.
-   *
-   * @var string[]
-   */
   private $plugins = [
     'view_mode:node.full',
     'view_mode:node.rss',
+    'view_mode:node.search_index',
+    'view_mode:node.search_result',
     'view_mode:node.teaser',
   ];
 

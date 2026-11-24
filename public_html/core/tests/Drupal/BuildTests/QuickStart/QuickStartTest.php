@@ -44,12 +44,20 @@ class QuickStartTest extends BuildTestBase {
   protected $testDb;
 
   /**
+   * The Drupal root directory.
+   *
+   * @var string
+   */
+  protected $root;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
     $php_executable_finder = new PhpExecutableFinder();
     $this->php = $php_executable_finder->find();
+    $this->root = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
     chdir($this->root);
     if (!is_writable("{$this->root}/sites/simpletest")) {
       $this->markTestSkipped('This test requires a writable sites/simpletest directory');
@@ -91,7 +99,7 @@ class QuickStartTest extends BuildTestBase {
 
     $install_command = [
       $this->php,
-      'core/scripts/dr',
+      'core/scripts/drupal',
       'quick-start',
       'standard',
       "--site-name='Test site {$this->testDb->getDatabasePrefix()}'",
@@ -145,7 +153,7 @@ class QuickStartTest extends BuildTestBase {
     // Install a site.
     $install_command = [
       $this->php,
-      'core/scripts/dr',
+      'core/scripts/drupal',
       'install',
       'minimal',
       "--password='secret'",
@@ -162,7 +170,7 @@ class QuickStartTest extends BuildTestBase {
     // Run the PHP built-in webserver.
     $server_command = [
       $this->php,
-      'core/scripts/dr',
+      'core/scripts/drupal',
       'server',
       '--suppress-login',
     ];
@@ -197,7 +205,7 @@ class QuickStartTest extends BuildTestBase {
     // Try to re-install over the top of an existing site.
     $install_command = [
       $this->php,
-      'core/scripts/dr',
+      'core/scripts/drupal',
       'install',
       'testing',
       "--site-name='Test another site {$this->testDb->getDatabasePrefix()}'",
@@ -225,7 +233,7 @@ class QuickStartTest extends BuildTestBase {
     // link generation works.
     $install_command = [
       $this->php,
-      'core/scripts/dr',
+      'core/scripts/drupal',
       'quick-start',
       'umami',
       "--site-name='Test site {$this->testDb->getDatabasePrefix()}' --suppress-login",
@@ -241,7 +249,7 @@ class QuickStartTest extends BuildTestBase {
   public function testServerWithNoInstall(): void {
     $server_command = [
       $this->php,
-      'core/scripts/dr',
+      'core/scripts/drupal',
       'server',
       '--suppress-login',
     ];

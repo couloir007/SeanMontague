@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\custom_field\Functional\FieldFormatter;
 
 use Drupal\Component\Serialization\Json;
@@ -16,7 +18,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the default 'custom_formatter' formatter.
+ * Tests the 'custom_template' formatter.
  *
  * @group custom_field
  * @runTestsInSeparateProcesses
@@ -47,16 +49,7 @@ final class TemplateFormatterTest extends FormatterTestBase {
   protected $imageFactory;
 
   /**
-   * The view display to use for testing.
-   *
-   * @var string
-   */
-  protected string $viewDisplay = 'node.custom_field_entity_test.default';
-
-  /**
-   * The display type to use for testing.
-   *
-   * @var string
+   * {@inheritdoc}
    */
   protected string $displayType = 'custom_template';
 
@@ -154,18 +147,14 @@ final class TemplateFormatterTest extends FormatterTestBase {
       ],
     ]);
     $this->imageFactory = $this->container->get('image.factory');
-    $display = EntityViewDisplay::load($this->viewDisplay);
-    $component = $display->getComponent($this->fieldName);
-    $component['type'] = $this->displayType;
-    $component['settings'] = [
+    $this->configureFormatter([
       'template' => '',
       'tokens' => 'basic',
       'advanced_tokens' => [
         'recursion_limit' => 3,
         'global_types' => FALSE,
       ],
-    ];
-    $display->setComponent($this->fieldName, $component)->save();
+    ]);
     $this->drupalLogin($this->adminUser);
   }
 
@@ -348,7 +337,7 @@ final class TemplateFormatterTest extends FormatterTestBase {
     $session->elementTextEquals('css', '.map_string', Json::encode($map_string));
     // Test link.
     $session->elementTextEquals('css', '.link-url', $this->articleNode->toUrl()->toString());
-    $session->elementTextEquals('css', '.link-url-args-last', $this->articleNode->id());
+    $session->elementTextEquals('css', '.link-url-args-last', (string) $this->articleNode->id());
     $session->elementTextEquals('css', '.link-title', $this->articleNode->label());
     // Test uri.
     $session->elementTextEquals('css', '.uri-url', 'http://www.example.com');
@@ -366,21 +355,21 @@ final class TemplateFormatterTest extends FormatterTestBase {
     $large_image_style->transformDimensions($dimensions, $image_uri);
     $session->elementTextEquals('css', '.image-alt', 'Test image alt');
     $session->elementTextEquals('css', '.image-title', 'Test image title');
-    $session->elementTextEquals('css', '.image-height', $image_height);
-    $session->elementTextEquals('css', '.image-width', $image_width);
+    $session->elementTextEquals('css', '.image-height', (string) $image_height);
+    $session->elementTextEquals('css', '.image-width', (string) $image_width);
     $session->elementTextEquals('css', '.image-entity', $test_image->label());
     $session->elementTextEquals('css', '.image-entity-name', $test_image->label());
     $session->elementTextEquals('css', '.image-entity-url', $test_image->createFileUrl(FALSE));
     // Test image style tokens.
-    $session->elementTextEquals('css', '.image-large-width', $dimensions['width']);
+    $session->elementTextEquals('css', '.image-large-width', (string) $dimensions['width']);
     $session->elementTextEquals('css', '.image-large-uri', $large_image_style->buildUri($image_uri));
     // Generate the image derivative.
     $derivative_image_uri = $large_image_style->buildUri($image_uri);
     $large_image_style->createDerivative($image_uri, $derivative_image_uri);
     $large_image = $this->imageFactory->get($derivative_image_uri);
-    $session->elementTextEquals('css', '.image-large-url', Markup::create($large_image_style->buildUrl($image_uri)));
+    $session->elementTextEquals('css', '.image-large-url', (string) Markup::create($large_image_style->buildUrl($image_uri)));
     $session->elementTextEquals('css', '.image-large-mimetype', $large_image->getMimeType());
-    $session->elementTextEquals('css', '.image-large-filesize', $large_image->getFileSize());
+    $session->elementTextEquals('css', '.image-large-filesize', (string) $large_image->getFileSize());
 
     // Test file.
     $session->elementTextEquals('css', '.file', $test_file->label());
@@ -388,18 +377,18 @@ final class TemplateFormatterTest extends FormatterTestBase {
     $session->elementTextEquals('css', '.file-entity-url', $test_file->createFileUrl(FALSE));
 
     // Test duration.
-    $session->elementTextEquals('css', '.duration', $values[0]['duration']);
+    $session->elementTextEquals('css', '.duration', (string) $values[0]['duration']);
 
     // Test time.
-    $session->elementTextEquals('css', '.time', $values[0]['time']);
+    $session->elementTextEquals('css', '.time', (string) $values[0]['time']);
 
     // Test time_range.
-    $session->elementTextEquals('css', '.time_range', $values[0]['time_range']);
-    $session->elementTextEquals('css', '.time_range-end', $values[0]['time_range__end']);
-    $session->elementTextEquals('css', '.time_range-duration', $values[0]['time_range__duration']);
+    $session->elementTextEquals('css', '.time_range', (string) $values[0]['time_range']);
+    $session->elementTextEquals('css', '.time_range-end', (string) $values[0]['time_range__end']);
+    $session->elementTextEquals('css', '.time_range-duration', (string) $values[0]['time_range__duration']);
 
     // Test datetime.
-    $session->elementTextEquals('css', '.field--type-custom .datetime', $values[0]['datetime']);
+    $session->elementTextEquals('css', '.field--type-custom .datetime', (string) $values[0]['datetime']);
     $datetime_object = $node1->get($this->fieldName)->first()->{'datetime__date'};
     $timestamp = $datetime_object->getTimestamp();
     $session->elementTextEquals('css', '.datetime-formatted-html_date', $this->dateFormatter->format($timestamp, 'html_date'));
@@ -408,9 +397,9 @@ final class TemplateFormatterTest extends FormatterTestBase {
     // Test daterange.
     $start_date = $node1->get($this->fieldName)->first()->{'daterange__start_date'};
     $end_date = $node1->get($this->fieldName)->first()->{'daterange__end_date'};
-    $session->elementTextEquals('css', '.daterange', $values[0]['daterange']);
-    $session->elementTextEquals('css', '.daterange-end', $values[0]['daterange__end']);
-    $session->elementTextEquals('css', '.daterange-duration', $values[0]['daterange__duration']);
+    $session->elementTextEquals('css', '.daterange', (string) $values[0]['daterange']);
+    $session->elementTextEquals('css', '.daterange-end', (string) $values[0]['daterange__end']);
+    $session->elementTextEquals('css', '.daterange-duration', (string) $values[0]['daterange__duration']);
     $session->elementTextEquals('css', '.daterange-startdate-html_date', $this->dateFormatter->format($start_date->getTimestamp(), 'html_date'));
     $session->elementTextEquals('css', '.daterange-startdate-custom-Y', $this->dateFormatter->format($start_date->getTimestamp(), 'custom', 'Y'));
     $session->elementTextEquals('css', '.daterange-enddate-html_date', $this->dateFormatter->format($end_date->getTimestamp(), 'html_date'));
@@ -419,10 +408,10 @@ final class TemplateFormatterTest extends FormatterTestBase {
     // Test entity_reference.
     $session->elementTextEquals('css', '.entity_reference', $this->articleNode->label());
     $session->elementTextEquals('css', '.entity_reference-entity-title', $this->articleNode->label());
-    $session->elementTextEquals('css', '.entity_reference-entity-url-args-last', $this->articleNode->id());
+    $session->elementTextEquals('css', '.entity_reference-entity-url-args-last', (string) $this->articleNode->id());
     // Test deep nested entity_reference.
     $term = $this->articleNode->get('field_tags')->referencedEntities()[0];
-    $session->elementTextEquals('css', '.entity_reference-entity-field-custom-title', $term->get('field_custom')->first()->get('title')->getValue());
+    $session->elementTextEquals('css', '.entity_reference-entity-field-custom-title', (string) $term->get('field_custom')->first()->get('title')->getValue());
 
     // Test string options label.
     $settings = $this->field->getSettings();

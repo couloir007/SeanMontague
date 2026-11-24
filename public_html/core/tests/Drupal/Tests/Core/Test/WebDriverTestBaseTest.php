@@ -8,7 +8,6 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 
@@ -27,7 +26,7 @@ class WebDriverTestBaseTest extends UnitTestCase {
    */
   #[TestWith([FALSE, NULL])]
   #[TestWith([FALSE, ""])]
-  #[TestWith(["", "", FALSE, ""])]
+  #[TestWith(["", "", ""])]
   #[TestWith([
     "[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"w3c\":true,\"args\":[\"--headless\"]}},\"http:\\/\\/localhost:4444\"]",
     "[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"w3c\":true,\"args\":[\"--headless\"]}},\"http:\\/\\/localhost:4444\"]",
@@ -35,37 +34,24 @@ class WebDriverTestBaseTest extends UnitTestCase {
   #[TestWith([
     "[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"w3c\":false,\"args\":[\"--headless\"]}},\"http:\\/\\/localhost:4444\"]",
     "[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"w3c\":false,\"args\":[\"--headless\"]}},\"http:\\/\\/localhost:4444\"]",
-    TRUE,
   ])]
   #[TestWith([
     "[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"args\":[\"--headless\"],\"w3c\":false}},\"http:\\/\\/localhost:4444\"]",
     "[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"args\":[\"--headless\"]}},\"http:\\/\\/localhost:4444\"]",
-    TRUE,
   ])]
   #[TestWith([
     "[\"chrome\",{\"browserName\":\"chrome\",\"goog:chromeOptions\":{\"w3c\":false}},\"http:\\/\\/localhost:4444\"]",
     "[\"chrome\",{\"browserName\":\"chrome\"},\"http:\\/\\/localhost:4444\"]",
-    TRUE,
   ])]
-  #[IgnoreDeprecations]
-  public function testCapabilities($expected, ?string $mink_driver_args_webdriver, ?bool $deprecated = FALSE, ?string $mink_driver_args = NULL): void {
+  public function testCapabilities($expected, ?string $mink_driver_args_webdriver, ?string $mink_driver_args = NULL): void {
     $this->putEnv("MINK_DRIVER_ARGS_WEBDRIVER", $mink_driver_args_webdriver);
     $this->putEnv("MINK_DRIVER_ARGS", $mink_driver_args);
 
     // @phpstan-ignore testClass.missingAttribute.Group, testClass.missingAttribute.RunInSeparateProcesses
-    $object = new #[IgnoreDeprecations] class('test') extends WebDriverTestBase {
-
-      public function test(): void {
-        $this->assertEquals(1, 1);
-      }
-
+    $object = new class('test') extends WebDriverTestBase {
     };
     $method = new \ReflectionMethod($object, 'getMinkDriverArgs');
     $this->assertSame($expected, $method->invoke($object));
-
-    if ($deprecated) {
-      $this->expectUserDeprecationMessage('The "w3c" option for Chrome is deprecated in drupal:11.4.0 and will be forced to TRUE in drupal:12.0.0. See https://www.drupal.org/node/3460567');
-    }
   }
 
   /**

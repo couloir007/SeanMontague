@@ -77,7 +77,7 @@ class AddHandler extends ViewsFormBase {
     $form['#section'] = $display_id . 'add-handler';
 
     // Add the display override dropdown.
-    $this->standardDisplayDropdown($form, $form_state, $section);
+    views_ui_standard_display_dropdown($form, $form_state, $section);
 
     // Figure out all the base tables allowed based upon what the relationships
     // provide.

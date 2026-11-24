@@ -8,7 +8,6 @@ use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\image\Entity\ImageStyle;
-use Drupal\image\ImageDerivativeUtilities;
 use Drupal\image\ImageStyleInterface;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\TestFileCreationTrait;
@@ -73,7 +72,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $this->drupalGet('admin/config/media/image-styles/add');
     $this->submitForm($edit, 'Create new style');
     $this->assertSession()->statusMessageContains("Style {$style_label} was created.", 'status');
-    $options = \Drupal::service(ImageDerivativeUtilities::class)->styleOptions();
+    $options = image_style_options();
     $this->assertArrayHasKey($style_name, $options);
   }
 

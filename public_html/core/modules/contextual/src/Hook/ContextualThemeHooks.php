@@ -2,7 +2,6 @@
 
 namespace Drupal\contextual\Hook;
 
-use Drupal\contextual\ContextualLinksSerializer;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Session\AccountInterface;
 
@@ -13,7 +12,6 @@ class ContextualThemeHooks {
 
   public function __construct(
     protected readonly AccountInterface $currentUser,
-    protected ContextualLinksSerializer $serializer,
   ) {}
 
   /**
@@ -52,7 +50,7 @@ class ContextualThemeHooks {
         // permission.
         $variables['title_suffix']['contextual_links'] = [
           '#type' => 'contextual_links_placeholder',
-          '#id' => $this->serializer->linksToId($element['#contextual_links']),
+          '#id' => _contextual_links_to_id($element['#contextual_links']),
         ];
       }
     }

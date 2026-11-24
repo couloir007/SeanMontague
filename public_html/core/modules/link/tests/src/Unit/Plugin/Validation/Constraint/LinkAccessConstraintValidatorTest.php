@@ -43,14 +43,15 @@ class LinkAccessConstraintValidatorTest extends UnitTestCase {
     }
 
     // Mock a link object that returns the URL object.
-    $link = $this->createStub(LinkItemInterface::class);
-    $link->method('getUrl')
+    $link = $this->createMock('Drupal\link\LinkItemInterface');
+    $link->expects($this->any())
+      ->method('getUrl')
       ->willReturn($url);
 
     // Mock a user object that returns a boolean indicating user access to all
     // links.
-    $user = $this->createMock(AccountProxyInterface::class);
-    $user->expects($this->once())
+    $user = $this->createMock('Drupal\Core\Session\AccountProxyInterface');
+    $user->expects($this->any())
       ->method('hasPermission')
       ->with($this->equalTo('link to any page'))
       ->willReturn($mayLinkAnyPage);
@@ -58,8 +59,7 @@ class LinkAccessConstraintValidatorTest extends UnitTestCase {
     $context = $this->createMock(ExecutionContextInterface::class);
 
     $constraintViolationBuilder = $this->createMock(ConstraintViolationBuilderInterface::class);
-    $constraintViolationBuilder->expects($valid ? $this->never() : $this->once())
-      ->method('atPath')
+    $constraintViolationBuilder->method('atPath')
       ->with('uri')
       ->willReturn($constraintViolationBuilder);
 
@@ -82,7 +82,7 @@ class LinkAccessConstraintValidatorTest extends UnitTestCase {
   /**
    * Data provider for LinkAccessConstraintValidator::validate().
    *
-   * @return \Generator
+   * @return array
    *   An array of tests, matching the parameter inputs for testValidate.
    *
    * @see \Drupal\Tests\link\LinkAccessConstraintValidatorTest::validate()
@@ -99,9 +99,9 @@ class LinkAccessConstraintValidatorTest extends UnitTestCase {
    */
   public function testUnexpectedValue(): void {
     $this->expectException(UnexpectedValueException::class);
-    $user = $this->createStub(AccountProxyInterface::class);
+    $user = $this->createMock(AccountProxyInterface::class);
     $validator = new LinkAccessConstraintValidator($user);
-    $context = $this->createStub(ExecutionContextInterface::class);
+    $context = $this->createMock(ExecutionContextInterface::class);
     $validator->initialize($context);
     $constraint = new LinkAccessConstraint();
     $validator->validate('bad value', $constraint);
@@ -118,9 +118,9 @@ class LinkAccessConstraintValidatorTest extends UnitTestCase {
     $link->expects($this->never())
       ->method('getUrl');
 
-    $user = $this->createStub(AccountProxyInterface::class);
+    $user = $this->createMock(AccountProxyInterface::class);
     $validator = new LinkAccessConstraintValidator($user);
-    $context = $this->createStub(ExecutionContextInterface::class);
+    $context = $this->createMock(ExecutionContextInterface::class);
     $validator->initialize($context);
     $constraint = new LinkAccessConstraint();
     $validator->validate($link, $constraint);

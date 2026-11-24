@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Core\Url;
-use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
@@ -65,7 +64,7 @@ class DisplayFeedTest extends ViewTestBase {
       'body' => [
         0 => [
           'value' => 'A paragraph',
-          'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id(),
+          'format' => filter_default_format(),
         ],
       ],
     ]);
@@ -128,7 +127,7 @@ class DisplayFeedTest extends ViewTestBase {
       'body' => [
         0 => [
           'value' => 'A paragraph',
-          'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id(),
+          'format' => filter_default_format(),
         ],
       ],
     ]);

@@ -83,10 +83,10 @@ class FieldTypePluginManagerTest extends UnitTestCase {
    */
   public function testGetGroupedDefinitions(): void {
     $this->discovery->getDefinitions()->willReturn([
-      'field_test' => [
+      'telephone' => [
         'category' => 'general',
-        'label' => 'field_test',
-        'id' => 'field_test',
+        'label' => 'Telephone',
+        'id' => 'telephone',
       ],
       'string' => [
         'category' => 'text',

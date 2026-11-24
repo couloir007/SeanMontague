@@ -69,11 +69,10 @@ final class Message
 
         $body->rewind();
         $summary = $body->read($truncateAt);
-        $lookahead = $size === null ? $body->read(3) : '';
 
-        if ($size > $truncateAt || $lookahead !== '') {
+        if ($size > $truncateAt) {
             if (preg_match('//u', $summary) !== 1) {
-                $summary = self::trimTrailingIncompleteUtf8Character($summary, $lookahead !== '' ? $lookahead : $body->read(3));
+                $summary = self::trimTrailingIncompleteUtf8Character($summary, $body->read(3));
             }
 
             $summary .= ' (truncated...)';

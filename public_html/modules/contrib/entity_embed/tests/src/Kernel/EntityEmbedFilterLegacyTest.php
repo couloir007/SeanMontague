@@ -2,18 +2,11 @@
 
 namespace Drupal\Tests\entity_embed\Kernel;
 
-use Drupal\entity_embed\Plugin\Filter\EntityEmbedFilter;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-
 /**
- * Tests the entity_embed filter's backwards compatibility with old embeds.
+ * @coversDefaultClass \Drupal\entity_embed\Plugin\Filter\EntityEmbedFilter
+ * @group entity_embed
+ * @group legacy
  */
-#[Group('entity_embed')]
-#[Group('legacy')]
-#[RunTestsInSeparateProcesses]
-#[CoversClass(EntityEmbedFilter::class)]
 class EntityEmbedFilterLegacyTest extends EntityEmbedFilterTestBase {
 
   /**

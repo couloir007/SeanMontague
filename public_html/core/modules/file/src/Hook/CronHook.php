@@ -21,13 +21,13 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 class CronHook {
 
   public function __construct(
-    protected readonly EntityTypeManagerInterface $entityTypeManager,
-    protected readonly StreamWrapperManagerInterface $streamWrapperManager,
-    protected readonly ConfigFactoryInterface $configFactory,
-    protected readonly FileUsageInterface $fileUsage,
-    protected readonly TimeInterface $time,
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly StreamWrapperManagerInterface $streamWrapperManager,
+    private readonly ConfigFactoryInterface $configFactory,
+    private readonly FileUsageInterface $fileUsage,
+    private readonly TimeInterface $time,
     #[Autowire('@logger.channel.file')]
-    protected readonly LoggerInterface $logger,
+    private readonly LoggerInterface $logger,
   ) {}
 
   /**

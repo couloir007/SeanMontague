@@ -206,7 +206,7 @@ class PoDatabaseWriter implements PoWriterInterface {
       $this->writeItem($item);
     }
     // Commit the transaction.
-    $transaction->commitOrRelease();
+    unset($transaction);
   }
 
   /**

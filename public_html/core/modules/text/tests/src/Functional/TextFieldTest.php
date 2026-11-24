@@ -9,7 +9,6 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
-use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\filter\Render\FilteredMarkup;
 use Drupal\Tests\field\Functional\FunctionalString\StringFieldTest;
 use Drupal\Tests\TestFileCreationTrait;
@@ -337,7 +336,7 @@ class TextFieldTest extends StringFieldTest {
 
     // Disable all text formats besides the plain text fallback format.
     $this->drupalLogin($this->adminUser);
-    foreach (\Drupal::service(FilterFormatRepositoryInterface::class)->getAllFormats() as $format) {
+    foreach (filter_formats() as $format) {
       if (!$format->isFallbackFormat()) {
         $this->drupalGet('admin/config/content/formats/manage/' . $format->id() . '/disable');
         $this->submitForm([], 'Disable');
@@ -378,6 +377,7 @@ class TextFieldTest extends StringFieldTest {
     ];
     $this->drupalGet('admin/config/content/formats/add');
     $this->submitForm($edit, 'Save configuration');
+    filter_formats_reset();
     $format = FilterFormat::load($edit['format']);
     $format_id = $format->id();
     $permission = $format->getPermissionName();

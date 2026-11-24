@@ -8,6 +8,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
 use Drupal\Core\Pager\PagerParametersInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * A common base class for sql based pager.
@@ -46,6 +47,19 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->pagerManager = $pager_manager;
     $this->pagerParameters = $pager_parameters;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('pager.manager'),
+      $container->get('pager.parameters')
+    );
   }
 
   /**

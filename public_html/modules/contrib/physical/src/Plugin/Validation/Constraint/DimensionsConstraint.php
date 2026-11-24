@@ -2,19 +2,18 @@
 
 namespace Drupal\physical\Plugin\Validation\Constraint;
 
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\Validation\Attribute\Constraint;
-use Symfony\Component\Validator\Constraint as SymfonyConstraint;
+use Symfony\Component\Validator\Constraint;
 
 /**
  * Dimensions constraint.
+ *
+ * @Constraint(
+ *   id = "Dimensions",
+ *   label = @Translation("Dimension", context = "Validation"),
+ *   type = { "physical_dimensions" }
+ * )
  */
-#[Constraint(
-  id: "Dimensions",
-  label: new TranslatableMarkup("Dimension", options: ["context" => "Validation"]),
-  type: ["physical_dimensions"],
-)]
-class DimensionsConstraint extends SymfonyConstraint {
+class DimensionsConstraint extends Constraint {
 
   /**
    * Empty Message variable.

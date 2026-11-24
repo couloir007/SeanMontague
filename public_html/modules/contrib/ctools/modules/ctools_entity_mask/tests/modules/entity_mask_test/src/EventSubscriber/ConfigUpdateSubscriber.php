@@ -39,7 +39,7 @@ class ConfigUpdateSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents(): array {
+  public static function getSubscribedEvents() {
     // The priority is set as 256, so that this event is called before the
     // `ConfigSchemaChecker` event.
     // @see \Drupal\Core\Config\Development\ConfigSchemaChecker

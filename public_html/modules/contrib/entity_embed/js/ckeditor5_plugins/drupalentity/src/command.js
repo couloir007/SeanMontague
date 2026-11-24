@@ -1,11 +1,7 @@
-/* eslint-disable import/no-extraneous-dependencies, import/no-unresolved */
-import { Command } from 'ckeditor5/src/core';
-
-function createEntityEmbed(writer, attributes) {
-  return writer.createElement('drupalEntity', attributes);
-}
+import {Command} from 'ckeditor5/src/core';
 
 export default class InsertEntityEmbedCommand extends Command {
+
   execute(attributes) {
     const { model } = this.editor;
     const entityEmbedEditing = this.editor.plugins.get('EntityEmbedEditing');
@@ -14,10 +10,7 @@ export default class InsertEntityEmbedCommand extends Command {
     // flipping `EntityEmbedEditing.attrs` object (i.e. keys from object become
     // values and values from object become keys).
     const dataAttributeMapping = Object.fromEntries(
-      Object.entries(entityEmbedEditing.attrs).map(([key, value]) => [
-        value,
-        key,
-      ]),
+      Object.entries(entityEmbedEditing.attrs).map(([key, value]) => [value, key])
     );
 
     // \Drupal\entity_embed\Form\EntityEmbedDialog returns data in keyed by
@@ -26,14 +19,12 @@ export default class InsertEntityEmbedCommand extends Command {
     const modelAttributes = Object.fromEntries(
       Object.keys(dataAttributeMapping)
         .filter((attribute) => attributes[attribute])
-        .map((attribute) => [
-          dataAttributeMapping[attribute],
-          attributes[attribute],
-        ]),
+        .map((attribute) => [dataAttributeMapping[attribute] ,attributes[attribute]])
     );
 
+
     model.change((writer) => {
-      model.insertObject(createEntityEmbed(writer, modelAttributes));
+      model.insertContent(createEntityEmbed(writer, modelAttributes));
     });
   }
 
@@ -45,5 +36,10 @@ export default class InsertEntityEmbedCommand extends Command {
       'drupalEntity',
     );
     this.isEnabled = allowedIn !== null;
-  }
+  };
+
+}
+
+function createEntityEmbed(writer, attributes) {
+  return writer.createElement('drupalEntity', attributes);
 }

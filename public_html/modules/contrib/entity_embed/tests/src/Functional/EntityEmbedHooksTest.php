@@ -2,14 +2,11 @@
 
 namespace Drupal\Tests\entity_embed\Functional;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-
 /**
  * Tests the hooks provided by entity_embed module.
+ *
+ * @group entity_embed
  */
-#[Group('entity_embed')]
-#[RunTestsInSeparateProcesses]
 class EntityEmbedHooksTest extends EntityEmbedTestBase {
 
   /**

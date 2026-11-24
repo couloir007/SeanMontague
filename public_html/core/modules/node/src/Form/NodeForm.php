@@ -181,6 +181,9 @@ class NodeForm extends ContentEntityForm {
       '#attributes' => [
         'class' => ['node-form-author'],
       ],
+      '#attached' => [
+        'library' => ['node/drupal.node'],
+      ],
       '#weight' => 90,
       '#optional' => TRUE,
     ];
@@ -201,6 +204,9 @@ class NodeForm extends ContentEntityForm {
       '#attributes' => [
         'class' => ['node-form-options'],
       ],
+      '#attached' => [
+        'library' => ['node/drupal.node'],
+      ],
       '#weight' => 95,
       '#optional' => TRUE,
     ];
@@ -213,7 +219,7 @@ class NodeForm extends ContentEntityForm {
       $form['sticky']['#group'] = 'options';
     }
 
-    $form['#attached']['library'][] = 'node/drupal.node';
+    $form['#attached']['library'][] = 'node/form';
 
     return $form;
   }

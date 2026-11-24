@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Controller to test Entity Embed's error handling in text editors.
+ * Controller to allow testing of error handling of Entity Embed in text editors.
  */
 class TestEntityEmbedController extends EmbedController {
 

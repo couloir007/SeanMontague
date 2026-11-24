@@ -231,8 +231,12 @@ class View extends WidgetBase {
    * {@inheritdoc}
    */
   protected function prepareEntities(array $form, FormStateInterface $form_state) {
-    $selected_rows = (array) ($form_state->getUserInput()['entity_browser_select'] ?? NULL);
-    $selected_rows = array_values(array_filter($selected_rows));
+    if (is_array($form_state->getUserInput()['entity_browser_select'])) {
+      $selected_rows = array_values(array_filter($form_state->getUserInput()['entity_browser_select']));
+    }
+    else {
+      $selected_rows = [$form_state->getUserInput()['entity_browser_select']];
+    }
 
     $entities = [];
     foreach ($selected_rows as $row) {

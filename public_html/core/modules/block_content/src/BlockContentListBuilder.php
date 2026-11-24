@@ -2,7 +2,6 @@
 
 namespace Drupal\block_content;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 
@@ -48,10 +47,8 @@ class BlockContentListBuilder extends EntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
-    $args = func_get_args();
-    $cacheability = $args[1] ?? new CacheableMetadata();
-    $operations = parent::getOperations($entity, $cacheability);
+  public function getOperations(EntityInterface $entity) {
+    $operations = parent::getOperations($entity);
     // The 'View' operation doesn't make sense for content blocks.
     unset($operations['view']);
     return $operations;

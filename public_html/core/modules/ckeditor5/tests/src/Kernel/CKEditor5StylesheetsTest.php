@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\Kernel;
 
-use Drupal\ckeditor5\Hook\Ckeditor5Hooks;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -39,14 +38,7 @@ class CKEditor5StylesheetsTest extends KernelTestBase {
   public function testExternalStylesheets($theme, $expected): void {
     \Drupal::service('theme_installer')->install([$theme]);
     $this->config('system.theme')->set('default', $theme)->save();
-
-    // Access protected \Drupal\ckeditor5\Hook\Ckeditor5Hooks::themeCss() method
-    // so we can test it.
-    $hooks_service = $this->container->get(Ckeditor5Hooks::class);
-    $class = new \ReflectionClass($hooks_service);
-    $theme_css_method = $class->getMethod('themeCss');
-
-    $this->assertSame($expected, $theme_css_method->invokeArgs($hooks_service, [$theme]));
+    $this->assertSame($expected, _ckeditor5_theme_css($theme));
   }
 
   /**

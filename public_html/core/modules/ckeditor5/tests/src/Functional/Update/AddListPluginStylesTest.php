@@ -7,7 +7,6 @@ namespace Drupal\Tests\ckeditor5\Functional\Update;
 use Drupal\editor\Entity\Editor;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -15,7 +14,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Update')]
 #[RunTestsInSeparateProcesses]
-#[IgnoreDeprecations]
 class AddListPluginStylesTest extends UpdatePathTestBase {
 
   /**

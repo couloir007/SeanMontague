@@ -56,16 +56,9 @@ final class DelimiterStack
 
     public function push(DelimiterInterface $newDelimiter): void
     {
-        // Charge the whole run, not just one per run: a single long run can produce deeply-nested emphasis
-        $cost = \max(1, $newDelimiter->getLength());
-        if ($cost > $this->remainingDelimiters) {
-            // Once the limit is hit, ignore all subsequent delimiters (even shorter ones)
-            $this->remainingDelimiters = 0;
-
+        if ($this->remainingDelimiters-- <= 0) {
             return;
         }
-
-        $this->remainingDelimiters -= $cost;
 
         $newDelimiter->setPrevious($this->top);
 

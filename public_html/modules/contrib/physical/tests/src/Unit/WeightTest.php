@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\physical\Unit;
 
-use PHPUnit\Framework\Attributes\Group;
 use Drupal\Tests\UnitTestCase;
 use Drupal\physical\Weight;
 
@@ -12,7 +11,6 @@ use Drupal\physical\Weight;
  * @coversDefaultClass \Drupal\physical\Weight
  * @group physical
  */
-#[Group('physical')]
 class WeightTest extends UnitTestCase {
 
   /**

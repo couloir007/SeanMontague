@@ -42,8 +42,7 @@ class ModuleFilterTest extends WebDriverTestBase {
    * Tests that filter results announcement has correct pluralization.
    */
   public function testModuleFilter(): void {
-    // @todo skipped due to random test failures, re-enable in https://www.drupal.org/project/drupal/issues/3028968.
-    $this->markTestSkipped();
+
     // Find the module filter field.
     $this->drupalGet('admin/modules');
     $assertSession = $this->assertSession();

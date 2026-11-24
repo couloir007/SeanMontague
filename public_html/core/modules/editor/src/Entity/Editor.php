@@ -36,7 +36,7 @@ use Drupal\editor\EditorInterface;
   ],
   constraints: [
     'RequiredConfigDependencies' => [
-      'entityTypes' => ['filter_format'],
+      'filter_format',
     ],
   ],
   config_export: [

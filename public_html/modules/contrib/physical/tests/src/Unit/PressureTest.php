@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\physical\Unit;
 
-use PHPUnit\Framework\Attributes\Group;
 use Drupal\Tests\UnitTestCase;
 use Drupal\physical\Pressure;
 
@@ -12,7 +11,6 @@ use Drupal\physical\Pressure;
  * @coversDefaultClass \Drupal\physical\Pressure
  * @group physical
  */
-#[Group('physical')]
 class PressureTest extends UnitTestCase {
 
   /**

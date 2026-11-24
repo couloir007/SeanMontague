@@ -207,13 +207,4 @@ abstract class WorkspaceResourceTestBase extends EntityResourceTestBase {
     return $modified;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function getExpectedCacheContexts() {
-    return [
-      'user.permissions',
-    ];
-  }
-
 }

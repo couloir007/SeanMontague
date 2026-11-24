@@ -339,18 +339,6 @@ ckeditor5.autoformat:
   dependencies:
     - core/ckeditor5
 
-ckeditor5.fullscreen:
-  remote: https://github.com/ckeditor/ckeditor5
-  version: "47.6.3-drupal.1"
-  license:
-    name: GPL-2.0-or-later
-    url: https://raw.githubusercontent.com/drupal-ckeditor/ckeditor5/refs/tags/v47.6.3-drupal.1/packages/ckeditor5/LICENSE.md
-    gpl-compatible: true
-  js:
-    assets/vendor/ckeditor5/fullscreen/fullscreen.js: { minified: true }
-  dependencies:
-    - core/ckeditor5
-
 drupal:
   version: VERSION
   js:
@@ -392,7 +380,7 @@ drupal.ajax:
     misc/ajax.js: {}
   css:
     component:
-      misc/components/ajax-progress.module.css: {}
+      misc/components/ajax-progress.module.css: { weight: -10 }
 
   drupalSettings:
     # These placeholder values will be set by system_js_settings_alter().
@@ -605,7 +593,7 @@ drupal.fieldgroup:
   version: VERSION
   css:
     component:
-      misc/components/fieldgroup.module.css: {}
+      misc/components/fieldgroup.module.css: { weight: -10 }
   moved_files:
     system/base:
       deprecation_version: 11.2.0
@@ -649,7 +637,7 @@ drupal.item-list:
   version: VERSION
   css:
     component:
-      misc/components/item-list.module.css: {}
+      misc/components/item-list.module.css: { weight: -10 }
   moved_files:
     system/base:
       deprecation_version: 11.3.0
@@ -686,7 +674,7 @@ drupal.progress:
     misc/progress.js: {}
   css:
     component:
-      misc/components/progress.module.css: {}
+      misc/components/progress.module.css: { weight: -10 }
 
   dependencies:
     - core/drupal
@@ -697,7 +685,7 @@ drupal.textarea-resize:
   version: VERSION
   css:
     component:
-      misc/components/resize.module.css: {}
+      misc/components/resize.module.css: { weight: -10 }
   moved_files:
     system/base:
       deprecation_version: 11.2.0
@@ -712,7 +700,7 @@ drupal.reset-appearance:
   version: VERSION
   css:
     component:
-      misc/components/reset-appearance.module.css: {}
+      misc/components/reset-appearance.module.css: { weight: -10 }
   moved_files:
     system/base:
       deprecation_version: 11.3.0
@@ -748,8 +736,8 @@ drupal.tabledrag:
     misc/tabledrag.js: { weight: -1 }
   css:
     component:
-      misc/components/tabledrag.module.css: {}
-      misc/components/tree-child.module.css: {}
+      misc/components/tabledrag.module.css: { weight: -10 }
+      misc/components/tree-child.module.css: { weight: -10 }
 
   dependencies:
     - core/jquery
@@ -770,7 +758,7 @@ drupal.tableheader:
   version: VERSION
   css:
     component:
-      misc/components/sticky-header.module.css: {}
+      misc/components/sticky-header.module.css: { weight: -10 }
 
 drupal.tableresponsive:
   version: VERSION
@@ -795,7 +783,7 @@ drupal.tablesort:
   version: VERSION
   css:
     component:
-      misc/components/tablesort.module.css: {}
+      misc/components/tablesort.module.css: { weight: -10 }
   moved_files:
     system/base:
       deprecation_version: 11.2.0
@@ -854,10 +842,10 @@ htmx:
 
 internal.floating-ui:
   remote: https://github.com/floating-ui/floating-ui
-  version: "1.7.6"
+  version: "1.7.4"
   license:
     name: MIT
-    url: https://github.com/floating-ui/floating-ui/blob/@floating-ui/dom@1.7.6/LICENSE
+    url: https://github.com/floating-ui/floating-ui/blob/@floating-ui/dom@1.7.4/LICENSE
     gpl-compatible: true
   js:
     assets/vendor/floating-ui/floating-ui.core.umd.min.js: { minified: true }

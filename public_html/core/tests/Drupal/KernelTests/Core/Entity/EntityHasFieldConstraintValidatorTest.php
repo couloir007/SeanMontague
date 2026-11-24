@@ -38,7 +38,7 @@ class EntityHasFieldConstraintValidatorTest extends EntityKernelTestBase {
    */
   public function testValidation(): void {
     $this->state->set('entity_test_constraints.build', [
-      'EntityHasField' => ['field_name' => 'body'],
+      'EntityHasField' => 'body',
     ]);
 
     /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */

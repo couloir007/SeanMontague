@@ -38,7 +38,7 @@ class ServiceWithDependency {
     if (isset($this->service)) {
       return $this->service->greet() . ' World';
     }
-    return 'No service.';
+    return 'Sorry, no service.';
   }
 
 }

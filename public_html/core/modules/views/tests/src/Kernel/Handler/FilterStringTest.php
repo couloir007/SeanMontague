@@ -181,19 +181,6 @@ class FilterStringTest extends ViewsKernelTestBase {
     ];
 
     $this->assertIdenticalResultset($view, $resultset, $this->columnMap);
-
-    // Test that leading and trailing whitespace in non-grouped exposed input is
-    // trimmed before filtering.
-    $view->destroy();
-    $filters['name']['is_grouped'] = FALSE;
-    $filters['name']['operator'] = '=';
-    $view = $this->getBasicPageView();
-    $view->setExposedInput(['name' => ' Ringo ']);
-    $view->setDisplay('page_1');
-    $view->displayHandlers->get('page_1')->overrideOption('filters', $filters);
-    $view->save();
-    $this->executeView($view);
-    $this->assertIdenticalResultset($view, [['name' => 'Ringo']], $this->columnMap);
   }
 
   /**
@@ -377,7 +364,7 @@ class FilterStringTest extends ViewsKernelTestBase {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
-    // Change the filtering to a sting containing only invalid characters.
+    // Change the filtering to a sting containing only illegal characters.
     $view->displayHandlers->get('default')->overrideOption('filters', [
       'description' => [
         'id' => 'description',

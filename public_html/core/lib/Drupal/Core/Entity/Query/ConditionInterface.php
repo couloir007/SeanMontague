@@ -91,22 +91,4 @@ interface ConditionInterface {
    */
   public function compile($query);
 
-  /**
-   * Sets query that is holding this condition.
-   *
-   * @param \Drupal\Core\Entity\Query\QueryInterface $query
-   *   New query to use.
-   *
-   * @return static
-   */
-  public function setQuery(QueryInterface $query): static;
-
-  /**
-   * Gets the query that is holding this condition.
-   *
-   * @return \Drupal\Core\Entity\Query\QueryInterface
-   *   The query object.
-   */
-  public function getQuery(): QueryInterface;
-
 }

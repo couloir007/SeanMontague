@@ -29,7 +29,7 @@ use Robo\Result;
  */
 class Scss extends CssPreprocessor
 {
-    public const FORMAT_NAME = 'scss';
+    const FORMAT_NAME = 'scss';
 
     /**
      * @var string[]
@@ -64,12 +64,7 @@ class Scss extends CssPreprocessor
             $scss->setFormatter($this->compilerOptions['formatter']);
         }
 
-        if (method_exists($scss, 'compileString')) {
-            // "compileString()" is available since scssphp v1.5
-            return $scss->compileString($scssCode)->getCss();
-        } else {
-            return $scss->compile($scssCode);
-        }
+        return $scss->compile($scssCode);
     }
 
     /**

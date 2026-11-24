@@ -10,12 +10,10 @@ use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Plugin\Context\ContextInterface;
 use Drupal\Tests\UnitTestCase;
-use Drupal\views\ContextualLinksHelper;
 use Drupal\views\Plugin\Block\ViewsBlock;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests Drupal\views\Plugin\block\ViewsBlock.
@@ -65,11 +63,6 @@ class ViewsBlockTest extends UnitTestCase {
    * @var \Drupal\views\Plugin\views\display\Block|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $displayHandler;
-
-  /**
-   * The Views contextual links service.
-   */
-  protected ContextualLinksHelper|Stub $contextualLinks;
 
   /**
    * {@inheritdoc}
@@ -156,7 +149,6 @@ class ViewsBlockTest extends UnitTestCase {
       ->with('test_view')
       ->willReturn($this->view);
     $this->account = $this->createMock('Drupal\Core\Session\AccountInterface');
-    $this->contextualLinks = $this->createStub(ContextualLinksHelper::class);
   }
 
   /**
@@ -184,7 +176,7 @@ class ViewsBlockTest extends UnitTestCase {
     $definition = [];
 
     $definition['provider'] = 'views';
-    $plugin = new ViewsBlock($config, $block_id, $definition, $this->executableFactory, $this->storage, $this->account, $this->contextualLinks);
+    $plugin = new ViewsBlock($config, $block_id, $definition, $this->executableFactory, $this->storage, $this->account);
 
     $this->assertEquals($build, $plugin->build());
   }
@@ -236,7 +228,7 @@ class ViewsBlockTest extends UnitTestCase {
     $definition = [
       'provider' => 'views',
     ];
-    $plugin = new ViewsBlock($config, $block_id, $definition, $this->executableFactory, $this->storage, $this->account, $this->contextualLinks);
+    $plugin = new ViewsBlock($config, $block_id, $definition, $this->executableFactory, $this->storage, $this->account);
     $plugin->setContext('context_name', $blockContext);
 
     // Assertions.
@@ -281,7 +273,7 @@ class ViewsBlockTest extends UnitTestCase {
     $definition = [];
 
     $definition['provider'] = 'views';
-    $plugin = new ViewsBlock($config, $block_id, $definition, $this->executableFactory, $this->storage, $this->account, $this->contextualLinks);
+    $plugin = new ViewsBlock($config, $block_id, $definition, $this->executableFactory, $this->storage, $this->account);
 
     $this->assertEquals(array_intersect_key($build, ['#cache' => TRUE]), $plugin->build());
   }
@@ -303,9 +295,23 @@ class ViewsBlockTest extends UnitTestCase {
     $definition = [];
 
     $definition['provider'] = 'views';
-    $plugin = new ViewsBlock($config, $block_id, $definition, $this->executableFactory, $this->storage, $this->account, $this->contextualLinks);
+    $plugin = new ViewsBlock($config, $block_id, $definition, $this->executableFactory, $this->storage, $this->account);
 
     $this->assertEquals([], $plugin->build());
+  }
+
+}
+
+// @todo https://www.drupal.org/node/2571679 replace
+//   views_add_contextual_links().
+namespace Drupal\views\Plugin\Block;
+
+if (!function_exists('views_add_contextual_links')) {
+
+  /**
+   * Define method views_add_contextual_links for this test.
+   */
+  function views_add_contextual_links(&$render_element, $location, $display_id, ?array $view_element = NULL): void {
   }
 
 }

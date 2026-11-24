@@ -44,7 +44,7 @@ abstract class Schema implements PlaceholderInterface {
   protected $uniqueIdentifier;
 
   public function __construct($connection) {
-    $this->uniqueIdentifier = bin2hex(random_bytes(12));
+    $this->uniqueIdentifier = uniqid('', TRUE);
     $this->connection = $connection;
   }
 
@@ -52,7 +52,7 @@ abstract class Schema implements PlaceholderInterface {
    * Implements the magic __clone function.
    */
   public function __clone() {
-    $this->uniqueIdentifier = bin2hex(random_bytes(12));
+    $this->uniqueIdentifier = uniqid('', TRUE);
   }
 
   /**

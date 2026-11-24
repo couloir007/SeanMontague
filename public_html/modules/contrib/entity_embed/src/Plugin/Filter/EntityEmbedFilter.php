@@ -105,7 +105,7 @@ class EntityEmbedFilter extends FilterBase implements ContainerFactoryPluginInte
    *   The entity embed builder service.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    *   The logger factory.
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator
+   * @param \Drupal\Core\File\FileUrlGeneratorInterface
    *   The file URL generator.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, RendererInterface $renderer, EntityEmbedBuilderInterface $builder, LoggerChannelFactoryInterface $logger_factory, FileUrlGeneratorInterface $file_url_generator) {

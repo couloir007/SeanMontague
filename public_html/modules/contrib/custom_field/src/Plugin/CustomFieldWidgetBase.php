@@ -119,7 +119,7 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
     $field_settings = $field->getFieldSettings();
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $items->getEntity();
-    $settings = $this->getSettings() ?? static::defaultSettings();
+    $settings = $this->getSettings() + static::defaultSettings();
     $is_required = $items->getFieldDefinition()->isRequired();
     $description = !empty($field_settings['description']) ? $this->t('@description', ['@description' => $field_settings['description']]) : NULL;
     /** @var \Drupal\custom_field\Plugin\Field\FieldType\CustomItem $item */

@@ -15,7 +15,7 @@ use Robo\Common\BuilderAwareTrait;
  * ``` php
  * <?php
  * $collection = $this->collectionBuilder();
- * $workingPath = $collection->workDir("build");
+ * $workingPath = $collection->workDir("build")->getPath();
  * $collection->taskFilesystemStack()
  *           ->mkdir("$workingPath/log")
  *           ->touch("$workingPath/log/error.txt");

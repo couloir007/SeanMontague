@@ -58,7 +58,7 @@ class ContentLanguageSettingsUnitTest extends UnitTestCase {
   protected $typedConfigManager;
 
   /**
-   * The config entity storage used for testing.
+   * The typed configuration manager used for testing.
    *
    * @var \Drupal\Core\Config\Entity\ConfigEntityStorage|\PHPUnit\Framework\MockObject\MockObject
    */

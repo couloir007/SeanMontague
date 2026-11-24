@@ -83,24 +83,6 @@ class NodeRequirementsStatusFilterWarningTest extends KernelTestBase {
   }
 
   /**
-   * Tests node_requirements() ignores displays that have NULL filters.
-   */
-  public function testNodeGrantsViewWithNullFilters(): void {
-    $this->strictConfigSchema = FALSE;
-    $this->enableNodeAccessTestModule();
-
-    $this->createTestView(
-      'test_view_null_filters',
-      'Null Filters View',
-      TRUE,
-      NULL
-    );
-
-    $requirements = $this->getRequirements();
-    $this->assertArrayNotHasKey('node_status_filter', $requirements);
-  }
-
-  /**
    * Tests node_requirements() with multiple problematic views.
    */
   public function testMultipleProblematicViews(): void {
@@ -236,13 +218,13 @@ class NodeRequirementsStatusFilterWarningTest extends KernelTestBase {
    *   The view label.
    * @param bool $status
    *   Whether the view is enabled.
-   * @param array|null $filters
-   *   Filters to apply to the view, or NULL to omit filters.
+   * @param array $filters
+   *   Filters to apply to the view.
    *
    * @return \Drupal\views\Entity\View
    *   The created view entity.
    */
-  private function createTestView(string $id, string $label, bool $status, ?array $filters): View {
+  private function createTestView(string $id, string $label, bool $status, array $filters): View {
     $view = View::create([
       'id' => $id,
       'label' => $label,

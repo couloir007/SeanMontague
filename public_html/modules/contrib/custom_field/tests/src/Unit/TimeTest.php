@@ -6,6 +6,8 @@ namespace Drupal\Tests\custom_field\Unit;
 
 use Drupal\custom_field\Time;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Time class.
@@ -13,6 +15,8 @@ use PHPUnit\Framework\TestCase;
  * @coversDefaultClass \Drupal\custom_field\Time
  * @group custom_field
  */
+#[Group('custom_field')]
+#[CoversClass(Time::class)]
 class TimeTest extends TestCase {
 
   /**
@@ -54,11 +58,66 @@ class TimeTest extends TestCase {
   }
 
   /**
+   * @covers ::createFromHtml5Format
+   *
+   * Free-form strings must throw cleanly (not emit undefined array key
+   * warnings). Requires the structural guard in createFromHtml5Format().
+   */
+  public function testCreateFromHtml5FormatRejectsInvalid(): void {
+    $this->expectException(\InvalidArgumentException::class);
+    Time::createFromHtml5Format('not-a-time');
+  }
+
+  /**
+   * @covers ::createFromHtml5Format
+   *
+   * Structurally valid but out of range (hour 25) is rejected by the
+   * constructor assertInRange().
+   */
+  public function testCreateFromHtml5FormatRejectsOutOfRange(): void {
+    $this->expectException(\InvalidArgumentException::class);
+    Time::createFromHtml5Format('25:00');
+  }
+
+  /**
    * @covers ::createFromTimestamp
    */
   public function testItCanBeCreatedFromDayTimestamp(): void {
     $time = Time::createFromTimestamp(3700);
     static::assertEquals('01:01:40', $time->format('H:i:s'));
+  }
+
+  /**
+   * @covers ::createFromTimestamp
+   */
+  public function testCreateFromTimestampMidnightAndEmpty(): void {
+    $midnight = Time::createFromTimestamp(0);
+    static::assertNotNull($midnight);
+    static::assertEquals(0, $midnight->getHour());
+    static::assertEquals(0, $midnight->getMinute());
+    static::assertEquals(0, $midnight->getSecond());
+    static::assertEquals(0, $midnight->getTimestamp());
+
+    static::assertNull(Time::createFromTimestamp(NULL));
+    static::assertNull(Time::createFromTimestamp(''));
+  }
+
+  /**
+   * @covers ::createFromTimestamp
+   */
+  public function testCreateFromTimestampRejectsOutOfRange(): void {
+    $this->expectException(\InvalidArgumentException::class);
+    Time::createFromTimestamp(90000);
+  }
+
+  /**
+   * @covers ::getTimestamp
+   */
+  public function testGetTimestamp(): void {
+    // 13*3600 + 40*60 + 30 = 49230.
+    $time = new Time(13, 40, 30);
+    static::assertEquals(49230, $time->getTimestamp());
+    static::assertEquals(0, (new Time(0, 0, 0))->getTimestamp());
   }
 
   /**

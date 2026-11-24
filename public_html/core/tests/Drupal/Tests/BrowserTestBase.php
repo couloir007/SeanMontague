@@ -24,8 +24,11 @@ use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
 use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
+use Drupal\TestTools\Extension\Dump\DebugDump;
 use GuzzleHttp\Cookie\CookieJar;
+use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Provides a test case for functional Drupal tests.
@@ -51,7 +54,6 @@ use PHPUnit\Framework\TestCase;
  */
 abstract class BrowserTestBase extends TestCase {
 
-  use DrupalTestCaseTrait;
   use FunctionalTestSetupTrait;
   use UiHelperTrait {
     FunctionalTestSetupTrait::refreshVariables insteadof UiHelperTrait;
@@ -69,6 +71,7 @@ abstract class BrowserTestBase extends TestCase {
     createContentType as drupalCreateContentType;
   }
   use ConfigTestTrait;
+  use TestRequirementsTrait;
   use UserCreationTrait {
     createRole as drupalCreateRole;
     createUser as drupalCreateUser;
@@ -177,6 +180,16 @@ abstract class BrowserTestBase extends TestCase {
   public function __construct(string $name) {
     parent::__construct($name);
     $this->setRunTestInSeparateProcess(TRUE);
+  }
+
+  /**
+   * Registers the dumper CLI handler when the DebugDump extension is enabled.
+   */
+  #[BeforeClass]
+  public static function setDebugDumpHandler(): void {
+    if (DebugDump::isEnabled()) {
+      VarDumper::setHandler(DebugDump::class . '::cliHandler');
+    }
   }
 
   /**
@@ -323,6 +336,7 @@ abstract class BrowserTestBase extends TestCase {
 
     parent::setUp();
 
+    $this->setUpAppRoot();
     chdir($this->root);
 
     // Allow tests to compare MarkupInterface objects via assertEquals().
@@ -346,14 +360,11 @@ abstract class BrowserTestBase extends TestCase {
 
   /**
    * Sets up the root application path.
-   *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Access
-   *   $this->root directly.
-   *
-   * @see https://www.drupal.org/node/3574112
    */
   protected function setUpAppRoot(): void {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Access $this->root directly. See https://www.drupal.org/node/3574112', E_USER_DEPRECATED);
+    if ($this->root === NULL) {
+      $this->root = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
+    }
   }
 
   /**
@@ -520,7 +531,7 @@ abstract class BrowserTestBase extends TestCase {
    * @see https://www.drupal.org/node/3523039
    */
   protected function getOptions($select, ?Element $container = NULL) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3523039', E_DEPRECATED);
+    @trigger_error(__METHOD__ . 'is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3523039', E_DEPRECATED);
     if (is_string($select)) {
       $select = $this->assertSession()->selectExists($select, $container);
     }
@@ -550,6 +561,12 @@ abstract class BrowserTestBase extends TestCase {
     // Clear the static cache so that subsequent cache invalidations will work
     // as expected.
     $this->container->get('cache_tags.invalidator')->resetChecksums();
+
+    // Explicitly call register() again on the container registered in \Drupal.
+    // @todo This should already be called through
+    //   DrupalKernel::prepareLegacyRequest() -> DrupalKernel::boot() but that
+    //   appears to be calling a different container.
+    $this->container->get('stream_wrapper_manager')->register();
   }
 
   /**

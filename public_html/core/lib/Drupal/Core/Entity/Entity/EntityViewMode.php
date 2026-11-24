@@ -36,10 +36,8 @@ use Drupal\Core\Entity\EntityViewModeInterface;
   ],
   constraints: [
     'ImmutableProperties' => [
-      'properties' => [
-        'id',
-        'targetEntityType',
-      ],
+      'id',
+      'targetEntityType',
     ],
   ],
   config_export: [

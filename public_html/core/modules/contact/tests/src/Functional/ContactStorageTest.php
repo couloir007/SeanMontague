@@ -7,7 +7,6 @@ namespace Drupal\Tests\contact\Functional;
 use Drupal\contact\Entity\Message;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -19,7 +18,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * is enabled for contact Message entities.
  */
 #[Group('contact')]
-#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class ContactStorageTest extends ContactSitewideTest {
 

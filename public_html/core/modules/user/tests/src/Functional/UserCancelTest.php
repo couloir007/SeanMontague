@@ -10,11 +10,9 @@ use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
-use Drupal\node\NodeAccessRebuild;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\user\Entity\User;
-use Drupal\user\OneTimeAuthentication;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -70,7 +68,7 @@ class UserCancelTest extends BrowserTestBase {
 
     // Attempt bogus account cancellation request confirmation.
     $timestamp = $account->getLastLoginTime();
-    $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$timestamp/" . \Drupal::service(OneTimeAuthentication::class)->generateHmac($account, (int) $timestamp));
+    $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$timestamp/" . user_pass_rehash($account, $timestamp));
     $this->assertSession()->statusCodeEquals(403);
     $user_storage->resetCache([$account->id()]);
     $account = $user_storage->load($account->id());
@@ -156,14 +154,14 @@ class UserCancelTest extends BrowserTestBase {
 
     // Attempt bogus account cancellation request confirmation.
     $bogus_timestamp = $timestamp + 60;
-    $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$bogus_timestamp/" . \Drupal::service(OneTimeAuthentication::class)->generateHmac($account, $bogus_timestamp));
+    $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$bogus_timestamp/" . user_pass_rehash($account, $bogus_timestamp));
     $this->assertSession()->pageTextContains('You have tried to use an account cancellation link that has expired. Request a new one using the form below.');
     $account = $user_storage->load($account->id());
     $this->assertTrue($account->isActive(), 'User account was not canceled.');
 
     // Attempt expired account cancellation request confirmation.
     $bogus_timestamp = $timestamp - 86400 - 60;
-    $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$bogus_timestamp/" . \Drupal::service(OneTimeAuthentication::class)->generateHmac($account, $bogus_timestamp));
+    $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$bogus_timestamp/" . user_pass_rehash($account, $bogus_timestamp));
     $this->assertSession()->pageTextContains('You have tried to use an account cancellation link that has expired. Request a new one using the form below.');
     $account = $user_storage->load($account->id());
     $this->assertTrue($account->isActive(), 'User account was not canceled.');
@@ -201,7 +199,7 @@ class UserCancelTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('A confirmation request to cancel your account has been sent to your email address.');
 
     // Confirm account cancellation request.
-    $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$timestamp/" . \Drupal::service(OneTimeAuthentication::class)->generateHmac($account, $timestamp));
+    $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$timestamp/" . user_pass_rehash($account, $timestamp));
     $account = $user_storage->load($account->id());
     $this->assertTrue($account->isBlocked(), 'User has been blocked.');
 
@@ -256,7 +254,7 @@ class UserCancelTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('A confirmation request to cancel your account has been sent to your email address.');
 
     // Confirm account cancellation request.
-    $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$timestamp/" . \Drupal::service(OneTimeAuthentication::class)->generateHmac($account, $timestamp));
+    $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$timestamp/" . user_pass_rehash($account, $timestamp));
     // Confirm that the user was redirected to the front page.
     $this->assertSession()->addressEquals('');
     $this->assertSession()->statusCodeEquals(200);
@@ -284,7 +282,7 @@ class UserCancelTest extends BrowserTestBase {
     \Drupal::service('module_installer')->install(['node_access_test', 'user_form_test']);
 
     // Setup node access.
-    \Drupal::service(NodeAccessRebuild::class)->rebuild();
+    node_access_rebuild();
     $this->addPrivateField(NodeType::load('page'));
     \Drupal::state()->set('node_access_test.private', TRUE);
 
@@ -371,7 +369,7 @@ class UserCancelTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('A confirmation request to cancel your account has been sent to your email address.');
 
     // Confirm account cancellation request.
-    $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$timestamp/" . \Drupal::service(OneTimeAuthentication::class)->generateHmac($account, $timestamp));
+    $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$timestamp/" . user_pass_rehash($account, $timestamp));
     $this->assertNull($user_storage->load($account->id()), 'User is not found in the database.');
 
     // Confirm that user's content has been attributed to anonymous user.
@@ -430,7 +428,7 @@ class UserCancelTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('A confirmation request to cancel your account has been sent to your email address.');
 
     // Confirm account cancellation request.
-    $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$timestamp/" . \Drupal::service(OneTimeAuthentication::class)->generateHmac($account, $timestamp));
+    $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$timestamp/" . user_pass_rehash($account, $timestamp));
     $this->assertNull($user_storage->load($account->id()), 'User is not found in the database.');
 
     // Confirm that user's content has been attributed to anonymous user.
@@ -500,7 +498,7 @@ class UserCancelTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('A confirmation request to cancel your account has been sent to your email address.');
 
     // Confirm account cancellation request.
-    $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$timestamp/" . \Drupal::service(OneTimeAuthentication::class)->generateHmac($account, $timestamp));
+    $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$timestamp/" . user_pass_rehash($account, $timestamp));
     $this->assertNull($user_storage->load($account->id()), 'User is not found in the database.');
 
     // Confirm there's only one session in the database. The user will be logged
@@ -642,7 +640,7 @@ class UserCancelTest extends BrowserTestBase {
 
     \Drupal::service('module_installer')->install(['node_access_test']);
     // Rebuild node access.
-    \Drupal::service(NodeAccessRebuild::class)->rebuild();
+    node_access_rebuild();
 
     $account = $this->drupalCreateUser(['access content']);
     $node = $this->drupalCreateNode(['type' => 'page', 'uid' => $account->id()]);
@@ -704,7 +702,7 @@ class UserCancelTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('A confirmation request to cancel your account has been sent to your email address.');
 
     // Confirm account cancellation request.
-    $this->drupalGet('user/' . $account->id() . "/cancel/confirm/$timestamp/" . \Drupal::service(OneTimeAuthentication::class)->generateHmac($account, $timestamp));
+    $this->drupalGet('user/' . $account->id() . "/cancel/confirm/$timestamp/" . user_pass_rehash($account, $timestamp));
     $user_storage->resetCache([$account->id()]);
     $this->assertNull($user_storage->load($account->id()), 'User is not found in the database.');
 

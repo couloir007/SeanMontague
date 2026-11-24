@@ -36,15 +36,13 @@ use Drupal\field\FieldConfigInterface;
     'plural' => '@count fields',
   ],
   constraints: [
-    'RequiredConfigDependencies' => ['entityTypes' => ['field_storage_config']],
+    'RequiredConfigDependencies' => ['field_storage_config'],
     'ImmutableProperties' => [
-      'properties' => [
-        'id',
-        'entity_type',
-        'field_name',
-        'bundle',
-        'field_type',
-      ],
+      'id',
+      'entity_type',
+      'field_name',
+      'bundle',
+      'field_type',
     ],
   ],
   config_export: [
@@ -218,7 +216,7 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
     parent::preDelete($storage, $fields);
 
     // Keep the field definitions in the deleted fields repository so we can use
-    // them later during the field purge process.
+    // them later during field_purge_batch().
     /** @var \Drupal\field\FieldConfigInterface $field */
     foreach ($fields as $field) {
       // Only mark a field for purging if there is data. Otherwise, just remove

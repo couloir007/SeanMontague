@@ -120,7 +120,7 @@ abstract class RelationshipsTestBase extends KernelTestBase {
       FieldStorageConfig::create([
         'field_name' => 'body',
         'entity_type' => 'node',
-        'type' => 'text_long',
+        'type' => 'text_with_summary',
       ])->save();
     }
     FieldConfig::create([

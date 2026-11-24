@@ -14,7 +14,6 @@ use Drupal\field_ui\Form\FieldConfigEditForm;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\field_ui\FieldUI;
 
 /**
  * Hook implementations for field_ui.
@@ -184,7 +183,7 @@ class FieldUiHooks {
         $operations['manage-display'] = [
           'title' => $this->t('Manage display'),
           'weight' => 25,
-          'url' => Url::fromRoute("entity.entity_view_display_overview.{$bundle_of}", [
+          'url' => Url::fromRoute("entity.entity_view_display.{$bundle_of}.default", [
             $entity->getEntityTypeId() => $entity->id(),
           ]),
         ];
@@ -274,20 +273,7 @@ class FieldUiHooks {
       unset($form['actions']['submit']['#button_type']);
       $form['actions']['save_continue']['#value'] = $this->t('Save and manage fields');
       $form['actions']['save_continue']['#weight'] = $form['actions']['save_continue']['#weight'] - 5;
-      $form['actions']['save_continue']['#submit'][] = self::class . ':manageFieldFormSubmit';
-    }
-  }
-
-  /**
-   * Form submission handler for the 'Save and manage fields' button.
-   *
-   * @see field_ui_form_alter()
-   */
-  public function manageFieldFormSubmit($form, FormStateInterface $form_state): void {
-    $provider = $form_state->getFormObject()->getEntity()->getEntityType()->getProvider();
-    $id = $form_state->getFormObject()->getEntity()->id();
-    if ($form_state->getTriggeringElement()['#parents'][0] === 'save_continue' && $route_info = FieldUI::getOverviewRouteInfo($provider, $id)) {
-      $form_state->setRedirectUrl($route_info);
+      $form['actions']['save_continue']['#submit'][] = 'field_ui_form_manage_field_form_submit';
     }
   }
 

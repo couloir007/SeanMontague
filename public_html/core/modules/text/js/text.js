@@ -41,7 +41,9 @@
 
         // Set up the edit/hide summary link.
         const $link = $(
-          Drupal.theme('textEditSummaryButton', Drupal.t('Hide summary')),
+          `<span class="field-edit-link"> (<button type="button" class="link link-edit-summary">${Drupal.t(
+            'Hide summary',
+          )}</button>)</span>`,
         );
         const $button = $link.find('button');
         let toggleClick = true;
@@ -68,9 +70,4 @@
       });
     },
   };
-  $.extend(Drupal.theme, {
-    textEditSummaryButton(title) {
-      return `<span class="field-edit-link"> (<button type="button" class="link link-edit-summary">${title}</button>)</span>`;
-    },
-  });
 })(jQuery, Drupal);

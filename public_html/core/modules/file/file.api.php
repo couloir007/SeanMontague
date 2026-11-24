@@ -81,11 +81,7 @@ function hook_file_copy(FileInterface $file, FileInterface $source): void {
     $file->setFilename($file->getOwner()->name . '_' . $file->getFilename());
     $file->save();
 
-    \Drupal::logger('file')
-      ->notice('Copied file %source has been renamed to %destination', [
-        '%source' => $source->filename,
-        '%destination' => $file->getFilename(),
-      ]);
+    \Drupal::logger('file')->notice('Copied file %source has been renamed to %destination', ['%source' => $source->filename, '%destination' => $file->getFilename()]);
   }
 }
 
@@ -105,11 +101,7 @@ function hook_file_move(FileInterface $file, FileInterface $source): void {
     $file->setFilename($file->getOwner()->name . '_' . $file->getFilename());
     $file->save();
 
-    \Drupal::logger('file')
-      ->notice('Moved file %source has been renamed to %destination', [
-        '%source' => $source->filename,
-        '%destination' => $file->getFilename(),
-      ]);
+    \Drupal::logger('file')->notice('Moved file %source has been renamed to %destination', ['%source' => $source->filename, '%destination' => $file->getFilename()]);
   }
 }
 

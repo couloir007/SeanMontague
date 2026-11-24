@@ -1,0 +1,64 @@
+name: seanmontague
+recipe: drupal10
+config:
+  webroot: public_html
+  php: '8.3'
+  composer_version: '2'
+  database: mariadb:10.11
+
+proxy:
+  appserver:
+    - seanmontague.lndo.site
+
+services:
+  appserver:
+    type: php:8.3
+    webroot: public_html
+    via: apache
+    overrides:
+      extra_hosts:
+        - 'host.docker.internal:172.17.0.1'
+      environment:
+        DRUSH_OPTIONS_URI: "https://seanmontague.lndo.site"
+
+  database:
+    type: mariadb:10.11
+    creds:
+      user: drupal
+      password: drupal
+      database: drupal
+    overrides:
+      networks:
+        default:
+          aliases:
+            - mariadb
+
+  postgis:
+    type: postgres:17
+    creds:
+      database: drupal
+      user: drupal
+      password: drupal
+    config:
+      extensions:
+        - postgis
+
+tooling:
+  composer:
+    service: appserver
+  drush:
+    service: appserver
+  mariadb:
+    service: database
+    cmd: mariadb -udrupal -pdrupal drupal
+  psql:
+    service: postgis
+    cmd: psql -U drupal drupal
+  dsql:
+    service: appserver
+    description: drush sql:query with --skip-ssl for the local MariaDB client
+    cmd: drush sql:query --extra=--skip-ssl
+  ddump:
+    service: appserver
+    description: drush sql:dump with --skip-ssl
+    cmd: drush sql:dump --extra-dump=--skip-ssl

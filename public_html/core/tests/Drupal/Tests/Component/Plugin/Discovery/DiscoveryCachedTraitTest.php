@@ -61,8 +61,6 @@ class DiscoveryCachedTraitTest extends TestCase {
         });
     }
     else {
-      $trait->expects($this->never())
-        ->method('getDefinitions');
       // Put $cached_definitions into our mocked ::$definitions.
       $reflection_definitions->setValue($trait, $cached_definitions);
     }

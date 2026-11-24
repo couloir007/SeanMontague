@@ -25,12 +25,10 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   list_class: ChangedFieldItemList::class,
   constraints: [
     "ComplexData" => [
-      'properties' => [
-        "value" => [
-          "Range" => [
-            "min" => "-2147483648",
-            "max" => "2147483648",
-          ],
+      "value" => [
+        "Range" => [
+          "min" => "-2147483648",
+          "max" => "2147483648",
         ],
       ],
     ],

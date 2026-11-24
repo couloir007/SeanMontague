@@ -98,9 +98,9 @@ class ArgumentsResolverTest extends TestCase {
    * Tests getArgument() with a Route, Request, and Account object.
    */
   public function testGetArgumentOrder(): void {
-    $a1 = $this->createStub(Test1Interface::class);
-    $a2 = $this->createStub(TestClass::class);
-    $a3 = $this->createStub(Test2Interface::class);
+    $a1 = $this->getMockBuilder('\Drupal\Tests\Component\Utility\Test1Interface')->getMock();
+    $a2 = $this->getMockBuilder('\Drupal\Tests\Component\Utility\TestClass')->getMock();
+    $a3 = $this->getMockBuilder('\Drupal\Tests\Component\Utility\Test2Interface')->getMock();
 
     $objects = [
       't1' => $a1,
@@ -126,7 +126,7 @@ class ArgumentsResolverTest extends TestCase {
    * callable.
    */
   public function testGetWildcardArgumentNoTypeHint(): void {
-    $a = $this->createStub(Test1Interface::class);
+    $a = $this->getMockBuilder('\Drupal\Tests\Component\Utility\Test1Interface')->getMock();
     $wildcards = [$a];
     $resolver = new ArgumentsResolver([], [], $wildcards);
 

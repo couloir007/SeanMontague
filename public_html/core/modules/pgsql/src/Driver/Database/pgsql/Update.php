@@ -71,20 +71,14 @@ class Update extends QueryUpdate {
       }
     }
 
-    if ($this->connection->inTransaction()) {
-      $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
-    }
+    $this->connection->addSavepoint();
     try {
       $stmt->execute(NULL, $this->queryOptions);
-      if (isset($savepoint)) {
-        $savepoint->commitOrRelease();
-      }
+      $this->connection->releaseSavepoint();
       return $stmt->rowCount();
     }
     catch (\Exception $e) {
-      if (isset($savepoint)) {
-        $savepoint->rollback();
-      }
+      $this->connection->rollbackSavepoint();
       $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, [], $this->queryOptions);
     }
   }

@@ -14,6 +14,7 @@ namespace Twig\Node;
 use Twig\Attribute\YieldReady;
 use Twig\Compiler;
 use Twig\Node\Expression\AbstractExpression;
+use Twig\Node\Expression\ConstantExpression;
 
 /**
  * Represents a deprecated node.
@@ -32,6 +33,17 @@ class DeprecatedNode extends Node implements CoercesChildrenToStringInterface
     {
         $compiler->addDebugInfo($this);
 
+        $expr = $this->getNode('expr');
+
+        if (!$expr instanceof ConstantExpression) {
+            $varName = $compiler->getVarName();
+            $compiler
+                ->write(\sprintf('$%s = ', $varName))
+                ->subcompile($expr)
+                ->raw(";\n")
+            ;
+        }
+
         $compiler->write('trigger_deprecation(');
         if ($this->hasNode('package')) {
             $compiler->subcompile($this->getNode('package'));
@@ -44,20 +56,24 @@ class DeprecatedNode extends Node implements CoercesChildrenToStringInterface
         } else {
             $compiler->raw("''");
         }
+        $compiler->raw(', ');
+
+        if ($expr instanceof ConstantExpression) {
+            $compiler->subcompile($expr);
+        } else {
+            $compiler->write(\sprintf('$%s', $varName));
+        }
+
         $compiler
-            ->raw(', sprintf(')
-            ->string(\sprintf('%%s in "%%s" at line %d.', $this->getTemplateLine()))
-            ->raw(', ')
-            ->subcompile($this->getNode('expr'))
-            ->raw(', ')
-            ->string($this->getTemplateName())
-            ->raw("));\n")
+            ->raw('.')
+            ->string(\sprintf(' in "%s" at line %d.', $this->getTemplateName(), $this->getTemplateLine()))
+            ->raw(");\n")
         ;
     }
 
     public function getStringCoercedChildNames(): array
     {
-        // the message is formatted by `sprintf()`, and `package` / `version` are typed `string` on trigger_deprecation()
+        // the message is concatenated with `.`, and `package` / `version` are typed `string` on trigger_deprecation()
         $names = ['expr'];
         if ($this->hasNode('package')) {
             $names[] = 'package';

@@ -104,11 +104,9 @@ trait CookieResourceTestTrait {
     // @see \Drupal\user\Authentication\Provider\Cookie
     // @todo https://www.drupal.org/node/2847623
     if ($method === 'GET') {
-      $expected_cookie_403_cacheability = $this->getExpectedUnauthorizedAccessCacheability();
-      if (method_exists($this, 'getExpectedUnauthorizedEntityAccessCacheability')) {
+      $expected_cookie_403_cacheability = $this->getExpectedUnauthorizedAccessCacheability()
         // @see \Drupal\Core\EventSubscriber\AnonymousUserResponseSubscriber::onRespond()
-        $expected_cookie_403_cacheability->addCacheableDependency($this->getExpectedUnauthorizedEntityAccessCacheability(FALSE));
-      }
+        ->addCacheableDependency($this->getExpectedUnauthorizedEntityAccessCacheability(FALSE));
       // - \Drupal\Core\EventSubscriber\AnonymousUserResponseSubscriber applies
       //   to cacheable anonymous responses: it updates their cacheability.
       // - A 403 response to a GET request is cacheable.

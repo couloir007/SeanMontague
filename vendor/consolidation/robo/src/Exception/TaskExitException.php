@@ -4,6 +4,7 @@ namespace Robo\Exception;
 
 class TaskExitException extends \Exception
 {
+
     /**
      * TaskExitException constructor.
      *

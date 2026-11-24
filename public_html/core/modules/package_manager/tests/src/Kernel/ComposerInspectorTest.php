@@ -502,10 +502,9 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
         [
           'example/plugin-a' => TRUE,
           'example/plugin-b' => FALSE,
-          // The scaffold and runtime plugins are explicitly disallowed by the
-          // fake_site fixture.
+          // The scaffold plugin is explicitly disallowed by the fake_site
+          // fixture.
           'drupal/core-composer-scaffold' => FALSE,
-          'symfony/runtime' => FALSE,
         ],
       ],
     ];

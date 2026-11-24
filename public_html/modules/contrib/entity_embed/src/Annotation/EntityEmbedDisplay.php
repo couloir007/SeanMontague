@@ -9,10 +9,6 @@ use Drupal\Component\Annotation\Plugin;
  *
  * Plugin Namespace: Plugin/entity_embed/EntityEmbedDisplay.
  *
- * Kept for backwards compatibility with contributed and custom plugins that
- * still use annotations. New plugins should use the
- * \Drupal\entity_embed\Attribute\EntityEmbedDisplay attribute instead.
- *
  * For a working example, see \Drupal\entity_embed\Plugin\entity_embed\EntityEmbedDisplay\FileFieldFormatter
  *
  * @see \Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayBase

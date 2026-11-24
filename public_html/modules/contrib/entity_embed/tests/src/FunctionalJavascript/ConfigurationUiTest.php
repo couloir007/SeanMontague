@@ -2,17 +2,14 @@
 
 namespace Drupal\Tests\entity_embed\FunctionalJavascript;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests text format & text editor configuration UI validation.
+ *
+ * @group entity_embed
  */
-#[Group('entity_embed')]
-#[RunTestsInSeparateProcesses]
 class ConfigurationUiTest extends EntityEmbedTestBase {
 
   use SortableTestTrait;
@@ -94,8 +91,9 @@ class ConfigurationUiTest extends EntityEmbedTestBase {
    *   missing or FALSE to leave the properly alone.
    * @param string $expected_error_message
    *   The error message that should display.
+   *
+   * @dataProvider providerTestValidations
    */
-  #[DataProvider('providerTestValidations')]
   public function testValidationWhenAdding($filter_html_status, $entity_embed_status, $allowed_html, $expected_error_message) {
     $this->drupalGet('admin/config/content/formats/add');
 
@@ -159,8 +157,9 @@ class ConfigurationUiTest extends EntityEmbedTestBase {
    *   present or FALSE to leave the properly alone.
    * @param string $expected_error_message
    *   The error message that should display.
+   *
+   * @dataProvider providerTestValidations
    */
-  #[DataProvider('providerTestValidations')]
   public function testValidationWhenEditing($filter_html_status, $entity_embed_status, $allowed_html, $expected_error_message) {
     $this->drupalGet('admin/config/content/formats/manage/embed_test');
 
@@ -211,10 +210,8 @@ class ConfigurationUiTest extends EntityEmbedTestBase {
   }
 
   /**
-   * Data provider for the validation tests.
-   *
-   * @see ::testValidationWhenAdding()
-   * @see ::testValidationWhenEditing()
+   * Data provider for testValidationWhenAdding() and
+   * testValidationWhenEditing().
    */
   public static function providerTestValidations(): array {
     return [
@@ -236,11 +233,20 @@ class ConfigurationUiTest extends EntityEmbedTestBase {
         'allowed_html' => 'default',
         'expected_error_message' => FALSE,
       ],
-      // @todo This test case currently fails. It looks like the
-      //   <drupal-entity> tag is not automatically added to the list of
-      //   allowed_html tags when the entity_embed filter is enabled. This
-      //   seems to be a JavaScript problem. Add a case with both filters
-      //   enabled in https://www.drupal.org/project/entity_embed/issues/3415080
+      /*
+       * TODO: This test case currently fails. It looks like the <drupal-entity>
+       * tag is not automatically added to the list of allowed_html tags when
+       * the entity_embed filter is enabled. This seems to be a JavaScript
+       * problem.
+       *
+       * https://www.drupal.org/project/entity_embed/issues/3415080
+       */
+      // 'Tests validation when entity_embed filter enabled and filter_html is enabled.' => [
+      //   'filters[filter_html][status]' => TRUE,
+      //   'filters[entity_embed][status]' => TRUE,
+      //   'allowed_html' => 'default',
+      //   'expected_error_message' => FALSE,
+      // ],
       'Tests validation when drupal-entity not added.' => [
         'filters[filter_html][status]' => TRUE,
         'filters[entity_embed][status]' => TRUE,

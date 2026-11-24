@@ -6,7 +6,6 @@ namespace Drupal\Tests\workspaces\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -14,7 +13,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('workspaces')]
 #[RunTestsInSeparateProcesses]
-#[IgnoreDeprecations]
 class WorkspaceAssociationRevisionTableUpdateTest extends UpdatePathTestBase {
 
   /**

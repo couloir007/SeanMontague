@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\ctools_views\Functional;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\views_ui\Functional\UITestBase;
 use Drupal\views\Tests\ViewTestData;
@@ -28,8 +26,6 @@ if (!trait_exists(EntityReferenceFieldCreationTrait::class)) {
  * @group ctools_views
  * @see \Drupal\ctools_views\Plugin\Display\Block
  */
-#[Group('ctools_views')]
-#[RunTestsInSeparateProcesses]
 class CToolsViewsEntityViewBlockTest extends UITestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -216,10 +212,10 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
 
     // @todo Remove this after debugging.
     $this->assertSession()->elementExists('xpath', '//div');
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_text")]//table', 1);
+    $this->assertEquals(1, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_text")]//table')), 'Found the view table.');
 
     // Check that the default settings return all results.
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_text")]//table/tbody/tr', 3);
+    $this->assertEquals(3, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_text")]//table/tbody/tr')));
     $this->assertSession()->fieldNotExists($filter_id);
 
     // Override configure_filters settings.
@@ -244,7 +240,7 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
     $this->assertSession()->buttonExists('Apply');
     $this->assertSession()->elementExists('xpath', '//fieldset[@id="edit-field-ctools-views-text-value-wrapper"]');
     // Check that the overridden settings return proper results.
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_text")]//table/tbody/tr', 2);
+    $this->assertEquals(2, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_text")]//table/tbody/tr')));
 
     // Override operator setting.
     $edit = [];
@@ -270,7 +266,7 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
     $this->assertSession()->buttonExists('Apply');
     $this->assertSession()->elementNotExists('xpath', '//fieldset[@id="edit-field-taxonomy-term-reference-target-id-wrapper"]');
     // Check that the overridden operator returns proper results.
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_text")]//table/tbody/tr', 1);
+    $this->assertEquals(1, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_text")]//table/tbody/tr')));
   }
 
   /**
@@ -278,8 +274,7 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
    */
   public function testConfigureFiltersTextfieldGrouped() {
     $default_theme = $this->config('system.theme')->get('default');
-    $filter_machine_name = 'title';
-    $filter_id = 'non-default-identifier';
+    $filter_id = 'title';
     $filter_op_id = $filter_id . '_op';
 
     $block = [];
@@ -289,7 +284,7 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
 
     // Get the "Configure block" form for our Views block.
     $this->drupalGet('admin/structure/block/add/' . $block['id'] . '/' . $block['theme']);
-    $this->assertSession()->fieldExists('settings[exposed][filter-' . $filter_machine_name . '][' . $filter_id . ']');
+    $this->assertSession()->fieldExists('settings[exposed][filter-' . $filter_id . '][' . $filter_id . ']');
 
     // Add block to sidebar_first region with default settings.
     $this->submitForm([
@@ -301,55 +296,51 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
     $this->drupalGet('<front>');
 
     // Check that the default settings return all results.
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_text_grouped")]//table/tbody/tr', 3);
+    $this->assertEquals(3, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_text_grouped")]//table/tbody/tr')));
 
     // Override configure_filters settings with test value contains group.
     $edit = [];
     $edit['region'] = 'sidebar_first';
-    $edit['settings[exposed][filter-' . $filter_machine_name . '][' . $filter_id . ']'] = '1';
+    $edit['settings[exposed][filter-' . $filter_id . '][' . $filter_id . ']'] = '1';
     $this->drupalGet('admin/structure/block/manage/views_block__ctools_views_entity_test_block_filter_text_grouped');
     $this->submitForm($edit, 'Save block');
 
     $block = $this->storage->load('views_block__ctools_views_entity_test_block_filter_text_grouped');
     $config = $block->getPlugin()->getConfiguration();
-    $this->assertEquals('1', $config['exposed']['filter-' . $filter_machine_name]['group_info']['default_group'], "'configure_filters' value is properly saved.");
-    $this->assertEquals('string', $config['exposed']['filter-' . $filter_machine_name]['plugin_id'], "'configure_filters' plugin_id is properly saved.");
-
-    // Check that the saved group is the default when editing the block again.
-    $this->drupalGet('admin/structure/block/manage/views_block__ctools_views_entity_test_block_filter_text_grouped');
-    $this->assertSession()->fieldValueEquals('settings[exposed][filter-' . $filter_machine_name . '][' . $filter_id . ']', '1');
+    $this->assertEquals('1', $config['exposed']['filter-' . $filter_id]['group_info']['default_group'], "'configure_filters' value is properly saved.");
+    $this->assertEquals('string', $config['exposed']['filter-' . $filter_id]['plugin_id'], "'configure_filters' plugin_id is properly saved.");
 
     // Assert configure_filters overridden settings.
     $this->drupalGet('<front>');
     // Check that the overridden settings return proper results.
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_text_grouped")]//table/tbody/tr', 1);
+    $this->assertEquals(1, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_text_grouped")]//table/tbody/tr')));
     $this->assertSession()->elementTextEquals('xpath', '(//div[contains(@class, "view-display-id-block_filter_text_grouped")]//table/tbody/tr)[1]', 'Test entity 2');
 
     // Override configure_filters settings with test value not group.
     $edit = [];
     $edit['region'] = 'sidebar_first';
-    $edit['settings[exposed][filter-' . $filter_machine_name . '][' . $filter_id . ']'] = '2';
+    $edit['settings[exposed][filter-' . $filter_id . '][' . $filter_id . ']'] = '2';
     $this->drupalGet('admin/structure/block/manage/views_block__ctools_views_entity_test_block_filter_text_grouped');
     $this->submitForm($edit, 'Save block');
 
     // Assert configure_filters overridden settings.
     $this->drupalGet('<front>');
     // Check that the overridden operator returns proper results.
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_text_grouped")]//table/tbody/tr', 2);
+    $this->assertEquals(2, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_text_grouped")]//table/tbody/tr')));
     $this->assertSession()->elementTextEquals('xpath', '(//div[contains(@class, "view-display-id-block_filter_text_grouped")]//table/tbody/tr)[1]', 'Test entity 1');
     $this->assertSession()->elementTextEquals('xpath', '(//div[contains(@class, "view-display-id-block_filter_text_grouped")]//table/tbody/tr)[2]', 'Test entity 2');
 
     // Override configure_filters settings with test value equals group.
     $edit = [];
     $edit['region'] = 'sidebar_first';
-    $edit['settings[exposed][filter-' . $filter_machine_name . '][' . $filter_id . ']'] = '3';
+    $edit['settings[exposed][filter-' . $filter_id . '][' . $filter_id . ']'] = '3';
     $this->drupalGet('admin/structure/block/manage/views_block__ctools_views_entity_test_block_filter_text_grouped');
     $this->submitForm($edit, 'Save block');
 
     // Assert configure_filters overridden settings.
     $this->drupalGet('<front>');
     // Check that the overridden operator returns proper results.
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_text_grouped")]//table/tbody/tr', 1);
+    $this->assertEquals(1, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_text_grouped")]//table/tbody/tr')));
     $this->assertSession()->elementTextEquals('xpath', '(//div[contains(@class, "view-display-id-block_filter_text_grouped")]//table/tbody/tr)[1]', 'Test entity 1');
   }
 
@@ -361,11 +352,10 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
     $tid = $this->terms[0]->id();
     $term_label = $this->terms[0]->label();
     $filter_id = 'field_ctools_views_tags_target_id';
-    $identifier = 'tags_filter_alternate_identifier';
 
     // Get the "Configure block" form for our Views block.
     $this->drupalGet('admin/structure/block/add/views_block:ctools_views_entity_test-block_filter_tax/' . $default_theme);
-    $this->assertSession()->fieldExists('settings[exposed][filter-' . $filter_id . '][' . $identifier . ']');
+    $this->assertSession()->fieldExists('settings[exposed][filter-' . $filter_id . '][' . $filter_id . ']');
 
     // Add block to sidebar_first region with default settings.
     $edit = [];
@@ -377,12 +367,12 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
     // Assert configure_filters default settings.
     $this->drupalGet('<front>');
     // Check that the default settings return all results.
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_tax")]//table/tbody/tr', 3);
+    $this->assertEquals(3, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_tax")]//table/tbody/tr')));
 
     // Override configure_filters settings.
     $edit = [];
     $edit['region'] = 'sidebar_first';
-    $edit['settings[exposed][filter-' . $filter_id . '][' . $identifier . ']'] = $tid;
+    $edit['settings[exposed][filter-' . $filter_id . '][' . $filter_id . ']'] = $tid;
     $this->drupalGet('admin/structure/block/manage/views_block__ctools_views_entity_test_block_filter_tax');
     $this->submitForm($edit, 'Save block');
 
@@ -393,60 +383,12 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
 
     // Test saved settings reload into configuration form correctly.
     $this->drupalGet('admin/structure/block/manage/views_block__ctools_views_entity_test_block_filter_tax');
-    $this->assertSession()->elementTextEquals('xpath', '//select[@data-drupal-selector="edit-settings-exposed-filter-field-ctools-views-tags-target-id-tags-filter-alternate-identifier"]/option[@selected="selected"]', $term_label);
+    $this->assertSession()->elementTextEquals('xpath', '//select[@data-drupal-selector="edit-settings-exposed-filter-field-ctools-views-tags-target-id-field-ctools-views-tags-target-id"]/option[@selected="selected"]', $term_label);
 
     // Assert configure_filters overridden settings.
     $this->drupalGet('<front>');
     // Check that the overridden settings return proper results.
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_tax")]//table/tbody/tr', 1);
-  }
-
-  /**
-   * Test 'configure_filters' with a taxonomy select and an exposed operator.
-   */
-  public function testConfigureFiltersTaxonomyExposedOperator() {
-    $default_theme = $this->config('system.theme')->get('default');
-    $tid = $this->terms[0]->id();
-    $filter_id = 'field_ctools_views_tags_target_id';
-    $identifier = 'tags_filter_alternate_identifier';
-    $wrapper = $identifier . '_wrapper';
-
-    // Expose the operator, which wraps the operator and value elements in a
-    // "{identifier}_wrapper" container.
-    $view = $this->container->get('entity_type.manager')->getStorage('view')->load('ctools_views_entity_test');
-    $display = &$view->getDisplay('block_filter_tax');
-    $display['display_options']['filters'][$filter_id]['expose']['use_operator'] = TRUE;
-    $view->save();
-
-    $this->drupalGet('admin/structure/block/add/views_block:ctools_views_entity_test-block_filter_tax/' . $default_theme);
-    $this->assertSession()->fieldExists('settings[exposed][filter-' . $filter_id . '][' . $wrapper . '][' . $identifier . ']');
-    $this->assertSession()->fieldExists('settings[exposed][filter-' . $filter_id . '][' . $wrapper . '][' . $filter_id . '_op]');
-
-    // Add block to sidebar_first region with default settings.
-    $edit = [];
-    $edit['region'] = 'sidebar_first';
-    $edit['id'] = 'views_block__ctools_views_entity_test_block_filter_tax';
-    $this->submitForm($edit, 'Save block');
-
-    $this->drupalGet('<front>');
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_tax")]//table/tbody/tr', 3);
-
-    // Override configure_filters settings.
-    $edit = [];
-    $edit['settings[exposed][filter-' . $filter_id . '][' . $wrapper . '][' . $identifier . ']'] = $tid;
-    $this->drupalGet('admin/structure/block/manage/views_block__ctools_views_entity_test_block_filter_tax');
-    $this->submitForm($edit, 'Save block');
-
-    $block = $this->storage->load('views_block__ctools_views_entity_test_block_filter_tax');
-    $config = $block->getPlugin()->getConfiguration();
-    $this->assertEquals([$tid => $tid], $config['exposed']['filter-' . $filter_id]['value'], "'configure_filters' setting is properly saved.");
-
-    // Test saved settings reload into configuration form correctly.
-    $this->drupalGet('admin/structure/block/manage/views_block__ctools_views_entity_test_block_filter_tax');
-    $this->assertSession()->elementTextEquals('xpath', '//select[@name="settings[exposed][filter-' . $filter_id . '][' . $wrapper . '][' . $identifier . ']"]/option[@selected="selected"]', $this->terms[0]->label());
-
-    $this->drupalGet('<front>');
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_tax")]//table/tbody/tr', 1);
+    $this->assertEquals(1, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_tax")]//table/tbody/tr')));
   }
 
   /**
@@ -455,11 +397,10 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
   public function testConfigureFiltersTaxonomyAutocomplete() {
     $default_theme = $this->config('system.theme')->get('default');
     $tid = $this->terms[0]->id();
-    $identifier = 'tags_autocomplete_alternate_identifier';
 
     // Get the "Configure block" form for our Views block.
     $this->drupalGet('admin/structure/block/add/views_block:ctools_views_entity_test-block_filter_auto/' . $default_theme);
-    $this->assertSession()->fieldExists('settings[exposed][filter-field_ctools_views_tags_target_id][' . $identifier . ']');
+    $this->assertSession()->fieldExists('settings[exposed][filter-field_ctools_views_tags_target_id][field_ctools_views_tags_target_id]');
 
     // Add block to sidebar_first region with default settings.
     $edit = [];
@@ -471,14 +412,14 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
     // Assert configure_filters default settings.
     $this->drupalGet('<front>');
     // Check that the default settings return all results.
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_auto")]//table/tbody/tr', 3);
+    $this->assertEquals(3, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_auto")]//table/tbody/tr')));
 
     // Override configure_filters settings.
     $edit = [];
     $edit['region'] = 'sidebar_first';
     $filter_term = $this->terms[0];
     $filter_value = EntityAutocomplete::getEntityLabels([$filter_term]);
-    $edit['settings[exposed][filter-field_ctools_views_tags_target_id][' . $identifier . ']'] = $filter_value;
+    $edit['settings[exposed][filter-field_ctools_views_tags_target_id][field_ctools_views_tags_target_id]'] = $filter_value;
     $this->drupalGet('admin/structure/block/manage/views_block__ctools_views_entity_test_block_filter_auto');
     $this->submitForm($edit, 'Save block');
 
@@ -488,12 +429,12 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
 
     // Check rendered value of autosubmit field in reloaded form.
     $this->drupalGet('admin/structure/block/manage/views_block__ctools_views_entity_test_block_filter_auto');
-    $this->assertSession()->elementTextEquals('xpath', '//input[@data-drupal-selector="edit-settings-exposed-filter-field-ctools-views-tags-target-id-tags-autocomplete-alternate-identifier"]/@value', $filter_value);
+    $this->assertSession()->elementTextEquals('xpath', '//input[@data-drupal-selector="edit-settings-exposed-filter-field-ctools-views-tags-target-id-field-ctools-views-tags-target-id"]/@value', $filter_value);
 
     // Assert configure_filters overridden settings.
     $this->drupalGet('<front>');
     // Check that the overridden settings return proper results.
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_auto")]//table/tbody/tr', 1);
+    $this->assertEquals(1, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_auto")]//table/tbody/tr')));
   }
 
   /**
@@ -516,7 +457,7 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
     // Assert configure_filters default settings.
     $this->drupalGet('<front>');
     // Check that the default settings return all results.
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_list")]//table/tbody/tr', 3);
+    $this->assertEquals(3, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_list")]//table/tbody/tr')));
 
     // Override configure_filters settings.
     $edit = [];
@@ -532,7 +473,7 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
     // Assert configure_filters overridden settings.
     $this->drupalGet('<front>');
     // Check that the overridden settings return proper results.
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_list")]//table/tbody/tr', 1);
+    $this->assertEquals(1, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_list")]//table/tbody/tr')));
   }
 
   /**
@@ -556,7 +497,7 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
     // Assert configure_filters default settings.
     $this->drupalGet('<front>');
     // Check that the default settings return all results.
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_date")]//table/tbody/tr', 3);
+    $this->assertEquals(3, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_date")]//table/tbody/tr')));
 
     // Override configure_filters settings for between date filter.
     $edit = [];
@@ -573,7 +514,7 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
     // Assert overridden between date filter settings.
     $this->drupalGet('<front>');
     // Check that the overridden settings return proper results.
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_date")]//table/tbody/tr', 1);
+    $this->assertEquals(1, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_date")]//table/tbody/tr')));
 
     // Reset between date filter.
     $edit = [];
@@ -586,7 +527,7 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
     // Assert configure_filters reset/default settings.
     $this->drupalGet('<front>');
     // Check that the default settings return all results.
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_date")]//table/tbody/tr', 3);
+    $this->assertEquals(3, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_date")]//table/tbody/tr')));
 
     // Override configure_filters settings for greater than date filter.
     $edit = [];
@@ -602,7 +543,7 @@ class CToolsViewsEntityViewBlockTest extends UITestBase {
     // Assert overridden greater then date filter settings.
     $this->drupalGet('<front>');
     // Check that the overridden settings return proper results.
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "view-display-id-block_filter_date")]//table/tbody/tr', 2);
+    $this->assertEquals(2, count($this->xpath('//div[contains(@class, "view-display-id-block_filter_date")]//table/tbody/tr')));
   }
 
   /**

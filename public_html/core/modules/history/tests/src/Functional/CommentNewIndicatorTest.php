@@ -11,7 +11,6 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\Tests\comment\Functional\CommentTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Http\Message\ResponseInterface;
 
@@ -19,7 +18,6 @@ use Psr\Http\Message\ResponseInterface;
  * Tests the 'new' indicator posted on comments.
  */
 #[Group('history')]
-#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class CommentNewIndicatorTest extends CommentTestBase {
 

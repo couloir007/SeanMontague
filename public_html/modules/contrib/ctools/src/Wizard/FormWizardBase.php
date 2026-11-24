@@ -322,10 +322,7 @@ abstract class FormWizardBase extends FormBase implements FormWizardInterface {
    * {@inheritdoc}
    */
   public function populateCachedValues(array &$form, FormStateInterface $form_state) {
-    // A new item has no machine name yet. PHP 8.5 deprecates the NULL array
-    // offset the key/value store would use for it, so skip the lookup.
-    $machine_name = $this->getMachineName();
-    $cached_values = isset($machine_name) ? $this->getTempstore()->get($machine_name) : NULL;
+    $cached_values = $this->getTempstore()->get($this->getMachineName());
     if (!$cached_values) {
       $cached_values = $form_state->getTemporaryValue('wizard');
       if (!$cached_values) {

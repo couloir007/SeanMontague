@@ -4,11 +4,14 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\custom_field\Plugin\CustomFieldTypeBase;
+use Drupal\custom_field\Trait\NumericTrait;
 
 /**
  * Base class for numeric custom field types.
  */
 class NumericTypeBase extends CustomFieldTypeBase {
+
+  use NumericTrait;
 
   /**
    * {@inheritdoc}
@@ -89,34 +92,46 @@ class NumericTypeBase extends CustomFieldTypeBase {
       $max = $field_settings['max'];
     }
 
-    if ($min) {
+    if (is_numeric($min)) {
       $constraints['Range']['min'] = $min;
     }
-    if ($max) {
+    if (is_numeric($max)) {
       $constraints['Range']['max'] = $max;
     }
 
     // Determine appropriate message.
-    $params = [
-      '%name' => $settings['name'],
-      '%min' => $min,
-      '%max' => $max,
-    ];
     $messages = [
-      'notInRangeMessage' => $this->t('%name: the value must be between %min and %max.', $params),
-      'minMessage' => $this->t('%name: the value may be no less than %min.', $params),
-      'maxMessage' => $this->t('%name: the value may be no greater than %max.', $params),
+      'notInRangeMessage' => $this->t('%name: the value must be between %min and %max.', [
+        '%name' => $settings['name'],
+        '%min' => $min,
+        '%max' => $max,
+      ]),
+      'minMessage' => $this->t('%name: the value may be no less than %min.', [
+        '%name' => $settings['name'],
+        '%min' => $min,
+      ]),
+      'maxMessage' => $this->t('%name: the value may be no greater than %max.', [
+        '%name' => $settings['name'],
+        '%max' => $max,
+      ]),
     ];
 
+    // Choose the message from the bounds the Range constraint ends up with,
+    // not from the settings: Range refuses minMessage or maxMessage when it has
+    // both bounds. Without a configured bound, Range keeps its default message.
     $message_type = NULL;
-    if ($min_set && $max_set) {
-      $message_type = 'notInRangeMessage';
-    }
-    elseif ($min_set) {
-      $message_type = ($min && $max) ? 'notInRangeMessage' : 'minMessage';
-    }
-    elseif ($max_set) {
-      $message_type = ($min && $max) ? 'notInRangeMessage' : 'maxMessage';
+    if ($min_set || $max_set) {
+      $has_min = isset($constraints['Range']['min']);
+      $has_max = isset($constraints['Range']['max']);
+      if ($has_min && $has_max) {
+        $message_type = 'notInRangeMessage';
+      }
+      elseif ($has_min) {
+        $message_type = 'minMessage';
+      }
+      elseif ($has_max) {
+        $message_type = 'maxMessage';
+      }
     }
 
     if (!is_null($message_type)) {
@@ -124,103 +139,6 @@ class NumericTypeBase extends CustomFieldTypeBase {
     }
 
     return $constraints;
-  }
-
-  /**
-   * Helper method to get the min value restricted by databases.
-   *
-   * @param array $settings
-   *   An array of field settings.
-   *
-   * @return int|float
-   *   The minimum value allowed by the database.
-   */
-  protected static function getDefaultMinValue(array $settings): int|float {
-    if (!empty($settings['unsigned'])) {
-      return 0;
-    }
-
-    // Each value is - (2 ^ (8 * bytes - 1)).
-    $size_map = [
-      'normal' => -2147483648,
-      'tiny' => -128,
-      'small' => -32768,
-      'medium' => -8388608,
-      'big' => -9223372036854775808,
-    ];
-    $size = $settings['size'] ?? 'normal';
-
-    return $size_map[(string) $size];
-  }
-
-  /**
-   * Helper method to get the max value restricted by databases.
-   *
-   * @param array $settings
-   *   An array of field settings.
-   *
-   * @return int
-   *   The maximum value allowed by the database.
-   */
-  protected static function getDefaultMaxValue(array $settings): int {
-    if (!empty($settings['unsigned'])) {
-      // Each value is (2 ^ (8 * bytes) - 1).
-      $size_map = [
-        'normal' => 4294967295,
-        'tiny' => 255,
-        'small' => 65535,
-        'medium' => 16777215,
-        'big' => PHP_INT_MAX,
-      ];
-    }
-    else {
-      // Each value is (2 ^ (8 * bytes - 1) - 1).
-      $size_map = [
-        'normal' => 2147483647,
-        'tiny' => 127,
-        'small' => 32767,
-        'medium' => 8388607,
-        'big' => PHP_INT_MAX,
-      ];
-    }
-    $size = $settings['size'] ?? 'normal';
-
-    return $size_map[(string) $size];
-  }
-
-  /**
-   * Helper method to truncate a decimal number to a given number of decimals.
-   *
-   * @param float $decimal
-   *   Decimal number to truncate.
-   * @param int $num
-   *   Number of digits the output will have.
-   *
-   * @return float
-   *   Decimal number truncated.
-   */
-  protected static function truncateDecimal(float $decimal, int $num): float {
-    $factor = pow(10, $num);
-    return floor($decimal * $factor) / $factor;
-  }
-
-  /**
-   * Helper method to get the number of decimal digits out of a decimal number.
-   *
-   * @param float|int $decimal
-   *   The number to calculate the number of decimals digits from.
-   *
-   * @return int
-   *   The number of decimal digits.
-   */
-  protected static function getDecimalDigits(float|int $decimal): int {
-    $digits = 0;
-    while ($decimal - round($decimal)) {
-      $decimal *= 10;
-      $digits++;
-    }
-
-    return $digits;
   }
 
 }

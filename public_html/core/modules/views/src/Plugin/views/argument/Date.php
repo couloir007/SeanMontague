@@ -9,6 +9,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\node\NodeInterface;
 use Drupal\views\Attribute\ViewsArgument;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Argument handler for dates.
@@ -85,6 +86,20 @@ class Date extends Formula implements ContainerFactoryPluginInterface {
 
     $this->routeMatch = $route_match;
     $this->dateFormatter = $date_formatter;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('current_route_match'),
+      $container->get('date.formatter'),
+      $container->get('datetime.time'),
+    );
   }
 
   /**

@@ -672,10 +672,6 @@ class StreamHandler
                     throw new RequestException('Request header fields must not contain a carriage return, line feed or NUL byte.', $request);
                 }
 
-                if (1 !== \preg_match('/^[a-zA-Z0-9\'`#$%&*+.^_|~!-]+$/D', (string) $name)) {
-                    throw new RequestException('Request header names must be valid HTTP tokens.', $request);
-                }
-
                 $headers .= "$name: $val\r\n";
             }
         }
@@ -1045,9 +1041,8 @@ class StreamHandler
 
         if (\is_array($parsed) && isset($parsed['scheme']) && Psr7\Utils::caselessEquals($parsed['scheme'], 'http')) {
             if (isset($parsed['host'], $parsed['port'])) {
-                // Each part is percent-decoded on its own, to match libcurl.
-                $user = \rawurldecode($parsed['user'] ?? '');
-                $pass = \rawurldecode($parsed['pass'] ?? '');
+                $user = $parsed['user'] ?? '';
+                $pass = $parsed['pass'] ?? '';
                 $auth = ($user !== '' || $pass !== '') ? 'Basic '.\base64_encode("{$user}:{$pass}") : null;
 
                 return [

@@ -13,22 +13,17 @@ class Delete extends QueryDelete {
    * {@inheritdoc}
    */
   public function execute() {
-    if ($this->connection->inTransaction()) {
-      $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
-    }
+    $this->connection->addSavepoint();
     try {
       $result = parent::execute();
-      if (isset($savepoint)) {
-        $savepoint->commitOrRelease();
-      }
-      return $result;
     }
     catch (\Exception $e) {
-      if (isset($savepoint)) {
-        $savepoint->rollback();
-      }
+      $this->connection->rollbackSavepoint();
       throw $e;
     }
+    $this->connection->releaseSavepoint();
+
+    return $result;
   }
 
 }

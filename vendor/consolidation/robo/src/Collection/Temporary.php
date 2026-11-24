@@ -25,6 +25,7 @@ namespace Robo\Collection;
  */
 class Temporary
 {
+
     /**
      * @var \Robo\Collection\Collection
      */

@@ -1,5 +1,3 @@
-// CI doesn't install this module's node_modules.
-/* eslint-disable import/no-unresolved */
 const path = require('path');
 const fs = require('fs');
 const webpack = require('webpack');

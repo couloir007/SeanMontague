@@ -505,7 +505,7 @@ class GenerateMarkdownDoc extends BaseTask implements BuilderAwareInterface
         $doc .= implode("\n", $properties);
 
         $methods = [];
-        foreach ($this->sortMethods($refl, $refl->getMethods()) as $reflMethod) {
+        foreach ($refl->getMethods() as $reflMethod) {
             $methods[$reflMethod->name] = $this->documentMethod($reflMethod);
         }
         if (is_callable($this->reorderMethods)) {
@@ -517,49 +517,6 @@ class GenerateMarkdownDoc extends BaseTask implements BuilderAwareInterface
         $doc .= implode("\n", $methods) . "\n";
 
         return $doc;
-    }
-
-    /**
-     * Sort methods into a stable order.
-     *
-     * The order of ReflectionClass::getMethods() for inherited and trait
-     * methods differs between PHP versions (e.g. PHP 8.5 vs. 8.4), which made
-     * the generated documentation depend on the PHP version it was built
-     * with. Methods are sorted by the class that declares them (the documented
-     * class first, then its parents from nearest to oldest), then methods
-     * written in that class's own file before methods from its traits, then
-     * by file and line, so source order is kept.
-     *
-     * @param \ReflectionClass $refl
-     * @param \ReflectionMethod[] $methods
-     *
-     * @return \ReflectionMethod[]
-     */
-    protected function sortMethods(\ReflectionClass $refl, array $methods)
-    {
-        $depth = [];
-        $level = 0;
-        for ($class = $refl; $class; $class = $class->getParentClass()) {
-            $depth[$class->getName()] = $level++;
-        }
-
-        $key = function (\ReflectionMethod $method) use ($depth) {
-            $declaringClass = $method->getDeclaringClass();
-            $file = (string) $method->getFileName();
-            return [
-                $depth[$declaringClass->getName()] ?? PHP_INT_MAX,
-                $file === (string) $declaringClass->getFileName() ? 0 : 1,
-                $file,
-                (int) $method->getStartLine(),
-                $method->getName(),
-            ];
-        };
-
-        usort($methods, function (\ReflectionMethod $a, \ReflectionMethod $b) use ($key) {
-            return $key($a) <=> $key($b);
-        });
-
-        return $methods;
     }
 
     /**
@@ -698,15 +655,12 @@ class GenerateMarkdownDoc extends BaseTask implements BuilderAwareInterface
             return "";
         }
         $propertyDoc = $reflectedProperty->getDocComment();
-        // take from the nearest parent that documents it
+        // take from parent
         if (!$propertyDoc) {
             $parent = $reflectedProperty->getDeclaringClass();
             while ($parent = $parent->getParentClass()) {
                 if ($parent->hasProperty($reflectedProperty->name)) {
                     $propertyDoc = $parent->getProperty($reflectedProperty->name)->getDocComment();
-                    if ($propertyDoc) {
-                        break;
-                    }
                 }
             }
         }
@@ -737,35 +691,14 @@ class GenerateMarkdownDoc extends BaseTask implements BuilderAwareInterface
         }
         $text .= '$' . $param->name;
         if ($param->isDefaultValueAvailable()) {
-            $text .= ' = ' . $this->documentDefaultValue($param);
+            if ($param->allowsNull()) {
+                $text .= ' = null';
+            } else {
+                $text .= ' = ' . str_replace("\n", ' ', var_export($param->getDefaultValue(), true));
+            }
         }
 
         return $text;
-    }
-
-    /**
-     * Render the default value of a parameter.
-     *
-     * Note that ReflectionParameter::allowsNull() is true for every untyped
-     * parameter, so it can't be used to decide whether the default is null.
-     *
-     * @param \ReflectionParameter $param
-     *
-     * @return string
-     */
-    protected function documentDefaultValue(\ReflectionParameter $param)
-    {
-        if ($param->isDefaultValueConstant()) {
-            return (string) $param->getDefaultValueConstantName();
-        }
-        $value = $param->getDefaultValue();
-        if ($value === null) {
-            return 'null';
-        }
-        if ($value === []) {
-            return '[]';
-        }
-        return str_replace("\n", ' ', var_export($value, true));
     }
 
     /**
@@ -828,15 +761,12 @@ class GenerateMarkdownDoc extends BaseTask implements BuilderAwareInterface
             return "";
         }
         $methodDoc = $reflectedMethod->getDocComment();
-        // take from the nearest parent that documents it
+        // take from parent
         if (!$methodDoc) {
             $parent = $reflectedMethod->getDeclaringClass();
             while ($parent = $parent->getParentClass()) {
                 if ($parent->hasMethod($reflectedMethod->name)) {
                     $methodDoc = $parent->getMethod($reflectedMethod->name)->getDocComment();
-                    if ($methodDoc) {
-                        break;
-                    }
                 }
             }
         }

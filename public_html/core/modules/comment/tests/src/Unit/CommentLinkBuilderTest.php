@@ -4,14 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Unit;
 
-use Drupal\comment\CommentingStatus;
 use Drupal\comment\CommentLinkBuilder;
-use Drupal\comment\CommentManagerInterface;
-use Drupal\comment\FormLocation;
-use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Url;
-use Drupal\node\NodeInterface;
 use Drupal\Tests\Traits\Core\GeneratePermutationsTrait;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -30,7 +25,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
   /**
    * Comment manager mock.
    *
-   * @var \Drupal\comment\CommentManagerInterface|\PHPUnit\Framework\MockObject\Stub
+   * @var \Drupal\comment\CommentManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $commentManager;
 
@@ -44,7 +39,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
   /**
    * Current user proxy mock.
    *
-   * @var \Drupal\Core\Session\AccountProxyInterface|\PHPUnit\Framework\MockObject\Stub
+   * @var \Drupal\Core\Session\AccountProxyInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $currentUser;
 
@@ -68,19 +63,20 @@ class CommentLinkBuilderTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->commentManager = $this->createStub(CommentManagerInterface::class);
+    $this->commentManager = $this->createMock('\Drupal\comment\CommentManagerInterface');
     $this->stringTranslation = $this->getStringTranslationStub();
-    $this->currentUser = $this->createStub(AccountProxyInterface::class);
+    $this->currentUser = $this->createMock('\Drupal\Core\Session\AccountProxyInterface');
     $this->commentLinkBuilder = new CommentLinkBuilder($this->currentUser, $this->commentManager, $this->stringTranslation);
-    $this->commentManager
+    $this->commentManager->expects($this->any())
       ->method('getFields')
+      ->with('node')
       ->willReturn([
         'comment' => [],
       ]);
-    $this->commentManager
+    $this->commentManager->expects($this->any())
       ->method('forbiddenMessage')
       ->willReturn("Can't let you do that Dave.");
-    $this->stringTranslation
+    $this->stringTranslation->expects($this->any())
       ->method('formatPlural')
       ->willReturnArgument(1);
   }
@@ -107,16 +103,16 @@ class CommentLinkBuilderTest extends UnitTestCase {
   #[DataProvider('getLinkCombinations')]
   public function testCommentLinkBuilder(array $node_args, $context, $has_access_comments, $has_post_comments, $is_anonymous, $expected): void {
     $node = $this->getMockNode(...$node_args);
-    $this->currentUser
+    $this->currentUser->expects($this->any())
       ->method('hasPermission')
       ->willReturnMap([
         ['access comments', $has_access_comments],
         ['post comments', $has_post_comments],
       ]);
-    $this->currentUser
+    $this->currentUser->expects($this->any())
       ->method('isAuthenticated')
       ->willReturn(!$is_anonymous);
-    $this->currentUser
+    $this->currentUser->expects($this->any())
       ->method('isAnonymous')
       ->willReturn($is_anonymous);
     $links = $this->commentLinkBuilder->buildCommentedEntityLinks($node, $context);
@@ -151,7 +147,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
     $cases = [];
     // No links should be created if the entity doesn't have the field.
     $cases[] = [
-      [FALSE, CommentingStatus::Open, FormLocation::Below, 1],
+      [FALSE, CommentItemInterface::OPEN, CommentItemInterface::FORM_BELOW, 1],
       ['view_mode' => 'teaser'],
       TRUE,
       TRUE,
@@ -161,7 +157,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
     foreach (['search_result', 'search_index', 'print'] as $view_mode) {
       // Nothing should be output in these view modes.
       $cases[] = [
-        [TRUE, CommentingStatus::Open, FormLocation::Below, 1],
+        [TRUE, CommentItemInterface::OPEN, CommentItemInterface::FORM_BELOW, 1],
         ['view_mode' => $view_mode],
         TRUE,
         TRUE,
@@ -175,8 +171,12 @@ class CommentLinkBuilderTest extends UnitTestCase {
       'comment_count' => [0, 1],
       'has_access_comments' => [0, 1],
       'has_post_comments'   => [0, 1],
-      'form_location' => FormLocation::cases(),
-      'comments' => CommentingStatus::cases(),
+      'form_location'            => [CommentItemInterface::FORM_BELOW, CommentItemInterface::FORM_SEPARATE_PAGE],
+      'comments'        => [
+        CommentItemInterface::OPEN,
+        CommentItemInterface::CLOSED,
+        CommentItemInterface::HIDDEN,
+      ],
       'view_mode' => [
         'teaser', 'rss', 'full',
       ],
@@ -193,21 +193,21 @@ class CommentLinkBuilderTest extends UnitTestCase {
       $expected = [];
       // When comments are enabled in teaser mode, and comments exist, and the
       // user has access - we can output the comment count.
-      if ($combination['comments'] !== CommentingStatus::Hidden && $combination['view_mode'] == 'teaser' && $combination['comment_count'] && $combination['has_access_comments']) {
+      if ($combination['comments'] && $combination['view_mode'] == 'teaser' && $combination['comment_count'] && $combination['has_access_comments']) {
         $expected['comment-comments'] = '1 comment';
       }
       // All view modes other than RSS.
       if ($combination['view_mode'] != 'rss') {
         // Where commenting is open.
-        if ($combination['comments'] == CommentingStatus::Open) {
+        if ($combination['comments'] == CommentItemInterface::OPEN) {
           // And the user has post-comments permission.
           if ($combination['has_post_comments']) {
             // If the view mode is teaser, or the user can access comments and
             // comments exist or the form is on a separate page.
-            if ($combination['view_mode'] == 'teaser' || ($combination['has_access_comments'] && $combination['comment_count']) || $combination['form_location'] == FormLocation::SeparatePage) {
+            if ($combination['view_mode'] == 'teaser' || ($combination['has_access_comments'] && $combination['comment_count']) || $combination['form_location'] == CommentItemInterface::FORM_SEPARATE_PAGE) {
               // There should be an add comment link.
               $expected['comment-add'] = ['title' => 'Add new comment'];
-              if ($combination['form_location'] == FormLocation::Below) {
+              if ($combination['form_location'] == CommentItemInterface::FORM_BELOW) {
                 // On the same page.
                 $expected['comment-add']['url'] = Url::fromRoute('node.view');
               }
@@ -238,23 +238,23 @@ class CommentLinkBuilderTest extends UnitTestCase {
   }
 
   /**
-   * Builds a stub node based on given scenario.
+   * Builds a mock node based on given scenario.
    *
    * @param bool $has_field
    *   TRUE if the node has the 'comment' field.
-   * @param \Drupal\comment\CommentingStatus $comment_status
-   *   One of the CommentingStatus enum cases.
-   * @param \Drupal\comment\FormLocation $form_location
-   *   One of the FormLocation enum cases.
+   * @param int $comment_status
+   *   One of CommentItemInterface::OPEN|HIDDEN|CLOSED.
+   * @param int $form_location
+   *   One of CommentItemInterface::FORM_BELOW|FORM_SEPARATE_PAGE.
    * @param int $comment_count
    *   Number of comments against the field.
    *
-   * @return \Drupal\node\NodeInterface|\PHPUnit\Framework\MockObject\Stub
-   *   Stub node for testing.
+   * @return \Drupal\node\NodeInterface|\PHPUnit\Framework\MockObject\MockObject
+   *   Mock node for testing.
    */
   protected function getMockNode($has_field, $comment_status, $form_location, $comment_count) {
-    $node = $this->createStub(NodeInterface::class);
-    $node
+    $node = $this->createMock('\Drupal\node\NodeInterface');
+    $node->expects($this->any())
       ->method('hasField')
       ->willReturn($has_field);
 
@@ -262,36 +262,39 @@ class CommentLinkBuilderTest extends UnitTestCase {
       $this->timestamp = time();
     }
     $field_item = (object) [
-      'status' => $comment_status->value,
+      'status' => $comment_status,
       'comment_count' => $comment_count,
       'last_comment_timestamp' => $this->timestamp,
     ];
-    $node
+    $node->expects($this->any())
       ->method('get')
+      ->with('comment')
       ->willReturn($field_item);
 
-    $field_definition = $this->createStub(FieldDefinitionInterface::class);
-    $field_definition
+    $field_definition = $this->createMock('\Drupal\Core\Field\FieldDefinitionInterface');
+    $field_definition->expects($this->any())
       ->method('getSetting')
-      ->willReturn($form_location->value);
-    $node
+      ->with('form_location')
+      ->willReturn($form_location);
+    $node->expects($this->any())
       ->method('getFieldDefinition')
+      ->with('comment')
       ->willReturn($field_definition);
 
-    $node
+    $node->expects($this->any())
       ->method('language')
       ->willReturn('und');
 
-    $node
+    $node->expects($this->any())
       ->method('getEntityTypeId')
       ->willReturn('node');
 
-    $node
+    $node->expects($this->any())
       ->method('id')
       ->willReturn(1);
 
     $url = Url::fromRoute('node.view');
-    $node
+    $node->expects($this->any())
       ->method('toUrl')
       ->willReturn($url);
 

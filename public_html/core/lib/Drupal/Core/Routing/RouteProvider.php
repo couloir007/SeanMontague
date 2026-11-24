@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Routing;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Database\Statement\FetchAs;
@@ -56,11 +57,6 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    * A cache of already-loaded serialized routes, keyed by route name.
    *
    * @var string[]
-   *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no
-   *    replacement.
-   *
-   * @see https://www.drupal.org/node/3589089
    */
   protected $serializedRoutes = [];
 
@@ -86,13 +82,6 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
   protected $cacheTagInvalidator;
 
   /**
-   * The chained fast cache backend.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
-   */
-  protected $fastCache;
-
-  /**
    * A path processor manager for resolving the system path.
    *
    * @var \Drupal\Core\PathProcessor\InboundPathProcessorInterface
@@ -108,11 +97,6 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
 
   /**
    * Cache ID prefix used to load routes.
-   *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no
-   *     replacement.
-   *
-   * @see https://www.drupal.org/node/3589089
    */
   const ROUTE_LOAD_CID_PREFIX = 'route_provider.route_load:';
 
@@ -138,33 +122,21 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    *   The path processor.
    * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cache_tag_invalidator
    *   The cache tag invalidator.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $fast_cache
-   *   The chained fast cache backend.
    * @param string $table
    *   (Optional) The table in the database to use for matching. Defaults to
    *   'router'.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   (Optional) The language manager.
    */
-  public function __construct(Connection $connection, StateInterface $state, CurrentPathStack $current_path, CacheBackendInterface $cache_backend, InboundPathProcessorInterface $path_processor, CacheTagsInvalidatorInterface $cache_tag_invalidator, $fast_cache = NULL, $table = 'router', ?LanguageManagerInterface $language_manager = NULL) {
+  public function __construct(Connection $connection, StateInterface $state, CurrentPathStack $current_path, CacheBackendInterface $cache_backend, InboundPathProcessorInterface $path_processor, CacheTagsInvalidatorInterface $cache_tag_invalidator, $table = 'router', ?LanguageManagerInterface $language_manager = NULL) {
     $this->connection = $connection;
     $this->state = $state;
     $this->currentPath = $current_path;
     $this->cache = $cache_backend;
     $this->cacheTagInvalidator = $cache_tag_invalidator;
     $this->pathProcessor = $path_processor;
-    if (!$fast_cache instanceof CacheBackendInterface) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $fast_cache argument is deprecated in drupal:11.4.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3503843', E_USER_DEPRECATED);
-
-      $this->fastCache = \Drupal::service('cache.routes');
-      $this->tableName = is_string($fast_cache) ? $fast_cache : 'router';
-      $this->languageManager = $table instanceof LanguageManagerInterface ? $table : \Drupal::languageManager();
-    }
-    else {
-      $this->fastCache = $fast_cache;
-      $this->tableName = $table;
-      $this->languageManager = $language_manager ?: \Drupal::languageManager();
-    }
+    $this->tableName = $table;
+    $this->languageManager = $language_manager ?: \Drupal::languageManager();
   }
 
   /**
@@ -262,36 +234,26 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
       throw new \InvalidArgumentException('You must specify the route names to load');
     }
 
-    $routes_to_load = array_diff($names, array_keys($this->routes));
+    $routes_to_load = array_diff($names, array_keys($this->routes), array_keys($this->serializedRoutes));
     if ($routes_to_load) {
-      $cached = $this->fastCache->getMultiple($routes_to_load);
-      foreach ($cached as $cid => $item) {
-        $this->routes[$cid] = $item->data;
-      }
 
-      // \Drupal\Core\Cache\CacheBackendInterface::getMultiple() removed the
-      // routes that were found in the cache from the variable. Load the
-      // remaining ones, if any, from the database.
-      if ($routes_to_load) {
+      $cid = static::ROUTE_LOAD_CID_PREFIX . hash('sha512', serialize($routes_to_load));
+      if ($cache = $this->cache->get($cid)) {
+        $routes = $cache->data;
+      }
+      else {
         try {
           $result = $this->connection->query('SELECT [name], [route] FROM {' . $this->connection->escapeTable($this->tableName) . '} WHERE [name] IN ( :names[] )', [':names[]' => $routes_to_load]);
-          $loaded_routes = array_map('unserialize', $result->fetchAllKeyed());
-          $this->routes += $loaded_routes;
-          $items = [];
-          foreach ($loaded_routes as $route_name => $data) {
-            $items[$route_name] = [
-              'data' => $data,
-              'expire' => CacheBackendInterface::CACHE_PERMANENT,
-              'tags' => ['routes'],
-            ];
-          }
-          if ($items) {
-            $this->fastCache->setMultiple($items);
-          }
+          $routes = $result->fetchAllKeyed();
+
+          $this->cache->set($cid, $routes, Cache::PERMANENT, ['routes']);
         }
         catch (\Exception) {
+          $routes = [];
         }
       }
+
+      $this->serializedRoutes += $routes;
     }
   }
 
@@ -300,6 +262,14 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    */
   public function getRoutesByNames($names) {
     $this->preLoadRoutes($names);
+
+    foreach ($names as $name) {
+      // The specified route name might not exist or might be serialized.
+      if (!isset($this->routes[$name]) && isset($this->serializedRoutes[$name])) {
+        $this->routes[$name] = unserialize($this->serializedRoutes[$name]);
+        unset($this->serializedRoutes[$name]);
+      }
+    }
 
     return array_intersect_key($this->routes, array_flip($names));
   }
@@ -466,6 +436,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    */
   public function reset() {
     $this->routes = [];
+    $this->serializedRoutes = [];
     $this->cacheTagInvalidator->invalidateTags(['routes']);
   }
 

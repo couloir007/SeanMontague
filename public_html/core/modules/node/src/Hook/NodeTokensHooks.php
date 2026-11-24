@@ -4,7 +4,6 @@ namespace Drupal\node\Hook;
 
 use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\text\TextSummary;
 use Drupal\user\Entity\User;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Render\BubbleableMetadata;
@@ -142,10 +141,11 @@ class NodeTokensHooks {
                     $settings = \Drupal::service('plugin.manager.field.formatter')->getDefaultSettings('text_summary_or_trimmed');
                     $length = $settings['trim_length'];
                   }
-                  $output = \Drupal::service(TextSummary::class)->generate($output, $item->format, $length);
+                  $output = text_summary($output, $item->format, $length);
                 }
               }
-              // "processed" returns a \Drupal\Component\Render\MarkupInterface.
+              // "processed" returns a \Drupal\Component\Render\MarkupInterface
+              // via check_markup().
               $replacements[$original] = $output;
             }
             break;

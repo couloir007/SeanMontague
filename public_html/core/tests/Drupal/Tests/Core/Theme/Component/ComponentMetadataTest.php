@@ -7,7 +7,7 @@ namespace Drupal\Tests\Core\Theme\Component;
 use Drupal\Core\Render\Component\Exception\InvalidComponentException;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\Component\ComponentMetadata;
-use Drupal\Tests\UnitTestCase;
+use Drupal\Tests\UnitTestCaseTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -17,13 +17,13 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[CoversClass(ComponentMetadata::class)]
 #[Group('sdc')]
-class ComponentMetadataTest extends UnitTestCase {
+class ComponentMetadataTest extends UnitTestCaseTest {
 
   /**
    * Tests that the correct data is returned for each property.
    */
   #[DataProvider('dataProviderMetadata')]
-  public function testMetadata(array $metadata_info, array $expectations, bool $missing_schema): void {
+  public function testMetadata(array $metadata_info, array $expectations): void {
     $metadata = new ComponentMetadata($metadata_info, 'foo/', FALSE);
     $this->assertSame($expectations['path'], $metadata->path);
     $this->assertSame($expectations['status'], $metadata->status);

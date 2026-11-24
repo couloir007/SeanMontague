@@ -59,6 +59,13 @@ trait SchemaCheckTrait {
         "The 'contact.form.feedback' config does not exist.",
       ],
     ],
+    'editor.editor.*' => [
+      // @todo Fix stream wrappers not being available early enough in
+      //   https://www.drupal.org/project/drupal/issues/3416735
+      'image_upload.scheme' => [
+        '^The file storage you selected is not a visible, readable and writable stream wrapper\. Possible choices: <em class="placeholder"><\/em>\.$',
+      ],
+    ],
     'search.settings' => [
       // @todo Simple config cannot have dependencies on any other config.
       //   Remove this in https://www.drupal.org/project/drupal/issues/3425992.

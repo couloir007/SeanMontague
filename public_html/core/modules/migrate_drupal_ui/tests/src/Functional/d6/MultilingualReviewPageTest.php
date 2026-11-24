@@ -114,6 +114,7 @@ class MultilingualReviewPageTest extends MultilingualReviewPageTestBase {
       'Poll aggregate',
       'Profile',
       'Profile translation',
+      'Search',
       'String translation',
       'Synchronize translations',
       'Syslog',
@@ -150,7 +151,6 @@ class MultilingualReviewPageTest extends MultilingualReviewPageTestBase {
       'Devel generate',
       'Devel node access',
       'Forum',
-      'Search',
       'Statistics',
       'Tracker',
       // Option Widgets is set not_finished in migrate_state_not_finished_test.

@@ -5,12 +5,17 @@ namespace Drupal\Tests\custom_field\Kernel\Feeds\Target;
 use Drupal\Tests\feeds\Kernel\FeedsKernelTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for mapping to custom_field fields.
  *
  * @group custom_field
+ * @runTestsInSeparateProcesses
  */
+#[Group('custom_field')]
+#[RunTestsInSeparateProcesses]
 class CustomFieldTest extends FeedsKernelTestBase {
 
   /**

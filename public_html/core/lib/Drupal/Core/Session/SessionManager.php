@@ -8,7 +8,6 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
-use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 
 /**
  * Manages user sessions.
@@ -38,50 +37,42 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   protected $startedLazy;
 
   /**
-   * The user session repository.
+   * The write safe session handler.
+   *
+   * @var \Drupal\Core\Session\WriteSafeSessionHandlerInterface
+   *
+   * @todo This reference should be removed once all database queries
+   *   are removed from the session manager class.
    */
-  protected UserSessionRepositoryInterface $sessionRepository;
+  protected $writeSafeHandler;
 
   /**
    * Constructs a new session manager instance.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
-   * @param \Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy|\SessionHandlerInterface|null $handler
-   *   The object to register as a PHP session handler.
+   * @param \Drupal\Core\Database\Connection $connection
+   *   The database connection.
    * @param \Drupal\Core\Session\MetadataBag $metadata_bag
    *   The session metadata bag.
    * @param \Drupal\Core\Session\SessionConfigurationInterface $sessionConfiguration
    *   The session configuration interface.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
-   * @param \Drupal\Core\Session\UserSessionRepositoryInterface $session_repository
-   *   The user session repository.
+   * @param \Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy|\SessionHandlerInterface|null $handler
+   *   The object to register as a PHP session handler.
    *
    * @see \Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage::setSaveHandler()
    */
   public function __construct(
     protected RequestStack $requestStack,
-    Connection|AbstractProxy|\SessionHandlerInterface|null $handler,
+    protected Connection $connection,
     MetadataBag $metadata_bag,
     protected SessionConfigurationInterface $sessionConfiguration,
     protected TimeInterface $time,
-    $session_repository = NULL,
+    $handler = NULL,
   ) {
-    // The second parameter ($handler) used to be the database connection. And
-    // the last parameter ($session_repository) used to be $handler. Rearrange
-    // the parameters if constructor was called like this.
-    if ($handler instanceof Connection && !$session_repository instanceof UserSessionRepositoryInterface) {
-      @trigger_error('Calling ' . __METHOD__ . '() with a database $connection as the second argument is deprecated in drupal:11.4.0 and it will throw an error in drupal:12.0.0. See https://www.drupal.org/node/3570851', E_USER_DEPRECATED);
-      $handler = $session_repository;
-    }
     parent::__construct([], $handler, $metadata_bag);
-    if ($session_repository instanceof UserSessionRepositoryInterface) {
-      $this->sessionRepository = $session_repository;
-    }
-    else {
-      $this->sessionRepository = \Drupal::service(UserSessionRepositoryInterface::class);
-    }
   }
 
   /**
@@ -215,7 +206,18 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
    * {@inheritdoc}
    */
   public function delete($uid) {
-    $this->sessionRepository->deleteAll($uid);
+    // Nothing to do if we are not allowed to change the session.
+    if (!$this->writeSafeHandler->isSessionWritable() || $this->isCli()) {
+      return;
+    }
+    // The sessions table may not have been created yet.
+    try {
+      $this->connection->delete('sessions')
+        ->condition('uid', $uid)
+        ->execute();
+    }
+    catch (\Exception) {
+    }
   }
 
   /**
@@ -249,6 +251,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
    * {@inheritdoc}
    */
   public function setWriteSafeHandler(WriteSafeSessionHandlerInterface $handler) {
+    $this->writeSafeHandler = $handler;
   }
 
   /**

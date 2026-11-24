@@ -36,6 +36,17 @@ class CustomFieldStringLong extends CustomFieldDataTypeBase implements Cacheable
   /**
    * {@inheritdoc}
    */
+  public function setValue($value, $notify = TRUE): void {
+    parent::setValue($value, $notify);
+    // Invalidate the cached processed text whenever the underlying value
+    // changes, so getProcessed() can't return filtered markup for stale
+    // content left over from a previous value.
+    $this->processed = NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getProcessed(): mixed {
     $format = $this->getFormat();
     if (!$format) {

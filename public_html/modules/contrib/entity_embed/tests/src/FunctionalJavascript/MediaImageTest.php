@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\entity_embed\FunctionalJavascript;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use Drupal\Component\Utility\Html;
 use Drupal\editor\Entity\Editor;
 use Drupal\entity_embed\Plugin\entity_embed\EntityEmbedDisplay\MediaImageDecorator;
@@ -11,15 +10,12 @@ use Drupal\file\Entity\File;
 use Drupal\media\Entity\Media;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\TestFileCreationTrait;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cspell:ignore captionless ceci freddys gallileo unbold unitalicize
 /**
  * Test Media Image specific functionality.
+ *
+ * @group entity_embed
  */
-#[Group('entity_embed')]
-#[RunTestsInSeparateProcesses]
 class MediaImageTest extends EntityEmbedTestBase {
 
   use ContentTypeCreationTrait;
@@ -62,7 +58,7 @@ class MediaImageTest extends EntityEmbedTestBase {
   protected function setUp(): void {
     // This test is supposed to pass in Drupal 10 with CKEditor 4. Regrettably,
     // it isn't working anymore. Thus, it needs to be disable until somebody
-    // comes around and ports it to CKEditor 5.
+    // comes around and ports it to CKEeditor 5.
     $this->markTestSkipped('Should be fixed in https://www.drupal.org/project/entity_embed/issues/3415080');
     parent::setUp();
 
@@ -783,9 +779,10 @@ JS;
    * Tests even <drupal-entity> elements whose button is not present are upcast.
    *
    * @param string $data_embed_button_attribute
-   *   The HTML for a data-embed-button attribute.
+   *   The HTML for a data-embed-button atttribute.
+   *
+   * @dataProvider providerCkeditorWidgetWorksForAllEmbeds
    */
-  #[DataProvider('providerCkeditorWidgetWorksForAllEmbeds')]
   public function testCkeditorWidgetWorksForAllEmbeds($data_embed_button_attribute) {
     $this->host->body->value = '<drupal-entity data-caption="baz" ' . $data_embed_button_attribute . ' data-entity-embed-display="entity_reference:media_thumbnail" data-entity-embed-display-settings="{&quot;image_style&quot;:&quot;&quot;,&quot;image_link&quot;:&quot;&quot;}" data-entity-type="media" data-entity-uuid="' . $this->media->uuid() . '"></drupal-entity>';
     $this->host->save();

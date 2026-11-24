@@ -17,7 +17,7 @@ class InlineFormErrorsThemeHooks {
    */
   #[Hook('preprocess_form_element')]
   public function preprocessFormElement(&$variables): void {
-    $this->setErrors($variables);
+    _inline_form_errors_set_errors($variables);
   }
 
   /**
@@ -25,7 +25,7 @@ class InlineFormErrorsThemeHooks {
    */
   #[Hook('preprocess_details')]
   public function preprocessDetails(&$variables): void {
-    $this->setErrors($variables);
+    _inline_form_errors_set_errors($variables);
   }
 
   /**
@@ -33,7 +33,7 @@ class InlineFormErrorsThemeHooks {
    */
   #[Hook('preprocess_fieldset')]
   public function preprocessFieldset(&$variables): void {
-    $this->setErrors($variables);
+    _inline_form_errors_set_errors($variables);
   }
 
   /**
@@ -41,17 +41,7 @@ class InlineFormErrorsThemeHooks {
    */
   #[Hook('preprocess_datetime_wrapper')]
   public function preprocessDatetimeWrapper(&$variables): void {
-    $this->setErrors($variables);
-  }
-
-  /**
-   * Populates form errors in the template.
-   */
-  protected function setErrors(&$variables): void {
-    $element = $variables['element'];
-    if (!empty($element['#errors']) && empty($element['#error_no_message'])) {
-      $variables['errors'] = $element['#errors'];
-    }
+    _inline_form_errors_set_errors($variables);
   }
 
 }

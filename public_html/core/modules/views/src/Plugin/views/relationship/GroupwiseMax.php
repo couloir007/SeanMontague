@@ -303,7 +303,7 @@ class GroupwiseMax extends RelationshipPluginBase {
   /**
    * Recursive helper to add a namespace to conditions.
    *
-   * Similar to ViewsHooks::viewsQueryTagAlterCondition().
+   * Similar to _views_query_tag_alter_condition().
    *
    * (Though why is the condition we get in a simple query 3 levels deep???)
    */
@@ -383,7 +383,7 @@ class GroupwiseMax extends RelationshipPluginBase {
     else {
       $id = 'subquery';
     }
-    $join = \Drupal::service('plugin.manager.views.join')->createInstance($id, $def);
+    $join = Views::pluginManager('join')->createInstance($id, $def);
 
     // Use a short alias for this:
     $alias = $def['table'] . '_' . $this->table;

@@ -66,7 +66,7 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
    */
   public function register(ContainerBuilder $container): void {
     parent::register($container);
-    foreach (static::providerTestCustomStreamWrappers() as $stream_wrapper) {
+    foreach ($this->providerTestCustomStreamWrappers() as $stream_wrapper) {
       $scheme = $stream_wrapper[0];
       $class = $stream_wrapper[2];
       $container->register("stream_wrapper.$scheme", $class)
@@ -81,11 +81,9 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
    *   The source stream wrapper scheme.
    * @param string $expected_scheme
    *   The derivative expected stream wrapper scheme.
-   * @param class-string $class
-   *   The stream wrapper service class.
    */
   #[DataProvider('providerTestCustomStreamWrappers')]
-  public function testCustomStreamWrappers(string $source_scheme, string $expected_scheme, string $class): void {
+  public function testCustomStreamWrappers($source_scheme, $expected_scheme): void {
     $derivative_uri = $this->imageStyle->buildUri("$source_scheme://some/path/image.png");
     $derivative_scheme = StreamWrapperManager::getScheme($derivative_uri);
 

@@ -12,24 +12,12 @@ include:
 #
 variables:
   # Broaden test coverage.
+  OPT_IN_TEST_PREVIOUS_MAJOR: 1
   OPT_IN_TEST_PREVIOUS_MINOR: 1
   OPT_IN_TEST_NEXT_MINOR: 1
-  OPT_IN_TEST_NEXT_MAJOR: 1
   OPT_IN_TEST_MAX_PHP: 1
-  # Start the variants without a manual click.
-  _AUTORUN_PREVIOUS_MINOR: 'all'
-  _AUTORUN_NEXT_MINOR: 'all'
-  _AUTORUN_NEXT_MAJOR: 'push-and-mr'
-  _AUTORUN_MAX_PHP: 'push-and-mr'
   _PHPUNIT_CONCURRENT: 1
-  # CSpell: project words, and paths that aren't hand-written source. The
-  # compiled CKEditor 5 plugin is built from js/ckeditor5_plugins, and the
-  # CKEditor 4 to 5 upgrade plugin is removed in #3639510.
-  _CSPELL_ALLOW_FAILURE: '0'
-  _CSPELL_DICTIONARY: .cspell-project-words.txt
-  _CSPELL_IGNORE_PATHS: 'js/build/**,src/Plugin/CKEditor4To5Upgrade/EntityEmbed.php'
-  # Fail the pipeline on coding standards, JavaScript and static analysis errors.
-  _PHPCS_ALLOW_FAILURE: '0'
-  _PHPSTAN_ALLOW_FAILURE: '0'
-  _STYLELINT_ALLOW_FAILURE: '0'
-  _ESLINT_ALLOW_FAILURE: '0'
+
+composer (previous major):
+  before_script:
+    - composer require --dev drupal/ckeditor --no-update

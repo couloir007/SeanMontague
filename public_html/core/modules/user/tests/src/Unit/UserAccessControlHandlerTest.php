@@ -7,13 +7,8 @@ namespace Drupal\Tests\user\Unit;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\Container;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Field\FieldItemList;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\UserAccessControlHandler;
-use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -81,16 +76,19 @@ class UserAccessControlHandlerTest extends UnitTestCase {
     $container->set('cache_contexts_manager', $cache_contexts_manager);
     \Drupal::setContainer($container);
 
-    $this->viewer = $this->createStub(UserInterface::class);
+    $this->viewer = $this->createMock('\Drupal\user\UserInterface');
     $this->viewer
+      ->expects($this->any())
       ->method('hasPermission')
       ->willReturn(FALSE);
     $this->viewer
+      ->expects($this->any())
       ->method('id')
       ->willReturn(1);
 
-    $this->owner = $this->createStub(UserInterface::class);
+    $this->owner = $this->createMock('\Drupal\user\UserInterface');
     $this->owner
+      ->expects($this->any())
       ->method('hasPermission')
       ->willReturnMap([
         ['administer users', FALSE],
@@ -98,29 +96,39 @@ class UserAccessControlHandlerTest extends UnitTestCase {
       ]);
 
     $this->owner
+      ->expects($this->any())
       ->method('id')
       ->willReturn(2);
 
-    $this->admin = $this->createStub(UserInterface::class);
+    $this->admin = $this->createMock('\Drupal\user\UserInterface');
     $this->admin
+      ->expects($this->any())
       ->method('hasPermission')
       ->willReturn(TRUE);
 
-    $this->emailViewer = $this->createStub(UserInterface::class);
+    $this->emailViewer = $this->createMock('\Drupal\user\UserInterface');
     $this->emailViewer
+      ->expects($this->any())
       ->method('hasPermission')
       ->willReturnMap([
         ['view user email addresses', TRUE],
       ]);
     $this->emailViewer
+      ->expects($this->any())
       ->method('id')
       ->willReturn(3);
 
-    $this->accessControlHandler = new UserAccessControlHandler($this->createStub(EntityTypeInterface::class));
-    $this->accessControlHandler->setModuleHandler($this->createStub(ModuleHandlerInterface::class));
+    $entity_type = $this->createMock('Drupal\Core\Entity\EntityTypeInterface');
 
-    $this->items = $this->createStub(FieldItemList::class);
+    $this->accessControlHandler = new UserAccessControlHandler($entity_type);
+    $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
+    $this->accessControlHandler->setModuleHandler($module_handler);
+
+    $this->items = $this->getMockBuilder('Drupal\Core\Field\FieldItemList')
+      ->disableOriginalConstructor()
+      ->getMock();
     $this->items
+      ->expects($this->any())
       ->method('defaultAccess')
       ->willReturn(AccessResult::allowed());
   }
@@ -131,12 +139,13 @@ class UserAccessControlHandlerTest extends UnitTestCase {
    * @internal
    */
   public function assertFieldAccess(string $field, string $viewer, string $target, bool $view, bool $edit): void {
-    $field_definition = $this->createStub(FieldDefinitionInterface::class);
-    $field_definition
+    $field_definition = $this->createMock('Drupal\Core\Field\FieldDefinitionInterface');
+    $field_definition->expects($this->any())
       ->method('getName')
       ->willReturn($field);
 
     $this->items
+      ->expects($this->any())
       ->method('getEntity')
       ->willReturn($this->{$target});
 

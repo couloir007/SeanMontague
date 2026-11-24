@@ -12,17 +12,14 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\Render\FilteredMarkup;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
-use Drupal\text\TextSummary;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests TextSummary::generate() with different strings and lengths.
+ * Tests text_summary() with different strings and lengths.
  */
 #[Group('text')]
 #[RunTestsInSeparateProcesses]
-#[CoversMethod(TextSummary::class, 'generate')]
 class TextSummaryTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -109,8 +106,8 @@ class TextSummaryTest extends KernelTestBase {
     // This string tests a number of edge cases.
     $text = "<p>\nHi\n</p>\n<p>\nfolks\n<br />\n!\n</p>";
 
-    // The summaries we expect TextSummary::generate() to return when
-    // $size is the index of each array item.
+    // The summaries we expect text_summary() to return when $size is the index
+    // of each array item.
     // Using no text format:
     $format = NULL;
     $i = 0;
@@ -240,6 +237,8 @@ class TextSummaryTest extends KernelTestBase {
 
   /**
    * Tests text summaries with an invalid filter format.
+   *
+   * @see text_summary()
    */
   public function testInvalidFilterFormat(): void {
 
@@ -247,12 +246,12 @@ class TextSummaryTest extends KernelTestBase {
   }
 
   /**
-   * Calls TextSummary::generate() and asserts that the expected teaser is returned.
+   * Calls text_summary() and asserts that the expected teaser is returned.
    *
    * @internal
    */
-  public function assertTextSummary(string $text, string $expected, ?string $format = NULL, int $size = 600): void {
-    $summary = \Drupal::service(TextSummary::class)->generate($text, $format, $size);
+  public function assertTextSummary(string $text, string $expected, ?string $format = NULL, ?int $size = NULL): void {
+    $summary = text_summary($text, $format, $size);
     $this->assertSame($expected, $summary, '<pre style="white-space: pre-wrap">' . $summary . '</pre> is identical to <pre style="white-space: pre-wrap">' . $expected . '</pre>');
   }
 
@@ -351,16 +350,16 @@ class TextSummaryTest extends KernelTestBase {
     ])->save();
 
     $filtered_markup = FilteredMarkup::create('<div><strong><span>Hello World</span></strong></div>');
-    // With either HTML filter enabled, TextSummary::generate() will
-    // normalize the text using HTML::normalize().
-    $summary = \Drupal::service(TextSummary::class)->generate($filtered_markup, 'filter_html_enabled', 30);
+    // With either HTML filter enabled, text_summary() will normalize the text
+    // using HTML::normalize().
+    $summary = text_summary($filtered_markup, 'filter_html_enabled', 30);
     $this->assertStringContainsString('<div><strong><span>', $summary);
     $this->assertStringContainsString('</span></strong></div>', $summary);
-    $summary = \Drupal::service(TextSummary::class)->generate($filtered_markup, 'filter_htmlcorrector_enabled', 30);
+    $summary = text_summary($filtered_markup, 'filter_htmlcorrector_enabled', 30);
     $this->assertStringContainsString('<div><strong><span>', $summary);
     $this->assertStringContainsString('</span></strong></div>', $summary);
     // If neither filter is enabled, the text will not be normalized.
-    $summary = \Drupal::service(TextSummary::class)->generate($filtered_markup, 'neither_filter_enabled', 30);
+    $summary = text_summary($filtered_markup, 'neither_filter_enabled', 30);
     $this->assertStringContainsString('<div><strong><span>', $summary);
     $this->assertStringNotContainsString('</span></strong></div>', $summary);
   }

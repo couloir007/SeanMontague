@@ -44,42 +44,8 @@
             if (!dialog.contains(document.activeElement)) {
               // Move focus to the first focusable element in the next event loop
               // to allow dialog buttons to be changed first.
-
-              // Replicate the autofocus behavior of jQuery UI Dialog.
-
-              const autoFocusElement = dialog?.querySelector('[autofocus]');
-
-              if (autoFocusElement) {
-                autoFocusElement.focus();
-                return;
-              }
-
-              const focusableElements = focusable(dialog);
-              if (focusableElements.length > 0) {
-                focusableElements[0].focus();
-                return;
-              }
-
-              const dialogWrapper = dialog.closest('.ui-dialog');
-
-              const buttonPane = dialogWrapper?.querySelector(
-                '.ui-dialog-buttonpane',
-              );
-              const focusableButtons = focusable(buttonPane);
-              if (focusableButtons.length > 0) {
-                focusableButtons[0].focus();
-                return;
-              }
-
-              const closeButton = dialogWrapper?.querySelector(
-                '.ui-dialog-titlebar-close',
-              );
-              if (closeButton) {
-                closeButton.focus();
-                return;
-              }
-
-              dialog.focus();
+              $(dialog).dialog('instance')._focusedElement = null;
+              $(dialog).dialog('instance')._focusTabbable();
             }
           }, 0);
         }

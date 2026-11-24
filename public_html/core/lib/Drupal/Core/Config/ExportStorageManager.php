@@ -68,7 +68,7 @@ final class ExportStorageManager implements StorageManagerInterface {
     // Wrapping the queries in a transaction for performance gain.
     $transaction = $this->connection->startTransaction();
     self::replaceStorageContents($this->active, $this->storage);
-    $transaction->commitOrRelease();
+    unset($transaction);
 
     $this->eventDispatcher->dispatch(new StorageTransformEvent($this->storage), ConfigEvents::STORAGE_TRANSFORM_EXPORT);
 

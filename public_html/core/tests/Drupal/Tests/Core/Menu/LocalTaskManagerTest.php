@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Menu;
 
-use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
-use Drupal\Component\Plugin\Factory\FactoryInterface;
-use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
@@ -16,18 +13,13 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Menu\LocalTaskInterface;
 use Drupal\Core\Menu\LocalTaskManager;
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Routing\RouteProviderInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 
 /**
  * Tests Drupal\Core\Menu\LocalTaskManager.
@@ -45,8 +37,10 @@ class LocalTaskManagerTest extends UnitTestCase {
 
   /**
    * The mocked argument resolver.
+   *
+   * @var \PHPUnit\Framework\MockObject\MockObject
    */
-  protected ArgumentResolverInterface&MockObject $argumentResolver;
+  protected $argumentResolver;
 
   /**
    * The test request.
@@ -57,18 +51,24 @@ class LocalTaskManagerTest extends UnitTestCase {
 
   /**
    * The mocked route provider.
+   *
+   * @var \PHPUnit\Framework\MockObject\MockObject
    */
-  protected RouteProviderInterface&MockObject $routeProvider;
+  protected $routeProvider;
 
   /**
    * The mocked plugin discovery.
+   *
+   * @var \PHPUnit\Framework\MockObject\MockObject
    */
-  protected DiscoveryInterface&MockObject $pluginDiscovery;
+  protected $pluginDiscovery;
 
   /**
    * The plugin factory used in the test.
+   *
+   * @var \PHPUnit\Framework\MockObject\MockObject
    */
-  protected FactoryInterface&MockObject $factory;
+  protected $factory;
 
   /**
    * The cache backend used in the test.
@@ -79,18 +79,24 @@ class LocalTaskManagerTest extends UnitTestCase {
 
   /**
    * The mocked access manager.
+   *
+   * @var \Drupal\Core\Access\AccessManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected AccessManagerInterface&MockObject $accessManager;
+  protected $accessManager;
 
   /**
    * The route match.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected RouteMatchInterface&MockObject $routeMatch;
+  protected $routeMatch;
 
   /**
    * The mocked account.
+   *
+   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected AccountInterface&MockObject $account;
+  protected $account;
 
   /**
    * {@inheritdoc}

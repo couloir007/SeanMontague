@@ -407,11 +407,11 @@ class BlockTest extends BlockTestBase {
     $this->assertSession()->pageTextContains($block['settings[label]']);
 
     $region_xpath = [
-      'header' => '//header',
+      'header' => '//header[@role = "banner"]',
       'sidebar_first' => '//aside[contains(@class, "layout-sidebar-first")]',
       'content' => '//div[contains(@class, "layout-content")]',
       'sidebar_second' => '//aside[contains(@class, "layout-sidebar-second")]',
-      'footer' => '//footer',
+      'footer' => '//footer[@role = "contentinfo"]',
     ];
 
     // Confirm that the content block was found at the proper region.
@@ -453,6 +453,8 @@ class BlockTest extends BlockTestBase {
     $cache_entry = \Drupal::cache('page')->get($cid);
     $expected_cache_tags = [
       'config:block_list',
+      'block_view',
+      'config:block.block.powered',
       'config:user.role.anonymous',
       'http_response',
       'rendered',
@@ -464,7 +466,8 @@ class BlockTest extends BlockTestBase {
     $this->assertSame($expected_cache_tags, $cache_entry->tags);
     $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered:' . implode(':', $keys));
     $expected_cache_tags = [
-      'config:block_list',
+      'block_view',
+      'config:block.block.powered',
       'rendered',
     ];
     sort($expected_cache_tags);
@@ -493,6 +496,9 @@ class BlockTest extends BlockTestBase {
     $cache_entry = \Drupal::cache('page')->get($cid);
     $expected_cache_tags = [
       'config:block_list',
+      'block_view',
+      'config:block.block.powered',
+      'config:block.block.powered_2',
       'config:user.role.anonymous',
       'http_response',
       'rendered',
@@ -500,7 +506,8 @@ class BlockTest extends BlockTestBase {
     sort($expected_cache_tags);
     $this->assertEquals($expected_cache_tags, $cache_entry->tags);
     $expected_cache_tags = [
-      'config:block_list',
+      'block_view',
+      'config:block.block.powered',
       'rendered',
     ];
     sort($expected_cache_tags);
@@ -510,7 +517,8 @@ class BlockTest extends BlockTestBase {
     $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered:' . implode(':', $keys));
     $this->assertSame($expected_cache_tags, $cache_entry->tags);
     $expected_cache_tags = [
-      'config:block_list',
+      'block_view',
+      'config:block.block.powered_2',
       'rendered',
     ];
     sort($expected_cache_tags);
@@ -641,25 +649,6 @@ class BlockTest extends BlockTestBase {
     $this->clickLink('Disable');
     $elements = $this->xpath('//table/tbody/tr//td[contains(@class, "block")]');
     $this->assertEquals("$title (disabled)", $elements[0]->getText());
-  }
-
-  /**
-   * Tests a combined page title, content, and messages block.
-   */
-  public function testTitleContentMessagesSingleBlock(): void {
-    // Place block which implements MainContentBlockPluginInterface,
-    // TitleBlockPluginInterface, and MessagesBlockPluginInterface.
-    $this->drupalPlaceBlock('test_title_content_message_block');
-    $this->drupalGet('');
-
-    // Ensure the block's setTitle function was called.
-    $this->assertSession()->pageTextContains('Page title has been placed in the block.');
-
-    // Ensure the block's setMainContent function was called.
-    $this->assertSession()->pageTextContains('Main content has been placed in the block.');
-
-    // Ensure the status message is shown.
-    $this->assertSession()->statusMessageContains('This is a status message.', 'status');
   }
 
 }

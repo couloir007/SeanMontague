@@ -296,13 +296,6 @@ class ThemeExtensionList extends ExtensionList {
   /**
    * {@inheritdoc}
    */
-  protected function subClassExtension(Extension $extension): Theme {
-    return new Theme($this->root, $extension->getPathname(), $extension->info, $extension->getExtensionFilename());
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function getInstalledExtensionNames() {
     // Cache the installed themes to avoid multiple calls to the config system.
     if (!isset($this->installedThemes)) {

@@ -33,7 +33,6 @@ class MetapackageUpdateTest extends TestCase {
         'composer/Metapackage/DevDependencies',
       ],
       [
-        // @phpstan-ignore classConstant.deprecatedClass
         DrupalPinnedDevDependenciesBuilder::class,
         'composer/Metapackage/PinnedDevDependencies',
       ],
