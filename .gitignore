@@ -177,3 +177,4 @@ error_log
 # DDEV
 /.ddev/config.local.yaml
 /.ddev/.env
+public_html/.user.ini
