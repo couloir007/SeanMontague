@@ -4,21 +4,14 @@ namespace Drupal\Tests\custom_field_sdc\Functional;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Tests\BrowserTestBase;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that view modes render through a component.
  *
- * @group custom_field
  * @group custom_field_sdc
- * @runTestsInSeparateProcesses
  *
  * @internal
  */
-#[Group('custom_field')]
-#[Group('custom_field_sdc')]
-#[RunTestsInSeparateProcesses]
 final class ComponentViewModeRenderTest extends BrowserTestBase {
 
   /**

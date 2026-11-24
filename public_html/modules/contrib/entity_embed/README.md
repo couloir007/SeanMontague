@@ -5,8 +5,8 @@ allows any entity to be embedded using a text editor.
 
 ## Requirements
 
-* Drupal 8
-* [Embed](https://www.drupal.org/project/embed) module
+* Drupal 11.3 or later
+* [Embed](https://www.drupal.org/project/embed) 8.x-1.12 or later
 
 ## Installation
 
@@ -26,7 +26,7 @@ Entity Embed can be installed via the
   * Drag and drop the 'E' button into the Active toolbar.
   * If the text format uses the 'Limit allowed HTML tags and correct
     faulty HTML' filter, ensure the necessary tags and attributes were
-    automatically whitelisted:
+    automatically allowed:
     ```<drupal-entity data-entity-type data-entity-uuid data-view-mode data-entity-embed-display data-entity-embed-display-settings data-align data-caption data-embed-button data-langcode alt title>```
     appears in the 'Allowed HTML tags' setting.
     *Warning: If you were using the module in very early pre-alpha

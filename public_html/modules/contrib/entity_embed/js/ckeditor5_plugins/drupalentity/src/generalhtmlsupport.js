@@ -1,4 +1,4 @@
-/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable import/no-extraneous-dependencies, import/no-unresolved */
 // cSpell:words datafilter eventinfo downcastdispatcher generalhtmlsupport
 import { Plugin } from 'ckeditor5/src/core';
 import { setViewAttributes } from '@ckeditor/ckeditor5-html-support/src/utils';
@@ -21,14 +21,14 @@ function viewToModelDrupalEntityAttributeConverter(dataFilter) {
         function preserveElementAttributes(viewElement, attributeName) {
           const viewAttributes = dataFilter.processViewAttributes(
             viewElement,
-            conversionApi
+            conversionApi,
           );
 
           if (viewAttributes) {
             conversionApi.writer.setAttribute(
               attributeName,
               viewAttributes,
-              data.modelRange
+              data.modelRange,
             );
           }
         }
@@ -45,7 +45,7 @@ function viewToModelDrupalEntityAttributeConverter(dataFilter) {
           preserveLinkAttributes(viewContainerElement);
         }
       },
-      { priority: 'low' }
+      { priority: 'low' },
     );
   };
 }
@@ -107,7 +107,7 @@ function modelToEditingViewAttributeConverter() {
         if (
           !conversionApi.consumable.consume(
             data.item,
-            'attribute:htmlLinkAttributes:drupalEntity'
+            'attribute:htmlLinkAttributes:drupalEntity',
           )
         ) {
           return;
@@ -117,16 +117,16 @@ function modelToEditingViewAttributeConverter() {
         const viewElement = getDescendantElement(
           conversionApi.writer,
           containerElement,
-          'a'
+          'a',
         );
 
         setViewAttributes(
           conversionApi.writer,
           data.item.getAttribute('htmlLinkAttributes'),
-          viewElement
+          viewElement,
         );
       },
-      { priority: 'low' }
+      { priority: 'low' },
     );
   };
 }
@@ -145,30 +145,30 @@ function modelToDataViewAttributeConverter() {
         if (
           !conversionApi.consumable.consume(
             data.item,
-            'attribute:htmlLinkAttributes:drupalEntity'
+            'attribute:htmlLinkAttributes:drupalEntity',
           )
         ) {
           return;
         }
 
         const entityEmbedElement = conversionApi.mapper.toViewElement(
-          data.item
+          data.item,
         );
         const linkElement = entityEmbedElement.parent;
 
         setViewAttributes(
           conversionApi.writer,
           data.item.getAttribute('htmlLinkAttributes'),
-          linkElement
+          linkElement,
         );
       },
-      { priority: 'low' }
+      { priority: 'low' },
     );
 
     dispatcher.on(
       'attribute:htmlAttributes:drupalEntity',
       modelToDataAttributeConverter,
-      { priority: 'low' }
+      { priority: 'low' },
     );
   };
 }
@@ -198,7 +198,7 @@ export default class EntityEmbedGeneralHtmlSupport extends Plugin {
       !editor.plugins.has('DataSchema')
     ) {
       console.error(
-        'DataFilter and DataSchema plugins are required for Entity Embed to integrate with General HTML Support plugin.'
+        'DataFilter and DataSchema plugins are required for Entity Embed to integrate with General HTML Support plugin.',
       );
     }
 

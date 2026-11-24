@@ -9,42 +9,6 @@ customfield
 nonroot
 nullsafe
 syndicatable
-viewfield
-viewfields
 
 # User names: contributors, maintainers, users (mostly in README.md files).
 apmsooner
-
-# Makedocs words.
-codehilite
-fontawesome
-frontends
-guidlines
-inlinehilite
-linenums
-pygments
-pymdownx
-startinline
-superfences
-Metadrop
-squidfunk
-APPROOT
-
-# custom_field_components: class/service names, test-method words and coined
-# adjectives used in the ADR and test docblocks.
-addability
-docblocks
-functionaljs
-greppable
-linkit
-metacharacter
-relocator
-tamperability
-undebuggable
-undraggable
-unloadable
-unminted
-unmodeled
-unrelocated
-unsaveable
-unsubmittable

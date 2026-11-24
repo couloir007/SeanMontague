@@ -31,16 +31,13 @@ class PropertiesConstraint implements ConstraintInterface
             return;
         }
 
-        $basePath = $path ?? new JsonPointer('');
         foreach ($schema->properties as $propertyName => $propertySchema) {
             $schemaConstraint = $this->factory->createInstanceFor('schema');
             if (!property_exists($value, $propertyName)) {
                 continue;
             }
 
-            $incrementedPath = $basePath->withPropertyPaths(array_merge($basePath->getPropertyPaths(), [$propertyName]));
-
-            $schemaConstraint->check($value->{$propertyName}, $propertySchema, $incrementedPath, $i);
+            $schemaConstraint->check($value->{$propertyName}, $propertySchema, $path, $i);
             if ($schemaConstraint->isValid()) {
                 continue;
             }

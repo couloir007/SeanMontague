@@ -5,7 +5,7 @@ package: Testing
 dependencies:
   - physical:physical
 
-# Information added by Drupal.org packaging script on 2024-10-29
-version: '8.x-1.5'
+# Information added by Drupal.org packaging script on 2026-11-23
+version: '8.x-1.6'
 project: 'physical'
-datestamp: 1730201475
+datestamp: 1795441626

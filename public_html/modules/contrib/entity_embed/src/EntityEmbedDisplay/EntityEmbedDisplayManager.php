@@ -7,11 +7,13 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\entity_embed\Attribute\EntityEmbedDisplay;
 use Drupal\entity_embed\Plugin\entity_embed\EntityEmbedDisplay\MediaImageDecorator;
 
 /**
  * Provides an Entity Embed display plugin manager.
  *
+ * @see \Drupal\entity_embed\Attribute\EntityEmbedDisplay
  * @see \Drupal\entity_embed\Annotation\EntityEmbedDisplay
  * @see \Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayBase
  * @see \Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayInterface
@@ -31,7 +33,14 @@ class EntityEmbedDisplayManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/entity_embed/EntityEmbedDisplay', $namespaces, $module_handler, 'Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayInterface', 'Drupal\entity_embed\Annotation\EntityEmbedDisplay');
+    parent::__construct(
+      'Plugin/entity_embed/EntityEmbedDisplay',
+      $namespaces,
+      $module_handler,
+      EntityEmbedDisplayInterface::class,
+      EntityEmbedDisplay::class,
+      'Drupal\entity_embed\Annotation\EntityEmbedDisplay',
+    );
     $this->alterInfo('entity_embed_display_plugins');
     // @todo Move the cache tag to the derivers once https://www.drupal.org/node/3001284 lands.
     $this->setCacheBackend($cache_backend, 'entity_embed_display_plugins', ['config:entity_view_mode_list']);

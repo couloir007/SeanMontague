@@ -3,14 +3,10 @@
 namespace Drupal\entity_embed\EntityEmbedDisplay;
 
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Field\FormatterPluginManager;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\PluginDependencyTrait;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\TypedData\TypedDataManager;
 use Drupal\entity_embed\Entity\EntityEmbedFakeEntity;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -124,7 +120,7 @@ abstract class FieldFormatterEntityEmbedDisplayBase extends EntityEmbedDisplayBa
 
     $definition = $this->getFieldDefinition();
 
-    /* @var \Drupal\Core\Field\FieldItemListInterface $items $items */
+    /** @var \Drupal\Core\Field\FieldItemListInterface $items $items */
     // Create a field item list object, 1 is the value, array('target_id' => 1)
     // would work too, or multiple values. 1 is passed down from the list to the
     // field item, which knows that an integer is the ID.
@@ -137,12 +133,12 @@ abstract class FieldFormatterEntityEmbedDisplayBase extends EntityEmbedDisplayBa
 
     // Prepare, expects an array of items, keyed by parent entity ID.
     $formatter = $this->getFieldFormatter();
-    $formatter->prepareView([$fakeEntity->id() => $items]);
+    $formatter->prepareView([$fakeEntity->id() ?? '' => $items]);
     $build = $formatter->viewElements($items, $this->getLangcode());
     // For some reason $build[0]['#printed'] is TRUE, which means it will fail
     // to render later. So for now we manually fix that.
     // @todo Investigate why this is needed.
-    show($build[0]);
+    $build[0]['#printed'] = FALSE;
 
     // Refresh the entity reference stored in the context. This is necessary in
     // Drupal 10.5+ and 11.2+ since the entity might have been cloned during the
@@ -230,6 +226,7 @@ abstract class FieldFormatterEntityEmbedDisplayBase extends EntityEmbedDisplayBa
    * constructor are called.
    *
    * @return \Drupal\Core\Field\FormatterPluginManager
+   *   The field formatter plugin manager.
    */
   public function formatterPluginManager() {
     if (!isset($this->formatterPluginManager)) {

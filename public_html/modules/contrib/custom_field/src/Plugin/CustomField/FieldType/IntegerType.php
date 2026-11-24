@@ -121,10 +121,8 @@ class IntegerType extends NumericTypeBase {
     $default_min = static::getDefaultMinValue($field->getSettings());
     $default_max = static::getDefaultMaxValue($field->getSettings());
 
-    // Round configured bounds inward: a fractional bound would otherwise be
-    // truncated to a value outside it.
-    $min = isset($field_settings['min']) && is_numeric($field_settings['min']) ? ceil((float) $field_settings['min']) : $default_min;
-    $max = isset($field_settings['max']) && is_numeric($field_settings['max']) ? floor((float) $field_settings['max']) : $default_max;
+    $min = isset($field_settings['min']) && is_numeric($field_settings['min']) ? $field_settings['min'] : $default_min;
+    $max = isset($field_settings['max']) && is_numeric($field_settings['max']) ? $field_settings['max'] : $default_max;
 
     return mt_rand((int) $min, (int) $max);
   }

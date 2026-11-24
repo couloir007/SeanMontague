@@ -51,7 +51,7 @@ class TelephoneType extends StringType {
       '#options' => $this->getTelephoneFormatOptions(),
       '#default_value' => $settings['pattern'],
       '#empty_option' => $this->t('- Select -'),
-      '#description' => $this->t('A validation pattern to enforce  on the input.'),
+      '#description' => $this->t('A pattern to enforce  on the input.'),
     ];
 
     return $element;

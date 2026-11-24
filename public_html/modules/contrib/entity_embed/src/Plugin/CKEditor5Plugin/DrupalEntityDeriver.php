@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\entity_embed\Plugin\CKEditor5Plugin;
 
@@ -12,6 +12,9 @@ use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Provides a CKEditor 5 plugin for each Entity Embed button.
+ */
 class DrupalEntityDeriver extends DeriverBase implements ContainerDeriverInterface {
 
   use StringTranslationTrait;
@@ -21,19 +24,16 @@ class DrupalEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $embedButtonStorage;
+  protected $entityTypeManager;
 
   /**
    * Constructs a new DrupalEntityDeriver object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
-    $this->embedButtonStorage = $entity_type_manager->getStorage('embed_button');
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -51,7 +51,7 @@ class DrupalEntityDeriver extends DeriverBase implements ContainerDeriverInterfa
   public function getDerivativeDefinitions($base_plugin_definition) {
     assert($base_plugin_definition instanceof CKEditor5PluginDefinition);
     /** @var \Drupal\embed\EmbedButtonInterface $embed_button */
-    foreach ($this->embedButtonStorage->loadMultiple() as $embed_button) {
+    foreach ($this->entityTypeManager->getStorage('embed_button')->loadMultiple() as $embed_button) {
       $embed_button_id = $embed_button->id();
       $embed_button_label = Html::escape($embed_button->label());
       $plugin_id = "entity_embed_{$embed_button_id}";

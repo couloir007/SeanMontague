@@ -69,7 +69,6 @@ class DateTimeWidgetBase extends CustomFieldWidgetBase {
     $item = $items[$delta];
     $datetime_type = $field->getDatetimeType();
     $field_settings = $field->getFieldSettings();
-    $settings = $this->getSettings() + static::defaultSettings();
 
     // Determine if we're showing seconds in the widget.
     $show_seconds = !empty($field_settings['seconds_enabled']);
@@ -79,7 +78,7 @@ class DateTimeWidgetBase extends CustomFieldWidgetBase {
       '#default_value' => NULL,
       '#date_increment' => 1,
       '#date_timezone' => date_default_timezone_get(),
-      '#date_year_range' => $settings['year_range'],
+      '#date_year_range' => $this->getSetting('year_range'),
       '#show_seconds' => $show_seconds,
     ];
 

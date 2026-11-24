@@ -2,21 +2,20 @@
 
 namespace Drupal\physical\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\physical\MeasurementType;
 
 /**
  * Plugin implementation of the 'physical_measurement_default' widget.
- *
- * @FieldWidget(
- *   id = "physical_measurement_default",
- *   label = @Translation("Default"),
- *   field_types = {
- *     "physical_measurement"
- *   }
- * )
  */
+#[FieldWidget(
+  id: "physical_measurement_default",
+  label: new TranslatableMarkup("Default"),
+  field_types: ["physical_measurement"],
+)]
 class MeasurementDefaultWidget extends PhysicalWidgetBase {
 
   /**

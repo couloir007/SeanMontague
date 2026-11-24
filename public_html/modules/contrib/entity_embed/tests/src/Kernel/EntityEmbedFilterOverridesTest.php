@@ -2,18 +2,22 @@
 
 namespace Drupal\Tests\entity_embed\Kernel;
 
+use Drupal\entity_embed\Plugin\Filter\EntityEmbedFilter;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\file\Entity\File;
 use Drupal\media\Entity\Media;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that entity embeds can have per-embed overrides for e.g. `alt`.
- *
- * @coversDefaultClass \Drupal\entity_embed\Plugin\Filter\EntityEmbedFilter
- * @group entity_embed
  */
+#[Group('entity_embed')]
+#[RunTestsInSeparateProcesses]
+#[CoversClass(EntityEmbedFilter::class)]
 class EntityEmbedFilterOverridesTest extends EntityEmbedFilterTestBase {
 
   use MediaTypeCreationTrait;

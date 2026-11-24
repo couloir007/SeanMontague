@@ -15,13 +15,6 @@ class ListWidgetBase extends CustomFieldWidgetBase {
   /**
    * {@inheritdoc}
    */
-  public static function isApplicable(CustomFieldTypeInterface $custom_item): bool {
-    return parent::isApplicable($custom_item) && !empty($custom_item->getFieldSetting('allowed_values'));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function defaultSettings(): array {
     return [
       'empty_option' => '- Select -',

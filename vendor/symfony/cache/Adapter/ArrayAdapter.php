@@ -59,12 +59,11 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
         }
 
         self::$createCacheItem ??= \Closure::bind(
-            static function ($key, $value, $isHit, $tags, $expiry = null, $clock = null) {
+            static function ($key, $value, $isHit, $tags, $expiry = null) {
                 $item = new CacheItem();
                 $item->key = $key;
                 $item->value = $value;
                 $item->isHit = $isHit;
-                $item->clock = $clock;
                 if (null !== $tags) {
                     $item->metadata[CacheItem::METADATA_TAGS] = $tags;
                 }
@@ -131,7 +130,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
             $value = $this->storeSerialized ? $this->unfreeze($key, $isHit) : $this->values[$key];
         }
 
-        return (self::$createCacheItem)($key, $value, $isHit, $this->tags[$key] ?? null, $this->explicitExpiries[$key] ?? null, $this->clock);
+        return (self::$createCacheItem)($key, $value, $isHit, $this->tags[$key] ?? null, $this->explicitExpiries[$key] ?? null);
     }
 
     public function getItems(array $keys = []): iterable
@@ -151,10 +150,6 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
 
     public function deleteItems(array $keys): bool
     {
-        foreach ($keys as $key) {
-            \assert('' !== CacheItem::validateKey($key));
-        }
-
         foreach ($keys as $key) {
             $this->deleteItem($key);
         }
@@ -331,7 +326,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
             }
             unset($keys[$i]);
 
-            yield $key => $f($key, $value, $isHit, $this->tags[$key] ?? null, $this->explicitExpiries[$key] ?? null, $this->clock);
+            yield $key => $f($key, $value, $isHit, $this->tags[$key] ?? null, $this->explicitExpiries[$key] ?? null);
         }
 
         foreach ($keys as $key) {

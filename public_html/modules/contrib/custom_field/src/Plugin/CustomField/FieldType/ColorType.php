@@ -64,7 +64,7 @@ class ColorType extends CustomFieldTypeBase {
    *   The generated hexadecimal code.
    */
   protected static function generateRandomHexCode(): string {
-    $characters = '0123456789abcdef';
+    $characters = '0123456789ABCDEF';
     $hexCode = '';
 
     for ($i = 0; $i < 6; $i++) {

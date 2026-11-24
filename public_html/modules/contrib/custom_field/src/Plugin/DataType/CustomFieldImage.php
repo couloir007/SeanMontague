@@ -7,8 +7,10 @@ namespace Drupal\custom_field\Plugin\DataType;
 use Drupal\Component\Uuid\Uuid;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\Attribute\DataType;
+use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\custom_field\Plugin\Field\FieldType\CustomItem;
 use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 
@@ -24,6 +26,47 @@ use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
   definition_class: CustomFieldDataDefinition::class,
 )]
 class CustomFieldImage extends CustomFieldEntityReferenceBase {
+
+  /**
+   * The image alt text value.
+   *
+   * @var string
+   */
+  protected mixed $alt;
+
+  /**
+   * The image title value.
+   *
+   * @var string
+   */
+  protected mixed $title;
+
+  /**
+   * The image width value.
+   *
+   * @var int
+   */
+  protected mixed $width;
+
+  /**
+   * The image height value.
+   *
+   * @var int
+   */
+  protected mixed $height;
+
+  /**
+   * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+   */
+  public function __construct(DataDefinitionInterface $definition, $name = NULL, ?FieldItemInterface $parent = NULL) {
+    parent::__construct($definition, $name, $parent);
+    $this->alt = $parent->get($this->getName() . '__alt')->getValue();
+    $this->title = $parent->get($this->getName() . '__title')->getValue();
+    $this->width = $parent->get($this->getName() . '__width')->getValue();
+    $this->height = $parent->get($this->getName() . '__height')->getValue();
+  }
 
   /**
    * {@inheritdoc}
@@ -42,16 +85,10 @@ class CustomFieldImage extends CustomFieldEntityReferenceBase {
       $value = ['target_id' => $value];
     }
     if (isset($value['alt'])) {
-      $this->getParent()->set($this->getName() . CustomItem::SEPARATOR . 'alt', $value['alt']);
+      $this->setAlt($value['alt']);
     }
     if (isset($value['title'])) {
-      $this->getParent()->set($this->getName() . CustomItem::SEPARATOR . 'title', $value['title']);
-    }
-    if (isset($value['width'])) {
-      $this->getParent()->set($this->getName() . CustomItem::SEPARATOR . 'width', $value['width']);
-    }
-    if (isset($value['height'])) {
-      $this->getParent()->set($this->getName() . CustomItem::SEPARATOR . 'height', $value['height']);
+      $this->setTitle($value['title']);
     }
     if ($entity instanceof EntityInterface) {
       if ($entity->isNew()) {
@@ -62,17 +99,37 @@ class CustomFieldImage extends CustomFieldEntityReferenceBase {
           $entity = NULL;
         }
       }
+      $this->entity = $entity;
       $value['target_id'] = $entity->id();
     }
 
-    // Invalidate the cached entity whenever the target changes, so a stale
-    // reference can't be returned for a new target_id. It will be lazily
-    // reloaded on next getEntity() call if needed.
-    if (($value['target_id'] ?? NULL) !== $this->value) {
-      $this->entity = $entity instanceof EntityInterface ? $entity : NULL;
-    }
-
     $this->value = $value['target_id'];
+  }
+
+  /**
+   * Sets the alt text value.
+   *
+   * @param string $alt
+   *   The alt text value to set.
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+   */
+  protected function setAlt(string $alt): void {
+    $this->getParent()->set($this->getName() . CustomItem::SEPARATOR . 'alt', $alt);
+    $this->alt = $alt;
+  }
+
+  /**
+   * Sets the title text value.
+   *
+   * @param string $title
+   *   The title text value to set.
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+   */
+  protected function setTitle(string $title): void {
+    $this->getParent()->set($this->getName() . CustomItem::SEPARATOR . 'title', $title);
+    $this->title = $title;
   }
 
   /**
@@ -80,11 +137,9 @@ class CustomFieldImage extends CustomFieldEntityReferenceBase {
    *
    * @return string|null
    *   The image alt text.
-   *
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   public function getAlt(): ?string {
-    return $this->getParent()->get($this->getName() . CustomItem::SEPARATOR . 'alt')->getValue();
+    return $this->alt;
   }
 
   /**
@@ -92,11 +147,9 @@ class CustomFieldImage extends CustomFieldEntityReferenceBase {
    *
    * @return string|null
    *   The image title.
-   *
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   public function getTitle(): ?string {
-    return $this->getParent()->get($this->getName() . CustomItem::SEPARATOR . 'title')->getValue();
+    return $this->title;
   }
 
   /**
@@ -104,12 +157,9 @@ class CustomFieldImage extends CustomFieldEntityReferenceBase {
    *
    * @return int|null
    *   The image width.
-   *
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   public function getWidth(): ?int {
-    $width = $this->getParent()->get($this->getName() . CustomItem::SEPARATOR . 'width')->getValue();
-    return $width ? (int) $width : NULL;
+    return $this->width ? (int) $this->width : NULL;
   }
 
   /**
@@ -117,12 +167,9 @@ class CustomFieldImage extends CustomFieldEntityReferenceBase {
    *
    * @return int|null
    *   The image height.
-   *
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   public function getHeight(): ?int {
-    $height = $this->getParent()->get($this->getName() . CustomItem::SEPARATOR . 'height')->getValue();
-    return $height ? (int) $height : NULL;
+    return $this->height ? (int) $this->height : NULL;
   }
 
   /**

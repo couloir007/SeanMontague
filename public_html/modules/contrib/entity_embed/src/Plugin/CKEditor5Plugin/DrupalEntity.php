@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\entity_embed\Plugin\CKEditor5Plugin;
 
@@ -14,6 +14,8 @@ use Drupal\editor\EditorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * CKEditor 5 plugin for Entity Embed buttons.
+ *
  * @CKEditor5Plugin(
  *   id = "entity_embed_drupalentity",
  *   ckeditor5 = @CKEditor5AspectsOfCKEditor5Plugin(
@@ -26,7 +28,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     admin_library = "entity_embed/admin.entity_embed",
  *     elements = {
  *       "<drupal-entity>",
- *       "<drupal-entity alt title data-align data-caption data-entity-embed-display data-entity-embed-display-settings data-view-mode data-entity-uuid>",
+ *       "<drupal-entity alt title data-align data-caption>",
+ *       "<drupal-entity data-entity-embed-display>",
+ *       "<drupal-entity data-entity-embed-display-settings>",
+ *       "<drupal-entity data-view-mode data-entity-uuid>",
  *       "<drupal-entity data-langcode>",
  *     },
  *     conditions = {
@@ -70,7 +75,7 @@ class DrupalEntity extends CKEditor5PluginDefault implements ContainerFactoryPlu
     string $plugin_id,
     CKEditor5PluginDefinition $plugin_definition,
     CsrfTokenGenerator $csrf_token_generator,
-    EntityTypeManagerInterface $entity_type_manager
+    EntityTypeManagerInterface $entity_type_manager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->csrfTokenGenerator = $csrf_token_generator;
@@ -105,10 +110,11 @@ class DrupalEntity extends CKEditor5PluginDefault implements ContainerFactoryPlu
     /** @var \Drupal\embed\EmbedButtonInterface $embed_button */
     foreach ($entity_embed_buttons as $entity_embed_button) {
       $id = $entity_embed_button->id();
-      $label = Html::escape($entity_embed_button->label());
+      $label = $entity_embed_button->label();
       $buttons[$id] = [
         'id' => $id,
-        'name' => $label,
+        'name' => Html::escape($label),
+        // Label should not be escaped.
         'label' => $label,
         'icon' => $entity_embed_button->getIconUrl(),
       ];

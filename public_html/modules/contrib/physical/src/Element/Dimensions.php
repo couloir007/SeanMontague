@@ -3,7 +3,7 @@
 namespace Drupal\physical\Element;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element\FormElement;
+use Drupal\Core\Render\Element\FormElementBase;
 use Drupal\physical\LengthUnit;
 
 /**
@@ -30,7 +30,7 @@ use Drupal\physical\LengthUnit;
  *
  * @FormElement("physical_dimensions")
  */
-class Dimensions extends FormElement {
+class Dimensions extends FormElementBase {
 
   /**
    * {@inheritdoc}

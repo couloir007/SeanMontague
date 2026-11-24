@@ -63,11 +63,6 @@ class CustomFieldItem extends GraphQLComposeFieldTypeBase implements FieldProduc
     $settings = $item->getFieldDefinition()->getSettings();
     $custom_items = $this->customFieldManager->getCustomFieldItems($settings);
     $field_definition = $item->getFieldDefinition();
-    // Every subfield's output depends on the field's settings, and the
-    // subfield plugins are chosen from its storage's columns, so a change to
-    // either must invalidate cached responses.
-    $context->addCacheableDependency($field_definition);
-    $context->addCacheableDependency($field_definition->getFieldStorageDefinition());
     $entity_type_id = $field_definition->getTargetEntityTypeId();
     $bundle = $field_definition->getTargetBundle();
     $field_name = $field_definition->getName();

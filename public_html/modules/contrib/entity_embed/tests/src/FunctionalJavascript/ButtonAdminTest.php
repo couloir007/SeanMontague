@@ -2,14 +2,17 @@
 
 namespace Drupal\Tests\entity_embed\FunctionalJavascript;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the creation and configuration of entity embed buttons.
- *
- * @group entity_embed
  */
+#[Group('entity_embed')]
+#[RunTestsInSeparateProcesses]
 class ButtonAdminTest extends WebDriverTestBase {
 
   use MediaTypeCreationTrait;
@@ -83,9 +86,8 @@ class ButtonAdminTest extends WebDriverTestBase {
    *   The bundle to select, if provided.
    * @param string $entity_embed_display_plugin_id
    *   The entity embed display plugin ID to select on the form.
-   *
-   * @dataProvider embedButtonAdminProvider
    */
+  #[DataProvider('embedButtonAdminProvider')]
   public function testEmbedButtonAdmin($entity_type_id, $bundle_id, $entity_embed_display_plugin_id) {
     $this->drupalLogin($this->adminUser);
 

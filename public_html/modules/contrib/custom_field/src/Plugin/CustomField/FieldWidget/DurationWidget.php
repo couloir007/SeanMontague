@@ -72,6 +72,9 @@ class DurationWidget extends CustomFieldWidgetBase {
       foreach ($duration_options as $option) {
         $options[(int) $option['key']] = $option['label'];
       }
+      if (empty($duration_value) || !array_key_exists($duration_value, $options)) {
+        $duration_value = 'custom';
+      }
       return [
         '#type' => 'select',
         '#options' => $options,

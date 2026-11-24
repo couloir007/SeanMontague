@@ -18,7 +18,7 @@ namespace Drupal\Tests\entity_embed\FunctionalJavascript;
  *   without warning. External code should not rely on or use this trait at all.
  *   If you need its functionality, copy it wholesale into your own code base.
  *
- * @todo Remove this trait entirey when Drupal 8.8 is the minimum version of
+ * @todo Remove this trait entirely when Drupal 8.8 is the minimum version of
  *   core supported by Entity Embed.
  */
 trait SortableTestTrait {
@@ -112,6 +112,9 @@ JS;
     $this->sortableUpdate($item, $from);
   }
 
+  /**
+   * Drags an item with the mouse, for browsers without Sortable support.
+   */
   protected function doLegacyDrag($item, $target) {
     $assert_session = $this->assertSession();
     $target = $assert_session->elementExists('css', $target);

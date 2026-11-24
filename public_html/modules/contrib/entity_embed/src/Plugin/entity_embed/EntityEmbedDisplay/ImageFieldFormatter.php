@@ -3,30 +3,26 @@
 namespace Drupal\entity_embed\Plugin\entity_embed\EntityEmbedDisplay;
 
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Field\FormatterPluginManager;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Image\ImageFactory;
-use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\TypedData\TypedDataManager;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\entity_embed\Attribute\EntityEmbedDisplay;
+use Drupal\entity_embed\Plugin\Derivative\FieldFormatterDeriver;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Entity Embed Display reusing image field formatters.
  *
  * @see \Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayInterface
- *
- * @EntityEmbedDisplay(
- *   id = "image",
- *   label = @Translation("Image"),
- *   entity_types = {"file"},
- *   deriver = "Drupal\entity_embed\Plugin\Derivative\FieldFormatterDeriver",
- *   field_type = "image",
- *   provider = "image"
- * )
  */
+#[EntityEmbedDisplay(
+  id: 'image',
+  label: new TranslatableMarkup('Image'),
+  entity_types: ['file'],
+  field_type: 'image',
+  deriver: FieldFormatterDeriver::class,
+  provider: 'image',
+)]
 class ImageFieldFormatter extends FileFieldFormatter {
 
   /**
@@ -93,7 +89,7 @@ class ImageFieldFormatter extends FileFieldFormatter {
     if ($entity = $this->getEntityFromContext()) {
       // Loading large files is slow, make sure it is an image mime type before
       // doing that.
-      list($type,) = explode('/', $entity->getMimeType(), 2);
+      [$type] = explode('/', $entity->getMimeType(), 2);
       $is_valid_image = FALSE;
       if ($type == 'image') {
         $is_valid_image = $this->imageFactory->get($entity->getFileUri())->isValid();

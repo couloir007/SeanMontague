@@ -8,17 +8,12 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests custom field subfields accessed through Views relationships.
  *
  * @group custom_field
- * @runTestsInSeparateProcesses
  */
-#[Group('custom_field')]
-#[RunTestsInSeparateProcesses]
 class CustomFieldViewsRelationshipTest extends ViewsKernelTestBase {
 
   /**

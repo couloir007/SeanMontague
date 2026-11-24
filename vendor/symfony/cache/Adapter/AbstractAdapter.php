@@ -122,7 +122,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Name
         return new ChainAdapter([$apcu, $opcache]);
     }
 
-    public static function createConnection(#[\SensitiveParameter] string $dsn, #[\SensitiveParameter] array $options = []): mixed
+    public static function createConnection(#[\SensitiveParameter] string $dsn, array $options = []): mixed
     {
         if (str_starts_with($dsn, 'redis:') || str_starts_with($dsn, 'rediss:') || str_starts_with($dsn, 'valkey:') || str_starts_with($dsn, 'valkeys:')) {
             return RedisAdapter::createConnection($dsn, $options);
@@ -131,10 +131,6 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Name
             return MemcachedAdapter::createConnection($dsn, $options);
         }
         if (str_starts_with($dsn, 'couchbase:')) {
-            if (class_exists(\CouchbaseBucket::class) && CouchbaseBucketAdapter::isSupported()) {
-                return CouchbaseBucketAdapter::createConnection($dsn, $options);
-            }
-
             return CouchbaseCollectionAdapter::createConnection($dsn, $options);
         }
         if (preg_match('/^(mysql|oci|pgsql|sqlsrv|sqlite):/', $dsn)) {

@@ -2,12 +2,20 @@
 
 namespace Drupal\Tests\entity_embed\Functional;
 
+use Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayManager;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayManager
- * @group entity_embed
+ * Tests the Entity Embed Display plugin manager.
  */
+#[Group('entity_embed')]
+#[RunTestsInSeparateProcesses]
+#[CoversClass(EntityEmbedDisplayManager::class)]
+#[CoversMethod(EntityEmbedDisplayManager::class, 'getDefinitionsForContexts')]
 class EntityEmbedDisplayManagerTest extends BrowserTestBase {
 
   /**
@@ -111,7 +119,7 @@ class EntityEmbedDisplayManagerTest extends BrowserTestBase {
   }
 
   /**
-   * @covers ::getDefinitionsForContexts
+   * Tests the display plugin options available for an entity.
    */
   public function testGetDefinitionsForContexts() {
     $options = $this->entityEmbedDisplayManager

@@ -1,9 +1,10 @@
-import { Plugin, icons } from 'ckeditor5/src/core';
+/* eslint-disable import/no-extraneous-dependencies, import/no-unresolved */
+import { Plugin } from 'ckeditor5/src/core';
+import { IconCog, IconPencil } from 'ckeditor5/src/icons';
 import { isWidget, WidgetToolbarRepository } from 'ckeditor5/src/widget';
 import { ButtonView } from 'ckeditor5/src/ui';
 
 export default class EntityEmbedToolbar extends Plugin {
-
   /**
    * @inheritdoc
    */
@@ -21,26 +22,28 @@ export default class EntityEmbedToolbar extends Plugin {
     const { dialogSettings = {} } = options;
 
     editor.ui.componentFactory.add('entityEmbedEdit', (locale) => {
-      let buttonView = new ButtonView(locale);
+      const buttonView = new ButtonView(locale);
 
       buttonView.set({
         label: editor.t('Edit'),
-        icon: icons.pencil,
+        icon: IconPencil,
         tooltip: true,
-      })
+      });
 
       this.listenTo(buttonView, 'execute', (eventInfo) => {
         const element = editor.model.document.selection.getSelectedElement();
-        const libraryURL = Drupal.url('entity-embed/dialog/' + options.format + '/' + element.getAttribute('drupalEntityEmbedButton'));
+        const libraryURL = Drupal.url(
+          `entity-embed/dialog/${options.format}/${element.getAttribute('drupalEntityEmbedButton')}`,
+        );
 
-        let existingValues = {};
+        const existingValues = {};
 
-        for (let [key, value] of element.getAttributes()) {
-          let attribute = entityEmbedEditing.attrs[key]
+        Array.from(element.getAttributes()).forEach(([key, value]) => {
+          const attribute = entityEmbedEditing.attrs[key];
           if (attribute) {
-            existingValues[attribute] = value
+            existingValues[attribute] = value;
           }
-        }
+        });
 
         // Open a dialog to select entity to embed.
         this._openDialog(
@@ -51,19 +54,19 @@ export default class EntityEmbedToolbar extends Plugin {
             editor.editing.view.focus();
           },
           dialogSettings,
-        )
+        );
       });
 
       return buttonView;
-    })
+    });
 
     editor.ui.componentFactory.add('editEmbeddedEntity', (locale) => {
-      let buttonView = new ButtonView(locale);
+      const buttonView = new ButtonView(locale);
 
       buttonView.set({
         isEnabled: true,
         label: Drupal.t('Edit the embedded entity (opens in new tab)'),
-        icon: icons.cog,
+        icon: IconCog,
         tooltip: true,
       });
 
@@ -73,33 +76,43 @@ export default class EntityEmbedToolbar extends Plugin {
           return null;
         }
         if (!element.hasAttribute('drupalEntityEntityUuid')) {
-          console.warn(Drupal.t('Unable to create edit link. There must be a value for data-entity-uuid.'));
+          console.warn(
+            Drupal.t(
+              'Unable to create edit link. There must be a value for data-entity-uuid.',
+            ),
+          );
           return null;
         }
         if (!element.hasAttribute('drupalEntityEntityType')) {
-          console.warn(Drupal.t('Unable to create edit link. There must be a value for data-entity-type.'));
+          console.warn(
+            Drupal.t(
+              'Unable to create edit link. There must be a value for data-entity-type.',
+            ),
+          );
           return null;
         }
         const uuid = element.getAttribute('drupalEntityEntityUuid');
         const type = element.getAttribute('drupalEntityEntityType');
-        const editUrl = Drupal.url(`entity-embed/edit-embedded/${type}/${uuid}`)
+        const editUrl = Drupal.url(
+          `entity-embed/edit-embedded/${type}/${uuid}`,
+        );
 
         // Ping the edit url and disable the button if the user does not have
         // access. Because this is async, there's a moment where the button is
         // clickable even if they don't have access, but the destination will
         // remain inaccessible.
-        fetch(editUrl)
-          .then((res) => {
-            if (!res.ok) {
-              buttonView.set({
-                label: Drupal.t(`You do not have the permissions needed to edit this ${type}.`),
-                isEnabled: false,
-              });
-            }
-          });
+        fetch(editUrl).then((res) => {
+          if (!res.ok) {
+            buttonView.set({
+              label: Drupal.t(
+                `You do not have the permissions needed to edit this ${type}.`,
+              ),
+              isEnabled: false,
+            });
+          }
+        });
 
         window.open(editUrl, '_blank');
-
       });
 
       return buttonView;
@@ -110,7 +123,7 @@ export default class EntityEmbedToolbar extends Plugin {
    * @inheritdoc
    */
   afterInit() {
-    const { editor } = this
+    const { editor } = this;
     if (!editor.plugins.has('WidgetToolbarRepository')) {
       return;
     }
@@ -120,20 +133,20 @@ export default class EntityEmbedToolbar extends Plugin {
       ariaLabel: Drupal.t('Entity Embed toolbar'),
       items: ['entityEmbedEdit', 'entityEmbedLink', 'editEmbeddedEntity'],
       getRelatedElement(selection) {
-        const viewElement = selection.getSelectedElement()
+        const viewElement = selection.getSelectedElement();
         if (!viewElement) {
-          return null
+          return null;
         }
         if (!isWidget(viewElement)) {
-          return null
+          return null;
         }
         if (!viewElement.getCustomProperty('drupalEntity')) {
-          return null
+          return null;
         }
 
-        return viewElement
+        return viewElement;
       },
-    })
+    });
   }
 
   /**
@@ -147,6 +160,7 @@ export default class EntityEmbedToolbar extends Plugin {
    * @param {object} dialogSettings
    *   An object containing settings to be passed to the jQuery UI.
    */
+  // eslint-disable-next-line class-methods-use-this
   _openDialog(url, existingValues, saveCallback, dialogSettings) {
     // Add a consistent dialog class.
     const classes = dialogSettings.dialogClass
@@ -154,8 +168,7 @@ export default class EntityEmbedToolbar extends Plugin {
       : [];
     classes.push('ui-dialog--narrow');
     dialogSettings.dialogClass = classes.join(' ');
-    dialogSettings.autoResize =
-      window.matchMedia('(min-width: 600px)').matches;
+    dialogSettings.autoResize = window.matchMedia('(min-width: 600px)').matches;
     dialogSettings.width = 'auto';
 
     const ckeditorAjaxDialog = Drupal.ajax({
@@ -180,5 +193,4 @@ export default class EntityEmbedToolbar extends Plugin {
   static get pluginName() {
     return 'EntityEmbedToolbar';
   }
-
 }

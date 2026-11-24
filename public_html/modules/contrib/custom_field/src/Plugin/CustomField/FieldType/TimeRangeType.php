@@ -47,36 +47,6 @@ class TimeRangeType extends TimeType {
 
   /**
    * {@inheritdoc}
-   *
-   * The nested shape keys its end time as 'end', while the column is
-   * '<name>__end', so the name has to be mapped rather than copied. The guard
-   * is the one CustomFieldTimeRange::setValue() applies to the same value -
-   * both the start and the end have to be non-empty times - so completing the
-   * values array here cannot change what is stored.
-   *
-   * The duration column is deliberately left out: CustomItem::preSave()
-   * computes it from the start and end times, and it never appears in the
-   * incoming value.
-   */
-  public static function extractExtraPropertyValues(array $settings, mixed $value): array {
-    if (!is_array($value)) {
-      return [];
-    }
-    ['name' => $name] = $settings;
-
-    $start_time = $value['value'] ?? NULL;
-    $end_time = $value['end'] ?? NULL;
-
-    $extra = [];
-    if (!Time::isEmpty($start_time) && !Time::isEmpty($end_time)) {
-      $extra[$name . self::SEPARATOR . 'end'] = $end_time;
-    }
-
-    return $extra;
-  }
-
-  /**
-   * {@inheritdoc}
    */
   public static function propertyDefinitions(array $settings): array {
     $properties = [];
@@ -115,18 +85,19 @@ class TimeRangeType extends TimeType {
    * {@inheritdoc}
    */
   public static function generateSampleValue(CustomFieldTypeInterface $field, string $target_entity_type): array {
-    // The end time must never wrap past midnight — TimeRangeWidget's
-    // start/end validation (and preSave()) rejects an end timestamp that's
-    // numerically before the start. Cap the start so that even the maximum
-    // duration keeps 'end' within the same day.
-    $max_duration = 4 * 3600;
-    $latest_start = 86400 - $max_duration - 1;
-    $start = rand(0, $latest_start);
-    // Normalize to whole minutes for a clean HH:MM:00 value.
-    $start -= $start % 60;
+    // Cap start time to ensure room for end time (e.g., max 20:00:00 or 72000
+    // seconds).
+    $hours = rand(0, 20);
+    $minutes = rand(0, 59);
 
+    // Format with leading zeros.
+    $time = sprintf('%02d:%02d:00', $hours, $minutes);
+    $start = Time::createFromHtml5Format($time)->getTimestamp();
+
+    // Generate a random duration (e.g., 1 to 12 hours in seconds) to add to
+    // start time.
     $duration = rand(1, 4) * 3600;
-    $end = $start + $duration;
+    $end = ($start + $duration) % 86400;
 
     return [
       'value' => $start,

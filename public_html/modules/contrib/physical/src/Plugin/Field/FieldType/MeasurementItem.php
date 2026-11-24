@@ -2,27 +2,28 @@
 
 namespace Drupal\physical\Plugin\Field\FieldType;
 
+use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\PreconfiguredFieldUiOptionsInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\physical\Measurement;
 use Drupal\physical\MeasurementType;
 
 /**
  * Plugin implementation of the 'physical_measurement' field type.
- *
- * @FieldType(
- *   id = "physical_measurement",
- *   label = @Translation("Measurement"),
- *   description = @Translation("This field stores a number and a unit of measure."),
- *   category = "physical",
- *   default_widget = "physical_measurement_default",
- *   default_formatter = "physical_measurement_default"
- * )
  */
+#[FieldType(
+  id: "physical_measurement",
+  label: new TranslatableMarkup("Measurement"),
+  description: new TranslatableMarkup("This field stores a number and a unit of measure."),
+  category: "physical",
+  default_widget: "physical_measurement_default",
+  default_formatter: "physical_measurement_default",
+)]
 class MeasurementItem extends FieldItemBase implements PreconfiguredFieldUiOptionsInterface {
   use StringTranslationTrait;
 

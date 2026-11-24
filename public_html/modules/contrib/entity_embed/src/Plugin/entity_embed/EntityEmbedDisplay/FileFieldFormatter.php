@@ -3,21 +3,23 @@
 namespace Drupal\entity_embed\Plugin\entity_embed\EntityEmbedDisplay;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\entity_embed\Attribute\EntityEmbedDisplay;
+use Drupal\entity_embed\Plugin\Derivative\FieldFormatterDeriver;
 
 /**
  * Entity Embed Display reusing file field formatters.
  *
  * @see \Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayInterface
- *
- * @EntityEmbedDisplay(
- *   id = "file",
- *   label = @Translation("File"),
- *   entity_types = {"file"},
- *   deriver = "Drupal\entity_embed\Plugin\Derivative\FieldFormatterDeriver",
- *   field_type = "file",
- *   provider = "file"
- * )
  */
+#[EntityEmbedDisplay(
+  id: 'file',
+  label: new TranslatableMarkup('File'),
+  entity_types: ['file'],
+  field_type: 'file',
+  deriver: FieldFormatterDeriver::class,
+  provider: 'file',
+)]
 class FileFieldFormatter extends EntityReferenceFieldFormatter {
 
   /**

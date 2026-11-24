@@ -2,23 +2,24 @@
 
 namespace Drupal\physical\Plugin\Field\FieldType;
 
+use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\physical\Length;
 
 /**
  * Plugin implementation of the 'physical_dimensions' field type.
- *
- * @FieldType(
- *   id = "physical_dimensions",
- *   label = @Translation("Dimensions"),
- *   description = @Translation("This field stores the length, width, height numbers and a unit of measure."),
- *   category = "physical",
- *   default_widget = "physical_dimensions_default",
- *   default_formatter = "physical_dimensions_default"
- * )
  */
+#[FieldType(
+  id: "physical_dimensions",
+  label: new TranslatableMarkup("Dimensions"),
+  description: new TranslatableMarkup("This field stores the length, width, height numbers and a unit of measure."),
+  category: "physical",
+  default_widget: "physical_dimensions_default",
+  default_formatter: "physical_dimensions_default",
+)]
 class DimensionsItem extends FieldItemBase {
 
   /**

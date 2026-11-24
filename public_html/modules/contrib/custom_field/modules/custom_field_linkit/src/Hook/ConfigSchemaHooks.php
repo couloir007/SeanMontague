@@ -3,14 +3,11 @@
 namespace Drupal\custom_field_linkit\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Provides hooks related to config schemas.
  */
 class ConfigSchemaHooks {
-
-  use StringTranslationTrait;
 
   /**
    * Implements hook_config_schema_info_alter().
@@ -21,18 +18,18 @@ class ConfigSchemaHooks {
     $definitions['custom_field.field.*']['mapping'] += [
       'linkit_profile' => [
         'type'  => 'string',
-        'label' => $this->t('Linkit profile'),
+        'label' => t('Linkit profile'),
       ],
       'linkit_auto_link_text' => [
         'type'  => 'boolean',
-        'label' => $this->t('Automatically populate link text from entity label'),
+        'label' => t('Automatically populate link text from entity label'),
       ],
     ];
     // Formatter settings.
     $definitions['custom_field.formatter_settings']['mapping'] += [
       'linkit_profile' => [
         'type'  => 'string',
-        'label' => $this->t('Linkit profile'),
+        'label' => t('Linkit profile'),
       ],
     ];
   }

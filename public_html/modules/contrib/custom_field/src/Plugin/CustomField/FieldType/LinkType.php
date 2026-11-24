@@ -87,32 +87,6 @@ class LinkType extends UriType {
 
   /**
    * {@inheritdoc}
-   *
-   * The nested shape keys its parts 'title' and 'options', while the columns
-   * are '<name>__title' and '<name>__options', so the names have to be mapped
-   * rather than copied. The guards are the ones CustomFieldLink::setValue()
-   * applies to the same value, so completing the values array here cannot
-   * change what is stored.
-   */
-  public static function extractExtraPropertyValues(array $settings, mixed $value): array {
-    if (!is_array($value)) {
-      return [];
-    }
-    ['name' => $name] = $settings;
-
-    $extra = [];
-    if (isset($value['title'])) {
-      $extra[$name . self::SEPARATOR . 'title'] = $value['title'];
-    }
-    if (isset($value['options']) && is_array($value['options'])) {
-      $extra[$name . self::SEPARATOR . 'options'] = $value['options'];
-    }
-
-    return $extra;
-  }
-
-  /**
-   * {@inheritdoc}
    */
   public static function propertyDefinitions(array $settings): array {
     ['name' => $name] = $settings;
@@ -220,25 +194,25 @@ class LinkType extends UriType {
     if ($link_type & self::LINK_EXTERNAL) {
       $tlds = ['com', 'net', 'gov', 'org', 'edu', 'biz', 'info'];
       $domain_length = mt_rand(7, 15);
+
+      switch ($field_settings['title']) {
+        case DRUPAL_DISABLED:
+          $value['title'] = '';
+          break;
+
+        case DRUPAL_REQUIRED:
+          $value['title'] = $random->sentences(4);
+          break;
+
+        case DRUPAL_OPTIONAL:
+          // In case of optional title, randomize its generation.
+          $value['title'] = mt_rand(0, 1) ? $random->sentences(4) : '';
+          break;
+      }
       $value['uri'] = 'https://www.' . $random->word($domain_length) . '.' . $tlds[mt_rand(0, (count($tlds) - 1))];
     }
     else {
       $value['uri'] = 'base:' . $random->name(mt_rand(1, 64));
-    }
-
-    switch ($field_settings['title']) {
-      case DRUPAL_DISABLED:
-        $value['title'] = '';
-        break;
-
-      case DRUPAL_REQUIRED:
-        $value['title'] = $random->sentences(4);
-        break;
-
-      case DRUPAL_OPTIONAL:
-        // In case of optional title, randomize its generation.
-        $value['title'] = mt_rand(0, 1) ? $random->sentences(4) : '';
-        break;
     }
 
     return $value;

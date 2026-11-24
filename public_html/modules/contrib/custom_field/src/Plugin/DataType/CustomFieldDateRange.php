@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\custom_field\Plugin\DataType;
 
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\Attribute\DataType;
@@ -24,6 +25,27 @@ use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 class CustomFieldDateRange extends CustomFieldDataTypeBase {
 
   /**
+   * The end date value.
+   *
+   * @var string|null
+   */
+  protected ?string $endDate;
+
+  /**
+   * The time zone value.
+   *
+   * @var string|null
+   */
+  protected ?string $timezone = NULL;
+
+  /**
+   * The duration in seconds.
+   *
+   * @var int|null
+   */
+  protected ?int $duration;
+
+  /**
    * Date format for SQL conversion.
    *
    * @var string
@@ -41,6 +63,8 @@ class CustomFieldDateRange extends CustomFieldDataTypeBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   public function __construct(DataDefinitionInterface $definition, $name = NULL, ?FieldItemInterface $parent = NULL) {
     parent::__construct($definition, $name, $parent);
@@ -48,12 +72,22 @@ class CustomFieldDateRange extends CustomFieldDataTypeBase {
       $this->datetimeType = DateTimeType::DATETIME_TYPE_DATE;
       $this->dateFormat = DateTimeTypeInterface::DATE_STORAGE_FORMAT;
     }
+    if ($parent) {
+      $this->endDate = $parent->get($this->getName() . CustomItem::SEPARATOR . 'end')
+        ->getValue();
+      $this->timezone = $parent->get($this->getName() . CustomItem::SEPARATOR . 'timezone')
+        ->getValue();
+      $duration = $parent->get($this->getName() . CustomItem::SEPARATOR . 'duration')
+        ->getValue();
+      $this->duration = $duration ? (int) $duration : NULL;
+    }
   }
 
   /**
    * {@inheritdoc}
    *
    * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+   * @throws \DateMalformedIntervalStringException
    */
   public function setValue($value, $notify = TRUE): void {
     // Treat the values as property value of the main property, if no array is
@@ -62,19 +96,24 @@ class CustomFieldDateRange extends CustomFieldDataTypeBase {
     if (isset($value) && !is_array($value)) {
       $value = [
         'value' => $value,
-        'end' => NULL,
+        'end_value' => NULL,
         'timezone' => NULL,
       ];
     }
 
     $this->value = !empty($value['value']) && is_string($value['value']) ? $value['value'] : NULL;
-    $end_date = !empty($value['end']) && is_string($value['end']) ? $value['end'] : NULL;
+    $this->endDate = !empty($value['end_value']) && is_string($value['end_value']) ? $value['end_value'] : NULL;
     if (!empty($this->value)) {
-      if (!empty($end_date)) {
-        $parent->set($this->getName() . CustomItem::SEPARATOR . 'end', $end_date);
+      $start = new DrupalDateTime($this->value, 'UTC');
+      if (!empty($this->endDate)) {
+        $end = new DrupalDateTime($this->endDate, 'UTC');
+        $seconds = $end->getTimestamp() - $start->getTimestamp();
+        $this->duration = $seconds;
+        $parent->set($this->getName() . CustomItem::SEPARATOR . 'end', $this->endDate);
       }
       if (isset($value['timezone'])) {
-        $parent->set($this->getName() . CustomItem::SEPARATOR . 'timezone', (string) $value['timezone']);
+        $this->timezone = (string) $value['timezone'];
+        $parent->set($this->getName() . CustomItem::SEPARATOR . 'timezone', $this->timezone);
       }
     }
   }
@@ -84,12 +123,9 @@ class CustomFieldDateRange extends CustomFieldDataTypeBase {
    *
    * @return string|null
    *   The stored timezone.
-   *
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   public function getTimezone(): ?string {
-    $timezone = $this->getParent()->get($this->getName() . CustomItem::SEPARATOR . 'timezone')->getValue();
-    return $timezone ? (string) $timezone : NULL;
+    return $this->timezone;
   }
 
   /**
@@ -97,12 +133,9 @@ class CustomFieldDateRange extends CustomFieldDataTypeBase {
    *
    * @return int|null
    *   The duration value in seconds.
-   *
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   public function getDuration(): ?int {
-    $duration = $this->getParent()->get($this->getName() . CustomItem::SEPARATOR . 'duration')->getValue();
-    return $duration ? (int) $duration : NULL;
+    return $this->duration;
   }
 
   /**

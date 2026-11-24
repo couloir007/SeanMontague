@@ -1,0 +1,5 @@
+*.min.js
+# Compiled by webpack from js/ckeditor5_plugins.
+js/build/
+# CKEditor 4 plugin, removed in 2.0.x (#3639495).
+js/plugins/

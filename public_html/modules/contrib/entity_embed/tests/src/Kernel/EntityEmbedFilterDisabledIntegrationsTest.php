@@ -2,12 +2,22 @@
 
 namespace Drupal\Tests\entity_embed\Kernel;
 
+use Drupal\entity_embed\Plugin\Filter\EntityEmbedFilter;
+use Drupal\entity_embed\Plugin\entity_embed\EntityEmbedDisplay\EntityReferenceFieldFormatter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests that entity embed disables certain integrations.
- *
- * @coversDefaultClass \Drupal\entity_embed\Plugin\Filter\EntityEmbedFilter
- * @group entity_embed
  */
+#[Group('entity_embed')]
+#[RunTestsInSeparateProcesses]
+#[CoversClass(EntityEmbedFilter::class)]
+#[CoversMethod(EntityReferenceFieldFormatter::class, 'disableContextualLinks')]
+#[CoversMethod(EntityReferenceFieldFormatter::class, 'disableQuickEdit')]
 class EntityEmbedFilterDisabledIntegrationsTest extends EntityEmbedFilterTestBase {
 
   /**
@@ -32,10 +42,9 @@ class EntityEmbedFilterDisabledIntegrationsTest extends EntityEmbedFilterTestBas
   }
 
   /**
-   * @covers \Drupal\entity_embed\Plugin\entity_embed\EntityEmbedDisplay\EntityReferenceFieldFormatter::disableContextualLinks
-   * @covers \Drupal\entity_embed\Plugin\entity_embed\EntityEmbedDisplay\EntityReferenceFieldFormatter::disableQuickEdit
-   * @dataProvider providerDisabledIntegrations
+   * Tests that integrations are disabled on embedded entities.
    */
+  #[DataProvider('providerDisabledIntegrations')]
   public function testDisabledIntegrations($integration_detection_selector) {
     $text = $this->createEmbedCode([
       'data-entity-type' => 'node',
@@ -54,7 +63,7 @@ class EntityEmbedFilterDisabledIntegrationsTest extends EntityEmbedFilterTestBas
     return [
       'contextual' => [
         'div.embedded-entity > .contextual-region',
-      ]
+      ],
     ];
   }
 

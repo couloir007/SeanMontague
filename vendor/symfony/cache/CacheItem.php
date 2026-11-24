@@ -12,7 +12,6 @@
 namespace Symfony\Component\Cache;
 
 use Psr\Cache\CacheItemInterface;
-use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Exception\LogicException;
@@ -35,7 +34,6 @@ final class CacheItem implements ItemInterface
     protected ?CacheItemInterface $innerItem = null;
     protected ?string $poolHash = null;
     protected bool $isTaggable = false;
-    protected ?ClockInterface $clock = null;
 
     public function getKey(): string
     {
@@ -80,9 +78,9 @@ final class CacheItem implements ItemInterface
         if (null === $time) {
             $this->expiry = null;
         } elseif ($time instanceof \DateInterval) {
-            $this->expiry = ($this->clock?->now()->format('U.u') ?? microtime(true)) + \DateTimeImmutable::createFromFormat('U', 0)->add($time)->format('U.u');
+            $this->expiry = microtime(true) + \DateTimeImmutable::createFromFormat('U', 0)->add($time)->format('U.u');
         } elseif (\is_int($time)) {
-            $this->expiry = $time + ($this->clock?->now()->format('U.u') ?? microtime(true));
+            $this->expiry = $time + microtime(true);
         } else {
             throw new InvalidArgumentException(\sprintf('Expiration date must be an integer, a DateInterval or null, "%s" given.', get_debug_type($time)));
         }

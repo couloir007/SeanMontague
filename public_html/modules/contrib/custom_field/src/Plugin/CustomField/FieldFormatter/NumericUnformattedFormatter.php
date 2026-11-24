@@ -7,7 +7,6 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
 
 /**
  * Plugin implementation of the 'number_unformatted' formatter.
@@ -21,7 +20,7 @@ use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
     'float',
   ],
 )]
-class NumericUnformattedFormatter extends CustomFieldFormatterBase {
+class NumericUnformattedFormatter extends DecimalFormatter {
 
   /**
    * {@inheritdoc}

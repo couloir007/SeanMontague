@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\linkit\FunctionalJavascript;
 
+use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\editor\Entity\Editor;
 use Drupal\entity_test\Entity\EntityTestMul;
 use Drupal\filter\Entity\FilterFormat;
-use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\linkit\MatcherInterface;
 use Drupal\linkit\Tests\ProfileCreationTrait;
-use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
-use Symfony\Component\Validator\ConstraintViolationInterface;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * Tests the Linkit extensions to the CKEditor 5 Link plugin.
@@ -130,8 +130,8 @@ class LinkitDialogCKEditor5Test extends WebDriverTestBase {
     $core_version = \Drupal::VERSION;
     // The following should run for Drupal 10.5+ and Drupal 11.2+, which
     // use CKEditor version 45.
-    if (str_starts_with('10', $core_version) && version_compare($core_version, '10.5', '>=') ||
-      str_starts_with('11', $core_version) && version_compare($core_version, '11.2', '>=')
+    if (str_starts_with($core_version, '10') && version_compare($core_version, '10.5', '>=') ||
+      str_starts_with($core_version, '11') && version_compare($core_version, '11.2', '>=')
     ) {
       $session = $this->getSession();
       $assert_session = $this->assertSession();
@@ -194,20 +194,9 @@ class LinkitDialogCKEditor5Test extends WebDriverTestBase {
       $link_edit_balloon = $this->assertVisibleBalloon('.ck-link-form');
       $autocomplete_field = $link_edit_balloon->find('css', '.form-linkit-autocomplete');
       $this->assertSame($expected_url, $autocomplete_field->getValue());
-      // Click to trigger the reset of the autocomplete status.
-      $autocomplete_field->click();
-      // Enter a URL and verify that no link suggestions are found.
-      $autocomplete_field->setValue('http://example.com');
-      $autocomplete_field->click();
-      $this->assertSession()->assertWaitOnAjaxRequest();
-      $this->assertSession()->waitForElementVisible('css', '.linkit-result-line.ui-menu-item');
-      $results = $page->findAll('css', '.linkit-result-line.ui-menu-item');
-      $this->assertCount(1, $results);
-      $this->assertSame('http://example.com', $results[0]->find('css', '.linkit-result-line--title')->getText());
-      $this->assertSame('No content suggestions found. This URL will be used as is.', $results[0]->find('css', '.linkit-result-line--description')->getText());
-      // Accept the link as-is.
-      $results = $page->findAll('css', '.linkit-result-line.ui-menu-item');
-      $results[0]->click();
+      // Enter an internal URL without selecting an autocomplete suggestion.
+      $manual_url = base_path() . 'entity_test_mul/manage/2';
+      $autocomplete_field->setValue($manual_url);
       $link_edit_balloon->pressButton('Update');
       // Assert balloon is still visible, but now it's again the link actions
       // one.
@@ -215,9 +204,9 @@ class LinkitDialogCKEditor5Test extends WebDriverTestBase {
       // Assert balloon can be closed by clicking elsewhere in the editor.
       $page->find('css', '.ck-editor__editable')->click();
       $this->assertTrue($assert_session->waitForElementRemoved('css', '.ck-button-toolbar'));
-      $changed_link = $assert_session->waitForElementVisible('css', '.ck-content [href="http://example.com"]');
+      $changed_link = $assert_session->waitForElementVisible('css', ".ck-content [href=\"$manual_url\"]");
       $this->assertNotNull($changed_link);
-      $this->assertEquals($changed_link->getAttribute('href'), 'http://example.com');
+      $this->assertEquals($changed_link->getAttribute('href'), $manual_url);
       foreach ([
         'data-entity-type',
         'data-entity-uuid',
@@ -229,6 +218,82 @@ class LinkitDialogCKEditor5Test extends WebDriverTestBase {
   }
 
   /**
+   * Tests that a programmatic URL change clears stale entity metadata.
+   *
+   * CKEditor 5 "link providers" (e.g. core's Bookmark feature, available
+   * since CKEditor 5 v45) let an editor point a link at a target by writing
+   * directly to the URL field's underlying DOM element, without a native
+   * keyboard event. Entity metadata (data-entity-type, data-entity-uuid,
+   * data-entity-substitution) must still be cleared in that case, the same
+   * as it is for a manually-typed URL. Detecting this only via a native
+   * 'input' DOM event listener (as opposed to comparing against the link
+   * command's own tracked value) misses this case, since programmatic
+   * value changes fire no such event.
+   *
+   * @see https://www.drupal.org/project/linkit/issues/3615946
+   */
+  public function testLinkDialogProgrammaticUrlChangeClearsEntityMetadata() {
+    $core_version = \Drupal::VERSION;
+    // Link providers require CKEditor 5 v45+, used by Drupal 10.5+ and
+    // 11.2+.
+    if (str_starts_with($core_version, '10') && version_compare($core_version, '10.5', '>=') ||
+      str_starts_with($core_version, '11') && version_compare($core_version, '11.2', '>=')
+    ) {
+      $assert_session = $this->assertSession();
+      $page = $this->getSession()->getPage();
+
+      // Create a test entity and link to it via autocomplete.
+      /** @var \Drupal\Core\Entity\EntityInterface $entity */
+      $entity = EntityTestMul::create(['name' => 'Foo']);
+      $entity->save();
+      $this->drupalGet('node/add/page');
+      $this->waitForEditor();
+      $this->pressEditorButton('Link');
+      $balloon = $this->assertVisibleBalloon('.ck-link-form');
+      $autocomplete_field = $balloon->find('css', '.form-linkit-autocomplete');
+      $autocomplete_field->setValue('f');
+      $this->assertTrue($this->getSession()->wait(5000, "document.querySelectorAll('.linkit-result-line.ui-menu-item').length > 0"));
+      $results = $page->findAll('css', '.linkit-result-line.ui-menu-item');
+      $results[0]->click();
+      $expected_url = base_path() . 'entity_test_mul/manage/1';
+      $this->assertSame($expected_url, $autocomplete_field->getValue());
+      $balloon->pressButton('Insert');
+      $this->assertTrue($assert_session->waitForElementRemoved('css', '.ck-button-save'));
+      $linkit_link = $assert_session->waitForElementVisible('css', '.ck-content a');
+      $this->assertSame('entity_test_mul', $linkit_link->getAttribute('data-entity-type'));
+      $this->assertSame($entity->uuid(), $linkit_link->getAttribute('data-entity-uuid'));
+
+      // Re-open the link edit dialog on that same link.
+      $this->selectTextInsideElement('a');
+      $this->pressEditorButton('Link');
+      $link_edit_balloon = $this->assertVisibleBalloon('.ck-link-form');
+      $autocomplete_field = $link_edit_balloon->find('css', '.form-linkit-autocomplete');
+      $this->assertSame($expected_url, $autocomplete_field->getValue());
+
+      // Change the URL field's value the way a link provider does: write
+      // directly to the DOM element, firing no keyboard/input event at all.
+      // This is what previously let stale entity metadata survive, because
+      // it was only cleared in response to a native 'input' event.
+      $this->getSession()->executeScript(
+        "document.querySelector('.ck-link-form .form-linkit-autocomplete').value = '#some-bookmark';"
+      );
+      $link_edit_balloon->pressButton('Update');
+      $this->assertTrue($assert_session->waitForElementRemoved('css', '.ck-button-save'));
+
+      $changed_link = $assert_session->waitForElementVisible('css', '.ck-content [href="#some-bookmark"]');
+      $this->assertNotNull($changed_link);
+      foreach ([
+        'data-entity-type',
+        'data-entity-uuid',
+        'data-entity-substitution',
+      ] as $attribute_name) {
+        $this->assertFalse($changed_link->hasAttribute($attribute_name), "Link should no longer have $attribute_name after a programmatic URL change");
+      }
+
+    }
+  }
+
+  /**
    * Test the link dialog with CKEditor version 44 or below.
    */
   public function testLinkDialogCkeditor44() {
@@ -236,8 +301,8 @@ class LinkitDialogCKEditor5Test extends WebDriverTestBase {
     // The following should run for Drupal 10.4 or lower and Drupal 11.1 or
     // lower which use CKEditor version 44.
     if (
-      str_starts_with('10', $core_version) && version_compare($core_version, '10.5', '<') ||
-      str_starts_with('11', $core_version) && version_compare($core_version, '11.2', '<')
+      str_starts_with($core_version, '10') && version_compare($core_version, '10.5', '<') ||
+      str_starts_with($core_version, '11') && version_compare($core_version, '11.2', '<')
     ) {
       $session = $this->getSession();
       $assert_session = $this->assertSession();
@@ -303,20 +368,9 @@ class LinkitDialogCKEditor5Test extends WebDriverTestBase {
       $link_edit_balloon = $this->assertVisibleBalloon('.ck-link-form');
       $autocomplete_field = $link_edit_balloon->find('css', '.ck-input-text');
       $this->assertSame($expected_url, $autocomplete_field->getValue());
-      // Click to trigger the reset of the autocomplete status.
-      $autocomplete_field->click();
-      // Enter a URL and verify that no link suggestions are found.
-      $autocomplete_field->setValue('http://example.com');
-      $autocomplete_field->click();
-      $this->assertSession()->assertWaitOnAjaxRequest();
-      $this->assertSession()->waitForElementVisible('css', '.linkit-result-line.ui-menu-item');
-      $results = $page->findAll('css', '.linkit-result-line.ui-menu-item');
-      $this->assertCount(1, $results);
-      $this->assertSame('http://example.com', $results[0]->find('css', '.linkit-result-line--title')->getText());
-      $this->assertSame('No content suggestions found. This URL will be used as is.', $results[0]->find('css', '.linkit-result-line--description')->getText());
-      // Decline the autocomplete suggestion.
-      $link_edit_balloon->pressButton('Cancel');
-      // Accept the link as-is.
+      // Enter an internal URL without selecting an autocomplete suggestion.
+      $manual_url = base_path() . 'entity_test_mul/manage/2';
+      $autocomplete_field->setValue($manual_url);
       $link_edit_balloon->pressButton('Save');
       $this->assertTrue($assert_session->waitForElementRemoved('css', '.ck-button-save'));
       // Assert balloon is still visible, but now it's again the link actions
@@ -325,8 +379,9 @@ class LinkitDialogCKEditor5Test extends WebDriverTestBase {
       // Assert balloon can be closed by clicking elsewhere in the editor.
       $page->find('css', '.ck-editor__editable')->click();
       $this->assertTrue($assert_session->waitForElementRemoved('css', '.ck-button-save'));
-      $changed_link = $assert_session->waitForElementVisible('css', '.ck-content [href="http://example.com"]');
+      $changed_link = $assert_session->waitForElementVisible(".ck-content [href=\"$manual_url\"]");
       $this->assertNotNull($changed_link);
+      $this->assertSame($changed_link->getAttribute('href'), $manual_url);
       foreach (
         [
           'data-entity-type',

@@ -6,8 +6,8 @@
  */
 
 /**
-+ * Implements hook_update_last_removed().
-  */
+ * Implements hook_update_last_removed().
+ */
 function entity_embed_update_last_removed() {
   return 8004;
 }

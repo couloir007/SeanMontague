@@ -2,19 +2,29 @@
 
 namespace Drupal\Tests\entity_embed\FunctionalJavascript;
 
+use Drupal\entity_embed\Plugin\CKEditor5Plugin\DrupalEntity;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\editor\Entity\Editor;
+use Drupal\embed\Entity\EmbedButton;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
- * @coversDefaultClass \Drupal\entity_embed\Plugin\CKEditor5Plugin\DrupalEntity
- * @group ckeditor5
+ * Tests Entity Embed's CKEditor 5 integration.
+ *
  * @internal
  */
+#[Group('entity_embed')]
+#[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
+#[CoversClass(DrupalEntity::class)]
 class CKEditor5IntegrationTest extends WebDriverTestBase {
 
   use CKEditor5TestTrait;
@@ -49,8 +59,7 @@ class CKEditor5IntegrationTest extends WebDriverTestBase {
     'entity_embed',
     'text',
     'ckeditor5_test',
-    // Because modules/contrib/entity_embed/config/optional/embed.button.node.yml
-    // will only then get installed.
+    // Installs this module's config/optional/embed.button.node.yml.
     'node',
     // For the `data-entity-embed-test-active-theme` attribute and the ability
     // to simulate preview failures.
@@ -257,10 +266,99 @@ class CKEditor5IntegrationTest extends WebDriverTestBase {
   }
 
   /**
-   * Ensures arbitrary attributes can be added on links wrapping entity via GHS.
+   * Tests that an embedded entity in a list item stays in the list item.
    *
-   * @dataProvider providerLinkability
+   * @see \Drupal\Tests\ckeditor5\FunctionalJavascript\MediaTest::testMediaSplitList()
    */
+  public function testEntityInListItem(): void {
+    $assert_session = $this->assertSession();
+
+    $editor = Editor::load('test_format');
+    $settings = $editor->getSettings();
+
+    // Add lists to the editor.
+    $settings['plugins']['ckeditor5_list'] = [
+      'properties' => [
+        'reversed' => FALSE,
+        'startIndex' => FALSE,
+        'styles' => FALSE,
+      ],
+      'multiBlock' => TRUE,
+    ];
+    $settings['toolbar']['items'] = array_merge($settings['toolbar']['items'], ['bulletedList', 'numberedList']);
+    $editor->setSettings($settings);
+    $editor->save();
+
+    // Add lists to the filter.
+    $filter_format = $editor->getFilterFormat();
+    $filter_format->setFilterConfig('filter_html', [
+      'status' => TRUE,
+      'settings' => [
+        'allowed_html' => '<p> <br> <strong> <em> <a href> <drupal-entity alt title data-align data-caption data-view-mode data-entity-embed-display data-entity-embed-display-settings data-entity-uuid data-langcode data-embed-button="node test_node test_media_entity_embed" data-entity-type="node media"> <ol> <ul> <li>',
+      ],
+    ]);
+    $filter_format->save();
+    $this->assertSame([], array_map(
+      function (ConstraintViolation $v) {
+        return (string) $v->getMessage();
+      },
+      iterator_to_array(CKEditor5::validatePair(
+        Editor::load('test_format'),
+        FilterFormat::load('test_format')
+      ))
+    ));
+
+    // Wrap the embedded entity with a list item.
+    $original_value = $this->host->body->value;
+    $this->host->body->value = '<ol><li>' . $original_value . '</li></ol>';
+    $this->host->save();
+    $this->drupalGet($this->host->toUrl('edit-form'));
+
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-widget.drupal-entity'));
+
+    // Confirm the embedded entity is wrapped by the list item on the editing
+    // view, not moved after the list.
+    $assert_session->elementExists('css', 'li > .drupal-entity');
+    $assert_session->elementNotExists('css', 'ol + .drupal-entity');
+
+    // Confirm the same in the editor's data.
+    $editor_dom = new \DOMXPath($this->getEditorDataAsDom());
+    $this->assertNotEmpty($editor_dom->query('//li/drupal-entity'));
+    $this->assertEmpty($editor_dom->query('//ol/following-sibling::drupal-entity'));
+  }
+
+  /**
+   * Tests that embed button labels are displayed as text, not HTML.
+   */
+  public function testButtonLabelIsText(): void {
+    $label = 'Tom & Jerry <img src="x" onerror="window.entityEmbedXss = true">';
+    EmbedButton::load('test_node')->set('label', $label)->save();
+    $editor = Editor::load('test_format');
+    $settings = $editor->getSettings();
+    $settings['toolbar']['items'][] = 'test_node';
+    $editor->setSettings($settings)->save();
+
+    $this->drupalGet($this->host->toUrl('edit-form'));
+    $this->waitForEditor();
+    $assert_session = $this->assertSession();
+
+    // The button's label and tooltip show the label as text.
+    $button = $this->getEditorButton($label);
+    $this->assertSame($label, $button->getAttribute('data-cke-tooltip-text'));
+    $button->mouseOver();
+    $tooltip = $assert_session->waitForElementVisible('css', '.ck-tooltip .ck-tooltip__text');
+    $this->assertNotEmpty($tooltip);
+    $this->assertSame($label, $tooltip->getText());
+
+    // No element was created from the label, and its script didn't run.
+    $assert_session->elementNotExists('css', 'img[src="x"]');
+    $this->assertNull($this->getSession()->evaluateScript('window.entityEmbedXss ?? null'));
+  }
+
+  /**
+   * Ensures arbitrary attributes can be added on links wrapping entity via GHS.
+   */
+  #[DataProvider('providerLinkability')]
   public function testLinkedEntityArbitraryHtml(bool $unrestricted): void {
     $assert_session = $this->assertSession();
 
@@ -272,9 +370,9 @@ class CKEditor5IntegrationTest extends WebDriverTestBase {
         ->setFilterConfig('filter_html', ['status' => FALSE]);
     }
     else {
-      // Allow the data-foo attribute in <a> via GHS. Also, add support for div's
-      // with data-foo attribute to ensure that linked drupal-entity elements can
-      // be wrapped with <div>.
+      // Allow the data-foo attribute in <a> via GHS. Also, add support for
+      // div's with data-foo attribute to ensure that linked drupal-entity
+      // elements can be wrapped with <div>.
       $settings['plugins']['ckeditor5_sourceEditing']['allowed_tags'] = ['<a data-foo>', '<div data-bar>'];
       $editor->setSettings($settings);
       $filter_format->setFilterConfig('filter_html', [
@@ -374,6 +472,7 @@ class CKEditor5IntegrationTest extends WebDriverTestBase {
     $this->adminUser->save();
 
     // Configure a different default and admin theme, like on most Drupal sites.
+    $this->container->get('theme_installer')->install(['stable9']);
     $this->config('system.theme')
       ->set('default', 'stable9')
       ->set('admin', 'starterkit_theme')
@@ -417,9 +516,8 @@ class CKEditor5IntegrationTest extends WebDriverTestBase {
    * "dataDowncast" results. These are CKEditor 5 concepts.
    *
    * @see https://ckeditor.com/docs/ckeditor5/latest/framework/guides/architecture/editing-engine.html#conversion
-   *
-   * @dataProvider providerLinkability
    */
+  #[DataProvider('providerLinkability')]
   public function testLinkability(bool $unrestricted) {
     // Disable filter_html.
     if ($unrestricted) {
@@ -434,10 +532,10 @@ class CKEditor5IntegrationTest extends WebDriverTestBase {
     $this->waitForEditor();
     $assert_session = $this->assertSession();
 
-    // Initial state: the Drupal Entity CKEditor Widget is not selected.
+    // Locate the Drupal Entity widget. CKEditor may initially select it when
+    // it is the only content in the editor.
     $drupalentity = $assert_session->waitForElementVisible('css', '.ck-content .ck-widget.drupal-entity');
     $this->assertNotEmpty($drupalentity);
-    $this->assertFalse($drupalentity->hasClass('.ck-widget_selected'));
 
     // Assert the "editingDowncast" HTML before making changes.
     $assert_session->elementExists('css', '.ck-content .ck-widget.drupal-entity > [data-drupal-entity-preview]');
@@ -467,10 +565,11 @@ class CKEditor5IntegrationTest extends WebDriverTestBase {
 
     // Assert structure of link form balloon.
     $balloon = $this->assertVisibleBalloon('.ck-link-form');
-    $url_input = $balloon->find('css', '.ck-labeled-field-view__input-wrapper .ck-input-text');
-    // Fill in link form balloon's <input> and hit "Save".
+    $url_input = $balloon->find('css', '.ck-input-text[inputmode="url"]');
+    // Fill the URL input, not the separate displayed-text input. The submit
+    // button label varies between inserting and editing a link.
     $url_input->setValue('http://linking-embedded-entity.com');
-    $balloon->pressButton('Save');
+    $balloon->find('css', 'button[type="submit"]')->click();
 
     // Assert the "editingDowncast" HTML after making changes. Assert the link
     // exists, then assert the link exists. Then assert the expected DOM
@@ -521,6 +620,35 @@ class CKEditor5IntegrationTest extends WebDriverTestBase {
     $this->assertNotEmpty($xpath->query('//a[@href="http://linking-embedded-entity.com"]'));
     $this->assertNotEmpty($xpath->query('//a[@href="http://linking-embedded-entity.com"]/drupal-entity'));
 
+    // Reopen an existing link. This exercises EntityEmbedLinkUI's call to
+    // LinkUI::_addToolbarView(), which replaced _addActionsView().
+    $this->assertNotEmpty($drupalentity = $assert_session->waitForElementVisible('css', '.ck-content .ck-widget.drupal-entity'));
+    $this->assertNotEmpty($assert_session->waitForElement('css', '.ck-content .ck-widget.drupal-entity [data-drupal-entity-preview="ready"]'));
+    $drupalentity->click();
+    $this->assertVisibleBalloon('.ck-toolbar[aria-label="Entity Embed toolbar"]');
+    $this->getBalloonButton('Link entity embed')->click();
+    $this->assertVisibleBalloon('.ck-link-toolbar');
+    $this->getBalloonButton('Edit link')->click();
+    $balloon = $this->assertVisibleBalloon('.ck-link-form');
+    $balloon->find('css', '.ck-input-text[inputmode="url"]')->setValue('http://linking-embedded-entity.com/updated');
+    $balloon->find('css', 'button[type="submit"]')->click();
+
+    // Editing a link must retain its embedded entity and caption.
+    $xpath = new \DOMXPath($this->getEditorDataAsDom());
+    $this->assertCount(1, $xpath->query('//drupal-entity'));
+    $this->assertNotEmpty($xpath->query('//a[@href="http://linking-embedded-entity.com/updated"]/drupal-entity[@data-caption="Surrealism is a favorite pastime of Belgians."]'));
+    $this->assertEmpty($xpath->query('//a[@href="http://linking-embedded-entity.com"]'));
+    $page->pressButton('Save');
+    $assert_session->elementExists('css', 'a[href="http://linking-embedded-entity.com/updated"]');
+
+    // Reload before unlinking to cover the updated link's upcast as well.
+    $this->drupalGet($this->host->toUrl('edit-form'));
+    $this->waitForEditor();
+    $this->assertNotEmpty($drupalentity = $assert_session->waitForElementVisible('css', '.ck-content .ck-widget.drupal-entity'));
+    $this->assertNotEmpty($assert_session->waitForElement('css', '.ck-content .ck-widget.drupal-entity [data-drupal-entity-preview="ready"]'));
+    $xpath = new \DOMXPath($this->getEditorDataAsDom());
+    $this->assertNotEmpty($xpath->query('//a[@href="http://linking-embedded-entity.com/updated"]/drupal-entity'));
+
     // Tests unlinking.
     $drupalentity->click();
     $this->assertEditorButtonEnabled('Link');
@@ -530,7 +658,7 @@ class CKEditor5IntegrationTest extends WebDriverTestBase {
     $link_embed_button = $this->getBalloonButton('Link entity embed');
     $this->assertSame('true', $link_embed_button->getAttribute('aria-pressed'));
     $link_embed_button->click();
-    // Assert structure of link actions balloon.
+    // Assert the linked entity uses the new link toolbar.
     $this->getBalloonButton('Edit link');
     $unlink_image_button = $this->getBalloonButton('Unlink');
     // Click the "Unlink" button.
@@ -554,6 +682,9 @@ class CKEditor5IntegrationTest extends WebDriverTestBase {
     $this->assertEmpty($xpath->query('//a'));
   }
 
+  /**
+   * Data provider for testLinkability().
+   */
   public static function providerLinkability(): array {
     return [
       'restricted' => [FALSE],
@@ -563,9 +694,8 @@ class CKEditor5IntegrationTest extends WebDriverTestBase {
 
   /**
    * Ensure that manual link decorators work with linkable entity embeds.
-   *
-   * @dataProvider providerLinkability
    */
+  #[DataProvider('providerLinkability')]
   public function testLinkManualDecorator(bool $unrestricted) {
     \Drupal::service('module_installer')->install(['ckeditor5_manual_decorator_test']);
     $this->resetAll();
@@ -588,19 +718,25 @@ class CKEditor5IntegrationTest extends WebDriverTestBase {
     $page = $this->getSession()->getPage();
 
     $this->assertNotEmpty($drupalentity = $assert_session->waitForElementVisible('css', '.ck-content .ck-widget.drupal-entity'));
+    $this->assertNotEmpty($assert_session->waitForElement('css', '.ck-content .ck-widget.drupal-entity [data-drupal-entity-preview="ready"]'));
     $drupalentity->click();
 
     $this->assertVisibleBalloon('.ck-toolbar[aria-label="Entity Embed toolbar"]');
     $this->getBalloonButton('Link entity embed')->click();
 
     $balloon = $this->assertVisibleBalloon('.ck-link-form');
-    $url_input = $balloon->find('css', '.ck-labeled-field-view__input-wrapper .ck-input-text');
+    $url_input = $balloon->find('css', '.ck-input-text[inputmode="url"]');
     $url_input->setValue('http://linking-embedded-entity.com');
-    $this->getBalloonButton($decorator)->click();
-    $balloon->pressButton('Save');
+    $balloon->find('css', 'button[type="submit"]')->click();
 
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.drupal-entity > a'));
-    $this->assertVisibleBalloon('.ck-link-actions');
+    $this->assertVisibleBalloon('.ck-link-toolbar');
+    // Manual decorators now live in the linked entity's properties panel.
+    $this->getBalloonButton('Link properties')->click();
+    $properties = $this->assertVisibleBalloon('.ck-link-properties');
+    $this->getBalloonButton($decorator)->click();
+    $properties->find('css', '.ck-button-back')->click();
+    $this->assertVisibleBalloon('.ck-link-toolbar');
 
     $xpath = new \DOMXPath($this->getEditorDataAsDom());
     $this->assertNotEmpty($xpath->query("//a[@href='http://linking-embedded-entity.com']$decorator_attributes"));
@@ -609,7 +745,9 @@ class CKEditor5IntegrationTest extends WebDriverTestBase {
     // Ensure that manual decorators upcast correctly.
     $page->pressButton('Save');
     $this->drupalGet($this->host->toUrl('edit-form'));
+    $this->waitForEditor();
     $this->assertNotEmpty($drupalentity = $assert_session->waitForElementVisible('css', '.ck-content .ck-widget.drupal-entity'));
+    $this->assertNotEmpty($assert_session->waitForElement('css', '.ck-content .ck-widget.drupal-entity [data-drupal-entity-preview="ready"]'));
     $xpath = new \DOMXPath($this->getEditorDataAsDom());
     $this->assertNotEmpty($xpath->query("//a[@href='http://linking-embedded-entity.com']$decorator_attributes"));
     $this->assertNotEmpty($xpath->query("//a[@href='http://linking-embedded-entity.com']$decorator_attributes/drupal-entity"));
@@ -618,7 +756,7 @@ class CKEditor5IntegrationTest extends WebDriverTestBase {
     $drupalentity->click();
     $this->assertVisibleBalloon('.ck-toolbar[aria-label="Entity Embed toolbar"]');
     $this->getBalloonButton('Link entity embed')->click();
-    $this->assertVisibleBalloon('.ck-link-actions');
+    $this->assertVisibleBalloon('.ck-link-toolbar');
     $this->getBalloonButton('Unlink')->click();
 
     $this->assertTrue($assert_session->waitForElementRemoved('css', '.drupal-entity > a'));
@@ -634,9 +772,8 @@ class CKEditor5IntegrationTest extends WebDriverTestBase {
    *   Whether to test with entity_embed filter enabled on the text format.
    * @param bool $can_use_format
    *   Whether the logged in user is allowed to use the text format.
-   *
-   * @dataProvider previewAccessProvider
    */
+  #[DataProvider('previewAccessProvider')]
   public function testEmbedPreviewAccess(bool $entity_embed_enabled, bool $can_use_format): void {
     // Reconfigure the host entity's text format to suit our needs.
     /** @var \Drupal\filter\FilterFormatInterface $format */
@@ -738,6 +875,7 @@ class CKEditor5IntegrationTest extends WebDriverTestBase {
     $this->drupalGet($this->host->toUrl('edit-form'));
     $this->waitForEditor();
     $this->assertNotEmpty($drupalentity = $assert_session->waitForElementVisible('css', '.ck-content .ck-widget.drupal-entity'));
+    $this->assertNotEmpty($assert_session->waitForElement('css', '.ck-content .ck-widget.drupal-entity [data-drupal-entity-preview="ready"]'));
     $drupalentity->click();
     $this->assertVisibleBalloon('.ck-toolbar[aria-label="Entity Embed toolbar"]');
     $this->getBalloonButton('Edit the embedded entity (opens in new tab)')->click();

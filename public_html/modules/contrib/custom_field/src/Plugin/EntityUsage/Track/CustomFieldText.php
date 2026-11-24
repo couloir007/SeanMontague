@@ -32,7 +32,7 @@ class CustomFieldText extends TextFieldEmbedBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->trackManager = $container->get('plugin.manager.entity_usage.track');
 

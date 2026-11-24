@@ -219,23 +219,6 @@ custom_field.field.*:
     duration_element:
       type: string
       label: 'Duration element'
-    # Select or Other widgets.
-    other_field_label:
-      type: label
-      label: 'Other field label'
-    other_placeholder:
-      type: label
-      label: 'Other placeholder'
-    other_option:
-      type: label
-      label: 'Other option'
-    select_element_type:
-      type: string
-      label: 'Element type'
-      constraints:
-        Choice:
-          - list
-          - buttons
 
 custom_field_formatter_base:
   type: mapping
@@ -674,10 +657,10 @@ custom_field.field_settings.*:
       label: 'Empty text'
     # integer|float|decimal subfields.
     min:
-      type: float
+      type: integer
       label: 'Minimum'
     max:
-      type: float
+      type: integer
       label: 'Maximum'
     # telephone subfields.
     pattern:

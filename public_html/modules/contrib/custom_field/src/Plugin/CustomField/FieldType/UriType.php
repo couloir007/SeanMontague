@@ -127,7 +127,7 @@ class UriType extends CustomFieldTypeBase implements LinkTypeInterface {
    */
   public static function generateSampleValue(CustomFieldTypeInterface $field, string $target_entity_type): array {
     $random = new Random();
-    $link_type = $field->getFieldSetting('link_type');
+    $link_type = $field->getFieldSetting('link_type') ?? NULL;
     if ($link_type & self::LINK_EXTERNAL) {
       $tlds = ['com', 'net', 'gov', 'org', 'edu', 'biz', 'info'];
       $domain_length = mt_rand(7, 15);

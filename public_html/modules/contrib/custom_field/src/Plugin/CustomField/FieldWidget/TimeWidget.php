@@ -32,15 +32,18 @@ class TimeWidget extends CustomFieldWidgetBase {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
     $field_settings = $field->getFieldSettings();
 
+    $item = $items[$delta];
+    $time = $item->{$field->getName()} ?? NULL;
+
     // Determine if we're showing seconds in the widget.
     $show_seconds = (bool) $field_settings['seconds_enabled'];
+    $additional = [
+      '#type' => 'time_cf',
+      '#default_value' => Time::createFromTimestamp($time)?->formatForWidget($show_seconds),
+    ];
 
     // We need this to be a correct Time also.
     $element['#default_value'] = Time::createFromTimestamp($element['#default_value'])?->formatForWidget($show_seconds);
-
-    $additional = [
-      '#type' => 'time_cf',
-    ];
 
     // Add the step attribute if we're showing seconds in the widget.
     if ($show_seconds) {

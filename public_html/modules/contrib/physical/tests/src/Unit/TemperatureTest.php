@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\physical\Unit;
 
+use PHPUnit\Framework\Attributes\Group;
 use Drupal\Tests\UnitTestCase;
 use Drupal\physical\Temperature;
 
@@ -11,6 +12,7 @@ use Drupal\physical\Temperature;
  * @coversDefaultClass \Drupal\physical\Temperature
  * @group physical
  */
+#[Group('physical')]
 class TemperatureTest extends UnitTestCase {
 
   /**

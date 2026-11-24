@@ -2,14 +2,20 @@
 
 namespace Drupal\Tests\entity_embed\Kernel;
 
+use Drupal\entity_embed\Plugin\Filter\EntityEmbedFilter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore portugues
 /**
  * Tests that entity embeds are translated based on host and `data-langcode`.
- *
- * @coversDefaultClass \Drupal\entity_embed\Plugin\Filter\EntityEmbedFilter
- * @group entity_embed
  */
+#[Group('entity_embed')]
+#[RunTestsInSeparateProcesses]
+#[CoversClass(EntityEmbedFilter::class)]
 class EntityEmbedFilterTranslationTest extends EntityEmbedFilterTestBase {
 
   /**
@@ -38,9 +44,8 @@ class EntityEmbedFilterTranslationTest extends EntityEmbedFilterTestBase {
 
   /**
    * Tests that the expected embedded entity translation is selected.
-   *
-   * @dataProvider providerTranslationSituations
    */
+  #[DataProvider('providerTranslationSituations')]
   public function testTranslationSelection($text_langcode, array $additional_attributes, $expected_title_langcode) {
     $text = $this->createEmbedCode([
       'data-entity-type' => 'node',

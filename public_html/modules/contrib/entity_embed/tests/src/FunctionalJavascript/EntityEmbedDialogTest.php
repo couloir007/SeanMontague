@@ -5,13 +5,14 @@ namespace Drupal\Tests\entity_embed\FunctionalJavascript;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entity_embed dialog controller and route.
- *
- * @group entity_embed
- * @requires function Drupal\FunctionalJavascriptTests\WebDriverTestBase::assertSession
  */
+#[Group('entity_embed')]
+#[RunTestsInSeparateProcesses]
 class EntityEmbedDialogTest extends WebDriverTestBase {
 
   /**
@@ -120,8 +121,6 @@ class EntityEmbedDialogTest extends WebDriverTestBase {
       'entity_reference:entity_reference_entity_id',
       'view_mode:node.full',
       'view_mode:node.rss',
-      'view_mode:node.search_index',
-      'view_mode:node.search_result',
       'view_mode:node.teaser',
     ];
     foreach ($plugins as $plugin) {

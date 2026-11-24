@@ -1,5 +1,4 @@
 drupal.entity_embed.dialog:
-  version: VERSION
   js:
     js/entity_embed.dialog.js: {}
   css:
@@ -11,7 +10,6 @@ drupal.entity_embed.dialog:
     - core/once
 
 caption:
-  version: VERSION
   css:
     component:
       css/entity_embed.filter.caption.css: {}

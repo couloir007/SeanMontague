@@ -74,10 +74,7 @@
 
     // Auto populate the title field if configured to do so for this link field.
     if (ui.item.label) {
-      // The title field for the link field should have the same drupal selector
-      // except instead of ending in -uri, it will end in -title.
-      const titleSelector = $getWidgetSelector(event.target) + '-title';
-      const $linkTitle = $(`[data-linkit-widget-title-autofill-enabled][data-drupal-selector="${titleSelector}"]`, $context);
+      const $linkTitle = $getTitleInput($context, event.target).filter('[data-linkit-widget-title-autofill-enabled]');
       // Don't overwrite an existing label unless we already replaced it
       // before.
       if ($linkTitle.length && (!$linkTitle.val() || $linkTitle.hasClass('link-widget-title--auto'))) {
@@ -124,20 +121,45 @@
   }
 
   /**
-   * Helper function for getting the base selector for an autocomplete element.
+   * Helper function for getting the name of an input related to an element.
+   *
+   * Related inputs are siblings of the autocomplete element in the form
+   * structure, so "field_link[0][uri]" has "field_link[0][title]" and
+   * "field_link[0][attributes][href]", and "button_link" has "title" and
+   * "attributes[href]". When the autocomplete element is the "href" attribute
+   * itself, as in link dialogs, "attributes[href]" has "title" and
+   * "attributes[data-entity-type]".
    *
    * @param {HTMLElement} element
    *   The URI autocomplete input element.
+   * @param {string[]} keys
+   *   The keys of the related input, relative to the element's parent.
    *
-   * @returns string
-   *   The base widget selector.
+   * @returns {string}
+   *   The name of the related input.
    */
-  function $getWidgetSelector(element) {
-    const linkSelector = element.getAttribute('data-drupal-selector');
-    if (!linkSelector || !linkSelector.endsWith('-uri')) {
-      throw 'Target element must have a data-drupal-selector attribute ending in "-uri". ' + element.outerHTML;
+  function getRelatedInputName(element, keys) {
+    const parents = (element.getAttribute('name') || '').replace(/]/g, '').split('[');
+    if (parents.pop() === 'href' && parents[parents.length - 1] === 'attributes') {
+      parents.pop();
     }
-    return linkSelector.slice(0, -4);
+    parents.push(...keys);
+    return parents.shift() + parents.map(part => `[${part}]`).join('');
+  }
+
+  /**
+   * Helper function for getting the title input element.
+   *
+   * @param {jQuery} $context
+   *   The element search context.
+   * @param {HTMLElement} element
+   *   The URI autocomplete input element.
+   *
+   * @returns {jQuery}
+   *   The selected element.
+   */
+  function $getTitleInput($context, element) {
+    return $context.find(`input[name="${getRelatedInputName(element, ['title'])}"]`);
   }
 
   /**
@@ -154,8 +176,7 @@
    *   The selected element.
    */
   function $getAttributesInput(name, $context, element) {
-    const selector = $getWidgetSelector(element);
-    return $context.find(`input[data-drupal-selector="${selector}-attributes-${name}"]`);
+    return $context.find(`input[name="${getRelatedInputName(element, ['attributes', name])}"]`);
   }
 
   /**
@@ -321,8 +342,7 @@
             autocomplete.options.isComposing = false;
           });
 
-          const titleSelector = $getWidgetSelector(this) + '-title';
-          $(`input[data-drupal-selector="${titleSelector}"]`)
+          $getTitleInput($(this.form || document), this)
             .each(function() {
               // Set automatic title flag if title is the same as uri text.
               var $title  = $(this);

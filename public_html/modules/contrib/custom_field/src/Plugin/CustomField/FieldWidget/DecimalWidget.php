@@ -30,14 +30,6 @@ class DecimalWidget extends NumberWidgetBase {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
     $element['#step'] = pow(0.1, $field->getScale());
 
-    $field_settings = $field->getFieldSettings();
-    $min_setting = $field_settings['min'] ?? NULL;
-    // Match IntegerWidget: force non-negative input when the column is unsigned
-    // and field min is unset or negative.
-    if ($field->isUnsigned() && (!is_numeric($min_setting) || $min_setting < 0)) {
-      $element['#min'] = 0;
-    }
-
     return $element;
   }
 

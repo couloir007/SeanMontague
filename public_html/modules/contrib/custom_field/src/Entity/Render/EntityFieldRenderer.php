@@ -47,11 +47,11 @@ final class EntityFieldRenderer extends RendererBase {
    */
   public function __construct(
     ViewExecutable $view,
-    protected ?string $relationship,
+    private readonly ?string $relationship,
     LanguageManagerInterface $language_manager,
     EntityTypeInterface $entity_type,
-    protected EntityTypeManagerInterface $entityTypeManager,
-    protected EntityRepositoryInterface $entityRepository,
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly EntityRepositoryInterface $entityRepository,
   ) {
     parent::__construct($view, $language_manager, $entity_type);
 

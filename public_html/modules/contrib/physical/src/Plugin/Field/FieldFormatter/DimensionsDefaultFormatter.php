@@ -2,21 +2,20 @@
 
 namespace Drupal\physical\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\physical\Length;
 use Drupal\physical\LengthUnit;
 
 /**
  * Plugin implementation of the 'physical_dimensions_default' formatter.
- *
- * @FieldFormatter(
- *   id = "physical_dimensions_default",
- *   label = @Translation("Default"),
- *   field_types = {
- *     "physical_dimensions"
- *   }
- * )
  */
+#[FieldFormatter(
+  id: "physical_dimensions_default",
+  label: new TranslatableMarkup("Default"),
+  field_types: ["physical_dimensions"],
+)]
 class DimensionsDefaultFormatter extends PhysicalFormatterBase {
 
   /**

@@ -1,12 +1,13 @@
 <?php
 
-use Drupal\file\FileInterface;
-use Drupal\node\NodeInterface;
-use Drupal\Core\Entity\EntityInterface;
 /**
  * @file
  * Hooks provided by the Entity Embed module.
  */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\file\FileInterface;
+use Drupal\node\NodeInterface;
 
 /**
  * @addtogroup hooks

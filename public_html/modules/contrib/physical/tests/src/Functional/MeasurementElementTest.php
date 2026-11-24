@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\physical\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 
@@ -10,6 +12,8 @@ use Drupal\language\Entity\ConfigurableLanguage;
  *
  * @group physical
  */
+#[Group('physical')]
+#[RunTestsInSeparateProcesses]
 class MeasurementElementTest extends BrowserTestBase {
 
   /**

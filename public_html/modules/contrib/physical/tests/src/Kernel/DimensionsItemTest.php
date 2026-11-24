@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\physical\Kernel;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
@@ -15,6 +17,8 @@ use SebastianBergmann\Comparator\Factory as PhpUnitComparatorFactory;
  *
  * @group physical
  */
+#[Group('physical')]
+#[RunTestsInSeparateProcesses]
 class DimensionsItemTest extends EntityKernelTestBase {
 
   /**

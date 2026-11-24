@@ -3,19 +3,21 @@
 namespace Drupal\entity_embed\Plugin\entity_embed\EntityEmbedDisplay;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\entity_embed\Attribute\EntityEmbedDisplay;
+use Drupal\entity_embed\Plugin\Derivative\ViewModeDeriver;
 
 /**
  * Entity Embed Display reusing entity reference field formatters.
  *
  * @see \Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayInterface
- *
- * @EntityEmbedDisplay(
- *   id = "view_mode",
- *   label = @Translation("View Mode"),
- *   deriver = "Drupal\entity_embed\Plugin\Derivative\ViewModeDeriver",
- *   field_type = "entity_reference"
- * )
  */
+#[EntityEmbedDisplay(
+  id: 'view_mode',
+  label: new TranslatableMarkup('View Mode'),
+  field_type: 'entity_reference',
+  deriver: ViewModeDeriver::class,
+)]
 class ViewModeFieldFormatter extends EntityReferenceFieldFormatter {
 
   /**

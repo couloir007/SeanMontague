@@ -53,6 +53,13 @@ class FlippedTableFormatter extends BaseFormatter {
       '#title' => $this->t('Hide rows with empty columns'),
       '#default_value' => $this->getSetting('hide_empty'),
     ];
+    foreach ($this->getCustomFieldItems() as $name => $custom_item) {
+      // Remove non-applicable settings.
+      $label_options = $form['fields'][$name]['content']['formatter_settings']['label_display']['#options'];
+      unset($label_options['inline']);
+      $label_options['above'] = $this->t('Default');
+      $form['fields'][$name]['content']['formatter_settings']['label_display']['#options'] = $label_options;
+    }
 
     return $form;
   }
@@ -63,7 +70,7 @@ class FlippedTableFormatter extends BaseFormatter {
   public function processFields(array $element, FormStateInterface $form_state, array $form): array {
     $element = parent::processFields($element, $form_state, $form);
     foreach ($this->getCustomFieldItems() as $name => $custom_item) {
-      // Remove non-applicable settings for flipped table row headers.
+      // Remove non-applicable settings.
       $label_options = $element[$name]['content']['formatter_settings']['label_display']['#options'];
       unset($label_options['inline']);
       $label_options['above'] = $this->t('Default');
@@ -84,9 +91,6 @@ class FlippedTableFormatter extends BaseFormatter {
       $settings = $this->getSetting('fields') ?? [];
       $custom_items = $this->sortFields($settings);
       $hide_empty = $this->getSetting('hide_empty') ?? FALSE;
-      $entity = $items->getEntity();
-      $entity_type = $entity->getEntityTypeId();
-      $bundle = $entity->bundle();
 
       // Initialize the table rows array.
       $rows = [];
@@ -147,14 +151,12 @@ class FlippedTableFormatter extends BaseFormatter {
               '#field_name' => $name,
               '#name' => $value['name'],
               '#value' => $value['value'],
-              '#raw_value' => $value['raw_value'],
               '#label' => $value['label'],
               '#label_display' => 'hidden',
               '#type' => $value['type'],
               '#wrappers' => $value['wrappers'],
-              '#entity_type' => $entity_type,
-              '#bundle' => $bundle,
-              '#language' => $langcode,
+              '#entity_type' => $value['entity_type'],
+              '#lang_code' => $langcode,
             ];
           }
           $row['data'][] = ['data' => $output ?: ''];

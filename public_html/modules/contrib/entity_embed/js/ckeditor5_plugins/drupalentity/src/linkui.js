@@ -1,9 +1,9 @@
-/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable import/no-extraneous-dependencies, import/no-unresolved */
 // cSpell:words linkui
-import { Plugin, icons } from 'ckeditor5/src/core';
+import { Plugin } from 'ckeditor5/src/core';
+import { IconLink } from 'ckeditor5/src/icons';
 import { LINK_KEYSTROKE } from '@ckeditor/ckeditor5-link/src/utils';
 import { ButtonView } from 'ckeditor5/src/ui';
-import linkIcon from '@ckeditor/ckeditor5-link/theme/icons/link.svg';
 
 /**
  * The link entity embed UI plugin.
@@ -47,7 +47,7 @@ export default class EntityEmbedLinkUI extends Plugin {
           evt.stop();
         }
       },
-      { priority: 'high' }
+      { priority: 'high' },
     );
 
     this._createToolbarLinkEntityEmbedButton();
@@ -72,7 +72,7 @@ export default class EntityEmbedLinkUI extends Plugin {
       button.set({
         isEnabled: true,
         label: Drupal.t('Link entity embed'),
-        icon: linkIcon,
+        icon: IconLink,
         keystroke: LINK_KEYSTROKE,
         tooltip: true,
         isToggleable: true,
@@ -88,7 +88,7 @@ export default class EntityEmbedLinkUI extends Plugin {
         if (
           this._isSelectedLinkedEntityEmbed(editor.model.document.selection)
         ) {
-          plugin._addActionsView();
+          plugin._addToolbarView();
         } else {
           plugin._showUI(true);
         }

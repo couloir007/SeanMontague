@@ -2,20 +2,19 @@
 
 namespace Drupal\physical\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\physical\MeasurementType;
 
 /**
  * Plugin implementation of the 'physical_measurement_default' formatter.
- *
- * @FieldFormatter(
- *   id = "physical_measurement_default",
- *   label = @Translation("Default"),
- *   field_types = {
- *     "physical_measurement"
- *   }
- * )
  */
+#[FieldFormatter(
+  id: "physical_measurement_default",
+  label: new TranslatableMarkup("Default"),
+  field_types: ["physical_measurement"],
+)]
 class MeasurementDefaultFormatter extends PhysicalFormatterBase {
 
   /**

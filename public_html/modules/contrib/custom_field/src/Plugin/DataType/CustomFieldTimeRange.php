@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\custom_field\Plugin\DataType;
 
+use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\Attribute\DataType;
+use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\custom_field\Plugin\Field\FieldType\CustomItem;
 use Drupal\custom_field\Time;
 use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
@@ -21,6 +23,37 @@ use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 class CustomFieldTimeRange extends CustomFieldDataTypeBase {
 
   /**
+   * The end time value.
+   *
+   * @var int|null
+   */
+  protected ?int $endTime;
+
+  /**
+   * The duration in seconds.
+   *
+   * @var int|null
+   */
+  protected ?int $duration;
+
+  /**
+   * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+   */
+  public function __construct(DataDefinitionInterface $definition, $name = NULL, ?FieldItemInterface $parent = NULL) {
+    parent::__construct($definition, $name, $parent);
+    if ($parent) {
+      $end_value = $parent->get($this->getName() . CustomItem::SEPARATOR . 'end')
+        ->getValue();
+      $duration = $parent->get($this->getName() . CustomItem::SEPARATOR . 'duration')
+        ->getValue();
+      $this->endTime = $end_value ? (int) $end_value : NULL;
+      $this->duration = $duration ? (int) $duration : NULL;
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function setValue($value, $notify = TRUE): void {
@@ -30,14 +63,14 @@ class CustomFieldTimeRange extends CustomFieldDataTypeBase {
     if (isset($value) && !is_array($value)) {
       $value = [
         'value' => $value,
-        'end' => NULL,
+        'end_value' => NULL,
       ];
     }
 
     $this->value = $value['value'] ?? NULL;
-    $end_time = $value['end'] ?? NULL;
-    if (!Time::isEmpty($this->value) && !Time::isEmpty($end_time)) {
-      $parent->set($this->getName() . CustomItem::SEPARATOR . 'end', $end_time);
+    $this->endTime = $value['end_value'] ?? NULL;
+    if (!Time::isEmpty($this->value) && !Time::isEmpty($this->endTime)) {
+      $parent->set($this->getName() . CustomItem::SEPARATOR . 'end', $this->endTime);
     }
   }
 
@@ -46,12 +79,9 @@ class CustomFieldTimeRange extends CustomFieldDataTypeBase {
    *
    * @return int|null
    *   The duration value in seconds.
-   *
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   public function getDuration(): ?int {
-    $duration = $this->getParent()->get($this->getName() . CustomItem::SEPARATOR . 'duration')->getValue();
-    return $duration ? (int) $duration : NULL;
+    return $this->duration;
   }
 
   /**

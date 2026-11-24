@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\physical\Unit;
 
+use PHPUnit\Framework\Attributes\Group;
 use Drupal\Tests\UnitTestCase;
 use Drupal\physical\Area;
 
@@ -11,6 +12,7 @@ use Drupal\physical\Area;
  * @coversDefaultClass \Drupal\physical\Area
  * @group physical
  */
+#[Group('physical')]
 class AreaTest extends UnitTestCase {
 
   /**

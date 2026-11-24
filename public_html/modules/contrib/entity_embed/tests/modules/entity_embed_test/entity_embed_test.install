@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ * Install hooks for the Entity Embed test module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+
+/**
+ * Implements hook_install().
+ */
+function entity_embed_test_install(bool $is_syncing): void {
+  // Reuse the body storage that core's testing profile provides when there is
+  // one: it's text_with_summary before Drupal 11.4 and text_long since, so
+  // the field, widget and formatter follow whichever type it has.
+  $storage = FieldStorageConfig::loadByName('node', 'body');
+  if (!$storage) {
+    $storage = FieldStorageConfig::create([
+      'field_name' => 'body',
+      'entity_type' => 'node',
+      'type' => 'text_long',
+      'persist_with_no_fields' => TRUE,
+    ]);
+    $storage->save();
+  }
+  FieldConfig::create([
+    'field_storage' => $storage,
+    'bundle' => 'article',
+    'label' => 'Body',
+  ])->save();
+
+  /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $repository */
+  $repository = \Drupal::service('entity_display.repository');
+  $repository->getFormDisplay('node', 'article')
+    ->setComponent('body', ['weight' => 2])
+    ->save();
+  $repository->getViewDisplay('node', 'article')
+    ->setComponent('body', ['label' => 'hidden', 'weight' => 101])
+    ->save();
+}

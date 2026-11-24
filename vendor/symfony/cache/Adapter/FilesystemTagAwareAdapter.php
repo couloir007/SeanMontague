@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
-use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\Marshaller\TagAwareMarshaller;
 use Symfony\Component\Cache\PruneableInterface;
@@ -171,22 +170,14 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
 
     protected function doDeleteYieldTags(array $ids): iterable
     {
-        $failed = false;
-
         foreach ($ids as $id) {
             $file = $this->getFile($id);
-            if (!is_file($file)) {
-                continue;
-            }
-
-            if (!$h = @fopen($file, 'r')) {
-                $failed = true;
+            if (!is_file($file) || !$h = @fopen($file, 'r')) {
                 continue;
             }
 
             if (!@unlink($file)) {
                 fclose($h);
-                $failed = true;
                 continue;
             }
 
@@ -210,11 +201,6 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
             }
 
             fclose($h);
-        }
-
-        if ($failed) {
-            // Make deleteItems() retry deleting the items one by one
-            throw new CacheException('Failed to delete some keys.');
         }
     }
 

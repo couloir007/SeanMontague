@@ -2,21 +2,20 @@
 
 namespace Drupal\physical\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\physical\LengthUnit;
 
 /**
  * Plugin implementation of the 'physical_dimensions_default' widget.
- *
- * @FieldWidget(
- *   id = "physical_dimensions_default",
- *   label = @Translation("Default"),
- *   field_types = {
- *     "physical_dimensions"
- *   },
- * )
  */
+#[FieldWidget(
+  id: "physical_dimensions_default",
+  label: new TranslatableMarkup("Default"),
+  field_types: ["physical_dimensions"],
+)]
 class DimensionsDefaultWidget extends PhysicalWidgetBase {
 
   /**

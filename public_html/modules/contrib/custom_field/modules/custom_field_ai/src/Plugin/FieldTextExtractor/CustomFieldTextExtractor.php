@@ -111,7 +111,7 @@ class CustomFieldTextExtractor extends FieldExtractorBase implements ContainerFa
         foreach ($newValue[$delta] as $name => $value) {
           if (isset($custom_items[$name])) {
             // Trim result if the custom field has a length limit.
-            $max_length = $custom_items[$name]->getSetting('length');
+            $max_length = $custom_items[$name]->getSetting('length') ?? NULL;
             if ($max_length !== NULL && is_string($value)) {
               $newValue[$delta][$name] = mb_strimwidth($value, 0, $max_length, '...');
             }

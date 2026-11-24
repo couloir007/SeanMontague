@@ -261,7 +261,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
         } else {
             $directory = \dirname($this->file);
 
-            if (!is_dir($directory) && !@mkdir($directory, 0o777, true) && !is_dir($directory)) {
+            if (!is_dir($directory) && !@mkdir($directory, 0o777, true)) {
                 throw new InvalidArgumentException(\sprintf('Cache directory does not exist and cannot be created: "%s".', $directory));
             }
 

@@ -47,10 +47,11 @@ class EntityEmbed extends PluginBase implements CKEditor4To5UpgradePluginInterfa
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The Entity Type Manager service.
    */
-  public function __construct(array $configuration,
+  public function __construct(
+    array $configuration,
     string $plugin_id,
     array $plugin_definition,
-    EntityTypeManagerInterface $entity_type_manager
+    EntityTypeManagerInterface $entity_type_manager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityTypeManager = $entity_type_manager;
@@ -71,6 +72,7 @@ class EntityEmbed extends PluginBase implements CKEditor4To5UpgradePluginInterfa
   /**
    * {@inheritdoc}
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidFunctionName.ScopeNotCamelCaps -- Name from core's interface.
   public function mapCKEditor4ToolbarButtonToCKEditor5ToolbarItem(string $cke4_button, HTMLRestrictions $text_format_html_restrictions): ?array {
     $entity_embed_buttons = $this->entityTypeManager
       ->getStorage('embed_button')
@@ -90,6 +92,7 @@ class EntityEmbed extends PluginBase implements CKEditor4To5UpgradePluginInterfa
   /**
    * {@inheritdoc}
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidFunctionName.ScopeNotCamelCaps -- Name from core's interface.
   public function mapCKEditor4SettingsToCKEditor5Configuration(string $cke4_plugin_id, array $cke4_plugin_settings): ?array {
     throw new \OutOfBoundsException();
   }
@@ -97,6 +100,7 @@ class EntityEmbed extends PluginBase implements CKEditor4To5UpgradePluginInterfa
   /**
    * {@inheritdoc}
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidFunctionName.ScopeNotCamelCaps -- Name from core's interface.
   public function computeCKEditor5PluginSubsetConfiguration(string $cke5_plugin_id, FilterFormatInterface $text_format): ?array {
     throw new \OutOfBoundsException();
   }

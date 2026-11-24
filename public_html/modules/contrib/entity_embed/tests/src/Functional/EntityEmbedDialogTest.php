@@ -3,12 +3,14 @@
 namespace Drupal\Tests\entity_embed\Functional;
 
 use Drupal\editor\Entity\Editor;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entity_embed dialog controller and route.
- *
- * @group entity_embed
  */
+#[Group('entity_embed')]
+#[RunTestsInSeparateProcesses]
 class EntityEmbedDialogTest extends EntityEmbedTestBase {
 
   /**

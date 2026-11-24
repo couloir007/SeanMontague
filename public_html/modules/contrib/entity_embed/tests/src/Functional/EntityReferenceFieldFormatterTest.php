@@ -3,12 +3,14 @@
 namespace Drupal\Tests\entity_embed\Functional;
 
 use Drupal\Core\Form\FormState;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entity reference field formatters provided by entity_embed.
- *
- * @group entity_embed
  */
+#[Group('entity_embed')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceFieldFormatterTest extends EntityEmbedTestBase {
 
   /**
@@ -45,8 +47,6 @@ class EntityReferenceFieldFormatterTest extends EntityEmbedTestBase {
       'entity_reference:entity_reference_entity_id',
       'view_mode:node.full',
       'view_mode:node.rss',
-      'view_mode:node.search_index',
-      'view_mode:node.search_result',
       'view_mode:node.teaser',
     ]);
 

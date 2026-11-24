@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Drupal\Tests\custom_field\Functional\FieldFormatter;
 
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\custom_field\Time;
 use Drupal\file\Entity\File;
 use Drupal\Tests\TestFileCreationTrait;
@@ -26,12 +25,30 @@ final class CustomFormatterTest extends FormatterTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $modules = [
+    'custom_field_test',
+    'node',
+    'field_ui',
+  ];
+
+  /**
+   * The view display to use for testing.
+   *
+   * @var string
+   */
+  protected string $viewDisplay = 'node.custom_field_entity_test.default';
+
+  /**
+   * The display type to use for testing.
+   *
+   * @var string
+   */
   protected string $displayType = 'custom_formatter';
 
   /**
-   * {@inheritdoc}
+   * The default wrappers.
    *
-   * Uses an h3 label tag so subfield labels are visible in render assertions.
+   * @var array
    */
   protected array $defaultWrappers = [
     'field_wrapper_tag' => '',
@@ -47,16 +64,23 @@ final class CustomFormatterTest extends FormatterTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    // The default view display already uses custom_formatter; only normalize
-    // wrappers so subfield labels render consistently.
-    $this->applyDefaultWrappers();
+    $display = EntityViewDisplay::load($this->viewDisplay);
+    $component = $display->getComponent($this->fieldName);
+    $fields = $component['settings']['fields'];
+    foreach ($fields as $field_name => $field_settings) {
+      $component['settings']['fields'][$field_name]['wrappers'] = $this->defaultWrappers;
+    }
+    $display->setComponent($this->fieldName, $component)->save();
     $this->drupalLogin($this->adminUser);
   }
 
   /**
-   * Tests that all subfield types render correctly with the default formatter.
+   * Tests components.
    */
   public function testFieldsRender(): void {
+    $display = EntityViewDisplay::load($this->viewDisplay);
+    $component = $display->getComponent($this->fieldName);
+    $display->setComponent($this->fieldName, $component)->save();
     $session = $this->assertSession();
     $articleNode = $this->drupalCreateNode([
       'type' => 'article',
@@ -87,17 +111,62 @@ final class CustomFormatterTest extends FormatterTestBase {
     $test_image->setPermanent();
     $test_image->save();
 
-    $node1 = $this->createPopulatedNode([
-      'time' => Time::createFromHtml5Format('13:40:30')->getTimestamp(),
-      'time_range' => Time::createFromHtml5Format('11:40:30')->getTimestamp(),
-      'time_range__end' => Time::createFromHtml5Format('14:40:30')->getTimestamp(),
-      'image' => $test_image->id(),
-      'file' => $test_file->id(),
-      'entity_reference' => $articleNode->id(),
-      'viewfield' => 'custom_field_test',
-      'viewfield__display' => 'block_1',
+    $node1 = $this->drupalCreateNode([
+      'title' => 'Test Node',
+      'type' => 'custom_field_entity_test',
+      $this->fieldName => [
+        'boolean' => TRUE,
+        'string' => 'Test string',
+        'string_long' => 'Test string long',
+        'integer' => 42,
+        'float' => 3.14,
+        'datetime' => '2020-01-01T01:30:00',
+        'daterange' => '2020-01-01T01:45:00',
+        'daterange__end' => '2021-01-01T02:40:00',
+        'decimal' => 42.420,
+        'email' => 'test@example.com',
+        'telephone' => '+1234567890',
+        'uri' => 'http://www.example.com',
+        'color' => 'FF0000',
+        'time' => Time::createFromHtml5Format('13:40:30')->getTimestamp(),
+        'time_range' => Time::createFromHtml5Format('11:40:30')->getTimestamp(),
+        'time_range__end' => Time::createFromHtml5Format('14:40:30')->getTimestamp(),
+        'map_string' => [
+          'Value 1',
+          'Value 2',
+          'Value 3',
+        ],
+        'map' => [
+          [
+            'key' => 'key1',
+            'value' => 'Value 1',
+          ],
+          [
+            'key' => 'key2',
+            'value' => 'Value 2',
+          ],
+          [
+            'key' => 'key3',
+            'value' => 'Value 3',
+          ],
+        ],
+        'image' => $test_image->id(),
+        'file' => $test_file->id(),
+        'link' => 'http://www.example.com',
+        'link__title' => 'Example link',
+        'link__options' => [
+          'attributes' => [
+            'rel' => 'nofollow',
+            'target' => '_blank',
+            'class' => ['link-test'],
+          ],
+        ],
+        'entity_reference' => $articleNode->id(),
+        'viewfield' => 'custom_field_test',
+        'viewfield__display' => 'block_1',
+        'duration' => 604800,
+      ],
     ]);
-
     $values = $node1->get($this->fieldName)->getValue();
     $date = $node1->{$this->fieldName}->{'datetime__date'};
     assert($date instanceof DrupalDateTime);
@@ -105,9 +174,7 @@ final class CustomFormatterTest extends FormatterTestBase {
     assert($date_range_start instanceof DrupalDateTime);
     $date_range_end = $node1->{$this->fieldName}->{'daterange__end_date'};
     assert($date_range_end instanceof DrupalDateTime);
-
     $this->drupalGet('/node/' . $node1->id());
-
     // Test boolean.
     $session->elementTextEquals('css', 'div.field--name-boolean .field__item', 'Yes');
     // Test string.
@@ -174,7 +241,7 @@ final class CustomFormatterTest extends FormatterTestBase {
     $session->elementExists('css', 'div.field--name-viewfield .view-custom-field-test');
     $session->elementsCount('css', 'div.field--name-viewfield .view-custom-field-test .views-row', 1);
     $session->elementTextContains('css', 'div.field--name-viewfield .view-custom-field-test .views-row a', 'Test Article');
-    // Create another article node and confirm the viewfield updates.
+    // Create another article node.
     $this->drupalCreateNode([
       'title' => 'Test Article 2',
       'type' => 'article',

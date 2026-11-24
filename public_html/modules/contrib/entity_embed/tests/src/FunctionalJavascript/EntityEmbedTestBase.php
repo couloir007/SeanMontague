@@ -42,7 +42,7 @@ JS;
    * Clicks a CKEditor button.
    *
    * @param string $name
-   *   The name of the button, such as drupalink, source, etc.
+   *   The name of the button, such as drupallink, source, etc.
    */
   protected function pressEditorButton($name) {
     $this->getSession()->switchToIFrame();

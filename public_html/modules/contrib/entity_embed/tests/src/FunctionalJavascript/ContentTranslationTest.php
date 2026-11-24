@@ -5,12 +5,15 @@ namespace Drupal\Tests\entity_embed\FunctionalJavascript;
 use Drupal\Component\Utility\Html;
 use Drupal\file\Entity\File;
 use Drupal\media\Entity\Media;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore aime bague clar Gollum Smeagol Superhomme
 /**
  * Test integration with content_translation.
- *
- * @group entity_embed
  */
+#[Group('entity_embed')]
+#[RunTestsInSeparateProcesses]
 class ContentTranslationTest extends EntityEmbedTestBase {
 
   /**
@@ -31,7 +34,7 @@ class ContentTranslationTest extends EntityEmbedTestBase {
   protected function setUp(): void {
     // This test is supposed to pass in Drupal 10 with CKEditor 4. Regrettably,
     // it isn't working anymore. Thus, it needs to be disable until somebody
-    // comes around and ports it to CKEeditor 5.
+    // comes around and ports it to CKEditor 5.
     $this->markTestSkipped('Should be fixed in https://www.drupal.org/project/entity_embed/issues/3415080');
     parent::setUp();
 

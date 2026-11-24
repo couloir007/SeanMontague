@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\custom_field\FunctionalJavascript\FieldFormatter;
 
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,16 +17,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('custom_field')]
 #[RunTestsInSeparateProcesses]
 final class SdcFormatterSettingsTest extends FormatterJavascriptTestBase {
-
-  /**
-   * Selector for an element that only exists once the settings form renders.
-   */
-  private const READY_CSS = 'select[name*="[component]"]';
-
-  /**
-   * The component selected in these tests.
-   */
-  private const COMPONENT_ID = 'sdc_test:my-banner';
 
   /**
    * {@inheritdoc}
@@ -43,8 +34,9 @@ final class SdcFormatterSettingsTest extends FormatterJavascriptTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $this->loadDisplay()->setComponent($this->fieldName, [
+    $display = EntityViewDisplay::load('node.custom_field_entity_test.default');
+    $this->assertNotNull($display, 'Entity view display node.custom_field_entity_test.default must exist.');
+    $display->setComponent($this->fieldName, [
       'type' => 'custom_field_sdc',
       'label' => 'above',
       'settings' => [
@@ -56,17 +48,32 @@ final class SdcFormatterSettingsTest extends FormatterJavascriptTestBase {
       'weight' => 1,
       'region' => 'content',
     ])->save();
-
     $this->drupalLogin($this->adminUser);
+  }
+
+  /**
+   * Opens the SDC formatter settings form for the test field.
+   */
+  protected function openFormatterSettings(): void {
+    $this->drupalGet($this->getManageDisplayPath());
+    $fieldNameHyphen = str_replace('_', '-', $this->fieldName);
+    $selector = '[data-drupal-selector="edit-fields-' . $fieldNameHyphen . '-settings-edit"]';
+
+    // Wait for the button to be present before clicking.
+    $button = $this->assertSession()->waitForElementVisible('css', $selector);
+    $this->assertNotNull($button, "Formatter settings edit button not found for selector: $selector");
+    $button->click();
+
+    $this->assertSession()->waitForElementVisible('css', 'select[name*="[component]"]');
   }
 
   /**
    * Tests that the settings form renders correctly with no component selected.
    */
   public function testSettingsFormRendersWithNoComponent(): void {
-    $this->openFormatterSettings(self::READY_CSS);
-
+    $this->openFormatterSettings();
     $session = $this->assertSession();
+    $session->elementExists('css', 'select[name*="[component]"]');
     $session->elementNotExists('css', 'details[id*="edit-slots"]');
     $session->elementNotExists('css', 'details[id*="edit-props"]');
   }
@@ -75,41 +82,52 @@ final class SdcFormatterSettingsTest extends FormatterJavascriptTestBase {
    * Tests that selecting a component via AJAX reveals prop settings.
    */
   public function testSelectingComponentRevealsPropSettings(): void {
-    $component = $this->openFormatterSettings(self::READY_CSS);
-    $this->selectOption($component, self::COMPONENT_ID);
+    $this->openFormatterSettings();
+    $session = $this->assertSession();
 
-    $this->waitForVisible(
-      'details[id*="props"]',
-      'Prop settings did not appear after selecting a component.',
+    $this->getSession()->getPage()->selectFieldOption(
+      $session->elementExists('css', 'select[name*="[component]"]')->getAttribute('name'),
+      'sdc_test:my-banner',
     );
+
+    $session->waitForElementVisible('css', 'details[id*="props"]');
+    $session->elementExists('css', 'details[id*="props"]');
   }
 
   /**
    * Tests that selecting a component with slots reveals slot configuration.
    */
   public function testSelectingComponentWithSlotsRevealsSlotSettings(): void {
-    $component = $this->openFormatterSettings(self::READY_CSS);
-    $this->selectOption($component, self::COMPONENT_ID);
+    $this->openFormatterSettings();
+    $session = $this->assertSession();
 
-    $this->waitForVisible(
-      'details[id*="slots"]',
-      'Slot settings did not appear after selecting a component.',
+    $this->getSession()->getPage()->selectFieldOption(
+      $session->elementExists('css', 'select[name*="[component]"]')->getAttribute('name'),
+      'sdc_test:my-banner',
     );
+
+    $session->waitForElementVisible('css', 'details[id*="slots"]');
+    $session->elementExists('css', 'details[id*="slots"]');
   }
 
   /**
    * Tests that changing component back to empty resets slot and prop settings.
    */
   public function testChangingComponentResetsSettings(): void {
-    $display = $this->loadDisplay();
-    $settings = $display->getComponent($this->fieldName);
-    $settings['settings']['component'] = self::COMPONENT_ID;
-    $display->setComponent($this->fieldName, $settings)->save();
+    $display = EntityViewDisplay::load('node.custom_field_entity_test.default');
+    $component = $display->getComponent($this->fieldName);
+    $component['settings']['component'] = 'sdc_test:my-banner';
+    $display->setComponent($this->fieldName, $component)->save();
 
-    $component = $this->openFormatterSettings(self::READY_CSS);
-    $this->selectOption($component, '');
-
+    $this->openFormatterSettings();
     $session = $this->assertSession();
+
+    $this->getSession()->getPage()->selectFieldOption(
+      $session->elementExists('css', 'select[name*="[component]"]')->getAttribute('name'),
+      '',
+    );
+
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $session->elementNotExists('css', 'details[id*="slots"]');
     $session->elementNotExists('css', 'details[id*="props"]');
   }
@@ -118,20 +136,20 @@ final class SdcFormatterSettingsTest extends FormatterJavascriptTestBase {
    * Tests that formatter settings save correctly through the form.
    */
   public function testFormatterSettingsSaveThroughForm(): void {
-    $component = $this->openFormatterSettings(self::READY_CSS);
-    $this->selectOption($component, self::COMPONENT_ID);
+    $this->openFormatterSettings();
+    $session = $this->assertSession();
+
+    $this->getSession()->getPage()->selectFieldOption(
+      $session->elementExists('css', 'select[name*="[component]"]')->getAttribute('name'),
+      'sdc_test:my-banner',
+    );
+    $this->assertSession()->assertWaitOnAjaxRequest();
 
     $this->getSession()->getPage()->pressButton('Save');
 
-    // pressButton() returns when the click is dispatched, not when the request
-    // completes, so wait for the response before reading the display back.
-    $this->waitForVisible(
-      '[data-drupal-messages]',
-      'Save did not complete: no status message appeared.',
-    );
-
-    $settings = $this->loadDisplay()->getComponent($this->fieldName);
-    $this->assertSame(self::COMPONENT_ID, $settings['settings']['component']);
+    $display = EntityViewDisplay::load('node.custom_field_entity_test.default');
+    $component = $display->getComponent($this->fieldName);
+    $this->assertSame('sdc_test:my-banner', $component['settings']['component']);
   }
 
 }

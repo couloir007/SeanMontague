@@ -56,11 +56,11 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
    * {@inheritdoc}
    *
    * @throws \LogicException
-   *   Throws an exception if field type is not defined in the annotation of the
-   *   Entity Embed Display plugin.
+   *   Throws an exception if field type is not defined in the definition of
+   *   the Entity Embed Display plugin.
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
-    // The field type must be defined in the annotation of the Entity Embed
+    // The field type must be defined in the definition of the Entity Embed
     // Display plugin.
     if (!isset($base_plugin_definition['field_type'])) {
       throw new \LogicException("Undefined field_type definition in plugin {$base_plugin_definition['id']}.");
@@ -75,7 +75,7 @@ class FieldFormatterDeriver extends DeriverBase implements ContainerDeriverInter
       $this->derivatives[$formatter] = $base_plugin_definition;
       $this->derivatives[$formatter]['label'] = $label;
 
-      // The base entity embed display plugin annotation has opted into
+      // The base entity embed display plugin definition has opted into
       // `supports_image_alt_and_title`. For some derivatives we know that they
       // do not support this, so opt them back out.
       if (in_array($formatter, $no_media_image_decorator, TRUE)) {

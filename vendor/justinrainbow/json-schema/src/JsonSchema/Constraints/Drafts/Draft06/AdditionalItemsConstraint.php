@@ -46,19 +46,16 @@ class AdditionalItemsConstraint implements ConstraintInterface
         }
 
         $additionalItems = array_diff_key($value, property_exists($schema, 'items') ? $schema->items : []);
-        $basePath = $path ?? new JsonPointer('');
 
         foreach ($additionalItems as $propertyName => $propertyValue) {
-            $incrementedPath = $basePath->withPropertyPaths(array_merge($basePath->getPropertyPaths(), [$propertyName]));
-
             $schemaConstraint = $this->factory->createInstanceFor('schema');
-            $schemaConstraint->check($propertyValue, $schema->additionalItems, $incrementedPath, $i);
+            $schemaConstraint->check($propertyValue, $schema->additionalItems, $path, $i);
 
             if ($schemaConstraint->isValid()) {
                 continue;
             }
 
-            $this->addError(ConstraintError::ADDITIONAL_ITEMS(), $incrementedPath, ['item' => $i, 'property' => $propertyName, 'additionalItems' => $schema->additionalItems]);
+            $this->addError(ConstraintError::ADDITIONAL_ITEMS(), $path, ['item' => $i, 'property' => $propertyName, 'additionalItems' => $schema->additionalItems]);
         }
     }
 }

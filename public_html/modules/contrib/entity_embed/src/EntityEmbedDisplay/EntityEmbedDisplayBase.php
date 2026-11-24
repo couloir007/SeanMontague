@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Defines a base Entity Embed Display implementation.
  *
- * @see \Drupal\entity_embed\Annotation\EntityEmbedDisplay
+ * @see \Drupal\entity_embed\Attribute\EntityEmbedDisplay
  * @see \Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayInterface
  * @see \Drupal\entity_embed\EntityEmbedDisplay\EntityEmbedDisplayManager
  * @see plugin_api
@@ -102,7 +102,7 @@ abstract class EntityEmbedDisplayBase extends PluginBase implements ContainerFac
   /**
    * Validates that this display plugin applies to the current entity type.
    *
-   * This checks the plugin annotation's 'entity_types' value, which should be
+   * This checks the plugin definition's 'entity_types' value, which should be
    * an array of entity types that this plugin can process, or FALSE if the
    * plugin applies to all entity types.
    *

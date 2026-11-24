@@ -1,2 +1,2 @@
-lando composer update "drupal/core-*" -W
+ddev composer update "drupal/core-*" -W
 

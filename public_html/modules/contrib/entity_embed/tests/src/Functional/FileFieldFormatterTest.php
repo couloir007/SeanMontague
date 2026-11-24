@@ -4,12 +4,14 @@ namespace Drupal\Tests\entity_embed\Functional;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Form\FormState;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the file field formatter provided by entity_embed.
- *
- * @group entity_embed
  */
+#[Group('entity_embed')]
+#[RunTestsInSeparateProcesses]
 class FileFieldFormatterTest extends EntityEmbedTestBase {
 
   /**

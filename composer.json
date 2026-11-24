@@ -32,9 +32,9 @@
         "drupal/color_field": "^3.0",
         "drupal/components": "^3.0@beta",
         "drupal/config_rewrite": "^1.6",
-        "drupal/core-composer-scaffold": "~11.3.14",
-        "drupal/core-project-message": "^10.4.4",
-        "drupal/core-recommended": "~11.3.14",
+        "drupal/core-composer-scaffold": "^11.4",
+        "drupal/core-project-message": "^11.4",
+        "drupal/core-recommended": "^11.4",
         "drupal/custom_field": "^4.0",
         "drupal/dashboard": "^2.2",
         "drupal/default_content": "^2.0@alpha",
@@ -133,6 +133,7 @@
             "drupal/core-project-message": true,
             "php-http/discovery": true,
             "phpstan/extension-installer": true,
+            "symfony/runtime": true,
             "wikimedia/composer-merge-plugin": true
         },
         "sort-packages": true

@@ -5,12 +5,14 @@ namespace Drupal\Tests\entity_embed\FunctionalJavascript;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ckeditor integration.
- *
- * @group entity_embed
  */
+#[Group('entity_embed')]
+#[RunTestsInSeparateProcesses]
 class ImageFieldFormatterTest extends WebDriverTestBase {
 
   use SortableTestTrait;
@@ -66,7 +68,7 @@ class ImageFieldFormatterTest extends WebDriverTestBase {
   protected function setUp(): void {
     // This test is supposed to pass in Drupal 10 with CKEditor 4. Regrettably,
     // it isn't working anymore. Thus, it needs to be disable until somebody
-    // comes around and ports it to CKEeditor 5.
+    // comes around and ports it to CKEditor 5.
     $this->markTestSkipped('Should be fixed in https://www.drupal.org/project/entity_embed/issues/3415080');
     parent::setUp();
 

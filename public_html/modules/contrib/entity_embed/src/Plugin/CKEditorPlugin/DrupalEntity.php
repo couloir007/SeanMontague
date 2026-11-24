@@ -18,6 +18,7 @@ use Drupal\embed\EmbedCKEditorPluginBase;
  *
  * @deprecated in entity_embed:8.x-1.7 and is removed from entity_embed:2.0.0.
  * Use \Drupal\entity_embed\Plugin\CKEditor5Plugin\DrupalEntity instead.
+ * @see https://www.drupal.org/project/entity_embed/issues/3639495
  */
 class DrupalEntity extends EmbedCKEditorPluginBase implements CKEditorPluginCssInterface {
 

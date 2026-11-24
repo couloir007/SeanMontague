@@ -12,6 +12,11 @@ Nothing yet
 
 <br>
 
+## 1.2.7 - 2026-11-21
+- Support for PHP 8.6
+
+<br>
+
 ## 1.2.6 - 2025-12-05
 - Support for PHP 8.5
 

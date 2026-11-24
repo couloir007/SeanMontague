@@ -11,17 +11,12 @@ use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test the UpdateManager service.
  *
  * @group custom_field
- * @runTestsInSeparateProcesses
  */
-#[Group('custom_field')]
-#[RunTestsInSeparateProcesses]
 class UpdateManagerTest extends KernelTestBase {
 
   use UserCreationTrait;

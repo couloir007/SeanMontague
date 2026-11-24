@@ -4,17 +4,23 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\entity_embed\Kernel;
 
+use Drupal\entity_embed\Plugin\CKEditor4To5Upgrade\EntityEmbed;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\ckeditor5\Kernel\SmartDefaultSettingsTest;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @covers \Drupal\entity_embed\Plugin\CKEditor4To5Upgrade\EntityEmbed
- * @group entity_embed
- * @group ckeditor5
- * @requires module ckeditor5
+ * Tests the CKEditor 4 to 5 upgrade path for Entity Embed buttons.
+ *
  * @internal
  */
+#[Group('entity_embed')]
+#[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
+#[CoversClass(EntityEmbed::class)]
 class UpgradePathTest extends SmartDefaultSettingsTest {
 
   /**
